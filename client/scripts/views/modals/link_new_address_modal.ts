@@ -21,7 +21,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
-import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
@@ -664,7 +664,7 @@ const LinkNewAddressModal: m.Component<
               ),
               m('.avatar-wrap', [
                 m(AvatarUpload, {
-                  avatarScope: AvatarScope.Account,
+                  avatarScope: 'account',
                   uploadStartedCallback: () => {
                     vnode.state.uploadsInProgress = true;
                     m.redraw();

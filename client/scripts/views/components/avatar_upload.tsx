@@ -10,11 +10,7 @@ import app from 'state';
 import User from 'views/components/widgets/user';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-export enum AvatarScope {
-  Account = 'account',
-  Chain = 'chain',
-  Community = 'community',
-}
+type AvatarScope = 'account' | 'chain' | 'community';
 
 type AvatarUploadAttrs = {
   avatarScope: AvatarScope;
@@ -104,8 +100,8 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         {
           class: this.uploaded ? 'hidden' : '',
           style:
-            vnode.attrs.avatarScope === AvatarScope.Chain ||
-            vnode.attrs.avatarScope === AvatarScope.Community
+            vnode.attrs.avatarScope === 'chain' ||
+            vnode.attrs.avatarScope === 'community'
               ? `background-image: url(${logoURL}); background-size: 92px;`
               : '',
         },
@@ -116,7 +112,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         ]
       ),
       !this.uploaded &&
-        vnode.attrs.avatarScope === AvatarScope.Account &&
+        vnode.attrs.avatarScope === 'account' &&
         m(User, {
           user: app.user.activeAccount,
           avatarOnly: true,

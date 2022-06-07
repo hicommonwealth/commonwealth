@@ -5,7 +5,7 @@ import m from 'mithril';
 import app from 'state';
 
 import { InputRow, SelectRow } from 'views/components/metadata_rows';
-import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/avatar_upload';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { ChainBase } from 'types';
@@ -47,13 +47,13 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     />,
     <div class="AvatarUploadRow">
       <CWLabel label="Upload Icon" />
-      {m(AvatarUpload, {
-        avatarScope: AvatarScope.Chain,
-        uploadStartedCallback: () => {
+      <AvatarUpload
+        avatarScope="chain"
+        uploadStartedCallback={() => {
           state.uploadInProgress = true;
           m.redraw();
-        },
-        uploadCompleteCallback: (files) => {
+        }}
+        uploadCompleteCallback={(files) => {
           files.forEach((f) => {
             if (!f.uploadURL) return;
             const url = f.uploadURL.replace(/\?.*/, '');
@@ -61,8 +61,8 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
           });
           state.uploadInProgress = false;
           m.redraw();
-        },
-      })}
+        }}
+      />
     </div>,
     <InputRow
       title="Icon URL"

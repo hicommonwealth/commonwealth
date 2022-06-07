@@ -5,7 +5,7 @@ import $ from 'jquery';
 import app from 'state';
 import { Button, Input, TextArea, FormLabel } from 'construct-ui';
 
-import { AvatarScope, AvatarUpload } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/avatar_upload';
 
 const EditProfileModal = {
   view: (vnode) => {
@@ -16,7 +16,7 @@ const EditProfileModal = {
       m('.form', [
         m('.avatar', [
           m(AvatarUpload, {
-            avatarScope: AvatarScope.Account,
+            avatarScope: 'account',
             uploadStartedCallback: () => {
               vnode.state.uploadsInProgress++;
               m.redraw();
