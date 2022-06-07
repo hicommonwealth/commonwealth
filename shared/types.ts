@@ -122,6 +122,7 @@ export enum WebsocketMessageNames {
   ChatMessage = 'chat-message',
   JoinChatChannel = 'join-chat-channel',
   LeaveChatChannel = 'leave-chat-channel',
+  Error = 'exception'
 }
 
 export type ChainEventNotification = {

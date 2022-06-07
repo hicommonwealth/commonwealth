@@ -107,11 +107,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
         const message = {
           message: $textarea.val(),
-          address: app.user.activeAccount.address,
           chat_channel_id: channel.id,
-          now: moment().toISOString(),
         };
-        app.socket.chatNs.sendMessage(message, channel);
+        app.socket.chatNs.sendMessage(message);
         mixpanelBrowserTrack({
           event: MixpanelChatEvents.NEW_CHAT_SENT,
           community: app.activeChainId(),

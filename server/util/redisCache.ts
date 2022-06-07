@@ -20,13 +20,30 @@ export class RedisCache {
    * Initializes the Redis client. Must be run before any Redis command can be executed.
    */
   public async init() {
+    if (!REDIS_URL) {
+      log.warn("Redis Url is undefined. Some services (e.g. chat) may not be available.");
+      this.initialized = false;
+      return;
+    }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
     if (!this.client) {
-      this.client = createClient({
-        url: REDIS_URL,
-        socket: { tls: true, rejectUnauthorized: false },
-      });
+      const redisOptions = {}
+      if (!REDIS_URL.includes("localhost") && !REDIS_URL.includes("127.0.0.1")) {
+        redisOptions['url'] = REDIS_URL;
+        redisOptions['socket'] = {
+          tls: true,
+          rejectUnauthorized: false,
+          reconnectStrategy(retries: number): number | Error {
+            if (retries <= 5) {
+              return (retries * 10) ** 2;
+            } else {
+              return new Error("Failed to connect to Redis!")
+            }
+          },
+        }
+      }
+      this.client = createClient(redisOptions);
     }
 
     this.client.on('error', (err) => log.error('Redis Client Error', err));
@@ -35,7 +52,7 @@ export class RedisCache {
       await this.client.connect();
     }
 
-    this.initialized = true;
+    this.initialized = !!this.client.isOpen;
   }
 
   /**
