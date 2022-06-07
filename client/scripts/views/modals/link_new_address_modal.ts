@@ -499,10 +499,13 @@ const LinkNewAddressModal: m.Component<
                     link('a', 'https://metamask.io/', 'Get Metamask', {
                       target: '_blank',
                     }),
-                  app.chain.base === ChainBase.CosmosSDK &&
+                  app.chain.base === ChainBase.CosmosSDK && app.chain.network !== ChainNetwork.Terra &&
                     link('a', 'https://wallet.keplr.app/', 'Get Keplr', {
                       target: '_blank',
                     }),
+                  app.chain.network === ChainNetwork.Terra &&
+                    link('a', 'https://www.terra.money/', 'Get Terra', {
+                      target: '_blank',}),
                 ]),
               webWallet?.enabled &&
                 m('.accounts-caption', [
