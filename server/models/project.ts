@@ -47,15 +47,20 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: true },
       entity_id: { type: dataTypes.INTEGER, allowNull: false },
-      creator: { type: dataTypes.STRING, allowNull: false },
       ipfs_hash_id: { type: dataTypes.INTEGER, allowNull: true },
 
+      creator: { type: dataTypes.STRING, allowNull: false },
       beneficiary: { type: dataTypes.STRING, allowNull: false },
       token: { type: dataTypes.STRING, allowNull: false },
+
       curator_fee: { type: dataTypes.STRING, allowNull: false },
       threshold: { type: dataTypes.STRING, allowNull: false },
       deadline: { type: dataTypes.INTEGER, allowNull: false },
       funding_amount: { type: dataTypes.STRING, allowNull: false },
+
+      cover_image: { type: dataTypes.STRING, allowNull: false },
+      description: { type: dataTypes.STRING, allowNull: false },
+      short_description: { type: dataTypes.STRING, allowNull: false },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
