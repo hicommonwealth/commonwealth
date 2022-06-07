@@ -9,6 +9,7 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
+import { LCDClient } from '@terra-money/terra.js';
 
 import BN from 'bn.js';
 import { providers } from 'ethers';
@@ -100,28 +101,53 @@ export class TokenBalanceProvider {
     return new BN(balanceBigNum.toString());
   }
 
-  public async getCosmosTokenBalance(url: string, userAddress: string): Promise<BN> {
-    /* Not sure how we want to handle token balance things */ 
-
-    const tmClient = await Tendermint34Client.connect(url);
-    const api = QueryClient.withExtensions(
-      tmClient,
-      setupBankExtension,
-      setupStakingExtension,
-    );
-
-    const { params: { bondDenom } } = await api.staking.params();
-    const denom = bondDenom;
-
+  public async getCosmosTokenBalance(url: string, network: string, userAddress: string): Promise<BN> {
+    /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */ 
+    
     let balance;
-    try {
-      const bal = await api.bank.balance(userAddress, denom);
-      console.log(bal);
-      return balance = new BN(bal.amount);
-    } catch (e) {
-      // if coins is null, they have a zero balance
-      balance = new BN(0);
-      throw new Error(`no balance found: ${e.message}`); 
+    let api;
+    if (network === ChainNetwork.Terra) {
+
+      api = new LCDClient({
+        URL: url + `/node_info?key=${process.env.TERRA_SETTEN_PHOENIX_API_KEY}`, 
+        chainID: 'phoenix-1',
+      });
+
+      try {
+        /* terra.js staking.parameter call returns 
+           Cannot read property 'unbonding_time' of undefined unbonding_time */
+
+        /* bank/v1beta1/denoms_metadata/uluna => exponent => look for luna???*/
+        const bal = await api.bank.balance(userAddress);
+        (bal[0].get('uluna')) ? balance = new BN(bal[0].get('uluna').toString()) : 
+          balance = new BN(0);
+        return balance;
+      } catch (e) {
+        // if coins is null, they have a zero balance
+        balance = new BN(0);
+        throw new Error(`no balance found: ${e.message}`); 
+      }
+
+    } else {
+      const tmClient = await Tendermint34Client.connect(url);
+
+      api = QueryClient.withExtensions(
+        tmClient,
+        setupBankExtension,
+        setupStakingExtension,
+      );
+
+      try {
+        const { params: { bondDenom } } = await api.staking.params();
+        const denom = bondDenom;
+        const bal = await api.bank.balance(userAddress, denom);
+        console.log(bal);
+        return balance = new BN(bal.amount);
+      } catch (e) {
+        // if coins is null, they have a zero balance
+        balance = new BN(0);
+        throw new Error(`no balance found: ${e.message}`); 
+      }
     }
   }
 
@@ -266,7 +292,7 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
     } else if (chain.base === ChainBase.CosmosSDK) {
       try {
-        balance = await this._balanceProvider.getCosmosTokenBalance(node.url, address);
+        balance = await this._balanceProvider.getCosmosTokenBalance(node.url, chain.network, address);
       } catch (e) {
         throw new Error(`Could not fetch token balance: ${e.message}`);
       }
