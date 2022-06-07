@@ -2,7 +2,7 @@
 
 .EditProfileModal {
   width: 620px;
-  @include sm-max {
+  @include small {
     width: initial;
   }
   .form {

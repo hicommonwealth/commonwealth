@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SidebarQuickSwitcher {
   border-right: 1px solid $neutral-50;
@@ -8,7 +8,7 @@
   overflow: hidden;
   min-width: $quick-switcher-width;
 
-  @include sm-max {
+  @include mediumSmallInclusive {
     display: none;
   }
 

@@ -1,7 +1,7 @@
 @import 'mixins/animation';
 @import 'mixins/buttons';
 @import 'mixins/popovers';
-@import 'mixins/responsive';
+@import 'mixins/media_queries';
 @import 'mixins/dragula';
 @import 'mixins/elevation';
 @import 'mixins/colors';
@@ -76,7 +76,7 @@ $text-size-mobile-header: 22px;
     }
   }
 
-  @include sm-max {
+  @include small {
     .stats-box-left {
       display: none;
     }
@@ -112,13 +112,13 @@ $text-size-mobile-header: 22px;
   position: relative;
   width: calc(50% - 24px);
 
-  @include xs-max {
+  @include extraSmall {
     margin-right: 0px;
     max-width: none;
     width: 100%;
   }
 
-  @include xl-min {
+  @include mediumSmall {
     width: calc(33% - 24px);
   }
 
@@ -132,7 +132,7 @@ $text-size-mobile-header: 22px;
     color: $neutral-500;
     margin: 0 24px 0 0;
 
-    @include sm-max {
+    @include smallInclusive {
       margin: 0 16px 0 0;
     }
   }

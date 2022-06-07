@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .TXSigningModalBody {
   .compact-modal-body {
@@ -44,7 +44,7 @@
     width: 490px;
     min-height: 450px;
 
-    @include sm-max {
+    @include smallInclusive {
       width: initial;
     }
   }

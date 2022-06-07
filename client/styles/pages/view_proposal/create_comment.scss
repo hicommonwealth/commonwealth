@@ -5,7 +5,7 @@
   display: flex;
 
   .create-comment-body {
-    @include xs-max {
+    @include extraSmall {
       margin: 0;
     }
 
