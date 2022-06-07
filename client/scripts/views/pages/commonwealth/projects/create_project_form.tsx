@@ -4,8 +4,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import QuillEditor from 'views/components/quill_editor';
 import m from 'mithril';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ButtonGroup, Button, Input, InputSelect } from 'construct-ui';
-import app from 'state';
+import { ButtonGroup, Button, InputSelect } from 'construct-ui';
+import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 
 interface ICreateProjectForm {
   name: string;
@@ -98,6 +98,13 @@ export class FundraisingSlide
           name="Curator Fee"
           oninput={(e) => {
             vnode.attrs.form.curatorFee = e.target.value;
+          }}
+          inputValidationFn={(value) => {
+            const isNotNumber = Number.isNaN(+value);
+            const isNotPercent = +value > 100 || +value < 0;
+            if (isNotNumber || isNotPercent) {
+              return [ValidationStatus, string];
+            }
           }}
         />
       </div>
