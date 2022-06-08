@@ -80,7 +80,8 @@ export class GovernanceSection
       isNotOffchain &&
       ((app.chain?.base === ChainBase.Substrate &&
         app.chain.network !== ChainNetwork.Darwinia) ||
-        app.chain?.base === ChainBase.CosmosSDK ||
+        (app.chain?.base === ChainBase.CosmosSDK && 
+        app.chain.network !== ChainNetwork.Terra) ||
         app.chain?.network === ChainNetwork.Sputnik ||
         app.chain?.network === ChainNetwork.Moloch ||
         app.chain?.network === ChainNetwork.Compound ||

@@ -1,8 +1,0 @@
-@import 'client/styles/shared';
-
-.NewThreadPage, .NewLinkPage {
-    .error-message {
-        @include error-text();
-        margin-top: 18px;
-    }
-}

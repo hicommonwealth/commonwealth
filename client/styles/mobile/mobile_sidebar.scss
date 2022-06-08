@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .MobileSidebar {
   align-items: center;
@@ -14,6 +14,11 @@
   .cui-tabs {
     margin-bottom: 16px;
     width: 100%;
+
+    @include extraSmall {
+      display: flex;
+      flex-direction: column;
+    }
 
     @include gradientTabs();
 

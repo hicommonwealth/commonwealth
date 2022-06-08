@@ -1,3 +1,5 @@
+import { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
+
 export type ChainFormIdFields = {
   id?: string;
   name: string;
@@ -18,12 +20,10 @@ export type ChainFormDefaultFields = {
 export type ChainFormFields = ChainFormIdFields & ChainFormDefaultFields;
 
 export type ChainFormState = {
-  error?: string;
   loaded?: boolean;
   loading?: boolean;
   saving?: boolean;
-  status?: string;
-};
+} & ValidationTextAttrs;
 
 export type EthChainAttrs = {
   ethChains: { [id: number]: { url: string; alt_wallet_url: string } };

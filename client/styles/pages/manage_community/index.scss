@@ -9,7 +9,7 @@
   padding: 24px;
   width: 480px;
 
-  @include sm-max {
+  @include small {
     width: 100%;
   }
 }

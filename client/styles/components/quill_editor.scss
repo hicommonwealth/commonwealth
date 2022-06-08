@@ -133,7 +133,7 @@
     white-space: nowrap;
     overflow-x: auto;
     min-height: 39px;
-    @include xs-max {
+    @include extraSmall {
       display: flex;
       flex-wrap: wrap;
       min-height: 78px;
@@ -187,7 +187,7 @@
     right: 100px;
     top: 6px;
     margin-right: 8px;
-    @include xs-max {
+    @include extraSmall {
       top: 40px;
     }
     user-select: none;
@@ -201,7 +201,7 @@
     display: flex;
     right: 10px;
     top: 6px;
-    @include xs-max {
+    @include extraSmall {
       top: 40px;
     }
     user-select: none;
