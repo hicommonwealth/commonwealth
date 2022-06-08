@@ -55,57 +55,41 @@ export class GovernanceSection
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
     const showMolochMenuOptions =
-      isNotOffchain &&
-      app.user.activeAccount &&
-      app.chain?.network === ChainNetwork.Moloch;
+      app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions =
-      isNotOffchain &&
-      showMolochMenuOptions &&
-      (app.user.activeAccount as any)?.shares?.gtn(0);
+      showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions =
-      isNotOffchain && app.chain?.network === ChainNetwork.Commonwealth;
+      app.chain?.network === ChainNetwork.Commonwealth;
     const showCompoundOptions =
-      isNotOffchain &&
-      app.user.activeAccount &&
-      app.chain?.network === ChainNetwork.Compound;
+      app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions =
-      isNotOffchain &&
-      app.user.activeAccount &&
-      app.chain?.network === ChainNetwork.Aave;
-    const showSnapshotOptions =
-      isNotOffchain && app.chain?.meta.snapshot?.length > 0;
+      app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
+    const showSnapshotOptions = app.chain?.meta.snapshot?.length > 0;
     const showReferenda =
-      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Darwinia &&
       app.chain.network !== ChainNetwork.HydraDX;
     const showProposals =
-      isNotOffchain &&
-      ((app.chain?.base === ChainBase.Substrate &&
+      (app.chain?.base === ChainBase.Substrate &&
         app.chain.network !== ChainNetwork.Darwinia) ||
-        (app.chain?.base === ChainBase.CosmosSDK && 
+      (app.chain?.base === ChainBase.CosmosSDK &&
         app.chain.network !== ChainNetwork.Terra) ||
-        app.chain?.network === ChainNetwork.Sputnik ||
-        app.chain?.network === ChainNetwork.Moloch ||
-        app.chain?.network === ChainNetwork.Compound ||
-        app.chain?.network === ChainNetwork.Aave);
-    const showCouncillors =
-      isNotOffchain && app.chain?.base === ChainBase.Substrate;
+      app.chain?.network === ChainNetwork.Sputnik ||
+      app.chain?.network === ChainNetwork.Moloch ||
+      app.chain?.network === ChainNetwork.Compound ||
+      app.chain?.network === ChainNetwork.Aave;
+    const showCouncillors = app.chain?.base === ChainBase.Substrate;
     const showTreasury =
-      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
     const showBounties =
-      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge &&
       app.chain.network !== ChainNetwork.HydraDX;
     const showTips =
-      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
     const showValidators =
-      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain?.network !== ChainNetwork.Kulupu &&
       app.chain?.network !== ChainNetwork.Darwinia;
@@ -284,7 +268,15 @@ export class GovernanceSection
         if (snapshotSpaces.length > 1) {
           navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
         } else {
-          navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          if (snapshotSpaces[0].lastIndexOf('/') > -1) {
+            navigateToSubpage(
+              `/snapshot/${snapshotSpaces[0]
+                .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
+                .trim()}`
+            );
+          } else {
+            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          }
         }
       },
       displayData: null,
