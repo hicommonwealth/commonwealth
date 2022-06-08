@@ -16,7 +16,7 @@ const log = factory.getLogger(addPrefix(__filename));
 
 export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCache) {
   const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
-  io.use(authenticate);
+  ChatNs.use(authenticate);
 
   ChatNs.on('connection', (socket) => {
     log.info(`${socket.id} connected to Chat`);
@@ -27,7 +27,8 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
 
     socket.on(
       WebsocketMessageNames.JoinChatChannel,
-      async (chatChannelIds: string[], activeAddress: string) => {
+      async (chatChannelIds: string[]) => {
+        console.log("Joining chat channels:", chatChannelIds);
         if (chatChannelIds.length > 0) {
           const channels = await models.ChatChannel.findAll({
             where: {
@@ -48,25 +49,6 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
             }
           }
 
-          const userId = models.Address.findOne({
-            attributes: ['user_id'],
-            where: {
-              address: activeAddress,
-            },
-          });
-
-          if (userId != (<any>socket).user.id) {
-            socket.emit(WebsocketMessageNames.Error, "WARNING: Authentication failed! Cannot send messages from an" +
-              "address you do not own!");
-            return;
-          }
-
-          const cacheRes = await redisCache.setKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id, activeAddress);
-          if (!cacheRes) {
-            socket.emit(WebsocketMessageNames.Error, "Joining channels failed!");
-            return;
-          }
-
           log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
           for (const channel of chatChannelIds) socket.join(channel);
         }
@@ -84,29 +66,63 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
     );
 
     socket.on(WebsocketMessageNames.ChatMessage, async (_message) => {
-      const { message, chat_channel_id } = _message;
-      const now_date = moment(Date.now()).toDate();
-      const address = await redisCache.getKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id);
-      models.ChatMessage.create({
-        address,
-        message,
-        chat_channel_id,
-        created_at: now_date,
-        updated_at: now_date,
-      })
-        .then((res) => {
-          const { id, created_at } = res;
-          ChatNs.to(`${chat_channel_id}`).emit(WebsocketMessageNames.ChatMessage, {
-            id,
-            address,
-            message,
-            chat_channel_id,
-            created_at,
+      try {
+        const { message, chat_channel_id, address } = _message;
+        const now_date = moment(moment().toISOString()).toDate();
+        const redisAddress = await redisCache.getKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id);
+        let finalAddress = redisAddress;
+
+        // if the cached address and the address in the message don't match then either the user has switched addresses,
+        // so we must check if they own that address and update the cache, or they are trying to spoof the address, so we
+        // send back an authentication error
+        if (address != redisAddress) {
+          const userId = await models.Address.findOne({
+            attributes: ['user_id'],
+            where: {
+              address: address,
+              user_id: (<any>socket).user.id
+            },
           });
+
+          if (!userId) {
+            socket.emit(WebsocketMessageNames.Error, "WARNING: Authentication failed! Cannot send messages from an" +
+              "address you do not own!");
+            return;
+          }
+
+          const redisResult = await redisCache.setKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id, address)
+          if (!redisResult) {
+            socket.emit(WebsocketMessageNames.Error, "Redis address update failed!");
+          }
+
+          finalAddress = address;
+        }
+
+        const isInRoom = ChatNs.adapter.socketRooms(socket.id).has(String(chat_channel_id));
+        if (!isInRoom) {
+          socket.emit(WebsocketMessageNames.Error, "WARNING: You cannot send a message to a chat channel that you are not in!");
+          return;
+        }
+
+        const {id, created_at} = await models.ChatMessage.create({
+          address: finalAddress,
+          message,
+          chat_channel_id,
+          created_at: now_date,
+          updated_at: now_date,
         })
-        .catch((e) => {
-          socket.emit('Error', e);
+
+        ChatNs.to(`${chat_channel_id}`).emit(WebsocketMessageNames.ChatMessage, {
+          id,
+          address: finalAddress,
+          message,
+          chat_channel_id,
+          created_at,
         });
+      } catch (e) {
+        log.error(`An error occurred upon receiving a chat message: ${JSON.stringify(_message)}`, e);
+      }
+
     });
   });
 

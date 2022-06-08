@@ -62,7 +62,7 @@ export class ChatNamespace {
         }
     }
 
-    public connectToChannels(channelIds: string[], activeAddress: string) {
+    public connectToChannels(channelIds: string[]) {
         if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channelIds)
     }
 
@@ -110,7 +110,9 @@ export class ChatNamespace {
     public async initialize() {
         console.log("Initializing chat state")
         this.addListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this));
-        this.connectToChannels(Object.values(this.channels).map(x => String(x.id)), app.user.activeAccount.address);
+        const channels = Object.values(this.channels).map(x => String(x.id))
+        console.log("Connecting to chat channels:", channels);
+        this.connectToChannels(channels);
         this._initialized = true;
     }
 
@@ -134,12 +136,11 @@ export class ChatNamespace {
         // removed_channel_ids are the ids in this.channels which are not in channels
         const removed_channel_ids = Object.keys(this.channels).filter(x => !Object.keys(channels).includes(x));
         this.disconnectFromChannels(removed_channel_ids)
-        this.connectToChannels(new_channel_ids, app.user.activeAccount.address);
+        this.connectToChannels(new_channel_ids);
         this.channels = channels
     }
 
     private onMessage(msg) {
-        console.log("onMessage")
         // Ignore message if it is already in ChatMessages, last 5 msgs
         if(this.channels[msg.chat_channel_id].ChatMessages.slice(-5).includes(msg)) {
             return

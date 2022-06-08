@@ -96,8 +96,8 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string
   ): Promise<string> {
-    const finalKey = namespace + '_' + 'key';
-    return this.client.get(finalKey);
+    const finalKey = namespace + '_' + key;
+    return await this.client.get(finalKey);
   }
 
   /**
