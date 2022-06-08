@@ -41,8 +41,8 @@ type TwitterAttestationModalState = {
 class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttrs, TwitterAttestationModalState> {
 
     oninit(vnode) {
-      // vnode.state.step = TwitterAttestationSteps.Step0ChooseAddress
-      vnode.state.step = TwitterAttestationSteps.Step2Sign
+      vnode.state.step = TwitterAttestationSteps.Step0ChooseAddress
+      // vnode.state.step = TwitterAttestationSteps.Step2Sign
       console.log(vnode.attrs.addresses)
       console.log(vnode.attrs.twitterAccount)
 

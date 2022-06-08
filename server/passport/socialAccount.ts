@@ -9,7 +9,7 @@ import { DB } from '../database';
 import {
   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK,
   DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES,
-  TWITTER_CLIENT_ID, TWITTER_BEARER, TWITTER_CLIENT_SECRET, TWITTER_OAUTH_CALLBACK
+  TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_CLIENT_SECRET, TWITTER_OAUTH_CALLBACK
 } from '../config';
 import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -160,8 +160,8 @@ export function useSocialAccountAuth(models: DB) {
 
 export function twitterAuth(models) {
   return new TwitterStrategy({
-    consumerKey: TWITTER_CLIENT_ID,
-    consumerSecret: TWITTER_CLIENT_SECRET,
+    consumerKey: TWITTER_API_KEY,
+    consumerSecret: TWITTER_API_SECRET,
     callbackURL: TWITTER_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req, token, tokenSecret, profile, cb) => {

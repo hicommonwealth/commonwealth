@@ -96,3 +96,10 @@ export const TWITTER_OAUTH_CALLBACK = process.env.TWITTER_OAUTH_CALLBACK
   || (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
     : 'http://127.0.0.1:8080') + '/api/auth/twitter/callback';
+
+export const TWITTER_API_KEY = process.env.TWITTER_API_KEY;
+export const TWITTER_API_SECRET = process.env.TWITTER_API_SECRET;
+export const TWITTER_ACCESS_TOKEN = process.env.TWITTER_ACCESS_TOKEN;
+export const TWITTER_ACCESS_TOKEN_SECRET = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+export const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
+
