@@ -55,22 +55,34 @@ export class GovernanceSection
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
     const showMolochMenuOptions =
-      app.user.activeAccount && app.chain?.network === ChainNetwork.Moloch;
+      isNotOffchain &&
+      app.user.activeAccount &&
+      app.chain?.network === ChainNetwork.Moloch;
     const showMolochMemberOptions =
-      showMolochMenuOptions && (app.user.activeAccount as any)?.shares?.gtn(0);
+      isNotOffchain &&
+      showMolochMenuOptions &&
+      (app.user.activeAccount as any)?.shares?.gtn(0);
     const showCommonwealthMenuOptions =
-      app.chain?.network === ChainNetwork.Commonwealth;
+      isNotOffchain && app.chain?.network === ChainNetwork.Commonwealth;
     const showCompoundOptions =
-      app.user.activeAccount && app.chain?.network === ChainNetwork.Compound;
+      isNotOffchain &&
+      app.user.activeAccount &&
+      app.chain?.network === ChainNetwork.Compound;
     const showAaveOptions =
-      app.user.activeAccount && app.chain?.network === ChainNetwork.Aave;
-    const showSnapshotOptions = app.chain?.meta.snapshot?.length > 0;
+      isNotOffchain &&
+      app.user.activeAccount &&
+      app.chain?.network === ChainNetwork.Aave;
+    const showSnapshotOptions =
+      app.chain?.base === ChainBase.Ethereum &&
+      app.chain?.meta.snapshot?.length > 0;
     const showReferenda =
+      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Darwinia &&
       app.chain.network !== ChainNetwork.HydraDX;
     const showProposals =
-      (app.chain?.base === ChainBase.Substrate &&
+      (isNotOffchain &&
+        app.chain?.base === ChainBase.Substrate &&
         app.chain.network !== ChainNetwork.Darwinia) ||
       (app.chain?.base === ChainBase.CosmosSDK &&
         app.chain.network !== ChainNetwork.Terra) ||
@@ -78,18 +90,23 @@ export class GovernanceSection
       app.chain?.network === ChainNetwork.Moloch ||
       app.chain?.network === ChainNetwork.Compound ||
       app.chain?.network === ChainNetwork.Aave;
-    const showCouncillors = app.chain?.base === ChainBase.Substrate;
+    const showCouncillors =
+      isNotOffchain && app.chain?.base === ChainBase.Substrate;
     const showTreasury =
+      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
     const showBounties =
+      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge &&
       app.chain.network !== ChainNetwork.HydraDX;
     const showTips =
+      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
     const showValidators =
+      isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain?.network !== ChainNetwork.Kulupu &&
       app.chain?.network !== ChainNetwork.Darwinia;

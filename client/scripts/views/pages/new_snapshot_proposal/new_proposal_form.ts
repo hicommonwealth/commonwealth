@@ -17,10 +17,11 @@ import {
 
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { ChainBase } from 'types';
 import { Account } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
@@ -142,10 +143,7 @@ const newThread = async (
     throw new Error(e.error);
   }
 
-  const wallet = await app.wallets.locateWallet(
-    author,
-    ChainBase.Ethereum
-  );
+  // const wallet = await app.wallets.locateWallet(author, ChainBase.Ethereum);
 
   /*  try {
     const wallet = await app.wallets.locateWallet(
@@ -195,6 +193,7 @@ const newLink = async (
     space,
     snapshotId
   );
+  console.log('the rro', errors);
   return errors;
 };
 
@@ -482,6 +481,8 @@ const NewProposalForm: m.Component<
                       );
                       vnode.state.saving = false;
                       clearLocalStorage();
+                      notifySuccess('Snapshot Created!');
+                      navigateToSubpage(`/snapshot/${vnode.state.space.id}`);
                     } catch (err) {
                       vnode.state.saving = false;
                       notifyError(capitalize(err.message));
