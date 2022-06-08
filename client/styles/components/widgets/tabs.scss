@@ -18,7 +18,7 @@
     border-bottom: 3px solid $neutral-500;
     padding-bottom: 8px;
   }
-  @include xs-max {
+  @include extraSmall {
     .tab-bar {
       margin-bottom: 16px;
     }
