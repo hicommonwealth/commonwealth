@@ -46,6 +46,22 @@ class TwitterAttestationModal implements m.Component<TwitterAttestationModalAttr
       console.log(vnode.attrs.addresses)
       console.log(vnode.attrs.twitterAccount)
 
+      // If redirected back to modal
+      if (window.location.search) {
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('continueTwitterAttestation')) {
+
+          if (!vnode.attrs.twitterAccount?.attested) {
+            vnode.state.step = TwitterAttestationSteps.Step2Sign;
+          } else if (!vnode.attrs.twitterAccount?.attested) {
+            vnode.state.step = TwitterAttestationSteps.Step3Publicize;
+          }
+
+        }        
+          
+      }
+
+      vnode.state.tweetLoaded = false;
     }
 
     view(vnode) {

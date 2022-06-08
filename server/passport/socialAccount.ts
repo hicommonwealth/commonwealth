@@ -165,6 +165,7 @@ export function twitterAuth(models) {
     callbackURL: TWITTER_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req, token, tokenSecret, profile, cb) => {
+
     const twitterAccount = await models.SocialAccount.findOne({
       where: { provider: 'twitter', provider_userid: profile.id }
     });

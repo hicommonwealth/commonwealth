@@ -674,7 +674,6 @@ function setupRouter(
     authenticator(req, res, next);
   });
 
-  // TODO: Refactor
   router.get('/auth/twitter/callback', (req, res, next) => {
     passport.authenticate('twitter', (err) => {
       const redirectUrl = req.session.redirect;
