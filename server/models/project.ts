@@ -66,7 +66,7 @@ export default (
   Project.associate = (models) => {
     models.Project.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Project.belongsTo(models.ChainEntity, { foreignKey: 'entity_id', targetKey: 'id' });
-    models.Project.belongsTo(models.IpfsPins, { foreignKey: 'ipfs_pin_hash', targetKey: 'id' });
+    models.Project.belongsTo(models.IpfsPins, { foreignKey: 'ipfs_hash_id', targetKey: 'id' });
   };
 
   return Project;
