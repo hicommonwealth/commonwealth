@@ -52,7 +52,6 @@ export class ComponentShowcase implements m.ClassComponent {
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
-  private uploadInProgress: boolean;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
@@ -69,23 +68,21 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         />
+        <h1>Avatar upload</h1>
         <AvatarUpload
           uploadStartedCallback={() => {
-            this.uploadInProgress = true;
             m.redraw();
           }}
           uploadCompleteCallback={(files) => {
-            console.log('files', files);
+            console.log(files);
             files.forEach((f) => {
               if (!f.uploadURL) return;
               const url = f.uploadURL.replace(/\?.*/, '');
               this.avatarUrl = url;
             });
-            this.uploadInProgress = false;
             m.redraw();
           }}
         />
-        <img style={`width: 32px; height: 32px;`} src={this.avatarUrl} />
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
           <CWAccountCreationButton

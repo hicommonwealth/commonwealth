@@ -9,6 +9,7 @@ import 'components/avatar_upload.scss';
 import app from 'state';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
+import { ComponentType } from './component_kit/types';
 
 type AvatarUploadAttrs = {
   uploadCompleteCallback?: CallableFunction;
@@ -26,8 +27,8 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
 
     this.dropzone = new Dropzone(vnode.dom, {
       // configuration for textarea dropzone
-      clickable: '.AvatarUpload .dropzone-attach .IconButton',
-      previewsContainer: '.AvatarUpload .dropzone-previews',
+      clickable: ['.dropzone-attach', '.IconButton'],
+      previewsContainer: '.AvatarUpload .dropzone-preview-container',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
       header: '',
@@ -46,6 +47,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           jwt: app.user.jwt,
         })
           .then((response) => {
+            console.log(response);
             if (response.status !== 'Success') {
               return done(
                 'Failed to get an S3 signed upload URL',
@@ -90,22 +92,21 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
     return (
-      <form class="AvatarUpload">
-        {!this.uploaded && (
-          <>
-            <CWIconButton
-              iconButtonTheme="primary"
-              iconName="plusCircle"
-              iconSize="small"
-            />
-            <div
-              class="dropzone-attach"
-              style={`background-image: url(${logoURL}); background-size: 92px;`}
-            />
-          </>
-        )}
-        <div class="dropzone-previews" />
-      </form>
+      <div class={ComponentType.AvatarUpload}>
+        <CWIconButton
+          iconButtonTheme="primary"
+          iconName="plusCircle"
+          iconSize="small"
+        />
+        {!this.uploaded && <div class="dropzone-attach" />}
+        <div
+          class={getClasses<{ hidden: boolean }>(
+            { hidden: !this.uploaded },
+            'dropzone-preview-container'
+          )}
+          style={`background-image: url(${logoURL}); background-size: 92px;`}
+        />
+      </div>
     );
   }
 }
