@@ -17,6 +17,10 @@ import {
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
 
+import TwitterAttestationModal from '../../modals/twitter_attestation_modal'
+import TwitterAttestationModalOld from '../../modals/twitter_attestation_modal_old'
+
+
 type SidebarQuickSwitcherItemAttrs = {
   item: ChainInfo;
   size: number;
@@ -41,6 +45,24 @@ class SidebarQuickSwitcherItem
 }
 
 export class SidebarQuickSwitcher implements m.ClassComponent {
+
+  oncreate() { 
+    if (window.location.search) {
+      const addresses = app.user.addresses
+      const twitterAccount = app.user.socialAccounts.find((acct) => acct.provider === 'twitter')
+      const refreshCallback = () => { console.log("REFRESH CALLBACK :)")}
+
+      const query = new URLSearchParams(window.location.search);
+      console.log(query)
+      if (query.get('continueTwitterAttestation')) {
+        app.modals.create({
+          modal: TwitterAttestationModal,
+          data: { addresses, twitterAccount, refreshCallback },
+        });
+      }
+    }
+  }
+
   view() {
     const allCommunities = app.config.chains
       .getAll()
@@ -60,6 +82,28 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
+          <div onclick={()=>{
+
+              // New
+              const addresses = app.user.addresses
+              const twitterAccount = app.user.socialAccounts.find((acct) => acct.provider === 'twitter')
+              const refreshCallback = () => { console.log("REFRESH CALLBACK :)")}
+              app.modals.create({
+                modal: TwitterAttestationModal,
+                data: { addresses, twitterAccount, refreshCallback },
+              });
+
+              // Old
+              // const account  = app.user.activeAccount;
+              // const twitter = app.user.socialAccounts.find((acct) => acct.provider === 'twitter');
+              // app.modals.create({
+              //   modal: TwitterAttestationModalOld,
+              //   data: { account, twitter, refreshCallback },
+              // })
+
+            }}>
+            <p>TWIT</p>
+          </div>
           <Button
             rounded={true}
             label={<CWIcon iconName="home" iconSize="small" />}
