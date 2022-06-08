@@ -26,6 +26,7 @@ import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channe
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
+import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/community_banner';
 import CollaborationFactory, {
   CollaborationModelStatic,
 } from './models/collaboration';
@@ -115,6 +116,7 @@ export type Models = {
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
+  CommunityBanner: CommunityBannerModelStatic;
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
@@ -194,6 +196,7 @@ const models: Models = {
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
+  CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),

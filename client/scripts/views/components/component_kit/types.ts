@@ -1,5 +1,6 @@
 export enum ComponentType {
   AddressTooltip = 'AddressTooltip',
+  Banner = 'Banner',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
