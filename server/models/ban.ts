@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type BanAttributes = {
   id?: number;
-  banner_text: string;
+  address: string;
   chain_id: string;
   created_at?: Date;
   updated_at?: Date;
@@ -21,7 +21,7 @@ export default (
 ): BanModelStatic => {
   const Ban = <BanModelStatic>sequelize.define('Bans', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    address_id: { type: dataTypes.INTEGER, allowNull: false },
+    address: { type: dataTypes.STRING, allowNull: false },
     chain_id: { type: dataTypes.STRING, allowNull: false },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
