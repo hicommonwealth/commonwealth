@@ -142,41 +142,6 @@ const newThread = async (
     console.log(e);
     throw new Error(e.error);
   }
-
-  // const wallet = await app.wallets.locateWallet(author, ChainBase.Ethereum);
-
-  /*  try {
-    const wallet = await app.wallets.locateWallet(
-      author.address,
-      ChainBase.Ethereum
-    );
-    if (
-      !(
-        wallet instanceof MetamaskWebWalletController ||
-        wallet instanceof WalletConnectWebWalletController
-      )
-    ) {
-      throw new Error('Invalid wallet.');
-    }
-    msg.sig = await wallet.signMessage(msg.msg);
-
-    const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
-      ...msg,
-    });
-    if (result.status === 'Failure') {
-      const errorMessage =
-        result && result.message.error_description
-          ? `${result.message.error_description}`
-          : NewThreadErrors.SomethingWentWrong;
-      throw new Error(errorMessage);
-    } else if (result.status === 'Success') {
-      await app.user.notifications.refresh();
-      await app.snapshot.refreshProposals();
-      navigateToSubpage(`/snapshot/${snapshotId}/${result.message.ipfsHash}`);
-    }
-  } catch (err) {
-    notifyError(err.message);
-  } */
 };
 
 const newLink = async (
