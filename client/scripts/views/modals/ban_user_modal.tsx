@@ -3,11 +3,12 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
 import $ from 'jquery';
+import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 
 export class BanUserModal implements m.ClassComponent {
   view(vnode) {
-    const userProfile = vnode.attrs.profile;
+    const { address } = vnode.attrs.profile;
 
     const exitModal = () => {
       $(vnode.dom).trigger('modalexit');
@@ -25,19 +26,24 @@ export class BanUserModal implements m.ClassComponent {
           </div>
           <div class="ban-modal-content">
             <CWButton
-              label="Ban Address"
+              label="Ban Address (just click once and wait)"
               buttonType="primary-red"
-              onclick={() => {
+              onclick={async () => {
                 try {
                   // ZAK TODO: Update Banned User Table with userProfile
-
+                  if (!address) { notifyError('CW Data error'); return; };
+                  await $.post('/api/banAddress', {
+                    jwt: app.user.jwt,
+                    address,
+                    chain_id: app.activeChainId(),
+                  });
                   exitModal();
                   notifySuccess('Banned Address');
                 } catch (e) {
                   notifyError('Ban Address Failed');
                 }
               }}
-            ></CWButton>
+            />
           </div>
         </div>
       </>
