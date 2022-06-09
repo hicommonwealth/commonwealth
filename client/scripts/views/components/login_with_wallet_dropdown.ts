@@ -96,7 +96,8 @@ const LoginWithWalletDropdown: m.Component<{
           onclick: (e) => {
             $('.Login').trigger('modalexit');
             const defaultChainId =
-              (webWallet?.specificChains && webWallet.specificChains[0]) || baseToNetwork(base);
+              (webWallet?.specificChains && webWallet.specificChains[0]) ||
+              baseToNetwork(base);
             if (app.activeChainId()) {
               navigateToSubpage('/web3login', web3loginParams);
             } else {
@@ -133,6 +134,7 @@ const LoginWithWalletDropdown: m.Component<{
     ) {
       chainbase = app.config.chains.getById(app.customDomainId()).base;
     }
+    console.log('chainbase', chainbase);
     const menuItems = chainbase
       ? [...getMenuItemsForChainBase(chainbase)]
       : _.flatten(
