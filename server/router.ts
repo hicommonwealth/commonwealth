@@ -134,13 +134,15 @@ import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
+import BanCache from './util/banCheckCache';
 
 function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  banCache: BanCache, // TODO: where is this needed?
 ) {
   const router = express.Router();
 
