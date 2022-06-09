@@ -9,15 +9,21 @@ import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { JWT_SECRET, REDIS_URL, WEBSOCKET_ADMIN_USERNAME, WEBSOCKET_ADMIN_PASSWORD } from '../config';
+import {
+  JWT_SECRET,
+  REDIS_URL,
+  WEBSOCKET_ADMIN_USERNAME,
+  WEBSOCKET_ADMIN_PASSWORD,
+} from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import {createChatNamespace} from "./chatNs";
-import {DB} from "../database";
+import { createChatNamespace } from './chatNs';
+import { DB } from '../database';
+import { RedisCache } from '../util/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -34,6 +40,7 @@ export const authenticate = (
       (err, decodedUser) => {
         if (err)
           return next(new Error('Authentication Error: incorrect JWT token'));
+        console.log(decodedUser);
         (<any>socket).user = decodedUser;
         next();
       }
@@ -77,22 +84,33 @@ export async function setupWebSocketServer(
 
   // enables the admin analytics dashboard (creates /admin namespace)
   instrument(io, {
-    auth: origin.includes("localhost") ? false : {
-      type: "basic",
-      username: WEBSOCKET_ADMIN_USERNAME,
-      password: bcrypt.hashSync(WEBSOCKET_ADMIN_PASSWORD, WEBSOCKET_ADMIN_PASSWORD.length)
-    }
+    auth: origin.includes('localhost')
+      ? false
+      : {
+          type: 'basic',
+          username: WEBSOCKET_ADMIN_USERNAME,
+          password: bcrypt.hashSync(
+            WEBSOCKET_ADMIN_PASSWORD,
+            WEBSOCKET_ADMIN_PASSWORD.length
+          ),
+        },
   });
 
-  log.info(`Connecting to Redis at: ${REDIS_URL}`);
-  const pubClient = createClient({ url: REDIS_URL, socket: { tls: true, rejectUnauthorized: false } });
-
-  const subClient = pubClient.duplicate();
+  log.info(
+    `Socket instance connecting to Redis at: ${REDIS_URL}. ${
+      !REDIS_URL
+        ? 'The Redis url is undefined so the socket instance will not work cross server'
+        : ''
+    }`
+  );
+  // const redisOptions = origin.includes("localhost") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
+  // const pubClient = createClient(redisOptions);
+  // const subClient = pubClient.duplicate();
 
   try {
-    await Promise.all([pubClient.connect(), subClient.connect()]);
+    // await Promise.all([pubClient.connect(), subClient.connect()]);
     // provide the redis connection instances to the socket.io adapters
-    await io.adapter(<any>createAdapter(pubClient, subClient));
+    // await io.adapter(<any>createAdapter(pubClient, subClient));
   } catch (e) {
     // local env may not have redis so don't do anything if they don't
     if (!origin.includes('localhost')) {
@@ -105,9 +123,14 @@ export async function setupWebSocketServer(
     }
   }
 
+  const redisCache = new RedisCache();
+  console.log("Initializing Redis Cache for WebSockets...")
+  await redisCache.init();
+  console.log("Redis Cache initialized!");
+
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
-  const chatNamespace = createChatNamespace(io, models);
+  const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
     const rabbitController = new RabbitMQController(
