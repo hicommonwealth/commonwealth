@@ -187,6 +187,12 @@ export interface IChainEventNotificationData {
   chain_id: string;
 }
 
+export interface IChatNotification {
+  messageId: string | number;
+  channelId: string | number;
+  chain_id: string;
+}
+
 export const PROFILE_NAME_MAX_CHARS = 40;
 export const PROFILE_HEADLINE_MAX_CHARS = 80;
 export const PROFILE_BIO_MAX_CHARS = 1000;
