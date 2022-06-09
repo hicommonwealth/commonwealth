@@ -49,29 +49,27 @@ export default class BanCache extends JobRunner<CacheT> {
     }
 
     // then, validate against db
-    const addressInstance = await this._models.Address.findOne({
-      where: {
-        chain: chain_id, address
-      }
-    });
-    if (!addressInstance?.user_id) {
-      // TODO: is this the correct behavior when address is not found?
-      return [false, BanErrors.NoAddress];
-    }
+    // const addressInstance = await this._models.Address.findOne({
+    //   where: {
+    //     chain: chain_id, address
+    //   }
+    // });
+    // if (!addressInstance?.user_id) {
+    //   // TODO: is this the correct behavior when address is not found?
+    //   return [false, BanErrors.NoAddress];
+    // }
 
-    const allAddressesOwnedByUser = await this._models.Address.findAll({
-      where: {
-        user_id: addressInstance.user_id,
-        chain: chain_id,
-      }
-    });
+    // const allAddressesOwnedByUser = await this._models.Address.findAll({
+    //   where: {
+    //     user_id: addressInstance.user_id,
+    //     chain: chain_id,
+    //   }
+    // });
 
     const ban = await this._models.Ban.findOne({
       where: {
         chain_id,
-        address: {
-          [Op.in]: allAddressesOwnedByUser.map((a) => a.address),
-        }
+        address
       },
     });
 
