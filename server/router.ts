@@ -132,6 +132,8 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
+import banAddress from './routes/banAddress';
+import getBannedAddresses from './routes/getBannedAddresses';
 
 function setupRouter(
   app: Express,
@@ -639,6 +641,10 @@ function setupRouter(
 
   // send feedback button
   router.post('/sendFeedback', sendFeedback.bind(this, models));
+
+  // bans
+  router.post('/banAddress', banAddress.bind(this, models));
+  router.get('/getBannedAddresses', getBannedAddresses.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));

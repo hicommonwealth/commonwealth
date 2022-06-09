@@ -31,6 +31,9 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     timestamps: true,
+    indexes: [
+      { fields: ['chain_id'] },
+    ]
   });
 
   Ban.associate = (models) => {

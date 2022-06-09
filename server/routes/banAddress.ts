@@ -1,10 +1,9 @@
-import { Response, NextFunction } from 'express';
 import { AppError } from '../util/errors';
-import { success, TypedRequestBody } from '../types';
+import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { BanInstance } from '../models/ban';
+import { BanAttributes, BanInstance } from '../models/ban';
 
 enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',
@@ -12,16 +11,17 @@ enum BanAddressErrors {
   NoPermission = 'You do not have permission to ban an address',
 }
 
-
 type BanAddressReq = Omit<BanInstance, 'id'> & {
   chain_id: string;
   address: string;
 };
 
+type BanAddressResp = BanAttributes;
+
 const banAddress = async (
   models: DB,
   req: TypedRequestBody<BanAddressReq>,
-  res: Response,
+  res: TypedResponse<BanAddressResp>,
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) throw new AppError(BanAddressErrors.NoChain);

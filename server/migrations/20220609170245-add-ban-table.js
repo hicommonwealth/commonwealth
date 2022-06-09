@@ -9,7 +9,14 @@ module.exports = {
         chain_id: { type: Sequelize.STRING, allowNull: false, references: { model: 'Chains', key: 'id' } },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
-      }, { transaction });
+      }, {
+        timestamps: true,
+        underscored: true,
+        indexes: [
+          { fields: ['chain_id'] },
+        ],
+        transaction,
+      });
     });
   },
 
