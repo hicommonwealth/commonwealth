@@ -9,11 +9,12 @@ import 'pages/discussions/discussion_filter_bar.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
+import { MixpanelSnapshotEvents } from 'analytics/types';
+
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CardsCollection } from '../../components/cards_collection';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
