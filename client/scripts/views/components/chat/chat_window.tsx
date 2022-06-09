@@ -50,7 +50,6 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
-      console.log('Message received');
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
@@ -107,11 +106,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
         const message = {
           message: $textarea.val(),
-          address: app.user.activeAccount.address,
           chat_channel_id: channel.id,
-          now: moment().toISOString(),
+          address: app.user.activeAccount.address
         };
-        app.socket.chatNs.sendMessage(message, channel);
+        app.socket.chatNs.sendMessage(message);
         mixpanelBrowserTrack({
           event: MixpanelChatEvents.NEW_CHAT_SENT,
           community: app.activeChainId(),
