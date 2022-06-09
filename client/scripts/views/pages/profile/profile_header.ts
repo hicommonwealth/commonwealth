@@ -7,13 +7,14 @@ import app from 'state';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
-import EditProfileModal from 'views/modals/edit_profile_modal';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { alertModalWithText } from '../../modals/alert_modal';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (
   account,
@@ -160,8 +161,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       m('.bio-actions', [
         account.profile &&
           account.profile.bio &&
-          m(Button, {
-            intent: 'warning',
+          m(CWButton, {
             onclick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
             },
@@ -169,22 +169,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         m('', [
           onOwnProfile
-            ? [
-                editIdentityAction(account, vnode.state.identity, vnode),
-                m(Button, {
-                  intent: 'primary',
-                  rounded: true,
-                  onclick: () => {
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: { account, refreshCallback },
-                    });
-                  },
-                  label: 'Edit',
-                }),
-              ]
-            : showJoinCommunityButton && app.activeChainId()
-            ? m(Button, {
+            ? showJoinCommunityButton && app.activeChainId()
+            : m(Button, {
                 intent: 'primary',
                 rounded: true,
                 onclick: async () => {
@@ -208,10 +194,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   }
                 },
                 label: onLinkedProfile ? 'Switch to address' : 'Join community',
-              })
-            : [
-                // TODO: actions for others' accounts
-              ],
+              }),
         ]),
       ]),
     ]);

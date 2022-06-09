@@ -13,7 +13,7 @@ import LoginWithWalletDropdown from '../../components/login_with_wallet_dropdown
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
-import EditProfileModal from '../../modals/edit_profile_modal';
+import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (

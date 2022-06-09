@@ -19,6 +19,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Text = 'Text',
+  TextArea = 'TextArea',
   TextInput = 'TextInput',
   WalletOptionRow = 'WalletOptionRow',
   ValidationText = 'ValidationText',

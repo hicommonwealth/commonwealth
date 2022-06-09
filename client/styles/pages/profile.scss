@@ -319,8 +319,7 @@
   }
   .bio-actions {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+    gap: 8px;
     margin-top: 12px;
 
     @include mediumSmallInclusive {

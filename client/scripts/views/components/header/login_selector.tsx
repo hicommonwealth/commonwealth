@@ -18,7 +18,7 @@ import {
 } from 'controllers/app/login';
 
 import User, { UserBlock } from 'views/components/widgets/user';
-import EditProfileModal from 'views/modals/edit_profile_modal';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';

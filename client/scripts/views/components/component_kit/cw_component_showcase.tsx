@@ -25,7 +25,7 @@ import { CWTooltip } from './cw_tooltip';
 import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../avatar_upload';
+import { CWTextArea } from './cw_text_area';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -67,21 +67,6 @@ export class ComponentShowcase implements m.ClassComponent {
               modal: NewLoginModal,
             })
           }
-        />
-        <h1>Avatar upload</h1>
-        <AvatarUpload
-          uploadStartedCallback={() => {
-            m.redraw();
-          }}
-          uploadCompleteCallback={(files) => {
-            console.log(files);
-            files.forEach((f) => {
-              if (!f.uploadURL) return;
-              const url = f.uploadURL.replace(/\?.*/, '');
-              this.avatarUrl = url;
-            });
-            m.redraw();
-          }}
         />
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
@@ -233,6 +218,11 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Disabled"
             disabled
             defaultValue="Some disabled text"
+          />
+          <CWTextArea
+            name="Textarea"
+            label="Text area"
+            placeholder="Type here"
           />
         </div>
         <h1>Buttons</h1>

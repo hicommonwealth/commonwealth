@@ -2,35 +2,20 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_text_input.scss';
+import 'components/component_kit/cw_text_area.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
 import { CWValidationText, ValidationStatus } from './cw_validation_text';
+import { TextInputAttrs } from './cw_text_input';
 
-type TextInputSize = 'small' | 'large';
-
-export type TextInputAttrs = {
-  autocomplete?: string;
-  autofocus?: boolean;
-  defaultValue?: string;
+type TextAreaStyleAttrs = {
   disabled?: boolean;
-  inputValidationFn?: (value: string) => [ValidationStatus, string];
-  label?: string;
-  name: string;
-  oninput?: (e) => void;
-  placeholder?: string;
-  tabindex?: number;
-};
-
-type InputStyleAttrs = {
-  disabled?: boolean;
-  size: TextInputSize;
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
@@ -47,18 +32,16 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       name,
       oninput,
       placeholder,
-      size = 'large',
       tabindex,
     } = vnode.attrs;
 
     return (
-      <div class={ComponentType.TextInput}>
+      <div class={ComponentType.TextArea}>
         {label && <CWLabel label={label} />}
-        <input
+        <textarea
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={getClasses<InputStyleAttrs & { isTyping: boolean }>({
-            size,
+          class={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
             validationStatus: this.validationStatus,
             disabled,
             isTyping: this.isTyping,
