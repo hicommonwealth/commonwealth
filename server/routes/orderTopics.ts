@@ -27,7 +27,7 @@ const OrderTopics = async (
   if (!req.user) return next(new Error(OrderTopicsErrors.NoUser));
   const isAdminOrMod: boolean = await validateRoles(
     models,
-    req,
+    req.user,
     'moderator',
     chain.id
   );

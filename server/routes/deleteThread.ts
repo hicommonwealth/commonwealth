@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 import validateRoles from '../util/validateRoles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -14,6 +15,7 @@ enum DeleteThreadErrors {
 
 const deleteThread = async (
   models: DB,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,12 +38,24 @@ const deleteThread = async (
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [models.Chain],
+      include: [models.Chain, models.Address],
     });
 
     let thread = myThread;
+
+    // check if author can delete post
+    if (thread) {
+      const [canInteract, error] = await banCache.checkBan({
+        chain: thread.chain,
+        address: thread.Address.address,
+      });
+      if (!canInteract) {
+        return next(new Error(error));
+      }
+    }
+
     if (!myThread) {
-      const isAdminOrMod = validateRoles(models, req, 'moderator', chain_id);
+      const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain_id);
 
       if (!isAdminOrMod) {
         return next(new Error(DeleteThreadErrors.NoPermission));

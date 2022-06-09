@@ -18,6 +18,7 @@ import {
   buildCategoryMap,
   setChainCategories,
 } from './helpers';
+import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -51,6 +52,7 @@ export class ChainMetadataRows
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
+  communityBanner: string;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -71,6 +73,7 @@ export class ChainMetadataRows
     this.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
+    this.communityBanner = vnode.attrs.chain.communityBanner;
   }
 
   view(vnode) {
@@ -213,14 +216,26 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
+        <InputRow
+          title="Banner"
+          name="Banner Text"
+          label="Banner"
+          placeholder="Text for across the top of your community"
+          defaultValue={this.communityBanner}
+          onChangeHandler={(v) => {
+            this.communityBanner = v;
+          }}
+        />
         <div class="tag-row">
-          <label>Community Tags</label>
+          <CWLabel label="Community Tags" />
           <div class="tag-group">
             {Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
                   label={key}
-                  buttonType={this.selectedTags[key] ? 'primary' : 'secondary'}
+                  buttonType={
+                    this.selectedTags[key] ? 'primary-black' : 'secondary-black'
+                  }
                   onclick={() => {
                     this.selectedTags[key] = !this.selectedTags[key];
                   }}
@@ -282,6 +297,19 @@ export class ChainMetadataRows
                   this.selectedTags[category]
                 );
               }
+            } catch (err) {
+              console.log(err);
+            }
+            try {
+              // if (!!this.communityBanner) {
+              $.post(`${app.serverUrl()}/updateBanner`, {
+                chain_id: vnode.attrs.chain.id,
+                banner_text: this.communityBanner,
+                auth: true,
+                jwt: app.user.jwt,
+              }).then(({ result }) => {
+                app.chain.meta.setBanner(this.communityBanner);
+              });
             } catch (err) {
               console.log(err);
             }

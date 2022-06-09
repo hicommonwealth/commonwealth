@@ -37,6 +37,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
   public readonly usingServerChainEntities = false;
+  public readonly communityBanner?: string;
 
   public deferred: boolean;
 
@@ -88,11 +89,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       activeUsers,
       numVotingThreads,
       chatChannels,
+      communityBanner
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
+    this.meta.setBanner(communityBanner);
+    console.log('initializing banner', this.meta.communityBanner);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));

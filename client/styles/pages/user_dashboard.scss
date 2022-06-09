@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .UserDashboard {
   align-items: flex-start;
@@ -47,7 +47,7 @@
       display: none;
       font-size: 18px;
 
-      @include md-max {
+      @include mediumSmallInclusive {
         align-items: center;
         border-radius: 10px;
         color: $purple-400;
@@ -92,7 +92,7 @@
   }
 
   .expore-communities-col {
-    @include md-max {
+    @include mediumSmallInclusive {
       display: none;
     }
 

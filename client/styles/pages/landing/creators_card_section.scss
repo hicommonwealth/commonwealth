@@ -21,7 +21,7 @@ img.TokensCreatorsImage {
   margin-left: 3rem;
   margin-top: 1rem;
 
-  @media (min-width: 0px) and (max-width: 1200px) {
+  @include mediumSmall {
     margin-left: 0rem;
   }
 }

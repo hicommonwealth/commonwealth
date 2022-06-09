@@ -36,7 +36,7 @@
     .topic-cell {
       flex: 1;
 
-      @include sm-max {
+      @include small {
         margin-bottom: 8px;
       }
 
@@ -55,7 +55,7 @@
       color: $neutral-600;
     }
 
-    @include sm-max {
+    @include small {
       flex-direction: column;
     }
 
@@ -81,7 +81,7 @@
           min-width: max-content;
         }
 
-        @include sm-max {
+        @include small {
           flex-direction: column;
         }
       }

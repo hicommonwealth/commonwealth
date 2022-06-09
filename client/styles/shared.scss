@@ -1,6 +1,7 @@
 @import 'mixins/animation';
 @import 'mixins/buttons';
-@import 'mixins/responsive';
+@import 'mixins/popovers';
+@import 'mixins/media_queries';
 @import 'mixins/dragula';
 @import 'mixins/elevation';
 @import 'mixins/colors';
@@ -32,42 +33,6 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
 // mobile specs
 
 $text-size-mobile-header: 22px;
-
-@mixin error-text {
-  color: $rorange-500;
-  font-weight: 500;
-}
-
-@mixin success-text {
-  color: $green-500;
-  font-weight: 500;
-}
-
-@mixin attachments {
-  p {
-    color: $neutral-500;
-    font-weight: 500;
-  }
-
-  a.attachment-item {
-    background: $primary-300;
-    display: inline-block;
-    margin-right: 10px;
-    max-height: 100px;
-    max-width: 100px;
-    text-align: center;
-    text-decoration: none;
-
-    &:hover {
-      background: $primary-200;
-    }
-
-    img {
-      margin: 10px 0 4px;
-      width: 50%;
-    }
-  }
-}
 
 @mixin gov-explainer {
   .stats-box {
@@ -111,7 +76,7 @@ $text-size-mobile-header: 22px;
     }
   }
 
-  @include sm-max {
+  @include small {
     .stats-box-left {
       display: none;
     }
@@ -147,13 +112,13 @@ $text-size-mobile-header: 22px;
   position: relative;
   width: calc(50% - 24px);
 
-  @include xs-max {
+  @include extraSmall {
     margin-right: 0px;
     max-width: none;
     width: 100%;
   }
 
-  @include xl-min {
+  @include mediumSmall {
     width: calc(33% - 24px);
   }
 
@@ -167,7 +132,7 @@ $text-size-mobile-header: 22px;
     color: $neutral-500;
     margin: 0 24px 0 0;
 
-    @include sm-max {
+    @include smallInclusive {
       margin: 0 16px 0 0;
     }
   }
@@ -244,47 +209,4 @@ h2 {
 h3 {
   @include header;
   font-size: 24px;
-}
-
-@mixin body {
-  font-family: $fonts;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@mixin body-paragraph {
-  @include body;
-  p {
-    margin-bottom: 10px;
-  }
-}
-
-@mixin link {
-  @include body;
-  font-weight: 500;
-  color: $primary-700;
-}
-
-@mixin button-label {
-  @include body;
-  font-weight: 600;
-}
-
-@mixin form-label {
-  @include body;
-  font-size: 14px;
-  color: $neutral-600;
-}
-
-@mixin rainbow-gradient-horizontal {
-  background: linear-gradient(90deg, #91bfff, #91ffa0, #fbff91, #ff9191);
-}
-
-@mixin rainbow-gradient-diagonal {
-  background: linear-gradient(45deg, #91bfff, #91ffa0, #fbff91, #ff9191);
-}
-
-@mixin shadow-gradient {
-  background: linear-gradient(270deg, #17161e, #07060d);
 }

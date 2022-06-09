@@ -13,6 +13,7 @@ import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ChatChannelInstance } from '../models/chat_channel';
+import { CommunityBannerInstance } from 'server/models/community_banner';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -32,7 +33,7 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, communityBanner] =
     await (<
       Promise<
         [
@@ -41,7 +42,8 @@ const bulkOffchain = async (
           RoleInstance[],
           unknown,
           OffchainThreadInstance[],
-          ChatChannelInstance[]
+          ChatChannelInstance[],
+          CommunityBannerInstance,
         ]
       >
     >Promise.all([
@@ -167,6 +169,11 @@ const bulkOffchain = async (
           required: false // should return channels with no chat messages
         }
       }),
+      models.CommunityBanner.findOne({
+        where: {
+          chain_id: chain.id,
+        }
+      }),
     ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -181,7 +188,8 @@ const bulkOffchain = async (
       pinnedThreads, // already converted to JSON earlier
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
-      chatChannels: JSON.stringify(chatChannels)
+      chatChannels: JSON.stringify(chatChannels),
+      communityBanner: communityBanner?.banner_text || '',
     },
   });
 };

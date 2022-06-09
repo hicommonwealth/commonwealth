@@ -35,7 +35,7 @@ $modal-padding: 16px;
     z-index: 20;
   }
 
-  @include xs-max {
+  @include extraSmall {
     .popup {
       max-height: calc(100vh - 20px);
       min-width: calc(100vw - 20px);
@@ -49,6 +49,10 @@ $modal-padding: 16px;
     flex-direction: row;
     justify-content: space-between;
     padding: $modal-padding;
+
+    &.ban-user {
+      background: $rorange-500;
+    }
 
     h1,
     h2,
@@ -80,4 +84,10 @@ $modal-padding: 16px;
   .compact-modal-actions {
     padding: $modal-padding;
   }
+}
+
+.ban-modal-content {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
 }

@@ -19,7 +19,7 @@
   .visible-sm {
     display: none;
 
-    @include sm-max {
+    @include small {
       display: block;
     }
   }
