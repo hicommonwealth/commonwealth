@@ -11,7 +11,6 @@ import TerraStationWebWalletController from './webWallets/terra_station_web_wall
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import RoninWebWalletController from './webWallets/ronin_web_wallet';
-import { constant } from 'lodash';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];

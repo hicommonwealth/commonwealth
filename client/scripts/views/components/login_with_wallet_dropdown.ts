@@ -134,7 +134,6 @@ const LoginWithWalletDropdown: m.Component<{
     ) {
       chainbase = app.config.chains.getById(app.customDomainId()).base;
     }
-    console.log('chainbase', chainbase);
     const menuItems = chainbase
       ? [...getMenuItemsForChainBase(chainbase)]
       : _.flatten(
