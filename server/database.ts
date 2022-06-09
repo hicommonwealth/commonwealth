@@ -7,6 +7,7 @@ import { DATABASE_URI } from './config';
 import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
+import BanFactory, { BanModelStatic } from './models/ban';
 import ChainFactory, { ChainModelStatic } from './models/chain';
 import ChainCategoryFactory, {
   ChainCategoryModelStatic,
@@ -106,6 +107,7 @@ import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
+  Ban: BanModelStatic;
   Chain: ChainModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
@@ -186,6 +188,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
+  Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),

@@ -50,6 +50,10 @@ $modal-padding: 16px;
     justify-content: space-between;
     padding: $modal-padding;
 
+    &.ban-user {
+      background: $rorange-500;
+    }
+
     h1,
     h2,
     h3 {
@@ -80,4 +84,10 @@ $modal-padding: 16px;
   .compact-modal-actions {
     padding: $modal-padding;
   }
+}
+
+.ban-modal-content {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
 }
