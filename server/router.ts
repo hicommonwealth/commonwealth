@@ -643,8 +643,17 @@ function setupRouter(
   router.post('/sendFeedback', sendFeedback.bind(this, models));
 
   // bans
-  router.post('/banAddress', banAddress.bind(this, models));
-  router.get('/getBannedAddresses', getBannedAddresses.bind(this, models));
+  router.post(
+    '/banAddress',
+    passport.authenticate('jwt', { session: false }),
+    banAddress.bind(this, models)
+  );
+
+  router.get(
+    '/getBannedAddresses',
+    passport.authenticate('jwt', { session: false }),
+    getBannedAddresses.bind(this, models)
+  );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
