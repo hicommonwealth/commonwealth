@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CreateCommunityIndex {
   display: flex;
@@ -22,11 +22,6 @@
       display: flex;
       flex-direction: column;
 
-      label {
-        @include form-label;
-        margin-bottom: 4px;
-      }
-
       textarea {
         resize: none;
       }
@@ -39,11 +34,6 @@
       display: flex;
       flex-direction: column;
       margin-bottom: 20px;
-
-      label {
-        @include form-label;
-        margin-bottom: 4px;
-      }
 
       .toggle-and-label {
         display: flex;
@@ -74,20 +64,6 @@
 
     .button-margin-bottom {
       margin-bottom: 20px;
-    }
-
-    .validation-container {
-      @include form-label;
-      height: 20px;
-
-      .error {
-        color: $rorange-500;
-        margin-top: 8px;
-      }
-
-      .status {
-        margin-top: 8px;
-      }
     }
   }
 }

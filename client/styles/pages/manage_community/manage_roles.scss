@@ -6,11 +6,6 @@
   margin-bottom: 24px;
   width: 248px;
 
-  label {
-    @include form-label;
-    margin-bottom: 4px;
-  }
-
   .roles-container {
     border: 2px solid $neutral-200;
     border-radius: 4px;

@@ -1,33 +1,36 @@
-import { Request, Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
+import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { DB } from '../database';
-import { getSupportedEthChainIds, getUrlsForEthChainId } from '../util/supportedEthChains';
 
-// TODO: fetch native currency as well as url to support adding chain on metamask
+type GetSupportedEthChainsResp = { [id: number]: { url: string, alt_wallet_url: string } };
+
 const getSupportedEthChains = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery<Record<string, never>>,
+  res: TypedResponse<GetSupportedEthChainsResp>,
 ) => {
-  // if the caller passes a chain_id into the query, only fetch that URL, if available
-  // TODO: integrate into a fetched chainlist like https://chainid.network/chains.json
-  //   and validate the URL as needed (i.e. supports websockets)
-  if (req.query.chain_id) {
-    const chainId = +req.query.chain_id;
-    try {
-      const supportedChainUrls = await getUrlsForEthChainId(models, chainId, false);
-      return res.json({ status: 'Success', result: { [chainId]: supportedChainUrls } });
-    } catch (e) {
-      return res.json({ status: 'Failure', message: e.message });
-    }
-  }
-
-  // otherwise, fetch all chainId/URL combinations we support currently
   try {
-    const supportedChainIds = await getSupportedEthChainIds(models);
-    return res.json({ status: 'Success', result: supportedChainIds });
+    const supportedChainIds = await models.ChainNode.findAll({
+      attributes: ['url', 'eth_chain_id', 'alt_wallet_url'],
+      group: ['url', 'eth_chain_id', 'alt_wallet_url'],
+      where: {
+        // get all nodes that have a valid chain id
+        eth_chain_id: {
+          [Op.and]: {
+            [Op.ne]: null,
+            [Op.ne]: 0,
+          }
+        }
+      }
+    });
+
+    const results: { [id: number]: { url: string, alt_wallet_url: string } } = {};
+    for (const { eth_chain_id, url, alt_wallet_url } of supportedChainIds) {
+      results[eth_chain_id] = { url, alt_wallet_url };
+    }
+    return success(res, results);
   } catch (e) {
-    return res.json({ status: 'Failure', message: e.message });
+    return res.json({ status: 'Failure', result: e.message });
   }
 };
 

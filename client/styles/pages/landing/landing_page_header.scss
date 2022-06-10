@@ -122,27 +122,15 @@ header {
 }
 
 header {
-  @media (max-width: 1023px) {
+  @include small {
     border-radius: 33px;
     &.fixed-header {
       width: calc(100% - 2rem);
     }
   }
-
-  // @media (min-width: 1100px) {
-  //   width: 85%;
-  // }
-
-  // @media (min-width: 1300px) {
-  //   width: 75%;
-  // }
-
-  // @media (min-width: 1500px) {
-  //   width: 90%;
-  // }
 }
 
-@include sm-max {
+@include small {
   .menuButton {
     display: none;
   }

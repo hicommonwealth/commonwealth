@@ -53,7 +53,7 @@ export class CompoundProposalStats
   view(vnode) {
     const { chain } = vnode.attrs;
 
-    const symbol = chain.meta.chain.symbol;
+    const symbol = chain.meta.symbol;
 
     return (
       <GovExplainer
@@ -83,7 +83,7 @@ export class CompoundProposalStats
         ]}
         statAction={
           <CWButton
-            buttonType="primary"
+            buttonType="primary-blue"
             onclick={() => navigateToSubpage('/new/proposal')}
             label="New proposal"
           />

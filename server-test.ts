@@ -24,6 +24,7 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import SnapshotSpaceCache from './server/util/snapshotSpaceCache';
+import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import Rollbar from "rollbar";
 
@@ -108,6 +109,27 @@ const resetServer = (debug = false): Promise<void> => {
         lastVisited: '{}',
       });
 
+      const nodes = [
+        ['mainnet1.edgewa.re'],
+        [
+          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          '1',
+        ],
+        [
+          'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          '3',
+        ],
+      ];
+
+      const [edgewareNode, mainnetNode, testnetNode] = await Promise.all(
+        nodes.map(([url, eth_chain_id]) =>
+          models.ChainNode.create({
+            url,
+            eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+          })
+        )
+      );
+
       // For all smart contract support chains
       await models.ContractCategory.create({
         name: 'Tokens',
@@ -132,6 +154,7 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Substrate,
         ss58_prefix: 7,
         has_chain_events_listener: false,
+        chain_node_id: edgewareNode.id,
       });
       const eth = await models.Chain.create({
         id: 'ethereum',
@@ -143,6 +166,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
+        chain_node_id: mainnetNode.id,
       });
       const alex = await models.Chain.create({
         id: 'alex',
@@ -154,6 +178,8 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
+        chain_node_id: testnetNode.id,
+        address: '0xFab46E002BbF0b4509813474841E0716E6730136',
       });
       const yearn = await models.Chain.create({
         id: 'yearn',
@@ -165,6 +191,8 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
+        chain_node_id: mainnetNode.id,
+        address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
       });
       const sushi = await models.Chain.create({
         id: 'sushi',
@@ -176,6 +204,8 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
+        chain_node_id: mainnetNode.id,
+        address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
       });
 
       // Admin roles for specific communities
@@ -275,45 +305,6 @@ const resetServer = (debug = false): Promise<void> => {
         is_active: true,
       });
 
-      const nodes = [
-        ['mainnet1.edgewa.re', 'edgeware', null, '0'],
-        [
-          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-          'ethereum',
-          null,
-          '1',
-        ],
-        [
-          'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
-          'alex',
-          '0xFab46E002BbF0b4509813474841E0716E6730136',
-          '3',
-        ],
-        [
-          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-          'yearn',
-          '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-          '1',
-        ],
-        [
-          'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-          'sushi',
-          '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-          '1',
-        ],
-      ];
-
-      await Promise.all(
-        nodes.map(([url, chain, address, eth_chain_id]) =>
-          models.ChainNode.create({
-            chain,
-            url,
-            address,
-            eth_chain_id: +eth_chain_id || null,
-          })
-        )
-      );
-
       if (debug) console.log('Database reset!');
     } catch (error) {
       console.log('error', error);
@@ -359,7 +350,9 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, snapshotSpaceCache);
+
+const banCache = new BanCache(models);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, snapshotSpaceCache, banCache);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -375,6 +368,7 @@ setupServer();
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
 export const getTokenBalanceCache = () => tokenBalanceCache;
+export const getBanCache = () => banCache;
 export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;

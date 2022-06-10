@@ -74,7 +74,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
         throw new Error('Could not fetch accounts from Metamask');
       } else {
         for (const acc of this._ethAccounts) {
-          this._accounts.push(encodeEthAddress(app.chain?.meta.chain.bech32Prefix || 'inj', acc));
+          this._accounts.push(encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc));
         }
       }
 
@@ -89,7 +89,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const encodedAccounts = accounts.map((a) => encodeEthAddress(app.chain?.meta.chain.bech32Prefix || 'inj', a));
+      const encodedAccounts = accounts.map((a) => encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a));
       const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === encodedAccounts[0]);
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);

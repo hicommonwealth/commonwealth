@@ -5,7 +5,7 @@
     width: auto;
     max-width: 500px;
     padding: 14px 28px 26px !important;
-    @include sm-min {
+    @include extraSmall {
       float: right;
     }
   }
@@ -80,14 +80,14 @@
     display: inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
-    @include sm-min {
+    @include extraSmall {
       border-right: 1px darken($color: $primary-400, $amount: 5%) solid;
       flex-direction: column;
       flex-wrap: nowrap;
       width: 200px;
     }
 
-    @include xs-max {
+    @include extraSmall {
       margin: 0 20px;
     }
     .inviteTitle {
@@ -95,14 +95,14 @@
       font-weight: 500;
       padding: 24px 0 4px;
       margin: 0 10px;
-      @include sm-min {
+      @include extraSmall {
         margin: 0;
         padding: 18px 21px 13px;
         border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
       }
       &.selected {
         border-bottom: 3px $green-500 solid;
-        @include sm-min {
+        @include extraSmall {
           border-left: 8px $green-500 solid;
           border-bottom: 1px darken($color: $primary-400, $amount: 5%) solid;
           padding-left: 13px;

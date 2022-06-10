@@ -1,6 +1,6 @@
 import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode, StdFee } from '@terra-money/terra.js';
+import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -9,7 +9,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   private _extension = new Extension()
 
   public readonly name = WalletId.TerraStation;
-  public readonly label = 'TerraStation';
+  public readonly label = 'Terra Station';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly specificChains = ['terra'];
 
@@ -40,9 +40,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     try {
       this._extension.once('onConnect', (accountAddr) => {
         if (accountAddr && !this._accounts.includes(accountAddr)) {
-          console.log(accountAddr);
           this._accounts.push(accountAddr);
-          console.log('enabled and added');
         }
         this._enabled = this._accounts.length !== 0;
       });
@@ -55,31 +53,22 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    this._extension.on('onSign', (payload) => {
-      console.log(payload);
-    });
-    const msgs: Msg[] = [
-      new MsgStoreCode(this._accounts[0], account.validationToken)
-    ];
-    try {
-      this._extension.sign({
-        fee: new StdFee(0, '0ust'),
-        msgs
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
         if (payload.result?.signature) resolve(payload.result);
         else reject();
       });
+      try {
+        this._extension.signBytes({
+          bytes: Buffer.from(account.validationToken)
+        })
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     const signature = {
-      signed: result.stdSignMsgData,
       signature: {
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
