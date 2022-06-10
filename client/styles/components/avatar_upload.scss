@@ -9,6 +9,10 @@
       border-radius: $border-radius-round;
       height: 60px;
       width: 60px;
+
+      &.hasNoAvatar {
+        background-color: $neutral-800;
+      }
     }
 
     .dropzone-preview-container {
@@ -27,6 +31,10 @@
       border-radius: $border-radius-round;
       height: 108px;
       width: 108px;
+
+      &.hasNoAvatar {
+        background-color: $neutral-800;
+      }
     }
 
     .dropzone-preview-container {
@@ -66,10 +74,6 @@
   }
 
   .dropzone-preview-container {
-    &.hasNoAvatar {
-      background-color: $neutral-800;
-    }
-
     .dz-preview {
       .dz-image {
         height: 100%;

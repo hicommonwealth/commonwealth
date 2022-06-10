@@ -116,7 +116,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(
               { hasNoAvatar: isUndefined(account) },
-              'dropzone-preview-container'
+              'dropzone-attach'
             )}
           >
             {account?.profile?.avatarUrl
