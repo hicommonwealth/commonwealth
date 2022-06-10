@@ -47,7 +47,6 @@ export class EditProfileModal
         </div>
         <div class="compact-modal-body">
           <AvatarUpload
-            size="small"
             account={account}
             uploadStartedCallback={() => {
               m.redraw();

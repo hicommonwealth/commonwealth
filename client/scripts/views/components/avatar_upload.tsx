@@ -8,16 +8,20 @@ import 'components/avatar_upload.scss';
 
 import app from 'state';
 import { Account } from 'models';
+import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
+type AvatarUploadStyleAttrs = {
+  size: 'small' | 'large';
+};
+
 type AvatarUploadAttrs = {
   account?: Account<any>;
-  size?: 'small' | 'large';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
-};
+} & AvatarUploadStyleAttrs;
 
 export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
@@ -91,21 +95,33 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   }
 
   view(vnode) {
-    const { account, size } = vnode.attrs;
+    const { account, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
     return (
-      <div class={ComponentType.AvatarUpload}>
+      <div
+        class={getClasses<AvatarUploadStyleAttrs>(
+          { size },
+          ComponentType.AvatarUpload
+        )}
+      >
         <CWIconButton
           iconButtonTheme="primary"
           iconName="plusCircle"
-          iconSize="small"
+          iconSize={size === 'small' ? 'small' : 'medium'}
         />
         {!this.uploaded && (
-          <div class="dropzone-attach">
-            {account.profile.getAvatar(avatarSize)}
+          <div
+            class={getClasses<{ hasNoAvatar: boolean }>(
+              { hasNoAvatar: isUndefined(account) },
+              'dropzone-preview-container'
+            )}
+          >
+            {account?.profile?.avatarUrl
+              ? account?.profile?.getAvatar(avatarSize)
+              : null}
           </div>
         )}
         <div
