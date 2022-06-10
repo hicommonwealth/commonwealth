@@ -40,8 +40,6 @@ export class EditProfileModal
   view(vnode) {
     const { account, refreshCallback } = vnode.attrs;
 
-    console.log(this);
-
     return (
       <div class="EditProfileModal">
         <div class="compact-modal-title">
