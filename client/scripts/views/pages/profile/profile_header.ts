@@ -7,7 +7,6 @@ import app from 'state';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';

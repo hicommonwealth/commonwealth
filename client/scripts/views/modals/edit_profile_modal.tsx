@@ -28,8 +28,19 @@ export class EditProfileModal
   private name: string;
   private saving: boolean;
 
+  oninit(vnode) {
+    const { account } = vnode.attrs;
+
+    this.avatarUrl = account.profile.avatarUrl;
+    this.bio = account.profile.bio;
+    this.headline = account.profile.headline;
+    this.name = account.profile.name;
+  }
+
   view(vnode) {
     const { account, refreshCallback } = vnode.attrs;
+
+    console.log(this);
 
     return (
       <div class="EditProfileModal">
@@ -53,7 +64,7 @@ export class EditProfileModal
           <CWTextInput
             label="Name"
             name="name"
-            defaultValue={account.name || account.profile.name}
+            defaultValue={this.name}
             placeholder="Add your name"
             disabled={account.profile.isOnchain}
             autocomplete="off"
@@ -66,7 +77,7 @@ export class EditProfileModal
           <CWTextInput
             label="Headline"
             name="headline"
-            defaultValue={account.profile.headline}
+            defaultValue={this.headline}
             placeholder="Add a headline"
             autocomplete="off"
             oninput={(e) => {
@@ -78,7 +89,7 @@ export class EditProfileModal
           <CWTextArea
             name="bio"
             label="Bio"
-            defaultValue={account.profile.bio}
+            defaultValue={this.bio}
             placeholder="Add a bio"
             oninput={(e) => {
               if (account.profile) {
@@ -93,9 +104,9 @@ export class EditProfileModal
                 e.preventDefault();
 
                 const data = {
-                  bio: this.bio || account.profile.bio,
-                  headline: this.headline || account.profile.headline,
-                  name: this.name || account.name || account.profile.name,
+                  bio: this.bio,
+                  headline: this.headline,
+                  name: this.name,
                   avatarUrl: this.avatarUrl,
                 };
 
