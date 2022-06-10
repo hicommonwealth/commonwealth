@@ -51,21 +51,26 @@ const User: m.Component<
       popover,
       showRole,
     } = vnode.attrs;
-    const { showFullAddress, autoTruncate, maxCharLength } =
-      vnode.attrs.addressDisplayOptions || {};
+
+    const { maxCharLength } = vnode.attrs.addressDisplayOptions || {};
+
     const avatarSize = vnode.attrs.avatarSize || 16;
+
     const showAvatar = !hideAvatar;
+
     if (!user) return;
 
     let account: Account<any>;
     let profile: Profile; // profile is used to retrieve the chain and address later
     let role;
+
     const addrShort = formatAddressShort(
       user.address,
       typeof user.chain === 'string' ? user.chain : user.chain?.id,
       false,
       maxCharLength
     );
+
     const friendlyChainName = app.config.chains.getById(
       typeof user.chain === 'string' ? user.chain : user.chain?.id
     )?.name;
@@ -102,7 +107,9 @@ const User: m.Component<
           account = null;
         }
       }
+
       profile = app.profiles.getProfile(chainId, address);
+
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId
       );
@@ -132,6 +139,7 @@ const User: m.Component<
         (r) => r.address === account.address && r.address_chain === chainId
       );
     }
+
     const getRoleTags = (long?) => [
       // 'long' makes role tags show as full length text
       profile.isCouncillor &&
@@ -162,30 +170,24 @@ const User: m.Component<
           size: 'xs',
         }),
     ];
+
     const ghostAddress = app.user.addresses.some(
       ({ address, ghostAddress }) => {
         if (this !== undefined) account.address === address && ghostAddress;
       }
     );
+
     const userFinal = avatarOnly
       ? m(
           '.User.avatar-only',
           {
             key: profile?.address || '-',
           },
-          [
-            m(
-              '.user-avatar-only',
-              { style: `width: ${avatarSize}px; height: ${avatarSize}px;` },
-              [
-                !profile
-                  ? null
-                  : profile.avatarUrl
-                  ? profile.getAvatar(avatarSize)
-                  : profile.getAvatar(avatarSize - 4),
-              ]
-            ),
-          ]
+          !profile
+            ? null
+            : profile.avatarUrl
+            ? profile.getAvatar(avatarSize)
+            : profile.getAvatar(avatarSize - 4)
         )
       : m(
           '.User',
@@ -367,7 +369,6 @@ export const UserBlock: m.Component<{
       popover,
       showRole,
       searchTerm,
-      hideOnchainRole,
       showAddressWithDisplayName,
       showChainName,
       selected,
@@ -376,10 +377,10 @@ export const UserBlock: m.Component<{
       addressDisplayOptions,
     } = vnode.attrs;
 
-    const { showFullAddress, autoTruncate, maxCharLength } =
-      vnode.attrs.addressDisplayOptions || {};
+    const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
 
     let profile;
+
     if (user instanceof AddressInfo) {
       if (!user.chain || !user.address) return;
       profile = app.profiles.getProfile(user.chain, user.address);
@@ -393,9 +394,9 @@ export const UserBlock: m.Component<{
       profile?.address &&
       searchTerm &&
       profile.address.toLowerCase().includes(searchTerm);
+
     const highlightedAddress = highlightSearchTerm
       ? (() => {
-          const isNear = profile.address.chain === 'near';
           const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
           const queryEnd = queryStart + searchTerm.length;
 
@@ -497,10 +498,14 @@ export const AnonymousUser: m.Component<
       distinguishingKey,
       showAsDeleted,
     } = vnode.attrs;
+
     const showAvatar = !hideAvatar;
+
     let profileAvatar;
+
     if (showAvatar) {
       const pseudoAddress = distinguishingKey;
+
       profileAvatar = m('svg.Jdenticon', {
         style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,

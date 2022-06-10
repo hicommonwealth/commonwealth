@@ -12,6 +12,7 @@ import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
 type AvatarUploadAttrs = {
+  size?: 'large' | 'small';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
 };
