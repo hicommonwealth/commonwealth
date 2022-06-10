@@ -8,7 +8,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 // map of snapshot spaces and associated chains
 // ALT: chainId could be an Array<ChainInstance> if we want to preserve it
-type CacheT = { [snapshotCache: string] : Set<string> };
+type CacheT = { [snapshotCache: string] : Map<string, Array<string>>};
 
 export default class SnapshotSpaceCache extends JobRunner<CacheT> {
   private _models: DB;
@@ -16,7 +16,7 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
       models: DB,
       // Update the cache every hour
       jobTimeS = 60 * 60,
-      cache: CacheT = { snapshotCache : new Set<string>() }
+      cache: CacheT = { snapshotCache : new Map<string, Array<string>>() }
     ) {
       super(cache, jobTimeS);
       this._models = models;
@@ -60,7 +60,7 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
     //      check method because cacheJobRunner makes the _job method
     //      run before all others
     const allSnapshots = await this._models.Chain.findAll({
-      attributes: ['snapshot'],
+      attributes: ['id', 'snapshot'],
       where: {
         snapshot: {
           [Op.ne]: []
@@ -70,9 +70,7 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
 
     // Get all snapshot spaces out of the ChainInstance array and add it to the snapshotCache
     allSnapshots.forEach((chainInstance: ChainInstance) => {
-      chainInstance.snapshot.forEach((snapshotSpace: string) => {
-        c.snapshotCache.add(snapshotSpace);
-      });
+      c.snapshotCache.set(chainInstance.id, chainInstance.snapshot);
     });
 
     return log.info(`Snapshot Space Cache Job Complete.`);
