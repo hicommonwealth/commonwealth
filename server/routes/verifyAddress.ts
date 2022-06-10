@@ -366,6 +366,13 @@ const verifySignature = async (
         object_id: `user-${user.id}`,
         is_active: true,
       });
+      // Automatically create subscription to chat mentions
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewChatMention,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      });
       addressModel.user_id = user.id;
     }
   } else if (isValid) {
@@ -514,7 +521,7 @@ const verifyAddress = async (
           isCustomDomain: null,
         });
       }
-      //mixpanelPeopleSet(req.user.id.toString());
+      // mixpanelPeopleSet(req.user.id.toString());
       return res.json({
         status: 'Success',
         result: {

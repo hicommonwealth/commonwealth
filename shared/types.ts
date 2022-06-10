@@ -18,6 +18,7 @@ export const NotificationCategories = {
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
   EntityEvent: 'entity-event',
+  NewChatMention: 'new-chat-mention',
 };
 
 export enum ProposalType {

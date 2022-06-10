@@ -180,6 +180,14 @@ export function useMagicAuth(models: DB) {
             is_active: true,
           }, { transaction: t });
 
+          // Automatically create subscription to chat mentions
+          await models.Subscription.create({
+            subscriber_id: newUser.id,
+            category_id: NotificationCategories.NewChatMention,
+            object_id: `user-${newUser.id}`,
+            is_active: true,
+          }, { transaction: t });
+
           // create token with provided user/address
           await models.SsoToken.create({
             issuer: userMetadata.issuer,

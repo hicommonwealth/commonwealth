@@ -46,7 +46,7 @@ const handleMentions = async (models: DB, socket: any, message: any, id: number,
             if (shouldNotifyMentionedUser)
               await models.Subscription.emitNotifications(
                 models,
-                NotificationCategories.NewMention,
+                NotificationCategories.NewChatMention,
                 `user-${mentionedAddress.User.id}`,
                 {
                     messageId: id,
