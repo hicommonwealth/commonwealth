@@ -1,7 +1,5 @@
 @import 'shared';
 
-// custom animation? progress bar enough?
-
 .AvatarUpload {
   align-items: center;
   cursor: pointer;
@@ -23,10 +21,8 @@
   }
 
   .dropzone-attach {
-    background-color: $neutral-900;
     border-radius: $border-radius-round;
     height: 60px;
-    overflow: hidden;
     width: 60px;
   }
 

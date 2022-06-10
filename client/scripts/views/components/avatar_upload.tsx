@@ -7,12 +7,14 @@ import Dropzone from 'dropzone';
 import 'components/avatar_upload.scss';
 
 import app from 'state';
+import { Account } from 'models';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
 type AvatarUploadAttrs = {
-  size?: 'large' | 'small';
+  account?: Account<any>;
+  size?: 'small' | 'large';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
 };
@@ -27,8 +29,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
 
     this.dropzone = new Dropzone(vnode.dom, {
-      // configuration for textarea dropzone
-      clickable: ['.dropzone-attach', '.IconButton'],
+      clickable: '.IconButton',
       previewsContainer: '.AvatarUpload .dropzone-preview-container',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
@@ -89,7 +90,10 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view() {
+  view(vnode) {
+    const { account, size } = vnode.attrs;
+
+    const avatarSize = size === 'small' ? 60 : 108;
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
     return (
@@ -99,13 +103,17 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           iconName="plusCircle"
           iconSize="small"
         />
-        {!this.uploaded && <div class="dropzone-attach" />}
+        {!this.uploaded && (
+          <div class="dropzone-attach">
+            {account.profile.getAvatar(avatarSize)}
+          </div>
+        )}
         <div
           class={getClasses<{ hidden: boolean }>(
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}
-          style={`background-image: url(${logoURL}); background-size: 92px;`}
+          style={`background-image: url(${logoURL}); background-size: ${avatarSize}px;`}
         />
       </div>
     );

@@ -283,15 +283,6 @@
   }
   .bio-left {
     width: 94px;
-    .avatar {
-      width: 94px;
-      height: 94px;
-      position: relative;
-      border-radius: 9999px;
-      .avatar-image {
-        background-size: cover;
-      }
-    }
   }
   .bio-right {
     flex: 1;
@@ -353,9 +344,6 @@
     @include mediumSmallInclusive {
       display: none;
     }
-  }
-  .avatar {
-    display: block;
   }
   .name-row {
     .name,

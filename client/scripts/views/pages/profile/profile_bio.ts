@@ -140,7 +140,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             account.profile &&
               m('.bio-left', [
                 // TODO: Rename class to non-bio to avoid confusion with Bio component
-                m('.avatar', account.profile?.getAvatar(90)),
+                account.profile?.getAvatar(90),
               ]),
             m('.bio-right', [
               m('.name-row', [
