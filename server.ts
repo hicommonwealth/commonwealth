@@ -6,7 +6,6 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import fs from 'fs';
 
-import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';

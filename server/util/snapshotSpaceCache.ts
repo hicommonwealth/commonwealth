@@ -6,7 +6,7 @@ import { ChainInstance } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-// map of snapshot spaces and associated chains
+// Map of snapshot spaces and associated chains
 // ALT: chainId could be an Array<ChainInstance> if we want to preserve it
 type CacheT = { [snapshotCache: string] : Map<string, Array<string>>};
 
@@ -27,19 +27,28 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
     log.info(`Started Snapshot Space Cache.`);
   }
 
-  public async check(snapshot : string): Promise<boolean> {
-    const result = await this.access((async (c: CacheT): Promise<boolean | undefined> => {
-      // Just in case cache is empty
+  // This will check if the given snapshot space is in the cache and will return
+  // either an array of the chains that subscribe to that space or an empty array
+  public async checkChainsToNotify(snapshot : string): Promise<string[]> {
+    const chainsToNotify = await this.access((async (c: CacheT): Promise<string[] | undefined> => {
+      const subscribedChains : string[] = [];
+
+      // In case cache is empty
       if (!c.snapshotCache.size) {
         // Call _job to populate cache
         await this._job(c);
       }
 
       // Check if the snapshot space is in the cache
-      return c.snapshotCache.has(snapshot);
+      c.snapshotCache.forEach((snapshotArray, spaceName) => {
+        if (snapshotArray.includes(snapshot)) {
+          subscribedChains.push(spaceName);
+        }
+      });
+      return subscribedChains;
     }));
 
-    return result;
+    return chainsToNotify;
   }
 
   protected async _job(c: CacheT): Promise<void> {
@@ -68,11 +77,13 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
       },
     });
 
-    // Get all snapshot spaces out of the ChainInstance array and add it to the snapshotCache
+    // Get chains and the snapshot spaces they subscribe to out of the ChainInstance array
+    // and add it to the snapshotCache
     allSnapshots.forEach((chainInstance: ChainInstance) => {
       c.snapshotCache.set(chainInstance.id, chainInstance.snapshot);
     });
 
+    console.log(c.snapshotCache);
     return log.info(`Snapshot Space Cache Job Complete.`);
   }
 }
