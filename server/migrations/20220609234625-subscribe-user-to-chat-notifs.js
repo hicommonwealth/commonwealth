@@ -3,18 +3,16 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(`
         INSERT INTO "NotificationCategories"
-        VALUES ('new-chat-mention', 'someone mentions a user in chat');
+        VALUES ('new-chat-mention', 'someone mentions a user in chat', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
       `, {transaction: t, raw: true, type: 'RAW'});
 
       await queryInterface.sequelize.query(`
-        INSERT INTO "Subscriptions"
-        SELECT nextval('"Subscriptions_id_seq"'::regclass) as id,
-                id                                         as subscriber_id,
-                'new-chat-mention'                         as category_id,
-                ('user-' || id)                            as object_id,
-                TRUE                                       as is_active,
-                CURRENT_TIMESTAMP                          as created_at,
-                CURRENT_TIMESTAMP                          as updated_at
+        INSERT INTO "Subscriptions" (subscriber_id, category_id, object_id, created_at, updated_at)
+        SELECT  id,
+                'new-chat-mention',
+                ('user-' || id),
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP 
         FROM "Users";
       `, {transaction: t, raw: true, type: 'RAW'});
     })

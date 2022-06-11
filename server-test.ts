@@ -10,6 +10,7 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import BN from 'bn.js';
 
+import Rollbar from "rollbar";
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
@@ -24,7 +25,6 @@ import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
-import Rollbar from "rollbar";
 
 require('express-async-errors');
 
@@ -282,6 +282,10 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
         description: 'an entity-event as occurred'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewChatMention,
+        description: 'someone mentions a user in chat'
       })
 
       // Admins need to be subscribed to mentions and collaborations
