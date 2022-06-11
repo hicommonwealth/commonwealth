@@ -38,6 +38,19 @@ const snapshotListener = async (
     return success(res, "Snapshot POST Recieved, Space not present");
   }
 
+  // 1. Get subscribers to send notifications to
+
+  // 2. bulk create notification instances for each chain_id
+
+  // 3. map into array all the notificationReads for each subscriber on each chain_id
+
+  // 4. bulk create notificationReads
+
+  // 5. create msg formats and send immediate emails
+
+  // 6. ping webhooks? (not sure if this is necessary we don't expose this as an option in the UI yet)
+
+
   // Build array of notifications to emit from array of chains to notify
   const notificationObjects = chainsToNotify.map((chain:string): NotificationInstance => {
     const notification = models.Notification.build({
