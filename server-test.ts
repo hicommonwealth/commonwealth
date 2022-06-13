@@ -39,14 +39,14 @@ const identityFetchCache = new IdentityFetchCache(10 * 60);
 class MockTokenBalanceProvider extends TokenBalanceProvider {
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
-  public async getTokenBalance(
+  public async getEthTokenBalance(
     address: string,
-    chain: ChainAttributes,
-    url?: string,
-    contractAddress?: string
+    network: string,
+    tokenAddress?: string,
+    userAddress?: string
   ): Promise<BN> {
     if (this.balanceFn) {
-      return this.balanceFn(contractAddress, address);
+      return this.balanceFn(tokenAddress, userAddress);
     } else {
       throw new Error('unable to fetch token balance');
     }
