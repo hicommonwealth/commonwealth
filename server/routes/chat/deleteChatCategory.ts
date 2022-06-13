@@ -26,15 +26,13 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     }
 
     // finds all channels with category and deletes them
-    const channels = await models.ChatChannel.findAll({
-        where: {
-            chain_id: req.body.chain_id,
-            category: req.body.category
-        }
-    });
-
     try {
-        await Promise.all(channels.map(c => {return c.destroy()}))
+        await models.ChatChannel.destroy({
+            where: {
+                chain_id: req.body.chain_id,
+                category: req.body.category
+            }
+        });
     } catch (e) {
         return next(new Error(e))
     }
