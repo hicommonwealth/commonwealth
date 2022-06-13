@@ -60,8 +60,7 @@ const User: m.Component<
     if (!user) return;
 
     let account: Account<any>;
-    let profile: Profile; // profile is used to retrieve the chain and address later
-    const profileBanned = false; // ZAK TODO: Update this with BannedAddresses Query
+    let profile: Profile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.user.isAdminOfEntity({
@@ -340,24 +339,16 @@ const User: m.Component<
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
           m('.ban-wrapper', [
-            !profileBanned
-              ? m(CWButton, {
-                  onclick: () => {
-                    app.modals.create({
-                      modal: BanUserModal,
-                      data: { profile }, // ZAK TODO: Might need to thread some other variable through to the modal
-                    });
-                  },
-                  label: 'Ban User',
-                  buttonType: 'primary-red',
-                })
-              : m(CWButton, {
-                  onclick: () => {
-                    // ZAK TODO: Do we want an unban method?
-                  },
-                  label: 'Banned',
-                  buttonType: 'secondary-red',
-                }),
+            m(CWButton, {
+              onclick: () => {
+                app.modals.create({
+                  modal: BanUserModal,
+                  data: { profile },
+                });
+              },
+              label: 'Ban User',
+              buttonType: 'primary-red',
+            })
           ]),
       ]
     );
