@@ -23,6 +23,7 @@ import {
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
+import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import { ChainAttributes } from './server/models/chain';
 
@@ -345,7 +346,9 @@ const setupServer = () => {
 };
 
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache);
+
+const banCache = new BanCache(models);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, banCache);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -361,6 +364,7 @@ setupServer();
 export const resetDatabase = () => resetServer();
 export const getIdentityFetchCache = () => identityFetchCache;
 export const getTokenBalanceCache = () => tokenBalanceCache;
+export const getBanCache = () => banCache;
 export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;
