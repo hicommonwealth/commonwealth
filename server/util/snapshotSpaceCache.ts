@@ -83,7 +83,8 @@ export default class SnapshotSpaceCache extends JobRunner<CacheT> {
       c.snapshotCache.set(chainInstance.id, chainInstance.snapshot);
     });
 
-    console.log(c.snapshotCache);
+    // Print all the snapshot spaces in the cache for debugging
+    // console.log(c.snapshotCache);
     return log.info(`Snapshot Space Cache Job Complete.`);
   }
 }
