@@ -61,14 +61,11 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
       }
     }
     // find and delete all associated subscriptions
-    const subscriptions = await models.Subscription.findAll({
+    await models.Subscription.destroy({
       where: {
         offchain_comment_id: comment.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
 
     // actually delete
     await comment.destroy();
