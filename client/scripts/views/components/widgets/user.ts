@@ -12,6 +12,8 @@ import { ChainBase } from 'types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWButton } from '../component_kit/cw_button';
+import { BanUserModal } from '../../modals/ban_user_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -58,7 +60,12 @@ const User: m.Component<
     if (!user) return;
 
     let account: Account<any>;
-    let profile: Profile; // profile is used to retrieve the chain and address later
+    let profile: Profile;
+    const loggedInUserIsAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
     let role;
     const addrShort = formatAddressShort(
       user.address,
@@ -328,6 +335,21 @@ const User: m.Component<
           ),
         friendlyChainName && m('.user-chain', friendlyChainName),
         getRoleTags(true), // always show roleTags in .UserPopover
+
+        // If Admin Allow Banning
+        loggedInUserIsAdmin &&
+          m('.ban-wrapper', [
+            m(CWButton, {
+              onclick: () => {
+                app.modals.create({
+                  modal: BanUserModal,
+                  data: { profile },
+                });
+              },
+              label: 'Ban User',
+              buttonType: 'primary-red',
+            })
+          ]),
       ]
     );
 
