@@ -4,11 +4,10 @@ import { StateMutabilityType, AbiType } from 'web3-utils';
 import * as solw3 from '@solana/web3.js';
 import {
   QueryClient,
-  BankExtension,
   setupBankExtension,
   setupStakingExtension,
 } from '@cosmjs/stargate';
-import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { LCDClient } from '@terra-money/terra.js';
 
 import BN from 'bn.js';
@@ -40,8 +39,119 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
+  public async getTokenBalance(
+    address: string,
+    chain: ChainAttributes,
+    url?: string,
+    contractAddress?: string
+  ): Promise<BN> {
+    // TODO: add near/sputnik
+    if (chain.network === ChainNetwork.AxieInfinity) {
+      return this._getRoninTokenBalance(address);
+    } else if (chain.network === ChainNetwork.Terra) {
+      return this._getTerraTokenBalance(url, address);
+    } else if (chain.base === ChainBase.Ethereum) {
+      return this._getEthTokenBalance(url, chain.network, contractAddress, address);
+    } else if (chain.base === ChainBase.Solana) {
+      return this._getSplTokenBalance(url as solw3.Cluster, contractAddress, address);
+    } else if (chain.base === ChainBase.CosmosSDK) {
+      return this._getCosmosTokenBalance(url, address);
+    } else {
+      throw new Error(`No balance available on chain ${chain.id}`);
+    }
+  }
 
-  public async getRoninTokenBalance(address: string) {
+  /*
+   *  General balances for chain bases.
+   */
+
+  private async _getEthTokenBalance(
+    url: string,
+    network: string,
+    tokenAddress: string,
+    userAddress: string
+  ): Promise<BN> {
+    const provider = new Web3.providers.WebsocketProvider(url);
+    let api;
+    if(network === ChainNetwork.ERC20) {
+      api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
+    }
+    else if(network === ChainNetwork.ERC721) {
+      api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
+    }
+    else {
+      throw new Error('Invalid token chain network');
+    }
+    await api.deployed();
+    const balanceBigNum = await api.balanceOf(userAddress);
+    provider.disconnect(1000, 'finished');
+    return new BN(balanceBigNum.toString());
+  }
+
+  private async _getSplTokenBalance(cluster: solw3.Cluster, mint: string, user: string): Promise<BN> {
+    const url = solw3.clusterApiUrl(cluster);
+    const connection = new solw3.Connection(url);
+    const mintPubKey = new solw3.PublicKey(mint);
+    const userPubKey = new solw3.PublicKey(user);
+    const { value } = await connection.getParsedTokenAccountsByOwner(
+      userPubKey,
+      { mint: mintPubKey },
+    );
+    const amount: string = value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
+    return new BN(amount, 10);
+  }
+
+  private async _getCosmosTokenBalance(url: string, userAddress: string): Promise<BN> {
+    /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
+    const tmClient = await Tendermint34Client.connect(url);
+
+    const api = QueryClient.withExtensions(
+      tmClient,
+      setupBankExtension,
+      setupStakingExtension,
+    );
+
+    try {
+      const { params: { bondDenom } } = await api.staking.params();
+      const denom = bondDenom;
+      // TODO: include staking balance alongside bank balance?
+      const bal = await api.bank.balance(userAddress, denom);
+      return new BN(bal.amount);
+    } catch (e) {
+      throw new Error(`no balance found: ${e.message}`);
+    }
+  }
+
+  /*
+   *  Special balances for unique chain networks.
+   */
+  private async _getTerraTokenBalance(url: string, userAddress: string): Promise<BN> {
+    if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {
+      throw new Error('No API key found for terra endpoint');
+    }
+    const api = new LCDClient({
+      URL: `${url}/node_info?key=${process.env.TERRA_SETTEN_PHOENIX_API_KEY}`,
+      chainID: 'phoenix-1',
+    });
+
+    try {
+      // NOTE: terra.js staking module is incompatible with stargate queries
+      const balResp = await api.bank.balance(userAddress);
+      let balance: BN;
+
+      // hardcoded token symbol is "uluna"
+      if (balResp[0].get('uluna')) {
+        balance = new BN(balResp[0].get('uluna').toString());
+      } else {
+        balance = new BN(0);
+      }
+      return balance;
+    } catch (e) {
+      throw new Error(`no balance found: ${e.message}`);
+    }
+  }
+
+  private async _getRoninTokenBalance(address: string) {
     // TODO: make configurable
     const rpcUrl = 'https://api.roninchain.com/rpc';
     const provider = new Web3.providers.HttpProvider(rpcUrl);
@@ -80,88 +190,6 @@ export class TokenBalanceProvider {
     const stakingPoolBalance = await axsStakingPoolContract.methods.getStakingAmount(address).call();
     provider.disconnect();
     return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
-  }
-
-  public async getEthTokenBalance(url: string, network: string,
-  tokenAddress: string, userAddress: string): Promise<BN> {
-    const provider = new Web3.providers.WebsocketProvider(url);
-    let api;
-    if(network === ChainNetwork.ERC20) {
-      api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
-    }
-    else if(network === ChainNetwork.ERC721) {
-      api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
-    }
-    else {
-      throw new Error('Invalid token chain network');
-    }
-    await api.deployed();
-    const balanceBigNum = await api.balanceOf(userAddress);
-    provider.disconnect(1000, 'finished');
-    return new BN(balanceBigNum.toString());
-  }
-
-  public async getCosmosTokenBalance(url: string, network: string, userAddress: string): Promise<BN> {
-    /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */ 
-    
-    let balance;
-    let api;
-    if (network === ChainNetwork.Terra) {
-
-      api = new LCDClient({
-        URL: url + `/node_info?key=${process.env.TERRA_SETTEN_PHOENIX_API_KEY}`, 
-        chainID: 'phoenix-1',
-      });
-
-      try {
-        /* terra.js staking.parameter call returns 
-           Cannot read property 'unbonding_time' of undefined unbonding_time */
-
-        /* bank/v1beta1/denoms_metadata/uluna => exponent => look for luna???*/
-        const bal = await api.bank.balance(userAddress);
-        (bal[0].get('uluna')) ? balance = new BN(bal[0].get('uluna').toString()) : 
-          balance = new BN(0);
-        return balance;
-      } catch (e) {
-        // if coins is null, they have a zero balance
-        balance = new BN(0);
-        throw new Error(`no balance found: ${e.message}`); 
-      }
-
-    } else {
-      const tmClient = await Tendermint34Client.connect(url);
-
-      api = QueryClient.withExtensions(
-        tmClient,
-        setupBankExtension,
-        setupStakingExtension,
-      );
-
-      try {
-        const { params: { bondDenom } } = await api.staking.params();
-        const denom = bondDenom;
-        const bal = await api.bank.balance(userAddress, denom);
-        console.log(bal);
-        return balance = new BN(bal.amount);
-      } catch (e) {
-        // if coins is null, they have a zero balance
-        balance = new BN(0);
-        throw new Error(`no balance found: ${e.message}`); 
-      }
-    }
-  }
-
-  public async getSplTokenBalance(cluster: solw3.Cluster, mint: string, user: string): Promise<BN> {
-    const url = solw3.clusterApiUrl(cluster);
-    const connection = new solw3.Connection(url);
-    const mintPubKey = new solw3.PublicKey(mint);
-    const userPubKey = new solw3.PublicKey(user);
-    const { value } = await connection.getParsedTokenAccountsByOwner(
-      userPubKey,
-      { mint: mintPubKey },
-    );
-    const amount: string = value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
-    return new BN(amount, 10);
   }
 }
 
@@ -252,53 +280,25 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     if (result !== undefined) return result;
 
     // fetch balance if not found in cache
-    let balance: BN;
     const fetchedAt = moment();
-    // TODO: add cosmos and other chains
     let contractAddress = chain.address;
-    if (chain.network === ChainNetwork.AxieInfinity) {
-      // special case for axie query using covalent
-      try {
-        balance = await this._balanceProvider.getRoninTokenBalance(address);
-      } catch (e) {
-        throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-    } else if (chain.base === ChainBase.Ethereum) {
-      if (!chain.address) {
-        // if token is not in the database, then query against the Token list
-        const tokenMeta = await this.models.Token.findOne({
-          where: {
-            id: chain.address,
-            chain_id: node.eth_chain_id,
-          }
-        });
-        if (!tokenMeta?.address) throw new Error('unsupported token');
-        contractAddress = tokenMeta.address;
-      } else if (!contractAddress) {
-        throw new Error('unsupported token');
-      }
 
-      const url = node.private_url || node.url;
-      try {
-        balance = await this._balanceProvider.getEthTokenBalance(url, chain.network, contractAddress, address);
-      } catch (e) {
-        throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-    } else if (chain.base === ChainBase.Solana) {
-      try {
-        balance = await this._balanceProvider.getSplTokenBalance(node.url as solw3.Cluster, contractAddress, address);
-      } catch (e) {
-        throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-    } else if (chain.base === ChainBase.CosmosSDK) {
-      try {
-        balance = await this._balanceProvider.getCosmosTokenBalance(node.url, chain.network, address);
-      } catch (e) {
-        throw new Error(`Could not fetch token balance: ${e.message}`);
-      }
-    } else {
-      throw new Error('Invalid token chain base');
+    // if token is not in the database, then query against the Token list
+    if (chain.base === ChainBase.Ethereum && chain.network !== ChainNetwork.AxieInfinity && !contractAddress) {
+      const tokenMeta = await this.models.Token.findOne({
+        where: {
+          id: chain.address,
+          chain_id: node.eth_chain_id,
+        }
+      });
+      if (!tokenMeta?.address) throw new Error('unsupported token');
+      contractAddress = tokenMeta.address;
     }
+
+    const url = node.private_url || node.url;
+
+    // will throw on invalid chain / other error
+    const balance = await this._balanceProvider.getTokenBalance(address, chain, url, contractAddress);
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {

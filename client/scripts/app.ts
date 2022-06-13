@@ -224,14 +224,14 @@ export async function selectChain(
     ).default;
     newChain = new Substrate(chain, app);
   } else if (chain.base === ChainBase.CosmosSDK) {
-    const CosmosWithToken = (
+    const Cosmos = (
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "cosmos-main" */
-        './controllers/chain/cosmos/tokenAdapter'
+        './controllers/chain/cosmos/main'
       )
     ).default;
-    newChain = new CosmosWithToken(chain, app);
+    newChain = new Cosmos(chain, app);
   } else if (chain.network === ChainNetwork.Ethereum) {
     const Ethereum = (
       await import(
