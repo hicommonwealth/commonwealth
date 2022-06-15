@@ -121,7 +121,6 @@ export default class ProjectsController {
       curatorFee,
     } = projectData;
     const creator = this._app.user.activeAccount;
-    const cwUrl = `https://commonwealth.im/${chainId}/project/`; // TODO: Confirm with PMs
 
     // upload ipfs content
     // TODO: should we check for failure vs success in result?
@@ -149,6 +148,8 @@ export default class ProjectsController {
     );
 
     const projectId = (await contract.numProjects()).toNumber();
+    const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
+
     const tx = await contract.createProject(
       title.slice(0, 32),
       ipfsHash,
