@@ -12,7 +12,6 @@ import { attachSigner } from './contractApi';
 
 export type IProjectCreationData = {
   ipfsContent: string;
-  cwUrl: string;
   title: string; // TODO length limits for contract side
   shortDescription: string;
   description: string;
@@ -114,7 +113,6 @@ export default class ProjectsController {
     const {
       beneficiary,
       title,
-      cwUrl,
       ipfsContent,
       chainId,
       token,
@@ -123,6 +121,7 @@ export default class ProjectsController {
       curatorFee,
     } = projectData;
     const creator = this._app.user.activeAccount;
+    const cwUrl = `https://commonwealth.im/${chainId}/project/`; // TODO: Confirm with PMs
 
     // upload ipfs content
     // TODO: should we check for failure vs success in result?

@@ -10,18 +10,22 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, InputSelect } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import validate from '@snapshot-labs/snapshot.js/dist/validations/basic';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
 
 interface ICreateProjectForm {
   // Descriptive
-  name: string;
+  title: string;
   description: string;
   shortDescription: string;
   coverImage: string;
+  chainId: string;
 
   // Mechanical
   token: string;
-  threshold: number;
+  creator: string;
   beneficiary: string;
+  threshold: number;
   fundraiseLength: number;
   curatorFee: number;
 }
@@ -31,6 +35,50 @@ interface ICoverImageUploadAttrs {
   uploadStartedCallback?: CallableFunction;
   uploadCompleteCallback?: CallableFunction;
 }
+
+const validateTitle = (title: string) => {
+  if (!title) return false;
+  if (title.length < 3 || title.length > 64) return false;
+  return true;
+};
+
+const validateShortDescription = (description: string) => {
+  if (!description) return false;
+  if (description.length > 224) return false;
+  return true;
+};
+
+const validateDescription = (description: string) => {
+  if (!description) return false;
+  return true;
+};
+const validateToken = (token: string) => {
+  if (!token) return false;
+  return true;
+};
+const validateBeneficiary = (beneficiary: string) => {
+  if (!beneficiary) return false;
+  return true;
+};
+const validateCreator = (creator: string) => {
+  if (!creator) return false;
+  return true;
+};
+const validateFundraiseLength = (length: number) => {
+  if (!length) return false;
+  if (Number.isNaN(length)) return false;
+  return true;
+};
+const validateCuratorFee = (fee: number) => {
+  if (!fee) return false;
+  if (Number.isNaN(fee)) return false;
+  return true;
+};
+const validateThreshold = (threshold: number) => {
+  if (!threshold) return false;
+  if (Number.isNaN(threshold)) return false;
+  return true;
+};
 
 class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
   private dropzone?: any;
@@ -136,11 +184,11 @@ export class InformationSlide
           label="Name Your Crowdfund"
           name="Name"
           oninput={(e) => {
-            vnode.attrs.form.name = e.target.value;
+            vnode.attrs.form.title = e.target.value;
           }}
           inputValidationFn={(value) => {
-            const { length } = value;
-            if (length < 8 || length > 64) {
+            const isValid = validateTitle(value);
+            if (!isValid) {
               return [
                 'failed',
                 `Name must be between 8-64 characters. Current count: ${length}`,
@@ -151,14 +199,14 @@ export class InformationSlide
         {/* TODO: The below should be a textarea */}
         <CWTextInput
           placeholder="Write a short 2 or 3 sentence description of your project,"
-          label="Brief Description"
-          name="Brief Description"
+          label="Short Description"
+          name="Short Description"
           oninput={(e) => {
-            vnode.attrs.form.name = e.target.value;
+            vnode.attrs.form.shortDescription = e.target.value;
           }}
           inputValidationFn={(value) => {
-            const { length } = value;
-            if (length > 224) {
+            const isValid = validateShortDescription(value);
+            if (!isValid) {
               return [
                 'failed',
                 `Input limit is 224 characters. Current count: ${length}`,
@@ -268,7 +316,7 @@ export default class CreateProjectForm implements m.ClassComponent {
     if (!this.stage) this.stage = 'information';
     if (!this.form)
       this.form = {
-        name: '',
+        title: '',
         token: '',
         beneficiary: '',
         description: '',
@@ -277,6 +325,7 @@ export default class CreateProjectForm implements m.ClassComponent {
         curatorFee: 0,
         threshold: 0,
         fundraiseLength: 0,
+        chainId: app.activeChainId(),
       };
     console.log(this.stage);
     return (
@@ -330,6 +379,46 @@ export default class CreateProjectForm implements m.ClassComponent {
               onclick: (e) => {
                 e.preventDefault();
                 console.log(this.form);
+                const {
+                  title,
+                  shortDescription,
+                  description,
+                  coverImage,
+                  token,
+                  threshold,
+                  creator,
+                  beneficiary,
+                  fundraiseLength,
+                  curatorFee,
+                } = this.form;
+                const isValidTitle = validateTitle(title);
+                const isValidDescription = validateDescription(description);
+                const isValidShortDescription =
+                  validateShortDescription(shortDescription);
+                const isValidCoverImage = coverImage?.length > 0;
+                const isValidToken = validateToken(token);
+                const isValidBeneficiary = validateBeneficiary(beneficiary);
+                const isValidCreator = validateCreator(creator);
+                const isValidFundraiseLength =
+                  validateFundraiseLength(fundraiseLength);
+                const isValidCuratorFee = validateCuratorFee(curatorFee);
+                const isValidThreshold = validateThreshold(threshold);
+                if (
+                  !isValidTitle ||
+                  !isValidDescription ||
+                  !isValidShortDescription ||
+                  !isValidCoverImage ||
+                  !isValidToken ||
+                  !isValidBeneficiary ||
+                  !isValidCreator ||
+                  !isValidCuratorFee ||
+                  !isValidFundraiseLength ||
+                  !isValidThreshold
+                ) {
+                  notifyError('Invalid form. Please check inputs.');
+                }
+                if (!title || title.length)
+                  app.projects.createProject(this.form);
               },
             }),
           ]
