@@ -7,13 +7,14 @@ import _ from 'lodash';
 import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { AnonymousUser } from 'views/components/widgets/user';
-import { Project } from 'models';
+import { AddressInfo, Project } from 'models';
 import { Tag } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { weiToTokens } from 'helpers';
 import BN from 'bn.js';
 import app from 'state';
 import moment from 'moment';
+import { BigNumberish } from 'ethers';
 
 enum ProjectRole {
   Curator = 'curator',
@@ -53,6 +54,7 @@ class ProjectHeaderPanel
     const iconSize = vnode.attrs.iconSize || 32;
     const { coverImage, userRole, supportAmount } = vnode.attrs;
     const isSupporter = userRole !== ProjectRole.Author;
+    console.log(userRole);
     return (
       <div
         class="ProjectHeaderPanel"
@@ -110,20 +112,41 @@ interface ProjectInfoAttrs {
   projectStatus: 'succeeded' | 'failed';
 }
 class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
-  _viewLabel(status, deadline) {
-    return status ? (
-      <CWText type="caption" fontWeight="medium">
-        {_.capitalize(status)}
-      </CWText>
-    ) : (
-      <>
-        <CWIcon iconName="clock" iconSize="small" />
-        <CWText type="caption" fontWeight="medium">
-          <div class="project-deadline">{`${deadline.fromNow(true)}`}</div>
-        </CWText>
-      </>
-    );
+  getUserRoles(project: Project, addresses: AddressInfo[]) {
+    let backingAmount = new BN(0);
+    let curatorAmount = new BN(0);
+    let isAuthor = false;
+    let isCurator = false;
+    let isBacker = false;
+    for (const address of addresses) {
+      const addressInfo: [string, string] = [address.address, address.chain];
+      if (project.isAuthor(...addressInfo)) {
+        isAuthor = true;
+      }
+      if (project.isCurator(...addressInfo)) {
+        isCurator = true;
+        curatorAmount = curatorAmount.add(
+          project.getCuratedAmount(...addressInfo)
+        );
+      }
+      if (project.isBacker(...addressInfo)) {
+        isBacker = true;
+        backingAmount = backingAmount.add(
+          project.getBackedAmount(...addressInfo)
+        );
+      }
+    }
+    if (isAuthor) {
+      return [ProjectRole.Author, null];
+    } else if (isCurator) {
+      return [ProjectRole.Curator, curatorAmount];
+    } else if (isBacker) {
+      return [ProjectRole.Backer, backingAmount];
+    } else {
+      return [null, null];
+    }
   }
+
   view(vnode: m.Vnode<ProjectInfoAttrs>) {
     const { project, projectStatus, avatarSize } = vnode.attrs;
 
@@ -133,7 +156,22 @@ class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
           <Tag
             intent="none"
             class={projectStatus}
-            label={this._viewLabel(projectStatus, project.deadline)}
+            label={
+              projectStatus ? (
+                <CWText type="caption" fontWeight="medium">
+                  {_.capitalize(projectStatus)}
+                </CWText>
+              ) : (
+                <>
+                  <CWIcon iconName="clock" iconSize="small" />
+                  <CWText type="caption" fontWeight="medium">
+                    <div class="project-deadline">{`${project.deadline.fromNow(
+                      true
+                    )}`}</div>
+                  </CWText>
+                </>
+              )
+            }
           />
           <div class="funding-state">
             <CWText type="h5" fontWeight="bold">
@@ -211,28 +249,10 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //   </div>
     // );
 
-    const { activeAccount } = app.user;
-    let userRole: ProjectRole;
-    let supportAmount: BN;
-    if (activeAccount) {
-      const addressInfo: [string, string] = [
-        activeAccount.address,
-        activeAccount.chain.id,
-      ];
-      userRole = project.isAuthor(...addressInfo)
-        ? ProjectRole.Author
-        : project.isCurator(...addressInfo)
-        ? ProjectRole.Curator
-        : project.isBacker(...addressInfo)
-        ? ProjectRole.Backer
-        : null;
-      supportAmount =
-        userRole === ProjectRole.Curator
-          ? project.getCuratedAmount(...addressInfo)
-          : userRole === ProjectRole.Backer
-          ? project.getBackedAmount(...addressInfo)
-          : null;
-    }
+    const [userRole, supportAmount] = getUserRoles(app.user.addresses);
+
+    // userRole = ProjectRole.Author;
+    // supportAmount = 1.4;
 
     return (
       <div class="ProjectCard large" onclick={onclick}>

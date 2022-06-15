@@ -92,7 +92,7 @@ export default (
       targetKey: 'id',
     });
     models.Project.belongsTo(models.IpfsPins, {
-      foreignKey: 'ipfs_pin_hash',
+      foreignKey: 'ipfs_hash_id',
       targetKey: 'id',
     });
   };

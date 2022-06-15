@@ -10,8 +10,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, InputSelect } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import validate from '@snapshot-labs/snapshot.js/dist/validations/basic';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 
 interface ICreateProjectForm {
   // Descriptive
@@ -209,6 +208,7 @@ export class InformationSlide
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
           name="Short Description"
+          // textInputSize="Large"
           oninput={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
@@ -320,22 +320,24 @@ export class DescriptionSlide
 export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
   private stage: 'information' | 'fundraising' | 'description';
+  oninit() {
+    this.stage = 'information';
+    this.form = {
+      title: '',
+      token: '',
+      creator: '',
+      beneficiary: '',
+      description: '',
+      shortDescription: '',
+      coverImage: '',
+      curatorFee: 0,
+      threshold: 0,
+      deadline: 0,
+      chainId: app.activeChainId(),
+      ipfsContent: null,
+    };
+  }
   view() {
-    if (!this.stage) this.stage = 'information';
-    if (!this.form)
-      this.form = {
-        title: '',
-        token: '',
-        beneficiary: '',
-        description: '',
-        shortDescription: '',
-        coverImage: '',
-        curatorFee: 0,
-        threshold: 0,
-        fundraiseLength: 0,
-        chainId: app.activeChainId(),
-      };
-    console.log(this.stage);
     return (
       <div class="CreateProjectForm">
         <div class="left-sidebar"></div>
