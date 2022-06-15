@@ -7,7 +7,7 @@ import {
 import { ChainInfo, NodeInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'types';
-import BN from 'bn.js';
+import { BigNumberish } from 'ethers';
 import { attachSigner } from './contractApi';
 
 export type IProjectCreationData = {
@@ -20,9 +20,9 @@ export type IProjectCreationData = {
   token: string;
   creator: string;
   beneficiary: string;
-  threshold: BN;
-  deadline: number; // unix timestamp
-  curatorFee: BN;
+  threshold: BigNumberish;
+  deadline: BigNumberish;
+  curatorFee: BigNumberish;
 };
 
 export default class ProjectsController {
@@ -120,6 +120,7 @@ export default class ProjectsController {
       deadline,
       curatorFee,
     } = projectData;
+
     const creator = this._app.user.activeAccount;
 
     // upload ipfs content

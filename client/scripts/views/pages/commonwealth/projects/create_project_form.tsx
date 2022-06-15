@@ -26,8 +26,11 @@ interface ICreateProjectForm {
   creator: string;
   beneficiary: string;
   threshold: number;
-  fundraiseLength: number;
+  deadline: number;
   curatorFee: number;
+
+  // IPFS
+  ipfsContent: string;
 }
 
 interface ICoverImageUploadAttrs {
@@ -54,19 +57,23 @@ const validateDescription = (description: string) => {
 };
 const validateToken = (token: string) => {
   if (!token) return false;
+  // TODO: Valid address check
   return true;
 };
 const validateBeneficiary = (beneficiary: string) => {
   if (!beneficiary) return false;
+  // TODO: Valid address check
   return true;
 };
 const validateCreator = (creator: string) => {
   if (!creator) return false;
+  // TODO: Valid address check
   return true;
 };
-const validateFundraiseLength = (length: number) => {
+const validateDeadline = (length: number) => {
   if (!length) return false;
   if (Number.isNaN(length)) return false;
+  // TODO: Min deadline check
   return true;
 };
 const validateCuratorFee = (fee: number) => {
@@ -77,6 +84,7 @@ const validateCuratorFee = (fee: number) => {
 const validateThreshold = (threshold: number) => {
   if (!threshold) return false;
   if (Number.isNaN(threshold)) return false;
+  // TODO: Min threshold check
   return true;
 };
 
@@ -253,7 +261,7 @@ export class FundraisingSlide
           onSelect={(e) => {
             // TODO: Real length options & conversion to time
             const lengthInSeconds = +e.target.value.split(' ')[0] * 604800;
-            vnode.attrs.form.fundraiseLength = lengthInSeconds;
+            vnode.attrs.form.deadline = lengthInSeconds;
           }}
         />
         <CWTextInput
@@ -388,7 +396,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                   threshold,
                   creator,
                   beneficiary,
-                  fundraiseLength,
+                  deadline,
                   curatorFee,
                 } = this.form;
                 const isValidTitle = validateTitle(title);
@@ -399,8 +407,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                 const isValidToken = validateToken(token);
                 const isValidBeneficiary = validateBeneficiary(beneficiary);
                 const isValidCreator = validateCreator(creator);
-                const isValidFundraiseLength =
-                  validateFundraiseLength(fundraiseLength);
+                const isValidDeadline = validateDeadline(deadline);
                 const isValidCuratorFee = validateCuratorFee(curatorFee);
                 const isValidThreshold = validateThreshold(threshold);
                 if (
@@ -412,11 +419,14 @@ export default class CreateProjectForm implements m.ClassComponent {
                   !isValidBeneficiary ||
                   !isValidCreator ||
                   !isValidCuratorFee ||
-                  !isValidFundraiseLength ||
+                  !isValidDeadline ||
                   !isValidThreshold
                 ) {
                   notifyError('Invalid form. Please check inputs.');
                 }
+
+                this.form.ipfsContent = JSON.stringify(this.form);
+
                 if (!title || title.length)
                   app.projects.createProject(this.form);
               },
