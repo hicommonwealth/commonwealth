@@ -169,11 +169,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
                 <Icon name={Icons.LINK} onclick={async () => {
-                  const route = m.route.get().indexOf("?") > -1
-                    ? m.route.get().slice(0, m.route.get().indexOf("?"))
-                    : m.route.get()
+                  const route = app.socket.chatNs
+                    .getRouteToMessage(grp.messages[0].chat_channel_id, grp.messages[0].id, app.chain.id)
                   navigator.clipboard.writeText(
-                    `${window.location.protocol}//${window.location.host}${route}?message=${grp.messages[0].id}`
+                    `${window.location.protocol}//${window.location.host}${route}`
                   )
                     .then(() => notifySuccess("Message link copied to clipboard"))
                     .catch(() => notifyError("Could not copy link to keyboard"))
@@ -225,7 +224,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     if (this.shouldScroll) {
       if(this.shouldScrollToHighlight) {
         const element = document.getElementById("highlighted")
-        element.scrollIntoView({behavior: "smooth"})
+        if (element) {
+          element.scrollIntoView({behavior: "smooth"})
+        } else {
+          this.scrollToBottom()
+        }
         this.shouldScrollToHighlight = false
         this.shouldScroll = false
       } else {

@@ -102,6 +102,7 @@ import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
 import getChatMessages from './routes/chat/getChatMessages';
+import getChatChannel from './routes/chat/getChatChannel';
 import createChatChannel from './routes/chat/createChatChannel';
 import deleteChatChannel from './routes/chat/deleteChatChannel';
 import deleteChatCategory from './routes/chat/deleteChatCategory';
@@ -590,6 +591,12 @@ function setupRouter(
     '/getChatMessages',
     passport.authenticate('jwt', { session: false }),
     getChatMessages.bind(this, models)
+  );
+
+  router.get(
+    '/getChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    getChatChannel.bind(this, models)
   );
 
   router.post(
