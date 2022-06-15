@@ -217,7 +217,13 @@ export class ChainMetadataRows
             onChangeHandler={(v) => {
               const snapshots = v
                 .split(',')
-                .map((val) => val.trim())
+                .map((val) => {
+                  if (val.lastIndexOf('/') > -1) {
+                    return val.slice(val.lastIndexOf('/') + 1).trim();
+                  } else {
+                    return val.trim();
+                  }
+                })
                 .filter((val) => val.length > 4);
               this.snapshot = snapshots;
             }}

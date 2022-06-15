@@ -70,22 +70,23 @@ export class GovernanceSection
       app.user.activeAccount &&
       app.chain?.network === ChainNetwork.Aave;
     const showSnapshotOptions =
-      isNotOffchain && app.chain?.meta.snapshot?.length > 0;
+      app.chain?.base === ChainBase.Ethereum &&
+      app.chain?.meta.snapshot?.length > 0;
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Darwinia &&
       app.chain.network !== ChainNetwork.HydraDX;
     const showProposals =
-      isNotOffchain &&
-      ((app.chain?.base === ChainBase.Substrate &&
+      (isNotOffchain &&
+        app.chain?.base === ChainBase.Substrate &&
         app.chain.network !== ChainNetwork.Darwinia) ||
-        (app.chain?.base === ChainBase.CosmosSDK && 
+      (app.chain?.base === ChainBase.CosmosSDK &&
         app.chain.network !== ChainNetwork.Terra) ||
-        app.chain?.network === ChainNetwork.Sputnik ||
-        app.chain?.network === ChainNetwork.Moloch ||
-        app.chain?.network === ChainNetwork.Compound ||
-        app.chain?.network === ChainNetwork.Aave);
+      app.chain?.network === ChainNetwork.Sputnik ||
+      app.chain?.network === ChainNetwork.Moloch ||
+      app.chain?.network === ChainNetwork.Compound ||
+      app.chain?.network === ChainNetwork.Aave;
     const showCouncillors =
       isNotOffchain && app.chain?.base === ChainBase.Substrate;
     const showTreasury =
@@ -281,7 +282,15 @@ export class GovernanceSection
         if (snapshotSpaces.length > 1) {
           navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
         } else {
-          navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          if (snapshotSpaces[0].lastIndexOf('/') > -1) {
+            navigateToSubpage(
+              `/snapshot/${snapshotSpaces[0]
+                .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
+                .trim()}`
+            );
+          } else {
+            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+          }
         }
       },
       displayData: null,
