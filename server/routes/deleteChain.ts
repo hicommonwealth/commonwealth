@@ -32,11 +32,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     const chain = await models.Chain.findOne({
       where: {
         id: req.body.id,
-      },
-      include: [{
-        model: models.ChainNode,
-        required: true,
-      }],
+      }
     });
     if (!chain) {
       return next(new Error(Errors.NoChain));
