@@ -3,7 +3,7 @@ import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 // TODO: hook up underlyung functionality of this boilerplate
@@ -13,7 +13,7 @@ class Ethereum extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public chain: EthereumChain;
   public accounts: EthereumAccounts;
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new EthereumChain(this.app);
     this.accounts = new EthereumAccounts(this.app);

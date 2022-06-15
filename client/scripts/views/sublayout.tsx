@@ -11,10 +11,13 @@ import { MobileHeader } from 'views/mobile/mobile_header';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
-import { TokenHero } from './token_hero';
-import { TokenTerms } from './token_terms';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
+import { CWBanner } from './components/component_kit/cw_banner';
+import { ITokenAdapter } from '../models';
+import { isNonEmptyString } from '../helpers/typeGuards';
+import { CWText } from './components/component_kit/cw_text';
+import { SublayoutBanners } from './sublayout_banners';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -60,8 +63,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       title,
     } = vnode.attrs;
 
-    const chain = app.chain ? app.chain.meta.chain : null;
+    const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
+    const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
 
     if (m.route.param('triggerInvite') === 't') {
@@ -87,13 +91,19 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           </div>
           <div class="sidebar-and-body-container">
             <Sidebar />
-            <div class="Body" onscroll={onscroll}>
-              <TokenHero chain={chain} />
-              <TokenTerms terms={terms} tosStatus={tosStatus} />
-              {vnode.children}
-              {!app.isCustomDomain() && !hideFooter && (
-                <Footer list={footercontents} />
-              )}
+            <div class="body-and-sticky-headers-container">
+              <SublayoutBanners
+                banner={banner}
+                chain={chain}
+                terms={terms}
+                tosStatus={tosStatus}
+              />
+              <div class="Body" onscroll={onscroll}>
+                {vnode.children}
+                {!app.isCustomDomain() && !hideFooter && (
+                  <Footer list={footercontents} />
+                )}
+              </div>
             </div>
           </div>
         </div>

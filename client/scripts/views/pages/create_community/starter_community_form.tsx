@@ -6,6 +6,8 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
@@ -15,11 +17,6 @@ import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { CommunityType } from '.';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
@@ -30,11 +27,11 @@ type CreateStarterForm = ChainFormFields & { base: ChainBase };
 type CreateStarterState = ChainFormState & { form: CreateStarterForm };
 export class StarterCommunityForm implements m.ClassComponent {
   private state: CreateStarterState = {
-    error: '',
+    message: '',
     loaded: false,
     loading: false,
     saving: false,
-    status: '',
+    status: undefined,
     form: {
       id: '',
       name: '',
@@ -81,7 +78,6 @@ export class StarterCommunityForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || this.state.form.id.length < 1}
           onclick={async () => {
             this.state.saving = true;

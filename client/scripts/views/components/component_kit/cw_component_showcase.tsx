@@ -1,45 +1,26 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
-import { CWGradientButton } from './cw_gradient_button';
-import { CWButtonGroup } from './cw_button_group';
 import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
-import { CWTextInput, ValidationStatus } from './cw_text_input';
+import { CWTextInput } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
-
-// const displayColors = (hexList) => {
-//   return Object.entries(hexList).map(([k, v]) => {
-//     return (
-//       <div class="color-row">
-//         {k}
-//         <div class="color" style={`background: ${v};`} />
-//       </div>
-//     );
-//   });
-// };
-
-// const displayGradients = (gradientNames: string[]) => {
-//   return gradientNames.map((gradient) => {
-//     return (
-//       <div class="color-row">
-//         {gradient}
-//         <div class={`color ${gradient}`} />
-//       </div>
-//     );
-//   });
-// };
+import { CWTooltip } from './cw_tooltip';
+import { CWPopover } from './cw_popover/cw_popover';
+import { CWAddressTooltip } from './cw_address_tooltip';
+import { ValidationStatus } from './cw_validation_text';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -73,6 +54,307 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Popover</h1>
+        <div class="tooltip-gallery">
+          <CWPopover
+            trigger={<CWButton label="Click me" />}
+            content={<>Some content</>}
+            interactionType="click"
+          />
+        </div>
+        <h1>Tooltip</h1>
+        <div class="tooltip-gallery">
+          <div class="tooltip-row">
+            <CWText>Hover</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover to side</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              toSide
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Persist on hover</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              persistOnHover
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover open and close delay</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              hoverOpenDelay={1500}
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Click</CWText>
+            <CWTooltip
+              interactionType="click"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background, no arrow</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidNoArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Address tooltip</CWText>
+            <CWAddressTooltip
+              address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+        </div>
+        <h1>Form fields</h1>
+        <div class="form-gallery">
+          <CWTextInput
+            name="Text field"
+            label="Large"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Small"
+            placeholder="Type here"
+            size="small"
+          />
+          <CWTextInput
+            name="Form field"
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return ['failure', 'Must enter characters A-Z'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
+            label="This input only accepts A-Z"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Disabled"
+            disabled
+            defaultValue="Some disabled text"
+          />
+        </div>
+        <h1>Buttons</h1>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            buttonType="primary-red"
+            label="Primary red with icon"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary-blue"
+            label="Primary blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary-black"
+            label="Primary black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Primary disabled"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Secondary red with icon"
+            buttonType="secondary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary blue"
+            buttonType="secondary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary black"
+            buttonType="secondary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary disabled"
+            buttonType="secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Tertiary blue with icon"
+            buttonType="tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary black"
+            buttonType="tertiary-black"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Tertiary disabled"
+            buttonType="tertiary-black"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large primary red with icon"
+            buttonType="lg-primary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large primary blue"
+            buttonType="lg-primary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large secondary red with icon"
+            buttonType="lg-secondary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary blue"
+            buttonType="lg-secondary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large secondary disabled"
+            buttonType="lg-secondary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            label="Large tertiary red with icon"
+            buttonType="lg-tertiary-red"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary blue "
+            buttonType="lg-tertiary-blue"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Large tertiary disabled "
+            buttonType="lg-tertiary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <h1>External Link Buttons</h1>
+        <div class="button-gallery">
+          <CWExternalLink
+            label="Button external link"
+            target="https://edgewa.re/"
+            linkType="button"
+          />
+          <CWExternalLink
+            label="Inline external link"
+            target="https://edgewa.re/"
+            linkType="inline"
+          />
+        </div>
+        <h1>Engagement Buttons</h1>
+        <div class="button-gallery">
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="sm"
+            label="Small"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWEngagementButton
+            buttonSize="lg"
+            label="Big"
+            disabled={true}
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
@@ -170,7 +452,9 @@ export class ComponentShowcase implements m.ClassComponent {
           <div class="text-row">
             <CWText type="h3">Overflow</CWText>
             <div class="ellipsis-row">
-              <CWText type="h3">Body1 noWrap</CWText>
+              <CWText type="h3" noWrap>
+                Body1 noWrap
+              </CWText>
             </div>
           </div>
         </div>
@@ -226,67 +510,6 @@ export class ComponentShowcase implements m.ClassComponent {
             )}
           </div>
         </div>
-        <h1>Buttons</h1>
-        <div class="button-gallery">
-          <CWButton
-            label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Disabled"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary"
-            buttonType="secondary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary"
-            buttonType="secondary"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWGradientButton
-            label="Primary"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <h1>Button Group</h1>
-        <div class="button-gallery">
-          <CWButtonGroup>
-            <CWButton
-              label="One"
-              onclick={() => notifySuccess('One clicked!')}
-            />
-            <CWButton
-              label="Two"
-              onclick={() => notifySuccess('Two clicked!')}
-            />
-            <CWButton
-              label="Three"
-              onclick={() => notifySuccess('Three clicked!')}
-            />
-            <CWButton
-              label="Four"
-              onclick={() => notifySuccess('Four clicked!')}
-            />
-          </CWButtonGroup>
-        </div>
-        <h1>External Link Buttons</h1>
-        <div class="button-gallery">
-          <CWExternalLink
-            label="Button external link"
-            target="https://edgewa.re/"
-            linkType="button"
-          />
-          <CWExternalLink
-            label="Inline external link"
-            target="https://edgewa.re/"
-            linkType="inline"
-          />
-        </div>
         <h1>Radio Button</h1>
         <div class="choice-gallery">
           <CWRadioButton
@@ -339,31 +562,6 @@ export class ComponentShowcase implements m.ClassComponent {
             indeterminate
           />
         </div>
-        <h1>Engagement Buttons</h1>
-        <div class="button-gallery">
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
         <h1>Cards</h1>
         <div class="card-gallery">
           <div class="top-card-row">
@@ -401,26 +599,6 @@ export class ComponentShowcase implements m.ClassComponent {
             <h4>Card title</h4>
             <div>Full width</div>
           </CWCard>
-        </div>
-        <h1>Form fields</h1>
-        <div class="form-gallery">
-          <CWTextInput
-            name="Form field"
-            inputValidationFn={(val: string): [ValidationStatus, string] => {
-              if (val.match(/[^A-Za-z]/)) {
-                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-              } else {
-                return [ValidationStatus.Success, 'Input validated'];
-              }
-            }}
-            label="This input only accepts A-Z"
-            placeholder="Placeholder"
-          />
-          <CWTextInput
-            name="Text field"
-            label="No status message or error validation"
-            placeholder="Placeholder"
-          />
         </div>
       </div>
     );

@@ -6,6 +6,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import fs from 'fs';
 
+import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -26,6 +27,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+import BanCache from './server/util/banCheckCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -39,7 +41,6 @@ import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
-import Rollbar from "rollbar";
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -91,9 +92,9 @@ async function main() {
       );
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
-      for (const [node, subscriber] of subscribers) {
-        if (node.Chain.base === ChainBase.Substrate) {
-          fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
+      for (const [chain, subscriber] of subscribers) {
+        if (chain.base === ChainBase.Substrate) {
+          fetchers[chain.id] = new SubstrateEvents.StorageFetcher(
             subscriber.api
           );
         }
@@ -267,12 +268,14 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
+  const banCache = new BanCache(models);
   setupAPI(
     app,
     models,
     viewCountCache,
     <any>identityFetchCache,
-    tokenBalanceCache
+    tokenBalanceCache,
+    banCache,
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

@@ -8,7 +8,7 @@ import { Footer } from '../../footer';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {
-    return m('div', [
+    return m('.WhyCommonWealth', [
       m(
         'div',
         { class: 'absolute w-screen z-20' },

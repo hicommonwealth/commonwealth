@@ -9,12 +9,14 @@ import { isAddress } from 'web3-utils';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'types';
 import { notifyError } from 'controllers/app/notifications';
 import { IERC20Metadata__factory } from 'eth/types';
-import { IdRow, InputRow, ValidationRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 import {
   initChainForm,
   defaultChainRows,
@@ -27,11 +29,7 @@ import {
   EthFormFields,
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -39,11 +37,11 @@ type CreateERC20State = ChainFormState & { form: CreateERC20Form };
 
 export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
   private state: CreateERC20State = {
-    error: '',
+    message: '',
     loaded: false,
     loading: false,
     saving: false,
-    status: '',
+    status: undefined,
     form: {
       address: '',
       altWalletUrl: '',
@@ -68,8 +66,8 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
 
     const updateTokenForum = async () => {
       if (!this.state.form.address || !this.state.form.ethChainId) return;
-      this.state.status = '';
-      this.state.error = '';
+      this.state.status = undefined;
+      this.state.message = '';
       this.state.loading = true;
       const args = {
         address: this.state.form.address,
@@ -97,7 +95,8 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             this.state.form.element = res.token.element || '';
             this.state.form.telegram = res.token.telegram || '';
             this.state.form.github = res.token.github || '';
-            this.state.status = 'Success!';
+            this.state.status = 'success';
+            this.state.message = 'Success!';
           } else {
             // attempt to query ERC20Detailed token info from chain
             console.log('Querying chain for ERC info');
@@ -115,13 +114,16 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
               this.state.form.id = name && slugify(name);
               this.state.form.symbol = symbol || '';
               this.state.form.decimals = decimals || 18;
-              this.state.status = 'Success!';
+              this.state.status = 'success';
+              this.state.message = 'Success!';
             } catch (e) {
               this.state.form.name = '';
               this.state.form.id = '';
               this.state.form.symbol = '';
               this.state.form.decimals = 18;
-              this.state.status = 'Verified token but could not load metadata.';
+              this.state.status = 'failure';
+              this.state.message =
+                'Verified token but could not load metadata.';
             }
             this.state.form.iconUrl = '';
             this.state.form.description = '';
@@ -134,10 +136,13 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
           }
           this.state.loaded = true;
         } else {
-          this.state.error = res.message || 'Failed to load Token Information';
+          this.state.status = 'failure';
+          this.state.message =
+            res.message || 'Failed to load Token Information';
         }
       } catch (err) {
-        this.state.error =
+        this.state.status = 'failure';
+        this.state.message =
           err.responseJSON?.error || 'Failed to load Token Information';
       }
       this.state.loading = false;
@@ -149,7 +154,6 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
         {...ethChainRows(vnode.attrs, this.state.form)}
         <CWButton
           label="Populate fields"
-          buttonType="primary"
           disabled={
             this.state.saving ||
             !validAddress ||
@@ -160,7 +164,10 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             await updateTokenForum();
           }}
         />
-        <ValidationRow error={this.state.error} status={this.state.status} />
+        <CWValidationText
+          status={this.state.status}
+          message={this.state.message}
+        />
         <InputRow
           title="Name"
           defaultValue={this.state.form.name}
@@ -183,7 +190,6 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
             const { altWalletUrl, chainString, ethChainId, nodeUrl } =
