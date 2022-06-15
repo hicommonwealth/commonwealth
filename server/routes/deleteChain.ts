@@ -32,7 +32,11 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     const chain = await models.Chain.findOne({
       where: {
         id: req.body.id,
-      }
+      },
+      include: [{
+        model: models.ChainNode,
+        required: true,
+      }],
     });
     if (!chain) {
       return next(new Error(Errors.NoChain));
@@ -138,7 +142,7 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
-    await models.sequelize.query(`DELETE FROM "Chains" WHERE id='${chain.id}';`, {
+    await models.sequelize.query(`DELETE FROM "Chains" WHERE id='${chain.ChainNode.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
