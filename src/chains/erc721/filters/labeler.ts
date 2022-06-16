@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 
 import {
   LabelerFilter,
@@ -26,7 +26,7 @@ export const Label: LabelerFilter = (
     case EventKind.Approval: {
       // check to see if owner disapproves all addresses
       let label = '';
-      if (!new BN(data.approved, 'hex').isZero()) {
+      if (!BigNumber.from(data.approved).isZero()) {
         label = `Owner ${fmtAddr(data.owner)} approved ${fmtAddr(data.approved)}
         to transfer token ${data.tokenId}.`;
       } else {
