@@ -52,6 +52,16 @@ export default class ProjectListing implements m.ClassComponent {
       >
         <div class="ProjectListing">
           <div class="listing-header">
+            {/* TODO:
+                  - Add chain community selector list, based on user role lookup
+                  - Redirect to a scoped creation form
+                  - Do not allow non-scoped creation forms (e.g. in routes, views)
+                  - Set address by default, based on highest-power role
+                  - Display this role address hard-coded (disabled input) in form next to beneficiary input
+                  - Add copy explaining to user how to change creator address
+                    - e.g. “Want a diff address? Switch active addr in nav bar dropdown”
+                  - Potentially add summary modal pre-TX submission
+             */}
             <CWButton
               onclick={(e) => m.route.set(`/projects/create`)}
               label="Create Project"
