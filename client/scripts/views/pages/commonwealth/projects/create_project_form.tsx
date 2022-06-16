@@ -11,6 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, InputSelect } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
+import { CWTextArea } from 'client/scripts/views/components/component_kit/cw_text_area';
 
 interface ICreateProjectForm {
   // Descriptive
@@ -204,11 +205,10 @@ export class InformationSlide
           }}
         />
         {/* TODO: The below should be a textarea */}
-        <CWTextInput
+        <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
           name="Short Description"
-          // textInputSize="Large"
           oninput={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
@@ -217,7 +217,7 @@ export class InformationSlide
             if (!isValid) {
               return [
                 'failed',
-                `Input limit is 224 characters. Current count: ${length}`,
+                `Input limit is 224 characters. Current count: ${value.length}`,
               ];
             }
           }}

@@ -112,41 +112,6 @@ interface ProjectInfoAttrs {
   projectStatus: 'succeeded' | 'failed';
 }
 class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
-  getUserRoles(project: Project, addresses: AddressInfo[]) {
-    let backingAmount = new BN(0);
-    let curatorAmount = new BN(0);
-    let isAuthor = false;
-    let isCurator = false;
-    let isBacker = false;
-    for (const address of addresses) {
-      const addressInfo: [string, string] = [address.address, address.chain];
-      if (project.isAuthor(...addressInfo)) {
-        isAuthor = true;
-      }
-      if (project.isCurator(...addressInfo)) {
-        isCurator = true;
-        curatorAmount = curatorAmount.add(
-          project.getCuratedAmount(...addressInfo)
-        );
-      }
-      if (project.isBacker(...addressInfo)) {
-        isBacker = true;
-        backingAmount = backingAmount.add(
-          project.getBackedAmount(...addressInfo)
-        );
-      }
-    }
-    if (isAuthor) {
-      return [ProjectRole.Author, null];
-    } else if (isCurator) {
-      return [ProjectRole.Curator, curatorAmount];
-    } else if (isBacker) {
-      return [ProjectRole.Backer, backingAmount];
-    } else {
-      return [null, null];
-    }
-  }
-
   view(vnode: m.Vnode<ProjectInfoAttrs>) {
     const { project, projectStatus, avatarSize } = vnode.attrs;
 
@@ -211,6 +176,41 @@ interface ProjectCardAttrs {
 }
 
 export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
+  getUserRoles(project: Project, addresses: AddressInfo[]) {
+    let backingAmount = new BN(0);
+    let curatorAmount = new BN(0);
+    let isAuthor = false;
+    let isCurator = false;
+    let isBacker = false;
+    for (const address of addresses) {
+      const addressInfo: [string, string] = [address.address, address.chain];
+      if (project.isAuthor(...addressInfo)) {
+        isAuthor = true;
+      }
+      if (project.isCurator(...addressInfo)) {
+        isCurator = true;
+        curatorAmount = curatorAmount.add(
+          project.getCuratedAmount(...addressInfo)
+        );
+      }
+      if (project.isBacker(...addressInfo)) {
+        isBacker = true;
+        backingAmount = backingAmount.add(
+          project.getBackedAmount(...addressInfo)
+        );
+      }
+    }
+    if (isAuthor) {
+      return [ProjectRole.Author, null];
+    } else if (isCurator) {
+      return [ProjectRole.Curator, curatorAmount];
+    } else if (isBacker) {
+      return [ProjectRole.Backer, backingAmount];
+    } else {
+      return [null, null];
+    }
+  }
+
   view(vnode: m.Vnode<ProjectCardAttrs>) {
     const { project, size } = vnode.attrs;
 
@@ -249,7 +249,7 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //   </div>
     // );
 
-    const [userRole, supportAmount] = getUserRoles(app.user.addresses);
+    const [userRole, supportAmount] = this.getUserRoles(app.user.addresses);
 
     // userRole = ProjectRole.Author;
     // supportAmount = 1.4;

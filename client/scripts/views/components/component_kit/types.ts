@@ -1,6 +1,8 @@
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
   AddressTooltip = 'AddressTooltip',
+  Avatar = 'Avatar',
+  AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
@@ -18,6 +20,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Text = 'Text',
+  TextArea = 'TextArea',
   TextInput = 'TextInput',
   WalletOptionRow = 'WalletOptionRow',
   ValidationText = 'ValidationText',

@@ -11,7 +11,7 @@ import { CWValidationText, ValidationStatus } from './cw_validation_text';
 
 type TextInputSize = 'small' | 'large';
 
-type TextInputAttrs = {
+export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   defaultValue?: string;
@@ -24,11 +24,12 @@ type TextInputAttrs = {
   tabindex?: number;
 };
 
-export type InputStyleAttrs = {
+type InputStyleAttrs = {
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
 };
+
 export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
