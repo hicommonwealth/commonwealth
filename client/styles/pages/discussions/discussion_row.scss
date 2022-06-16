@@ -96,7 +96,7 @@
     flex-direction: row;
   }
 
-  @include xs-max {
+  @include extraSmall {
     .content-right-container,
     .activity-icons,
     .last-active {

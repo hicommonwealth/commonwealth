@@ -3,7 +3,7 @@
 .VersionHistoryModal {
   .compact-modal-body {
     width: 640px;
-    @include xs-max {
+    @include extraSmall {
       width: initial;
     }
     .versions {

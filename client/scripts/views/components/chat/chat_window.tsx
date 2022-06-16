@@ -12,9 +12,11 @@ import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
+import { Icons, Icon } from 'construct-ui';
+import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -38,15 +40,16 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   private onIncomingMessage: (any: any) => void;
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
+  private shouldScrollToHighlight: boolean;
 
   oninit(vnode) {
     this.shouldScroll = true;
+    this.shouldScrollToHighlight = Boolean(m.route.param("message"))
     this.scrollToBottom = () => {
       const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
-      console.log('Message received');
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
@@ -103,11 +106,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
         const message = {
           message: $textarea.val(),
-          address: app.user.activeAccount.address,
           chat_channel_id: channel.id,
-          now: moment().toISOString(),
+          address: app.user.activeAccount.address
         };
-        app.socket.chatNs.sendMessage(message, channel);
+        app.socket.chatNs.sendMessage(message);
         mixpanelBrowserTrack({
           event: MixpanelChatEvents.NEW_CHAT_SENT,
           community: app.activeChainId(),
@@ -116,6 +118,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
         $textarea.val('');
       }
     };
+
+    const messageIsHighlighted = (message: any): boolean => {
+      return m.route.param('message') && Number(m.route.param('message')) === message.id
+    }
 
     return (
       <div class="ChatPage">
@@ -126,7 +132,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
             </div>
           )}
           {groupedMessages.map((grp) => (
-            <div class="chat-message-group">
+            <div
+              class="chat-message-group"
+              id={grp.messages.some(messageIsHighlighted) ? "highlighted" : ""}
+            >
               <div class="user-and-timestamp-container">
                 {m(User, {
                   user: new AddressInfo(
@@ -141,6 +150,17 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
+                <Icon name={Icons.LINK} onclick={async () => {
+                  const route = m.route.get().indexOf("?") > -1
+                    ? m.route.get().slice(0, m.route.get().indexOf("?"))
+                    : m.route.get()
+                  navigator.clipboard.writeText(
+                    `https://commonwealth.im${route}?message=${grp.messages[0].id}`
+                  )
+                    .then(() => notifySuccess("Message link copied to clipboard"))
+                    .catch(() => notifyError("Could not copy link to keyboard"))
+                  this.shouldScroll = false;
+                }}></Icon>
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (
@@ -187,7 +207,14 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
   onupdate() {
     if (this.shouldScroll) {
-      this.scrollToBottom();
+      if(this.shouldScrollToHighlight) {
+        const element = document.getElementById("highlighted")
+        element.scrollIntoView({behavior: "smooth"})
+        this.shouldScrollToHighlight = false
+        this.shouldScroll = false
+      } else {
+        this.scrollToBottom();
+      }
     }
   }
 }

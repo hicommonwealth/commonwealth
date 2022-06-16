@@ -9,7 +9,6 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import app from 'state';
 import Sublayout from 'views/sublayout';
 import { blockperiodToDuration, formatDuration } from 'helpers';
-import { ChainInfo, NodeInfo } from 'models';
 import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
@@ -19,159 +18,6 @@ import { DropdownFormField } from 'views/components/forms';
 import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
-
-interface IChainManagerAttrs {
-  success?: string;
-  error?: string;
-}
-
-interface IChainManagerState {
-  error: string;
-  success: string;
-}
-
-const ChainManager: m.Component<IChainManagerAttrs, IChainManagerState> = {
-  view: (vnode) => {
-    const nodeRows = (chain: ChainInfo) =>
-      (app.config.nodes.getByChain(chain.id) || []).map((node) => {
-        return m('li.chain-node', [
-          m('span', node.url),
-          ' ',
-          m(
-            'a',
-            {
-              href: '#',
-              onclick: (e) => {
-                e.preventDefault();
-                if (!app.user.jwt) return alert('Login required');
-                if (!app.user.isSiteAdmin) return alert('Admin required');
-                vnode.attrs.success = null;
-                vnode.attrs.error = null;
-                if (!confirm('Are you sure?')) return;
-                // TODO: Change to DELETE /chainNoode
-                $.post(`${app.serverUrl()}/deleteChainNode`, {
-                  id: chain.id,
-                  node_url: node.url,
-                  auth: true,
-                  jwt: app.user.jwt,
-                }).then(
-                  (result) => {
-                    if (result.status !== 'Success') return;
-                    app.config.nodes.remove(node);
-                    vnode.attrs.success = 'Successfully deleted';
-                    m.redraw();
-                  },
-                  (err) => {
-                    vnode.state.error = err.responseJSON
-                      ? err.responseJSON.error
-                      : `${err.status}: ${err.statusText}`;
-                    m.redraw();
-                  }
-                );
-              },
-            },
-            'Remove'
-          ),
-        ]);
-      });
-
-    const addNodeRow = (chain: ChainInfo) =>
-      m('li', [
-        m(
-          'a',
-          {
-            href: '#',
-            onclick: (e) => {
-              e.preventDefault();
-              if (!app.user.jwt) return alert('Login required');
-              if (!app.user.isSiteAdmin) return alert('Admin required');
-              vnode.attrs.success = null;
-              vnode.attrs.error = null;
-              const url = prompt('Enter the node url:');
-              // TODO: Change to POST /chainNode
-              // TODO: add ss58_prefix for substrate chains
-              // TODO: add eth_chain_id for ethereum chains
-              $.post(`${app.serverUrl()}/addChainNode`, {
-                id: chain.id,
-                name: chain.name,
-                symbol: chain.symbol,
-                network: chain.network,
-                base: chain.base,
-                decimals: chain.decimals,
-                node_url: url,
-                auth: true,
-                jwt: app.user.jwt,
-              }).then(
-                (result) => {
-                  app.config.nodes.add(new NodeInfo(result.result));
-                  vnode.state.success = 'Sucessfully added';
-                  m.redraw();
-                },
-                (err) => {
-                  vnode.state.error = err.responseJSON
-                    ? err.responseJSON.error
-                    : `${err.status}: ${err.statusText}`;
-                  m.redraw();
-                }
-              );
-            },
-          },
-          'Add'
-        ),
-      ]);
-
-    return m('.ChainManager', [
-      m(
-        'button',
-        {
-          onclick: (e) => {
-            e.preventDefault();
-            m.route.set('/createCommunity');
-          },
-        },
-        'Add a new offchain community'
-      ),
-      (app.config.chains.getAll() || []).map((chain) =>
-        m('.chain-row', [
-          m('h3', [
-            m('strong', chain.name),
-            m(
-              'span.lighter',
-              {
-                style: 'font-weight: 400; color: #999; margin-left: 6px;',
-              },
-              chain.symbol
-            ),
-          ]),
-          m(
-            '.chain-subtitle',
-            {
-              style: 'margin: -14px 0 10px; color: #999;',
-            },
-            `${chain.id} (Network: ${chain.network})`
-          ),
-          m('ul.chain-info', [nodeRows(chain), addNodeRow(chain)]),
-        ])
-      ),
-      vnode.state.success &&
-        m(
-          '.success-message',
-          {
-            style: 'color: #5eaf77; font-weight: 500; margin: 10px 0;',
-          },
-          vnode.state.error
-        ),
-      vnode.state.error &&
-        m(
-          '.error-message',
-          {
-            style: 'color: red; font-weight: 500; margin: 10px 0;',
-          },
-          vnode.state.error
-        ),
-    ]);
-  },
-};
 
 interface ISudoFormState {
   txProcessing: boolean;
@@ -538,10 +384,6 @@ const AdminPage: m.Component<{}> = {
             content: app.chain
               ? [m(AdminActions), m(SudoForm), m(ChainStats)]
               : [],
-          },
-          {
-            name: 'Manage Chains and Nodes',
-            content: m(ChainManager),
           },
         ]),
       ])

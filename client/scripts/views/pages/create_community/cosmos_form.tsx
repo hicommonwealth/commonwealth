@@ -6,18 +6,16 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'types';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState, EthFormFields } from './types';
-import { IdRow, InputRow, ValidationRow } from '../../components/metadata_rows';
+import { IdRow, InputRow } from '../../components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 // TODO: populate additional fields
 
@@ -32,7 +30,7 @@ type CreateCosmosState = ChainFormState & { form: CreateCosmosForm };
 
 export class CosmosForm implements m.ClassComponent {
   private state: CreateCosmosState = {
-    error: '',
+    message: '',
     saving: false,
     form: {
       altWalletUrl: '',
@@ -94,7 +92,6 @@ export class CosmosForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const {
@@ -127,7 +124,7 @@ export class CosmosForm implements m.ClassComponent {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
-              this.state.error =
+              this.state.message =
                 err.responseJSON?.error ||
                 'Creating new Cosmos community failed';
             } finally {
@@ -136,7 +133,9 @@ export class CosmosForm implements m.ClassComponent {
             }
           }}
         />
-        <ValidationRow error={this.state.error} />
+        {this.state.message && (
+          <CWValidationText message={this.state.message} status="failure" />
+        )}
       </div>
     );
   }

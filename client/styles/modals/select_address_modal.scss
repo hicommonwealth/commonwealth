@@ -4,7 +4,7 @@
   .compact-modal-body {
     width: 480px;
     padding: 24px 28px 32px !important;
-    @include xs-max {
+    @include extraSmall {
       width: initial;
     }
   }

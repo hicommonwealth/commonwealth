@@ -29,7 +29,7 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
     const activeAccount = app.user.activeAccount;
 
     const showSnapshotOptions =
-      app.user.activeAccount && app.chain?.meta.chain.snapshot.length > 0;
+      app.user.activeAccount && app.chain?.meta.snapshot.length > 0;
 
     const topics = app.topics
       .getByCommunity(app.activeChainId())
@@ -164,7 +164,7 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
         {showSnapshotOptions && (
           <MenuItem
             onclick={() => {
-              const snapshotSpaces = app.chain.meta.chain.snapshot;
+              const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
                 navigateToSubpage('/multiple-snapshots', {
                   action: 'create-proposal',

@@ -70,7 +70,6 @@ export class SputnikForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const { iconUrl, name } = this.state.form;
@@ -87,7 +86,7 @@ export class SputnikForm implements m.ClassComponent {
               ? 'https://rpc.mainnet.near.org'
               : 'https://rpc.testnet.near.org';
 
-            const addChainNodeArgs = {
+            const createChainArgs = {
               base: ChainBase.NEAR,
               icon_url: iconUrl,
               id,
@@ -136,11 +135,11 @@ export class SputnikForm implements m.ClassComponent {
 
               // POST object
               const res = await $.post(
-                `${app.serverUrl()}/addChainNode`,
-                addChainNodeArgs
+                `${app.serverUrl()}/createChain`,
+                createChainArgs
               );
               await initAppState(false);
-              m.route.set(`${window.location.origin}/${res.result.chain}`);
+              m.route.set(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Adding DAO failed.');
               console.error(err.responseJSON?.error || err.message);

@@ -1,0 +1,158 @@
+@import 'shared';
+
+$large-chain-icon-size: 96px;
+$small-chain-icon-size: 40px;
+
+.community-card.Card {
+  align-items: center;
+  height: 336px;
+  justify-content: flex-start;
+  width: 240px;
+
+  @include smallInclusive {
+    height: 220px;
+    width: 136px;
+  }
+
+  .large-chain-icon {
+    border-radius: $border-radius-round;
+    height: $large-chain-icon-size;
+    margin-bottom: 8px;
+    width: $large-chain-icon-size;
+
+    @include smallInclusive {
+      height: $small-chain-icon-size;
+      width: $small-chain-icon-size;
+    }
+
+    &.no-image {
+      align-items: center;
+      background: $neutral-800;
+      display: flex;
+      min-height: $large-chain-icon-size;
+      justify-content: center;
+      width: $large-chain-icon-size;
+
+      @include smallInclusive {
+        min-height: $small-chain-icon-size;
+        width: $small-chain-icon-size;
+      }
+
+      .no-image-text.Text {
+        color: $white;
+
+        @include smallInclusive {
+          font-family: $font-family-neue-haas-unica;
+          font-size: 14px;
+          line-height: 20px;
+        }
+      }
+    }
+  }
+
+  .card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    width: 100%;
+
+    .chain-name.Text {
+      text-align: center;
+      width: 200px;
+      // Gabe 5/24/22: not sure why I have to set this width
+      // to get noWrap to work... to be continued...
+
+      @include smallInclusive {
+        font-family: $font-family-silka;
+        font-size: 18px;
+        line-height: 24px;
+        width: 96px;
+      }
+    }
+
+    .IconButton {
+      display: none;
+    }
+
+    @include smallInclusive {
+      .Button {
+        display: none;
+      }
+
+      .IconButton {
+        display: flex;
+      }
+    }
+
+    .card-description.Text {
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      color: $neutral-500;
+      display: -webkit-box;
+      overflow: hidden;
+      width: 152px;
+
+      @include smallInclusive {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 14px;
+        line-height: 20px;
+        width: 88px;
+      }
+    }
+  }
+}
+
+.new-community-card.Card {
+  height: 336px;
+  width: 240px;
+
+  @include smallInclusive {
+    height: 220px;
+    width: 136px;
+  }
+
+  .new-community-card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    .new-community-header.Text {
+      margin-bottom: 48px;
+      text-align: center;
+
+      @include smallInclusive {
+        font-family: $font-family-silka;
+        font-size: 18px;
+        line-height: 24px;
+        margin-bottom: 8px;
+        width: 96px;
+      }
+    }
+
+    .new-community.Text {
+      margin-bottom: 48px;
+      text-align: center;
+
+      @include smallInclusive {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+        margin-bottom: 8px;
+      }
+    }
+
+    @include smallInclusive {
+      a.learn-more {
+        font-family: $font-family-neue-haas-unica;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        line-height: 16px;
+      }
+    }
+  }
+}

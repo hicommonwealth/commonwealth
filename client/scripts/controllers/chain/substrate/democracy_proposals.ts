@@ -83,14 +83,14 @@ class SubstrateDemocracyProposals extends ProposalModule<
     // fetch proposals from chain
     const events = await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
     );
 
     const hashes = events.map((e) => e.data.proposalHash);
     await this.app.chain.chainEntities.fetchEntities(
       this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
 

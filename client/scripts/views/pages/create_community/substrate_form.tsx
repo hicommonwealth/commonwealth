@@ -112,7 +112,6 @@ export class SubstrateForm implements m.ClassComponent {
         {...defaultChainRows(this.state.form)}
         <CWButton
           label="Save changes"
-          buttonType="primary"
           disabled={this.state.saving}
           onclick={async () => {
             const { name, nodeUrl, iconUrl, substrateSpec } = this.state.form;
@@ -129,7 +128,7 @@ export class SubstrateForm implements m.ClassComponent {
               return;
             }
             this.state.saving = true;
-            $.post(`${app.serverUrl()}/addChainNode`, {
+            $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Substrate,
               icon_url: iconUrl,
               id: slugify(name),
@@ -142,7 +141,7 @@ export class SubstrateForm implements m.ClassComponent {
             })
               .then(async (res) => {
                 await initAppState(false);
-                m.route.set(`/${res.result.chain}`);
+                m.route.set(`/${res.result.chain.id}`);
               })
               .catch((err: any) => {
                 notifyError(

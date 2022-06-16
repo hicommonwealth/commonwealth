@@ -5,9 +5,13 @@ import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
 import { ChainInstance } from 'server/models/chain';
 import OffchainTopic from './OffchainTopic';
+import NodeInfo from './NodeInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly ChainNode: NodeInfo;
+  public readonly address: string;
+  public readonly tokenName: string;
   public readonly symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -37,6 +41,9 @@ class ChainInfo {
   public decimals: number;
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
+  public communityBanner?: string;
+
+  public get node() { return this.ChainNode; }
 
   constructor({
     id,
@@ -66,6 +73,9 @@ class ChainInfo {
     type,
     decimals,
     substrateSpec,
+    ChainNode,
+    tokenName,
+    address,
     adminOnlyPolling,
   }) {
     this.id = id;
@@ -96,7 +106,11 @@ class ChainInfo {
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.ChainNode = ChainNode;
+    this.tokenName = tokenName;
+    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
+    this.communityBanner = null;
   }
 
   public static fromJSON({
@@ -127,6 +141,9 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
+    token_name,
+    address,
+    ChainNode,
     admin_only_polling,
   }) {
     let blockExplorerIdsParsed;
@@ -164,6 +181,9 @@ class ChainInfo {
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      tokenName: token_name,
+      address,
+      ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
   }
@@ -218,6 +238,10 @@ class ChainInfo {
         )
       );
     });
+  }
+
+  public setBanner(banner_text: string) {
+    this.communityBanner = banner_text;
   }
 
   // TODO: change to accept an object
