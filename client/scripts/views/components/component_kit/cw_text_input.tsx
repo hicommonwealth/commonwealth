@@ -69,7 +69,6 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           placeholder={placeholder}
           oninput={(e) => {
             if (oninput) oninput(e);
-
             if (e.target.value?.length === 0) {
               this.isTyping = false;
               this.validationStatus = undefined;
@@ -91,6 +90,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             }
           }}
           onfocusout={(e) => {
+            debugger;
             if (inputValidationFn) {
               if (e.target.value?.length === 0) {
                 this.isTyping = false;

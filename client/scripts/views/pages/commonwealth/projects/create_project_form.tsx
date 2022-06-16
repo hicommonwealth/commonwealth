@@ -8,10 +8,18 @@ import QuillEditor from 'views/components/quill_editor';
 import Dropzone from 'dropzone';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ButtonGroup, Button, InputSelect } from 'construct-ui';
+import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+
+const weekInSeconds = 604800;
+const nowInSeconds = new Date().getTime() / 1000;
+
+type TokenOption = {
+  name: string;
+  address: string;
+};
 
 interface ICreateProjectForm {
   // Descriptive
@@ -26,6 +34,7 @@ interface ICreateProjectForm {
   creator: string;
   beneficiary: string;
   threshold: number;
+  fundraiseLength: number;
   deadline: number;
   curatorFee: number;
 
@@ -70,10 +79,10 @@ const validateCreator = (creator: string) => {
   // TODO: Valid address check
   return true;
 };
-const validateDeadline = (length: number) => {
+const validateFundraiseLength = (length: number) => {
   if (!length) return false;
   if (Number.isNaN(length)) return false;
-  // TODO: Min deadline check
+  // TODO: Min fundraiseLength check
   return true;
 };
 const validateCuratorFee = (fee: number) => {
@@ -88,6 +97,7 @@ const validateThreshold = (threshold: number) => {
   return true;
 };
 
+// TODO: Synchronize with new Avatar component
 class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
@@ -192,15 +202,18 @@ export class InformationSlide
           label="Name Your Crowdfund"
           name="Name"
           oninput={(e) => {
+            console.log(e);
             vnode.attrs.form.title = e.target.value;
           }}
           inputValidationFn={(value) => {
             const isValid = validateTitle(value);
             if (!isValid) {
               return [
-                'failed',
-                `Name must be between 8-64 characters. Current count: ${length}`,
+                'failure',
+                `Name must be between 8-64 characters. Current count: ${value.length}`,
               ];
+            } else {
+              return ['success', ''];
             }
           }}
         />
@@ -216,9 +229,11 @@ export class InformationSlide
             const isValid = validateShortDescription(value);
             if (!isValid) {
               return [
-                'failed',
+                'failure',
                 `Input limit is 224 characters. Current count: ${value.length}`,
               ];
+            } else {
+              return ['success', ''];
             }
           }}
         />
@@ -231,6 +246,8 @@ export class InformationSlide
 export class FundraisingSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
 {
+  private tokenName = 'WETH';
+
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     return (
       <div class="FundraisingSlide">
@@ -239,30 +256,77 @@ export class FundraisingSlide
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
-        <InputSelect
-          items={['WETH', 'DAI', 'ALEX']}
-          itemRender={(i) => {
-            <CWText type="body1">{i}</CWText>;
+        <SelectList
+          items={[
+            {
+              name: 'WETH',
+              address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+            },
+            {
+              name: 'DAI',
+              address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+            },
+            {
+              name: 'USDC',
+              address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            },
+            {
+              name: 'RAI',
+              address: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919',
+            },
+          ]}
+          itemRender={(token: TokenOption) => {
+            return (
+              <div value={token.address} style="cursor: pointer">
+                <CWText type="body1">{token.name}</CWText>
+              </div>
+            );
           }}
+          filterable={false}
           label="Raise In"
           name="Raise In"
-          onSelect={(e) => {
-            // TODO: Conversion to token address
-            vnode.attrs.form.token = e.target.value;
+          onSelect={(token: TokenOption) => {
+            this.tokenName = token.name;
+            vnode.attrs.form.token = token.address;
           }}
+          trigger={
+            <Button
+              align="left"
+              compact={true}
+              iconRight={Icons.CHEVRON_DOWN}
+              style="width: 480px"
+              label={`Raise token: ${this.tokenName}`}
+            />
+          }
         />
-        <InputSelect
-          items={['1 wk', '2 wk', '3 wk', '4 wk']}
-          itemRender={(i) => {
-            <CWText type="body1">{i}</CWText>;
+        <SelectList
+          items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
+          itemRender={(i: string) => {
+            console.log(i);
+            return (
+              <div value={i} style="cursor: pointer">
+                <CWText type="body1">{i}</CWText>
+              </div>
+            );
           }}
+          filterable={false}
           label="Fundraising Period"
           name="Fundraising Period"
-          onSelect={(e) => {
-            // TODO: Real length options & conversion to time
-            const lengthInSeconds = +e.target.value.split(' ')[0] * 604800;
-            vnode.attrs.form.deadline = lengthInSeconds;
+          onSelect={(length: string) => {
+            const lengthInSeconds = +length.split(' ')[0] * weekInSeconds;
+            vnode.attrs.form.fundraiseLength = lengthInSeconds;
           }}
+          trigger={
+            <Button
+              align="left"
+              compact={true}
+              iconRight={Icons.CHEVRON_DOWN}
+              style="width: 480px"
+              label={`Fundraise period: ${
+                vnode.attrs.form?.fundraiseLength / weekInSeconds
+              } week`}
+            />
+          }
         />
         <CWTextInput
           placeholder="Address"
@@ -275,16 +339,23 @@ export class FundraisingSlide
         />
         <CWTextInput
           placeholder="Set Quantity"
-          label="Curator Fee"
+          label="Curator Fee (%)"
           name="Curator Fee"
           oninput={(e) => {
+            // Convert to 10000 to capture decimal points
             vnode.attrs.form.curatorFee = Math.round(e.target.value * 100);
+            console.log(vnode.attrs.form.curatorFee);
           }}
           inputValidationFn={(value) => {
             const isNotNumber = Number.isNaN(+value);
             const isNotPercent = +value > 100 || +value < 0;
             if (isNotNumber || isNotPercent) {
-              return ['failed', 'Input must be valid number between 0 and 100'];
+              return [
+                'failure',
+                'Input must be valid percentage between 0 and 100',
+              ];
+            } else {
+              return ['success', ''];
             }
           }}
         />
@@ -324,15 +395,17 @@ export default class CreateProjectForm implements m.ClassComponent {
     this.stage = 'information';
     this.form = {
       title: '',
-      token: '',
-      creator: '',
+      // WETH hard-coded as default raise token
+      token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      creator: app.user.activeAccount.address,
       beneficiary: '',
       description: '',
       shortDescription: '',
       coverImage: '',
       curatorFee: 0,
       threshold: 0,
-      deadline: 0,
+      fundraiseLength: weekInSeconds,
+      deadline: nowInSeconds + weekInSeconds,
       chainId: app.activeChainId(),
       ipfsContent: null,
     };
@@ -398,7 +471,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                   threshold,
                   creator,
                   beneficiary,
-                  deadline,
+                  fundraiseLength,
                   curatorFee,
                 } = this.form;
                 const isValidTitle = validateTitle(title);
@@ -409,7 +482,8 @@ export default class CreateProjectForm implements m.ClassComponent {
                 const isValidToken = validateToken(token);
                 const isValidBeneficiary = validateBeneficiary(beneficiary);
                 const isValidCreator = validateCreator(creator);
-                const isValidDeadline = validateDeadline(deadline);
+                const isValidFundraiseLength =
+                  validateFundraiseLength(fundraiseLength);
                 const isValidCuratorFee = validateCuratorFee(curatorFee);
                 const isValidThreshold = validateThreshold(threshold);
                 if (
@@ -421,14 +495,14 @@ export default class CreateProjectForm implements m.ClassComponent {
                   !isValidBeneficiary ||
                   !isValidCreator ||
                   !isValidCuratorFee ||
-                  !isValidDeadline ||
+                  !isValidFundraiseLength ||
                   !isValidThreshold
                 ) {
                   notifyError('Invalid form. Please check inputs.');
                 }
 
+                this.form.deadline = nowInSeconds + weekInSeconds;
                 this.form.ipfsContent = JSON.stringify(this.form);
-
                 if (!title || title.length)
                   app.projects.createProject(this.form);
               },
