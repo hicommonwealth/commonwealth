@@ -24,7 +24,6 @@ import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 const createProposalTransactionLabels = {

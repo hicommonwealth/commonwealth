@@ -57,8 +57,13 @@
         margin-bottom: 8px;
       }
 
-      .Text {
+      .sidebar-body-text.Text {
         color: $white;
+      }
+
+      .Button {
+        border: none;
+        padding: 0;
       }
 
       .manage-link.Text {

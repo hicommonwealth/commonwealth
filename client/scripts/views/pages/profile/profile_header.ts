@@ -7,7 +7,6 @@ import app from 'state';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
-import EditProfileModal from 'views/modals/edit_profile_modal';
 import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
@@ -123,7 +122,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       m('.bio-main', [
         m('.bio-left', [
           // TODO: Rename class to non-bio to avoid confusion with Bio component
-          account.profile && m('.avatar', account.profile?.getAvatar(90)),
+          account.profile && account.profile?.getAvatar(90),
         ]),
         m('.bio-right', [
           m('.name-row', [
@@ -169,45 +168,30 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       m('.bio-actions', [
         account.profile &&
           account.profile.bio &&
-          m(Button, {
-            intent: 'warning',
+          m(CWButton, {
             onclick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
             },
             label: 'View Bio',
           }),
-      // If Admin Allow Banning
+        // If Admin Allow Banning
         loggedInUserIsAdmin &&
-        m('.ban-wrapper', [
-          m(CWButton, {
-            onclick: () => {
-              app.modals.create({
-                modal: BanUserModal,
-                data: { profile: account.profile },
-              });
-            },
-            label: 'Ban User',
-            buttonType: 'primary-red',
-          })
-        ]),
+          m('.ban-wrapper', [
+            m(CWButton, {
+              onclick: () => {
+                app.modals.create({
+                  modal: BanUserModal,
+                  data: { profile: account.profile },
+                });
+              },
+              label: 'Ban User',
+              buttonType: 'primary-red',
+            }),
+          ]),
         m('', [
           onOwnProfile
-            ? [
-                editIdentityAction(account, vnode.state.identity, vnode),
-                m(Button, {
-                  intent: 'primary',
-                  rounded: true,
-                  onclick: () => {
-                    app.modals.create({
-                      modal: EditProfileModal,
-                      data: { account, refreshCallback },
-                    });
-                  },
-                  label: 'Edit',
-                }),
-              ]
-            : showJoinCommunityButton && app.activeChainId()
-            ? m(Button, {
+            ? showJoinCommunityButton && app.activeChainId()
+            : m(Button, {
                 intent: 'primary',
                 rounded: true,
                 onclick: async () => {
@@ -231,10 +215,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   }
                 },
                 label: onLinkedProfile ? 'Switch to address' : 'Join community',
-              })
-            : [
-                // TODO: actions for others' accounts
-              ],
+              }),
         ]),
       ]),
     ]);
