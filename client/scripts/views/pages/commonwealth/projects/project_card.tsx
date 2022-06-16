@@ -71,15 +71,22 @@ class ProjectHeaderPanel
               )}
             </div>
             <div class="banner-right">
-              <CWText type="caption" fontWeight="uppercase">
-                {' '}
-                {weiToTokens(supportAmount.toString(), 18)} ETH
-              </CWText>
+              {isSupporter && (
+                <CWText type="caption" fontWeight="uppercase">
+                  {' '}
+                  {weiToTokens(supportAmount.toString(), 18)} ETH
+                </CWText>
+              )}
             </div>
           </div>
         )}
         {iconSize && (
-          <DummyChainIcon chain={null} onclick={null} size={iconSize} />
+          <div
+            class="dummy-chain-wrap"
+            style={isSupporter ? 'top: 104px' : 'top: 8px'}
+          >
+            <DummyChainIcon chain={null} onclick={null} size={iconSize} />
+          </div>
         )}
       </div>
     );
@@ -254,8 +261,8 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //   app.user.addresses
     // );
 
-    const userRole = ProjectRole.Author;
-    const supportAmount = 1.4;
+    const userRole = ProjectRole.Curator;
+    const supportAmount = '320000000000000000';
 
     return (
       <div class="ProjectCard large" onclick={onclick}>

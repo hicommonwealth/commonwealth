@@ -7,14 +7,12 @@
   display: flex;
   filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.3));
   flex-direction: column;
-  height: 376px;
   width: 336px;
 
   // TODO: Mockup only
-  .DummyChainIcon {
+  .dummy-chain-wrap {
     left: 8px;
     position: relative;
-    top: 8px;
     .chain-icon {
       border-radius: 100%;
     }
@@ -25,10 +23,14 @@
     background-size: 100%;
     border-radius: 5px 5px 0 0;
     flex: 32;
-    height: 100%;
+    min-height: 184px;
+    max-height: 184px;
     .user-role-banner {
       height: 40px;
       width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
       &.author {
         background-color: $primary-50;
         .Text {
@@ -36,15 +38,41 @@
         }
       }
       &.curator {
-        background-color: $purple-50;
-        .Text {
-          color: $purple-200;
+        background-color: $pink-50;
+        .banner-left {
+          .Text {
+            color: $pink-300;
+          }
+          svg > path {
+            fill: $pink-300;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $pink-500;
+          }
         }
       }
       &.backer {
-        background-color: $pink-50;
-        .Text {
-          color: $pink-300;
+        background-color: $purple-50;
+        .banner-left {
+          .Text {
+            color: $purple-200;
+          }
+          svg > path {
+            fill: $purple-200;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $purple-400;
+          }
+        }
+      }
+      .banner-left {
+        display: flex;
+        .caption {
+          margin-right: 8px;
         }
       }
     }
@@ -66,6 +94,8 @@
   .ProjectInfoPanel {
     background-color: $white;
     padding: 8px 16px;
+    min-height: 208px;
+    max-height: 208px;
     .funding-data {
       display: flex;
       justify-content: space-between;
@@ -93,7 +123,7 @@
     .description {
       border-radius: 0 0 5px 5px;
       flex: 32;
-      margin: 20px 0 8px;
+      margin: 16px 0 8px;
       .h5 {
         color: $neutral-800;
         display: flex;
