@@ -1279,10 +1279,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@commonwealth/chain-events@^0.13.2":
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.13.2.tgz#422095417c0359d50394b3366e0ba6c5b14da89b"
-  integrity sha512-+o07Nv0/usAf8pwtf8L92p8ZB4F/yxL2AqCgnPdjMKllhbHyLhh52uH8c8FyH94DEjYcPoM7UHzVbaAzWLsBfw==
+"@commonwealth/chain-events@^0.13.3":
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/@commonwealth/chain-events/-/chain-events-0.13.3.tgz#62194b2e0292c039c7f153b8419152a48b145282"
+  integrity sha512-J42+U+hKR3eKyBgjhshy4ysR5PLxDuczwnRrLL6B72eiKIGZ0siVNT3i5VfsgC23CRHPiDI2sPUEFddexYp1lQ==
   dependencies:
     "@ethersproject/abi" "^5.0.0"
     "@ethersproject/bytes" "^5.0.0"
