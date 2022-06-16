@@ -26,7 +26,7 @@ export const Label: LabelerFilter = (
     case EventKind.Approval: {
       // check to see if owner disapproves all addresses
       let label = '';
-      if (!new BN(data.approved, 10).isZero()) {
+      if (!new BN(data.approved, 'hex').isZero()) {
         label = `Owner ${fmtAddr(data.owner)} approved ${fmtAddr(data.approved)}
         to transfer token ${data.tokenId}.`;
       } else {
@@ -34,7 +34,7 @@ export const Label: LabelerFilter = (
           previously able to transfer token ${data.tokenId}.`;
       }
       return {
-        heading: 'ApprovalForAll',
+        heading: 'Approval',
         label,
       };
     }
