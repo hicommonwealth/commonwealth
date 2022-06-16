@@ -6,18 +6,18 @@ module.exports = {
       await queryInterface.bulkUpdate('ChainNodes', {
         url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
       }, {
-        chain: 'terra',
+        url: 'https://terra-rpc.cw-figment.workers.dev',
       }, {
         transaction
       });
-      await queryInterface.bulkUpdate('Chain', {
+      await queryInterface.bulkUpdate('Chains', {
         decimals: 6,
       }, {
         id: 'terra',
       }, {
         transaction
       });
-      await queryInterface.bulkUpdate('Chain', {
+      await queryInterface.bulkUpdate('Chains', {
         type: 'token',
       }, {
         id: 'terra',
@@ -32,18 +32,18 @@ module.exports = {
       await queryInterface.bulkUpdate('ChainNodes', {
         url: 'https://terra-rpc.cw-figment.workers.dev',
       }, {
-        chain: 'terra',
+        url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
       }, {
         transaction
       });
-      await queryInterface.bulkUpdate('Chain', {
+      await queryInterface.bulkUpdate('Chains', {
         decimals: 9,
       }, {
         id: 'terra',
       }, {
         transaction
       });
-      await queryInterface.bulkUpdate('Chain', {
+      await queryInterface.bulkUpdate('Chains', {
         type: 'chain',
       }, {
         id: 'terra',
