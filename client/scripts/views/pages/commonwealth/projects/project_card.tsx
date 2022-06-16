@@ -249,10 +249,13 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     //   </div>
     // );
 
-    const [userRole, supportAmount] = this.getUserRoles(app.user.addresses);
+    // const [userRole, supportAmount] = this.getUserRoles(
+    //   project,
+    //   app.user.addresses
+    // );
 
-    // userRole = ProjectRole.Author;
-    // supportAmount = 1.4;
+    const userRole = ProjectRole.Author;
+    const supportAmount = 1.4;
 
     return (
       <div class="ProjectCard large" onclick={onclick}>

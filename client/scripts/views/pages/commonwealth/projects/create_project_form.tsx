@@ -11,7 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, InputSelect } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
-import { CWTextArea } from 'client/scripts/views/components/component_kit/cw_text_area';
+import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 
 interface ICreateProjectForm {
   // Descriptive
