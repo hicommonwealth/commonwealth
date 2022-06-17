@@ -53,13 +53,14 @@
 
     .active-proposal {
       @include extraSmall {
-        margin-top: 14px;
+        margin-top: 18px;
       }
 
       align-items: center;
       background-color: $neutral-50;
       border-radius: 9999px;
       max-width: max-content;
+      margin-top: 14px;
       display: flex;
       color: $neutral-600;
       padding: 4px 16px;

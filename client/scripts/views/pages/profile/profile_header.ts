@@ -14,6 +14,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { BanUserModal } from '../../modals/ban_user_modal';
 
 const editIdentityAction = (
   account,
@@ -88,6 +89,13 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;
     const isClaimable = !account || !account.profile || account.profile.isEmpty;
+
+    // For Banning
+    const loggedInUserIsAdmin =
+      app.user.isSiteAdmin ||
+      app.user.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
 
     const joinCommunity = async () => {
       if (!app.activeChainId() || onOwnProfile) return;
@@ -166,6 +174,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             },
             label: 'View Bio',
           }),
+        // If Admin Allow Banning
+        loggedInUserIsAdmin &&
+          m('.ban-wrapper', [
+            m(CWButton, {
+              onclick: () => {
+                app.modals.create({
+                  modal: BanUserModal,
+                  data: { profile: account.profile },
+                });
+              },
+              label: 'Ban User',
+              buttonType: 'primary-red',
+            }),
+          ]),
         m('', [
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
