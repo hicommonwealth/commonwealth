@@ -1,6 +1,8 @@
 import moment from 'moment';
 import Web3 from 'web3';
+import axios from 'axios';
 import { StateMutabilityType, AbiType } from 'web3-utils';
+import { bech32 } from 'bech32';
 import * as solw3 from '@solana/web3.js';
 import {
   QueryClient,
@@ -8,7 +10,6 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { LCDClient } from '@terra-money/terra.js';
 
 import BN from 'bn.js';
 import { providers } from 'ethers';
@@ -129,21 +130,30 @@ export class TokenBalanceProvider {
     if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {
       throw new Error('No API key found for terra endpoint');
     }
-    const api = new LCDClient({
-      URL: `${url}/node_info?key=${process.env.TERRA_SETTEN_PHOENIX_API_KEY}`,
-      chainID: 'phoenix-1',
-    });
+
+    // verify address is valid before making query
+    const decodedAddress = bech32.decodeUnsafe(userAddress);
+    if (!decodedAddress) {
+      throw new Error('invalid terra address');
+    }
+
+    // make balance query
+    const queryUrl = `${url}/cosmos/bank/v1beta1/balances/${
+      userAddress
+    }?key=${
+      process.env.TERRA_SETTEN_PHOENIX_API_KEY
+    }`;
 
     try {
       // NOTE: terra.js staking module is incompatible with stargate queries
-      const balResp = await api.bank.balance(userAddress);
-      let balance: BN;
-
-      // hardcoded token symbol is "uluna"
-      if (balResp[0].get('uluna')) {
-        balance = new BN(balResp[0].get('uluna').toString());
-      } else {
-        balance = new BN(0);
+      const balResp = await axios.get(queryUrl); // [ { denom: 'uluna', amount: '5000000' } ]
+      const balances: Array<{ denom: string, amount: string }> = balResp?.data?.balances;
+      let balance = new BN(0);
+      if (balances?.length > 0) {
+        const balanceObj = balances.find(({ denom }) => denom === 'uluna');
+        if (balanceObj) {
+          balance = new BN(balanceObj.amount);
+        }
       }
       return balance;
     } catch (e) {

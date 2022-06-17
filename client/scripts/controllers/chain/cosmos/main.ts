@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import $ from 'jquery';
 import { ChainBase } from 'types';
 import { ChainInfo, IChainAdapter, ITokenAdapter } from 'models';
 import { IApp } from 'state';
