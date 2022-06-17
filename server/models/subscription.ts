@@ -180,21 +180,26 @@ export default (
 
     // if the notification does not yet exist create it here
     // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
+    console.log(notification_data);
     if (!notification) {
-      const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
-      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+      if (isChainEventData) {
+        const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
+        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
 
-      notification = await models.Notification.create(isChainEventData ? {
-        notification_data: JSON.stringify(event),
-        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
-        category_id: 'chain-event',
-        chain_id: (<IChainEventNotificationData>notification_data).chain_id
-      } : {
-        notification_data: JSON.stringify(notification_data),
-        category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id
-          || (<ICommunityNotificationData>notification_data).chain
-      })
+        notification = await models.Notification.create({
+          notification_data: JSON.stringify(event),
+          chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+          category_id: 'chain-event',
+          chain_id: (<IChainEventNotificationData>notification_data).chain_id
+        })
+      } else {
+        notification = await models.Notification.create({
+          notification_data: JSON.stringify(notification_data),
+          category_id,
+          chain_id: (<IPostNotificationData>notification_data).chain_id
+            || (<ICommunityNotificationData>notification_data).chain
+        });
+      }
     }
 
     let msg;
