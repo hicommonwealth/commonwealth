@@ -41,7 +41,7 @@
     }
   }
 
-  @include sm-max {
+  @include small {
     .emoji {
       display: none;
     }

@@ -12,7 +12,7 @@ const log = factory.getLogger(addPrefix(__filename));
 
 export function createCeNamespace(io: Server) {
   const CeNs = io.of(`/${WebsocketNamespaces.ChainEvents}`);
-  io.use(authenticate);
+  CeNs.use(authenticate);
 
   CeNs.on('connection', (socket) => {
     log.info(`${socket.id} connected to Chain-Events`);

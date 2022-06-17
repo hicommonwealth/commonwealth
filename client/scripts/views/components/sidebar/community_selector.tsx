@@ -123,10 +123,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
     );
 
     return isMobile ? (
-      <div class="CommunitySelectList">
-        {homeButton}
-        {app.isLoggedIn() && communityList}
-      </div>
+      <div class="CommunitySelectList">{app.isLoggedIn() && communityList}</div>
     ) : (
       <div class="CommunitySelector">
         <div class="title-selector">

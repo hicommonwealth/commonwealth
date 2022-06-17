@@ -25,6 +25,7 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
+import BanCache from '../util/banCheckCache';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -46,6 +47,7 @@ export const Errors = {
 const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -56,6 +58,15 @@ const createComment = async (
   if (authorError) return next(new Error(authorError));
 
   const { parent_id, root_id, text } = req.body;
+
+  // check if banned
+  const [canInteract, banError] = await banCache.checkBan({
+    chain: chain.id,
+    address: author.address,
+  });
+  if (!canInteract) {
+    return next(new Error(banError));
+  }
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins

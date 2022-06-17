@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .LinkNewAddressModal {
   text-align: center;
@@ -8,11 +8,13 @@
     padding: 20px 40px 18px;
     background: $primary-500;
     color: $white;
+
     h3 {
       margin: 0;
       font-size: 17px;
     }
   }
+
   .link-address-step-narrow {
     padding: 28px 40px;
     width: 460px;
@@ -25,43 +27,49 @@
     height: 175px;
     margin-bottom: 20px;
   }
+
   h3 {
     margin: 8px 0 16px;
   }
+
   p {
     margin: 4px 0;
   }
+
   code {
     font-size: 13px;
     padding: 2px 3px;
     margin: 0 3px;
     white-space: nowrap;
   }
+
   .CodeBlock {
     text-align: left;
+
     .no-select {
       opacity: 0.8;
       user-select: none;
     }
   }
+
   .CodeBlock + .CodeBlock {
     margin-top: -10px;
   }
-  .error-message {
-    @include error-text();
-    margin: 15px 0;
-  }
+
   .mobile-error-message {
     color: $neutral-500;
     margin: 26px 40px;
+
     p {
       margin: 8px 0;
     }
   }
+
   a.back-text {
     color: $neutral-500;
     text-decoration: none;
     margin-top: 20px;
+
     &:hover {
       text-decoration: underline;
     }
@@ -70,10 +78,12 @@
   // for step 0 - chain selection
   .select-chain-step {
     padding: 55px 0 60px;
+
     .cui-button {
       margin-top: 15px;
     }
   }
+
   .get-wallet-text {
     margin-top: 15px;
     color: $neutral-800;
@@ -84,16 +94,19 @@
     text-align: left;
     margin-bottom: 24px;
   }
+
   .link-address-precopy {
     display: block;
     font-size: 15px;
     color: $neutral-500;
     margin: 26px auto 4px;
     max-width: 480px;
-    @include xs-max {
+
+    @include extraSmall {
       margin: 20px auto 10px;
     }
   }
+
   .link-address-combined-warning {
     display: flex;
     background: $primary-300;
@@ -103,14 +116,17 @@
     text-align: left;
     border: 1px solid $neutral-50;
     font-size: 14px;
+
     .link-address-combined-warning-icon {
       margin-right: 6px;
     }
-    @include xs-max {
+
+    @include extraSmall {
       margin-left: 20px;
       margin-right: 20px;
     }
   }
+
   .link-address-options {
     text-align: center;
     padding: 0 20px 10px;
@@ -127,62 +143,77 @@
       border: 1px solid $neutral-50;
       background: $white;
       box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+
       &.mobile-disabled {
         opacity: 0.6;
         pointer-events: none;
         // disable CLI and substrate wallets for mobile users
       }
+
       &.selected {
         border-color: $primary-500;
       }
-      @include xs-max {
+
+      @include extraSmall {
         height: initial;
         margin: 8px 8px;
       }
     }
+
     .link-address-header {
       text-align: center;
       background: $primary-400;
       padding: 15px 0 0;
       border-radius: 4px 4px 0 0;
-      @include xs-max {
+
+      @include extraSmall {
         padding-top: 12px;
       }
     }
+
     .link-address-title {
       font-weight: 500;
     }
+
     .link-address-icon {
       height: 36px;
+
       img {
         width: 34px;
       }
     }
+
     .link-address-title {
       padding: 9px 15px;
       color: $neutral-500;
     }
+
     .link-address-description {
       font-size: 13px;
       margin: 16px 20px 10px;
       color: $neutral-500;
     }
+
     .link-address-link {
       font-size: 13px;
       margin: 10px 20px 16px;
       color: $neutral-500;
     }
+
     .link-address-link a {
       color: $neutral-500;
       text-decoration: none;
+
       &:hover {
         text-decoration: underline;
       }
     }
   }
+
   button.link-address-options-continue {
     margin: 0 0 24px;
   }
+
   .link-address-options-back {
     margin-bottom: 24px;
   }
@@ -361,7 +392,7 @@
       height: 92px;
     }
   }
-  @include xs-max {
+  @include extraSmall {
     min-width: 0;
     .link-address-step-narrow {
       width: 100%;

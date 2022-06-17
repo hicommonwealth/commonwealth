@@ -32,10 +32,16 @@ export class ChatNamespace {
     public async init() {
         this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
             transports: ['websocket'],
+            query: { token: app.user.jwt },
         });
 
         this.chatNs.on('connect', this.onConnect.bind(this));
         this.chatNs.on('disconnect', this.onDisconnect.bind(this));
+        this.chatNs.on(WebsocketMessageNames.Error, this.onError.bind(this));
+    }
+
+    public async onError(errorMsg: string) {
+        console.error(errorMsg);
     }
 
     public async addListener(eventName: string, listener: (any) => void) {
@@ -48,21 +54,20 @@ export class ChatNamespace {
         if (this.initialized()) this.chatNs.off(eventName, listener);
     }
 
-    public sendMessage(message: Record<string, any>, channel: IChannel) {
+    public sendMessage(message: Record<string, any>) {
         if (this.isConnected) {
             this.chatNs.emit(WebsocketMessageNames.ChatMessage, {
-                socket_room: ChatNamespace.channelToRoomId(channel),
                 ...message
             })
         }
     }
 
-    public connectToChannels(channel_ids: string[]) {
-        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channel_ids)
+    public connectToChannels(channelIds: string[]) {
+        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.JoinChatChannel, channelIds)
     }
 
-    public disconnectFromChannels(channel_ids: string[]) {
-        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.LeaveChatChannel, channel_ids)
+    public disconnectFromChannels(channelIds: string[]) {
+        if (this.isConnected) this.chatNs.emit(WebsocketMessageNames.LeaveChatChannel, channelIds)
     }
 
     private onConnect() {
@@ -104,15 +109,17 @@ export class ChatNamespace {
 
     public async initialize() {
         console.log("Initializing chat state")
-        this.addListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
-        this.connectToChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
+        this.addListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this));
+        const channels = Object.values(this.channels).map(x => String(x.id))
+        console.log("Connecting to chat channels:", channels);
+        this.connectToChannels(channels);
         this._initialized = true;
     }
 
     public async deinit() {
         this._initialized = false;
         this.removeListener(WebsocketMessageNames.ChatMessage, this.onMessage.bind(this))
-        this.disconnectFromChannels(Object.values(this.channels).map(ChatNamespace.channelToRoomId))
+        this.disconnectFromChannels(Object.values(this.channels).map(x => String(x.id)));
         this.channels = {}
     }
 
@@ -128,13 +135,12 @@ export class ChatNamespace {
         const new_channel_ids = Object.keys(channels).filter(x => !Object.keys(this.channels).includes(x));
         // removed_channel_ids are the ids in this.channels which are not in channels
         const removed_channel_ids = Object.keys(this.channels).filter(x => !Object.keys(channels).includes(x));
-        this.disconnectFromChannels(removed_channel_ids.map(id => this.channels[id]).map(ChatNamespace.channelToRoomId))
-        this.connectToChannels(new_channel_ids.map(id => channels[id]).map(ChatNamespace.channelToRoomId))
+        this.disconnectFromChannels(removed_channel_ids)
+        this.connectToChannels(new_channel_ids);
         this.channels = channels
     }
 
     private onMessage(msg) {
-        console.log("onMessage")
         // Ignore message if it is already in ChatMessages, last 5 msgs
         if(this.channels[msg.chat_channel_id].ChatMessages.slice(-5).includes(msg)) {
             return
@@ -151,10 +157,6 @@ export class ChatNamespace {
 
     public readMessages(channel_id: string) {
         this.channels[channel_id].unread = 0;
-    }
-
-    private static channelToRoomId(channel: IChannel) {
-        return `${channel.chain_id}-${channel.id}`
     }
 
     public async createChatChannel(name, chain_id, category) {

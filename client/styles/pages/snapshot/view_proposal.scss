@@ -286,7 +286,7 @@
     margin-top: 24px;
     margin-left: -15px;
 
-    @media (min-width: 1025px) {
+    @include mediumSmall {
       display: none;
     }
   }
@@ -295,13 +295,13 @@
 .proposal-tab {
   .proposal-body {
     .proposal-content {
-      @media (max-width: 1023px) {
+      @include small {
         display: block;
       }
     }
 
     .proposal-info {
-      @media (max-width: 1023px) {
+      @include small {
         display: none;
       }
     }
@@ -311,13 +311,13 @@
 .info-tab {
   .proposal-body {
     .proposal-content {
-      @media (max-width: 1023px) {
+      @include small {
         display: none;
       }
     }
 
     .proposal-info {
-      @media (max-width: 1023px) {
+      @include small {
         display: block;
       }
     }
