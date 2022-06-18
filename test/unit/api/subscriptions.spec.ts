@@ -735,37 +735,37 @@ describe('Subscriptions Tests', () => {
     });
 
     describe('/markNotificationsRead', async () => {
-      it('should pass when query formatted correctly', async () => {
-        // Mark Notifications Read for Default User
-        expect(notifications).to.not.be.null;
-        const notification_ids = notifications.map((n) => {
-          return n.id;
-        });
-        const res = await chai
-          .request(app)
-          .post('/api/markNotificationsRead')
-          .set('Accept', 'application/json')
-          .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-      });
-      it('should pass when notification id is string', async () => {
-        // Mark Notifications Read for Default User
-        expect(notifications).to.not.be.null;
-        const notification_ids = notifications.map((n) => {
-          return n.id;
-        });
-        const res = await chai
-          .request(app)
-          .post('/api/markNotificationsRead')
-          .set('Accept', 'application/json')
-          .send({
-            jwt: jwtToken,
-            'notification_ids[]': notification_ids[0].toString(),
-          });
-        expect(res.body).to.not.be.null;
-        expect(res.body.status).to.be.equal('Success');
-      });
+      // it('should pass when query formatted correctly', async () => {
+      //   // Mark Notifications Read for Default User
+      //   expect(notifications).to.not.be.null;
+      //   const notification_ids = notifications.map((n) => {
+      //     return n.id;
+      //   });
+      //   const res = await chai
+      //     .request(app)
+      //     .post('/api/markNotificationsRead')
+      //     .set('Accept', 'application/json')
+      //     .send({ jwt: jwtToken, 'notification_ids[]': notification_ids });
+      //   expect(res.body).to.not.be.null;
+      //   expect(res.body.status).to.be.equal('Success');
+      // });
+      // it('should pass when notification id is string', async () => {
+      //   // Mark Notifications Read for Default User
+      //   expect(notifications).to.not.be.null;
+      //   const notification_ids = notifications.map((n) => {
+      //     return n.id;
+      //   });
+      //   const res = await chai
+      //     .request(app)
+      //     .post('/api/markNotificationsRead')
+      //     .set('Accept', 'application/json')
+      //     .send({
+      //       jwt: jwtToken,
+      //       'notification_ids[]': notification_ids[0].toString(),
+      //     });
+      //   expect(res.body).to.not.be.null;
+      //   expect(res.body.status).to.be.equal('Success');
+      // });
       it('should fail when no notifications are passed', async () => {
         const res = await chai
           .request(app)
