@@ -1,5 +1,5 @@
 import passport from 'passport';
-import passportGithub from 'passport-github';
+import passportGithub from 'passport-github2'; // passport-github is not up to date with Github OAuth 3.0
 import passportDiscord from 'passport-discord';
 import { Request } from 'express';
 
@@ -134,8 +134,9 @@ export function useSocialAccountAuth(models: DB) {
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
-    state: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
+    console.log('req.query.state');
+    console.log(req.query.state);
     await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
   }));
 
@@ -146,7 +147,6 @@ export function useSocialAccountAuth(models: DB) {
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
     callbackURL: DISCORD_OAUTH_CALLBACK,
-    state: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))

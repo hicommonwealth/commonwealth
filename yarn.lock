@@ -14327,10 +14327,10 @@ passport-discord@^0.1.4:
   dependencies:
     passport-oauth2 "^1.5.0"
 
-passport-github@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/passport-github/-/passport-github-1.1.0.tgz"
-  integrity sha1-jOHj/NYa11eOsd9ZWDnkrqEjVdQ=
+passport-github2@^0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/passport-github2/-/passport-github2-0.1.12.tgz#a72ebff4fa52a35bc2c71122dcf470d1116f772c"
+  integrity sha512-3nPUCc7ttF/3HSP/k9sAXjz3SkGv5Nki84I05kSQPo01Jqq1NzJACgMblCK0fGcv9pKCG/KXU3AJRDGLqHLoIw==
   dependencies:
     passport-oauth2 "1.x.x"
 
