@@ -25,203 +25,220 @@ export const VotingResults: m.Component<{ proposal: AnyProposal }> = {
 
     // TODO: fix up this function for cosmos votes
     if (proposal.votingType === VotingType.SimpleYesNoVoting) {
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${votes.filter((v) => v.choice === true).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === true),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${votes.filter((v) => v.choice === false).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === false),
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${votes.filter((v) => v.choice === true).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === true)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${votes.filter((v) => v.choice === false).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === false)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.MolochYesNo) {
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${votes.filter((v) => v.choice === MolochVote.YES).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.YES),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${votes.filter((v) => v.choice === MolochVote.NO).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === MolochVote.NO),
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${
+                votes.filter((v) => v.choice === MolochVote.YES).length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === MolochVote.YES)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${votes.filter((v) => v.choice === MolochVote.NO).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === MolochVote.NO)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal instanceof AaveProposal) {
       const yesVotes: AaveProposalVote[] = votes.filter((v) => !!v.choice);
+
       const yesBalance = yesVotes.reduce(
         (total, v) => total.add(v.power),
         new BN(0)
       );
+
       const yesBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(yesBalance.toString())
       )} ${app.chain.meta.symbol}`;
+
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
+
       const noBalance = noVotes.reduce(
         (total, v) => total.add(v.power),
         new BN(0)
       );
+
       const noBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(noBalance.toString())
       )} ${app.chain.meta.symbol}`;
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${yesBalanceString}) (${yesVotes.length} voters)`
-          ),
-          m('.results-subheader', [m('span', 'User'), m('span', 'Power')]),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => !!v.choice),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${noBalanceString}) (${noVotes.length} voters)`
-          ),
-          m('.results-subheader', [m('span', 'User'), m('span', 'Power')]),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => !v.choice),
-            }),
-          ]),
-        ]),
-      ]);
+
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${yesBalanceString} ${yesVotes.length}) voters`}
+            </div>
+            <div class="results-subheader">
+              <span>User</span>
+              <span>Power</span>
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => !!v.choice)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${noBalanceString} ${noVotes.length}) voters`}
+            </div>
+            <div class="results-subheader">
+              <span>User</span>
+              <span>Power</span>
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => !v.choice)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${votes.filter((v) => v.choice === BravoVote.YES).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === BravoVote.YES),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${votes.filter((v) => v.choice === BravoVote.NO).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === BravoVote.NO),
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${
+                votes.filter((v) => v.choice === BravoVote.YES).length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === BravoVote.YES)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${votes.filter((v) => v.choice === BravoVote.NO).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === BravoVote.NO)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${votes.filter((v) => v.choice === BravoVote.YES).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === BravoVote.YES),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${votes.filter((v) => v.choice === BravoVote.NO).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === BravoVote.NO),
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `Abstain (${
-              votes.filter((v) => v.choice === BravoVote.ABSTAIN).length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === BravoVote.ABSTAIN),
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${
+                votes.filter((v) => v.choice === BravoVote.YES).length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === BravoVote.YES)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${votes.filter((v) => v.choice === BravoVote.NO).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === BravoVote.NO)}
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`Abstain (${
+                votes.filter((v) => v.choice === BravoVote.ABSTAIN).length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === BravoVote.ABSTAIN)}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
-      return m('.VotingResults', [
-        m('.results-column.yes-votes', [
-          m(
-            '.results-header',
-            `Yes (${votes.filter((v) => v.choice === true).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === true),
-              amount: true,
-              weight: true,
-            }),
-          ]),
-        ]),
-        m('.results-column.no-votes', [
-          m(
-            '.results-header',
-            `No (${votes.filter((v) => v.choice === false).length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === false),
-              amount: true,
-              weight: true,
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column yes-votes">
+            <div class="results-header">
+              {`Yes (${votes.filter((v) => v.choice === true).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === true)}
+                amount
+                weight
+              />
+            </div>
+          </div>
+          <div class="results-column no-votes">
+            <div class="results-header">
+              {`No (${votes.filter((v) => v.choice === false).length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === false)}
+                amount
+                weight
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       // return different voting results on completed cosmos proposal, as voters are not available
       if (
@@ -238,165 +255,175 @@ export const VotingResults: m.Component<{ proposal: AnyProposal }> = {
           const coin = new Coin(denom, n, false, decimals);
           return coin.format();
         };
+
         const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
+
         const getPct = (n: BN) => {
           return (n.muln(10_000).div(voteTotal).toNumber() / 100).toFixed(2);
         };
-        return m('.VotingResults', [
-          m('.results-column', [
-            m('.results-header', `${getPct(yes)}% voted Yes`),
-            m('.results-cell', `(${formatCurrency(yes)})`),
-          ]),
-          m('.results-column', [
-            m('.results-header', `${getPct(no)}% voted No`),
-            m('.results-cell', `(${formatCurrency(no)})`),
-          ]),
-          m('.results-column', [
-            m('.results-header', `${getPct(abstain)}% voted Abstain`),
-            m('.results-cell', `(${formatCurrency(abstain)})`),
-          ]),
-          m('.results-column', [
-            m('.results-header', `${getPct(noWithVeto)}% voted Veto`),
-            m('.results-cell', `(${formatCurrency(noWithVeto)})`),
-          ]),
-        ]);
+
+        return (
+          <div class="VotingResults">
+            <div class="results-column">
+              <div class="results-header">{`${getPct(yes)}% voted Yes`}</div>
+              <div class="results-cell">{`(${formatCurrency(yes)})`}</div>
+            </div>
+            <div class="results-column">
+              <div class="results-header">{`${getPct(no)}% voted No`}</div>
+              <div class="results-cell">{`(${formatCurrency(no)})`}</div>
+            </div>
+            <div class="results-column">
+              <div class="results-header">
+                {`${getPct(abstain)}% voted Abstain`}
+              </div>
+              <div class="results-cell">{`(${formatCurrency(abstain)})`}</div>
+            </div>
+            <div class="results-column">
+              <div class="results-header">
+                {`${getPct(noWithVeto)}% voted Veto`}
+              </div>
+              <div class="results-cell">
+                {`(${formatCurrency(noWithVeto)})`}
+              </div>
+            </div>
+          </div>
+        );
       }
-      return m('.VotingResults', [
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === 'Yes'),
-            }),
-          ]),
-        ]),
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted no (${votes.filter((v) => v.choice === 'No').length})`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === 'No'),
-            }),
-          ]),
-        ]),
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted abstain (${
-              votes.filter((v) => v.choice === 'Abstain').length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === 'Abstain'),
-            }),
-          ]),
-        ]),
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted veto (${
-              votes.filter((v) => v.choice === 'NoWithVeto').length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter((v) => v.choice === 'NoWithVeto'),
-            }),
-          ]),
-        ]),
-      ]);
+
+      return (
+        <div class="VotingResults">
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === 'Yes')}
+              />
+            </div>
+          </div>
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === 'No')}
+              />
+            </div>
+          </div>
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted abstain (${
+                votes.filter((v) => v.choice === 'Abstain').length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === 'Abstain')}
+              />
+            </div>
+          </div>
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted veto (${
+                votes.filter((v) => v.choice === 'NoWithVeto').length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter((v) => v.choice === 'NoWithVeto')}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (
       proposal.votingType === VotingType.SimpleYesApprovalVoting &&
       proposal instanceof CosmosProposal
     ) {
       // special case for cosmos proposals in deposit stage
-      return m('.VotingResults', [
-        m('.results-column', [
-          m('.results-header', `Approved ${proposal.depositorsAsVotes.length}`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: proposal.depositorsAsVotes,
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column">
+            <div class="results-header">{`Approved ${proposal.depositorsAsVotes.length}`}</div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={proposal.depositorsAsVotes}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
-      return m('.VotingResults', [
-        m('.results-column', [
-          m('.results-header', `Approved ${votes.length}`),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes,
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column">
+            <div class="results-header">{`Approved ${votes.length}`}</div>
+            <div class="results-cell">
+              <VoteListing proposal={proposal} votes={votes} />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.YesNoReject) {
-      return m('.VotingResults', [
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted approve (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
-                .length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Approve
-              ),
-            }),
-          ]),
-        ]),
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted reject (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
-                .length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Reject
-              ),
-            }),
-          ]),
-        ]),
-        m('.results-column', [
-          m(
-            '.results-header',
-            `Voted remove (${
-              votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
-                .length
-            })`
-          ),
-          m('.results-cell', [
-            m(VoteListing, {
-              proposal,
-              votes: votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Remove
-              ),
-            }),
-          ]),
-        ]),
-      ]);
+      return (
+        <div class="VotingResults">
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted approve (${
+                votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
+                  .length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter(
+                  (v) => v.choice === NearSputnikVoteString.Approve
+                )}
+              />
+            </div>
+          </div>
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted reject (${
+                votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
+                  .length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter(
+                  (v) => v.choice === NearSputnikVoteString.Reject
+                )}
+              />
+            </div>
+          </div>
+          <div class="results-column">
+            <div class="results-header">
+              {`Voted remove (${
+                votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
+                  .length
+              })`}
+            </div>
+            <div class="results-cell">
+              <VoteListing
+                proposal={proposal}
+                votes={votes.filter(
+                  (v) => v.choice === NearSputnikVoteString.Remove
+                )}
+              />
+            </div>
+          </div>
+        </div>
+      );
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       // to be implemented
     } else {
