@@ -234,12 +234,13 @@ async function main() {
     // add security middleware
     app.use(function applyXFrame(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
-      next(); 
-    });
-    app.use(function applyCSP(req, res, next) {
       res.set('Content-Security-Policy', "frame-ancestors 'none';");
-      next(); 
-  });
+      next();
+    });
+    // app.use(function applyCSP(req, res, next) {
+    //   res.set('Content-Security-Policy', "frame-ancestors 'none';");
+    //   next();
+  // });
 
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
