@@ -4,7 +4,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-top: 25px;
 
   .VoteRow {
     display: flex;
@@ -12,6 +11,7 @@
     &:hover {
       background: $neutral-50;
     }
+
     .row-left {
       flex: 1;
       text-align: left;
@@ -25,20 +25,11 @@
 
   .results-column {
     background-color: $neutral-100;
-    border-radius: 10px;
+    border-radius: $border-radius-corners;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    margin-bottom: 8px;
-    max-width: 48%;
-    min-width: 48%;
-    padding: 18px 0 12px;
-
-    .results-cell,
-    .results-header,
-    .results-subheader > span {
-      padding: 0 26px;
-    }
+    width: 344px;
+    padding: 16px;
 
     .results-header {
       font-weight: 500;
@@ -71,18 +62,6 @@
         color: $rorange-500;
         font-size: 24px;
       }
-    }
-  }
-
-  @include mediumSmallInclusive {
-    display: block;
-    width: 100%;
-
-    .results-column,
-    .results-header,
-    .results-cell {
-      min-width: 100%;
-      max-width: 100%;
     }
   }
 

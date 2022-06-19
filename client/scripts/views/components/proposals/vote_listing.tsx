@@ -4,17 +4,10 @@ import m from 'mithril';
 
 import 'components/proposals/vote_listing.scss';
 
-import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
-import {
-  VotingUnit,
-  IVote,
-  DepositVote,
-  BinaryVote,
-  AnyProposal,
-} from 'models';
+import { IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
 import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
@@ -23,6 +16,8 @@ import { SubstrateDemocracyVote } from 'controllers/chain/substrate/democracy_re
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
+import { CWText } from '../component_kit/cw_text';
+import { getBalance } from './helpers';
 
 type VoteListingAttrs = {
   amount?: boolean;
@@ -32,19 +27,8 @@ type VoteListingAttrs = {
 };
 
 export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
-  private balancesCache;
-  private balancesCacheInitialized;
-
   view(vnode) {
     const { proposal, votes } = vnode.attrs;
-
-    const balanceWeighted =
-      proposal.votingUnit === VotingUnit.CoinVote ||
-      proposal.votingUnit === VotingUnit.ConvictionCoinVote ||
-      proposal.votingUnit === VotingUnit.PowerVote;
-
-    if (!this.balancesCache) this.balancesCache = {};
-    if (!this.balancesCacheInitialized) this.balancesCacheInitialized = {};
 
     // TODO: show turnout if specific votes not found
     const sortedVotes = votes;
@@ -58,86 +42,47 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
     return (
       <div class="VoteListing">
         {sortedVotes.length === 0 ? (
-          <div class="no-votes">No votes</div>
+          <CWText className="no-votes">No votes</CWText>
         ) : (
           votes.map((vote) => {
-            let balance;
+            const balance = getBalance(proposal, vote);
 
-            if (balanceWeighted && !(vote instanceof CosmosVote)) {
-              // fetch and display balances
-              if (this.balancesCache[vote.account.address]) {
-                balance = this.balancesCache[vote.account.address];
-              } else if (this.balancesCacheInitialized[vote.account.address]) {
-                // do nothing, fetch already in progress
-                balance = '--';
-              } else {
-                // fetch balance and store in cache
-                this.balancesCacheInitialized[vote.account.address] = true;
-
-                if (vote instanceof AaveProposalVote) {
-                  balance = vote.power;
-                  this.balancesCache[vote.account.address] = vote.format();
-                  m.redraw();
-                } else if (vote instanceof CompoundProposalVote) {
-                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
-                  this.balancesCache[vote.account.address] = balance;
-                  m.redraw();
-                } else {
-                  vote.account.balance.then((b) => {
-                    balance = b;
-                    this.balancesCache[vote.account.address] = formatCoin(
-                      b,
-                      true
-                    );
-                    m.redraw();
-                  });
-                  balance = '--';
-                }
-              }
-            }
+            console.log(balance);
 
             switch (true) {
               case vote instanceof CosmosVote:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, {
-                        user: vote.account,
-                        linkify: true,
-                        popover: true,
-                      })}
-                      {/* (balanceWeighted && balance) && m('.vote-balance', balance), */}
-                    </div>
+                    {m(User, {
+                      user: vote.account,
+                      linkify: true,
+                      popover: true,
+                    })}
+                    {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
                   </div>
                 );
 
               case vote instanceof MolochProposalVote:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, { user: vote.account, linkify: true })}
-                    </div>
-                    {balance && <div class="vote-balance">{balance}</div>}
+                    {m(User, { user: vote.account, linkify: true })}
+                    {balance && <CWText>{balance}</CWText>}
                   </div>
                 );
 
               case vote instanceof CompoundProposalVote:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, { user: vote.account, linkify: true })}
-                    </div>
-                    {balance && <div class="vote-balance">{balance}</div>}
+                    {m(User, { user: vote.account, linkify: true })}
+                    {balance && <CWText>{balance}</CWText>}
                   </div>
                 );
 
               case vote instanceof AaveProposalVote:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, { user: vote.account, linkify: true })}
-                    </div>
-                    {balance && <div class="vote-balance">{balance}</div>}
+                    {m(User, { user: vote.account, linkify: true })}
+                    {balance && <CWText>{balance}</CWText>}
                   </div>
                 );
 
@@ -146,22 +91,22 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateDemocracyVote:
                     return (
                       <div class="vote">
-                        <div class="vote-voter">
-                          {m(User, {
-                            user: vote.account,
-                            linkify: true,
-                            popover: true,
-                          })}
-                        </div>
-                        <div class="vote-balance">
-                          {formatCoin(
-                            (vote as SubstrateDemocracyVote).balance,
-                            true
-                          )}
-                        </div>
-                        <div class="vote-weight">
-                          {(vote as SubstrateDemocracyVote).weight &&
-                            `${(vote as SubstrateDemocracyVote).weight}x`}
+                        {m(User, {
+                          user: vote.account,
+                          linkify: true,
+                          popover: true,
+                        })}
+                        <div class="vote-right-container">
+                          <CWText noWrap>
+                            {formatCoin(
+                              (vote as SubstrateDemocracyVote).balance,
+                              true
+                            )}
+                          </CWText>
+                          <CWText noWrap>
+                            {(vote as SubstrateDemocracyVote).weight &&
+                              `${(vote as SubstrateDemocracyVote).weight}x`}
+                          </CWText>
                         </div>
                       </div>
                     );
@@ -169,31 +114,29 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateCollectiveVote:
                     return (
                       <div class="vote">
-                        <div class="vote-voter">
-                          {m(User, {
-                            user: vote.account,
-                            linkify: true,
-                            popover: true,
-                          })}
-                        </div>
+                        {m(User, {
+                          user: vote.account,
+                          linkify: true,
+                          popover: true,
+                        })}
                       </div>
                     );
 
                   default:
                     return (
                       <div class="vote">
-                        <div class="vote-voter">
-                          {m(User, {
-                            user: vote.account,
-                            linkify: true,
-                            popover: true,
-                          })}
-                        </div>
-                        <div class="vote-balance">
-                          {(vote as any).amount && (vote as any).amount}
-                        </div>
-                        <div class="vote-weight">
-                          {(vote as any).weight && `${(vote as any).weight}x`}
+                        {m(User, {
+                          user: vote.account,
+                          linkify: true,
+                          popover: true,
+                        })}
+                        <div class="vote-right-container">
+                          <CWText noWrap>
+                            {(vote as any).amount && (vote as any).amount}
+                          </CWText>
+                          <CWText noWrap>
+                            {(vote as any).weight && `${(vote as any).weight}x`}
+                          </CWText>
                         </div>
                       </div>
                     );
@@ -202,29 +145,25 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
               case vote instanceof DepositVote:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, {
-                        user: vote.account,
-                        linkify: true,
-                        popover: true,
-                      })}
-                    </div>
-                    <div class="vote-deposit">
+                    {m(User, {
+                      user: vote.account,
+                      linkify: true,
+                      popover: true,
+                    })}
+                    <CWText>
                       {formatCoin((vote as DepositVote<any>).deposit, true)}
-                    </div>
+                    </CWText>
                   </div>
                 );
 
               default:
                 return (
                   <div class="vote">
-                    <div class="vote-voter">
-                      {m(User, {
-                        user: vote.account,
-                        linkify: true,
-                        popover: true,
-                      })}
-                    </div>
+                    {m(User, {
+                      user: vote.account,
+                      linkify: true,
+                      popover: true,
+                    })}
                   </div>
                 );
             }
