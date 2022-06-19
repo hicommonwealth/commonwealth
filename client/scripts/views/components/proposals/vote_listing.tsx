@@ -47,8 +47,6 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
           votes.map((vote) => {
             const balance = getBalance(proposal, vote);
 
-            console.log(balance);
-
             switch (true) {
               case vote instanceof CosmosVote:
                 return (
