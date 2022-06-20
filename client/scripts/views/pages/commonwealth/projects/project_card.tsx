@@ -16,7 +16,7 @@ import app from 'state';
 import moment from 'moment';
 import { BigNumberish } from 'ethers';
 
-enum ProjectRole {
+export enum ProjectRole {
   Curator = 'curator',
   Backer = 'backer',
   Author = 'author',

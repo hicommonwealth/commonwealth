@@ -1,0 +1,23 @@
+.CreateProjectForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .form-panel {
+    width: 480px;
+  }
+  .NavigationButtons.cui-button-group {
+    width: 480px;
+    margin: 100px 0;
+    .cui-button {
+      width: 50%;
+      .cui-button-label {
+        display: flex;
+        span {
+          position: relative;
+          top: 2px;
+          padding: 0 5px;
+        }
+      }
+    }
+  }
+}

@@ -676,6 +676,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/commonwealth/projects/view_project.tsx',
               { scoped: false, hideSidebar: true }
             ),
+            '/:scope/new/project': importRoute(
+              'views/pages/commonwealth/projects/create_project_form.tsx',
+              { scoped: true, hideSidebar: true }
+            ),
             '/backers': importRoute('views/pages/commonwealth/backers/index', {
               scoped: true,
             }),
@@ -946,6 +950,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //   'views/pages/commonwealth/projects/view_project.tsx',
             //   { scoped: true, hideSidebar: true }
             // ),
+            '/:scope/new/project': importRoute(
+              'views/pages/commonwealth/projects/create_project_form.tsx',
+              { scoped: true, hideSidebar: true }
+            ),
             '/:scope/backers': importRoute(
               'views/pages/commonwealth/backers/index',
               {

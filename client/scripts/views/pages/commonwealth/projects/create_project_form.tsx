@@ -1,4 +1,5 @@
 /* @jsx m */
+import 'pages/projects/create_project_form.scss';
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -12,6 +13,8 @@ import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import Sublayout from 'views/sublayout';
+import { CommonLogo } from './common_logo';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -24,7 +27,7 @@ type TokenOption = {
 interface ICreateProjectForm {
   // Descriptive
   title: string;
-  description: string;
+  description: any;
   shortDescription: string;
   coverImage: string;
   chainId: string;
@@ -37,9 +40,6 @@ interface ICreateProjectForm {
   fundraiseLength: number;
   deadline: number;
   curatorFee: number;
-
-  // IPFS
-  ipfsContent: string;
 }
 
 interface ICoverImageUploadAttrs {
@@ -108,8 +108,8 @@ class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
     });
     this.dropzone = new Dropzone(vnode.dom, {
       // configuration for textarea dropzone
-      clickable: '.AvatarUpload .attach-button',
-      previewsContainer: '.AvatarUpload .dropzone-previews',
+      clickable: '.CoverImageUpload .attach-button',
+      previewsContainer: '.CoverImageUpload .dropzone-previews',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
       header: '',
@@ -289,12 +289,13 @@ export class FundraisingSlide
             this.tokenName = token.name;
             vnode.attrs.form.token = token.address;
           }}
+          style="width: 441px;"
           trigger={
             <Button
               align="left"
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
-              style="width: 480px"
+              style="width: 100%; margin: 16px 0;"
               label={`Raise token: ${this.tokenName}`}
             />
           }
@@ -316,12 +317,13 @@ export class FundraisingSlide
             const lengthInSeconds = +length.split(' ')[0] * weekInSeconds;
             vnode.attrs.form.fundraiseLength = lengthInSeconds;
           }}
+          style="width: 441px;"
           trigger={
             <Button
               align="left"
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
-              style="width: 480px"
+              style="width: 100%; margin: 16px 0;"
               label={`Fundraise period: ${
                 vnode.attrs.form?.fundraiseLength / weekInSeconds
               } week`}
@@ -377,7 +379,7 @@ export class DescriptionSlide
         </CWText>
         {m(QuillEditor, {
           oncreateBind: (state) => {
-            vnode.attrs.form.description = state;
+            vnode.attrs.form.description = state.editor.editor.delta;
           },
           editorNamespace: 'project-description',
           placeholder:
@@ -391,125 +393,145 @@ export class DescriptionSlide
 export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
   private stage: 'information' | 'fundraising' | 'description';
-  oninit() {
-    this.stage = 'information';
-    this.form = {
-      title: '',
-      // WETH hard-coded as default raise token
-      token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-      creator: app.user.activeAccount.address,
-      beneficiary: '',
-      description: '',
-      shortDescription: '',
-      coverImage: '',
-      curatorFee: 0,
-      threshold: 0,
-      fundraiseLength: weekInSeconds,
-      deadline: nowInSeconds + weekInSeconds,
-      chainId: app.activeChainId(),
-      ipfsContent: null,
-    };
-  }
+
   view() {
+    if (!app?.user?.activeAccount || !app.activeChainId()) return;
+    if (!this.stage) {
+      this.stage = 'information';
+    }
+    if (!this.form) {
+      this.form = {
+        title: '',
+        // WETH hard-coded as default raise token, but can be overwritten
+        token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        creator: app.user.activeAccount.address,
+        beneficiary: '',
+        description: '',
+        shortDescription: '',
+        coverImage: '',
+        curatorFee: 0,
+        threshold: 0,
+        fundraiseLength: weekInSeconds,
+        deadline: nowInSeconds + weekInSeconds,
+        chainId: app.activeChainId(),
+      };
+    }
     return (
-      <div class="CreateProjectForm">
-        <div class="left-sidebar"></div>
-        <div class="right-panel">
-          {this.stage === 'information' && (
-            <InformationSlide form={this.form} />
-          )}
-          {this.stage === 'fundraising' && (
-            <FundraisingSlide form={this.form} />
-          )}
-          {this.stage === 'description' && (
-            <DescriptionSlide form={this.form} />
+      <Sublayout
+        title={<CommonLogo />}
+        hideSearch={true}
+        hideSidebar={true}
+        showNewProposalButton={false}
+        alwaysShowTitle={true}
+      >
+        <div class="CreateProjectForm">
+          <div class="form-panel">
+            {this.stage === 'information' && (
+              <InformationSlide form={this.form} />
+            )}
+            {this.stage === 'fundraising' && (
+              <FundraisingSlide form={this.form} />
+            )}
+            {this.stage === 'description' && (
+              <DescriptionSlide form={this.form} />
+            )}
+          </div>
+          {m(
+            ButtonGroup,
+            {
+              class: 'NavigationButtons',
+              outlined: true,
+            },
+            [
+              m(Button, {
+                disabled: this.stage === 'information',
+                label: [
+                  m(CWIcon, { iconName: 'arrowLeft' }),
+                  m('span', 'Previous Page'),
+                ],
+                onclick: (e) => {
+                  e.preventDefault();
+                  if (this.stage === 'fundraising') {
+                    this.stage = 'information';
+                  } else if (this.stage === 'description') {
+                    this.stage = 'fundraising';
+                  }
+                },
+              }),
+              this.stage !== 'description' &&
+                m(Button, {
+                  label: [
+                    m('span', 'Next Page'),
+                    m(CWIcon, { iconName: 'arrowRight' }),
+                  ],
+                  onclick: (e) => {
+                    e.preventDefault();
+                    if (this.stage === 'information') {
+                      this.stage = 'fundraising';
+                    } else if (this.stage === 'fundraising') {
+                      this.stage = 'description';
+                    }
+                  },
+                }),
+              this.stage === 'description' &&
+                m(Button, {
+                  label: 'Submit',
+                  onclick: (e) => {
+                    e.preventDefault();
+                    console.log(this.form);
+                    const {
+                      title,
+                      shortDescription,
+                      description,
+                      coverImage,
+                      token,
+                      threshold,
+                      creator,
+                      beneficiary,
+                      fundraiseLength,
+                      curatorFee,
+                    } = this.form;
+                    const isValidTitle = validateTitle(title);
+                    const isValidDescription = validateDescription(description);
+                    const isValidShortDescription =
+                      validateShortDescription(shortDescription);
+                    const isValidCoverImage = coverImage?.length > 0;
+                    const isValidToken = validateToken(token);
+                    const isValidBeneficiary = validateBeneficiary(beneficiary);
+                    const isValidCreator = validateCreator(creator);
+                    const isValidFundraiseLength =
+                      validateFundraiseLength(fundraiseLength);
+                    const isValidCuratorFee = validateCuratorFee(curatorFee);
+                    const isValidThreshold = validateThreshold(threshold);
+                    if (
+                      !isValidTitle ||
+                      !isValidDescription ||
+                      !isValidShortDescription ||
+                      !isValidCoverImage ||
+                      !isValidToken ||
+                      !isValidBeneficiary ||
+                      !isValidCreator ||
+                      !isValidCuratorFee ||
+                      !isValidFundraiseLength ||
+                      !isValidThreshold
+                    ) {
+                      notifyError('Invalid form. Please check inputs.');
+                    }
+                    this.form.description = this.form.description.markdownMode
+                      ? this.form.description.editor.getText()
+                      : JSON.stringify(
+                          this.form.description.editor.getContents()
+                        );
+                    this.form.deadline = nowInSeconds + weekInSeconds;
+                    console.log(this.form);
+                    console.log(JSON.stringify(this.form));
+                    app.projects.createProject(this.form);
+                  },
+                }),
+            ]
           )}
         </div>
-        {m(
-          ButtonGroup,
-          {
-            class: 'NotificationButtons',
-            outlined: true,
-          },
-          [
-            m(Button, {
-              disabled: this.stage === 'information',
-              label: 'Previous Page',
-              onclick: (e) => {
-                e.preventDefault();
-                if (this.stage === 'fundraising') {
-                  this.stage = 'information';
-                } else if (this.stage === 'description') {
-                  this.stage = 'fundraising';
-                }
-              },
-            }),
-            m(Button, {
-              disabled: this.stage === 'description',
-              label: 'Next Page',
-              onclick: (e) => {
-                e.preventDefault();
-                if (this.stage === 'information') {
-                  this.stage = 'fundraising';
-                } else if (this.stage === 'fundraising') {
-                  this.stage = 'description';
-                }
-              },
-            }),
-            m(Button, {
-              disabled: this.stage !== 'description',
-              label: 'Submit',
-              onclick: (e) => {
-                e.preventDefault();
-                console.log(this.form);
-                const {
-                  title,
-                  shortDescription,
-                  description,
-                  coverImage,
-                  token,
-                  threshold,
-                  creator,
-                  beneficiary,
-                  fundraiseLength,
-                  curatorFee,
-                } = this.form;
-                const isValidTitle = validateTitle(title);
-                const isValidDescription = validateDescription(description);
-                const isValidShortDescription =
-                  validateShortDescription(shortDescription);
-                const isValidCoverImage = coverImage?.length > 0;
-                const isValidToken = validateToken(token);
-                const isValidBeneficiary = validateBeneficiary(beneficiary);
-                const isValidCreator = validateCreator(creator);
-                const isValidFundraiseLength =
-                  validateFundraiseLength(fundraiseLength);
-                const isValidCuratorFee = validateCuratorFee(curatorFee);
-                const isValidThreshold = validateThreshold(threshold);
-                if (
-                  !isValidTitle ||
-                  !isValidDescription ||
-                  !isValidShortDescription ||
-                  !isValidCoverImage ||
-                  !isValidToken ||
-                  !isValidBeneficiary ||
-                  !isValidCreator ||
-                  !isValidCuratorFee ||
-                  !isValidFundraiseLength ||
-                  !isValidThreshold
-                ) {
-                  notifyError('Invalid form. Please check inputs.');
-                }
-
-                this.form.deadline = nowInSeconds + weekInSeconds;
-                this.form.ipfsContent = JSON.stringify(this.form);
-                if (!title || title.length)
-                  app.projects.createProject(this.form);
-              },
-            }),
-          ]
-        )}
-      </div>
+      </Sublayout>
     );
   }
 }

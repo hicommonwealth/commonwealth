@@ -3,18 +3,17 @@ import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { TabItem, Tabs } from 'construct-ui';
+import { SelectList, TabItem, Tabs } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
+import { RoleInfo } from 'client/scripts/models';
 import Sublayout from '../../../sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
 import { CommonLogo } from './common_logo';
-import CreateProjectForm from './create_project_form';
 
 enum ProjectListingSubpage {
-  Create = 'create',
   Explore = 'explore',
   Yours = 'yours',
 }
@@ -25,22 +24,10 @@ export default class ProjectListing implements m.ClassComponent {
   view(vnode) {
     const { subpage } = vnode.attrs;
     if (!app) return;
-    console.log(subpage);
+
     const onExplore = subpage !== ProjectListingSubpage.Yours;
     if (!app.isLoggedIn() && !onExplore) {
       m.route.set('/projects/explore');
-    } else if (subpage === ProjectListingSubpage.Create) {
-      return (
-        <Sublayout
-          title={<CommonLogo />}
-          hideSearch={true}
-          hideSidebar={true}
-          showNewProposalButton={false}
-          alwaysShowTitle={true}
-        >
-          <CreateProjectForm />
-        </Sublayout>
-      );
     }
     return (
       <Sublayout
@@ -62,9 +49,20 @@ export default class ProjectListing implements m.ClassComponent {
                     - e.g. “Want a diff address? Switch active addr in nav bar dropdown”
                   - Potentially add summary modal pre-TX submission
              */}
-            <CWButton
-              onclick={(e) => m.route.set(`/projects/create`)}
-              label="Create Project"
+            <SelectList
+              items={app.user.roles.map((role: RoleInfo) => role.chain_id)}
+              itemRender={(chainId: string) => {
+                return (
+                  <div value={chainId} style="cursor: pointer">
+                    <CWText type="body1">{chainId}</CWText>
+                  </div>
+                );
+              }}
+              filterable={false}
+              onSelect={(chainId: string) => {
+                m.route.set(`/${chainId}/new/project`);
+              }}
+              trigger={<CWButton label="Create Project" />}
             />
             <Tabs align="left" bordered={false} fluid={true}>
               <TabItem

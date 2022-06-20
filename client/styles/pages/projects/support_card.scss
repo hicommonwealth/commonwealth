@@ -1,0 +1,31 @@
+@import 'shared';
+
+.SupportCard {
+  border: 2px solid $neutral-800;
+  border-radius: 5px;
+  width: 336px;
+  .card-header {
+    align-items: center;
+    background-color: $neutral-800;
+    color: white;
+    display: flex;
+    justify-content: left;
+    height: 56px;
+    padding: 8px 24px;
+    .Text {
+      color: inherit;
+      margin-left: 4px;
+    }
+    path {
+      fill: white;
+    }
+  }
+  .card-body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 192px;
+    justify-content: center;
+    padding: 16px;
+  }
+}

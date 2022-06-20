@@ -11,7 +11,6 @@ import { BigNumberish } from 'ethers';
 import { attachSigner } from './contractApi';
 
 export type IProjectCreationData = {
-  ipfsContent: string;
   title: string; // TODO length limits for contract side
   shortDescription: string;
   description: string;
@@ -110,10 +109,10 @@ export default class ProjectsController {
     // }
     // const curatorFee = Math.min(projectData.curatorFee, 10000 - this.protocolFee);
 
+    const ipfsContent = JSON.stringify(projectData);
     const {
       beneficiary,
       title,
-      ipfsContent,
       chainId,
       token,
       threshold,
