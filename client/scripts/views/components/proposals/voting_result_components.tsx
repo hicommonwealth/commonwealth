@@ -8,6 +8,7 @@ import 'components/proposals/voting_result_components.scss';
 import { AnyProposal, IVote } from 'models';
 import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
 import { VoteListing } from './vote_listing';
+import { CWText } from '../component_kit/cw_text';
 
 type BaseVotingResultAttrs = {
   proposal: AnyProposal;
@@ -27,19 +28,23 @@ export class VotingResult implements m.ClassComponent<VotingResultAttrs> {
 
     return (
       <div class="VotingResult">
-        <div class="results-column yes-votes">
-          <div class="results-header">{`Yes (${getYesVotes.length})`}</div>
+        <div class="results-column-yes">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`Yes (${getYesVotes.length})`}
+          </CWText>
           <VoteListing proposal={proposal} votes={getYesVotes} />
         </div>
-        <div class="results-column no-votes">
-          <div class="results-header">{`No (${getNoVotes.length})`}</div>
+        <div class="results-column-no">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`No (${getNoVotes.length})`}
+          </CWText>
           <VoteListing proposal={proposal} votes={getNoVotes} />
         </div>
         {getAbstainVotes && (
-          <div class="results-column no-votes">
-            <div class="results-header">
+          <div class="results-column-no">
+            <CWText type="h4" fontWeight="medium" className="results-header">
               {`Abstain (${getAbstainVotes.length})`}
-            </div>
+            </CWText>
             <VoteListing proposal={proposal} votes={getAbstainVotes} />
           </div>
         )}
