@@ -58,7 +58,14 @@ export function useMagicAuth(models: DB) {
 
       if (!existingUser) {
         const ethAddress = userMetadata.publicAddress;
-        let polkadotAddress;
+        let polkadotAddress
+
+        /* This just uses the ETH Address to encode a Substrate Address, which I'm not sure is the right approach.
+           We may want to derive / generate various Magic Chain Addresses on the front end then create / store them via the `createAddress` route
+           We will have to:
+            1. validate the signature + pass the address back + 
+            2. have some specific logic for generating / loading various Magic Extensions as necessary
+        */
 
         // always retrieve the polkadot address for the user regardless of chain
         try {
@@ -75,7 +82,7 @@ export function useMagicAuth(models: DB) {
           // convert to chain-specific address based on ss58 prefix, if we are on a specific
           // polkadot chain. otherwise, encode to edgeware.
           if (registrationChain.ss58_prefix) {
-            polkadotAddress = encodeAddress(polkadotRespAddress, registrationChain.ss58_prefix);
+            polkadotAddress = encodeAddress(polkadotRespAddress, registrationChain.ss58_prefix); // edgeware SS58 prefix
           } else {
             polkadotAddress = encodeAddress(polkadotRespAddress, 7); // edgeware SS58 prefix
           }
@@ -93,21 +100,8 @@ export function useMagicAuth(models: DB) {
           // create an address on their selected chain
           let newAddress: AddressInstance;
           if (registrationChain.base === ChainBase.Substrate) {
+            // Swap "newAddress" with Ethereum as "existing User" SSO Token search expects ETH Address
             newAddress = await models.Address.create({
-              address: polkadotAddress,
-              chain: registrationChain.id,
-              verification_token: 'MAGIC',
-              verification_token_expires: null,
-              verified: new Date(), // trust addresses from magic
-              last_active: new Date(),
-              user_id: newUser.id,
-              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
-              wallet_id: WalletId.Magic,
-            }, { transaction: t });
-
-            // if they selected a substrate chain, create an additional address on ethereum
-            // and auto-add them to the eth forum
-            const ethAddressInstance = await models.Address.create({
               address: ethAddress,
               chain: 'ethereum',
               verification_token: 'MAGIC',
@@ -119,8 +113,22 @@ export function useMagicAuth(models: DB) {
               wallet_id: WalletId.Magic
             }, { transaction: t });
 
+            // if they selected a substrate chain, create an additional address on ethereum
+            // and auto-add them to the eth forum
+            const substrateAddressInstance = await models.Address.create({
+              address: polkadotAddress,
+              chain: registrationChain.id,
+              verification_token: 'MAGIC',
+              verification_token_expires: null,
+              verified: new Date(), // trust addresses from magic
+              last_active: new Date(),
+              user_id: newUser.id,
+              profile_id: (newUser.Profiles[0] as ProfileAttributes).id,
+              wallet_id: WalletId.Magic,
+            }, { transaction: t });
+
             await models.Role.create({
-              address_id: ethAddressInstance.id,
+              address_id: newAddress.id,
               chain_id: 'ethereum',
               permission: 'member',
             });
@@ -184,9 +192,11 @@ export function useMagicAuth(models: DB) {
           await models.SsoToken.create({
             issuer: userMetadata.issuer,
             issued_at: user.claim.iat,
-            address_id: newAddress.id,
+            address_id: newAddress.id, // always ethereum address
+            created_at: new Date(),
+            updated_at: new Date(),
           }, { transaction: t });
-
+          
           return newUser;
         });
 
@@ -206,7 +216,7 @@ export function useMagicAuth(models: DB) {
           },
           include: [{
             model: models.Address,
-            where: { address: user.publicAddress },
+            where: { address: user.publicAddress }, // Assumes address is always Ethereum Address which it isn't
             required: true,
           }]
         });
@@ -218,6 +228,7 @@ export function useMagicAuth(models: DB) {
           });
         }
         ssoToken.issued_at = user.claim.iat;
+        ssoToken.updated_at = new Date(),
         await ssoToken.save();
         console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
         return cb(null, existingUser);
