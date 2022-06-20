@@ -264,7 +264,7 @@ export async function getResults(
             .filter((vote) => vote.balance > 0);
           break;
         } catch (e) {
-          if (attempts == 3) {
+          if (attempts === 3) {
             console.log(e);
             notifyError('Snapshot.js API failed to return the results.');
           }
@@ -328,12 +328,17 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
   }> = [];
 
   for (const spaceId of snapshot_spaces) {
+    let cleanSpaceId = spaceId;
+    // Extract space if currently saved as a link
+    if (spaceId.lastIndexOf('/') > -1) {
+      cleanSpaceId = spaceId.slice(spaceId.lastIndexOf('/') + 1).trim();
+    }
     try {
-      const proposals = await getProposals(spaceId);
-      const space = await getSpace(spaceId);
+      const proposals = await getProposals(cleanSpaceId);
+      const space = await getSpace(cleanSpaceId);
       spacesData.push({ space, proposals });
     } catch (e) {
-      console.error(`Failed to initialize snapshot: ${spaceId}.`);
+      console.error(`Failed to initialize snapshot: ${cleanSpaceId}.`);
     }
   }
 

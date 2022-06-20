@@ -1,20 +1,18 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .NewProposalPage {
   flex: 1;
   padding: 24px;
 
-  .error {
-    @include error-text();
-    margin-bottom: 15px;
-  }
   h3 {
     margin-top: 0;
     margin-bottom: 20px;
   }
-  @include xs-max {
+
+  @include extraSmall {
     width: initial;
   }
+
   .topic-loading-spinner-wrap {
     height: 120px;
     width: 100%;
@@ -25,20 +23,24 @@
 }
 
 .NewProposalForm {
-  @media (min-width: 1024px) {
+  @include mediumSmall {
     max-width: 85%;
   }
+
   textarea {
     min-height: 200px;
   }
+
   .council-motion-description {
     margin-top: -12px;
     margin-bottom: 22px;
     color: $neutral-500;
   }
+
   .cui-overlay-inline {
     display: block;
   }
+
   .cui-grid {
     max-width: 100%;
 

@@ -11,34 +11,16 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
-import { CWTextInput, ValidationStatus } from './cw_text_input';
+import { CWTextInput } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWCheckbox } from './cw_checkbox';
-
-// const displayColors = (hexList) => {
-//   return Object.entries(hexList).map(([k, v]) => {
-//     return (
-//       <div class="color-row">
-//         {k}
-//         <div class="color" style={`background: ${v};`} />
-//       </div>
-//     );
-//   });
-// };
-
-// const displayGradients = (gradientNames: string[]) => {
-//   return gradientNames.map((gradient) => {
-//     return (
-//       <div class="color-row">
-//         {gradient}
-//         <div class={`color ${gradient}`} />
-//       </div>
-//     );
-//   });
-// };
+import { CWTooltip } from './cw_tooltip';
+import { CWPopover } from './cw_popover/cw_popover';
+import { CWAddressTooltip } from './cw_address_tooltip';
+import { ValidationStatus } from './cw_validation_text';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -72,6 +54,145 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Popover</h1>
+        <div class="tooltip-gallery">
+          <CWPopover
+            trigger={<CWButton label="Click me" />}
+            content={<>Some content</>}
+            interactionType="click"
+          />
+        </div>
+        <h1>Tooltip</h1>
+        <div class="tooltip-gallery">
+          <div class="tooltip-row">
+            <CWText>Hover</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover to side</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              toSide
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Persist on hover</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              persistOnHover
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover open and close delay</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              hoverOpenDelay={1500}
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Click</CWText>
+            <CWTooltip
+              interactionType="click"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background, no arrow</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidNoArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Address tooltip</CWText>
+            <CWAddressTooltip
+              address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+        </div>
+        <h1>Form fields</h1>
+        <div class="form-gallery">
+          <CWTextInput
+            name="Text field"
+            label="Large"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Small"
+            placeholder="Type here"
+            size="small"
+          />
+          <CWTextInput
+            name="Form field"
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return ['failure', 'Must enter characters A-Z'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
+            label="This input only accepts A-Z"
+            placeholder="Type here"
+          />
+          <CWTextInput
+            name="Text field"
+            label="Disabled"
+            disabled
+            defaultValue="Some disabled text"
+          />
+        </div>
         <h1>Buttons</h1>
         <div class="button-gallery">
           <CWButton
@@ -478,26 +599,6 @@ export class ComponentShowcase implements m.ClassComponent {
             <h4>Card title</h4>
             <div>Full width</div>
           </CWCard>
-        </div>
-        <h1>Form fields</h1>
-        <div class="form-gallery">
-          <CWTextInput
-            name="Form field"
-            inputValidationFn={(val: string): [ValidationStatus, string] => {
-              if (val.match(/[^A-Za-z]/)) {
-                return [ValidationStatus.Failure, 'Must enter characters A-Z'];
-              } else {
-                return [ValidationStatus.Success, 'Input validated'];
-              }
-            }}
-            label="This input only accepts A-Z"
-            placeholder="Placeholder"
-          />
-          <CWTextInput
-            name="Text field"
-            label="No status message or error validation"
-            placeholder="Placeholder"
-          />
         </div>
       </div>
     );

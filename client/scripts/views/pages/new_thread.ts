@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import 'pages/new_thread.scss';
 
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';

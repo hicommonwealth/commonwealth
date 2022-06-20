@@ -17,7 +17,7 @@
   .other-details {
     margin-top: 14px;
 
-    @media (min-width: 600px) {
+    @include small {
       display: flex;
     }
 
@@ -38,7 +38,7 @@
     }
 
     .closed-proposal {
-      @media (max-width: 600px) {
+      @include extraSmall {
         margin-top: 14px;
       }
 
@@ -52,14 +52,15 @@
     }
 
     .active-proposal {
-      @media (max-width: 600px) {
-        margin-top: 14px;
+      @include extraSmall {
+        margin-top: 18px;
       }
 
       align-items: center;
       background-color: $neutral-50;
       border-radius: 9999px;
       max-width: max-content;
+      margin-top: 14px;
       display: flex;
       color: $neutral-600;
       padding: 4px 16px;

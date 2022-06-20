@@ -68,10 +68,14 @@ export async function initAppState(
           });
         data.chains
           .filter((chain) => chain.active)
-          .map((chain) => app.config.chains.add(ChainInfo.fromJSON({
-            ChainNode: app.config.nodes.getById(chain.chain_node_id),
-            ...chain
-          })));
+          .map((chain) => {
+            delete chain.ChainNode;
+            return app.config.chains.add(ChainInfo.fromJSON({
+              ChainNode: app.config.nodes.getById(chain.chain_node_id),
+              ...chain
+            }));
+          });
+        console.log(app.config);
         app.user.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
@@ -93,13 +97,7 @@ export async function initAppState(
         if (app.loginState == LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
-          app.socket.init(app.user.jwt).then(() => {
-            if (app.socket.isConnected) {
-              console.log('Websocket connected');
-            } else {
-              console.log('Websocket connection failure');
-            }
-          });
+          app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
         } else if (
           app.loginState == LoginState.LoggedOut &&

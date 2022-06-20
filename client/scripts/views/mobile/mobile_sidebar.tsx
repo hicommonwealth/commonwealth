@@ -160,7 +160,7 @@ export class MobileSidebar implements m.ClassComponent {
         {this.activeTab === MenuTabs.CurrentCommunity ? (
           CurrentCommunityMenu
         ) : this.activeTab === MenuTabs.AllCommunities ? (
-          <Menu class="AllCommunitiesMenu">
+          <Menu>
             <CommunitySelector isMobile={true} />
           </Menu>
         ) : (
