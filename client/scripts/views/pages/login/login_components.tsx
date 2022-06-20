@@ -14,6 +14,7 @@ import { LoginSidebarType } from '../../modals/login_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWTooltip } from '../../components/component_kit/cw_tooltip';
 
 export class LoginSidebar
   implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
@@ -146,15 +147,28 @@ export class WalletsList implements m.ClassComponent<WalletsListAttrs> {
             ))}
           </div>
           {hasNoWalletsLink && (
-            <CWText type="caption" className="no-wallet-link">
-              <a
-                onclick={() => {
-                  // link to where?
-                }}
-              >
-                Don't see your wallet?
-              </a>
-            </CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContents={
+                <>
+                  <CWText type="caption">
+                    If you don’t see your wallet then make sure:
+                  </CWText>
+                  <CWText type="caption">
+                    • Your wallet chrome extension installed?
+                  </CWText>
+                  <CWText type="caption">
+                    • Your wallet chrome extension active?
+                  </CWText>
+                </>
+              }
+              tooltipType="solidNoArrow"
+              trigger={
+                <CWText type="caption" className="no-wallet-link">
+                  Don't see your wallet?
+                </CWText>
+              }
+            />
           )}
         </div>
         <CWText type="b2" className="connect-another-way-link">

@@ -64,7 +64,7 @@ export class NewLoginModal implements m.ClassComponent {
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'allSet';
+    this.bodyType = 'walletList';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.wallets = Object.values(WalletId);
