@@ -5,24 +5,6 @@
   flex-wrap: wrap;
   gap: 16px;
 
-  .VoteRow {
-    display: flex;
-
-    &:hover {
-      background: $neutral-50;
-    }
-
-    .row-left {
-      flex: 1;
-      text-align: left;
-    }
-
-    .row-right {
-      flex: 1;
-      text-align: right;
-    }
-  }
-
   .results-column {
     background-color: $neutral-100;
     border-radius: $border-radius-corners;
