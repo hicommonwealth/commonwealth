@@ -1,6 +1,9 @@
 @import 'shared';
 
 .VoteListing {
+  display: flex;
+  flex-direction: column;
+
   .no-votes.Text {
     color: $neutral-500;
   }

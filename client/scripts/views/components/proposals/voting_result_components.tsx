@@ -29,24 +29,18 @@ export class VotingResult implements m.ClassComponent<VotingResultAttrs> {
       <div class="VotingResult">
         <div class="results-column yes-votes">
           <div class="results-header">{`Yes (${getYesVotes.length})`}</div>
-          <div class="results-cell">
-            <VoteListing proposal={proposal} votes={getYesVotes} />
-          </div>
+          <VoteListing proposal={proposal} votes={getYesVotes} />
         </div>
         <div class="results-column no-votes">
           <div class="results-header">{`No (${getNoVotes.length})`}</div>
-          <div class="results-cell">
-            <VoteListing proposal={proposal} votes={getNoVotes} />
-          </div>
+          <VoteListing proposal={proposal} votes={getNoVotes} />
         </div>
         {getAbstainVotes && (
           <div class="results-column no-votes">
             <div class="results-header">
               {`Abstain (${getAbstainVotes.length})`}
             </div>
-            <div class="results-cell">
-              <VoteListing proposal={proposal} votes={getAbstainVotes} />
-            </div>
+            <VoteListing proposal={proposal} votes={getAbstainVotes} />
           </div>
         )}
       </div>
@@ -84,12 +78,10 @@ export class AaveVotingResult
             <span>User</span>
             <span>Power</span>
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => !!v.choice)}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => !!v.choice)}
+          />
         </div>
         <div class="results-column no-votes">
           <div class="results-header">
@@ -99,12 +91,10 @@ export class AaveVotingResult
             <span>User</span>
             <span>Power</span>
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => !v.choice)}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => !v.choice)}
+          />
         </div>
       </div>
     );
@@ -172,23 +162,19 @@ export class YesNoAbstainVetoVotingResult
           <div class="results-header">
             {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => v.choice === 'Yes')}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => v.choice === 'Yes')}
+          />
         </div>
         <div class="results-column">
           <div class="results-header">
             {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => v.choice === 'No')}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => v.choice === 'No')}
+          />
         </div>
         <div class="results-column">
           <div class="results-header">
@@ -196,12 +182,10 @@ export class YesNoAbstainVetoVotingResult
               votes.filter((v) => v.choice === 'Abstain').length
             })`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => v.choice === 'Abstain')}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => v.choice === 'Abstain')}
+          />
         </div>
         <div class="results-column">
           <div class="results-header">
@@ -209,12 +193,10 @@ export class YesNoAbstainVetoVotingResult
               votes.filter((v) => v.choice === 'NoWithVeto').length
             })`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter((v) => v.choice === 'NoWithVeto')}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter((v) => v.choice === 'NoWithVeto')}
+          />
         </div>
       </div>
     );
@@ -235,9 +217,7 @@ export class SimpleYesApprovalVotingResult
       <div class="VotingResult">
         <div class="results-column">
           <div class="results-header">{`Approved ${approvedCount}`}</div>
-          <div class="results-cell">
-            <VoteListing proposal={proposal} votes={votes} />
-          </div>
+          <VoteListing proposal={proposal} votes={votes} />
         </div>
       </div>
     );
@@ -259,14 +239,12 @@ export class YesNoRejectVotingResult
                 .length
             })`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Approve
-              )}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter(
+              (v) => v.choice === NearSputnikVoteString.Approve
+            )}
+          />
         </div>
         <div class="results-column">
           <div class="results-header">
@@ -275,14 +253,12 @@ export class YesNoRejectVotingResult
                 .length
             })`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Reject
-              )}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter(
+              (v) => v.choice === NearSputnikVoteString.Reject
+            )}
+          />
         </div>
         <div class="results-column">
           <div class="results-header">
@@ -291,14 +267,12 @@ export class YesNoRejectVotingResult
                 .length
             })`}
           </div>
-          <div class="results-cell">
-            <VoteListing
-              proposal={proposal}
-              votes={votes.filter(
-                (v) => v.choice === NearSputnikVoteString.Remove
-              )}
-            />
-          </div>
+          <VoteListing
+            proposal={proposal}
+            votes={votes.filter(
+              (v) => v.choice === NearSputnikVoteString.Remove
+            )}
+          />
         </div>
       </div>
     );
