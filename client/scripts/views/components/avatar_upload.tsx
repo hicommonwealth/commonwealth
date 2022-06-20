@@ -33,7 +33,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
 
     this.dropzone = new Dropzone(vnode.dom, {
-      clickable: '.IconButton',
+      clickable: '.icon-button-container',
       previewsContainer: '.AvatarUpload .dropzone-preview-container',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
@@ -107,11 +107,13 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           ComponentType.AvatarUpload
         )}
       >
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="plusCircle"
-          iconSize={size === 'small' ? 'small' : 'medium'}
-        />
+        <div class="icon-button-container">
+          <CWIconButton
+            iconButtonTheme="primary"
+            iconName="plusCircle"
+            iconSize={size === 'small' ? 'small' : 'medium'}
+          />
+        </div>
         {!this.uploaded && (
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(

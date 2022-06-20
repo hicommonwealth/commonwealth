@@ -248,3 +248,24 @@
     @include visibleScrollbar;
   }
 }
+
+.AvatarAndUsernameInput {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  .input-and-address-container {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+
+    .username-input-container {
+      margin: 0 0 8px 0;
+    }
+
+    .abbreviated-address {
+      color: $neutral-500;
+    }
+  }
+}

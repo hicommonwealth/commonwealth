@@ -277,6 +277,10 @@ export function formatProposalHashShort(hash: string) {
   return `${hash.slice(0, 8)}…`;
 }
 
+export function formatAddressShort(address: string) {
+  return `${address.slice(0, 5)}…${address.slice(-5, -1)}`;
+}
+
 export function renderMultilineText(text: string) {
   if (!text) return;
   const paragraphs = text

@@ -61,7 +61,7 @@
     @include avatarUploadSizing(large);
   }
 
-  .IconButton {
+  .icon-button-container {
     background-color: $white;
     border-radius: $border-radius-round;
     position: absolute;

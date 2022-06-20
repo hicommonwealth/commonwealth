@@ -14,8 +14,8 @@ type TextInputSize = 'small' | 'large';
 export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
+  containerClassName?: string;
   defaultValue?: string;
-  disabled?: boolean;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   name: string;
@@ -25,6 +25,7 @@ export type TextInputAttrs = {
 };
 
 type InputStyleAttrs = {
+  inputClassName?: string;
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
@@ -40,8 +41,10 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
     const {
       autocomplete,
       autofocus,
+      containerClassName,
       defaultValue,
       disabled,
+      inputClassName,
       inputValidationFn,
       label,
       name,
@@ -52,7 +55,18 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class={ComponentType.TextInput}>
+      <div
+        class={getClasses<{
+          containerClassName?: string;
+          validationStatus?: ValidationStatus;
+        }>(
+          {
+            containerClassName,
+            validationStatus: this.validationStatus,
+          },
+          ComponentType.TextInput
+        )}
+      >
         {label && <CWLabel label={label} />}
         <input
           autofocus={autofocus}
@@ -62,6 +76,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             validationStatus: this.validationStatus,
             disabled,
             isTyping: this.isTyping,
+            inputClassName,
           })}
           disabled={disabled}
           tabindex={tabindex}
