@@ -214,6 +214,12 @@ export class ComponentShowcase implements m.ClassComponent {
             placeholder="Type here"
           />
           <CWTextInput
+            label="Text field with icon"
+            name="Text field with icon"
+            placeholder="Type here"
+            iconRight="edit"
+          />
+          <CWTextInput
             name="Text field"
             label="Disabled"
             disabled

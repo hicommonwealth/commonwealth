@@ -283,6 +283,7 @@ export class AvatarAndUsernameInput
         <div class="input-and-address-container">
           <CWTextInput
             size="small"
+            iconRight="edit"
             containerClassName="username-input-container"
             defaultValue={defaultValue}
             oninput={(e) => {
