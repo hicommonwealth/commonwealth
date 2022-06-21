@@ -27,6 +27,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
+import BanCache from './server/util/banCheckCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
@@ -230,9 +231,17 @@ async function main() {
       }
     }
 
+    // add security middleware
+    app.use(function applyXFrameAndCSP(req, res, next) {
+      res.set('X-Frame-Options', 'DENY');
+      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      next();
+    });
+
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
+  
 
     // add other middlewares
     app.use(logger('dev'));
@@ -267,12 +276,14 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
+  const banCache = new BanCache(models);
   setupAPI(
     app,
     models,
     viewCountCache,
     <any>identityFetchCache,
-    tokenBalanceCache
+    tokenBalanceCache,
+    banCache,
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

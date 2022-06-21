@@ -19,6 +19,7 @@ import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 const CreateComment: m.Component<
   {
@@ -292,7 +293,11 @@ const CreateComment: m.Component<
                           label: 'Cancel',
                         }),
                     ]),
-                    error && m('.new-comment-error', error),
+                    error &&
+                      m(CWValidationText, {
+                        message: error,
+                        status: 'failure',
+                      }),
                   ]
                 ),
               ],

@@ -52,7 +52,6 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
-      console.log('Message received');
       const { chat_channel_id } = msg;
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
@@ -103,14 +102,12 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
       const { quillEditorState } = vnode.state;
 
-      app.socket.chatNs.sendMessage(
-        {
-          message: JSON.stringify(quillEditorState.editor.getContents()),
-          address: app.user.activeAccount.address,
-          chat_channel_id: channel.id,
-          now: moment().toISOString(),
-        }, channel);
-
+      const message = {
+        message: JSON.stringify(quillEditorState.editor.getContents()),
+        chat_channel_id: channel.id,
+        address: app.user.activeAccount.address,
+      };
+      app.socket.chatNs.sendMessage(message);
       if (quillEditorState.editor) {
         quillEditorState.editor.enable();
         quillEditorState.editor.setContents();

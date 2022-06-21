@@ -10,7 +10,7 @@
   min-height: 240px;
   padding: 48px 24px;
 
-  @include sm-max {
+  @include small {
     padding: 24px;
   }
 

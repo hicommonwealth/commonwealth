@@ -4,7 +4,9 @@
   padding: 0;
 
   .stage-items {
+    max-height: 192px;
     max-width: 296px;
+    overflow-y: auto;
 
     .cui-menu-divider {
       margin: 0;
