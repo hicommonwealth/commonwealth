@@ -8,15 +8,16 @@
   padding: 16px;
   width: 344px;
 
+  @include smallInclusive {
+    width: 100%;
+  }
+
   .results-subheader {
     border-bottom: 1px solid $neutral-100;
     color: $neutral-600;
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
-
-    font-size: 18px;
-    font-weight: 500;
   }
 }
 
@@ -52,11 +53,6 @@
 
     .results-header {
       margin-bottom: 16px;
-    }
-
-    .results-cell {
-      display: flex;
-      flex-direction: column;
     }
   }
 }

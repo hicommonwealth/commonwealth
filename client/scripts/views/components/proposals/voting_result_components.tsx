@@ -75,26 +75,34 @@ export class AaveVotingResult
 
     return (
       <div class="VotingResult">
-        <div class="results-column yes-votes">
-          <div class="results-header">
+        <div class="results-column-yes">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Yes (${yesBalanceString} ${yesVotesCount}) voters`}
-          </div>
+          </CWText>
           <div class="results-subheader">
-            <span>User</span>
-            <span>Power</span>
+            <CWText type="h5" fontWeight="medium">
+              User
+            </CWText>
+            <CWText type="h5" fontWeight="medium">
+              Power
+            </CWText>
           </div>
           <VoteListing
             proposal={proposal}
             votes={votes.filter((v) => !!v.choice)}
           />
         </div>
-        <div class="results-column no-votes">
-          <div class="results-header">
+        <div class="results-column-no">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`No (${noBalanceString} ${noVotesCount}) voters`}
-          </div>
+          </CWText>
           <div class="results-subheader">
-            <span>User</span>
-            <span>Power</span>
+            <CWText type="h5" fontWeight="medium">
+              User
+            </CWText>
+            <CWText type="h5" fontWeight="medium">
+              Power
+            </CWText>
           </div>
           <VoteListing
             proposal={proposal}
@@ -135,20 +143,28 @@ export class CompletedProposalVotingResult
     return (
       <div class="VotingResult">
         <div class="results-column">
-          <div class="results-header">{`${yesPct}% voted Yes`}</div>
-          <div class="results-cell">{`(${yesResults})`}</div>
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${yesPct}% voted Yes`}
+          </CWText>
+          <CWText>{`(${yesResults})`}</CWText>
         </div>
         <div class="results-column">
-          <div class="results-header">{`${noPct}% voted No`}</div>
-          <div class="results-cell">{`(${noResults})`}</div>
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${noPct}% voted No`}
+          </CWText>
+          <CWText>{`(${noResults})`}</CWText>
         </div>
         <div class="results-column">
-          <div class="results-header">{`${abstainPct}% voted Abstain`}</div>
-          <div class="results-cell">{`(${abstainResults})`}</div>
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${abstainPct}% voted Abstain`}
+          </CWText>
+          <CWText>{`(${abstainResults})`}</CWText>
         </div>
         <div class="results-column">
-          <div class="results-header">{`${noWithVetoPct}% voted Veto`}</div>
-          <div class="results-cell">{`(${noWithVetoResults})`}</div>
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${noWithVetoPct}% voted Veto`}
+          </CWText>
+          <CWText>{`(${noWithVetoResults})`}</CWText>
         </div>
       </div>
     );
@@ -164,40 +180,40 @@ export class YesNoAbstainVetoVotingResult
     return (
       <div class="VotingResult">
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter((v) => v.choice === 'Yes')}
           />
         </div>
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter((v) => v.choice === 'No')}
           />
         </div>
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted abstain (${
               votes.filter((v) => v.choice === 'Abstain').length
             })`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter((v) => v.choice === 'Abstain')}
           />
         </div>
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted veto (${
               votes.filter((v) => v.choice === 'NoWithVeto').length
             })`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter((v) => v.choice === 'NoWithVeto')}
@@ -221,7 +237,9 @@ export class SimpleYesApprovalVotingResult
     return (
       <div class="VotingResult">
         <div class="results-column">
-          <div class="results-header">{`Approved ${approvedCount}`}</div>
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`Approved ${approvedCount}`}
+          </CWText>
           <VoteListing proposal={proposal} votes={votes} />
         </div>
       </div>
@@ -238,12 +256,12 @@ export class YesNoRejectVotingResult
     return (
       <div class="VotingResult">
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted approve (${
               votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
                 .length
             })`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter(
@@ -252,12 +270,12 @@ export class YesNoRejectVotingResult
           />
         </div>
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted reject (${
               votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
                 .length
             })`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter(
@@ -266,12 +284,12 @@ export class YesNoRejectVotingResult
           />
         </div>
         <div class="results-column">
-          <div class="results-header">
+          <CWText type="h4" fontWeight="medium" className="results-header">
             {`Voted remove (${
               votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
                 .length
             })`}
-          </div>
+          </CWText>
           <VoteListing
             proposal={proposal}
             votes={votes.filter(
