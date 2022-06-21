@@ -104,7 +104,7 @@ import {
 import CreateComment from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
 import User from '../../components/widgets/user';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -316,8 +316,7 @@ const ProposalHeader: m.Component<
                             app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
-                                const snapshotSpaces =
-                                  app.chain.meta.snapshot;
+                                const snapshotSpaces = app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',

@@ -25,7 +25,7 @@ import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User, { AnonymousUser } from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import {
@@ -740,7 +740,7 @@ const formatBody = (vnode) => {
       vnode.state.collapsed = true;
     }
   }
-}
+};
 
 export const ProposalBodyText: m.Component<
   {

@@ -23,7 +23,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { ContentType } from 'controllers/server/search';
-import MarkdownFormattedText from './markdown_formatted_text';
+import { MarkdownFormattedText } from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
@@ -310,9 +310,9 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   // TODO: using chainScope instead of communityScope OK?
   const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope();
-  if(types.indexOf(SearchScope.Communities) > 0) {
+  if (types.indexOf(SearchScope.Communities) > 0) {
     types.splice(types.indexOf(SearchScope.Communities), 1);
-    types.unshift(SearchScope.Communities)
+    types.unshift(SearchScope.Communities);
   }
   const results = getBalancedContentListing(
     app.search.getByQuery(searchQuery).results,

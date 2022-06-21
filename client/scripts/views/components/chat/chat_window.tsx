@@ -10,7 +10,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import ResizableTextarea from 'views/components/widgets/resizable_textarea';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
@@ -44,7 +44,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
   oninit(vnode) {
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(m.route.param("message"))
+    this.shouldScrollToHighlight = Boolean(m.route.param('message'));
     this.scrollToBottom = () => {
       const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
@@ -107,7 +107,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
         const message = {
           message: $textarea.val(),
           chat_channel_id: channel.id,
-          address: app.user.activeAccount.address
+          address: app.user.activeAccount.address,
         };
         app.socket.chatNs.sendMessage(message);
         mixpanelBrowserTrack({
@@ -120,8 +120,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     };
 
     const messageIsHighlighted = (message: any): boolean => {
-      return m.route.param('message') && Number(m.route.param('message')) === message.id
-    }
+      return (
+        m.route.param('message') &&
+        Number(m.route.param('message')) === message.id
+      );
+    };
 
     return (
       <div class="ChatPage">
@@ -134,7 +137,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           {groupedMessages.map((grp) => (
             <div
               class="chat-message-group"
-              id={grp.messages.some(messageIsHighlighted) ? "highlighted" : ""}
+              id={grp.messages.some(messageIsHighlighted) ? 'highlighted' : ''}
             >
               <div class="user-and-timestamp-container">
                 {m(User, {
@@ -150,17 +153,26 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
-                <Icon name={Icons.LINK} onclick={async () => {
-                  const route = m.route.get().indexOf("?") > -1
-                    ? m.route.get().slice(0, m.route.get().indexOf("?"))
-                    : m.route.get()
-                  navigator.clipboard.writeText(
-                    `https://commonwealth.im${route}?message=${grp.messages[0].id}`
-                  )
-                    .then(() => notifySuccess("Message link copied to clipboard"))
-                    .catch(() => notifyError("Could not copy link to keyboard"))
-                  this.shouldScroll = false;
-                }}></Icon>
+                <Icon
+                  name={Icons.LINK}
+                  onclick={async () => {
+                    const route =
+                      m.route.get().indexOf('?') > -1
+                        ? m.route.get().slice(0, m.route.get().indexOf('?'))
+                        : m.route.get();
+                    navigator.clipboard
+                      .writeText(
+                        `https://commonwealth.im${route}?message=${grp.messages[0].id}`
+                      )
+                      .then(() =>
+                        notifySuccess('Message link copied to clipboard')
+                      )
+                      .catch(() =>
+                        notifyError('Could not copy link to keyboard')
+                      );
+                    this.shouldScroll = false;
+                  }}
+                ></Icon>
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (
@@ -207,11 +219,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
   onupdate() {
     if (this.shouldScroll) {
-      if(this.shouldScrollToHighlight) {
-        const element = document.getElementById("highlighted")
-        element.scrollIntoView({behavior: "smooth"})
-        this.shouldScrollToHighlight = false
-        this.shouldScroll = false
+      if (this.shouldScrollToHighlight) {
+        const element = document.getElementById('highlighted');
+        element.scrollIntoView({ behavior: 'smooth' });
+        this.shouldScrollToHighlight = false;
+        this.shouldScroll = false;
       } else {
         this.scrollToBottom();
       }

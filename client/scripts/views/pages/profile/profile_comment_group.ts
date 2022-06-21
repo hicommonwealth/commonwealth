@@ -8,7 +8,7 @@ import { getProposalUrlPath } from 'identifiers';
 
 import User from 'views/components/widgets/user';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread | any;

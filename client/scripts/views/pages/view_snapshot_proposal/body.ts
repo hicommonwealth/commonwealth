@@ -5,7 +5,7 @@ import m from 'mithril';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { AddressInfo } from 'models';
 
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
@@ -21,14 +21,15 @@ export const ProposalBodyAuthor: m.Component<{ item: SnapshotProposal }> = {
       m(User, {
         user: new AddressInfo(null, item.author, app.activeChainId(), null), // TODO: activeID becomes chain_base, fix
         linkify: true,
-        popover: true
+        popover: true,
       }),
     ]);
-  }
+  },
 };
 
 export const ProposalBodyCreated: m.Component<{
-  item: SnapshotProposal, link: string
+  item: SnapshotProposal;
+  link: string;
 }> = {
   view: (vnode) => {
     const { item, link } = vnode.attrs;
@@ -37,9 +38,9 @@ export const ProposalBodyCreated: m.Component<{
     const time = moment(+item.start * 1000);
 
     return m('.ProposalBodyCreated', [
-      m('', `Created ${formatLastUpdated(time)}`)
+      m('', `Created ${formatLastUpdated(time)}`),
     ]);
-  }
+  },
 };
 
 export const ProposalBodyEnded: m.Component<{ item: SnapshotProposal }> = {
@@ -54,11 +55,14 @@ export const ProposalBodyEnded: m.Component<{ item: SnapshotProposal }> = {
     const time = moment(+item.end * 1000);
 
     return m('.ProposalBodyLastEnded', [
-      m('', (now > time)
-      ? `Ended ${formatLastUpdated(time)}`
-      : `Ending in ${formatTimestamp(time)}`)
+      m(
+        '',
+        now > time
+          ? `Ended ${formatLastUpdated(time)}`
+          : `Ending in ${formatTimestamp(time)}`
+      ),
     ]);
-  }
+  },
 };
 
 export const ProposalBodyText: m.Component<{ item: SnapshotProposal }> = {
@@ -69,8 +73,6 @@ export const ProposalBodyText: m.Component<{ item: SnapshotProposal }> = {
     const body = item.body;
     if (!body) return;
 
-    return m('.ProposalBodyText', [
-      m(MarkdownFormattedText, { doc: body })
-    ]);
-  }
+    return m('.ProposalBodyText', [m(MarkdownFormattedText, { doc: body })]);
+  },
 };

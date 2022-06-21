@@ -2,7 +2,7 @@ import 'modals/preview_modal.scss';
 
 import m from 'mithril';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const PreviewModal: m.Component<{ title: string; doc: string }> = {
@@ -14,7 +14,8 @@ const PreviewModal: m.Component<{ title: string; doc: string }> = {
         m('h3', title ? `Preview: ${title}` : 'Preview'),
         m(CompactModalExitButton),
       ]),
-      m('.compact-modal-body',
+      m(
+        '.compact-modal-body',
         (() => {
           try {
             const doc = JSON.parse(vnode.attrs.doc);
