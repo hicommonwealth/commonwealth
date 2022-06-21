@@ -135,8 +135,6 @@ export function useSocialAccountAuth(models: DB) {
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
-    console.log('req.query.state');
-    console.log(req.query.state);
     await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
   }));
 

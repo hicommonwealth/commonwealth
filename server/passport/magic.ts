@@ -196,7 +196,7 @@ export function useMagicAuth(models: DB) {
             created_at: new Date(),
             updated_at: new Date(),
           }, { transaction: t });
-          
+
           return newUser;
         });
 
@@ -228,7 +228,7 @@ export function useMagicAuth(models: DB) {
           });
         }
         ssoToken.issued_at = user.claim.iat;
-        ssoToken.updated_at = new Date(),
+        ssoToken.updated_at = new Date();
         await ssoToken.save();
         console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
         return cb(null, existingUser);

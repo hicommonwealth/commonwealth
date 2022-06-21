@@ -28,7 +28,6 @@ const startOAuthLogin = async (
   }
 
   if (provider === 'github') {
-    console.log(`on auth/ req.sessionID ${req.sessionID}`)
     passport.authenticate('github', {
       callbackURL: `${GITHUB_OAUTH_CALLBACK}?from=${encodeURIComponent(
         req.hostname
@@ -40,7 +39,7 @@ const startOAuthLogin = async (
   }
 
   else {
-    console.log(successRedirect)
+    // TODO: figure out how to pass a callbackURL without error
     passport.authenticate('discord', {
       successRedirect,
       failureRedirect,
