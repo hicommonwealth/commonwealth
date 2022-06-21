@@ -38,7 +38,11 @@ const deleteThread = async (
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [models.Chain, models.Address],
+      include: [{
+        model: models.Chain,
+      }, {
+        association: 'Address',
+      }],
     });
 
     let thread = myThread;
@@ -73,22 +77,12 @@ const deleteThread = async (
       }
     }
 
-    const topic = await models.OffchainTopic.findOne({
-      where: { id: thread.topic_id },
-      include: [{ model: models.OffchainThread, as: 'threads' }],
-    });
-
     // find and delete all associated subscriptions
-    const subscriptions = await models.Subscription.findAll({
+    await models.Subscription.destroy({
       where: {
         offchain_thread_id: thread.id,
       },
     });
-    await Promise.all(
-      subscriptions.map((s) => {
-        return s.destroy();
-      })
-    );
 
     await thread.destroy();
     return res.json({ status: 'Success' });
