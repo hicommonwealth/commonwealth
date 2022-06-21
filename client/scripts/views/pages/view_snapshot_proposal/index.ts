@@ -1,13 +1,15 @@
-import 'pages/snapshot/view_proposal.scss';
-import 'pages/snapshot/list_proposal.scss';
-
 import m from 'mithril';
 import { Button, Tabs, TabItem, RadioGroup } from 'construct-ui';
 import moment from 'moment';
+
+import 'pages/snapshot/view_proposal.scss';
+import 'pages/snapshot/list_proposal.scss';
+
 import app from 'state';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
-import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
+import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 import {
   SnapshotSpace,
   SnapshotProposal,
@@ -17,12 +19,10 @@ import {
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
-
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 
@@ -208,11 +208,6 @@ const VoteAction: m.Component<
       return vote.voter === app.user?.activeAccount?.address;
     })?.choice;
 
-    const onModalClose = () => {
-      vnode.state.votingModalOpen = false;
-      m.redraw();
-    };
-
     if (!vnode.state.fetchedPower) {
       getPower(
         vnode.attrs.space,
@@ -307,7 +302,7 @@ const ViewProposalPage: m.Component<
     threads: Array<{ id: string; title: string }> | null;
   }
 > = {
-  oncreate: (vnode) => {
+  oncreate: () => {
     mixpanelBrowserTrack({
       event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
       isCustomDomain: app.isCustomDomain(),
@@ -490,7 +485,7 @@ const ViewProposalPage: m.Component<
                             m(
                               '.truncate',
                               proposal.strategies.length > 1
-                                ? proposal.strategies.length + ' Strategies'
+                                ? `${proposal.strategies.length} Strategies`
                                 : proposal.strategies[0].name
                             ),
                             m(CWIcon, {

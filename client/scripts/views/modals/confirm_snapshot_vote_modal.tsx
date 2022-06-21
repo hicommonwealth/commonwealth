@@ -1,53 +1,44 @@
-import 'modals/confirm_snapshot_vote_modal.scss';
+/* @jsx m */
 
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 
+import 'modals/confirm_snapshot_vote_modal.scss';
+
+import app from 'state';
 import {
   SnapshotProposal,
   SnapshotSpace,
   castVote,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
-
 import { formatNumberShort } from 'adapters/currency';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 
-enum NewVoteErrors {
-  SomethingWentWrong = 'Something went wrong!',
-}
+type ConfirmSnapshotVoteModalAttrs = {
+  id: string;
+  proposal: SnapshotProposal;
+  scores: any;
+  selectedChoice: string;
+  snapshot: any;
+  space: SnapshotSpace;
+  totalScore: number;
+};
 
-const ConfirmSnapshotVoteModal: m.Component<
-  {
-    space: SnapshotSpace;
-    proposal: SnapshotProposal;
-    id: string;
-    selectedChoice: string;
-    totalScore: number;
-    scores: any;
-    snapshot: any;
-  },
-  {
-    error: any;
-    saving: boolean;
-    validAgainstStrategies: boolean;
-  }
-> = {
-  view: (vnode) => {
+export class ConfirmSnapshotVoteModal
+  implements m.Component<ConfirmSnapshotVoteModalAttrs>
+{
+  private error: any;
+  private saving: boolean;
+  private validAgainstStrategies: boolean;
+
+  view(vnode) {
     const author = app.user.activeAccount;
-    const {
-      proposal,
-      space,
-      id,
-      selectedChoice,
-      totalScore,
-      scores,
-      snapshot,
-    } = vnode.attrs;
+
+    const { proposal, space, id, selectedChoice, totalScore } = vnode.attrs;
 
     return m('.ConfirmSnapshotVoteModal', [
       m('.compact-modal-title', [
@@ -65,14 +56,6 @@ const ConfirmSnapshotVoteModal: m.Component<
             m('span', { class: 'text-blue' }, 'Option'),
             m('span', `${proposal.choices[selectedChoice]}`),
           ]),
-          // TODO: this links out to the block explorer specific to each space, which we don't hardcode
-          // m('.d-flex', [
-          //   m('span', { class: 'text-blue' }, 'Snapshot'),
-          //   m('a', { href: `${_explorer(space.network, proposal.snapshot, 'block')}`, target: '_blank' }, [
-          //     `${formatNumberShort(proposal.snapshot, '0,0')}`,
-          //     m('i', { class: 'iconexternal-link' })
-          //   ]),
-          // ]),
           m('.d-flex', [
             m('span', { class: 'text-blue' }, 'Your voting power'),
             m(
@@ -86,7 +69,7 @@ const ConfirmSnapshotVoteModal: m.Component<
         m('.button-group', [
           m(Button, {
             intent: 'none',
-            disabled: vnode.state.saving,
+            disabled: this.saving,
             rounded: true,
             onclick: async (e) => {
               e.preventDefault();
@@ -96,11 +79,13 @@ const ConfirmSnapshotVoteModal: m.Component<
           }),
           m(Button, {
             intent: 'primary',
-            disabled: vnode.state.saving,
+            disabled: this.saving,
             rounded: true,
             onclick: async (e) => {
               e.preventDefault();
-              vnode.state.saving = true;
+
+              this.saving = true;
+
               const votePayload = {
                 space: space.id,
                 proposal: id,
@@ -108,6 +93,7 @@ const ConfirmSnapshotVoteModal: m.Component<
                 choice: selectedChoice + 1,
                 metadata: JSON.stringify({}),
               };
+
               try {
                 castVote(author.address, votePayload).then(() => {
                   $(e.target).trigger('modalexit');
@@ -118,20 +104,18 @@ const ConfirmSnapshotVoteModal: m.Component<
                   isCustomDomain: app.isCustomDomain(),
                   space: app.snapshot.space.id,
                 });
-              } catch (e) {
-                console.log(e);
-                const errorMessage = e.message;
+              } catch (err) {
+                console.log(err);
+                const errorMessage = err.message;
                 notifyError(errorMessage);
               }
 
-              vnode.state.saving = false;
+              this.saving = false;
             },
             label: 'Vote',
           }),
         ]),
       ]),
     ]);
-  },
-};
-
-export default ConfirmSnapshotVoteModal;
+  }
+}

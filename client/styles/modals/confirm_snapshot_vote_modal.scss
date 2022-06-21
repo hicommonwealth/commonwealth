@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ConfirmSnapshotVoteModal {
   h4 {
@@ -6,6 +6,7 @@
     font-size: 20px;
     margin-bottom: 24px;
   }
+
   .vote-info {
     border: 1px solid $primary-300;
     border-radius: 8px;
@@ -16,6 +17,7 @@
       justify-content: space-between;
       margin: 5px;
       font-weight: bold;
+
       .text-blue {
         color: $primary-400;
       }
@@ -27,6 +29,7 @@
 
     margin-bottom: 24px;
   }
+
   .button-group {
     display: flex;
     justify-content: space-between;
@@ -35,5 +38,6 @@
       flex: 1 1 auto;
     }
   }
+
   max-width: 480px;
 }
