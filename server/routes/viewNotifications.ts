@@ -135,12 +135,18 @@ export default async (
   const subscriptionsObj = {}
 
   for (const nr of notificationsRead) {
-    const chainEvent = JSON.parse(nr.Notification.notification_data);
+    let chainEvent;
+    if (nr.Notification.chain_event_id) {
+      chainEvent = JSON.parse(nr.Notification.notification_data);
+    }
+
     if (!subscriptionsObj[nr.subscription_id]) {
       subscriptionsObj[nr.subscription_id] = {
-        ChainEventType: chainEvent.ChainEventType,
         NotificationsReads: [], // also contains notifications
         ...nr.Subscription
+      }
+      if (nr.Notification.chain_event_id) {
+        subscriptionsObj[nr.subscription_id].ChainEventType = chainEvent.ChainEventType
       }
     }
 
