@@ -15,6 +15,7 @@ let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
 const MAX_NOTIFS = 40;
 let init = false;
+let pageKey = 0;
 
 function increment(type: 'chain-event' | 'discussion') {
   if (type === 'chain-event') {
@@ -38,9 +39,6 @@ function nextPage() {
   const numDiscussionNotif =
     app.user.notifications.discussionNotifications.length;
 
-  const flag = false;
-
-  // TODO: fix multiple redraw
   if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
@@ -67,16 +65,19 @@ function previousPage() {
   if (minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
     flag = true;
+  } else if (minChainEventsNotification != 0) {
+    minChainEventsNotification = 0;
+    flag = true;
   }
 
   if (minDiscussionNotification >= MAX_NOTIFS) {
     minDiscussionNotification -= MAX_NOTIFS;
     flag = true;
+  } else if (minDiscussionNotification != 0) {
+    minDiscussionNotification = 0;
+    flag = true;
   }
-
-  if (flag) {
-    m.redraw();
-  }
+  if (flag) m.redraw();
 }
 
 const NotificationsPage: m.Component<{}> = {
@@ -140,13 +141,31 @@ const NotificationsPage: m.Component<{}> = {
                 label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
+                  pageKey -= 1;
+                  console.log(
+                    'Before=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
                   previousPage();
+                  console.log(
+                    'After=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
                 },
               }),
               m(Button, {
                 label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
+                  pageKey += 1;
 
                   if (!init) {
                     init = true;
@@ -155,8 +174,23 @@ const NotificationsPage: m.Component<{}> = {
                     minChainEventsNotification =
                       app.user.notifications.chainEventNotifications.length;
                   }
-
+                  console.log(
+                    'Before=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
                   nextPage();
+                  console.log(
+                    'After=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
                 },
               }),
               m(Button, {
@@ -227,6 +261,7 @@ const NotificationsPage: m.Component<{}> = {
                   pageData: () => {
                     return allNotifications;
                   },
+                  pageKey: () => {return pageKey},
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
                       notifications: [data],

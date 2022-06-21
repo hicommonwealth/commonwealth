@@ -22,6 +22,8 @@ export class NotificationsMenu
   private minDiscussionNotification = 0;
   private minChainEventsNotification = 0;
   private init = false;
+  private showingDiscussionNotifications;
+  private showingChainEventNotifications;
 
   private _incrementAndRedraw(type: 'chain-event' | 'discussion') {
     if (type === 'chain-event') {
@@ -63,45 +65,32 @@ export class NotificationsMenu
   private _previousPage(showingChainEvents: boolean) {
     if (showingChainEvents && this.minChainEventsNotification >= MAX_NOTIFS) {
       this.minChainEventsNotification -= MAX_NOTIFS;
-      m.redraw();
+    } else if (showingChainEvents && this.minChainEventsNotification != 0) {
+      this.minChainEventsNotification = 0;
     } else if (this.minDiscussionNotification >= MAX_NOTIFS) {
       this.minDiscussionNotification -= MAX_NOTIFS;
-      m.redraw();
+    } else if (this.minDiscussionNotification != 0) {
+      this.minDiscussionNotification = 0;
     }
+    m.redraw();
   }
 
   view(vnode) {
     // TODO: Add helper directly on controller
     const { small } = vnode.attrs;
 
-    // const notifications = app.user.notifications?.notifications || [];
-    const discussionNotifications =
-      app.user.notifications.discussionNotifications;
-    const chainEventNotifications =
-      app.user.notifications.chainEventNotifications;
-    console.log(this);
-    console.log(chainEventNotifications);
+    this.showingDiscussionNotifications =
+      app.user.notifications.discussionNotifications.slice(
+        this.minDiscussionNotification,
+        this.minDiscussionNotification + MAX_NOTIFS
+      );
 
-    const unreadDiscussionNotifications = discussionNotifications.filter(
-      (n) => !n.isRead
-    );
-    const unreadChainEventNotifications = chainEventNotifications.filter(
-      (n) => !n.isRead
-    );
+    this.showingChainEventNotifications =
+      app.user.notifications.chainEventNotifications.slice(
+        this.minChainEventsNotification,
+        this.minChainEventsNotification + MAX_NOTIFS
+      );
 
-    // const unreadNotificationsCount = unreadNotifications.length;
-
-    // const unreadFilteredNotificationsCount = filteredNotifications.filter(
-    //   (n) => !n.isRead
-    // ).length;
-
-    // const chainNotificationsCount = this.selectedChainEvents
-    //   ? unreadFilteredNotificationsCount
-    //   : unreadNotificationsCount - unreadFilteredNotificationsCount;
-    //
-    // const discussionNotificationsCount = this.selectedChainEvents
-    //   ? unreadNotificationsCount - unreadFilteredNotificationsCount
-    //   : unreadFilteredNotificationsCount;
     const unreadNotificationsCount = app.user.notifications.numUnread;
 
     return (
@@ -174,16 +163,16 @@ export class NotificationsMenu
             <div class="notification-list">
               {(() => {
                 if (this.selectedChainEvents) {
-                  if (chainEventNotifications.length > 0) {
+                  if (this.showingChainEventNotifications.length > 0) {
                     return (
                       <Infinite
                         maxPages={1} // prevents rollover/repeat
-                        pageData={() =>
-                          chainEventNotifications.slice(
-                            this.minChainEventsNotification,
+                        pageData={() => this.showingChainEventNotifications} // limit the number of rows shown here
+                        pageKey={() =>
+                          `${this.minChainEventsNotification} - ${
                             this.minChainEventsNotification + MAX_NOTIFS
-                          )
-                        } // limit the number of rows shown here
+                          }`
+                        }
                         key={
                           // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
                           // sortedFilteredNotifications.length
@@ -195,18 +184,22 @@ export class NotificationsMenu
                         }}
                       />
                     );
-                  } else return 'No chain notifications';
+                  } else if (
+                    app.user.notifications.chainEventNotifications.length === 0
+                  )
+                    return 'No chain notifications';
+                  else return 'No more chain notifications';
                 } else {
-                  if (discussionNotifications.length > 0) {
+                  if (this.showingDiscussionNotifications.length > 0) {
                     return (
                       <Infinite
                         maxPages={1} // prevents rollover/repeat
-                        pageData={() =>
-                          discussionNotifications.slice(
-                            this.minDiscussionNotification,
+                        pageData={() => this.showingDiscussionNotifications} // limit the number of rows shown here
+                        pageKey={() =>
+                          `${this.minDiscussionNotification} - ${
                             this.minDiscussionNotification + MAX_NOTIFS
-                          )
-                        } // limit the number of rows shown here
+                          }`
+                        }
                         key={
                           // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
                           // sortedFilteredNotifications.length
@@ -217,7 +210,11 @@ export class NotificationsMenu
                         }}
                       />
                     );
-                  } else return 'No discussion notifications';
+                  } else if (
+                    app.user.notifications.discussionNotifications.length === 0
+                  )
+                    return 'No discussion notifications';
+                  else return 'No more discussion notifications';
                 }
               })()}
             </div>
@@ -236,8 +233,8 @@ export class NotificationsMenu
                   e.preventDefault();
                   // e.stopPropagation();
                   const typeNotif = this.selectedChainEvents
-                    ? chainEventNotifications
-                    : discussionNotifications;
+                    ? this.showingChainEventNotifications
+                    : this.showingDiscussionNotifications;
                   if (typeNotif.length < 1) return;
                   app.user.notifications
                     .markAsRead(typeNotif)
@@ -265,7 +262,6 @@ export class NotificationsMenu
                     this.minChainEventsNotification =
                       app.user.notifications.chainEventNotifications.length;
                   }
-
                   this._nextPage(this.selectedChainEvents);
                 }}
               />
