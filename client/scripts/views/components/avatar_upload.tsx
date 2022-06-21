@@ -98,7 +98,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     const { account, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
-    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
+    const logoURL = this.dropzone?.options?.url || app.chain?.meta.iconUrl;
 
     return (
       <div

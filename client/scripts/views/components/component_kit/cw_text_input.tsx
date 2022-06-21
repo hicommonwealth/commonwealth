@@ -68,7 +68,6 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           name={name}
           placeholder={placeholder}
           oninput={(e) => {
-            if (oninput) oninput(e);
             if (e.target.value?.length === 0) {
               this.isTyping = false;
               this.validationStatus = undefined;
@@ -84,13 +83,17 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 if (inputValidationFn && e.target.value?.length > 3) {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
+                  if (oninput && this.validationStatus === 'success') {
+                    oninput(e);
+                  }
                   m.redraw();
+                } else {
+                  if (oninput) oninput(e);
                 }
               }, timeout);
             }
           }}
           onfocusout={(e) => {
-            debugger;
             if (inputValidationFn) {
               if (e.target.value?.length === 0) {
                 this.isTyping = false;

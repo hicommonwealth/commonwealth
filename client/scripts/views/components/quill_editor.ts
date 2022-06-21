@@ -985,6 +985,7 @@ interface IQuillEditorAttrs {
   theme?: string;
   onkeyboardSubmit?;
   editorNamespace: string;
+  disableRichText?: boolean;
 }
 
 interface IQuillEditorState {
@@ -1027,14 +1028,17 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       tabindex,
       editorNamespace,
       onkeyboardSubmit,
+      disableRichText,
     } = vnode.attrs;
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
     // If this component is running for the first time, and the parent has not provided contentsDoc,
     // try to load it from the drafts and also set markdownMode appropriately
     let contentsDoc = vnode.attrs.contentsDoc;
+
     if (
       !contentsDoc &&
       !vnode.state.markdownMode &&
+      !disableRichText &&
       localStorage.getItem(
         `${app.activeChainId()}-${editorNamespace}-storedText`
       ) !== null
@@ -1054,7 +1058,11 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
         vnode.state.markdownMode = true;
       }
     } else if (vnode.state.markdownMode === undefined) {
-      if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
+      if (disableRichText) {
+        vnode.state.markdownMode = true;
+      } else if (
+        localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true'
+      ) {
         vnode.state.markdownMode = true;
       } else if (
         localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false'
@@ -1115,6 +1123,7 @@ const QuillEditor: m.Component<IQuillEditorAttrs, IQuillEditorState> = {
       [
         m('.quill-editor'),
         theme !== 'bubble' &&
+          !disableRichText &&
           m('.type-selector', [
             vnode.state.markdownMode
               ? m(Tooltip, {

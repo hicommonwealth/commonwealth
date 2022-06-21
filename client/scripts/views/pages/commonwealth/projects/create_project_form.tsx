@@ -81,23 +81,23 @@ const validateCreator = (creator: string) => {
 };
 const validateFundraiseLength = (length: number) => {
   if (!length) return false;
-  if (Number.isNaN(length)) return false;
+  if (Number.isNaN(+length)) return false;
   // TODO: Min fundraiseLength check
   return true;
 };
 const validateCuratorFee = (fee: number) => {
   if (!fee) return false;
-  if (Number.isNaN(fee)) return false;
+  if (Number.isNaN(+fee)) return false;
   return true;
 };
 const validateThreshold = (threshold: number) => {
   if (!threshold) return false;
-  if (Number.isNaN(threshold)) return false;
+  if (Number.isNaN(+threshold)) return false;
   // TODO: Min threshold check
   return true;
 };
 
-// TODO: Synchronize with new Avatar component
+// TODO Graham 6/21/22: Synchronize with new Avatar component
 class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
@@ -156,12 +156,14 @@ class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
       },
     });
     this.dropzone.on('processing', (file) => {
+      console.log(file);
       this.dropzone.options.url = file.uploadURL;
       if (vnode.attrs.uploadStartedCallback) {
         vnode.attrs.uploadStartedCallback();
       }
     });
     this.dropzone.on('complete', (file) => {
+      console.log(file);
       if (vnode.attrs.uploadCompleteCallback) {
         vnode.attrs.uploadCompleteCallback(this.dropzone.files);
       }
@@ -169,7 +171,8 @@ class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
   }
 
   view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
-    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
+    const logoURL = this.dropzone?.options?.url;
+    debugger;
     return (
       <div class="CoverImageUpload">
         <div
@@ -177,7 +180,8 @@ class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
           style={`background-image: url(${logoURL}); background-size: 92px;`}
         >
           <div class="attach-button">
-            <CWIcon iconName="plus" iconSize="small" />
+            <CWIcon iconName="plus" iconSize="large" />
+            <CWText type="h5">Upload Cover Image</CWText>
           </div>
         </div>
         <div class={`dropzone-previews ${this.uploaded ? 'hidden' : ''}`}></div>
@@ -237,7 +241,19 @@ export class InformationSlide
             }
           }}
         />
-        <CoverImageUpload />
+        <CoverImageUpload
+          uploadStartedCallback={() => {
+            m.redraw();
+          }}
+          uploadCompleteCallback={(files) => {
+            files.forEach((f) => {
+              if (!f.uploadURL) return;
+              const url = f.uploadURL.replace(/\?.*/, '');
+              vnode.attrs.form.coverImage = url.trim();
+            });
+            m.redraw();
+          }}
+        />
       </div>
     );
   }
@@ -379,9 +395,10 @@ export class DescriptionSlide
         </CWText>
         {m(QuillEditor, {
           oncreateBind: (state) => {
-            vnode.attrs.form.description = state.editor.editor.delta;
+            vnode.attrs.form.description = state.editor;
           },
           editorNamespace: 'project-description',
+          disableRichText: true,
           placeholder:
             'Write a full-length description of your project proposal,',
         })}
@@ -418,7 +435,7 @@ export default class CreateProjectForm implements m.ClassComponent {
     }
     return (
       <Sublayout
-        title={<CommonLogo />}
+        title="Create project"
         hideSearch={true}
         hideSidebar={true}
         showNewProposalButton={false}
@@ -478,7 +495,6 @@ export default class CreateProjectForm implements m.ClassComponent {
                   label: 'Submit',
                   onclick: (e) => {
                     e.preventDefault();
-                    console.log(this.form);
                     const {
                       title,
                       shortDescription,
@@ -517,14 +533,8 @@ export default class CreateProjectForm implements m.ClassComponent {
                     ) {
                       notifyError('Invalid form. Please check inputs.');
                     }
-                    this.form.description = this.form.description.markdownMode
-                      ? this.form.description.editor.getText()
-                      : JSON.stringify(
-                          this.form.description.editor.getContents()
-                        );
+                    this.form.description = this.form.description.getText();
                     this.form.deadline = nowInSeconds + weekInSeconds;
-                    console.log(this.form);
-                    console.log(JSON.stringify(this.form));
                     app.projects.createProject(this.form);
                   },
                 }),
