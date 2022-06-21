@@ -231,9 +231,6 @@ const VoteAction: m.Component<
             id: vnode.attrs.id,
             selectedChoice,
             totalScore: vnode.state.totalScore,
-            scores: vnode.attrs.scores,
-            snapshot: vnode.attrs.proposal.snapshot,
-            state: vnode.state,
           },
         });
         vnode.state.votingModalOpen = true;
@@ -382,15 +379,6 @@ const ViewProposalPage: m.Component<
               activeTab === 'Proposals' ? '.proposal-tab' : '.info-tab'
             }`,
             [
-              // eslint-disable-next-line no-restricted-globals
-              m('.back-button', { onclick: () => m.route.set(scope) }, [
-                m('img', {
-                  class: 'back-icon',
-                  src: '/static/img/arrow-right-black.svg',
-                  alt: 'Go Back',
-                }),
-                m('.back-button-text', 'Back'),
-              ]),
               m(
                 Tabs,
                 {

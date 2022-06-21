@@ -31,9 +31,7 @@ type ConfirmSnapshotVoteModalAttrs = {
 export class ConfirmSnapshotVoteModal
   implements m.Component<ConfirmSnapshotVoteModalAttrs>
 {
-  private error: any;
   private saving: boolean;
-  private validAgainstStrategies: boolean;
 
   view(vnode) {
     const author = app.user.activeAccount;
