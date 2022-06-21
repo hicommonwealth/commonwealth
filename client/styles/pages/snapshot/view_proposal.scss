@@ -265,28 +265,12 @@
     }
   }
 
-  .back-button {
-    color: $neutral-500;
-    display: flex;
-    align-items: flex-start;
-    cursor: pointer;
-
-    .back-icon {
-      margin-right: 14px;
-      transform: rotate(180deg);
-      opacity: 0.5;
-    }
-
-    .back-button-text {
-      text-transform: uppercase;
-    }
-  }
-
   .snapshot-tabs {
-    margin-top: 24px;
-    margin-left: -15px;
+    @include medium {
+      display: none;
+    }
 
-    @include mediumSmall {
+    @include large {
       display: none;
     }
   }
@@ -301,7 +285,7 @@
     }
 
     .proposal-info {
-      @include small {
+      @include mediumSmallInclusive {
         display: none;
       }
     }
