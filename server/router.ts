@@ -136,7 +136,7 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
-import RuleCache from './util/ruleCache';
+import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
@@ -147,7 +147,7 @@ function setupRouter(
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache
+  ruleCache: RuleCache,
   banCache: BanCache, // TODO: where is this needed?
 ) {
   const router = express.Router();

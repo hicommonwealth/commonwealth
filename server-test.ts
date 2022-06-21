@@ -26,7 +26,7 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
-import RuleCache from './server/util/ruleCache';
+import RuleCache from './server/util/rules/ruleCache';
 
 require('express-async-errors');
 

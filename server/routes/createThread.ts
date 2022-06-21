@@ -20,8 +20,8 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
-import checkRule from '../util/checkRule';
-import RuleCache from '../util/ruleCache';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));

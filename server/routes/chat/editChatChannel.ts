@@ -1,4 +1,4 @@
-import { NextFunction, Request } from 'express';
+import { NextFunction } from 'express';
 import validateRoles from '../../util/validateRoles';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { DB } from '../../database';
@@ -30,7 +30,7 @@ export default async (
 
   if (!req.body.channel_id) return next(new Error(Errors.NoChannelId));
 
-  const requesterIsAdmin = validateRoles(models, req as Request, 'admin', req.body.chain_id);
+  const requesterIsAdmin = validateRoles(models, req.user, 'admin', req.body.chain_id);
   if (requesterIsAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }

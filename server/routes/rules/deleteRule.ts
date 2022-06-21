@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { DB } from '../../database';
 import { AppError, ServerError } from '../../util/errors';
 import validateRoles from '../../util/validateRoles';
@@ -17,7 +16,7 @@ const deleteRule = async (
   req: TypedRequestBody<DeleteRuleReq>,
   res: TypedResponse<DeleteRuleResp>
 ) => {
-  const isAdmin = validateRoles(models, req as Request, 'admin', req.body.chain_id);
+  const isAdmin = validateRoles(models, req.user, 'admin', req.body.chain_id);
   if (!isAdmin) {
     throw new AppError(Errors.AdminOnly);
   }

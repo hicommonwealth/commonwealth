@@ -10,8 +10,8 @@ import {
   OffchainVoteAttributes,
   OffchainVoteInstance,
 } from '../models/offchain_vote';
-import checkRule from '../util/checkRule';
-import RuleCache from '../util/ruleCache';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

@@ -27,7 +27,7 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import RuleCache from './server/util/ruleCache';
+import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';

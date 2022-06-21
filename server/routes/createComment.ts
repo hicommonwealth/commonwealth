@@ -25,8 +25,8 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
-import checkRule from '../util/checkRule';
-import RuleCache from '../util/ruleCache';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 
 const sgMail = require('@sendgrid/mail');

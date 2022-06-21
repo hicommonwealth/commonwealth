@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import { NextFunction, Request } from 'express';
+import { NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
@@ -53,7 +53,7 @@ const editTopic = async (
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const requesterIsAdmin = validateRoles(models, req as Request, 'admin', chain.id);
+  const requesterIsAdmin = validateRoles(models, req.user, 'admin', chain.id);
   if (requesterIsAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }
