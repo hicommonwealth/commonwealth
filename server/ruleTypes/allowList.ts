@@ -1,4 +1,4 @@
-import { RuleType, RuleArgumentType } from '../util/ruleParser';
+import { RuleType, RuleArgumentType } from '../util/rules/ruleTypes';
 
 type SchemaT = { AllowListRule: [ string[] ] };
 
@@ -7,6 +7,7 @@ export default class AllowListRule extends RuleType<SchemaT> {
   public readonly metadata = {
     name: 'Allow List Rule',
     description: 'Only a specified list of addresses can perform action',
+    // TODO: add argument for address type?
     arguments: [{
       name: 'Allow List',
       description: 'Permitted addresses',

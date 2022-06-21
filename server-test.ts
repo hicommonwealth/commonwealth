@@ -345,6 +345,7 @@ const setupServer = () => {
   server.on('listening', onListen);
 };
 
+const banCache = new BanCache(models);
 setupPassport(models);
 setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, ruleCache, banCache);
 

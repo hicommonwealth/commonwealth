@@ -1,6 +1,6 @@
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 import { DB } from '../../database';
-import { RuleMetadata } from '../../util/ruleParser';
+import { RuleMetadata } from '../../util/rules/ruleTypes';
 import RuleTypes from '../../ruleTypes';
 
 type GetRuleTypesResp = { [name: string]: RuleMetadata };

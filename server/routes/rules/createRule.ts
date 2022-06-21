@@ -5,7 +5,7 @@ import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { RuleAttributes } from '../../models/rule';
 
 import { factory, formatFilename } from '../../../shared/logging';
-import { validateRule } from '../../util/ruleParser';
+import { validateRule } from '../../util/rules/ruleParser';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -34,10 +34,10 @@ const createRule = async (
   if (!req.body.rule) {
     throw new AppError(Errors.NoRuleSpecified);
   }
-  let rule;
+  let santizedResult;
   try {
     const ruleJson = JSON.parse(req.body.rule);
-    rule = validateRule(ruleJson);
+    santizedResult = validateRule(ruleJson);
   } catch (e) {
     log.info(`Failed to validate rule: ${e.message}`);
     throw new AppError(Errors.InvalidRule);
@@ -46,7 +46,7 @@ const createRule = async (
   try {
     const ruleInstance = await models.Rule.create({
       chain_id: req.body.chain_id,
-      rule,
+      rule: santizedResult,
     });
     return success(
       res,
