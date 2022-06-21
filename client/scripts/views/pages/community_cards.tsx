@@ -6,7 +6,7 @@ import numeral from 'numeral';
 import 'pages/landing/community_cards.scss';
 
 import app from 'state';
-import { ChainInfo, NodeInfo } from 'models';
+import { ChainInfo } from 'models';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
@@ -86,9 +86,8 @@ class HomepageCommunityCards implements m.ClassComponent {
     const chainBaseFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
         const chainBase =
-          Object.keys(ChainBase)[
-            Object.values(ChainBase).indexOf(data.base)
-          ]; // Converts chain.base into a ChainBase key to match our filterMap keys
+          Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
+        // Converts chain.base into a ChainBase key to match our filterMap keys
 
         return filterMap[chainBase];
       });
@@ -168,8 +167,9 @@ class HomepageCommunityCards implements m.ClassComponent {
           return threadCountB - threadCountA;
         })
         .map((chain: ChainInfo) => {
-          return m(NewCommunityCard, { chain });
+          return m(CommunityCard, { chain });
         });
+
       return res;
     };
 

@@ -24,7 +24,7 @@
   padding: 8px 16px;
   &.selected {
     background: $neutral-100;
-    @include xs-max {
+    @include extraSmall {
       margin: 0px -22px;
       padding-right: 22px;
       padding-left: 22px;
@@ -66,7 +66,7 @@
       margin-left: 10px;
     }
   }
-  @include xs-max {
+  @include extraSmall {
     display: block;
     padding: 10px 0 10px 0;
     .avatar-col {

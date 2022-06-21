@@ -7,6 +7,7 @@ import { DATABASE_URI } from './config';
 import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
+import BanFactory, { BanModelStatic } from './models/ban';
 import ChainFactory, { ChainModelStatic } from './models/chain';
 import ChainCategoryFactory, {
   ChainCategoryModelStatic,
@@ -26,6 +27,7 @@ import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channe
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
+import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/community_banner';
 import CollaborationFactory, {
   CollaborationModelStatic,
 } from './models/collaboration';
@@ -106,6 +108,7 @@ import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
+  Ban: BanModelStatic;
   Chain: ChainModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
@@ -116,6 +119,7 @@ export type Models = {
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
+  CommunityBanner: CommunityBannerModelStatic;
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
@@ -186,6 +190,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
+  Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
@@ -196,6 +201,7 @@ const models: Models = {
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
+  CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),

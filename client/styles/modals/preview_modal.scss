@@ -6,7 +6,7 @@
     max-height: 64vh;
     overflow-y: auto;
     margin: 25px 0;
-    @include xs-max {
+    @include extraSmall {
       width: initial;
     }
   }

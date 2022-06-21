@@ -38,15 +38,16 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       return next(new Error(Errors.NoChain));
     }
 
-    await models.sequelize.query(`DELETE FROM "ChainNodes" WHERE chain='${chain.id}';`, {
-      type: QueryTypes.DELETE,
-      transaction: t,
-    });
-
     await models.sequelize.query(`DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    await models.sequelize.query(
+      `UPDATE "Users" SET "selected_chain_id" = NULL WHERE "selected_chain_id" = '${chain.id}';`, {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      });
 
     await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,

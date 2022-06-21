@@ -29,6 +29,7 @@ import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
+import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
@@ -136,6 +137,9 @@ import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 import RuleCache from './util/ruleCache';
+import banAddress from './routes/banAddress';
+import getBannedAddresses from './routes/getBannedAddresses';
+import BanCache from './util/banCheckCache';
 
 function setupRouter(
   app: Express,
@@ -144,6 +148,7 @@ function setupRouter(
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache
+  banCache: BanCache, // TODO: where is this needed?
 ) {
   const router = express.Router();
 
@@ -235,12 +240,12 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
-    createThread.bind(this, models, tokenBalanceCache, ruleCache)
+    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
-    editThread.bind(this, models)
+    editThread.bind(this, models, banCache)
   );
 
   router.post(
@@ -311,7 +316,7 @@ function setupRouter(
   router.post(
     '/deleteThread',
     passport.authenticate('jwt', { session: false }),
-    deleteThread.bind(this, models)
+    deleteThread.bind(this, models, banCache)
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
@@ -345,17 +350,17 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
-    createComment.bind(this, models, tokenBalanceCache, ruleCache)
+    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
-    editComment.bind(this, models)
+    editComment.bind(this, models, banCache)
   );
   router.post(
     '/deleteComment',
     passport.authenticate('jwt', { session: false }),
-    deleteComment.bind(this, models)
+    deleteComment.bind(this, models, banCache)
   );
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
@@ -397,12 +402,12 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
-    createReaction.bind(this, models, tokenBalanceCache, ruleCache)
+    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/deleteReaction',
     passport.authenticate('jwt', { session: false }),
-    deleteReaction.bind(this, models)
+    deleteReaction.bind(this, models, banCache)
   );
   router.get('/viewReactions', viewReactions.bind(this, models));
   router.get('/bulkReactions', bulkReactions.bind(this, models));
@@ -440,6 +445,13 @@ function setupRouter(
     '/updateEmail',
     passport.authenticate('jwt', { session: false }),
     updateEmail.bind(this, models)
+  );
+
+  // community banners (update or create)
+  router.post(
+    '/updateBanner',
+    passport.authenticate('jwt', { session: false }),
+    updateBanner.bind(this, models)
   );
 
   // fetch addresses (e.g. for mentions)
@@ -653,6 +665,19 @@ function setupRouter(
 
   // send feedback button
   router.post('/sendFeedback', sendFeedback.bind(this, models));
+
+  // bans
+  router.post(
+    '/banAddress',
+    passport.authenticate('jwt', { session: false }),
+    banAddress.bind(this, models)
+  );
+
+  router.get(
+    '/getBannedAddresses',
+    passport.authenticate('jwt', { session: false }),
+    getBannedAddresses.bind(this, models)
+  );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));

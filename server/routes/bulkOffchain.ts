@@ -14,6 +14,7 @@ import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { RuleInstance } from '../models/rule';
+import { CommunityBannerInstance } from '../models/community_banner';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -33,7 +34,7 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules, communityBanner] =
     await (<
       Promise<
         [
@@ -44,6 +45,7 @@ const bulkOffchain = async (
           OffchainThreadInstance[],
           ChatChannelInstance[],
           RuleInstance[],
+          CommunityBannerInstance,
         ]
       >
     >Promise.all([
@@ -173,7 +175,12 @@ const bulkOffchain = async (
         where: {
           chain_id: chain.id,
         }
-      })
+      }),
+      models.CommunityBanner.findOne({
+        where: {
+          chain_id: chain.id,
+        }
+      }),
     ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -190,6 +197,7 @@ const bulkOffchain = async (
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),
       rules: rules.map((r) => r.toJSON()),
+      communityBanner: communityBanner?.banner_text || '',
     },
   });
 };

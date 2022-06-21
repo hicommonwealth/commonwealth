@@ -22,6 +22,7 @@ import {
 } from '../../shared/analytics/types';
 import checkRule from '../util/checkRule';
 import RuleCache from '../util/ruleCache';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -203,6 +204,7 @@ const createThread = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -252,6 +254,15 @@ const createThread = async (
     }
   } else {
     return next(new Error(Errors.UnsupportedKind));
+  }
+
+  // check if banned
+  const [canInteract, banError] = await banCache.checkBan({
+    chain: chain.id,
+    address: author.address,
+  });
+  if (!canInteract) {
+    return next(new Error(banError));
   }
 
   // Render a copy of the thread to plaintext for the search indexer

@@ -20,6 +20,7 @@ import {
 } from '../../shared/analytics/types';
 import checkRule from '../util/checkRule';
 import RuleCache from '../util/ruleCache';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,6 +39,7 @@ const createReaction = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -85,6 +87,17 @@ const createReaction = async (
       if (!passesRules) {
         return next(new Error(Errors.RuleCheckFailed));
       }
+    }
+  }
+
+  // check if author can react
+  if (chain) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: req.body.address
+    });
+    if (!canInteract) {
+      return next(new Error(banError));
     }
   }
 

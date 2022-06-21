@@ -27,6 +27,7 @@ import {
 import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/checkRule';
 import RuleCache from '../util/ruleCache';
+import BanCache from '../util/banCheckCache';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -50,6 +51,7 @@ const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -69,6 +71,15 @@ const createComment = async (
     (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
   ) {
     return next(new Error(Errors.MissingTextOrAttachment));
+  }
+
+  // check if banned
+  const [canInteract, banError] = await banCache.checkBan({
+    chain: chain.id,
+    address: author.address,
+  });
+  if (!canInteract) {
+    return next(new Error(banError));
   }
 
   let parentComment;
