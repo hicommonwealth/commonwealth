@@ -359,8 +359,6 @@ const ViewProposalPage: m.Component<
   view: (vnode) => {
     const author = app.user.activeAccount;
     const { proposal, votes, activeTab, threads } = vnode.state;
-    const route = m.route.get();
-    const scope = route.slice(0, route.lastIndexOf('/'));
 
     const isActive =
       vnode.state.proposal &&
