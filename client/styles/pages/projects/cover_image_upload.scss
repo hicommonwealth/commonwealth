@@ -1,7 +1,8 @@
 @import 'shared';
 
 .CoverImageUpload {
-  height: 150px;
+  height: 262px;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,12 +29,13 @@
   .dropzone-previews {
     .dz-preview {
       .dz-image {
-        height: 100%;
-        width: 100%;
+        height: 262px;
+        width: 480px;
 
         img {
-          height: 100%;
-          width: 100%;
+          height: 262px;
+          width: 480px;
+          object-fit: fill;
         }
       }
 

@@ -21,6 +21,7 @@ export default class CoverImageUpload
   implements m.ClassComponent<ICoverImageUploadAttrs>
 {
   private dropzone?: any;
+  private uploading: boolean;
   private uploaded: boolean;
 
   oncreate(vnode: m.VnodeDOM<ICoverImageUploadAttrs>) {
@@ -77,14 +78,13 @@ export default class CoverImageUpload
       },
     });
     this.dropzone.on('processing', (file) => {
-      console.log(file);
+      this.uploading = true;
       this.dropzone.options.url = file.uploadURL;
       if (vnode.attrs.uploadStartedCallback) {
         vnode.attrs.uploadStartedCallback();
       }
     });
     this.dropzone.on('complete', (file) => {
-      console.log(file);
       if (vnode.attrs.uploadCompleteCallback) {
         vnode.attrs.uploadCompleteCallback(this.dropzone.files);
       }
@@ -103,6 +103,7 @@ export default class CoverImageUpload
           <div class="attach-button">
             <CWIcon iconName="plus" iconSize="large" />
             <CWText type="h5">Upload Cover Image</CWText>
+            <CWText type="caption">1040px by 568px</CWText>
           </div>
         </div>
         <div class={`dropzone-previews`}></div>

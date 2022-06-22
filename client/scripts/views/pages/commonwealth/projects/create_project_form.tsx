@@ -70,16 +70,15 @@ export class InformationSlide
             console.log(e);
             vnode.attrs.form.title = e.target.value;
           }}
-          inputValidationFn={(value) => {
+          inputValidationFn={(value: string) => {
             const isValid = validateTitle(value);
             if (!isValid) {
               return [
                 'failure',
                 `Name must be between 8-64 characters. Current count: ${value.length}`,
               ];
-            } else {
-              return ['success', ''];
             }
+            return ['success', ''];
           }}
         />
         {/* TODO: The below should be a textarea */}
@@ -90,16 +89,15 @@ export class InformationSlide
           oninput={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
-          inputValidationFn={(value) => {
+          inputValidationFn={(value: string) => {
             const isValid = validateShortDescription(value);
             if (!isValid) {
               return [
                 'failure',
                 `Input limit is 224 characters. Current count: ${value.length}`,
               ];
-            } else {
-              return ['success', ''];
             }
+            return ['success', ''];
           }}
         />
         <CoverImageUpload
@@ -211,6 +209,13 @@ export class FundraisingSlide
           placeholder="Address"
           label="Beneficiary Address"
           name="Beneficiary Address"
+          inputValidationFn={(value: string) => {
+            const isValid = validateBeneficiary(value);
+            if (!isValid) {
+              return ['failure', 'Invalid address'];
+            }
+            return ['success', ''];
+          }}
           oninput={(e) => {
             // TODO: Address validation
             vnode.attrs.form.beneficiary = e.target.value;
@@ -225,7 +230,8 @@ export class FundraisingSlide
             vnode.attrs.form.curatorFee = Math.round(e.target.value * 100);
             console.log(vnode.attrs.form.curatorFee);
           }}
-          inputValidationFn={(value) => {
+          inputValidationFn={(value: string) => {
+            // TODO: Better use of validation helpers
             const isNotNumber = Number.isNaN(+value);
             const isNotPercent = +value > 100 || +value < 0;
             if (isNotNumber || isNotPercent) {
@@ -233,9 +239,8 @@ export class FundraisingSlide
                 'failure',
                 'Input must be valid percentage between 0 and 100',
               ];
-            } else {
-              return ['success', ''];
             }
+            return ['success', ''];
           }}
         />
       </div>
@@ -304,6 +309,9 @@ export default class CreateProjectForm implements m.ClassComponent {
       >
         <div class="CreateProjectForm">
           <div class="form-panel">
+            <CWText type="h5" weight="medium">
+              Project Creation
+            </CWText>
             {this.stage === 'information' && (
               <InformationSlide form={this.form} />
             )}
