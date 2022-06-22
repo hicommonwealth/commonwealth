@@ -60,6 +60,14 @@ export type LoginBodyType =
   | 'walletList'
   | 'welcome';
 
+// TODO Gabe 6/22/22:
+// 1. Pull in new headers when done
+// 2. Dark mode styles where applicable
+// 3. New PNG backgrounds where applicable
+// 4. Vertical orientation for AvatarAndUsernameInput
+// 5. New ethereum wallet alerts
+// 6. All mobile
+
 export class NewLoginModal implements m.ClassComponent {
   private avatarUrl: string;
   private bodyType: LoginBodyType;
