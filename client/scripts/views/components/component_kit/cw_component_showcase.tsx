@@ -5,7 +5,6 @@ import m from 'mithril';
 import 'components/component_kit/cw_component_showcase.scss';
 
 import app from 'state';
-// import breakpoints from 'mixins/breakpoints.scss';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWExternalLink } from './cw_external_link';
@@ -46,7 +45,6 @@ const radioGroupOptions = [
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
-
 export class ComponentShowcase implements m.ClassComponent {
   private avatarUrl: string;
   private checkboxChecked: boolean;
@@ -59,7 +57,6 @@ export class ComponentShowcase implements m.ClassComponent {
   }
 
   view() {
-    // console.log('helpers', breakpoints);
     return (
       <div class="ComponentShowcase">
         <CWButton

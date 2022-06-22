@@ -7,6 +7,7 @@ import app from 'state';
 import { OffchainTopic } from 'client/scripts/models';
 import { LoadingRow } from '../../components/loading_row';
 import SummaryRow from './summary_row';
+import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
 
 export class SummaryListing implements m.ClassComponent {
   private initializing: boolean;
@@ -32,8 +33,6 @@ export class SummaryListing implements m.ClassComponent {
         return a.name.localeCompare(b.name);
       });
 
-    const isMobile = window.innerWidth < 767.98;
-
     return (
       <div class="SummaryListing">
         {!this.isMobile && (
@@ -49,7 +48,7 @@ export class SummaryListing implements m.ClassComponent {
             );
             return (
               <SummaryRow
-                isMobile={isMobile}
+                isMobile={isWindowSmallInclusive(window.innerWidth)}
                 monthlyThreads={topicScopedThreads}
                 topic={topic}
               />

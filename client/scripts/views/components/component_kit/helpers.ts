@@ -19,5 +19,29 @@ export const getClasses = <T>(
   return type.concat(classes).join(' ');
 };
 
-export const isWindowExtraSmall =
-  window.innerWidth < breakpoints.breakpointSmall;
+export const isWindowLarge = (width: number) =>
+  width > breakpoints.breakpointLargeM;
+
+export const isWindowMediumInclusive = (width: number) =>
+  width < breakpoints.breakpointMediumMax;
+
+export const isWindowMedium = (width: number) =>
+  width < breakpoints.breakpointMediumMax &&
+  width > breakpoints.breakpointMediumMin;
+
+export const isWindowMediumSmallInclusive = (width: number) =>
+  width < breakpoints.breakpointMediumSmallMax;
+
+export const isWindowMediumSmall = (width: number) =>
+  width < breakpoints.breakpointMediumSmallMax &&
+  width > breakpoints.breakpointMediumSmallMin;
+
+export const isWindowSmallInclusive = (width: number) =>
+  width < breakpoints.breakpointSmallMax;
+
+export const isWindowSmall = (width: number) =>
+  width < breakpoints.breakpointSmallMax &&
+  width > breakpoints.breakpointSmallMin;
+
+export const isWindowExtraSmall = (width: number) =>
+  width < breakpoints.breakpointExtraSmallMax;
