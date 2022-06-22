@@ -2,11 +2,9 @@
 import 'pages/projects/create_project_form.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 
 import app from 'state';
 import QuillEditor from 'views/components/quill_editor';
-import Dropzone from 'dropzone';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
@@ -14,7 +12,18 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
-import { CommonLogo } from './common_logo';
+import CoverImageUpload from './cover_image_upload';
+import {
+  validateTitle,
+  validateShortDescription,
+  validateDescription,
+  validateToken,
+  validateBeneficiary,
+  validateCreator,
+  validateFundraiseLength,
+  validateCuratorFee,
+  validateThreshold,
+} from './project_helpers';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -24,7 +33,7 @@ type TokenOption = {
   address: string;
 };
 
-interface ICreateProjectForm {
+export interface ICreateProjectForm {
   // Descriptive
   title: string;
   description: any;
@@ -40,154 +49,6 @@ interface ICreateProjectForm {
   fundraiseLength: number;
   deadline: number;
   curatorFee: number;
-}
-
-interface ICoverImageUploadAttrs {
-  form: ICreateProjectForm;
-  uploadStartedCallback?: CallableFunction;
-  uploadCompleteCallback?: CallableFunction;
-}
-
-const validateTitle = (title: string) => {
-  if (!title) return false;
-  if (title.length < 3 || title.length > 64) return false;
-  return true;
-};
-
-const validateShortDescription = (description: string) => {
-  if (!description) return false;
-  if (description.length > 224) return false;
-  return true;
-};
-
-const validateDescription = (description: string) => {
-  if (!description) return false;
-  return true;
-};
-const validateToken = (token: string) => {
-  if (!token) return false;
-  // TODO: Valid address check
-  return true;
-};
-const validateBeneficiary = (beneficiary: string) => {
-  if (!beneficiary) return false;
-  // TODO: Valid address check
-  return true;
-};
-const validateCreator = (creator: string) => {
-  if (!creator) return false;
-  // TODO: Valid address check
-  return true;
-};
-const validateFundraiseLength = (length: number) => {
-  if (!length) return false;
-  if (Number.isNaN(+length)) return false;
-  // TODO: Min fundraiseLength check
-  return true;
-};
-const validateCuratorFee = (fee: number) => {
-  if (!fee) return false;
-  if (Number.isNaN(+fee)) return false;
-  return true;
-};
-const validateThreshold = (threshold: number) => {
-  if (!threshold) return false;
-  if (Number.isNaN(+threshold)) return false;
-  // TODO: Min threshold check
-  return true;
-};
-
-// TODO Graham 6/21/22: Synchronize with new Avatar component
-class CoverImageUpload implements m.ClassComponent<ICoverImageUploadAttrs> {
-  private dropzone?: any;
-  private uploaded: boolean;
-
-  oncreate(vnode: m.VnodeDOM<ICoverImageUploadAttrs>) {
-    $(vnode.dom).on('cleardropzone', () => {
-      this.dropzone.files.map((file) => this.dropzone.removeFile(file));
-    });
-    this.dropzone = new Dropzone(vnode.dom, {
-      // configuration for textarea dropzone
-      clickable: '.CoverImageUpload .attach-button',
-      previewsContainer: '.CoverImageUpload .dropzone-previews',
-      // configuration for direct upload to s3
-      url: '/', // overwritten when we get the target URL back from s3
-      header: '',
-      method: 'put',
-      parallelUploads: 1,
-      uploadMultiple: false,
-      autoProcessQueue: false,
-      maxFiles: 1,
-      maxFilesize: 10, // MB
-      // request a signed upload URL when a file is accepted from the user
-      accept: (file, done) => {
-        // TODO: Change to POST /uploadSignature
-        // TODO: Reuse code as this is used in other places
-        $.post(`${app.serverUrl()}/getUploadSignature`, {
-          name: file.name, // tokyo.png
-          mimetype: file.type, // image/png
-          auth: true,
-          jwt: app.user.jwt,
-        })
-          .then((response) => {
-            if (response.status !== 'Success') {
-              return done(
-                'Failed to get an S3 signed upload URL',
-                response.error
-              );
-            }
-            file.uploadURL = response.result;
-            this.uploaded = true;
-            done();
-            setTimeout(() => this.dropzone.processFile(file));
-          })
-          .catch((err: any) => {
-            done(
-              'Failed to get an S3 signed upload URL',
-              err.responseJSON ? err.responseJSON.error : err.responseText
-            );
-          });
-      },
-      sending: (file, xhr) => {
-        const _send = xhr.send;
-        xhr.send = () => {
-          _send.call(xhr, file);
-        };
-      },
-    });
-    this.dropzone.on('processing', (file) => {
-      console.log(file);
-      this.dropzone.options.url = file.uploadURL;
-      if (vnode.attrs.uploadStartedCallback) {
-        vnode.attrs.uploadStartedCallback();
-      }
-    });
-    this.dropzone.on('complete', (file) => {
-      console.log(file);
-      if (vnode.attrs.uploadCompleteCallback) {
-        vnode.attrs.uploadCompleteCallback(this.dropzone.files);
-      }
-    });
-  }
-
-  view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
-    const logoURL = this.dropzone?.options?.url;
-    debugger;
-    return (
-      <div class="CoverImageUpload">
-        <div
-          class={`dropzone-attach ${this.uploaded ? 'hidden' : ''}`}
-          style={`background-image: url(${logoURL}); background-size: 92px;`}
-        >
-          <div class="attach-button">
-            <CWIcon iconName="plus" iconSize="large" />
-            <CWText type="h5">Upload Cover Image</CWText>
-          </div>
-        </div>
-        <div class={`dropzone-previews ${this.uploaded ? 'hidden' : ''}`}></div>
-      </div>
-    );
-  }
 }
 
 export class InformationSlide

@@ -11,7 +11,6 @@ import { RoleInfo } from 'client/scripts/models';
 import Sublayout from '../../../sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
-import { CommonLogo } from './common_logo';
 
 enum ProjectListingSubpage {
   Explore = 'explore',
@@ -31,7 +30,7 @@ export default class ProjectListing implements m.ClassComponent {
     }
     return (
       <Sublayout
-        title={<CommonLogo />}
+        title="Projects"
         hideSearch={true}
         hideSidebar={true}
         showNewProposalButton={false}

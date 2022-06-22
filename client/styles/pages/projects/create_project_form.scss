@@ -7,56 +7,6 @@
   .form-panel {
     width: 480px;
   }
-  .CoverImageUpload {
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: $neutral-50;
-    border: 2px solid $neutral-200;
-    border-radius: 5px;
-    .dropzone-attach {
-      .attach-button {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        .Text {
-          color: $neutral-400;
-          margin-top: 8px;
-        }
-        .Icon {
-          fill: $neutral-400;
-          margin-bottom: 8px;
-        }
-      }
-    }
-    .dropzone-previews {
-      .dz-preview {
-        .dz-image {
-          height: 100%;
-          width: 100%;
-
-          img {
-            height: 100%;
-            width: 100%;
-          }
-        }
-
-        .dz-details,
-        .dz-progress,
-        .dz-success-mark,
-        .dz-error-mark,
-        .dz-error-message {
-          display: none;
-        }
-      }
-
-      &.hidden {
-        display: none;
-      }
-    }
-  }
   .NavigationButtons.cui-button-group {
     width: 480px;
     margin: 100px 0;

@@ -1,40 +1,36 @@
 /* @jsx m */
+import 'pages/projects/cover_image_upload.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
+import $ from 'jquery';
+import app from 'state';
 import Dropzone from 'dropzone';
 
-import 'components/avatar_upload.scss';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { ICreateProjectForm } from './create_project_form';
 
-import app from 'state';
-import { Account } from 'models';
-import { isUndefined } from 'helpers/typeGuards';
-import { CWIconButton } from './component_kit/cw_icon_button';
-import { getClasses } from './component_kit/helpers';
-import { ComponentType } from './component_kit/types';
-
-type AvatarUploadStyleAttrs = {
-  size: 'small' | 'large';
-};
-
-type AvatarUploadAttrs = {
-  account?: Account<any>;
-  uploadCompleteCallback?: CallableFunction;
+interface ICoverImageUploadAttrs {
+  form: ICreateProjectForm;
   uploadStartedCallback?: CallableFunction;
-} & AvatarUploadStyleAttrs;
+  uploadCompleteCallback?: CallableFunction;
+}
 
-export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
+// TODO Graham 6/21/22: Synchronize with new Avatar component
+export default class CoverImageUpload
+  implements m.ClassComponent<ICoverImageUploadAttrs>
+{
   private dropzone?: any;
   private uploaded: boolean;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.VnodeDOM<ICoverImageUploadAttrs>) {
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
-
     this.dropzone = new Dropzone(vnode.dom, {
-      clickable: '.IconButton',
-      previewsContainer: '.AvatarUpload .dropzone-preview-container',
+      // configuration for textarea dropzone
+      clickable: '.CoverImageUpload .attach-button',
+      previewsContainer: '.CoverImageUpload .dropzone-previews',
       // configuration for direct upload to s3
       url: '/', // overwritten when we get the target URL back from s3
       header: '',
@@ -46,14 +42,15 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
+        // TODO: Change to POST /uploadSignature
+        // TODO: Reuse code as this is used in other places
         $.post(`${app.serverUrl()}/getUploadSignature`, {
-          name: file.name, // imageName.png
+          name: file.name, // tokyo.png
           mimetype: file.type, // image/png
           auth: true,
           jwt: app.user.jwt,
         })
           .then((response) => {
-            console.log(response);
             if (response.status !== 'Success') {
               return done(
                 'Failed to get an S3 signed upload URL',
@@ -79,58 +76,36 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         };
       },
     });
-
     this.dropzone.on('processing', (file) => {
+      console.log(file);
       this.dropzone.options.url = file.uploadURL;
       if (vnode.attrs.uploadStartedCallback) {
         vnode.attrs.uploadStartedCallback();
       }
     });
-
-    this.dropzone.on('complete', () => {
+    this.dropzone.on('complete', (file) => {
+      console.log(file);
       if (vnode.attrs.uploadCompleteCallback) {
         vnode.attrs.uploadCompleteCallback(this.dropzone.files);
       }
     });
   }
 
-  view(vnode) {
-    const { account, size = 'small' } = vnode.attrs;
-
-    const avatarSize = size === 'small' ? 60 : 108;
-    const logoURL = this.dropzone?.options?.url || app.chain?.meta.iconUrl;
-    console.log({ logoURL });
+  view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
+    const logoURL = this.dropzone?.options?.url;
+    console.log(this.dropzone);
     return (
-      <div
-        class={getClasses<AvatarUploadStyleAttrs>(
-          { size },
-          ComponentType.AvatarUpload
-        )}
-      >
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="plusCircle"
-          iconSize={size === 'small' ? 'small' : 'medium'}
-        />
-        {!this.uploaded && (
-          <div
-            class={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: isUndefined(account) },
-              'dropzone-attach'
-            )}
-          >
-            {account?.profile?.avatarUrl
-              ? account?.profile?.getAvatar(avatarSize)
-              : null}
-          </div>
-        )}
+      <div class="CoverImageUpload">
         <div
-          class={getClasses<{ hidden: boolean }>(
-            { hidden: !this.uploaded },
-            'dropzone-preview-container'
-          )}
-          style={`background-image: url(${logoURL}); background-size: ${avatarSize}px;`}
-        />
+          class={`dropzone-attach ${this.uploaded ? 'hidden' : ''}`}
+          style={`background-image: url(${logoURL}); background-size: 92px;`}
+        >
+          <div class="attach-button">
+            <CWIcon iconName="plus" iconSize="large" />
+            <CWText type="h5">Upload Cover Image</CWText>
+          </div>
+        </div>
+        <div class={`dropzone-previews`}></div>
       </div>
     );
   }
