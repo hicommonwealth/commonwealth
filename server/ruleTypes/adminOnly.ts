@@ -17,7 +17,7 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
     address: string,
     chain: string,
     models: DB,
-    transaction: Transaction,
+    transaction?: Transaction,
   ): Promise<boolean> {
     const role = await models.Role.findOne({
       where: {
