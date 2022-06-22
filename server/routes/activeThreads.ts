@@ -20,7 +20,7 @@ const activeThreads = async (
     || Number.isNaN(threads_per_topic)
     || threads_per_topic < MIN_THREADS_PER_TOPIC
     || threads_per_topic > MAX_THREADS_PER_TOPIC) {
-    threads_per_topic = 3;
+    threads_per_topic = 5;
   }
 
   const allThreads = [];
