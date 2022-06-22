@@ -18,3 +18,6 @@ export const getClasses = <T>(
 
   return type.concat(classes).join(' ');
 };
+
+export const isWindowExtraSmall =
+  window.innerWidth < breakpoints.breakpointSmall;

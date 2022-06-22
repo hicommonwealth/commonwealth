@@ -1,10 +1,23 @@
-$breakpoint-large: 1440px;
-$breakpoint-medium: 1240px;
-$breakpoint-medium-small: 905px;
-$breakpoint-small: 600px;
+// for js comparison
+$breakpoint-large: 1440;
+$breakpoint-medium: 1240;
+$breakpoint-medium-small: 905;
+$breakpoint-small: 600;
+
+// for scss media queries
+$breakpoint-large-px: $breakpoint-large * 1px;
+$breakpoint-medium-px: $breakpoint-medium * 1px;
+$breakpoint-medium-small-px: $breakpoint-medium-small * 1px;
+$breakpoint-small-px: $breakpoint-small * 1px;
+
+// for both
 $breakpoint-extra-small: 0;
 
 :export {
+  breakpointLargePx: $breakpoint-large-px;
+  breakpointMediumPx: $breakpoint-medium-px;
+  breakpointMediumSmallPx: $breakpoint-medium-small-px;
+  breakpointSmallPx: $breakpoint-small-px;
   breakpointLarge: $breakpoint-large;
   breakpointMedium: $breakpoint-medium;
   breakpointMediumSmall: $breakpoint-medium-small;
