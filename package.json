@@ -39,7 +39,8 @@
     "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --exclude-table-data=\"public.\\\"OldNotifications\\\"\" --no-privileges --no-owner -f latest.dump",
     "reset-db": "sh -c \"npx sequelize db:drop && npx sequelize db:create\"",
     "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump",
-    "migrate-db": "npx sequelize db:migrate"
+    "migrate-db": "npx sequelize db:migrate",
+    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump"
   },
   "engines": {
     "node": "14.x"
