@@ -95,7 +95,7 @@ export default async (
   if (req.body.unread_only) whereAndOptions.push({ is_read: false });
 
   // TODO: write raw query so that all subscriptions are included
-  const notificationsRead = await models.NotificationsRead.findAll({
+  const notificationsReadPromise = models.NotificationsRead.findAll({
     include: [
       {
         model: models.Subscription,
@@ -117,6 +117,16 @@ export default async (
     limit: MAX_NOTIF,
     raw: true, nest: true, logging: true
   });
+
+
+
+  const subscriptionsPromise = models.Subscription.findAll({
+    where: {
+      subscriber_id: req.user.id
+    }
+  });
+
+  const [notificationsRead, allSubscriptions] = await Promise.all([notificationsReadPromise, subscriptionsPromise]);
 
   performance.mark('C');
 
@@ -163,8 +173,17 @@ export default async (
     })
   }
 
+  for (const sub of allSubscriptions) {
+    if (!subscriptionsObj[sub.id]) {
+      const subObj = sub.toJSON();
+      subObj['NotificationsReads'] = [];
+      subscriptionsObj[sub.id] = subObj
+    }
+  }
+
   const subscriptions = []
   for (const sub_id in subscriptionsObj) subscriptions.push(subscriptionsObj[sub_id]);
+
 
   return res.json({ status: 'Success', result: {subscriptions, numNotifications: numNr, numUnread} });
 };

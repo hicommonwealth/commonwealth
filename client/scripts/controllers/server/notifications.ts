@@ -314,8 +314,11 @@ class NotificationsController {
     const ceSubs = [];
 
     for (const subscriptionJSON of subscriptions) {
+      // save the subscription
       const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
       this._subscriptions.push(subscription);
+
+      // save the chainEventType for the subscription if the subscription type is chain-event
       let chainEventType = null;
       if (subscriptionJSON.ChainEventType) {
         chainEventType = ChainEventType.fromJSON(
@@ -323,6 +326,7 @@ class NotificationsController {
         );
       }
 
+      // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
           is_read: notificationsReadJSON.is_read,
