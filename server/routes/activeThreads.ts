@@ -50,21 +50,21 @@ const activeThreads = async (
 
       // In absence of X threads with recent activity (comments),
       // commentless threads are fetched and included as active
-      if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
-        const commentlessTopicThreads = await models.OffchainThread.findAll({
-          where: {
-            topic_id: topic.id,
-            last_commented_on: {
-              [Op.is]: null,
-            }
-          },
-          include: threadInclude,
-          limit: threads_per_topic - (recentTopicThreads || []).length,
-          order: [['created_at', 'DESC']]
-        });
+      // if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
+      //   const commentlessTopicThreads = await models.OffchainThread.findAll({
+      //     where: {
+      //       topic_id: topic.id,
+      //       last_commented_on: {
+      //         [Op.is]: null,
+      //       }
+      //     },
+      //     include: threadInclude,
+      //     limit: threads_per_topic - (recentTopicThreads || []).length,
+      //     order: [['created_at', 'DESC']]
+      //   });
 
-        recentTopicThreads.push(...(commentlessTopicThreads || []));
-      }
+      //   recentTopicThreads.push(...(commentlessTopicThreads || []));
+      // }
 
       allThreads.push(...(recentTopicThreads || []));
     })).catch((err) => {

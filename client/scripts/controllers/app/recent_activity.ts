@@ -73,7 +73,7 @@ class RecentActivityController {
   public async getRecentTopicActivity(): Promise<OffchainThread[]> {
     const params = {
       chain: app.activeChainId(),
-      threads_per_topic: 3,
+      threads_per_topic: 5,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
