@@ -45,7 +45,7 @@ const activeThreads = async (
         },
         include: threadInclude,
         limit: threads_per_topic,
-        order: [['last_commented_on', 'DESC'],['created_at', 'DESC']]
+        order: [['created_at', 'DESC'], ['last_commented_on', 'DESC']]
       });
 
       // In absence of X threads with recent activity (comments),
