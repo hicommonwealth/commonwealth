@@ -176,7 +176,7 @@
     "mithril-infinite": "^1.3.0",
     "mixpanel": "^0.14.0",
     "mixpanel-browser": "^2.45.0",
-    "moment": "^2.23.0",
+    "moment": "^2.29.2",
     "moment-locales-webpack-plugin": "^1.1.0",
     "morgan": "^1.9.1",
     "near-api-js": "^0.42.0",
