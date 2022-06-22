@@ -1,5 +1,5 @@
 @mixin large {
-  @media only screen and (min-width: 1440px) {
+  @media only screen and (min-width: $breakpoint-large) {
     @content;
   }
 }
@@ -11,7 +11,7 @@
 }
 
 @mixin medium {
-  @media only screen and (min-width: 1240px) and (max-width: 1439px) {
+  @media only screen and (min-width: $breakpoint-medium) and (max-width: 1439px) {
     @content;
   }
 }
@@ -23,7 +23,7 @@
 }
 
 @mixin mediumSmall {
-  @media only screen and (min-width: 905px) and (max-width: 1239px) {
+  @media only screen and (min-width: $breakpoint-medium-small) and (max-width: 1239px) {
     @content;
   }
 }
@@ -35,13 +35,13 @@
 }
 
 @mixin small {
-  @media only screen and (min-width: 600px) and (max-width: 904px) {
+  @media only screen and (min-width: $breakpoint-small) and (max-width: 904px) {
     @content;
   }
 }
 
 @mixin extraSmall {
-  @media only screen and (min-width: 0) and (max-width: 600px) {
+  @media only screen and (min-width: $breakpoint-extra-small) and (max-width: 599px) {
     @content;
   }
 }
