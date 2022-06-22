@@ -3,12 +3,12 @@ import m from 'mithril';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
-import FooterLandingPage from '../landing/landing_page_footer';
 import LandingPageButton from '../landing/landing_page_button';
+import { Footer } from '../../footer';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {
-    return m('div', [
+    return m('.WhyCommonWealth', [
       m(
         'div',
         { class: 'absolute w-screen z-20' },
@@ -27,14 +27,16 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         m('div.WhyCommonWealthInitialSection', { class: 'container mx-auto' }, [
           m(
             'h2',
-            { class: 'mt-24 text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center leading-tight pl-6 pr-6' },
+            {
+              class:
+                'mt-24 text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center leading-tight pl-6 pr-6',
+            },
             ' Crypto-native communities deserve crypto-native software. '
           ),
           m(
             'p',
             {
-              class:
-                'text-xl text-gray-600 mb-12 mt-4 text-center',
+              class: 'text-xl text-gray-600 mb-12 mt-4 text-center',
             },
             ' Combine multiple tools in one. '
           ),
@@ -43,7 +45,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              m(LandingPageButton, { href: '', text: 'See docs' })
+              m(LandingPageButton, {
+                href: 'https://docs.commonwealth.im/commonwealth/',
+                text: 'See docs',
+              })
             )
           ),
         ])
@@ -93,7 +98,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
         ),
         m(
           'h2',
-          { class: 'text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center -mt-10 sm:-mt-20"' },
+          {
+            class:
+              'text-4xl sm:text-5xl text-left font-bold mb-2 md:text-center -mt-10 sm:-mt-20"',
+          },
           'Integrate your existing community tools. '
         ),
         m(
@@ -121,7 +129,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           { class: 'container mx-auto p-10 ' },
           m(
             'div',
-            { class: 'grid grid-cols-1 lg:grid-cols-2  gap-10 mb-64 mt-10 sm:mt-40' },
+            {
+              class:
+                'grid grid-cols-1 lg:grid-cols-2  gap-10 mb-64 mt-10 sm:mt-40',
+            },
             [
               m('div', { class: 'mt-10' }, [
                 m(
@@ -194,7 +205,11 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
               { class: 'flex justify-left' },
               m(
                 'div',
-                m('img', { class: 'mt-40 md:mt-1', src: 'static/img/commonWealthFork.svg', alt: '' })
+                m('img', {
+                  class: 'mt-40 md:mt-1',
+                  src: 'static/img/commonWealthFork.svg',
+                  alt: '',
+                })
               )
             ),
             m('div', { class: 'mt-10 lg:-ml-20 ' }, [
@@ -237,15 +252,21 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           })
         ),
       ]),
-      m(FooterLandingPage, {
+      m(Footer, {
         list: [
           { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-          { text: 'Jobs', externalLink: 'https://angel.co/company/commonwealth-labs/jobs' },
-          { text:  'Terms', redirectTo:  '/terms' },
-          { text:  'Privacy', redirectTo: '/privacy' },
-          { text: 'Discord', externalLink: 'https://discord.gg/frnQxxZG5S' },
+          {
+            text: 'Jobs',
+            externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
+          },
+          { text: 'Terms', redirectTo: '/terms' },
+          { text: 'Privacy', redirectTo: '/privacy' },
+          { text: 'Discord', externalLink: 'https://discord.gg/vYcfQ758' },
           { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
-          { text: 'Twitter', externalLink: 'https://twitter.com/hicommonwealth' }
+          {
+            text: 'Twitter',
+            externalLink: 'https://twitter.com/hicommonwealth',
+          },
           // { text:  'Use Cases' },
           // { text:  'Crowdfunding' },
           // { text:  'Developers' },

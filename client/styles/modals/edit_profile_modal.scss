@@ -1,48 +1,49 @@
 @import 'client/styles/shared';
 
 .EditProfileModal {
-    width: 620px;
-    @include sm-max {
-        width: initial;
+  width: 620px;
+  @include small {
+    width: initial;
+  }
+  .form {
+    .avatar {
+      .AvatarUpload {
+        width: 92px;
+        height: 92px;
+      }
     }
-    .form {
-        .avatar {
-            .AvatarUpload {
-                width: 92px;
-                height: 92px;
-            }
-        }
-        display: flex;
-        flex-direction: column;
-        padding: 26px;
-        .text-input-wrapper {
-            margin: 6px 0 4px 0;
-            label.cui-form-label {
-                display: block;
-                margin-top: 8px;
-                color: $text-color-black;
-            }
-            input, textarea {
-                margin: 8px 0;
-            }
-            textarea {
-                height: 96px !important;
-                padding-top: 15px;
-            }
-        }
+    display: flex;
+    flex-direction: column;
+    padding: 26px;
+    .text-input-wrapper {
+      margin: 6px 0 4px 0;
+      label.cui-form-label {
+        display: block;
+        margin-top: 8px;
+        color: $neutral-800;
+      }
+      input,
+      textarea {
+        margin: 8px 0;
+      }
+      textarea {
+        height: 96px !important;
+        padding-top: 15px;
+      }
     }
-    .form-bottom {
-        .buttons {
-            margin-top: 12px;
-            display: flex;
-            justify-content: left;
-        }
-        .cui-button {
-            margin-right: 12px;
-        }
+  }
+  .form-bottom {
+    .buttons {
+      margin-top: 12px;
+      display: flex;
+      justify-content: left;
     }
-    .error-message {
-        margin-top: 12px;
-        color: $negative-bg-color;
+    .cui-button {
+      margin-right: 12px;
     }
+  }
+  .error-message {
+    margin-top: 12px;
+    color: $rorange-500;
+  }
 }

@@ -11,6 +11,7 @@ import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from '.
 export interface WebhookContent {
   notificationCategory: string;
   chain?: string;
+  body?: string;
   community?: string;
   author_chain?: string;
   title: string;
@@ -18,6 +19,7 @@ export interface WebhookContent {
   url?: string;
   user: any;
   chainEvent?: any;
+  chainEventType?: any;
 }
 
 const REGEX_IMAGE = /\b(https?:\/\/\S*?\.(?:png|jpe?g|gif)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b/;
@@ -93,9 +95,7 @@ const send = async (models, content: WebhookContent) => {
   }
 
   // if a community is passed with the content, we know that it is from an offchain community
-  const chainOrCommObj = (content.community) ? { offchain_community_id: content.community }
-    : (content.chain) ? { chain_id: content.chain }
-      : null;
+  const chainOrCommObj = (content.chain) ? { chain_id: content.chain } : null;
   const notificationCategory = (content.chainEvent)
     ? content.chainEvent.chain_event_type_id : content.notificationCategory;
   // grab all webhooks for specific community
@@ -155,16 +155,6 @@ const send = async (models, content: WebhookContent) => {
         // can't handle the prefix of `previeImageUrl` with SERVER_URL
         // because social platforms can't access to localhost:8080.
         previewAltText = chain.name;
-      }
-    } else if (content.community) {
-      // if the community has a logo, show it as preview image
-      const offchainCommunity = await models.OffchainCommunity.findOne({ where: { id: content.community, privacy_enabled: false } });
-      if (offchainCommunity) {
-        if (offchainCommunity.icon_url) {
-          previewImageUrl = (offchainCommunity.icon_url.match(`^(http|https)://`)) ? offchainCommunity.icon_url :
-            `https://commonwealth.im${offchainCommunity.icon_url}`;
-        }
-        previewAltText = offchainCommunity.name;
       }
     }
   }
@@ -267,11 +257,11 @@ const send = async (models, content: WebhookContent) => {
         // };
       } else if ((url.indexOf('telegram') !== -1) && process.env.TELEGRAM_BOT_TOKEN) {
         let getChatUsername = url.split('/@');
-        getChatUsername = '@' + getChatUsername[1];
+        getChatUsername = `@${  getChatUsername[1]}`;
 
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
-        let getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
-        url = getUpdatesUrl + '/sendMessage';
+        const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+        url = `${getUpdatesUrl  }/sendMessage`;
 
         webhookData = isChainEvent ? {
           chat_id: getChatUsername,

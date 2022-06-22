@@ -1,289 +1,173 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SearchPage {
-    padding-bottom: 40px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 904px;
 
-    .sublayout-main-col {
-        padding: 0 5%;
-    }
-    .sublayout-sidebar-col {
-        max-width: 0px;
-        padding-right: 0;
+  @include small {
+    width: 100%;
+  }
+
+  .search-page-input {
+    margin-top: 30px;
+  }
+
+  .search-error {
+    margin: 21px 0 8px;
+  }
+
+  .cui-tabs {
+    @include gradientTabs();
+  }
+
+  .search-results-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .search-results {
+      display: flex;
+      flex-direction: column;
     }
 
-    .search-page-input {
-        margin-top: 30px;
-    }
-    .search-error {
-        margin: 21px 0 8px;
-    }
-    .cui-tabs {
-        @include gradientTabs();
-    }
-    .search-results-wrapper {
-        .search-results-caption {
-            margin: 20px 0;
-            text-align: center;
-            color: $text-color-light;
-            .search-results-clear {
-                margin-left: 10px;
-            }
-        }
-        .search-all-communities {
-            &:hover {
-                text-decoration: none;
-            }
-        }
-        .search-results-list {
-            padding: 10px 20px;
-            .cui-list {
-                max-height: none !important;
-            }
-            .cui-list-item {
-                border-top: none;
-                border-bottom: none;
-                min-height: 100px;
-                padding: 5px 0;
-                &:hover {
-                    background-color: $background-color-white-hover;
-                }
-                .cui-list-item-content-left {
-                    height: 100px;
-                    width: 50px;
-                    min-width: 50px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-right: 4px;
-                }
-                .search-results-item {
-                    display: block;
-                    padding: 20px;
-                    color: $text-color-black;
-                    text-decoration: none;
-                    width: 100%;
-                    overflow: hidden;
-                    /* Member results */
-                    .user-block-name {
-                        opacity: 1;
-                        font-weight: 500;
-                        margin-bottom: 2px;
-                    }
-                    .user-block-address {
-                        font-size: 18px;
-                        margin-top: 2px;
-                        opacity: 1;
-                        color: $text-color-light;
-                        mark {
-                            background: $background-color-light;
-                            border-radius: 5px;
-                            color: black !important;
-                        }
-                    }
-                    /* Thread results */
-                    .search-results-thread-title {
-                        font-weight: 500;
-                    }
-                    .search-results-thread-subtitle {
-                        margin: 2px 0 3px;
-                        .created-at {
-                            font-weight: 400;
-                            color: $text-color-light;
-                        }
-                        .User {
-                            margin-left: 14px;
-                            font-weight: 400;
-                            color: $text-color-light;
-                        }
-                    }
-                    .search-results-thread-body {
-                        color: $text-color-light;
-                    }
-                    .search-results-comment {
-                        color: $text-color-light;
-                    }
-                    .search-results-thread-body,
-                    .search-results-comment {
-                        mark {
-                            background: $background-color-light;
-                            padding: 5px 2px 0;
-                            margin: 0 3px;
-                            border-radius: 5px;
-                        }
-                    }
-                    .TokenLabel {
-                        display: flex;
-                        justify-content: left;
-                        align-items: center;
-                        .token-label-left {
-                            padding-right: 12px;
-                        }
-                        .token-label-right {
-                            font-weight: 500;
-                            line-height: 1.25;
-                        }
-                    }
-                }
-                .search-results-item:hover {
-                    cursor: pointer;
-                }
-            }
-        }
-    }
-}
+    .search-results-caption {
+      margin: 20px 0;
+      text-align: center;
+      color: $neutral-500;
 
-.SearchBar {
-    margin: -1px 4%;
-    padding: 0 1px;
-    flex: 6;
-    position: relative;
-    .cui-input {
-        display: flex;
-        align-items: center;
-        height: 100%;
-        border-radius: 25px;
-        font-size: 14px;
-        color: black;
-        border: 1px solid $border-color-lightest;
-        svg.SearchIcon {
-            z-index: 2;
-            position: relative;
-            left: 30px;
-            margin-left: -15px;
-            fill: url(#paint0_linear);
-        }
-        .chain-icon, .community-icon, .cui-icon-x {
-            z-index: 2;
-            right: 30px;
-            margin-right: -15px;
-            border-radius: 50%;
-        }
-        .chain-icon, .community-icon {
-            position: relative;
-        }
-        .ChainIcon, .CommunityIcon {
-            position: absolute;
-            right: -14px;
-            width: 18px;
-        }
-        &:focus-within {
-            background: linear-gradient(to bottom, #91ACE1, #DDBFE1) !important;
-            border: none;
-            padding: 0 1px;
-        }
-        &:hover {
-            background: linear-gradient(to bottom, #CDDEFE, #E7D8E9);
-        }
-        input {
-            height: 31px;
-            padding: 20px 15px 15px;
-            padding-right: 38px;
-            position: relative;
-            background: #EFEFEF;
-            border: none;
-            outline: 0;
-        }
+      .search-results-clear {
+        margin-left: 10px;
+      }
     }
-    .search-results-list, .cui-list {
-        position: absolute;
-        z-index: 11;
-        top: 40px;
-        left: 4%;
-        border-radius: 0 0 8px 8px;
-        box-shadow: 0px 10px 10px rgba(0, 0, 0,  .15);
-        width: 92%;
-        padding: 20px 0;
-        overflow-y: visible;
+    .search-all-communities {
+      &:hover {
+        text-decoration: none;
+      }
+    }
+    .search-results-filters {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: center;
+
+      h4 {
+        margin-right: 10px;
+      }
+
+      .cui-select > select {
+        padding-left: 5px;
+        padding-right: 30px;
+      }
+    }
+    .search-results-list {
+      padding: 10px 20px;
+
+      .cui-list {
         max-height: none !important;
-        &.search-results-loading {
-            display: flex;
-            justify-content: center;
+      }
+
+      .cui-list-item {
+        border-top: none;
+        border-bottom: none;
+        min-height: 100px;
+        padding: 5px 5px 5px 10px;
+
+        &:hover {
+          background-color: $primary-400;
         }
-        .cui-list-item {
-            border-bottom: none;
-            padding: 5px 20px !important;
-            &:focus {
-                outline: #CFCBFF auto 2px;
-            }
-            .search-results-item {
-                color: $text-color-black;
-                text-decoration: none;
-                padding: 12px 0 6px;
-                font-size: 18px;
-                overflow: hidden;
-                line-height: 1.2;
-                .TokenLabel {
-                    display: flex;
-                    justify-content: left;
-                    align-items: center;
-                    .token-label-left {
-                        padding-right: 12px;
-                    }
-                    .token-label-right {
-                        font-weight: 500;
-                    }
-                }
-                .search-results-thread-title {
-                    font-weight: 500;
-                    margin-bottom: 4px;
-                }
-                .search-results-thread-subtitle {
-                    margin-bottom: 2px;
-                    .User {
-                        margin-left: 5px;
-                    }
-                }
-                mark {
-                    background-color: #CFCBFF;
-                }
-            }
-            &.disabled, &.no-results {
-                font-weight: 500;
-                font-size: 14px;
-                letter-spacing: 0.3px;
-                margin-bottom: 3px;
-                line-height: 14px;
-                text-transform: uppercase;
-                color: #AAAAAA;
-                margin-top: 18px;
-                top: 2px;
-                &:first-child {
-                    margin-top: 0px;
-                }
-                &:hover {
-                    background: white;
-                }
-            }
-            &.disabled {
-                margin-top: 5px;
-                &:hover {
-                    cursor: default;
-                }
-            }
-            &.no-results {
-                display: flex;
-                justify-content: space-between;
-                b {
-                    width: 50%;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                    white-space: nowrap;
-                }
-                span {
-                    width: 50%;
-                    color: $primary-bg-color;
-                    text-align: right;
-                }
-            }
+
+        .cui-list-item-content-left {
+          height: 100px;
+          width: 50px;
+          min-width: 50px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 4px;
         }
-        .UserBlock {
-            .user-block-left {
-                display: flex;
-                align-items: center;
+
+        .search-results-item {
+          padding: 20px;
+          color: $neutral-800;
+          text-decoration: none;
+          width: 100%;
+          overflow: hidden;
+
+          /* Member results */
+          .user-block-name {
+            opacity: 1;
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+
+          .user-block-address {
+            font-size: 18px;
+            margin-top: 2px;
+            opacity: 1;
+            color: $neutral-500;
+
+            mark {
+              background: $primary-300;
+              border-radius: 5px;
+              color: $black !important;
             }
-            .user-block-right {
-                display: none;
+          }
+
+          .search-results-thread-header {
+            color: $neutral-500;
+            text-transform: uppercase;
+            font-size: 13px;
+            margin-bottom: 2px;
+          }
+
+          /* Thread results */
+          .search-results-thread-title {
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .search-results-thread-subtitle {
+            margin: 2px 0 3px;
+
+            .created-at {
+              font-weight: 400;
+              color: $neutral-500;
             }
+
+            .User {
+              margin-left: 14px;
+              font-weight: 400;
+              color: $neutral-500;
+            }
+          }
+
+          .search-results-thread-body {
+            color: $neutral-500;
+          }
+
+          .search-results-comment {
+            color: $neutral-500;
+          }
+
+          .search-results-thread-body,
+          .search-results-comment {
+            mark {
+              background: $primary-300;
+              padding: 5px 2px 0;
+              margin: 0 3px;
+              border-radius: 5px;
+            }
+          }
         }
+
+        .search-results-item:hover {
+          cursor: pointer;
+        }
+      }
     }
+  }
 }

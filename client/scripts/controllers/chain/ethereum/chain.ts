@@ -7,7 +7,8 @@ import {
   NodeInfo,
   ITXModalData,
   ITXData,
-  IChainModule
+  IChainModule,
+  ChainInfo
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
@@ -70,25 +71,39 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
 
     this.app.chain.networkStatus = ApiStatus.Connected;
-    this._api.eth.getBlock('latest').then((headers) => {
-      if (this.app.chain) {
-        this.app.chain.block.height = headers.number;
-        this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
-        m.redraw();
+    console.log('getting block #');
+    const blockNumber = await this._api.eth.getBlockNumber();
+    console.log(blockNumber);
+    const headers = await this._api.eth.getBlock(`${blockNumber}`);
+    if (this.app.chain && this.app.chain.meta.node.ethChainId !== 1) {
+      this.app.chain.block.height = headers.number;
+      this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
+
+      // compute the average block time
+      // TODO: cache the average blocktime on server rather than computing it here every time
+      const nHeadersForBlocktime = 5;
+      let totalDuration = 0;
+      let lastBlockTime = +headers.timestamp;
+      for (let n = 0; n < nHeadersForBlocktime; n++) {
+        const prevBlockNumber = blockNumber - 1 - n;
+        if (prevBlockNumber > 0) {
+          const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
+          const duration = lastBlockTime -+prevHeader.timestamp;
+          lastBlockTime = +prevHeader.timestamp;
+          totalDuration += duration;
+        } else {
+          break;
+        }
       }
-    });
-    this._api.eth.subscribe('newBlockHeaders', (err, headers) => {
-      if (this.app.chain) {
-        this.app.chain.block.height = headers.number;
-        this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
-        m.redraw();
-      }
-    });
+      this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
+      console.log(`Computed block duration: ${this.app.chain.block.duration}`);
+      m.redraw();
+    }
     return this._api;
   }
 
-  public async resetApi(selectedNode: NodeInfo) {
-    await this.initApi(selectedNode);
+  public async resetApi(selectedChain: ChainInfo) {
+    await this.initApi(selectedChain.node);
     return this._api;
   }
 

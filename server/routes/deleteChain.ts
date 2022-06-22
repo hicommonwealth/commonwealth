@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { QueryTypes } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -10,6 +11,7 @@ export const Errors = {
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
   CannotDeleteChain: 'Cannot delete a chain with registered addresses',
+  NotAcceptableAdmin: 'Not an Acceptable Admin'
 };
 
 const deleteChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -22,27 +24,127 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   if (!req.body.id) {
     return next(new Error(Errors.NeedChainId));
   }
-
-  const chain = await models.Chain.findOne({ where: {
-    id: req.body.id,
-  } });
-  if (!chain) {
-    return next(new Error(Errors.NoChain));
+  if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
+    return next(new Error(Errors.NotAcceptableAdmin));
   }
 
-  // make sure no addresses are associated
-  const hasAddresses = await chain.getAddresses();
-  if (hasAddresses && hasAddresses.length) {
-    return next(new Error(Errors.CannotDeleteChain));
-  }
+  await models.sequelize.transaction(async (t) => {
+    const chain = await models.Chain.findOne({
+      where: {
+        id: req.body.id,
+      }
+    });
+    if (!chain) {
+      return next(new Error(Errors.NoChain));
+    }
 
-  const chainTopics = await chain.getTopics();
-  chain.removeTopics(chainTopics);
+    await models.sequelize.query(`DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
 
-  // delete all nodes first
-  const nodes = await chain.getChainNodes();
-  await Promise.all(nodes.map((n) => n.destroy()));
-  await chain.destroy();
+    await models.sequelize.query(
+      `UPDATE "Users" SET "selected_chain_id" = NULL WHERE "selected_chain_id" = '${chain.id}';`, {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      });
+
+    await models.sequelize.query(`DELETE FROM "OffchainReactions" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainComments" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainTopics" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Roles" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "InviteCodes" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Subscriptions" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Webhooks" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Collaborations"
+        USING "Collaborations" AS c
+        LEFT JOIN "OffchainThreads" t ON offchain_thread_id = t.id
+        WHERE t.chain = '${chain.id}'
+        AND c.offchain_thread_id  = "Collaborations".offchain_thread_id 
+        AND c.address_id = "Collaborations".address_id;`, {
+      raw: true,
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "LinkedThreads"
+        USING "LinkedThreads" AS l
+        LEFT JOIN "OffchainThreads" t ON linked_thread = t.id
+        WHERE t.chain = '${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainThreads" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "StarredCommunities" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
+        USING "OffchainProfiles" AS profilesBeingUsedAsReferences
+        LEFT JOIN "Addresses" a ON profilesBeingUsedAsReferences.address_id = a.id
+        WHERE a.chain = '${chain.id}'
+        AND profilesGettingDeleted.address_id  = profilesBeingUsedAsReferences.address_id;`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "ChainEventTypes" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    // notifications + notifications_read (cascade)
+    await models.sequelize.query(`DELETE FROM "Notifications" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    // TODO: Remove this once we figure out a better way to relate addresses across many chains (token communities)
+    await models.sequelize.query(`DELETE FROM "Addresses" WHERE chain='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "Chains" WHERE id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+  });
+
   return res.json({ status: 'Success', result: 'Deleted chain' });
 };
 

@@ -5,8 +5,8 @@ import {
   MAGIC_DEFAULT_CHAIN
 } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
-import { DynamicTemplate } from '../../shared/types';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { DynamicTemplate, WalletId } from '../../shared/types';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -40,6 +40,11 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
     where: {
       email,
     },
+    include: [{
+      model: models.Address,
+      where: { wallet_id: WalletId.Magic },
+      required: false,
+    }]
   });
 
   // check whether to recommend magic.link registration instead
@@ -48,18 +53,12 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   //
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
-  const [ chain, community, error ] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
-
-  let magicChain;
-  if (chain?.id) {
-    magicChain = chain;
-  } else {
-    const chainId = community?.default_chain || MAGIC_DEFAULT_CHAIN;
-    magicChain = await models.Chain.findOne({ where: { id: chainId } });
-  }
+  const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
+  const [ chain, error ] = await validateChain(models, context);
+  const magicChain = chain;
 
   const isNewRegistration = !previousUser;
-  const isExistingMagicUser = previousUser && !!previousUser.lastMagicLoginAt;
+  const isExistingMagicUser = previousUser && previousUser.Addresses?.length > 0;
   if (isExistingMagicUser // existing magic users should always use magic login, even if they're in the wrong community
       || (isNewRegistration && magicChain?.base && MAGIC_SUPPORTED_BASES.includes(magicChain.base)
           && !req.body.forceEmailLogin)) {
@@ -99,6 +98,7 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
       loginLink,
     },
   };
+
   sgMail.send(msg).then((result) => {
     res.json({ status: 'Success' });
   }).catch((e) => {

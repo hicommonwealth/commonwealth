@@ -1,7 +1,8 @@
 import BN from 'bn.js';
-import { NodeInfo } from 'models';
+import { ChainInfo } from 'models';
 import { ERC20Votes } from 'eth/types';
 import { BigNumber } from 'ethers';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';
@@ -12,15 +13,19 @@ import CompoundAPI, { GovernorTokenType } from './api';
 export default class CompoundChain extends EthereumChain {
   public compoundApi: CompoundAPI;
 
-  public async init(selectedNode: NodeInfo) {
-    await super.resetApi(selectedNode);
+  public coins(n: number, inDollars?: boolean) {
+    return new EthereumCoin(this.app?.chain?.meta.symbol || '???', n, inDollars);
+  }
+
+  public async init(selectedChain: ChainInfo) {
+    await super.resetApi(selectedChain);
     await super.initMetadata();
     this.compoundApi = new CompoundAPI(
       null,
-      selectedNode.address,
+      selectedChain.address,
       this.api.currentProvider as any
     );
-    await this.compoundApi.init(selectedNode.tokenName);
+    await this.compoundApi.init(selectedChain.tokenName);
   }
 
   public deinit() {
@@ -59,7 +64,7 @@ export default class CompoundChain extends EthereumChain {
     try {
       const contract = await attachSigner(
         this.app.wallets,
-        this.app.user.activeAccount.address,
+        this.app.user.activeAccount,
         this.compoundApi.Token
       );
       if (this.compoundApi.isTokenMPond(contract)) {
@@ -100,16 +105,24 @@ export default class CompoundChain extends EthereumChain {
     return !m.isZero();
   }
 
-  public async isDelegate(address: string): Promise<boolean> {
+  public async isDelegate(address: string, block?: number): Promise<boolean> {
     if (!this.compoundApi.Token) {
       console.warn('No token found, cannot fetch vote status');
       return null;
     }
     let voteAmount: BigNumber;
     if (this.compoundApi.tokenType === GovernorTokenType.OzVotes) {
-      voteAmount = await (this.compoundApi.Token as ERC20Votes).getVotes(address);
+      if (block) {
+        voteAmount = await (this.compoundApi.Token as ERC20Votes).getPastVotes(address, block);
+      } else {
+        voteAmount = await (this.compoundApi.Token as ERC20Votes).getVotes(address);
+      }
     } else {
-      voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
+      if (block) {
+        voteAmount = await this.compoundApi.Token.getPriorVotes(address, block);
+      } else {
+        voteAmount = await this.compoundApi.Token.getCurrentVotes(address);
+      }
     }
     return !voteAmount.isZero();
   }

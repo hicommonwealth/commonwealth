@@ -40,7 +40,7 @@ export class Coin extends BN {
 
   constructor(denomination: string,
     n: number | BN,
-    inDollars: boolean = false,
+    inDollars = false,
     dollar: BN = null,) {
     // dollars are not set by default
     if (!dollar) dollar = new BN(1);

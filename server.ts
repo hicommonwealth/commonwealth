@@ -4,9 +4,9 @@ import express from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
-import WebSocket from 'ws';
 import fs from 'fs';
 
+import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
@@ -27,18 +27,18 @@ import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
-import { SESSION_SECRET } from './server/config';
+import BanCache from './server/util/banCheckCache';
+import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
-import { updateEvents, updateBalances } from './server/util/eventPoller';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
+import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
-import { fetchStats } from './server/routes/getEdgewareLockdropStats';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
@@ -51,19 +51,12 @@ async function main() {
 
   // CLI parameters for which task to run
   const SHOULD_SEND_EMAILS = process.env.SEND_EMAILS === 'true';
-  const SHOULD_UPDATE_EVENTS = process.env.UPDATE_EVENTS === 'true';
-  const SHOULD_UPDATE_BALANCES = process.env.UPDATE_BALANCES === 'true';
-  const SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS =
-    process.env.UPDATE_EDGEWARE_LOCKDROP_STATS === 'true';
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
-    SHOULD_UPDATE_EVENTS ||
-    SHOULD_UPDATE_BALANCES ||
-    SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
@@ -99,9 +92,9 @@ async function main() {
       );
       // construct storageFetchers needed for the identity cache
       const fetchers = {};
-      for (const [node, subscriber] of subscribers) {
-        if (node.Chain.base === ChainBase.Substrate) {
-          fetchers[node.chain] = new SubstrateEvents.StorageFetcher(
+      for (const [chain, subscriber] of subscribers) {
+        if (chain.base === ChainBase.Substrate) {
+          fetchers[chain.id] = new SubstrateEvents.StorageFetcher(
             subscriber.api
           );
         }
@@ -126,26 +119,6 @@ async function main() {
     return;
   } else if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (SHOULD_UPDATE_EVENTS) {
-    rc = await updateEvents(app, models);
-  } else if (SHOULD_UPDATE_BALANCES) {
-    try {
-      rc = await updateBalances(app, models);
-    } catch (e) {
-      log.error('Failed updating balances: ', e.message);
-      rc = 1;
-    }
-  } else if (SHOULD_UPDATE_EDGEWARE_LOCKDROP_STATS) {
-    // Run fetchStats here to populate lockdrop stats for Edgeware Lockdrop.
-    // This only needs to run once on prod to make the necessary queries.
-    try {
-      await fetchStats(models, 'mainnet');
-      log.info('Finished adding Lockdrop statistics into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed adding Lockdrop statistics into the DB: ', e.message);
-      rc = 1;
-    }
   } else if (IDENTITY_MIGRATION) {
     log.info('Started migrating chain identities into the DB');
     try {
@@ -187,7 +160,6 @@ async function main() {
           publicPath: '/build',
         })
       : null;
-  const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const closeMiddleware = (): Promise<void> => {
@@ -259,9 +231,17 @@ async function main() {
       }
     }
 
+    // add security middleware
+    app.use(function applyXFrameAndCSP(req, res, next) {
+      res.set('X-Frame-Options', 'DENY');
+      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      next();
+    });
+
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
+  
 
     // add other middlewares
     app.use(logger('dev'));
@@ -272,12 +252,6 @@ async function main() {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
-
-    // store wss into request obj
-    app.use((req: express.Request, res, next) => {
-      req.wss = wss;
-      next();
-    });
   };
 
   const templateFile = (() => {
@@ -302,15 +276,26 @@ async function main() {
   setupPassport(models);
 
   await tokenBalanceCache.start();
+  const banCache = new BanCache(models);
   setupAPI(
     app,
     models,
     viewCountCache,
     <any>identityFetchCache,
-    tokenBalanceCache
+    tokenBalanceCache,
+    banCache,
   );
+  setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
-  setupErrorHandlers(app);
+
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
+  setupErrorHandlers(app, rollbar);
 
   if (CHAIN_EVENTS) {
     const exitCode = await listenChainEvents();
@@ -321,7 +306,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
-  setupServer(app, wss, sessionParser);
+  setupServer(app, rollbar, models);
 }
 
 main();

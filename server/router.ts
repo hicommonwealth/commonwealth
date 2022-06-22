@@ -1,19 +1,15 @@
 import express from 'express';
 import passport from 'passport';
+import type { Express } from 'express';
 
 import domain from './routes/domain';
 import status from './routes/status';
-import createGist from './routes/createGist';
-
-import edgewareLockdropEvents from './routes/edgeware_lockdrop_events';
-import edgewareLockdropBalances from './routes/edgeware_lockdrop_balances';
-
 import createAddress from './routes/createAddress';
 import linkExistingAddressToChain from './routes/linkExistingAddressToChain';
 import verifyAddress from './routes/verifyAddress';
 import deleteAddress from './routes/deleteAddress';
 import getAddressStatus from './routes/getAddressStatus';
-import selectNode from './routes/selectNode';
+import selectChain from './routes/selectChain';
 import startEmailLogin from './routes/startEmailLogin';
 import finishEmailLogin from './routes/finishEmailLogin';
 import finishOAuthLogin from './routes/finishOAuthLogin';
@@ -30,13 +26,11 @@ import bulkReactions from './routes/bulkReactions';
 import reactionsCounts from './routes/reactionsCounts';
 import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
-import createCommunity from './routes/createCommunity';
-import deleteCommunity from './routes/deleteCommunity';
-import updateCommunity from './routes/updateCommunity';
-import communityStats from './routes/communityStats';
 import createChain from './routes/createChain';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
+import updateBanner from './routes/updateBanner';
+import communityStats from './routes/communityStats';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -46,20 +40,19 @@ import disableSubscriptions from './routes/subscription/disableSubscriptions';
 import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
 import viewNotifications from './routes/viewNotifications';
+import viewUserActivity from './routes/viewUserActivity';
+import viewChainActivity from './routes/viewChainActivity';
+import viewGlobalActivity from './routes/viewGlobalActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
 import clearNotifications from './routes/clearNotifications';
 import bulkMembers from './routes/bulkMembers';
 import bulkAddresses from './routes/bulkAddresses';
 import createInvite from './routes/createInvite';
-import getInvites from './routes/getInvites';
 import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
-import createInviteLink from './routes/createInviteLink';
-import acceptInviteLink from './routes/acceptInviteLink';
-import getInviteLinks from './routes/getInviteLinks';
-import deleteGithubAccount from './routes/deleteGithubAccount';
+import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
 
 import createRole from './routes/createRole';
@@ -70,7 +63,8 @@ import getUploadSignature from './routes/getUploadSignature';
 import activeThreads from './routes/activeThreads';
 import createThread from './routes/createThread';
 import editThread from './routes/editThread';
-import updateThreadPolling from './routes/updateThreadPolling';
+import createPoll from './routes/createPoll';
+import getPolls from './routes/getPolls';
 import updateThreadStage from './routes/updateThreadStage';
 import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
@@ -87,14 +81,13 @@ import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
 import getThreads from './routes/getThreads';
-import search from './routes/search';
+import searchDiscussions from './routes/searchDiscussions';
+import searchComments from './routes/searchComments';
 import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
 import getDrafts from './routes/drafts/getDrafts';
-import addChainNode from './routes/addChainNode';
 import deleteChain from './routes/deleteChain';
-import deleteChainNode from './routes/deleteChainNode';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
@@ -102,15 +95,20 @@ import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
 import createTopic from './routes/createTopic';
-import updateTopics from './routes/updateTopics';
+import updateTopic from './routes/updateTopic';
+import orderTopics from './routes/orderTopics';
 import editTopic from './routes/editTopic';
 import deleteTopic from './routes/deleteTopic';
 import bulkTopics from './routes/bulkTopics';
 import bulkOffchain from './routes/bulkOffchain';
 import setTopicThreshold from './routes/setTopicThreshold';
+import getChatMessages from './routes/chat/getChatMessages';
+import createChatChannel from './routes/chat/createChatChannel';
+import deleteChatChannel from './routes/chat/deleteChatChannel';
+import deleteChatCategory from './routes/chat/deleteChatCategory';
+import renameChatChannel from './routes/chat/renameChatChannel';
+import renameChatCategory from './routes/chat/renameChatCategory';
 
-import edgewareLockdropLookup from './routes/getEdgewareLockdropLookup';
-import edgewareLockdropStats from './routes/getEdgewareLockdropStats';
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
@@ -118,24 +116,33 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import TokenBalanceCache from './util/tokenBalanceCache';
+import updateChainCategory from './routes/updateChainCategory';
 
+import startSsoLogin from './routes/startSsoLogin';
+import finishSsoLogin from './routes/finishSsoLogin';
 import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
+import tokenBalance from './routes/tokenBalance';
 import getSupportedEthChains from './routes/getSupportedEthChains';
-import getSubstrateSpec from './routes/getSubstrateSpec';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
 import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
+import ipfsPin from './routes/ipfsPin';
+import setAddressWallet from './routes/setAddressWallet';
+import banAddress from './routes/banAddress';
+import getBannedAddresses from './routes/getBannedAddresses';
+import BanCache from './util/banCheckCache';
 
 function setupRouter(
-  app,
+  app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
+  banCache: BanCache, // TODO: where is this needed?
 ) {
   const router = express.Router();
 
@@ -159,19 +166,17 @@ function setupRouter(
   );
   router.get('/domain', domain.bind(this, models));
   router.get('/status', status.bind(this, models));
-
-  router.get('/getSubstrateSpec', getSubstrateSpec.bind(this, models));
+  router.post(
+    '/ipfsPin',
+    passport.authenticate('jwt', { session: false }),
+    ipfsPin.bind(this, models)
+  );
   router.post(
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),
     editSubstrateSpec.bind(this, models)
   );
 
-  router.post(
-    '/createGist',
-    passport.authenticate('jwt', { session: false }),
-    createGist.bind(this, models)
-  );
   router.post('/createAddress', createAddress.bind(this, models));
   router.post('/verifyAddress', verifyAddress.bind(this, models));
   router.post(
@@ -186,16 +191,16 @@ function setupRouter(
   );
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   router.post(
-    '/selectNode',
+    '/selectChain',
     passport.authenticate('jwt', { session: false }),
-    selectNode.bind(this, models)
+    selectChain.bind(this, models)
   );
 
   // chains
   router.post(
-    '/addChainNode',
+    '/createChain',
     passport.authenticate('jwt', { session: false }),
-    addChainNode.bind(this, models)
+    createChain.bind(this, models)
   );
   router.post(
     '/deleteChain',
@@ -203,70 +208,46 @@ function setupRouter(
     deleteChain.bind(this, models)
   );
   router.post(
-    '/deleteChainNode',
-    passport.authenticate('jwt', { session: false }),
-    deleteChainNode.bind(this, models)
-  );
-  router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
   );
 
-  // offchain communities
   router.post(
     '/starCommunity',
     passport.authenticate('jwt', { session: false }),
     starCommunity.bind(this, models)
   );
 
-  // offchain community admin routes
   router.post(
-    '/createCommunity',
-    passport.authenticate('jwt', { session: false }),
-    createCommunity.bind(this, models)
-  );
-  router.post(
-    '/deleteCommunity',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunity.bind(this, models)
-  );
-  router.post(
-    '/updateCommunity',
-    passport.authenticate('jwt', { session: false }),
-    updateCommunity.bind(this, models)
-  );
-  router.get(
-    '/communityStats',
-    passport.authenticate('jwt', { session: false }),
-    communityStats.bind(this, models)
+    '/tokenBalance',
+    tokenBalance.bind(this, models, tokenBalanceCache)
   );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
-  router.get('/getSupportedEthChains', getSupportedEthChains.bind(this, models));
-  router.post(
-    '/createChain',
-    passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
+  router.get(
+    '/getSupportedEthChains',
+    getSupportedEthChains.bind(this, models)
   );
 
   // offchain threads
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
-    createThread.bind(this, models, tokenBalanceCache)
+    createThread.bind(this, models, tokenBalanceCache, banCache)
   );
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
-    editThread.bind(this, models)
+    editThread.bind(this, models, banCache)
   );
 
   router.post(
-    '/updateThreadPolling',
+    '/createPoll',
     passport.authenticate('jwt', { session: false }),
-    updateThreadPolling.bind(this, models)
+    createPoll.bind(this, models)
   );
+  router.get('/getPolls', getPolls.bind(this, models));
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
@@ -329,12 +310,13 @@ function setupRouter(
   router.post(
     '/deleteThread',
     passport.authenticate('jwt', { session: false }),
-    deleteThread.bind(this, models)
+    deleteThread.bind(this, models, banCache)
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
   router.get('/getThreads', getThreads.bind(this, models));
-  router.get('/search', search.bind(this, models));
+  router.get('/searchDiscussions', searchDiscussions.bind(this, models));
+  router.get('/searchComments', searchComments.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
 
@@ -362,17 +344,17 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
-    createComment.bind(this, models, tokenBalanceCache)
+    createComment.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
-    editComment.bind(this, models)
+    editComment.bind(this, models, banCache)
   );
   router.post(
     '/deleteComment',
     passport.authenticate('jwt', { session: false }),
-    deleteComment.bind(this, models)
+    deleteComment.bind(this, models, banCache)
   );
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
@@ -384,9 +366,14 @@ function setupRouter(
     createTopic.bind(this, models)
   );
   router.post(
-    '/updateTopics',
+    '/updateTopic',
     passport.authenticate('jwt', { session: false }),
-    updateTopics.bind(this, models)
+    updateTopic.bind(this, models)
+  );
+  router.post(
+    '/orderTopics',
+    passport.authenticate('jwt', { session: false }),
+    orderTopics.bind(this, models)
   );
   router.post(
     '/editTopic',
@@ -409,12 +396,12 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
-    createReaction.bind(this, models, tokenBalanceCache)
+    createReaction.bind(this, models, tokenBalanceCache, banCache)
   );
   router.post(
     '/deleteReaction',
     passport.authenticate('jwt', { session: false }),
-    deleteReaction.bind(this, models)
+    deleteReaction.bind(this, models, banCache)
   );
   router.get('/viewReactions', viewReactions.bind(this, models));
   router.get('/bulkReactions', bulkReactions.bind(this, models));
@@ -424,30 +411,12 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // generic invite link
-  router.post(
-    '/createInviteLink',
-    passport.authenticate('jwt', { session: false }),
-    createInviteLink.bind(this, models)
-  );
-  router.get('/acceptInviteLink', acceptInviteLink.bind(this, models));
-  router.get(
-    '/getInviteLinks',
-    passport.authenticate('jwt', { session: false }),
-    getInviteLinks.bind(this, models)
-  );
-
   // roles + permissions
   router.get('/bulkMembers', bulkMembers.bind(this, models));
   router.post(
     '/createInvite',
     passport.authenticate('jwt', { session: false }),
     createInvite.bind(this, models)
-  );
-  router.get(
-    '/getInvites',
-    passport.authenticate('jwt', { session: false }),
-    getInvites.bind(this, models)
   );
   router.post(
     '/acceptInvite',
@@ -470,6 +439,13 @@ function setupRouter(
     '/updateEmail',
     passport.authenticate('jwt', { session: false }),
     updateEmail.bind(this, models)
+  );
+
+  // community banners (update or create)
+  router.post(
+    '/updateBanner',
+    passport.authenticate('jwt', { session: false }),
+    updateBanner.bind(this, models)
   );
 
   // fetch addresses (e.g. for mentions)
@@ -526,7 +502,13 @@ function setupRouter(
   router.delete(
     '/githubAccount',
     passport.authenticate('jwt', { session: false }),
-    deleteGithubAccount.bind(this, models)
+    deleteSocialAccount.bind(this, models, 'github')
+  );
+
+  router.delete(
+    '/discordAccount',
+    passport.authenticate('jwt', { session: false }),
+    deleteSocialAccount.bind(this, models, 'discord')
   );
 
   // offchain viewCount
@@ -571,6 +553,13 @@ function setupRouter(
     viewNotifications.bind(this, models)
   );
   router.post(
+    '/viewUserActivity',
+    passport.authenticate('jwt', { session: false }),
+    viewUserActivity.bind(this, models)
+  );
+  router.post('/viewChainActivity', viewChainActivity.bind(this, models));
+  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
+  router.post(
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
     markNotificationsRead.bind(this, models)
@@ -595,6 +584,55 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     disableImmediateEmails.bind(this, models)
   );
+  router.post(
+    '/setAddressWallet',
+    passport.authenticate('jwt', { session: false }),
+    setAddressWallet.bind(this, models)
+  );
+
+  // chain categories
+  router.post(
+    '/updateChainCategory',
+    passport.authenticate('jwt', { session: false }),
+    updateChainCategory.bind(this, models)
+  );
+
+  // chat
+  router.get(
+    '/getChatMessages',
+    passport.authenticate('jwt', { session: false }),
+    getChatMessages.bind(this, models)
+  );
+
+  router.post(
+    '/createChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    createChatChannel.bind(this, models)
+  );
+
+  router.delete(
+    '/deleteChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    deleteChatChannel.bind(this, models)
+  );
+
+  router.delete(
+    '/deleteChatCategory',
+    passport.authenticate('jwt', { session: false }),
+    deleteChatCategory.bind(this, models)
+  );
+
+  router.put(
+    '/renameChatChannel',
+    passport.authenticate('jwt', { session: false }),
+    renameChatChannel.bind(this, models)
+  );
+
+  router.put(
+    '/renameChatCategory',
+    passport.authenticate('jwt', { session: false }),
+    renameChatCategory.bind(this, models)
+  );
 
   // settings
   router.post(
@@ -606,24 +644,35 @@ function setupRouter(
   // send feedback button
   router.post('/sendFeedback', sendFeedback.bind(this, models));
 
-  // stats
-  // edgeware
-  router.get(
-    '/stats/edgeware/lockdrop/events',
-    edgewareLockdropEvents.bind(this, models)
+  // bans
+  router.post(
+    '/banAddress',
+    passport.authenticate('jwt', { session: false }),
+    banAddress.bind(this, models)
   );
+
   router.get(
-    '/stats/edgeware/lockdrop/balances',
-    edgewareLockdropBalances.bind(this, models)
+    '/getBannedAddresses',
+    passport.authenticate('jwt', { session: false }),
+    getBannedAddresses.bind(this, models)
   );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
 
-  router.get('/auth/github', startOAuthLogin.bind(this, models));
-  router.get('/auth/github/callback', startOAuthLogin.bind(this, models));
+  router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
+  router.get(
+    '/auth/github/callback',
+    startOAuthLogin.bind(this, models, 'github')
+  );
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
+
+  router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
+  router.get(
+    '/auth/discord/callback',
+    startOAuthLogin.bind(this, models, 'discord')
+  );
 
   router.post(
     '/auth/magic',
@@ -633,23 +682,23 @@ function setupRouter(
     }
   );
 
+  router.post('/auth/sso', startSsoLogin.bind(this, models));
+  router.post(
+    '/auth/sso/callback',
+    // passport.authenticate('jwt', { session: false }),
+    finishSsoLogin.bind(this, models)
+  );
+
   // logout
   router.get('/logout', logout.bind(this, models));
-
-  router.get(
-    '/edgewareLockdropLookup',
-    edgewareLockdropLookup.bind(this, models)
-  );
-  router.get(
-    '/edgewareLockdropStats',
-    edgewareLockdropStats.bind(this, models)
-  );
 
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  router.get('/communityStats', communityStats.bind(this, models));
 
   app.use('/api', router);
 }
+
 export default setupRouter;

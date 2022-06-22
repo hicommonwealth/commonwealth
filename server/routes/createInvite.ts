@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from '../../shared/logging';
 import { DynamicTemplate } from '../../shared/types';
@@ -20,7 +20,7 @@ export const Errors = {
 };
 
 const createInvite = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error('Not logged in'));
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
@@ -29,10 +29,6 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
   if (req.body.invitedAddress && req.body.invitedEmail) {
     return next(new Error(Errors.NoEmailAndAddress));
   }
-
-  const chainOrCommObj = chain
-    ? { chain_id: chain.id }
-    : { offchain_community_id: community.id };
 
   // check that invites_enabled === true, or the user is an admin or mod
   const address = await models.Address.findOne({
@@ -43,16 +39,14 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
   });
   if (!address) return next(new Error(Errors.AddressNotFound));
 
-  if (community && !community.invites_enabled) {
-    const requesterIsAdminOrMod = await models.Role.findAll({
-      where: {
-        ...chainOrCommObj,
-        address_id: address.id,
-        permission: ['admin', 'moderator']
-      },
-    });
-    if (requesterIsAdminOrMod.length === 0) return next(new Error(Errors.MustBeAdminOrMod));
-  }
+  const requesterIsAdminOrMod = await models.Role.findAll({
+    where: {
+      chain_id: chain.id,
+      address_id: address.id,
+      permission: ['admin', 'moderator']
+    },
+  });
+  if (requesterIsAdminOrMod.length === 0) return next(new Error(Errors.MustBeAdminOrMod));
 
   const { invitedEmail } = req.body;
   if (req.body.invitedAddress) {
@@ -64,13 +58,13 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     if (!existingAddress) return next(new Error(Errors.AddressNotFound));
     const existingRole = await models.Role.findOne({
       where: {
-        ...chainOrCommObj,
+        chain_id: chain.id,
         address_id: existingAddress.id,
       },
     });
     if (existingRole) return next(new Error(Errors.IsAlreadyMember));
     const role = await models.Role.create({
-      ...chainOrCommObj,
+      chain_id: chain.id,
       address_id: existingAddress.id,
       permission: 'member',
     });
@@ -90,14 +84,12 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     },
   });
 
-  const inviteChainOrCommObj = chain
-    ? { chain_id: chain.id, community_name: chain.name }
-    : { community_id: community.id, community_name: community.name };
+  const inviteChain = { chain_id: chain.id, community_name: chain.name }
 
   const previousInvite = await models.InviteCode.findOne({
     where: {
       invited_email: invitedEmail,
-      ...inviteChainOrCommObj
+      ...inviteChain
     }
   });
 
@@ -107,7 +99,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
     const inviteCode = crypto.randomBytes(24).toString('hex');
     invite = await models.InviteCode.create({
       id: inviteCode,
-      ...inviteChainOrCommObj,
+      ...inviteChain,
       creator_id: req.user.id,
       invited_email: invitedEmail,
       used: false,
@@ -116,20 +108,17 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   // create and email the link
   const joinOrLogIn = user ? 'Log in' : 'Sign up';
-  const communityRoute = chain
-    ? `/${chain.id}`
-    : community.privacy_enabled
-      ? '' : `/${community.id}`;
+  const chainRoute = `/${chain.id}`
   // todo: inviteComm param may only be necesssary if no communityRoute present
-  const params = `?triggerInvite=t&inviteComm=${(community || chain).id}&inviteEmail=${invitedEmail}`;
-  const signupLink = `${SERVER_URL}${communityRoute}${params}`;
+  const params = `?triggerInvite=t&inviteComm=${chain.id}&inviteEmail=${invitedEmail}`;
+  const signupLink = `${SERVER_URL}${chainRoute}${params}`;
 
   const msg = {
     to: invitedEmail,
     from: 'Commonwealth <no-reply@commonwealth.im>',
     templateId: DynamicTemplate.EmailInvite,
     dynamic_template_data: {
-      community_name: inviteChainOrCommObj.community_name,
+      community_name: inviteChain.community_name,
       inviter: address.name,
       joinOrLogIn,
       invite_link: signupLink,

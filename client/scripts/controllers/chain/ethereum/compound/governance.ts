@@ -57,7 +57,7 @@ export default class CompoundGovernance extends ProposalModule<
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, address, this._api.Contract);
+    const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount, this._api.Contract);
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !calldatas || !description)
@@ -133,12 +133,11 @@ export default class CompoundGovernance extends ProposalModule<
       const params = new URLSearchParams(countingMode);
       this._supportsAbstain = params.get('support') === 'bravo';
       this._useAbstainInQuorum = params.get('quorum') !== 'bravo';
-      const blockNumber = this.app.chain.block.height;
+      const blockNumber = await this._api.Provider.getBlockNumber();
       this._quorumVotes = new BN(
         (await (this.api.Contract as GovernorCompatibilityBravo).quorum(blockNumber - 1)
       ).toString());
     }
-
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
@@ -164,7 +163,7 @@ export default class CompoundGovernance extends ProposalModule<
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       subscriber,
       processor
     );

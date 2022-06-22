@@ -4,10 +4,9 @@ import $ from 'jquery';
 import m from 'mithril';
 import Dropzone from 'dropzone';
 
-import { Icon, Icons } from 'construct-ui';
 import User from 'views/components/widgets/user';
 import app from 'state';
-import { ChainIcon, CommunityIcon } from './chain_icon';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 export enum AvatarScope {
   Account = 'account',
@@ -96,10 +95,7 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const logoURL =
-      vnode.state.dropzone?.option?.url ||
-      (app.activeCommunityId()
-        ? app.community.meta.iconUrl
-        : app.chain.meta.chain.iconUrl);
+      vnode.state.dropzone?.option?.url || app.chain?.meta.iconUrl;
     return m('form.AvatarUpload', [
       m(
         '.dropzone-attach',
@@ -111,7 +107,11 @@ const AvatarUpload: m.Component<IAttrs, IState> = {
               ? `background-image: url(${logoURL}); background-size: 92px;`
               : '',
         },
-        [m('div.attach-button', [m(Icon, { name: Icons.PLUS, size: 'xs' })])]
+        [
+          m('div.attach-button', [
+            m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+          ]),
+        ]
       ),
       !vnode.state.uploaded &&
         vnode.attrs.avatarScope === AvatarScope.Account &&

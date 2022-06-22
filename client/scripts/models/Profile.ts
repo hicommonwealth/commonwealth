@@ -8,12 +8,12 @@ class Profile {
   private _avatarUrl: string;
   private _initialized: boolean;
   private _judgements: { [registrar: string]: string } = {};
-  private _isOnchain: boolean = false;
+  private _isOnchain = false;
   private _lastActive: Date;
-  private _isCouncillor: boolean = false;
-  private _isValidator: boolean = false;
-  private _isEmpty: boolean = false;
-  private _isNameInvalid: boolean = false;
+  private _isCouncillor = false;
+  private _isValidator = false;
+  private _isEmpty = false;
+  private _isNameInvalid = false;
   get name() { return this._name; }
   get headline() { return this._headline; }
   get bio() { return this._bio; }
@@ -95,8 +95,7 @@ class Profile {
     } else {
       const html = jdenticon.toSvg(this.address, size);
       return m('svg.Jdenticon', {
-        width: size,
-        height: size,
+        style: `width: ${size}px; height: ${size}px;`,
         'data-address': this.address.toString(),
         oncreate: (vnode) => {
           jdenticon.update(vnode.dom as HTMLElement, this.address);

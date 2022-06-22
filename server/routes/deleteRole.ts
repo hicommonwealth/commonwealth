@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -11,7 +11,7 @@ export const Errors = {
 };
 
 const deleteRole = async (models: DB, req, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
@@ -25,27 +25,19 @@ const deleteRole = async (models: DB, req, res: Response, next: NextFunction) =>
   });
   if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
-  const existingRole = await models.Role.findOne({ where: chain ? {
+  const existingRole = await models.Role.findOne({ where: {
     address_id: req.body.address_id,
     chain_id: chain.id,
-  } : {
-    address_id: req.body.address_id,
-    offchain_community_id: community.id,
   } });
   if (!existingRole) return next(new Error(Errors.RoleDNE));
 
   if (existingRole.permission === 'admin') {
-    const otherExistingAdmin = await models.Role.findOne({ where: chain ? {
+    const otherExistingAdmin = await models.Role.findOne({ where: {
       address_id: req.body.address_id,
       chain_id: chain.id,
       id: { [Sequelize.Op.ne]: existingRole.id },
       permission: ['admin'],
-    } : {
-      address_id: req.body.address_id,
-      offchain_community_id: community.id,
-      id: { [Sequelize.Op.ne]: existingRole.id },
-      permission: ['admin'],
-    } });
+    }});
     if (!otherExistingAdmin) return next(new Error(Errors.OtherAdminDNE));
   }
 

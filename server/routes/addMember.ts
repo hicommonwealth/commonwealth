@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -15,30 +15,27 @@ export const Errors = {
 };
 
 const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
-  if (!community && !chain) return next(new Error(Errors.InvalidCommunity));
+  if (!chain) return next(new Error(Errors.InvalidCommunity));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new Error(Errors.NeedAddress));
-  const chainOrCommunity = chain ? { chain_id: chain.id } : { offchain_community_id: community.id };
 
   // check that either invites_enabled === true, or the user is an admin or mod
-  if ((community && !community.invites_enabled) || chain) {
-    const adminAddress = await models.Address.findOne({
-      where: {
-        address: req.body.address,
-        user_id: req.user.id,
-      },
-    });
-    const requesterIsAdminOrMod = await models.Role.findAll({
-      where: {
-        address_id: adminAddress.id,
-        ...chainOrCommunity,
-        permission: ['admin', 'moderator'],
-      },
-    });
-    if (!requesterIsAdminOrMod) return next(new Error(Errors.MustBeAdmin));
-  }
+  const adminAddress = await models.Address.findOne({
+    where: {
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
+  const requesterIsAdminOrMod = await models.Role.findAll({
+    where: {
+      address_id: adminAddress.id,
+      chain_id: chain.id,
+      permission: ['admin', 'moderator'],
+    },
+  });
+  if (!requesterIsAdminOrMod) return next(new Error(Errors.MustBeAdmin));
 
   const existingAddress = await models.Address.findOne({
     where: {
@@ -50,7 +47,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
   const existingRole = await models.Role.findOne({
     where: {
       address_id: existingAddress.id,
-      ...chainOrCommunity,
+      chain_id: chain.id,
     },
   });
 
@@ -58,8 +55,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
 
   const role = await models.Role.create({
     address_id: existingAddress.id,
-    // offchain_community_id: community.id,
-    ...chainOrCommunity,
+    chain_id: chain.id,
     permission: 'member',
   });
 

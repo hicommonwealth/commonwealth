@@ -1,8 +1,27 @@
-.PrivacyPage, .TermsPage {
-    .forum-container {
-        padding: 10vh 20vw;
+@import 'client/styles/shared';
+
+.PrivacyPage,
+.TermsPage {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  width: 100%;
+
+  .forum-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    width: 736px;
+
+    @include small {
+      width: unset;
     }
-    p {
-        margin: 7px 0;
-    }
+  }
+
+  p {
+    margin: 8px 0;
+  }
 }

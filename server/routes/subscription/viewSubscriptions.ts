@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from '../../../shared/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -13,30 +10,8 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     return next(new Error(Errors.NotLoggedIn));
   }
 
-  const notificationParams: any = {
-    model: models.Notification,
-    as: 'Notifications',
-    include: [{
-      model: models.ChainEvent,
-      required: false,
-      as: 'ChainEvent',
-      include: [{
-        model: models.ChainEventType,
-        required: false,
-        as: 'ChainEventType',
-      }, ],
-    }, ]
-  };
-
   const associationParams: any = [
-    notificationParams,
     {
-      model: models.Chain,
-      as: 'Chain',
-    }, {
-      model: models.OffchainCommunity,
-      as: 'OffchainCommunity',
-    }, {
       model: models.OffchainThread,
       as: 'OffchainThread',
     }, {
@@ -45,9 +20,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     }, {
       model: models.ChainEventType,
       as: 'ChainEventType',
-    // // }, {
-    // //   model: models.ChainEntity,
-    // //   as: 'ChainEntity',
     }];
 
   const searchParams: any[] = [

@@ -13,9 +13,7 @@ import {
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 
-import { factory, formatFilename, addPrefix } from '../../shared/logging';
-import { IWebsocketsPayload, WebsocketMessageType } from '../../shared/types';
-const log = factory.getLogger(formatFilename(__filename));
+import { factory, addPrefix } from '../../shared/logging';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -28,26 +26,26 @@ export default class extends IEventHandler {
     super();
   }
 
-  private async _wssSend(dbEntity, dbEvent) {
-    if (!this._wss) return;
-    const dbEventType = await dbEvent.getChainEventType();
-    const payload: IWebsocketsPayload<any> = {
-      event: WebsocketMessageType.ChainEntity,
-      data: {
-        object_id: dbEntity.id,
-        chainEntity: dbEntity.toJSON(),
-        chainEvent: dbEvent.toJSON(),
-        chainEventType: dbEventType.toJSON(),
-      },
-    };
-    try {
-      this._wss.emit(WebsocketMessageType.ChainEntity, payload);
-    } catch (e) {
-      log.warn(
-        `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`
-      );
-    }
-  }
+  // private async _wssSend(dbEntity, dbEvent) {
+  //   if (!this._wss) return;
+  //   const dbEventType = await dbEvent.getChainEventType();
+  //   const payload: IWebsocketsPayload<any> = {
+  //     event: WebsocketMessageNames.ChainEntity,
+  //     data: {
+  //       object_id: dbEntity.id,
+  //       chainEntity: dbEntity.toJSON(),
+  //       chainEvent: dbEvent.toJSON(),
+  //       chainEventType: dbEventType.toJSON(),
+  //     },
+  //   };
+  //   try {
+  //     this._wss.emit(WebsocketMessageNames.ChainEntity, payload);
+  //   } catch (e) {
+  //     log.warn(
+  //       `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`
+  //     );
+  //   }
+  // }
 
   /**
    * Handles an existing ChainEvent by connecting it with an entity, and creating
@@ -107,7 +105,7 @@ export default class extends IEventHandler {
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;
         await dbEvent.save();
-        await this._wssSend(dbEntity, dbEvent);
+        // await this._wssSend(dbEntity, dbEvent);
       } else {
         log.info(
           `Db Event is already linked to entity! Doing nothing.`
@@ -147,7 +145,7 @@ export default class extends IEventHandler {
         dbEntity.completed = true;
         await dbEntity.save();
       }
-      await this._wssSend(dbEntity, dbEvent);
+      // await this._wssSend(dbEntity, dbEvent);
 
       return dbEvent;
     };

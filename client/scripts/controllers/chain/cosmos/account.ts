@@ -21,7 +21,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
-    super(app, app.chain.meta.chain, address);
+    super(app, app.chain.meta, address);
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
@@ -35,18 +35,6 @@ export default class CosmosAccount extends Account<CosmosToken> {
     this._Accounts.store.add(this);
   }
 
-  protected async addressFromMnemonic(mnemonic: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  protected async addressFromSeed(seed: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
-  public async signMessage(message: string): Promise<string> {
-    throw new Error('unsupported');
-  }
-
   public updateBalance = _.throttle(async () => {
     try {
       const bal = await this._Chain.api.bank.balance(this.address, this._Chain.denom);
@@ -57,11 +45,6 @@ export default class CosmosAccount extends Account<CosmosToken> {
       this._balance = this._Chain.coins(0);
     }
   });
-
-  public sendBalanceTx(recipient: Account<CosmosToken>, amount: CosmosToken):
-    ITXModalData | Promise<ITXModalData> {
-    throw new Error('Method not implemented.');
-  }
 
   public async sendTx(recipient: CosmosAccount, amount: CosmosToken) {
     const msg: MsgSendEncodeObject = {

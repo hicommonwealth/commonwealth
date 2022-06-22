@@ -9,55 +9,61 @@ import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
   const attachments = draft.OffchainAttachments
-    ? draft.OffchainAttachments.map((a) => new OffchainAttachment(a.url, a.description))
+    ? draft.OffchainAttachments.map(
+        (a) => new OffchainAttachment(a.url, a.description)
+      )
     : [];
   return new DiscussionDraft(
     draft.Address.address,
     draft.id,
-    draft.community,
     draft.chain,
     draft.title,
     draft.body,
     draft.topic,
     moment(draft.created_at),
-    attachments,
+    attachments
   );
 };
 
 class DraftsController {
   private _store = new DraftStore();
 
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _initialized = false;
 
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   public async create(
     title: string,
     body: string,
     topicName: string,
-    attachments?: string[],
+    attachments?: string[]
   ) {
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
-        'address': app.user.activeAccount.address,
-        'author_chain': app.user.activeAccount.chain.id,
-        'chain': app.activeChainId(),
-        'community': app.activeCommunityId(),
-        'title': title,
-        'body': body,
-        'topic': topicName,
+        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAccount.chain.id,
+        chain: app.activeChainId(),
+        title: title,
+        body: body,
+        topic: topicName,
         'attachments[]': attachments,
-        'jwt': app.user.jwt,
+        jwt: app.user.jwt,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
       return result;
     } catch (err) {
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to create draft');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to create draft'
+      );
     }
   }
 
@@ -66,24 +72,23 @@ class DraftsController {
     title: string,
     body: string,
     topicName: string,
-    attachments?: string[],
+    attachments?: string[]
   ) {
     // Todo: handle attachments
     try {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
         data: {
-          'address': app.user.activeAccount.address,
-          'author_chain': app.user.activeAccount.chain.id,
-          'community': app.activeCommunityId(),
-          'chain': app.activeChainId(),
-          'id': id,
-          'title': title,
-          'body': body,
-          'topic': topicName,
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          chain: app.activeChainId(),
+          id: id,
+          title: title,
+          body: body,
+          topic: topicName,
           'attachments[]': attachments,
-          'jwt': app.user.jwt
-        }
+          jwt: app.user.jwt,
+        },
       });
       const result = modelFromServer(response.result);
       if (this._store.getById(result.id)) {
@@ -92,9 +97,11 @@ class DraftsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to edit draft');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to edit draft'
+      );
     }
   }
 
@@ -103,13 +110,12 @@ class DraftsController {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
-          'address': app.user.activeAccount.address,
-          'author_chain': app.user.activeAccount.chain.id,
-          'community': app.activeCommunityId(),
-          'chain': app.activeChainId(),
-          'id': id,
-          'jwt': app.user.jwt,
-        }
+          address: app.user.activeAccount.address,
+          author_chain: app.user.activeAccount.chain.id,
+          chain: app.activeChainId(),
+          id: id,
+          jwt: app.user.jwt,
+        },
       });
       if (response.status !== 'Success') {
         throw new Error(`${response.status} error: Failed to delete draft`);
@@ -117,9 +123,11 @@ class DraftsController {
       const draft = this._store.getById(id);
       this._store.remove(draft);
     } catch (err) {
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Failed to delete draft');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Failed to delete draft'
+      );
     }
   }
 
@@ -152,9 +160,11 @@ class DraftsController {
       }
       this._initialized = true;
     } catch (err) {
-      throw new Error((err.responseJSON && err.responseJSON.error)
-        ? err.responseJSON.error
-        : 'Error loading discussion drafts');
+      throw new Error(
+        err.responseJSON && err.responseJSON.error
+          ? err.responseJSON.error
+          : 'Error loading discussion drafts'
+      );
     }
   }
 

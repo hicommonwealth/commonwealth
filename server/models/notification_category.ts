@@ -1,18 +1,17 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface NotificationCategoryAttributes {
+export type NotificationCategoryAttributes = {
   name: string;
   description: string;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface NotificationCategoryInstance
-extends Model<NotificationCategoryAttributes>, NotificationCategoryAttributes {}
+export type NotificationCategoryInstance = ModelInstance<NotificationCategoryAttributes>;
 
-export type NotificationCategoryModelStatic = ModelStatic<NotificationCategoryInstance>
+export type NotificationCategoryModelStatic = ModelStatic<NotificationCategoryInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -27,5 +26,9 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+  NotificationCategory.associate = (models) => {
+    models.NotificationCategory.hasMany(models.Notification, {foreignKey: 'category_id'});
+    models.NotificationCategory.hasMany(models.Subscription, {foreignKey: 'category_id'})
+  }
   return NotificationCategory;
 };

@@ -1,9 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
+import { ChainAttributes } from '../models/chain';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -24,10 +26,18 @@ export const Errors = {
   InvalidTerms: 'Terms of Service must begin with https://',
 };
 
+type UpdateChainReq = ChainAttributes & {
+  id: string;
+  'featured_topics[]'?: string[];
+  'snapshot[]'?: string[];
+};
+
+type UpdateChainResp = ChainAttributes;
+
 const updateChain = async (
   models: DB,
-  req: Request,
-  res: Response,
+  req: TypedRequestBody<UpdateChainReq>,
+  res: TypedResponse<UpdateChainResp>,
   next: NextFunction
 ) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
@@ -69,8 +79,16 @@ const updateChain = async (
     custom_domain,
     default_summary_view,
     terms,
-    snapshot,
   } = req.body;
+
+  let snapshot = req.body['snapshot[]'];
+
+  // Handle single string case and undefined case
+  if (snapshot !== undefined && typeof snapshot === 'string') {
+    snapshot = [snapshot];
+  } else if (snapshot === undefined) {
+    snapshot = [];
+  }
 
   if (website && !urlHasValidHTTPPrefix(website)) {
     return next(new Error(Errors.InvalidWebsite));
@@ -85,13 +103,14 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new Error(Errors.InvalidCustomDomain));
   } else if (
-    snapshot &&
-    !/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
-      snapshot
+    snapshot.some(
+      (snapshot_space) =>
+        snapshot_space !== '' &&
+        snapshot_space.slice(snapshot_space.length - 4) !== '.eth'
     )
   ) {
     return next(new Error(Errors.InvalidSnapshot));
-  } else if (snapshot && chain.base !== ChainBase.Ethereum) {
+  } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
     return next(new Error(Errors.SnapshotOnlyOnEthereum));
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
     return next(new Error(Errors.InvalidTerms));
@@ -112,8 +131,9 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
-  if (req.body['featured_topics[]'])
-    chain.featured_topics = req.body['featured_topics[]'];
+
+  // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
+  // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
 
   // Under our current security policy, custom domains must be set by trusted
@@ -124,7 +144,7 @@ const updateChain = async (
 
   await chain.save();
 
-  return res.json({ status: 'Success', result: chain.toJSON() });
+  return success(res, chain.toJSON());
 };
 
 export default updateChain;

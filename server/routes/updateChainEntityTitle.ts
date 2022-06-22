@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -15,11 +15,7 @@ const updateChainEntityTitle = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.body,
-    req.user
-  );
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const { unique_id, title } = req.body;
 

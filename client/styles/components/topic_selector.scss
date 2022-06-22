@@ -1,26 +1,30 @@
 @import 'client/styles/shared';
 
 .TopicSelector {
-    .no-matching-topics {
-        max-width: 190px;
-    }
-    .cui-popover-content {
-        padding: 0 !important;
-        min-width: 178px;
-        .cui-list {
-            border-radius: 3px;
-        }
-    }
-    &.cui-popover[x-placement^="top"] > .cui-popover-arrow {
-        bottom: -3px;
-    }
-    @include xs-max {
-        width: calc(100vw - 53px);
-        .cui-popover-content {
-            width: 100%;
-        }
-    }
-}
+  @include dragula;
 
-.topic-selection-drop-menu {
+  .no-matching-topics {
+    max-width: 190px;
+  }
+
+  .cui-popover-content {
+    padding: 0 !important;
+    min-width: 178px;
+
+    .cui-list {
+      border-radius: 3px;
+    }
+  }
+
+  &.cui-popover[x-placement^='top'] > .cui-popover-arrow {
+    bottom: -3px;
+  }
+
+  @include extraSmall {
+    width: calc(100vw - 53px);
+
+    .cui-popover-content {
+      width: 100%;
+    }
+  }
 }

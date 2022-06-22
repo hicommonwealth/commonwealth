@@ -7,7 +7,14 @@ import { DATABASE_URI } from './config';
 import { factory, formatFilename } from '../shared/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
+import BanFactory, { BanModelStatic } from './models/ban';
 import ChainFactory, { ChainModelStatic } from './models/chain';
+import ChainCategoryFactory, {
+  ChainCategoryModelStatic,
+} from './models/chain_category';
+import ChainCategoryTypeFactory, {
+  ChainCategoryTypeModelStatic,
+} from './models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -16,9 +23,11 @@ import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
 import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
+import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
+import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/community_banner';
 import CollaborationFactory, {
   CollaborationModelStatic,
 } from './models/collaboration';
@@ -31,26 +40,10 @@ import ContractItemFactory, {
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
-import EdgewareLockdropBalanceFactory, {
-  EdgewareLockdropBalanceModelStatic,
-} from './models/edgeware_lockdrop_balance';
-import EdgewareLockdropEventFactory, {
-  EdgewareLockdropEventModelStatic,
-} from './models/edgeware_lockdrop_event';
-import EdgewareLockdropEverythingFactory, {
-  EdgewareLockdropEverythingModelStatic,
-} from './models/edgeware_lockdrop_everything';
-import HedgehogAuthenticationFactory, {
-  HedgehogAuthenticationModelStatic,
-} from './models/hedgehog_authentication';
-import HedgehogUserFactory, {
-  HedgehogUserModelStatic,
-} from './models/hedgehog_user';
 import IdentityCacheFactory, {
   IdentityCacheStatic,
 } from './models/identity_cache';
 import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import InviteLinkFactory, { InviteLinkModelStatic } from './models/invite_link';
 import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
 import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
 import NotificationFactory, {
@@ -65,9 +58,6 @@ import OffchainAttachmentFactory, {
 import OffchainCommentFactory, {
   OffchainCommentModelStatic,
 } from './models/offchain_comment';
-import OffchainCommunityFactory, {
-  OffchainCommunityModelStatic,
-} from './models/offchain_community';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
@@ -86,10 +76,15 @@ import OffchainViewCountFactory, {
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
 } from './models/offchain_vote';
+import OffchainPollFactory, {
+  OffchainPollModelStatic,
+} from './models/offchain_poll';
+import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
+import SsoTokenFactory, { SsoTokenModelStatic } from './models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
 } from './models/starred_community';
@@ -105,42 +100,49 @@ import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
 } from './models/waitlist_registration';
 import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+import NotificationsReadFactory, {
+  NotificationsReadModelStatic,
+} from './models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;
+  Ban: BanModelStatic;
   Chain: ChainModelStatic;
+  ChainCategory: ChainCategoryModelStatic;
+  ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
+  ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
+  CommunityBanner: CommunityBannerModelStatic;
   ContractCategory: ContractCategoryModelStatic;
   ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
-  EdgewareLockdropBalance: EdgewareLockdropBalanceModelStatic;
-  EdgewareLockdropEvent: EdgewareLockdropEventModelStatic;
-  EdgewareLockdropEverything: EdgewareLockdropEverythingModelStatic;
-  HedgehogAuthentication: HedgehogAuthenticationModelStatic;
-  HedgehogUser: HedgehogUserModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
-  InviteLink: InviteLinkModelStatic;
+  IpfsPins: IpfsPinsModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
+  NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
   OffchainComment: OffchainCommentModelStatic;
-  OffchainCommunity: OffchainCommunityModelStatic;
+  OffchainPoll: OffchainPollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   OffchainReaction: OffchainReactionModelStatic;
   OffchainThread: OffchainThreadModelStatic;
   OffchainTopic: OffchainTopicModelStatic;
   OffchainViewCount: OffchainViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
+  Profile: ProfileModelStatic;
   Role: RoleModelStatic;
   SocialAccount: SocialAccountModelStatic;
+  SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
@@ -186,42 +188,42 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
+  Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
+  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
+  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
+  ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
+  CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
   ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  EdgewareLockdropBalance: EdgewareLockdropBalanceFactory(sequelize, DataTypes),
-  EdgewareLockdropEvent: EdgewareLockdropEventFactory(sequelize, DataTypes),
-  EdgewareLockdropEverything: EdgewareLockdropEverythingFactory(
-    sequelize,
-    DataTypes
-  ),
-  HedgehogAuthentication: HedgehogAuthenticationFactory(sequelize, DataTypes),
-  HedgehogUser: HedgehogUserFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  InviteLink: InviteLinkFactory(sequelize, DataTypes),
+  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
   OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
-  OffchainCommunity: OffchainCommunityFactory(sequelize, DataTypes),
+  OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
   OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
   OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
+  Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+  SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),

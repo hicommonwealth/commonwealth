@@ -4,7 +4,7 @@ import app from 'state';
 import BN from 'bn.js';
 import Web3 from 'web3';
 
-import { formatCoin, formatNumberLong } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
+import { formatCoin, formatNumberLong, Coin } from 'adapters/currency'; // TODO: remove formatCoin, only use coins.format()
 import User from 'views/components/widgets/user';
 import { VotingType, VotingUnit, IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
@@ -189,7 +189,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       );
       const yesBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(yesBalance.toString())
-      )} ${app.chain.meta.chain.symbol}`;
+      )} ${app.chain.meta.symbol}`;
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
       const noBalance = noVotes.reduce(
         (total, v) => total.add(v.power),
@@ -197,7 +197,7 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       );
       const noBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(noBalance.toString())
-      )} ${app.chain.meta.chain.symbol}`;
+      )} ${app.chain.meta.symbol}`;
       return m('.VotingResults', [
         m('.results-column.yes-votes', [
           m('.results-header', `Yes (${yesBalanceString}) (${yesVotes.length} voters)`),
@@ -303,6 +303,40 @@ const VotingResults: m.Component<{ proposal: AnyProposal }> = {
         ])
       ]);
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
+      // return different voting results on completed cosmos proposal, as voters are not available
+      if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
+        const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data.state.tally;
+
+        // TODO: move this marshalling into controller
+        const formatCurrency = (n: BN) => {
+          const decimals = new BN(10).pow(new BN(app.chain.meta.decimals || 6));
+          const denom = app.chain.meta.symbol;
+          const coin = new Coin(denom, n, false, decimals);
+          return coin.format();
+        }
+        const voteTotal = yes.add(no).add(abstain).add(noWithVeto);
+        const getPct = (n: BN) => {
+          return (n.muln(10_000).div(voteTotal).toNumber() / 100).toFixed(2);
+        }
+        return m('.VotingResults', [
+          m('.results-column', [
+            m('.results-header', `${getPct(yes)}% voted Yes`),
+            m('.results-cell', `(${formatCurrency(yes)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `${getPct(no)}% voted No`),
+            m('.results-cell', `(${formatCurrency(no)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `${getPct(abstain)}% voted Abstain`),
+            m('.results-cell', `(${formatCurrency(abstain)})`),
+          ]),
+          m('.results-column', [
+            m('.results-header', `${getPct(noWithVeto)}% voted Veto`),
+            m('.results-cell', `(${formatCurrency(noWithVeto)})`),
+          ])
+        ]);
+      }
       return m('.VotingResults', [
         m('.results-column', [
           m('.results-header', `Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`),

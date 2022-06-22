@@ -2,9 +2,9 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ChainEventAttributes } from './chain_event';
 import { ChainAttributes } from './chain';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 
-export interface ChainEventTypeAttributes {
+export type ChainEventTypeAttributes = {
   id: string;
   chain: string;
   event_network: string;
@@ -13,10 +13,9 @@ export interface ChainEventTypeAttributes {
   Chain?: ChainAttributes;
 }
 
-export interface ChainEventTypeInstance
-extends Model<ChainEventTypeAttributes>, ChainEventTypeAttributes {}
+export type ChainEventTypeInstance = ModelInstance<ChainEventTypeAttributes>;
 
-export type ChainEventTypeModelStatic = ModelStatic<ChainEventTypeInstance>
+export type ChainEventTypeModelStatic = ModelStatic<ChainEventTypeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

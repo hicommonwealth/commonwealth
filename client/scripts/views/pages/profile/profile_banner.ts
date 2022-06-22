@@ -16,8 +16,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
     const createRole = async (e) => {
       vnode.state.loading = true;
 
-      const community = app.chain?.meta.chain ? app.chain.meta.chain.name
-        : app.community?.meta ? app.community.meta.name : 'current';
+      const community = app.chain?.meta ? app.chain.meta.name : 'current';
       const confirmed = await confirmationModalWithText(
         `Join the ${community} community with this address?`
       )();
@@ -30,7 +29,6 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
       app.user.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }).then(() => {
         vnode.state.loading = false;
         m.redraw();

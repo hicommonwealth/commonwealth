@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { NotificationCategories } from '../../shared/types';
 import { DB } from '../database';
 
@@ -17,14 +17,11 @@ const createRole = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
 
   if (error) return next(new Error(error));
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
-
-  // cannot join private communities using this route
-  if (community && community.privacy_enabled) return next(new Error(Errors.InvalidChainComm));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -35,26 +32,17 @@ const createRole = async (
   });
   if (!validAddress) return next(new Error(Errors.InvalidAddress));
 
-  const [ role ] = await models.Role.findOrCreate({ where: chain ? {
+  const [ role ] = await models.Role.findOrCreate({ where: {
     address_id: validAddress.id,
     chain_id: chain.id,
-  } : {
-    address_id: validAddress.id,
-    offchain_community_id: community.id,
-  } });
+  }});
 
   const [ subscription ] = await models.Subscription.findOrCreate({
-    where: chain ? {
+    where: {
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewThread,
       chain_id: chain.id,
       object_id: chain.id,
-      is_active: true,
-    } : {
-      subscriber_id: req.user.id,
-      category_id: NotificationCategories.NewThread,
-      community_id: community.id,
-      object_id: community.id,
       is_active: true,
     }
   });

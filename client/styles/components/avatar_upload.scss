@@ -1,66 +1,58 @@
 @import 'client/styles/shared';
 
 .AvatarUpload {
-    border-radius: 9999px;
-    overflow: hidden;
-    margin-bottom: 10px;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $white;
+  border: 1px solid $neutral-300;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
+  > .User,
+  .ChainIcon,
+  .CommunityIcon {
+    position: absolute;
+    z-index: 0;
+  }
+  .dropzone-attach {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: white;
-    border: 1px solid $background-color-light;
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.04);
-    > .User, .ChainIcon, .CommunityIcon {
-        position: absolute;
-        z-index: 0;
+    height: 100%;
+    width: 100%;
+    color: $neutral-600;
+    z-index: 1;
+    &.hidden {
+      display: none;
     }
-    .dropzone-attach {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        width: 100%;
-        color: $text-color-light;
-        z-index: 1;
-        &.hidden {
-            display: none;
-        }
+  }
+  .attach-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+    background-color: $neutral-50;
+    clip-path: circle(12px at center);
+    -webkit-clip-path: circle(12px at center);
+    cursor: pointer;
+
+    &:hover {
+      color: $neutral-800;
     }
-    .attach-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 24px;
-        width: 24px;
-        background-color: lightgray;
-        clip-path: circle(12px at center);
-        -webkit-clip-path: circle(12px at center);
-        color: inherit;
-        font-size: 14px;
-        cursor: pointer;
-        &:hover {
-            color: $text-color-medium;
-        }
-        > svg {
-            margin: -3px 0;
-            margin-right: 6px;
-        }
-        .icon-plus {
-            font-size: 16px;
-            position: relative;
-            top: 3px;
-        }
+  }
+  .dropzone-previews {
+    flex: 1;
+    text-align: right;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    &.hidden {
+      display: none;
     }
-    .dropzone-previews {
-        flex: 1;
-        text-align: right;
-        height: 100%;
-        width: 100%;
-        z-index: 2;
-        &.hidden {
-            display: none;
-        }
-    }
+  }
 }
 
 /*
@@ -87,267 +79,338 @@
 // SOFTWARE.
 
 @mixin keyframes($name) {
-    @-webkit-keyframes #{$name} {
-        @content;
-    }
-    @-moz-keyframes #{$name} {
-        @content;
-    }
-    @keyframes #{$name} {
-        @content;
-    }
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+  @-moz-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  }
 }
 
 @mixin prefix($map, $vendors: webkit moz ms o) {
-    @each $prop, $value in $map {
-        @if $vendors {
-            @each $vendor in $vendors {
-                #{"-" + $vendor + "-" + $prop}: #{$value};
-            }
-        }
-        // Dump regular property anyway
-        #{$prop}: #{$value};
+  @each $prop, $value in $map {
+    @if $vendors {
+      @each $vendor in $vendors {
+        #{"-" + $vendor + "-" + $prop}: #{$value};
+      }
     }
+    // Dump regular property anyway
+    #{$prop}: #{$value};
+  }
 }
 
-
 @include keyframes(passing-through) {
-    0% {
-        opacity: 0;
-        @include prefix((transform: translateY(40px)));
-    }
-    30%, 70% {
-        opacity: 1;
-        @include prefix((transform: translateY(0px)));
-    }
-    100% {
-        opacity: 0;
-        @include prefix((transform: translateY(-40px)));
-    }
+  0% {
+    opacity: 0;
+    @include prefix(
+      (
+        transform: translateY(40px),
+      )
+    );
+  }
+  30%,
+  70% {
+    opacity: 1;
+    @include prefix(
+      (
+        transform: translateY(0px),
+      )
+    );
+  }
+  100% {
+    opacity: 0;
+    @include prefix(
+      (
+        transform: translateY(-40px),
+      )
+    );
+  }
 }
 
 @include keyframes(slide-in) {
-    0% {
-        opacity: 0;
-        @include prefix((transform: translateY(40px)));
-    }
-    30% {
-        opacity: 1;
-        @include prefix((transform: translateY(0px)));
-    }
+  0% {
+    opacity: 0;
+    @include prefix(
+      (
+        transform: translateY(40px),
+      )
+    );
+  }
+  30% {
+    opacity: 1;
+    @include prefix(
+      (
+        transform: translateY(0px),
+      )
+    );
+  }
 }
 
 @include keyframes(pulse) {
-    0% { @include prefix((transform: scale(1))); }
-    10% { @include prefix((transform: scale(1.1))); }
-    20% { @include prefix((transform: scale(1))); }
+  0% {
+    @include prefix(
+      (
+        transform: scale(1),
+      )
+    );
+  }
+  10% {
+    @include prefix(
+      (
+        transform: scale(1.1),
+      )
+    );
+  }
+  20% {
+    @include prefix(
+      (
+        transform: scale(1),
+      )
+    );
+  }
 }
 
 .AvatarUpload {
-    $image-size: 30px;
-    $image-border-radius: 4px;
-    &.dz-clickable {
-        cursor: pointer;
+  $image-size: 30px;
+  $image-border-radius: 4px;
+  &.dz-clickable {
+    cursor: pointer;
 
-        * {
-            cursor: default;
-        }
-        .dz-message {
-            &, * {
-                cursor: pointer;
-            }
-        }
-    }
-
-    &.dz-started {
-        .dz-message {
-            display: none;
-        }
-    }
-
-    &.dz-drag-hover {
-        border-style: solid;
-        border: 2px solid $primary-bg-color;
-        border-radius: 5px;
-        margin: -8px -2px;
+    * {
+      cursor: default;
     }
     .dz-message {
-        text-align: center;
-        margin: 2em 0;
+      &,
+      * {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &.dz-started {
+    .dz-message {
+      display: none;
+    }
+  }
+
+  &.dz-drag-hover {
+    border-style: solid;
+    border: 2px solid $primary-500;
+    border-radius: 5px;
+    margin: -8px -2px;
+  }
+  .dz-message {
+    text-align: center;
+    margin: 2em 0;
+  }
+
+  .dz-preview {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    &:hover {
+      // Making sure that always the hovered preview element is on top
+      z-index: 1000;
+    }
+    &.dz-file-preview {
+      .dz-image {
+        height: 100%;
+        width: 100%;
+        border-radius: $image-border-radius;
+        background: $neutral-500;
+        background: linear-gradient(to bottom, $primary-300, $neutral-100);
+      }
+      .dz-details {
+        opacity: 1;
+      }
+    }
+    &.dz-image-preview {
+      height: 100%;
+      width: 100%;
+      background: $white;
+      .dz-details {
+        @include prefix(
+          (
+            transition: opacity 0.2s linear,
+          )
+        );
+      }
     }
 
-    .dz-preview {
-        position: relative;
-        display: inline-block;
-        vertical-align: top;
-        &:hover {
-            // Making sure that always the hovered preview element is on top
-            z-index: 1000;
-        }
-        &.dz-file-preview {
-            .dz-image {
-                height: 100%;
-                width: 100%;
-                border-radius: $image-border-radius;
-                background: $text-color-light;
-                background: linear-gradient(to bottom, $background-color-light, #ddd);
-            }
-            .dz-details {
-                opacity: 1;
-            }
-        }
-        &.dz-image-preview {
-            height: 100%;
-            width: 100%;
-            background: white;
-            .dz-details {
-                @include prefix((transition: opacity 0.2s linear));
-            }
-        }
-
-        .dz-remove {
-            font-size: 14px;
-            text-align: center;
-            display: block;
-            cursor: pointer;
-            border: none;
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-        .dz-details {
-            display: none;
-        }
-        .dz-image {
-            border-radius: $image-border-radius;
-            overflow: hidden;
-            position: relative;
-            display: block;
-            z-index: 10;
-            img {
-                display: block;
-                height: 100%;
-                width: 100%;
-            }
-        }
-
-        &.dz-success {
-            .dz-success-mark {
-                @include prefix((animation: passing-through 3s cubic-bezier(0.770, 0.000, 0.175, 1.000)));
-            }
-        }
-        &.dz-error {
-            .dz-error-mark {
-                opacity: 1;
-                @include prefix((animation: slide-in 3s cubic-bezier(0.770, 0.000, 0.175, 1.000)));
-            }
-        }
-        .dz-success-mark, .dz-error-mark {
-            $image-height: 16px;
-            $image-width: 16px;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 500;
-            position: absolute;
-            display: block;
-            top: 50%;
-            left: 50%;
-            margin-left: -($image-width/2);
-            margin-top: -($image-height/2);
-            svg {
-                display: block;
-                width: $image-width;
-                height: $image-height;
-            }
-        }
-
-
-        &.dz-processing .dz-progress {
-            opacity: 1;
-            @include prefix((transition: all 0.2s linear));
-        }
-        &.dz-complete .dz-progress {
-            opacity: 0;
-            @include prefix((transition: opacity 0.4s ease-in));
-        }
-
-        &:not(.dz-processing) {
-            .dz-progress {
-                @include prefix((animation: pulse 6s ease infinite));
-            }
-        }
-        .dz-progress {
-            opacity: 1;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            pointer-events: none;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            height: 5px;
-            width: 40px;
-            margin-top: -2px;
-            margin-left: -20px;
-
-            // Fix for chrome bug: https://code.google.com/p/chromium/issues/detail?id=157218
-            -webkit-transform: scale(1);
-            border-radius: 8px;
-            overflow: hidden;
-            .dz-upload {
-                background: $background-color-dark-accent;
-                background: linear-gradient(to bottom, $background-color-dark-accent, $background-color-darker-accent);
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                width: 0;
-                @include prefix((transition: width 300ms ease-in-out));
-            }
-        }
-
-        &.dz-error {
-            .dz-error-message {
-                display: block;
-            }
-            &:hover .dz-error-message {
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
-
-        .dz-error-message {
-            $width: $image-size + 20px;
-            $color: $negative-bg-color;
-
-            pointer-events: none;
-            z-index: 1000;
-            position: absolute;
-            display: block;
-            display: none;
-            opacity: 0;
-            @include prefix((transition: opacity 0.3s ease));
-            border-radius: 8px;
-            font-size: 13px;
-            top: $image-size + 10px;
-            left: -10px;
-            width: $width;
-            background: $color;
-            background: linear-gradient(to bottom, $color, darken($color, 5%));
-            padding: 0.5em 1.2em;
-            color: $text-color-white;
-
-            // The triangle pointing up
-            &:after {
-                content: '';
-                position: absolute;
-                top: -6px;
-                left: $width / 2 - 6px;
-                width: 0;
-                height: 0;
-                border-left: 6px solid transparent;
-                border-right: 6px solid transparent;
-                border-bottom: 6px solid $color;
-            }
-        }
+    .dz-remove {
+      font-size: 14px;
+      text-align: center;
+      display: block;
+      cursor: pointer;
+      border: none;
+      &:hover {
+        text-decoration: underline;
+      }
     }
+    .dz-details {
+      display: none;
+    }
+    .dz-image {
+      border-radius: $image-border-radius;
+      overflow: hidden;
+      position: relative;
+      display: block;
+      z-index: 10;
+      img {
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+    }
+
+    &.dz-success {
+      .dz-success-mark {
+        @include prefix(
+          (
+            animation: passing-through 3s cubic-bezier(0.77, 0, 0.175, 1),
+          )
+        );
+      }
+    }
+    &.dz-error {
+      .dz-error-mark {
+        opacity: 1;
+        @include prefix(
+          (
+            animation: slide-in 3s cubic-bezier(0.77, 0, 0.175, 1),
+          )
+        );
+      }
+    }
+    .dz-success-mark,
+    .dz-error-mark {
+      $image-height: 16px;
+      $image-width: 16px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 500;
+      position: absolute;
+      display: block;
+      top: 50%;
+      left: 50%;
+      margin-left: -($image-width/2);
+      margin-top: -($image-height/2);
+      svg {
+        display: block;
+        width: $image-width;
+        height: $image-height;
+      }
+    }
+
+    &.dz-processing .dz-progress {
+      opacity: 1;
+      @include prefix(
+        (
+          transition: all 0.2s linear,
+        )
+      );
+    }
+    &.dz-complete .dz-progress {
+      opacity: 0;
+      @include prefix(
+        (
+          transition: opacity 0.4s ease-in,
+        )
+      );
+    }
+
+    &:not(.dz-processing) {
+      .dz-progress {
+        @include prefix(
+          (
+            animation: pulse 6s ease infinite,
+          )
+        );
+      }
+    }
+    .dz-progress {
+      opacity: 1;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      pointer-events: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      height: 5px;
+      width: 40px;
+      margin-top: -2px;
+      margin-left: -20px;
+
+      // Fix for chrome bug: https://code.google.com/p/chromium/issues/detail?id=157218
+      -webkit-transform: scale(1);
+      border-radius: 8px;
+      overflow: hidden;
+      .dz-upload {
+        background: $primary-600;
+        background: linear-gradient(to bottom, $primary-600, $primary-800);
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        @include prefix(
+          (
+            transition: width 300ms ease-in-out,
+          )
+        );
+      }
+    }
+
+    &.dz-error {
+      .dz-error-message {
+        display: block;
+      }
+      &:hover .dz-error-message {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    .dz-error-message {
+      $width: $image-size + 20px;
+      $color: $rorange-500;
+
+      pointer-events: none;
+      z-index: 1000;
+      position: absolute;
+      display: block;
+      display: none;
+      opacity: 0;
+      @include prefix(
+        (
+          transition: opacity 0.3s ease,
+        )
+      );
+      border-radius: 8px;
+      font-size: 13px;
+      top: $image-size + 10px;
+      left: -10px;
+      width: $width;
+      background: $color;
+      background: linear-gradient(to bottom, $color, darken($color, 5%));
+      padding: 0.5em 1.2em;
+      color: $white;
+
+      // The triangle pointing up
+      &:after {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: $width / 2 - 6px;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid $color;
+      }
+    }
+  }
 }

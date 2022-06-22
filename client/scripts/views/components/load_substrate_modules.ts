@@ -3,8 +3,8 @@ import app from 'state';
 import { ChainBase } from 'types';
 import { ProposalModule } from 'models';
 import { Tag } from 'construct-ui';
-import PageLoading from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
 
 const loadSubstrateModules = (
   name: string,
@@ -20,7 +20,11 @@ const loadSubstrateModules = (
           message: `Failed to initialize chain modules: ${errors.join(', ')}.`,
           title: [
             name,
-            m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+            m(Tag, {
+              size: 'xs',
+              label: 'Beta',
+              style: 'position: relative; top: -2px; margin-left: 6px',
+            }),
           ],
         });
       }
@@ -29,9 +33,13 @@ const loadSubstrateModules = (
         message: `Loading ${name.toLowerCase()}`,
         title: [
           name,
-          m(Tag, { size: 'xs', label: 'Beta', style: 'position: relative; top: -2px; margin-left: 6px' })
+          m(Tag, {
+            size: 'xs',
+            label: 'Beta',
+            style: 'position: relative; top: -2px; margin-left: 6px',
+          }),
         ],
-        showNewProposalButton: true
+        showNewProposalButton: true,
       });
     }
   }

@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from '../../shared/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from '../../shared/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -16,14 +17,23 @@ export const Errors = {
   NoProposal: 'No matching proposal found',
 };
 
-const editComment = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+const editComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
   if (!req.body.id) {
     return next(new Error(Errors.NoId));
+  }
+
+  // check if banned
+  const [canInteract, banError] = await banCache.checkBan({
+    chain: chain.id,
+    address: author.address,
+  });
+  if (!canInteract) {
+    return next(new Error(banError));
   }
 
   const attachFiles = async () => {
@@ -100,7 +110,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     }
 
     const cwUrl = typeof proposal === 'string'
-      ? getProposalUrlWithoutObject(prefix, (comment.chain || comment.community), proposal, finalComment)
+      ? getProposalUrlWithoutObject(prefix, comment.chain, proposal, finalComment)
       : getProposalUrl(prefix, proposal, comment);
     const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
@@ -117,7 +127,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         comment_id: +finalComment.id,
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
-        community_id: finalComment.community,
         author_address: finalComment.Address.address,
         author_chain: finalComment.Address.chain,
       },
@@ -127,7 +136,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
         url: cwUrl,
         title: proposal.title || '',
         chain: finalComment.chain,
-        community: finalComment.community,
       },
       req.wss,
       [ finalComment.Address.address ],
@@ -175,19 +183,7 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
     if (mentionedAddresses?.length > 0) {
       await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-
-        let shouldNotifyMentionedUser = true;
-        if (finalComment.community) {
-          const originCommunity = await models.OffchainCommunity.findOne({
-            where: { id: finalComment.community }
-          });
-          if (originCommunity.privacy_enabled) {
-            const destinationCommunity = mentionedAddress.Roles
-              .find((role) => role.offchain_community_id === originCommunity.id);
-            if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-          }
-        }
-        if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+        await models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,
@@ -199,7 +195,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             comment_id: +finalComment.id,
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
-            community_id: finalComment.community,
             author_address: finalComment.Address.address,
             author_chain: finalComment.Address.chain,
           },
@@ -209,7 +204,6 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
             url: cwUrl,
             title: proposal.title || '',
             chain: finalComment.chain,
-            community: finalComment.community,
             body: finalComment.text,
           },
           req.wss,

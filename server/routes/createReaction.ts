@@ -2,14 +2,23 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { ChainType, NotificationCategories } from '../../shared/types';
-import { getProposalUrl, getProposalUrlWithoutObject } from '../../shared/utils';
+import {
+  getProposalUrl,
+  getProposalUrlWithoutObject,
+} from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelCommunityInteractionPayload,
+} from '../../shared/analytics/types';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,22 +27,35 @@ export const Errors = {
   NoReaction: 'Must provide a reaction',
   NoCommentMatch: 'No matching comment found',
   NoProposalMatch: 'No matching proposal found',
-  InsufficientTokenBalance: 'Users need to hold some of the community\'s tokens to react',
+  InsufficientTokenBalance:
+    "Users need to hold some of the community's tokens to react",
   BalanceCheckFailed: 'Could not verify user token balance',
 };
 
 const createReaction = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
+
+  // check if author can react
+  if (chain) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: req.body.address
+    });
+    if (!canInteract) {
+      return next(new Error(banError));
+    }
+  }
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
@@ -61,7 +83,10 @@ const createReaction = async (
           });
         }
 
-        const canReact = await tokenBalanceCache.validateTopicThreshold(thread.topic_id, req.body.address);
+        const canReact = await tokenBalanceCache.validateTopicThreshold(
+          thread.topic_id,
+          req.body.address
+        );
         if (!canReact) {
           return next(new Error(Errors.BalanceCheckFailed));
         }
@@ -85,10 +110,8 @@ const createReaction = async (
   const options = {
     reaction,
     address_id: author.id,
+    chain: chain.id,
   };
-
-  if (community) options['community'] = community.id;
-  else if (chain) options['chain'] = chain.id;
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
@@ -104,16 +127,17 @@ const createReaction = async (
   let created;
 
   try {
-    [ finalReaction, created ] = await models.OffchainReaction.findOrCreate({
+    [finalReaction, created] = await models.OffchainReaction.findOrCreate({
       where: options,
       defaults: options,
-      include: [ models.Address]
+      include: [models.Address],
     });
 
-    if (created) finalReaction = await models.OffchainReaction.findOne({
-      where: options,
-      include: [ models.Address]
-    });
+    if (created)
+      finalReaction = await models.OffchainReaction.findOne({
+        where: options,
+        include: [models.Address],
+      });
   } catch (err) {
     return next(new Error(err));
   }
@@ -128,10 +152,14 @@ const createReaction = async (
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.OffchainThread.findOne({
-        where: { id }
+        where: { id },
       });
       cwUrl = getProposalUrl(prefix, proposal, comment);
-    } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    } else if (
+      prefix.includes('proposal') ||
+      prefix.includes('referendum') ||
+      prefix.includes('motion')
+    ) {
       cwUrl = getProposalUrlWithoutObject(prefix, chain.id, id, comment);
       proposal = id;
     } else {
@@ -145,17 +173,19 @@ const createReaction = async (
     root_type = 'discussion';
   }
 
-  const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
+  const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
   // dispatch notifications
   const notification_data = {
     created_at: new Date(),
-    root_id: comment ? comment.root_id.split('_')[1] : proposal instanceof models.OffchainThread
-      ? proposal.id : proposal?.root_id,
+    root_id: comment
+      ? comment.root_id.split('_')[1]
+      : proposal instanceof models.OffchainThread
+      ? proposal.id
+      : proposal?.root_id,
     root_title,
     root_type,
     chain_id: finalReaction.chain,
-    community_id: finalReaction.community,
     author_address: finalReaction.Address.address,
     author_chain: finalReaction.Address.chain,
   };
@@ -179,15 +209,22 @@ const createReaction = async (
       url: cwUrl,
       title: proposal.title || '',
       chain: finalReaction.chain,
-      community: finalReaction.community,
-      body: (comment_id) ? comment.text : '',
+      body: comment_id ? comment.text : '',
     },
     req.wss,
-    [ finalReaction.Address.address ],
+    [finalReaction.Address.address]
   );
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();
+
+  if (process.env.NODE_ENV !== 'test') {
+    mixpanelTrack({
+      event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
+      community: chain.id,
+      isCustomDomain: null,
+    });
+  }
 
   return res.json({ status: 'Success', result: finalReaction.toJSON() });
 };

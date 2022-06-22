@@ -1,26 +1,26 @@
 @import 'client/styles/shared';
 
 .Tabs {
+  .tab-bar {
+    border-bottom: 1px solid $neutral-100;
+    margin-bottom: 30px;
+  }
+  a.tab-entry {
+    text-decoration: none;
+    color: $neutral-600;
+    padding: 8px 10px;
+    margin-right: 4px;
+    display: inline-block;
+    font-weight: 500;
+  }
+  a.tab-entry.active {
+    color: $neutral-700;
+    border-bottom: 3px solid $neutral-500;
+    padding-bottom: 8px;
+  }
+  @include extraSmall {
     .tab-bar {
-        border-bottom: 1px solid #e4e4e4;
-        margin-bottom: 30px;
+      margin-bottom: 16px;
     }
-    a.tab-entry {
-        text-decoration: none;
-        color: $text-color-black;
-        padding: 8px 10px;
-        margin-right: 4px;
-        display: inline-block;
-        font-weight: 500;
-    }
-    a.tab-entry.active {
-        color: $text-color-black;
-        border-bottom: 3px solid $background-color-dark-accent;
-        padding-bottom: 6px;
-    }
-    @include xs-max {
-        .tab-bar {
-            margin-bottom: 16px;
-        }
-    }
+  }
 }

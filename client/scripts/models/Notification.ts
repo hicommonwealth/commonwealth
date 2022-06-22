@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { ChainEventType } from 'models/index';
 import NotificationSubscription from './NotificationSubscription';
 import ChainEvent from './ChainEvent';
 
@@ -6,10 +7,10 @@ class Notification {
   public readonly id: number;
   public readonly data: string;
   public readonly createdAt: moment.Moment;
-  public readonly subscription: NotificationSubscription;
+  public readonly subscription?: NotificationSubscription;
   public readonly chainEvent?: ChainEvent;
+  private _isRead?: boolean;
 
-  private _isRead: boolean;
   public get isRead(): boolean {
     return this._isRead;
   }
@@ -31,14 +32,14 @@ class Notification {
     }
   }
 
-  public static fromJSON(json, subscription: NotificationSubscription) {
+  public static fromJSON(json, subscription: NotificationSubscription, chainEventType?: ChainEventType) {
     return new Notification(
       json.id,
       json.notification_data,
       json.is_read,
       json.created_at,
       subscription,
-      json.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent) : undefined,
+      json?.ChainEvent ? ChainEvent.fromJSON(json.ChainEvent, chainEventType) : undefined
     );
   }
 }

@@ -1,5 +1,6 @@
-import { NodeInfo } from 'models';
+import { ChainInfo, NodeInfo } from 'models';
 import { IAaveGovernanceV2__factory } from 'eth/types';
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
 import AaveApi from './api';
 import { attachSigner } from '../contractApi';
@@ -9,12 +10,16 @@ import { attachSigner } from '../contractApi';
 export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
 
-  public async init(selectedNode: NodeInfo) {
-    await super.resetApi(selectedNode);
+  public coins(n: number, inDollars?: boolean) {
+    return new EthereumCoin(this.app?.chain?.meta.symbol || '???', n, inDollars);
+  }
+
+  public async init(selectedChain: ChainInfo) {
+    await super.resetApi(selectedChain);
     await super.initMetadata();
     this.aaveApi = new AaveApi(
       IAaveGovernanceV2__factory.connect,
-      selectedNode.address,
+      selectedChain.address,
       this.api.currentProvider as any
     );
     await this.aaveApi.init();
@@ -29,8 +34,7 @@ export default class AaveChain extends EthereumChain {
   public async setDelegate(delegatee: string) {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const delegator = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.wallets, delegator, token);
+    const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount, token);
     await contract.delegate(delegatee);
   }
 

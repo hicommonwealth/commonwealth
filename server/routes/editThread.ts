@@ -2,12 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +19,7 @@ export const Errors = {
   InvalidLink: 'Invalid thread URL'
 };
 
-const editThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editThread = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   const { body, title, kind, stage, thread_id, version_history, url } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -29,7 +30,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
@@ -62,7 +63,27 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       address_id: { [Op.in]: userOwnedAddressIds }
     }
   });
-  if (collaboration) {
+
+  const admin = await models.Role.findOne({
+    where: {
+      chain_id: chain.id,
+      address_id: { [Op.in]: userOwnedAddressIds },
+      permission: 'admin'
+    }
+  });
+
+  // check if banned
+  if (!admin) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: author.address,
+    });
+    if (!canInteract) {
+      return next(new Error(banError));
+    }
+  }
+
+  if (collaboration || admin) {
     thread = await models.OffchainThread.findOne({
       where: {
         id: thread_id
@@ -77,6 +98,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
     });
   }
   if (!thread) return next(new Error('No thread with that id found'));
+
   try {
     let latestVersion;
     try {
@@ -115,8 +137,10 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         return next(new Error(Errors.InvalidLink));
       }
     }
+
     await thread.save();
     await attachFiles();
+
     const finalThread = await models.OffchainThread.findOne({
       where: { id: thread.id },
       include: [
@@ -131,7 +155,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       ],
     });
 
-    // dispatch notifications to subscribers of the given chain/community
+    // dispatch notifications to subscribers of the given chain
     await models.Subscription.emitNotifications(
       models,
       NotificationCategories.ThreadEdit,
@@ -142,8 +166,8 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
         root_type: ProposalType.OffchainThread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
-        community_id: finalThread.community,
-        author_address: finalThread.Address.address
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
       },
       // don't send webhook notifications for edits
       null,
@@ -193,19 +217,7 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
     if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      let shouldNotifyMentionedUser = true;
-      if (finalThread.community) {
-        const originCommunity = await models.OffchainCommunity.findOne({
-          where: { id: finalThread.community }
-        });
-        if (originCommunity.privacy_enabled) {
-          const destinationCommunity = mentionedAddress.Roles
-            .find((role) => role.offchain_community_id === originCommunity.id);
-          if (destinationCommunity === undefined) shouldNotifyMentionedUser = false;
-        }
-      }
-
-      if (shouldNotifyMentionedUser) await models.Subscription.emitNotifications(
+      await models.Subscription.emitNotifications(
         models,
         NotificationCategories.NewMention,
         `user-${mentionedAddress.User.id}`,
@@ -216,7 +228,6 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
-          community_id: finalThread.community,
           author_address: finalThread.Address.address,
           author_chain: finalThread.Address.chain,
         },
@@ -226,7 +237,6 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
           title: req.body.title,
           bodyUrl: req.body.url,
           chain: finalThread.chain,
-          community: finalThread.community,
           body: finalThread.body,
         },
         req.wss,

@@ -2,17 +2,25 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
+import validateRoles from '../util/validateRoles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 enum DeleteThreadErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
-  NoPermission = 'Not owned by this user'
+  NoPermission = 'Not owned by this user',
 }
 
-const deleteThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id } = req.body;
+const deleteThread = async (
+  models: DB,
+  banCache: BanCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { thread_id, chain_id } = req.body;
   if (!req.user) {
     return next(new Error(DeleteThreadErrors.NoUser));
   }
@@ -22,64 +30,59 @@ const deleteThread = async (models: DB, req: Request, res: Response, next: NextF
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses())
-      .filter((addr) => !!addr.verified).map((addr) => addr.id);
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
 
-    // allow either the author or admin/mods to delete threads
     const myThread = await models.OffchainThread.findOne({
       where: {
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
       },
-      include: [ models.Chain, models.OffchainCommunity ]
+      include: [{
+        model: models.Chain,
+      }, {
+        association: 'Address',
+      }],
     });
 
-    const thread = myThread || await models.OffchainThread.findOne({
-      where: {
-        id: req.body.thread_id,
-      },
-      include: [ models.Chain, models.OffchainCommunity ]
-    });
+    let thread = myThread;
 
-    if (!thread) {
-      return next(new Error(DeleteThreadErrors.NoThread));
+    // check if author can delete post
+    if (thread) {
+      const [canInteract, error] = await banCache.checkBan({
+        chain: thread.chain,
+        address: thread.Address.address,
+      });
+      if (!canInteract) {
+        return next(new Error(error));
+      }
     }
 
-    const userRole = await models.Role.findOne({
-      where: thread.Chain ? {
-        address_id: userOwnedAddressIds,
-        chain_id: thread.Chain.id,
-        permission: ['admin', 'moderator'],
-      } : {
-        address_id: userOwnedAddressIds,
-        offchain_community_id: thread.OffchainCommunity.id,
-        permission: ['admin', 'moderator'],
-      },
-    });
+    if (!myThread) {
+      const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain_id);
 
-    const isAdminOrMod = userRole?.permission === 'admin' || userRole?.permission === 'moderator';
+      if (!isAdminOrMod) {
+        return next(new Error(DeleteThreadErrors.NoPermission));
+      }
 
-    if (!myThread && (!isAdminOrMod && !req.user.isAdmin)) {
-      return next(new Error(DeleteThreadErrors.NoPermission));
-    }
+      thread = await models.OffchainThread.findOne({
+        where: {
+          id: req.body.thread_id,
+        },
+        include: [models.Chain],
+      });
 
-    const topic = await models.OffchainTopic.findOne({
-      where: { id: thread.topic_id },
-      include: [ { model: models.OffchainThread, as: 'threads' } ]
-    });
-    const featuredTopics = (thread.Chain || thread.OffchainCommunity).featured_topics;
-    if (topic && !featuredTopics.includes(`${topic.id}`) && topic.threads.length <= 1) {
-      topic.destroy();
+      if (!thread) {
+        return next(new Error(DeleteThreadErrors.NoThread));
+      }
     }
 
     // find and delete all associated subscriptions
-    const subscriptions = await models.Subscription.findAll({
+    await models.Subscription.destroy({
       where: {
         offchain_thread_id: thread.id,
       },
     });
-    await Promise.all(subscriptions.map((s) => {
-      return s.destroy();
-    }));
 
     await thread.destroy();
     return res.json({ status: 'Success' });

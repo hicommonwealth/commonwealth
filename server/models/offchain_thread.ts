@@ -1,14 +1,13 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainCommunityAttributes } from './offchain_community';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 
-export interface OffchainThreadAttributes {
+export type OffchainThreadAttributes = {
   address_id: number;
   title: string;
   kind: string;
@@ -19,24 +18,21 @@ export interface OffchainThreadAttributes {
   url?: string;
   topic_id?: number;
   pinned?: boolean;
-  chain?: string;
-  community?: string;
+  chain: string;
 
   read_only?: boolean;
   version_history?: string[];
   snapshot_proposal?: string;
 
-  offchain_voting_options?: string;
-  offchain_voting_ends_at?: Date;
-  offchain_voting_votes?: number;
+  has_poll?: boolean;
 
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  last_commented_on?: Date;
 
   // associations
   Chain?: ChainAttributes;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Address?: AddressAttributes;
   OffchainAttachments?:
     | OffchainAttachmentAttributes[]
@@ -44,13 +40,11 @@ export interface OffchainThreadAttributes {
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
-}
+};
 
-export interface OffchainThreadInstance
-  extends Model<OffchainThreadAttributes>,
-    OffchainThreadAttributes {
+export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {
   // no mixins used
-}
+};
 
 export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>;
 
@@ -79,8 +73,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: true },
-      community: { type: dataTypes.STRING, allowNull: true },
+      chain: { type: dataTypes.STRING, allowNull: false },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -93,13 +86,12 @@ export default (
       },
       snapshot_proposal: { type: dataTypes.STRING(48), allowNull: true },
 
-      offchain_voting_options: { type: dataTypes.STRING },
-      offchain_voting_ends_at: { type: dataTypes.DATE, allowNull: true },
-      offchain_voting_votes: { type: dataTypes.INTEGER, allowNull: true },
+      has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
+      last_commented_on: { type: dataTypes.DATE, allowNull: true },
     },
     {
       timestamps: true,
@@ -112,17 +104,10 @@ export default (
       indexes: [
         { fields: ['address_id'] },
         { fields: ['chain'] },
-        { fields: ['community'] },
         { fields: ['chain', 'created_at'] },
-        { fields: ['community', 'created_at'] },
         { fields: ['chain', 'updated_at'] },
-        { fields: ['community', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
-        { fields: ['community', 'pinned'] },
-        { fields: ['chain', 'offchain_voting_ends_at'] },
-        { fields: ['community', 'offchain_voting_ends_at'] },
-        { fields: ['chain', 'offchain_voting_votes'] },
-        { fields: ['community', 'offchain_voting_votes'] },
+        { fields: ['chain', 'has_poll'] },
       ],
     }
   );
@@ -130,10 +115,6 @@ export default (
   OffchainThread.associate = (models) => {
     models.OffchainThread.belongsTo(models.Chain, {
       foreignKey: 'chain',
-      targetKey: 'id',
-    });
-    models.OffchainThread.belongsTo(models.OffchainCommunity, {
-      foreignKey: 'community',
       targetKey: 'id',
     });
     models.OffchainThread.belongsTo(models.Address, {
@@ -169,10 +150,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
     });
-    models.OffchainThread.hasMany(models.OffchainVote, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',
@@ -180,6 +157,9 @@ export default (
     models.OffchainThread.hasMany(models.LinkedThread, {
       foreignKey: 'linking_thread',
       as: 'linked_threads',
+    });
+    models.OffchainThread.hasMany(models.OffchainPoll, {
+      foreignKey: 'thread_id',
     });
   };
 

@@ -1,59 +1,57 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ModelStatic } from './types';
+import { DataTypes } from 'sequelize';
+import { ModelStatic, ModelInstance } from './types';
 import { OffchainThreadAttributes } from './offchain_thread';
+import { OffchainPollAttributes } from './offchain_poll';
 
-export interface OffchainVoteAttributes {
-  thread_id: number;
+export type OffchainVoteAttributes = {
+  poll_id: number;
   option: string;
   address: string;
   author_chain: string;
-  chain: string;
-  community: string;
+  chain_id: string;
   id?: number;
   created_at?: Date;
   updated_at?: Date;
 
   // associations
-  thread?: OffchainThreadAttributes | OffchainThreadAttributes['id'];
-}
+  poll?: OffchainPollAttributes;
+};
 
-export interface OffchainVoteInstance
-extends Model<OffchainVoteAttributes>, OffchainVoteAttributes {}
+export type OffchainVoteInstance = ModelInstance<OffchainVoteAttributes>;
 
-export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>
+export type OffchainVoteModelStatic = ModelStatic<OffchainVoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): OffchainVoteModelStatic => {
   const OffchainVote = <OffchainVoteModelStatic>sequelize.define(
-    'OffchainVote', {
+    'OffchainVote',
+    {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      thread_id: { type: dataTypes.INTEGER, allowNull: false },
+      poll_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
       author_chain: { type: Sequelize.STRING, allowNull: true },
-      chain: { type: Sequelize.STRING, allowNull: true },
-      community: { type: Sequelize.STRING, allowNull: true },
+      chain_id: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-    }, {
+    },
+    {
       tableName: 'OffchainVotes',
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['thread_id'] },
-      ],
+      indexes: [{ fields: ['poll_id'] }],
     }
   );
 
   OffchainVote.associate = (models) => {
-    models.OffchainVote.belongsTo(models.OffchainThread, {
-      foreignKey: 'thread_id',
+    models.OffchainVote.belongsTo(models.OffchainPoll, {
+      foreignKey: 'poll_id',
       constraints: false,
-      as: 'thread',
+      as: 'poll',
     });
   };
 

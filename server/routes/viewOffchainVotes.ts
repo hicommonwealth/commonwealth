@@ -1,25 +1,26 @@
-import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { OffchainVoteAttributes } from '../models/offchain_vote';
+import { TypedRequestQuery, TypedResponse, success } from '../types';
 
 export const Errors = {
-  InvalidThread: 'Invalid thread',
+  NoPollSpecified: 'No poll has been specified',
 };
+
+type ViewOffchainVotesReq = { poll_id: string; chain_id: string };
+type ViewOffchainVotesResp = OffchainVoteAttributes[];
 
 const viewOffchainVotes = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery<ViewOffchainVotesReq>,
+  res: TypedResponse<ViewOffchainVotesResp>
 ) => {
-  let chain, community, error;
+  // TODO: runtime validation based on params
+  //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
+  let chain, error;
   try {
-    [chain, community, error] = await lookupCommunityIsVisibleToUser(
-      models,
-      req.query,
-      req.user
-    );
+    [chain, error] = await validateChain(models, req.query);
   } catch (err) {
     throw new AppError(err);
   }
@@ -28,21 +29,21 @@ const viewOffchainVotes = async (
     throw new AppError(error);
   }
 
-  if (!req.query.thread_id) {
-    throw new AppError(Errors.InvalidThread);
-    // return next(new Error(Errors.InvalidThread));
+  if (!req.query.poll_id) {
+    throw new AppError(Errors.NoPollSpecified);
   }
 
   try {
     const votes = await models.OffchainVote.findAll({
-      where: community
-        ? { thread_id: req.query.thread_id, community: community.id }
-        : { thread_id: req.query.thread_id, chain: chain.id },
+      where: {
+        poll_id: req.query.poll_id,
+        chain_id: chain.id,
+      },
     });
-    return res.json({
-      status: 'Success',
-      result: votes.map((v) => v.toJSON()),
-    });
+    return success(
+      res,
+      votes.map((v) => v.toJSON())
+    );
   } catch (err) {
     throw new ServerError(err);
   }

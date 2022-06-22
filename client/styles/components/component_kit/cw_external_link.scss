@@ -1,0 +1,43 @@
+@import 'client/styles/shared';
+
+.ExternalLink {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  font-weight: 500;
+  min-width: fit-content;
+
+  span {
+    color: $purple-500;
+    margin-right: 15px;
+  }
+
+  &.button {
+    padding: 4px 8px;
+    border: 1px solid $purple-200;
+    border-radius: 10px;
+
+    svg {
+      color: $purple-500;
+    }
+  }
+
+  &.inline {
+    padding: 4px 8px;
+    border-radius: 4px;
+
+    svg {
+      color: $purple-500;
+    }
+  }
+
+  &:hover {
+    background-color: $purple-200;
+
+    svg {
+      color: $purple-500;
+    }
+  }
+}

@@ -1,0 +1,41 @@
+@import 'shared.scss';
+
+.ExternalLinksModule {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+
+  :not(:last-child) {
+    margin-right: 16px;
+  }
+
+  .cui-link:hover {
+    background: $purple-400;
+    color: $white;
+  }
+
+  .telegram-link {
+    color: $primary-500;
+    cursor: pointer;
+  }
+
+  .element-link {
+    color: $green-500;
+    cursor: pointer;
+  }
+
+  .discord-link {
+    color: $purple-300;
+    cursor: pointer;
+  }
+
+  .website-link {
+    color: $neutral-800;
+    cursor: pointer;
+  }
+
+  .github-link {
+    color: $neutral-800;
+    cursor: pointer;
+  }
+}

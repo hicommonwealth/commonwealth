@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -13,7 +13,7 @@ export const Errors = {
 };
 
 const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
@@ -29,16 +29,12 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
   const topic = await models.OffchainTopic.findOne({ where: { id } });
   if (!topic) return next(new Error(Errors.TopicNotFound));
 
-  const chainOrCommunity = community
-    ? 'community = :community'
-    : 'chain = :chain';
-  const replacements = community
-    ? { community: community.id }
-    : { chain: chain.id };
-  replacements['id'] = id;
-  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id = :id AND ${chainOrCommunity};`;
+  const chainOrCommunity = 'chain = $chain';
+  const bind = { chain: chain.id };
+  bind['id'] = id;
+  const query = `UPDATE "OffchainThreads" SET topic_id=null WHERE topic_id = $id AND ${chainOrCommunity};`;
   await models.sequelize.query(query, {
-    replacements,
+    bind,
     type: QueryTypes.UPDATE,
   });
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 
@@ -17,7 +17,7 @@ export const Errors = {
 };
 
 const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
@@ -41,12 +41,9 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
   const roleWhere = {
     address_id: adminAddress.id,
     permission: 'admin',
+    chain_id: chain.id,
   };
-  if (community) {
-    roleWhere['offchain_community_id'] = community.id;
-  } else if (chain) {
-    roleWhere['chain_id'] = chain.id;
-  }
+
   const requesterIsAdminOrMod = await models.Role.findOne({
     where: roleWhere,
   });
@@ -74,21 +71,6 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     topic.featured_in_new_post = !!(featured_in_new_post === 'true');
     topic.default_offchain_template = default_offchain_template || '';
     await topic.save();
-
-    if (featured_order) {
-      const activeEntity = community
-        ? await models.OffchainCommunity.findOne({ where: { id: community.id } })
-        : await models.Chain.findOne({ where: { id: chain.id } });
-      let { featured_topics } = activeEntity;
-      if (featured_order === 'true' && !featured_topics.includes(`${id}`)) {
-        featured_topics.push(`${id}`);
-      } else if (featured_order === 'false' && featured_topics.includes(`${id}`)) {
-        const idx = featured_topics.indexOf(`${id}`);
-        featured_topics = featured_topics.slice(0, idx).concat(featured_topics.slice(idx + 1));
-      }
-      activeEntity.featured_topics = featured_topics;
-      await activeEntity.save();
-    }
 
     return res.json({ status: 'Success', result: topic.toJSON() });
   } catch (e) {

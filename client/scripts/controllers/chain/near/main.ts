@@ -1,5 +1,5 @@
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 import { NearToken } from 'adapters/chain/near/types';
@@ -11,7 +11,7 @@ export default class Near extends IChainAdapter<NearToken, any> {
   public chain: NearChain;
   public accounts: NearAccounts;
 
-  constructor(meta: NodeInfo, app: IApp) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new NearChain(this.app);
     this.accounts = new NearAccounts(this.app);

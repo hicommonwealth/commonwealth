@@ -5,47 +5,51 @@ class OffchainTopic {
   public readonly id: number;
   public readonly description: string;
   public readonly telegram?: string;
-  public readonly communityId?: string;
-  public readonly chainId?: string;
+  public readonly chainId: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
+  public order?: number;
   public readonly defaultOffchainTemplate?: string;
 
   private _tokenThreshold?: BN;
-  public get tokenThreshold() { return this._tokenThreshold; }
-  public setTokenThreshold(t: BN) { this._tokenThreshold = t; }
+  public get tokenThreshold() {
+    return this._tokenThreshold;
+  }
+  public setTokenThreshold(t: BN) {
+    this._tokenThreshold = t;
+  }
 
   constructor({
     name,
     id,
     description,
     telegram,
-    community_id,
     chain_id,
     featured_in_sidebar,
     featured_in_new_post,
+    order,
     default_offchain_template,
     token_threshold,
   }: {
-      name: string,
-      id: number,
-      description: string,
-      telegram?: string,
-      community_id?: string,
-      chain_id?: string,
-      featured_in_sidebar?: boolean,
-      featured_in_new_post?: boolean,
-      default_offchain_template?: string,
-      token_threshold?: BN | string | number,
+    name: string;
+    id: number;
+    description: string;
+    telegram?: string;
+    chain_id?: string;
+    featured_in_sidebar?: boolean;
+    featured_in_new_post?: boolean;
+    order?: number;
+    default_offchain_template?: string;
+    token_threshold?: BN | string | number;
   }) {
     this.name = name;
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    this.communityId = community_id;
     this.chainId = chain_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;
+    this.order = order;
     this.defaultOffchainTemplate = default_offchain_template;
     if (token_threshold !== undefined) {
       this._tokenThreshold = new BN(token_threshold);

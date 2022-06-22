@@ -1,43 +1,42 @@
 @import 'client/styles/shared';
 
 .BountiesPage {
-    padding-bottom: 60px;
-    @include gov-explainer;
+  flex: 1;
+  padding: 24px;
+  width: 100%;
 
-    .proposal-title {
-        min-height: 70px;
-    }
+  @include gov-explainer;
 
-    .BountyDetail {
-        p {
-            margin-top: 16px;
-        }
-        p + p {
-            margin-top: 4px;
-        }
-        .b-box {
-            border: 1px solid $border-color-lightest;
-            border-radius: 8px;
-            border-bottom: none;
-            margin-bottom: 18px;
-            .b-row {
-                padding: 0 10px;
-                padding-top: 5px;
-                border-bottom: 1px solid $border-color-lightest;
-                display: flex;
-                &.waiting {
-                    color: $text-color-light;
-                }
-                &:last-child {
-                    border-radius: 0 0 8px 8px;
-                }
-            }
-            .b-col {
-                min-width: 24px;
-            }
-        }
-        .cui-button + .cui-button {
-            margin-top: 6px;
-        }
+  .BountyDetail {
+    p {
+      margin-top: 16px;
     }
+    p + p {
+      margin-top: 4px;
+    }
+    .b-box {
+      border: 1px solid $neutral-50;
+      border-radius: 8px;
+      border-bottom: none;
+      margin-bottom: 18px;
+      .b-row {
+        padding: 0 10px;
+        padding-top: 5px;
+        border-bottom: 1px solid $neutral-50;
+        display: flex;
+        &.waiting {
+          color: $neutral-500;
+        }
+        &:last-child {
+          border-radius: 0 0 8px 8px;
+        }
+      }
+      .b-col {
+        min-width: 24px;
+      }
+    }
+    .cui-button + .cui-button {
+      margin-top: 6px;
+    }
+  }
 }

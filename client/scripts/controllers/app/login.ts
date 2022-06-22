@@ -9,14 +9,13 @@ import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
-import Token from 'controllers/chain/ethereum/token/adapter';
-import { ChainBase } from 'types';
+import { ChainBase, WalletId } from 'types';
 import {
   ChainInfo,
   SocialAccount,
   Account,
-  CommunityInfo,
-  AddressInfo
+  AddressInfo,
+  ITokenAdapter,
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
@@ -24,61 +23,59 @@ const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
   account: Account<any>,
+  walletId: WalletId,
   community?: string
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
-    keytype: account.chainBase === ChainBase.Substrate
-      && (account as any).isEd25519 ? 'ed25519' : undefined,
+    keytype:
+      account.chainBase === ChainBase.Substrate && (account as any).isEd25519
+        ? 'ed25519'
+        : undefined,
     chain: account.chain.id,
     community,
     jwt: app.user.jwt,
+    wallet_id: walletId,
   });
 }
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
-  originChain: string,
-  community: string,
+  originChain: string
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    'address': address,
-    'chain': chain,
-    'originChain': originChain,
-    'community': community,
+    address: address,
+    chain: chain,
+    originChain: originChain,
     jwt: app.user.jwt,
   });
 }
 
 export async function setActiveAccount(account: Account<any>): Promise<void> {
   const chain = app.activeChainId();
-  const community = app.activeCommunityId();
-  const role = app.user.getRoleInCommunity({ account, chain, community });
+  const role = app.user.getRoleInCommunity({ account, chain });
 
-  if (app.chain && (app.chain as Token).isToken) {
-    (app.chain as Token).activeAddressHasToken(account.address).then(() => m.redraw());
+  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+    app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
   }
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
-    if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
     return;
   }
 
   try {
-    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, chain ? {
+    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_chain: account.chain.id,
       chain,
-      jwt: app.user.jwt,
-      auth: true,
-    } : {
-      address: account.address,
-      author_chain: account.chain.id,
-      community,
       jwt: app.user.jwt,
       auth: true,
     });
@@ -91,16 +88,23 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 
   // update is_user_default
-  app.user.getAllRolesInCommunity({ chain, community })
-    .forEach((r) => { r.is_user_default = false; });
+  app.user.getAllRolesInCommunity({ chain }).forEach((r) => {
+    r.is_user_default = false;
+  });
   role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
-  if (app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length === 0) {
+  if (
+    app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
+    0
+  ) {
     app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
   }
 }
 
-export async function updateLastVisited(activeEntity: ChainInfo | CommunityInfo, updateFrontend?: boolean) {
+export async function updateLastVisited(
+  activeEntity: ChainInfo,
+  updateFrontend?: boolean
+) {
   if (!app.isLoggedIn()) return;
   try {
     const timestamp = moment();
@@ -123,22 +127,15 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   // update addresses for a chain (if provided) or for offchain communities (if null)
   // for offchain communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
-    chain
-      ? app.user.addresses
-        .filter((a) => a.chain === chain.id)
-        .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
-        .filter((addr) => addr)
-      : app.user.addresses
-        .filter((addr) => app.config.chains.getById(addr.chain))
-        .map((addr) => app.community?.accounts.get(addr.address, addr.chain))
-        .filter((addr) => addr)
+    app.user.addresses
+      .filter((a) => a.chain === chain.id)
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .filter((addr) => addr)
   );
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return chain
-      ? app.user.isMember({ chain: chain.id, account })
-      : app.user.isMember({ community: app.community.meta.id, account });
+    return app.user.isMember({ chain: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -147,13 +144,16 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = chain
-      ? app.user.getDefaultAddressInCommunity({ chain: chain.id })
-      : app.user.getDefaultAddressInCommunity({ community: app.community.meta.id });
+    const existingAddress = app.user.getDefaultAddressInCommunity({
+      chain: chain.id,
+    });
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
-        return a.chain.id === existingAddress.chain && a.address === existingAddress.address;
+        return (
+          a.chain.id === existingAddress.chain &&
+          a.address === existingAddress.address
+        );
       });
       if (account) await setActiveAccount(account);
     }
@@ -185,8 +185,24 @@ export function updateActiveUser(data) {
     app.user.setEmailVerified(data.emailVerified);
     app.user.setJWT(data.jwt);
 
-    app.user.setAddresses(data.addresses.map((a) => new AddressInfo(a.id, a.address, a.chain, a.keytype, a.is_magic, a.ghost_address)));
-    app.user.setSocialAccounts(data.socialAccounts.map((sa) => new SocialAccount(sa.provider, sa.provider_username)));
+    app.user.setAddresses(
+      data.addresses.map(
+        (a) =>
+          new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          )
+      )
+    );
+    app.user.setSocialAccounts(
+      data.socialAccounts.map(
+        (sa) => new SocialAccount(sa.provider, sa.provider_username)
+      )
+    );
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
@@ -196,14 +212,18 @@ export function updateActiveUser(data) {
 }
 
 export async function createUserWithAddress(
-  address: string, keytype?: string, community?: string
+  address: string,
+  walletId: WalletId,
+  keytype?: string,
+  community?: string
 ): Promise<Account<any>> {
   const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, community);
+  const response = await createAccount(account, walletId, community);
   const token = response.result.verification_token;
   const newAccount = app.chain.accounts.get(response.result.address, keytype);
   newAccount.setValidationToken(token);
   newAccount.setAddressId(response.result.id);
+  newAccount.setWalletId(walletId);
   return newAccount;
 }
 
@@ -220,7 +240,9 @@ export async function unlinkLogin(account) {
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
   app.user.activeAccounts.splice(index, 1);
-  index = app.user.addresses.indexOf(app.user.addresses.find((a) => a.address === account.address));
+  index = app.user.addresses.indexOf(
+    app.user.addresses.find((a) => a.address === account.address)
+  );
   app.user.addresses.splice(index, 1);
 
   if (!unlinkingCurrentlyActiveAccount) return;
@@ -232,13 +254,15 @@ export async function unlinkLogin(account) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, { extensions: [
-    new PolkadotExtension({
-      // we don't need a real node URL because we're only generating an address,
-      // not doing anything requiring chain connection
-      rpcUrl: 'ws://localhost:9944',
-    })
-  ] });
+  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new PolkadotExtension({
+        // we don't need a real node URL because we're only generating an address,
+        // not doing anything requiring chain connection
+        rpcUrl: 'ws://localhost:9944',
+      }),
+    ],
+  });
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
@@ -246,23 +270,20 @@ export async function loginWithMagicLink(email: string) {
       Authorization: `Bearer ${didToken}`,
     },
     xhrFields: {
-      withCredentials: true
+      withCredentials: true,
     },
     data: {
       // send chain/community to request
-      'chain': app.activeChainId(),
-      'community': app.activeCommunityId(),
+      chain: app.activeChainId(),
     },
   });
   if (response.status === 'Success') {
     // log in as the new user (assume all verification done server-side)
     await initAppState(false);
-    if (app.community) {
-      await updateActiveAddresses();
-    } else if (app.chain) {
-      const c = app.user.selectedNode
-        ? app.user.selectedNode.chain
-        : app.config.nodes.getByChain(app.activeChainId())[0].chain;
+    if (app.chain) {
+      const c = app.user.selectedChain
+        ? app.user.selectedChain
+        : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses(c);
     }
   } else {

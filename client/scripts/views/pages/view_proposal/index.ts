@@ -1,27 +1,28 @@
-import 'pages/view_proposal/index.scss';
-import 'pages/view_proposal/tips.scss';
-
 import $ from 'jquery';
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import {
   PopoverMenu,
   MenuDivider,
   MenuItem,
-  Icon,
-  Icons,
   Button,
   Input,
-  Size,
 } from 'construct-ui';
+
+import 'pages/view_proposal/index.scss';
+import 'pages/view_proposal/tips.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { ProposalType, ChainBase } from 'types';
-import { idToProposal, proposalSlugToClass } from 'identifiers';
+import {
+  chainToProposalSlug,
+  getProposalUrlPath,
+  idToProposal,
+  pathIsDiscussion,
+  proposalSlugToClass,
+} from 'identifiers';
 import { slugify } from 'utils';
-
 import Substrate from 'controllers/chain/substrate/main';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
@@ -39,9 +40,9 @@ import {
 } from 'models';
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
-import TopicEditor from 'views/components/topic_editor';
-import StageEditor from 'views/components/stage_editor';
-import PollEditor from 'views/components/poll_editor';
+import { TopicEditor } from 'views/components/topic_editor';
+import { StageEditor } from 'views/components/stage_editor';
+import { PollEditor } from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
@@ -52,8 +53,8 @@ import ProposalVotingActions, {
   QueueButton,
 } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
-import PageLoading from 'views/pages/loading';
-import PageNotFound from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
+import { PageNotFound } from 'views/pages/404';
 
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
@@ -65,12 +66,8 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
+import OffchainPoll from 'client/scripts/models/OffchainPoll';
 import {
-  ProposalHeaderExternalLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
-  ProposalHeaderOffchainPoll,
-  ProposalHeaderThreadLink,
   ProposalHeaderTopics,
   ProposalHeaderTitle,
   ProposalHeaderStage,
@@ -83,12 +80,6 @@ import {
   ProposalLinkEditor,
   // ProposalHeaderLinkThreadsMenuItem,
 } from './header';
-import {
-  ProposalSidebarStageEditorModule,
-  ProposalSidebarPollEditorModule,
-  ProposalSidebarLinkedViewer,
-  ProposalLinkedThreadsEditorModule,
-} from './sidebar';
 import {
   AaveViewProposalDetail,
   AaveViewProposalSummary,
@@ -105,7 +96,6 @@ import {
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyReaction,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
   EditPermissionsButton,
@@ -117,12 +107,28 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { InlineReplyButton } from '../../components/inline_reply_button';
+import { PollEditorCard } from './poll_editor_card';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
+import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ProposalPoll } from './poll';
+import {
+  ProposalHeaderExternalLink,
+  ProposalHeaderThreadLink,
+  ProposalHeaderBlockExplorerLink,
+  ProposalHeaderVotingInterfaceLink,
+} from './proposal_header_links';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 const MAX_THREAD_LEVEL = 2;
 
 interface IPrefetch {
   [identifier: string]: {
     commentsStarted: boolean;
+    pollsStarted: boolean;
     viewCountStarted: boolean;
     profilesStarted: boolean;
     profilesFinished: boolean;
@@ -130,24 +136,25 @@ interface IPrefetch {
 }
 
 export interface IProposalPageState {
+  comments: OffchainComment<OffchainThread>[];
+  polls: OffchainPoll[];
   editing: boolean;
-  recentlyEdited: boolean;
-  replying: boolean;
-  parentCommentId: number; // if null or undefined, reply is thread-scoped
-  recentlySubmitted: number; // comment ID for CSS highlight transitions
   highlightedComment: boolean;
+  parentCommentId: number; // if null or undefined, reply is thread-scoped
+  pollEditorIsOpen: boolean;
   prefetch: IPrefetch;
-  comments;
-  viewCount: number;
   proposal: AnyProposal | OffchainThread;
+  recentlyEdited: boolean;
+  recentlySubmitted: number; // comment ID for CSS highlight transitions
+  replying: boolean;
+  stageEditorIsOpen: boolean;
   threadFetched;
   threadFetchFailed;
-  pollEditorIsOpen: boolean;
-  stageEditorIsOpen: boolean;
   tipAmount: number;
+  viewCount: number;
 }
 
-export const scrollToForm = (parentId?: number) => {
+const scrollToForm = (parentId?: number) => {
   setTimeout(() => {
     const $reply = parentId
       ? $(`.comment-${parentId}`).nextAll('.CreateComment')
@@ -174,28 +181,6 @@ export const scrollToForm = (parentId?: number) => {
     // focus the reply form
     $reply.find('.ql-editor').focus();
   }, 1);
-};
-
-const InlineReplyButton: m.Component<
-  { commentReplyCount: number; onclick },
-  {}
-> = {
-  view: (vnode) => {
-    const { commentReplyCount, onclick } = vnode.attrs;
-    return m(
-      '.InlineReplyButton',
-      {
-        onclick,
-      },
-      [
-        m(Icon, {
-          name: Icons.MESSAGE_SQUARE,
-          size: Size.XL,
-        }),
-        m('.reply-count', commentReplyCount),
-      ]
-    );
-  },
 };
 
 const ProposalHeader: m.Component<
@@ -236,15 +221,14 @@ const ProposalHeader: m.Component<
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
     const attachments =
       proposal instanceof OffchainThread
         ? (proposal as OffchainThread).attachments
         : false;
-    const proposalLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/${proposal.identifier}-` + `${slugify(proposal.title)}`;
+    const proposalLink = getProposalUrlPath(
+      proposal.slug,
+      `${proposal.identifier}-${slugify(proposal.title)}`
+    );
     const proposalTitleIsEditable =
       proposal instanceof SubstrateDemocracyProposal ||
       proposal instanceof SubstrateCollectiveProposal ||
@@ -301,7 +285,7 @@ const ProposalHeader: m.Component<
                         closeOnContentClick: true,
                         menuAttrs: { size: 'default' },
                         content: [
-                          (isEditor || isAuthor) &&
+                          (isEditor || isAuthor || isAdmin) &&
                             m(ProposalBodyEditMenuItem, {
                               item: proposal,
                               proposalPageState: vnode.attrs.proposalPageState,
@@ -329,13 +313,21 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot !== null &&
+                            app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
-                              onclick: (e) => {
-                                navigateToSubpage(
-                                  `/new/snapshot/${app.chain.meta.chain.snapshot}` +
-                                    `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
-                                );
+                              onclick: () => {
+                                const snapshotSpaces =
+                                  app.chain.meta.snapshot;
+                                if (snapshotSpaces.length > 1) {
+                                  navigateToSubpage('/multiple-snapshots', {
+                                    action: 'create-from-thread',
+                                    proposal,
+                                  });
+                                } else {
+                                  navigateToSubpage(
+                                    `/snapshot/${snapshotSpaces}`
+                                  );
+                                }
                               },
                               label: 'Snapshot proposal from thread',
                             }),
@@ -349,7 +341,10 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                     !app.isCustomDomain() &&
                       m('.CommentSocialHeader', [m(SocialSharingCarat)]),
@@ -386,11 +381,11 @@ const ProposalHeader: m.Component<
                         onChangeHandler: (
                           stage: OffchainThreadStage,
                           chainEntities: ChainEntity[],
-                          snapshotProposal: SnapshotProposal
+                          snapshotProposal: SnapshotProposal[]
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
-                          if (app.chain?.meta.chain.snapshot) {
+                          if (app.chain?.meta.snapshot) {
                             proposal.snapshotProposal = snapshotProposal[0]?.id;
                           }
                           app.threads.fetchThreadsFromId([proposal.identifier]);
@@ -432,19 +427,22 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                        trigger: m(CWIcon, {
+                          iconName: 'chevronDown',
+                          iconSize: 'small',
+                        }),
                       }),
                   ]
             ),
             m('.proposal-body-link', [
               proposal instanceof OffchainThread &&
                 proposal.kind === OffchainThreadKind.Link && [
-                  !vnode.state.editing
-                    ? m(ProposalHeaderExternalLink, { proposal })
-                    : m(ProposalLinkEditor, {
+                  vnode.state.editing
+                    ? m(ProposalLinkEditor, {
                         item: proposal,
                         parentState: vnode.state,
-                      }),
+                      })
+                    : m(ProposalHeaderExternalLink, { proposal }),
                 ],
               !(proposal instanceof OffchainThread) &&
                 (proposal['blockExplorerLink'] ||
@@ -495,10 +493,12 @@ const ProposalHeader: m.Component<
                   ]),
                 !vnode.state.editing &&
                   m('.proposal-response-row', [
-                    m(ProposalBodyReaction, { item: proposal }),
+                    m(ThreadReactionButton, {
+                      thread: proposal,
+                    }),
                     m(InlineReplyButton, {
                       commentReplyCount: commentCount,
-                      onclick: (e) => {
+                      onclick: () => {
                         if (!proposalPageState.replying) {
                           proposalPageState.replying = true;
                           scrollToForm();
@@ -549,17 +549,16 @@ const ProposalComment: m.Component<
       isAdmin,
       isLast,
     } = vnode.attrs;
+
     if (!comment) return;
     const parentType = comment.parentComment
       ? CommentParent.Comment
       : CommentParent.Proposal;
 
-    const commentLink =
-      `${app.isCustomDomain() ? '' : `/${app.activeId()}`}/proposal/${
-        proposal.slug
-      }/` +
-      `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`;
-
+    const commentLink = getProposalUrlPath(
+      proposal.slug,
+      `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`
+    );
     const commentReplyCount = app.comments
       .getByProposal(proposal)
       .filter((c) => c.parentComment === comment.id && !c.deleted).length;
@@ -600,7 +599,10 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(Icon, { name: Icons.CHEVRON_DOWN }),
+                trigger: m(CWIcon, {
+                  iconName: 'chevronDown',
+                  iconSize: 'small',
+                }),
               }),
             ],
             !app.isCustomDomain() &&
@@ -654,10 +656,12 @@ const ProposalComment: m.Component<
             !vnode.state.editing &&
               !comment.deleted &&
               m('.comment-response-row', [
-                m(ProposalBodyReaction, { item: comment }),
+                m(CommentReactionButton, {
+                  comment,
+                }),
                 m(InlineReplyButton, {
                   commentReplyCount,
-                  onclick: (e) => {
+                  onclick: () => {
                     if (
                       !proposalPageState.replying ||
                       proposalPageState.parentCommentId !== comment.id
@@ -779,7 +783,7 @@ const ProposalComments: m.Component<
           return m(
             `.threading-level-${threadLevel}`,
             {
-              style: `margin-left: calc(36px * ${threadLevel})`,
+              style: `margin-left: 32px`,
             },
             [
               m(ProposalComment, {
@@ -820,7 +824,10 @@ const ProposalComments: m.Component<
         // create comment
         // errors
         vnode.state.commentError &&
-          m('.comments-error', vnode.state.commentError),
+          m(CWValidationText, {
+            message: vnode.state.commentError,
+            status: 'failure',
+          }),
       ]
     );
   },
@@ -829,26 +836,33 @@ const ProposalComments: m.Component<
 const ViewProposalPage: m.Component<
   {
     identifier: string;
-    type: string;
+    type?: string;
   },
   IProposalPageState
 > = {
   oncreate: (vnode) => {
-    mixpanel.track('PageVisit', { 'Page Name': 'ViewProposalPage' });
-    mixpanel.track('Proposal Funnel', {
-      'Step No': 1,
-      Step: 'Viewing Proposal',
-      'Proposal Name': `${vnode.attrs.type}: ${vnode.attrs.identifier}`,
-      Scope: app.activeId(),
-    });
+    // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
+
     if (!vnode.state.editing) {
       vnode.state.editing = false;
     }
   },
   view: (vnode) => {
-    const { identifier, type } = vnode.attrs;
-    const headerTitle =
-      m.route.param('type') === 'discussion' ? 'Discussions' : 'Proposals';
+    const { identifier } = vnode.attrs;
+    const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
+    if (!app.chain?.meta && !isDiscussion) {
+      return m(PageLoading, {
+        narrow: true,
+        showNewProposalButton: true,
+        title: 'Loading...',
+      });
+    }
+    const type =
+      vnode.attrs.type ||
+      (isDiscussion
+        ? ProposalType.OffchainThread
+        : chainToProposalSlug(app.chain.meta));
+    const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });
     const proposalId = identifier.split('-')[0];
@@ -860,6 +874,7 @@ const ViewProposalPage: m.Component<
       vnode.state.prefetch = {};
       vnode.state.prefetch[proposalIdAndType] = {
         commentsStarted: false,
+        pollsStarted: false,
         viewCountStarted: false,
         profilesStarted: false,
         profilesFinished: false,
@@ -962,19 +977,27 @@ const ViewProposalPage: m.Component<
     if (proposalRecentlyEdited) vnode.state.recentlyEdited = false;
     if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
       navigateToSubpage(
-        `/proposal/${proposal.slug}/${proposalId}-${slugify(proposal.title)}`,
+        getProposalUrlPath(
+          proposal.slug,
+          `${proposalId}-${slugify(proposal.title)}`,
+          true
+        ),
         {},
         { replace: true }
       );
     }
 
+    // load proposal
+    if (!vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([proposal]).then(() => m.redraw);
+      vnode.state.prefetch[proposalIdAndType]['threadReactionsStarted'] = true;
+    }
+
     // load comments
     if (!vnode.state.prefetch[proposalIdAndType]['commentsStarted']) {
-      (app.activeCommunityId()
-        ? app.comments.refresh(proposal, null, app.activeCommunityId())
-        : app.comments.refresh(proposal, app.activeChainId(), null)
-      )
-        .then(async (result) => {
+      app.comments
+        .refresh(proposal, app.activeChainId())
+        .then(async () => {
           vnode.state.comments = app.comments
             .getByProposal(proposal)
             .filter((c) => c.parentComment === null);
@@ -987,20 +1010,26 @@ const ViewProposalPage: m.Component<
             },
             data: JSON.stringify({
               proposal_ids: [proposalId],
-              comment_ids: vnode.state.comments.map((comment) => comment.id),
+              comment_ids: app.comments
+                .getByProposal(proposal)
+                .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
           });
           // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier(rc);
+            const id = app.reactionCounts.store.getIdentifier({
+              threadId: rc.thread_id,
+              proposalId: rc.proposal_id,
+              commentId: rc.comment_id,
+            });
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
           }
           m.redraw();
         })
-        .catch((err) => {
+        .catch(() => {
           notifyError('Failed to load comments');
           vnode.state.comments = [];
           m.redraw();
@@ -1010,7 +1039,7 @@ const ViewProposalPage: m.Component<
 
     if (vnode.state.comments?.length) {
       const mismatchedComments = vnode.state.comments.filter((c) => {
-        return c.rootProposal !== `${vnode.attrs.type}_${proposalId}`;
+        return c.rootProposal !== `${type}_${proposalId}`;
       });
       if (mismatchedComments.length) {
         vnode.state.prefetch[proposalIdAndType]['commentsStarted'] = false;
@@ -1024,6 +1053,21 @@ const ViewProposalPage: m.Component<
       m.redraw();
     };
 
+    // load polls
+    if (
+      proposal instanceof OffchainThread &&
+      !vnode.state.prefetch[proposalIdAndType]['pollsStarted']
+    ) {
+      app.polls.fetchPolls(app.activeChainId(), proposal.id).catch(() => {
+        notifyError('Failed to load comments');
+        vnode.state.comments = [];
+        m.redraw();
+      });
+      vnode.state.prefetch[proposalIdAndType]['pollsStarted'] = true;
+    } else if (proposal instanceof OffchainThread) {
+      vnode.state.polls = app.polls.getByThreadId(proposal.id);
+    }
+
     // load view count
     if (
       !vnode.state.prefetch[proposalIdAndType]['viewCountStarted'] &&
@@ -1031,7 +1075,6 @@ const ViewProposalPage: m.Component<
     ) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
         object_id: proposal.id, // (proposal instanceof OffchainThread) ? proposal.id : proposal.slug,
       })
         .then((response) => {
@@ -1070,7 +1113,6 @@ const ViewProposalPage: m.Component<
     }
 
     // load profiles
-    // TODO: recursively fetch child comments as well (prevent reloading flash for threads with child comments)
     if (
       vnode.state.prefetch[proposalIdAndType]['profilesStarted'] === undefined
     ) {
@@ -1132,7 +1174,7 @@ const ViewProposalPage: m.Component<
     const authorChain =
       proposal instanceof OffchainThread
         ? proposal.authorChain
-        : app.activeId();
+        : app.activeChainId();
     const authorAddress =
       proposal instanceof OffchainThread
         ? proposal.author
@@ -1147,17 +1189,19 @@ const ViewProposalPage: m.Component<
           c.chain === activeAccount?.chain.id
         );
       }).length > 0;
-    const isAdmin =
+    const isAdminOrMod =
       app.user.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       }) ||
       app.user.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
-        community: app.activeCommunityId(),
       });
+    const isAdmin = app.user.isRoleOfCommunity({
+      role: 'admin',
+      chain: app.activeChainId(),
+    });
 
     if (proposal instanceof SubstrateTreasuryTip) {
       const {
@@ -1166,11 +1210,9 @@ const ViewProposalPage: m.Component<
         data: { who, reason },
       } = proposal;
       const contributors = proposal.getVotes();
-
       return m(
         Sublayout,
         {
-          class: 'ViewProposalPage',
           showNewProposalButton: true,
           title: headerTitle,
         },
@@ -1273,99 +1315,114 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
+    const showLinkedSnapshotOptions =
+      (proposal as OffchainThread).snapshotProposal?.length > 0 ||
+      (proposal as OffchainThread).chainEntities?.length > 0 ||
+      isAuthor ||
+      isAdminOrMod;
+    const showLinkedThreadOptions =
+      (proposal as OffchainThread).linkedThreads?.length > 0 ||
+      isAuthor ||
+      isAdminOrMod;
 
     return m(
       Sublayout,
       {
-        class: 'ViewProposalPage',
         showNewProposalButton: true,
         title: headerTitle,
-        rightContent: [
-          proposal instanceof OffchainThread &&
-            proposal.hasOffchainPoll &&
-            m(ProposalHeaderOffchainPoll, { proposal }),
-          proposal instanceof OffchainThread &&
-            (isAuthor) &&
-            !proposal.offchainVotingEndsAt &&
-            m(ProposalSidebarPollEditorModule, {
-              proposal,
-              openPollEditor: () => {
-                vnode.state.pollEditorIsOpen = true;
-              },
-            }),
-          proposal instanceof OffchainThread &&
-            ((proposal as OffchainThread).chainEntities.length > 0 ||
-              (proposal as OffchainThread).snapshotProposal?.length > 0) &&
-            m(ProposalSidebarLinkedViewer, {
-              proposal,
-            }),
-          proposal instanceof OffchainThread &&
-            (isAuthor || isAdmin) &&
-            m(ProposalSidebarStageEditorModule, {
-              proposal,
-              openStageEditor: () => {
-                vnode.state.stageEditorIsOpen = true;
-              },
-            }),
-          proposal instanceof OffchainThread &&
-          (proposal.linkedThreads?.length > 0 || isAuthor || isAdmin) &&
-            m(ProposalLinkedThreadsEditorModule, {
-              proposal,
-              allowLinking: isAuthor || isAdmin,
-            }),
-        ],
       },
-      [
-        m(ProposalHeader, {
-          proposal,
-          commentCount,
-          viewCount,
-          getSetGlobalEditingStatus,
-          proposalPageState: vnode.state,
-          isAuthor,
-          isEditor,
-          isAdmin,
-          stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-          pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-          closeStageEditor: () => {
-            vnode.state.stageEditorIsOpen = false;
-            m.redraw();
-          },
-          closePollEditor: () => {
-            vnode.state.pollEditorIsOpen = false;
-            m.redraw();
-          },
-        }),
-        !(proposal instanceof OffchainThread) &&
-          m(LinkedProposalsEmbed, { proposal }),
-        proposal instanceof AaveProposal && [
-          m(AaveViewProposalSummary, { proposal }),
-          m(AaveViewProposalDetail, { proposal }),
-        ],
-        !(proposal instanceof OffchainThread) &&
-          m(ProposalVotingResults, { proposal }),
-        !(proposal instanceof OffchainThread) &&
-          m(ProposalVotingActions, { proposal }),
-        m(ProposalComments, {
-          proposal,
-          comments,
-          createdCommentCallback,
-          getSetGlobalEditingStatus,
-          proposalPageState: vnode.state,
-          recentlySubmitted: vnode.state.recentlySubmitted,
-          isAdmin,
-        }),
-        !vnode.state.editing &&
-          !vnode.state.parentCommentId &&
-          m(CreateComment, {
-            callback: createdCommentCallback,
-            cancellable: true,
-            getSetGlobalEditingStatus,
-            proposalPageState: vnode.state,
-            parentComment: null,
-            rootProposal: proposal,
-          }),
-      ]
+      m('.ViewProposalPage', [
+        m('.view-proposal-page-container', [
+          [
+            m(ProposalHeader, {
+              proposal,
+              commentCount,
+              viewCount,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              isAuthor,
+              isEditor,
+              isAdmin: isAdminOrMod,
+              stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+              pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+              closeStageEditor: () => {
+                vnode.state.stageEditorIsOpen = false;
+                m.redraw();
+              },
+              closePollEditor: () => {
+                vnode.state.pollEditorIsOpen = false;
+                m.redraw();
+              },
+            }),
+            !(proposal instanceof OffchainThread) &&
+              m(LinkedProposalsEmbed, { proposal }),
+            proposal instanceof AaveProposal && [
+              m(AaveViewProposalSummary, { proposal }),
+              m(AaveViewProposalDetail, { proposal }),
+            ],
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingResults, { proposal }),
+            !(proposal instanceof OffchainThread) &&
+              m(ProposalVotingActions, { proposal }),
+            m(ProposalComments, {
+              proposal,
+              comments,
+              createdCommentCallback,
+              getSetGlobalEditingStatus,
+              proposalPageState: vnode.state,
+              recentlySubmitted: vnode.state.recentlySubmitted,
+              isAdmin: isAdminOrMod,
+            }),
+            !vnode.state.editing &&
+              !vnode.state.parentCommentId &&
+              m(CreateComment, {
+                callback: createdCommentCallback,
+                cancellable: true,
+                getSetGlobalEditingStatus,
+                proposalPageState: vnode.state,
+                parentComment: null,
+                rootProposal: proposal,
+              }),
+          ],
+        ]),
+        m('.right-content-container', [
+          [
+            showLinkedSnapshotOptions &&
+              proposal instanceof OffchainThread &&
+              m(LinkedProposalsCard, {
+                proposal,
+                openStageEditor: () => {
+                  vnode.state.stageEditorIsOpen = true;
+                },
+                showAddProposalButton: isAuthor || isAdminOrMod,
+              }),
+            showLinkedThreadOptions &&
+              proposal instanceof OffchainThread &&
+              m(LinkedThreadsCard, {
+                proposalId: proposal.id,
+                allowLinking: isAuthor || isAdminOrMod,
+              }),
+            proposal instanceof OffchainThread &&
+              isAuthor &&
+              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
+              m(PollEditorCard, {
+                proposal,
+                proposalAlreadyHasPolling: !vnode.state.polls?.length,
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
+                },
+              }),
+            proposal instanceof OffchainThread &&
+              [
+                ...new Map(
+                  vnode.state.polls?.map((poll) => [poll.id, poll])
+                ).values(),
+              ].map((poll) => {
+                return m(ProposalPoll, { poll, thread: proposal });
+              }),
+          ],
+        ]),
+      ])
     );
   },
 };

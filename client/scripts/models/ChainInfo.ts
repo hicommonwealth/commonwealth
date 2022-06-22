@@ -3,11 +3,15 @@ import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'types';
-import OffchainTopic from './OffchainTopic';
 import { ChainInstance } from 'server/models/chain';
+import OffchainTopic from './OffchainTopic';
+import NodeInfo from './NodeInfo';
 
 class ChainInfo {
   public readonly id: string;
+  public readonly ChainNode: NodeInfo;
+  public readonly address: string;
+  public readonly tokenName: string;
   public readonly symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
@@ -22,20 +26,24 @@ class ChainInfo {
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
-  public snapshot: string;
+  public snapshot: string[];
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
-  public readonly featuredTopics: string[];
   public readonly topics: OffchainTopic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
   public readonly ss58Prefix: string;
+  public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public adminOnlyPolling: boolean;
+  public communityBanner?: string;
+
+  public get node() { return this.ChainNode; }
 
   constructor({
     id,
@@ -57,14 +65,18 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultSummaryView,
-    featuredTopics,
     topics,
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrateSpec,
+    ChainNode,
+    tokenName,
+    address,
+    adminOnlyPolling,
   }) {
     this.id = id;
     this.network = network;
@@ -87,13 +99,18 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
-    this.featuredTopics = featuredTopics || [];
-    this.topics = topics.map((t) => new OffchainTopic(t)) || [];
+    this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
+    this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.ChainNode = ChainNode;
+    this.tokenName = tokenName;
+    this.address = address;
+    this.adminOnlyPolling = adminOnlyPolling;
+    this.communityBanner = null;
   }
 
   public static fromJSON({
@@ -116,14 +133,18 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
-    featured_topics,
     topics,
     adminsAndMods,
     base,
     ss58_prefix,
+    bech32_prefix,
     type,
     decimals,
     substrate_spec,
+    token_name,
+    address,
+    ChainNode,
+    admin_only_polling,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -152,14 +173,18 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultSummaryView: default_summary_view,
-      featuredTopics: featured_topics,
       topics,
       adminsAndMods,
       base,
       ss58_prefix,
+      bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      tokenName: token_name,
+      address,
+      ChainNode,
+      adminOnlyPolling: admin_only_polling,
     });
   }
 
@@ -191,7 +216,6 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )
@@ -209,12 +233,15 @@ class ChainInfo {
           r.Address.address,
           r.Address.chain,
           r.chain_id,
-          r.offchain_community_id,
           r.permission,
           r.is_user_default
         )
       );
     });
+  }
+
+  public setBanner(banner_text: string) {
+    this.communityBanner = banner_text;
   }
 
   // TODO: change to accept an object
@@ -268,35 +295,6 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
-    console.log({ this: this.defaultSummaryView, route: updatedChain.default_summary_view });
-  }
-
-  public addFeaturedTopic(topic: string) {
-    this.featuredTopics.push(topic);
-  }
-
-  public removeFeaturedTopic(topic: string) {
-    if (this.featuredTopics.includes(topic)) {
-      this.featuredTopics.splice(this.featuredTopics.indexOf(topic), 1);
-    }
-  }
-
-  public async updateFeaturedTopics(topics: string[]) {
-    try {
-      // TODO: Change to PUT /chain
-      await $.post(`${app.serverUrl()}/updateChain`, {
-        id: app.activeChainId(),
-        'featured_topics[]': topics,
-        jwt: app.user.jwt,
-      });
-    } catch (err) {
-      console.log('Failed to update featured topics');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to update featured topics'
-      );
-    }
   }
 }
 

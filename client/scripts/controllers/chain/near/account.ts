@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { Account, IAccountsModule, ITXModalData } from 'models';
+import { Account, IAccountsModule } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import { IApp } from 'state';
 import { AccountsStore } from 'stores';
@@ -28,7 +28,7 @@ export class NearAccount extends Account<NearToken> {
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
-    super(app, app.chain.meta.chain, address);
+    super(app, app.chain.meta, address);
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;
@@ -41,10 +41,6 @@ export class NearAccount extends Account<NearToken> {
         return this._Chain.coins(s.amount, false);
       }
     );
-  }
-
-  public sendBalanceTx(recipient: NearAccount, amount: NearToken): ITXModalData {
-    throw new Error('tx not supported on NEAR protocol');
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -60,14 +56,6 @@ export class NearAccount extends Account<NearToken> {
       signature: Buffer.from(signature).toString('base64'),
       publicKey: Buffer.from(publicKey.data).toString('base64')
     });
-  }
-
-  protected addressFromMnemonic(mnemonic: string): Promise<string> {
-    throw new Error('not valid on Near protocol');
-  }
-
-  protected addressFromSeed(seed: string): Promise<string> {
-    throw new Error('not valid on Near protocol');
   }
 }
 

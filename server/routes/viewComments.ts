@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import { getLastEdited } from '../util/getLastEdited';
@@ -16,11 +16,7 @@ const viewComments = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.query,
-    req.user
-  );
+  const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
   if (!req.query.root_id) {
@@ -28,9 +24,7 @@ const viewComments = async (
   }
 
   const comments = await models.OffchainComment.findAll({
-    where: community
-      ? { community: community.id, root_id: req.query.root_id }
-      : { chain: chain.id, root_id: req.query.root_id },
+    where: { chain: chain.id, root_id: req.query.root_id },
     include: [
       models.Address,
       models.OffchainAttachment,

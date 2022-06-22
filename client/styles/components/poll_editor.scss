@@ -1,37 +1,72 @@
 @import 'client/styles/shared';
 
 .PollEditorDialog {
-    .cui-dialog-body {
-        padding: 36px 28px 32px;
-    }
+  .cui-dialog-body {
+    padding: 24px;
+
     .cui-switch {
-        color: $text-color-black;
-        margin-bottom: 20px;
-    }
-    h4 {
-        margin: 12px 0 14px;
-    }
-    h4.disabled {
-        color: $text-color-light;
-    }
-    .poll-editor-choices-question {
-        margin-bottom: 16px;
-    }
-    .poll-editor-choices {
-        .poll-editor-choice-buttons {
-            margin: 4px 0;
-        }
-        .poll-editor-choice {
-            margin-bottom: 4px;
-        }
-        .cui-input,
-        .cui-button {
-            margin-bottom: 8px;
-        }
+      color: $neutral-800;
+      margin-bottom: 16px;
     }
 
-    .poll-editor-footer {
-        margin: 22px 0 0;
-        color: $text-color-medium;
+    h4 {
+      margin: 8px 0;
     }
+
+    h4.disabled {
+      color: $neutral-500;
+    }
+
+    .poll-editor-options-question {
+      margin-bottom: 16px;
+    }
+
+    .poll-editor-options {
+      .poll-editor-choice-buttons {
+        margin: 4px 0;
+      }
+
+      .poll-editor-choice {
+        margin-bottom: 4px;
+      }
+
+      .cui-input,
+      .cui-button {
+        margin-bottom: 8px;
+      }
+    }
+
+    .poll-duration-copy {
+      color: $neutral-500;
+      margin: 16px 0px;
+    }
+
+    .poll-editor-duration {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+
+      .cui-switch {
+        color: $neutral-500;
+        margin-bottom: 0;
+        min-width: max-content;
+      }
+    }
+  }
+}
+
+.custom-duration-items {
+  .cui-popover-content {
+    padding: 8px;
+    width: 104px;
+
+    .duration-item {
+      cursor: pointer;
+      padding: 4px 8px;
+
+      &:hover {
+        background-color: $primary-400;
+      }
+    }
+  }
 }

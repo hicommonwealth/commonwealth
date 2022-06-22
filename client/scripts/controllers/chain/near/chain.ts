@@ -12,7 +12,7 @@ import {
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import { uuidv4 } from 'lib/util';
-import { IChainModule, ITXModalData, NodeInfo } from 'models';
+import { ChainInfo, IChainModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
@@ -70,7 +70,6 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     return this._chainId;
   }
 
-  private _syncHandle;
   private _nodeStatus: NodeStatusResult;
   public get nodeStatus(): NodeStatusResult {
     return this._nodeStatus;
@@ -90,17 +89,17 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
     this._app = app;
   }
 
-  public async init(node: NodeInfo, accounts: NearAccounts): Promise<void> {
-    const decimalPlaces = node.chain.decimals || 24;
+  public async init(chain: ChainInfo, accounts: NearAccounts): Promise<void> {
+    const decimalPlaces = chain.decimals || 24;
     this._decimals = new BN(10).pow(new BN(decimalPlaces));
-    const networkSuffix = node.chain.id.split('.').pop();
+    const networkSuffix = chain.id.split('.').pop();
     this._networkId =
-      node.chain.id === 'near-testnet' || networkSuffix === 'testnet'
+      chain.id === 'near-testnet' || networkSuffix === 'testnet'
         ? 'testnet'
         : 'mainnet';
     this._config = {
       networkId: this.isMainnet ? 'mainnet' : 'testnet',
-      nodeUrl: node.url,
+      nodeUrl: chain.node.url,
       walletUrl: this.isMainnet
         ? 'https://wallet.near.org/'
         : 'https://wallet.testnet.near.org/',
@@ -109,45 +108,31 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
     this._api = await nearConnect(this.config);
 
-    // block times seem about 1.5-2.5 seconds, so querying every 2s feels right
-    const syncFn = async () => {
-      try {
-        this._nodeStatus = await this._api.connection.provider.status();
+    try {
+      this._nodeStatus = await this._api.connection.provider.status();
 
-        // handle chain-related updates
-        this._chainId = this._nodeStatus.chain_id;
-        const { latest_block_time, latest_block_height } =
-          this._nodeStatus.sync_info;
+      // handle chain-related updates
+      this._chainId = this._nodeStatus.chain_id;
+      const { latest_block_time, latest_block_height } =
+        this._nodeStatus.sync_info;
 
-        // update block heights and times
-        const lastTime: moment.Moment =
-          this.app.chain.block && this.app.chain.block.lastTime;
-        const lastHeight = this.app.chain.block && this.app.chain.block.height;
-        this.app.chain.block.lastTime = moment(latest_block_time);
-        this.app.chain.block.height = latest_block_height;
-        if (lastTime && lastHeight) {
-          const duration =
-            this.app.chain.block.lastTime.diff(lastTime, 'ms') / 1000;
-          const nBlocks = this.app.chain.block.height - lastHeight;
-          if (nBlocks > 0 && duration > 0) {
-            // if we accidentally miss multiple blocks, use the average block time across all of them
-            this.app.chain.block.duration = duration / nBlocks;
-          }
-        }
-        if (this.app.chain.networkStatus !== ApiStatus.Connected) {
-          this.app.chain.networkStatus = ApiStatus.Connected;
-          m.redraw();
-        }
-      } catch (e) {
-        if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
-          console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
-          this.app.chain.networkStatus = ApiStatus.Disconnected;
-          m.redraw();
-        }
+      // update block heights and times
+      this.app.chain.block.lastTime = moment(latest_block_time);
+      this.app.chain.block.height = latest_block_height;
+      const prevBlock = await this._api.connection.provider.block(latest_block_height - 1)
+      // TODO: check ms vs seconds here
+      this.app.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
+      if (this.app.chain.networkStatus !== ApiStatus.Connected) {
+        this.app.chain.networkStatus = ApiStatus.Connected;
+        m.redraw();
       }
-    };
-    await syncFn();
-    this._syncHandle = setInterval(syncFn, 2000);
+    } catch (e) {
+      if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
+        console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
+        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        m.redraw();
+      }
+    }
   }
 
   public async query<T>(
@@ -346,7 +331,6 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async deinit(): Promise<void> {
-    clearInterval(this._syncHandle);
     this.app.chain.networkStatus = ApiStatus.Disconnected;
   }
 

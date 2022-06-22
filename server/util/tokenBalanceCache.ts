@@ -1,23 +1,24 @@
 import moment from 'moment';
 import Web3 from 'web3';
+import { StateMutabilityType, AbiType } from 'web3-utils';
+import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
 
-import { ERC20__factory } from '../../shared/eth/types';
+import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
 
 import JobRunner from './cacheJobRunner';
 
 import { ChainAttributes } from '../models/chain';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { ChainType } from '../../shared/types';
-import { getUrlForEthChainId } from './supportedEthChains';
+import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-function getKey(chainId: number, contract: string, address: string) {
-  return `${chainId}-${contract}-${address}`;
+function getKey(chainBase: string, chainId: number, contract: string, address: string) {
+  return `${chainBase}-${chainId}-${contract}-${address}`;
 }
 
 // map of addresses to balances
@@ -30,13 +31,78 @@ interface CacheT {
 
 // Uses a tiny class so it's mockable for testing
 export class TokenBalanceProvider {
-  public async getBalance(url: string, tokenAddress: string, userAddress: string): Promise<BN> {
+
+  public async getRoninTokenBalance(address: string) {
+    // TODO: make configurable
+    const rpcUrl = 'https://api.roninchain.com/rpc';
+    const provider = new Web3.providers.HttpProvider(rpcUrl);
+    const web3 = new Web3(provider);
+    const axsAddress = '0x97a9107c1793bc407d6f527b77e7fff4d812bece';
+    const axsStakingPoolAddress = '05b0bb3c1c320b280501b86706c3551995bc8571';
+
+    const axsApi = ERC20__factory.connect(axsAddress, new providers.Web3Provider(provider as any));
+    await axsApi.deployed();
+    const axsBalanceBigNum = await axsApi.balanceOf(address);
+
+    const axsStakingAbi = [
+      {
+        'constant': true,
+        'inputs': [
+          {
+            'internalType': 'address',
+            'name': '_user',
+            'type': 'address'
+          }
+        ],
+        'name': 'getStakingAmount',
+        'outputs': [
+          {
+            'internalType': 'uint256',
+            'name': '',
+            'type': 'uint256'
+          }
+        ],
+        'payable': false,
+        'stateMutability': 'view' as StateMutabilityType,
+        'type': 'function' as AbiType,
+      },
+    ];
+    const axsStakingPoolContract = new web3.eth.Contract(axsStakingAbi, axsStakingPoolAddress);
+    const stakingPoolBalance = await axsStakingPoolContract.methods.getStakingAmount(address).call();
+    provider.disconnect();
+    return new BN(axsBalanceBigNum.toString()).add(new BN(stakingPoolBalance.toString()));
+  }
+
+  public async getEthTokenBalance(url: string, network: string,
+  tokenAddress: string, userAddress: string): Promise<BN> {
     const provider = new Web3.providers.WebsocketProvider(url);
-    const api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider));
+    let api;
+    if(network === ChainNetwork.ERC20) {
+      api = ERC20__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
+    }
+    else if(network === ChainNetwork.ERC721) {
+      api = ERC721__factory.connect(tokenAddress, new providers.Web3Provider(provider as any));
+    }
+    else {
+      throw new Error('Invalid token chain network');
+    }
     await api.deployed();
     const balanceBigNum = await api.balanceOf(userAddress);
     provider.disconnect(1000, 'finished');
     return new BN(balanceBigNum.toString());
+  }
+
+  public async getSplTokenBalance(cluster: solw3.Cluster, mint: string, user: string): Promise<BN> {
+    const url = solw3.clusterApiUrl(cluster);
+    const connection = new solw3.Connection(url);
+    const mintPubKey = new solw3.PublicKey(mint);
+    const userPubKey = new solw3.PublicKey(user);
+    const { value } = await connection.getParsedTokenAccountsByOwner(
+      userPubKey,
+      { mint: mintPubKey },
+    );
+    const amount: string = value[0]?.account?.data?.parsed?.info?.tokenAmount?.amount;
+    return new BN(amount, 10);
   }
 }
 
@@ -93,11 +159,10 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       }
       const threshold = topic.token_threshold;
       if (threshold && threshold > 0) {
-        const nodes = await this.models.ChainNode.findAll({ where: { chain: topic.chain.id } });
-        if (!nodes || !nodes[0].eth_chain_id) {
-          throw new Error('Could not find chain node.');
-        }
-        const tokenBalance = await this.getBalance(nodes[0].eth_chain_id, topic.chain.id, userAddress);
+        const tokenBalance = await this.getBalance(
+          topic.chain,
+          userAddress,
+        );
         log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
         return (new BN(tokenBalance)).gten(threshold);
       } else {
@@ -110,33 +175,14 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   }
 
   // query a user's balance on a given token contract and save in cache
-  public async getBalance(chainId: number, contractId: string, address: string): Promise<BN> {
-    let contractAddress: string;
-    // See if token is already in the database as a Chain
-    const node = await this.models.ChainNode.findOne({
-      where: {
-        chain: contractId,
-        eth_chain_id: chainId,
-      }
-    });
-    if (node?.address) {
-      contractAddress = node.address;
-    }
-
-    // if token is not in the database, then query against the Token list
-    if (!contractAddress) {
-      const tokenMeta = await this.models.Token.findOne({
-        where: {
-          id: contractId,
-          chain_id: chainId,
-        }
-      });
-      if (!tokenMeta?.address) throw new Error('unsupported token');
-      contractAddress = tokenMeta.address;
+  public async getBalance(chain: ChainAttributes, address: string): Promise<BN> {
+    const node = await this.models.ChainNode.scope('withPrivateData').findOne({ where: { id: chain.chain_node_id } });
+    if (!node || (chain.base === ChainBase.Ethereum && !node.eth_chain_id)) {
+      throw new Error('Could not find chain node.');
     }
 
     // check the cache for the token balance
-    const cacheKey = getKey(chainId, contractAddress, address);
+    const cacheKey = getKey(chain.base, node.eth_chain_id, chain.address, address);
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
       if (c[cacheKey]) {
         return c[cacheKey].balance;
@@ -147,18 +193,47 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     if (result !== undefined) return result;
 
     // fetch balance if not found in cache
-    const url = await getUrlForEthChainId(this.models, chainId);
-    if (!url) {
-      throw new Error(`unsupported eth chain id ${chainId}`);
-    }
-
     let balance: BN;
-    try {
-      balance = await this._balanceProvider.getBalance(url, contractAddress, address);
-    } catch (e) {
-      throw new Error(`Could not fetch token balance: ${e.message}`);
-    }
     const fetchedAt = moment();
+    // TODO: add cosmos and other chains
+    let contractAddress = chain.address;
+    if (chain.network === ChainNetwork.AxieInfinity) {
+      // special case for axie query using covalent
+      try {
+        balance = await this._balanceProvider.getRoninTokenBalance(address);
+      } catch (e) {
+        throw new Error(`Could not fetch token balance: ${e.message}`);
+      }
+    } else if (chain.base === ChainBase.Ethereum) {
+      if (!chain.address) {
+        // if token is not in the database, then query against the Token list
+        const tokenMeta = await this.models.Token.findOne({
+          where: {
+            id: chain.address,
+            chain_id: node.eth_chain_id,
+          }
+        });
+        if (!tokenMeta?.address) throw new Error('unsupported token');
+        contractAddress = tokenMeta.address;
+      } else if (!contractAddress) {
+        throw new Error('unsupported token');
+      }
+
+      const url = node.private_url || node.url;
+      try {
+        balance = await this._balanceProvider.getEthTokenBalance(url, chain.network, contractAddress, address);
+      } catch (e) {
+        throw new Error(`Could not fetch token balance: ${e.message}`);
+      }
+    } else if (chain.base === ChainBase.Solana) {
+      try {
+        balance = await this._balanceProvider.getSplTokenBalance(node.url as solw3.Cluster, contractAddress, address);
+      } catch (e) {
+        throw new Error(`Could not fetch token balance: ${e.message}`);
+      }
+    } else {
+      throw new Error('Invalid token chain base');
+    }
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {

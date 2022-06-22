@@ -1,7 +1,8 @@
-import $ from 'jquery';
 import m from 'mithril';
-import { Toast, Toaster, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
+import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelErrorCaptureEvent } from 'analytics/types';
 import app from 'state';
 
 const timeout = 3000;
@@ -36,6 +37,12 @@ export class ToastStore {
     m.redraw();
   }
   public createError(message) {
+    mixpanelBrowserTrack({
+      message,
+      community: app.activeChainId(),
+      isCustomDomain: app.isCustomDomain(),
+      event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
+    });
     const key = uuidv4();
     const toast = m(Toast, {
       key,

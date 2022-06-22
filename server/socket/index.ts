@@ -1,147 +1,158 @@
-import WebSocket from 'ws';
-import * as jwt from 'jsonwebtoken';
-import http from 'http';
-import express from 'express';
-import * as net from 'net';
-import { WebsocketEventType, WebsocketMessageType, IWebsocketsPayload } from '../../shared/types';
-import { JWT_SECRET } from '../config';
+// Use https://admin.socket.io/#/ to monitor
 
+// TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
+import { Server, Socket } from 'socket.io';
+import { instrument } from '@socket.io/admin-ui';
+import { BrokerConfig } from 'rascal';
+import * as jwt from 'jsonwebtoken';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import * as http from 'http';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
+import bcrypt from 'bcrypt';
+import Rollbar from 'rollbar';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import {
+  JWT_SECRET,
+  REDIS_URL,
+  WEBSOCKET_ADMIN_USERNAME,
+  WEBSOCKET_ADMIN_PASSWORD,
+} from '../config';
 import { factory, formatFilename } from '../../shared/logging';
+import { createChatNamespace } from './chatNs';
+import { DB } from '../database';
+import { RedisCache } from '../util/redisCache';
+
 const log = factory.getLogger(formatFilename(__filename));
 
-const ALIVE_TIMEOUT = 30 * 1000; // heartbeats are 15 seconds
-const EXPIRATION_TIME = 15 * 60 * 1000; // 15 minutes, same as session expiration
+const origin = process.env.SERVER_URL || 'http://localhost:8080';
 
-class AuthWebSocket extends WebSocket {
-  isAlive?: boolean;
-  aliveTimer?: NodeJS.Timeout;
-  expirationTimer?: NodeJS.Timeout;
-  isAuthenticated?: boolean;
-  user?: any;
-}
+export const authenticate = (
+  socket: Socket,
+  next: (err?: ExtendedError) => void
+) => {
+  if (socket.handshake.query?.token) {
+    jwt.verify(
+      <string>socket.handshake.query.token,
+      JWT_SECRET,
+      (err, decodedUser) => {
+        if (err)
+          return next(new Error('Authentication Error: incorrect JWT token'));
+        console.log(decodedUser);
+        (<any>socket).user = decodedUser;
+        next();
+      }
+    );
+  } else {
+    next(new Error('Authentication Error: no JWT token given'));
+  }
+};
 
-const userMap: { [user: number]: AuthWebSocket } = {};
-const sessionMap: { [session: string]: AuthWebSocket } = {};
-
-export default function (
-  wss: WebSocket.Server,
-  server: http.Server,
-  sessionParser: express.RequestHandler,
-  logging: boolean
+export async function setupWebSocketServer(
+  httpServer: http.Server,
+  rollbar: Rollbar,
+  models: DB
 ) {
-  server.on(WebsocketEventType.Upgrade, (req: express.Request, socket: net.Socket, head) => {
-    log.trace('\nParsing session from request...\n');
-    sessionParser(req, {} as express.Response, () => {
-      if (!req.session) {
-        log.error('No session found.');
-        socket.destroy();
-        return;
-      }
+  // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
+  // library to the user since we already import it + disable http long-polling to avoid sticky session issues
+  const io = new Server(httpServer, {
+    transports: ['websocket'],
+    cors: {
+      origin,
+      methods: ['GET', 'POST'],
+    },
+  });
 
-      log.trace('Session is parsed!');
+  io.use(authenticate);
 
-      wss.handleUpgrade(req, socket, head, (ws) => {
-        wss.emit(WebsocketEventType.Connection, ws, req);
-      });
+  io.on('connection', (socket) => {
+    log.trace(`${socket.id} connected`);
+    socket.on('disconnect', () => {
+      log.trace(`${socket.id} disconnected`);
     });
   });
 
-  wss.on(WebsocketEventType.Connection, (ws: AuthWebSocket, req: express.Request) => {
-    const sessionId = req.sessionID;
-    sessionMap[sessionId] = ws;
-
-    let userId: number;
-    if (req.session && req.session.passport && req.session.passport.user) {
-      userId = req.session.passport.user;
-      userMap[userId] = ws;
-    }
-    ws.on(WebsocketEventType.Message, (message) => {
-      log.trace(`Received message ${message} from session ${sessionId}`);
-      try {
-        const payload: IWebsocketsPayload<any> = JSON.parse(message.toString());
-        if (payload.event === WebsocketMessageType.Heartbeat) {
-          ws.isAlive = true;
-
-          // reset liveness timers
-          if (ws.aliveTimer) clearTimeout(ws.aliveTimer);
-          ws.aliveTimer = global.setTimeout(() => { ws.isAlive = false; }, ALIVE_TIMEOUT);
-
-          if (ws.expirationTimer) clearTimeout(ws.expirationTimer);
-          ws.expirationTimer = global.setTimeout(() => {
-            // TODO: do i need to manually close the socket here?
-            log.trace(`Websocket ${sessionId} expired, emitting close`);
-            wss.emit(WebsocketEventType.Close);
-          }, EXPIRATION_TIME);
-
-          // get user if verified
-          if (payload.jwt) {
-            jwt.verify(payload.jwt, JWT_SECRET, async (err, decodedUser) => {
-              if (err) {
-                log.info(`received message with malformed JWT: ${payload.jwt}`);
-              } else {
-                ws.isAuthenticated = true;
-                ws.user = decodedUser;
-              }
-            });
-          }
-        } else {
-          log.error('received malformed message');
-        }
-      } catch (e) {
-        log.error('received malformed message');
-      }
-    });
-
-    ws.on(WebsocketEventType.Close, () => {
-      log.trace(`Received close event for websocket ${sessionId}`);
-      if (sessionMap[sessionId]) {
-        delete sessionMap[sessionId];
-      }
-      if (userId && userMap[userId]) {
-        delete userMap[userId];
-      }
-    });
+  io.engine.on('connection_error', (err) => {
+    // log.error(err.req);      // the request object
+    // console.log(err.code);     // the error code, for example 1
+    // console.log(err.message);  // the error message, for example "Session ID unknown"
+    // console.log(err.context);  // some additional error context
+    log.error('A WebSocket connection error has occurred', err);
   });
 
-  // TODO: maybe unify these, or else remove the event type from payload and add it manually here?
-  wss.on(WebsocketMessageType.InitializeScrollback, (payload: IWebsocketsPayload<any>, userIds: number[]) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(userIds)}`);
-    for (const user of userIds) {
-      if (user && user in userMap && userMap[user].isAlive) {
-        userMap[user].send(JSON.stringify(payload));
-      }
-    }
+  // enables the admin analytics dashboard (creates /admin namespace)
+  instrument(io, {
+    auth: origin.includes('localhost')
+      ? false
+      : {
+          type: 'basic',
+          username: WEBSOCKET_ADMIN_USERNAME,
+          password: bcrypt.hashSync(
+            WEBSOCKET_ADMIN_PASSWORD,
+            WEBSOCKET_ADMIN_PASSWORD.length
+          ),
+        },
   });
 
-  wss.on(
-    WebsocketMessageType.Notification,
-    (payload: IWebsocketsPayload<any>, notifications: { [user: number]: any }) => {
-      if (logging) {
-        log.info(`Payloading ${JSON.stringify(payload)} to users ${JSON.stringify(Object.keys(notifications))}`);
-      }
-      for (const [ user, notification ] of Object.entries(notifications)) {
-        if (user && user in userMap && userMap[user].isAlive) {
-          // augment notification with unique database id
-          payload.data.id = notification.id;
-          payload.data.subscription_id = notification.subscription_id;
-          userMap[user].send(JSON.stringify(payload));
-        }
-      }
-    }
+  log.info(
+    `Socket instance connecting to Redis at: ${REDIS_URL}. ${
+      !REDIS_URL
+        ? 'The Redis url is undefined so the socket instance will not work cross server'
+        : ''
+    }`
   );
+  // const redisOptions = origin.includes("localhost") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
+  // const pubClient = createClient(redisOptions);
+  // const subClient = pubClient.duplicate();
 
-  wss.on(WebsocketMessageType.ChainEntity, (payload: IWebsocketsPayload<any>) => {
-    if (logging) log.info(`Payloading ${JSON.stringify(payload)}`);
-    for (const [ session, sessionSocket ] of Object.entries(sessionMap)) {
-      if (sessionSocket && sessionSocket.isAlive) {
-        sessionSocket.send(JSON.stringify(payload), (err?) => {
-          if (err) {
-            log.error(`Failed to send chain entity to session: ${session}`);
-            log.error(`Error: ${err}.`);
-            // TODO: remove from map if err is that it's closed?
-          }
-        });
-      }
+  try {
+    // await Promise.all([pubClient.connect(), subClient.connect()]);
+    // provide the redis connection instances to the socket.io adapters
+    // await io.adapter(<any>createAdapter(pubClient, subClient));
+  } catch (e) {
+    // local env may not have redis so don't do anything if they don't
+    if (!origin.includes('localhost')) {
+      log.error('Failed to connect to Redis!', e);
+      rollbar.critical(
+        'Socket.io server failed to connect to Redis. Servers will NOT share socket messages' +
+          'between rooms on different servers!',
+        e
+      );
     }
-  });
+  }
+
+  const redisCache = new RedisCache();
+  console.log("Initializing Redis Cache for WebSockets...")
+  await redisCache.init();
+  console.log("Redis Cache initialized!");
+
+  // create the chain-events namespace
+  const ceNamespace = createCeNamespace(io);
+  const chatNamespace = createChatNamespace(io, models, redisCache);
+
+  try {
+    const rabbitController = new RabbitMQController(
+      <BrokerConfig>RabbitMQConfig
+    );
+
+    await rabbitController.init();
+    await rabbitController.startSubscription(
+      publishToCERoom.bind(ceNamespace),
+      'ChainEventsNotificationsSubscription'
+    );
+  } catch (e) {
+    log.error(
+      `Failure connecting to ${process.env.NODE_ENV || 'local'}` +
+        'RabbitMQ server. Please fix the RabbitMQ server configuration',
+      e
+    );
+    if (!origin.includes('localhost'))
+      rollbar.critical(
+        'Failed to connect to RabbitMQ so the chain-evens notification consumer is DISABLED.' +
+          'Handle immediately to avoid notifications queue backlog.',
+        e
+      );
+  }
 }

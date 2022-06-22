@@ -1,0 +1,74 @@
+@import 'client/styles/shared';
+
+// page layout
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  font-family: $fonts;
+  font-size: 16px;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  background: $white;
+}
+
+// global css
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+strong {
+  font-weight: 600;
+}
+
+a {
+  color: $purple-400;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+a:visited {
+  color: $purple-400;
+}
+
+code,
+pre {
+  font-family: $monospace-fonts;
+  font-size: 13.5px;
+  background: $neutral-300;
+  border-radius: 4px;
+}
+
+code {
+  padding: 1px 3px;
+  color: $rorange-500;
+}
+
+pre {
+  padding: 10px 12px;
+}
+
+::selection {
+  color: $white;
+  background: $primary-600;
+}
+
+// shared styles
+.clear {
+  clear: both;
+}

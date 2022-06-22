@@ -19,10 +19,10 @@ import { Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
-import { BlocktimeHelper } from 'helpers';
 import { ChainNetwork } from 'types';
 import {
   NodeInfo,
+  ChainInfo,
   ITXModalData,
   TransactionStatus,
   IChainModule,
@@ -56,10 +56,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _existentialdeposit: SubstrateCoin;
   public get existentialdeposit() { return this._existentialdeposit; }
 
-  private _metadataInitialized: boolean = false;
+  private _metadataInitialized = false;
   public get metadataInitialized() { return this._metadataInitialized; }
 
-  private _eventsInitialized: boolean = false;
+  private _eventsInitialized = false;
   public get eventsInitialized() { return this._eventsInitialized; }
 
   private _sudoKey: string;
@@ -86,7 +86,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   private _blockSubscription: VoidFn;
 
-  private _suppressAPIDisconnectErrors: boolean = false;
+  private _suppressAPIDisconnectErrors = false;
   private _api: ApiPromise;
 
   private _app: IApp;
@@ -111,7 +111,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   public get registry() { return this.api.registry; }
 
   private _connectTime = 0;
-  private _timedOut: boolean = false;
+  private _timedOut = false;
   public get timedOut() {
     return this._timedOut;
   }
@@ -135,7 +135,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       }
     };
     const disconnectedCb = () => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta.node) {
         this.app.chain.networkStatus = ApiStatus.Disconnected;
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = true;
@@ -148,7 +148,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const errorCb = (err) => {
       console.log(`api error; waited ${this._connectTime}ms`);
       this._connectTime += INTERVAL;
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta) {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta.node) {
         if (this.app.chain.networkStatus === ApiStatus.Connected) {
           notifyInfo('Reconnecting to chain...');
         } else {
@@ -182,8 +182,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     return provider;
   }
 
-  public async resetApi(selectedNode: NodeInfo, additionalOptions?): Promise<ApiPromise> {
-    const provider = await this.createApiProvider(selectedNode);
+  public async resetApi(selectedChain: ChainInfo, additionalOptions?): Promise<ApiPromise> {
+    const provider = await this.createApiProvider(selectedChain.node);
 
     // note that we reuse the same provider and type registry to create both an rxjs
     // and a promise-based API -- this avoids creating multiple connections to the node
@@ -230,7 +230,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const processor = new SubstrateEvents.Processor(this.api);
     return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       subscriber,
       processor,
     );
@@ -301,6 +301,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
       const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
       this._ss58Format = +ss58Format.unwrapOr(42);
@@ -314,17 +315,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
     // redraw
     m.redraw();
-
-    // grab last timestamps from storage and use to compute blocktime
-    const TIMESTAMP_LOOKBACK = 5;
-    const blockNumbers = [...Array(TIMESTAMP_LOOKBACK).keys()].map((i) => +blockNumber - i - 1);
-    const hashes = await this.api.query.system.blockHash.multi<Hash>(blockNumbers);
-    const timestamps = await Promise.all(hashes.map((hash) => this.api.query.timestamp.now.at(hash)));
-    const blocktimeHelper = new BlocktimeHelper();
-    for (const timestamp of timestamps.reverse()) {
-      blocktimeHelper.stamp(moment(+timestamp));
-    }
-    this.app.chain.block.duration = blocktimeHelper.blocktime;
     this._metadataInitialized = true;
   }
 
@@ -516,7 +506,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else if (hexTxOrAddress) {
               unsubscribe = this.api.tx(hexTxOrAddress).send(txResultHandler);
             } else {
-              unsubscribe = txFunc(this.api).signAndSend(author.getKeyringPair(), txResultHandler);
+              throw new Error('no signer found');
             }
           } catch (err) {
             if (err.message.indexOf('1014: Priority is too low') !== -1) {

@@ -9,7 +9,7 @@ import {
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -28,7 +28,7 @@ const updateProfile = async (
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new Error(Errors.MissingParams));
   }
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
 
   let unpackedData;

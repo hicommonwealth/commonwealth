@@ -73,17 +73,18 @@ export default class AaveGovernance extends ProposalModule<
     }
 
     // validate user
+    const blockNumber = await this._api.Provider.getBlockNumber();
     const isPropositionPowerEnough = await executorContract.isPropositionPowerEnough(
       this._api.Governance.address,
       address,
-      this.app.chain.block.height - 1,
+      blockNumber - 1,
     );
     if (!isPropositionPowerEnough) {
       throw new Error('user does not have enough proposition power');
     }
 
     // send transaction
-    const contract = await attachSigner(this.app.wallets, address, this._api.Governance);
+    const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount, this._api.Governance);
     const tx = await contract.create(
       executorContract.address,
       targets,
@@ -127,7 +128,7 @@ export default class AaveGovernance extends ProposalModule<
     const processor = new AaveEvents.Processor(chainEventsContracts);
     await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta.chain),
+      chainToEventNetwork(this.app.chain.meta),
       subscriber,
       processor,
     );

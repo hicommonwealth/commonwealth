@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 export const Errors = {
@@ -10,7 +10,7 @@ export const Errors = {
 };
 
 const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.body, req.user);
+  const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const { thread_id } = req.body;
 
@@ -30,7 +30,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
       }
     });
     const role = roles.find((r) => {
-      return r.offchain_community_id === thread.community || r.chain_id === thread.chain;
+      return r.chain_id === thread.chain;
     });
     if (!role) return next(new Error(Errors.NotAdminOrOwner));
   }

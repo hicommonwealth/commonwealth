@@ -1,0 +1,15 @@
+@import 'client/styles/shared';
+
+.ManageCommunityPage {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-right: auto;
+  padding: 24px;
+  width: 480px;
+
+  @include small {
+    width: 100%;
+  }
+}

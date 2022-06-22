@@ -15,7 +15,6 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Draft Tests', () => {
-  const community = 'staking';
   const chain = 'ethereum';
 
   const title = 'test title';
@@ -27,8 +26,10 @@ describe('Draft Tests', () => {
   let user2Address;
   let user2JWT;
 
-  before(async () => {
+  before(async function () {
+    this.timeout(300000);
     await resetDatabase();
+    console.log('Database reset');
 
     let res = await modelUtils.createAndVerifyAddress({ chain });
     user2Address = res.address;
@@ -53,31 +54,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
-          title,
-          topic,
-          body,
-          jwt: userJWT,
-        });
-      const { result } = res.body;
-      expect(res).to.have.status(200);
-      expect(result).to.not.be.null;
-      expect(result.title).to.equal(title);
-      expect(result.body).to.equal(body);
-      expect(result.Address).to.not.be.null;
-      expect(result.Address.address).to.equal(userAddress);
-    });
-
-    it('should successfully create a chain discussion draft with all reqd params', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/drafts')
-        .set('Accept', 'application/json')
-        .send({
-          address: userAddress,
-          author_chain: chain,
-          chain: null,
-          community,
           title,
           topic,
           body,
@@ -101,7 +77,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title: null,
           topic,
           body,
@@ -125,7 +100,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title,
           topic: null,
           body,
@@ -149,7 +123,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title: null,
           topic,
           body: null,
@@ -172,7 +145,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title,
           topic,
           body,
@@ -191,7 +163,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           id: firstDraft.id,
           title: `${title} edited`,
           topic: `${topic} edited`,
@@ -214,7 +185,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           id: null,
           title,
           topic,
@@ -235,7 +205,6 @@ describe('Draft Tests', () => {
           address: user2Address,
           author_chain: chain,
           chain,
-          community: null,
           id: firstDraft.id,
           title,
           topic,
@@ -259,7 +228,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           title,
           topic,
           body,
@@ -277,7 +245,6 @@ describe('Draft Tests', () => {
           address: userAddress,
           author_chain: chain,
           chain,
-          community: null,
           id: draft.id,
           jwt: userJWT,
         });
@@ -295,7 +262,6 @@ describe('Draft Tests', () => {
           address: user2Address,
           author_chain: chain,
           chain,
-          community: null,
           id: draft.id,
           jwt: user2JWT,
         });

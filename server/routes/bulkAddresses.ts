@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import validateChain from '../util/validateChain';
 const { Op } = Sequelize;
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -21,11 +21,11 @@ const bulkAddresses = async (models: DB, req, res, next) => {
 
   if (req.query.limit) options['limit'] = req.query.limit;
 
-  let chain; let community; let error;
-  if (req.query.chain || req.query.community) {
-    [chain, community, error] = await lookupCommunityIsVisibleToUser(models, req.query, req.user);
+  let chain; let error;
+  if (req.query.chain) {
+    [chain, error] = await validateChain(models, req.query);
     if (error) return next(new Error(error));
-    if (chain) options['where'] = { chain: req.query.chain };
+    options['where'] = { chain: req.query.chain };
   }
 
   if (req.query.searchTerm?.length) {
@@ -43,13 +43,8 @@ const bulkAddresses = async (models: DB, req, res, next) => {
     options['where'] = options['where']
       ? Object.assign(options['where'], subStr)
       : subStr;
-    if (req.query.community) {
-      options['include'] = [{
-        model: models.Role,
-        where: { offchain_community_id: community.id },
-      }];
-    }
   }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const addresses = await models.Address.findAll(options);
   return res.json({ status: 'Success', result: addresses.map((p) => p.toJSON()) });

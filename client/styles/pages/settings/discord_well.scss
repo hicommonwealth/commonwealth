@@ -1,0 +1,15 @@
+@import 'client/styles/shared';
+
+.DiscordWell {
+  margin-top: 12px;
+
+  input {
+    margin-right: 12px;
+  }
+}
+
+.LinkButtonWrapper {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+}

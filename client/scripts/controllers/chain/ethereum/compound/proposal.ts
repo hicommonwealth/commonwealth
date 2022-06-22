@@ -2,7 +2,7 @@ import moment from 'moment';
 import BN from 'bn.js';
 import { capitalize } from 'lodash';
 import { ContractTransaction, utils } from 'ethers';
-import { GovernorCompatibilityBravo } from 'eth/types';
+import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'eth/types';
 
 import { CompoundTypes } from '@commonwealth/chain-events';
 import { ProposalType } from 'types';
@@ -21,6 +21,7 @@ import {
   ChainEntity,
   ChainEvent,
 } from 'models';
+import { blocknumToTime } from 'helpers';
 
 import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
@@ -162,14 +163,14 @@ export default class CompoundProposal extends Proposal<
   public get votingPeriodEnd() { return this.startingPeriod + +this._Gov.votingPeriod; }
 
   public get state(): CompoundTypes.ProposalState {
-    const blockNumber = this._Gov.app.chain.block.height;
+    const time = Date.now() / 1000;
     if (this.data.cancelled) return CompoundTypes.ProposalState.Canceled;
     if (this.data.executed) return CompoundTypes.ProposalState.Executed;
     if (this.data.expired) return CompoundTypes.ProposalState.Expired;
     if (this.data.queued) return CompoundTypes.ProposalState.Queued;
-    if (blockNumber <= this.data.startBlock)
+    if (time <= blocknumToTime(this.data.startBlock).unix())
       return CompoundTypes.ProposalState.Pending;
-    if (blockNumber <= this.data.endBlock)
+    if (time <= blocknumToTime(this.data.endBlock).unix())
       return CompoundTypes.ProposalState.Active;
 
     const votes = this.getVotes();
@@ -340,16 +341,46 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already cancelled');
     }
 
-    // TODO: condition check for who can cancel
-
-    const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
-
-    const gasLimit = await contract.estimateGas.cancel(this.data.identifier);
-    const tx = await contract.cancel(
-      this.data.identifier,
-      { gasLimit }
+    let tx: ContractTransaction;
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
     );
+    try {
+      const gasLimit = await contract.estimateGas['cancel(uint256)'](this.data.identifier);
+      tx = await contract['cancel(uint256)'](
+        this.data.identifier,
+        { gasLimit }
+      );
+    } catch (e) {
+      // workaround for Oz without BravoCompatLayer
+      // uses GovernorMock because it supports the proper cancel ABI vs BravoCompat
+      const contractNoSigner = GovernorMock__factory.connect(this._Gov.api.contractAddress, this._Gov.api.Provider);
+      const ozContract = await attachSigner(this._Gov.app.wallets, this._Gov.app.user.activeAccount, contractNoSigner);
+      const descriptionHash = utils.keccak256(
+        utils.toUtf8Bytes(this.data.description)
+      );
+      try {
+        const gasLimit = await ozContract.estimateGas.cancel(
+          this.data.targets,
+          this.data.values,
+          this.data.calldatas,
+          descriptionHash
+        );
+        tx = await ozContract.cancel(
+          this.data.targets,
+          this.data.values,
+          this.data.calldatas,
+          descriptionHash,
+          { gasLimit }
+        );
+      } catch (eInner) {
+        // both errored out -- fail
+        console.error(eInner.message);
+        throw eInner;
+      }
+    }
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('failed to cancel proposal');
@@ -362,8 +393,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -406,8 +440,11 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already executed');
     }
 
-    const address = this._Gov.app.user.activeAccount.address;
-    const contract = await attachSigner(this._Gov.app.wallets, address, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.wallets,
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -451,11 +488,11 @@ export default class CompoundProposal extends Proposal<
     const address = vote.account.address;
     const contract = await attachSigner(
       this._Gov.app.wallets,
-      address,
+      vote.account,
       this._Gov.api.Contract,
     );
-    if (!(await this._Chain.isDelegate(address))) {
-      throw new Error('sender must be valid delegate');
+    if (!(await this._Chain.isDelegate(address, this.data.startBlock))) {
+      throw new Error('Must have voting balance at proposal start');
     }
     if (!this._Gov.supportsAbstain && vote.choice === BravoVote.ABSTAIN) {
       throw new Error('Cannot vote abstain on governor alpha!');

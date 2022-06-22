@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupCommunityIsVisibleToUser from '../util/lookupCommunityIsVisibleToUser';
+import { ServerError } from '../util/errors';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
 const getThreads = async (
@@ -9,11 +10,7 @@ const getThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, community, error] = await lookupCommunityIsVisibleToUser(
-    models,
-    req.query,
-    req.user
-  );
+  const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
   let threads;
@@ -21,6 +18,7 @@ const getThreads = async (
     threads = await models.OffchainThread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
+        chain: chain.id
       },
       include: [
         {
@@ -58,9 +56,10 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
+    throw new ServerError(error)
   }
 
-  return threads
+  return threads.length
     ? res.json({ status: 'Success', result: threads.map((th) => th.toJSON()) })
     : res.json({ status: 'Failure' });
 };

@@ -1,9 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import Sequelize, { Op } from 'sequelize';
+import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import Web3 from 'web3';
-import { sequelize, DB } from '../database';
+import { DB } from '../database';
 import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
-import { getUrlForEthChainId } from '../util/supportedEthChains';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +10,6 @@ const getTokenForum = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   const address = req.query.address;
   if (!address) {
@@ -20,13 +18,16 @@ const getTokenForum = async (
 
   // default to mainnet
   const chain_id = +req.query.chain_id || 1;
+  // default to ERC20
+  const chain_network = req.query.chain_network? req.query.chain_network : ChainNetwork.ERC20;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
       chain_id,
     }
   });
-  let url = await getUrlForEthChainId(models, chain_id);
+  const node = await models.ChainNode.scope('withPrivateData').findOne({ where: { eth_chain_id: chain_id }});
+  let url = node.url;
   if (!url) {
     url = req.query.url;
     if (!url) {
@@ -34,28 +35,28 @@ const getTokenForum = async (
     }
   }
 
-  if (!token) {
-    if (req.query.allowUncached) {
-      return res.json({ status: 'Success', result: { chain: null, node: null } });
-    }
+  if (!token && !req.query.allowUncached) {
     return res.json({ status: 'Failure', message: 'Token does not exist' });
   }
 
   try {
-    const provider = new Web3.providers.WebsocketProvider(url);
+    const provider = new Web3.providers.WebsocketProvider(node?.private_url || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(address);
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
-      return res.json({ status: 'Failure', message: 'Must provide contract address' });
+      return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
     }
-    const result = await sequelize.transaction(async (t) => {
-      const [ chain ] = await models.Chain.findOrCreate({
+    if (req.query.autocreate) {
+      if (!node) {
+        return res.json({ status: 'Failure', message: 'Cannot autocreate custom node' });
+      }
+      const [chain] = await models.Chain.findOrCreate({
         where: { id: token.id },
         defaults: {
           active: true,
-          network: ChainNetwork.ERC20,
+          network: chain_network,
           type: ChainType.Token,
           icon_url: token.icon_url,
           symbol: token.symbol,
@@ -64,21 +65,14 @@ const getTokenForum = async (
           base: ChainBase.Ethereum,
           has_chain_events_listener: false,
         },
-        transaction: t,
       });
-      const [ node ] = await models.ChainNode.findOrCreate({
-        where: { chain: token.id },
-        defaults: {
-          chain: token.id,
-          url,
-          address: token.address,
-          eth_chain_id: chain_id,
-        },
-        transaction: t,
-      });
-      return { chain: chain.toJSON(), node: node.toJSON() };
-    });
-    return res.json({ status: 'Success', result });
+      const nodeJSON = node.toJSON();
+      delete nodeJSON.private_url;
+      return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: nodeJSON }});
+    } else {
+      // only return token data if we do not autocreate
+      return res.json({ status: 'Success', token: token ? token.toJSON() : {} });
+    }
   } catch (e) {
     log.error(e.message);
     return res.json({ status: 'Failure', message: 'Failed to find or create chain' });

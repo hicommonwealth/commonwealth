@@ -1,67 +1,90 @@
+@import 'shared';
+
 .SummaryListing {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+
+  .row-header {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 16px;
+
+    h4 {
+      color: $neutral-600;
+      flex: 1;
+      font-weight: 500;
+    }
+  }
+
+  .row-wrap {
     display: flex;
     flex-direction: column;
-    .topic {
-        flex: 3;
-    }
-    .thread-count {
-        flex: 1;
-    }
-    .recent-threads {
-        flex: 4;
-    }
-    .row-header {
-        color: #666666;
-        font-size: 18px;
-        h4 {
-            font-weight: 500;
-        }
-        display: flex;
-    }
-    .row-wrap {
-        display: flex;
-        flex-direction: column;
-    }
-}
+  }
 
-.SummaryRow {
+  .SummaryRow {
+    border-top: 1px solid $neutral-100;
     display: flex;
-    padding: 20px 0;
-    border-bottom: 1px solid #DDDDDD;
-    max-width: 100%;
-    > div {
-        padding-right: 15px;
-        &:last-child {
-            padding-right: 0;
-        }
+    flex-direction: row;
+    width: 100%;
+    padding: 16px 0;
+
+    .topic-header {
+      color: $neutral-600;
     }
-    &:last-child {
-        border-bottom: none;
+
+    .topic-cell {
+      flex: 1;
+
+      @include small {
+        margin-bottom: 8px;
+      }
+
+      h3 {
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 15px;
+        padding-right: 16px;
+      }
     }
-    .recent-threads {
+
+    .recent-thread-header {
+      color: $neutral-600;
+    }
+
+    @include small {
+      flex-direction: column;
+    }
+
+    .recent-thread-cell {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+
+      .thread-summary {
         display: flex;
-        flex-direction: column;
-        .thread-summary {
-            margin-bottom: 10px;
-            a {
-                color: #4723AD;
-                &:hover {
-                    text-decoration: none;
-                }
-            }
-            span {
-                color: #666666;
-                margin-left: 10px;
-            }
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 16px;
+
+        .thread-title {
+          display: flex;
+          color: $purple-400;
+          margin-right: 16px;
         }
-    }
-    .thread-count {
-        font-weight: 500;
-    }
-    .topic {
-        h3 {
-            font-size: 24px;
-            font-weight: 500;
+
+        .last-updated {
+          color: $neutral-500;
+          min-width: max-content;
         }
+
+        @include small {
+          flex-direction: column;
+        }
+      }
     }
+  }
 }

@@ -4,6 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
+import { ChainNetwork } from 'types';
 import { loginWithMagicLink } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
@@ -36,6 +37,29 @@ const Login: m.Component<{}, {
 }> = {
   view: (vnode) => {
     const defaultEmail = m.route.param('inviteEmail');
+    // only provide single wallet button on Axie
+    if (app?.chain?.network === ChainNetwork.AxieInfinity) {
+      return m(Button, {
+        intent: 'primary',
+        rounded: true,
+        onclick: async (e) => {
+          // get a state id from the server
+          const result = await $.post(
+            `${app.serverUrl()}/auth/sso`,
+            { issuer: 'AxieInfinity' },
+          );
+          if (result.status === 'Success' && result.result.stateId) {
+            const stateId = result.result.stateId;
+
+            // redirect to axie page for login
+            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+          } else {
+            vnode.state.error = result.error || 'Could not login';
+          }
+        },
+        label: 'Continue to Ronin wallet'
+      });
+    }
     return m('.Login', {
       onclick: (e) => {
         e.stopPropagation();
@@ -81,7 +105,6 @@ const Login: m.Component<{}, {
               try {
                 const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                   'chain': app.activeChainId(),
-                  'community': app.activeCommunityId(),
                   email,
                   path,
                 });
@@ -149,7 +172,6 @@ const Login: m.Component<{}, {
               const path = m.route.get();
               const legacyResponse = await $.post(`${app.serverUrl()}/login`, {
                 'chain': app.activeChainId(),
-                'community': app.activeCommunityId(),
                 email: vnode.state.showMagicLoginPromptEmail,
                 path,
                 forceEmailLogin: true,
@@ -216,10 +238,26 @@ const Login: m.Component<{}, {
         ]),
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
+            m(Button, {
+              intent: 'primary',
+              fluid: true,
+              rounded: true,
+              href: `${app.serverUrl()}/auth/discord`,
+              onclick: (e) => {
+                localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                  timestamp: (+new Date()).toString(),
+                  path: m.route.get()
+                }));
+              },
+              label: 'Continue with Discord'
+            }),
+          ]),
+        ]),
+        m(Form, { gutter: 10 }, [
+          m(FormGroup, { span: 12 }, [
             m(LoginWithWalletDropdown, {
               label: 'Continue with wallet',
               joiningChain: null,
-              joiningCommunity: null,
               loggingInWithAddress: true,
             }),
           ]),

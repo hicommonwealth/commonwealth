@@ -1,15 +1,8 @@
 import moment from 'moment';
-import {
-  OffchainTopic,
-  AbridgedThread,
-  Profile,
-  OffchainComment,
-  OffchainThread,
-} from 'models';
+import { OffchainTopic, AbridgedThread, Profile, OffchainThread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -33,7 +26,6 @@ export const modelAbridgedThreadFromServer = (
     thread.Address.chain,
     decodeURIComponent(thread.title),
     moment(thread.created_at),
-    thread.community,
     thread.chain,
     thread.topic,
     thread.pinned,
@@ -78,41 +70,32 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentCommunityActivity(options: {
-    chainId: string;
-    communityId: string;
-    cutoffDate?: moment.Moment;
-  }): Promise<{ threads: OffchainThread[]; activitySummary }> {
-    const { chainId, communityId } = options;
-    const cutoffDate =
-      options.cutoffDate || moment(Date.now() - 30 * 24 * 3600 * 1000);
-
+  public async getRecentTopicActivity(): Promise<OffchainThread[]> {
     const params = {
-      chain: chainId,
-      community: communityId,
-      cutoff_date: cutoffDate.toISOString(),
+      chain: app.activeChainId(),
+      threads_per_topic: 3,
     };
+
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }
-    const { threads, activitySummary } = response.result;
 
-    return {
-      threads: threads.map((thread) => {
-        const modeledThread = modelThreadFromServer(thread);
-        if (!thread.Address) {
-          console.error('OffchainThread missing address');
-        }
+    const threads = response.result;
+    return threads.map((thread) => {
+      const modeledThread = modelThreadFromServer(thread);
+      if (!thread.Address) {
+        console.error('OffchainThread missing address');
+      }
+      if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
         try {
-          app.threads.store.add(modeledThread);
+          app.threads.summaryStore.add(modeledThread);
         } catch (e) {
           console.error(e.message);
         }
-        return modeledThread;
-      }),
-      activitySummary,
-    };
+      }
+      return modeledThread;
+    });
   }
 
   // public addThreads(threads: IAbridgedThreadFromServer[], clear?: boolean) {
@@ -131,14 +114,14 @@ class RecentActivityController {
   // public addAddressesFromActivity(activity: any[], clear?: boolean) {
   //   if (clear) this._addressStore.clearAddresses();
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     this._addressStore.addAddress(item.Address, parentEntity);
   //   });
   // }
 
   // public removeAddressActivity(activity: any[]) {
   //   activity.forEach((item) => {
-  //     const parentEntity = item.community || item.chain;
+  //     const parentEntity = item.chain;
   //     const addressId = item.Address?.id || item.address_id || item.author;
   //     this._addressStore.removeAddressActivity(addressId, parentEntity);
   //   });

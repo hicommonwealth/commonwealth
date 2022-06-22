@@ -142,8 +142,9 @@ type FunctionCall = {
   FunctionCall: { actions: NearSputnikActionCall[]; receiver_id: AccountId };
 };
 type ChangePolicy = { ChangePolicy: { policy: NearSputnikPolicy } };
+type ChangeConfig = { ChangeConfig: { config: NearSputnikConfig } };
 export type NearSputnikProposalKind =
-  | 'ChangeConfig'
+  | ChangeConfig
   | 'UpgradeSelf'
   | 'UpgradeRemote'
   | 'Transfer'
@@ -184,9 +185,14 @@ export function isChangePolicy(
 ): kind is ChangePolicy {
   return typeof kind === 'object' && typeof kind['ChangePolicy'] === 'object';
 }
+export function isChangeConfig(
+  kind: NearSputnikProposalKind
+): kind is ChangeConfig {
+  return typeof kind === 'object' && typeof kind['ChangeConfig'] === 'object';
+}
 
 export function kindToPolicyLabel(kind: NearSputnikProposalKind): string {
-  if (kind === 'ChangeConfig') return 'config';
+  if (isChangeConfig(kind)) return 'config';
   if (kind === 'UpgradeSelf') return 'upgrade_self';
   if (kind === 'UpgradeRemote') return 'upgrade_remote';
   if (kind === 'Transfer' || isTransfer(kind)) return 'transfer';

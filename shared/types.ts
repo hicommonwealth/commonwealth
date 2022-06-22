@@ -1,5 +1,6 @@
 import { ChainAttributes } from 'server/models/chain';
-import { OffchainCommunityAttributes } from 'server/models/offchain_community';
+import { ChainEventAttributes } from 'server/models/chain_event';
+import moment from 'moment';
 
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
@@ -43,12 +44,32 @@ export enum ChainBase {
   Substrate = 'substrate',
   Ethereum = 'ethereum',
   NEAR = 'near',
+  Solana = 'solana',
 }
 
 export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
   Token = 'token',
+  Offchain = 'offchain',
+}
+
+export enum WalletId {
+  Magic = 'magic',
+  Polkadot = 'polkadot',
+  Metamask = 'metamask',
+  WalletConnect = 'walletconnect',
+  Keplr = 'keplr',
+  NearWallet = 'near',
+  TerraStation = 'terrastation',
+  CosmosEvmMetamask = 'cosm-metamask',
+  Phantom = 'phantom',
+  Ronin = 'ronin',
+}
+
+export enum ChainCategoryType {
+  DeFi = 'DeFi',
+  DAO = 'DAO',
 }
 
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
@@ -80,41 +101,53 @@ export enum ChainNetwork {
   Metacartel = 'metacartel',
   ALEX = 'alex',
   ERC20 = 'erc20',
+  ERC721 = 'erc721',
   Clover = 'clover',
   HydraDX = 'hydradx',
   Crust = 'crust',
   Sputnik = 'sputnik',
   Commonwealth = 'commonwealth',
+  SolanaDevnet = 'solana-devnet',
+  SolanaTestnet = 'solana-testnet',
+  Solana = 'solana',
+  SPL = 'spl', // solana token
+  AxieInfinity = 'axie-infinity',
+  Evmos = 'evmos',
 }
 
-export enum WebsocketEventType {
-  Connection = 'connection',
-  Message = 'message',
-  Upgrade = 'upgrade',
-  Close = 'close',
+export enum WebsocketMessageNames {
+  ChainEventNotification = 'chain-event-notification',
+  NewSubscriptions = 'new-subscriptions',
+  DeleteSubscriptions = 'delete-subscriptions',
+  ChatMessage = 'chat-message',
+  JoinChatChannel = 'join-chat-channel',
+  LeaveChatChannel = 'leave-chat-channel',
+  Error = 'exception'
 }
 
-export enum WebsocketMessageType {
-  Message = 'message',
-  Heartbeat = 'heartbeat',
-  HeartbeatPong = 'heartbeat-pong',
-  InitializeScrollback = 'scrollback',
-  Typing = 'typing',
-  Notification = 'notification',
-  ChainEntity = 'chain-entity',
+export type ChainEventNotification = {
+  id: string;
+  notification_data: '';
+  chain_event_id: string;
+  category_id: 'chain-event';
+  chain_id: string;
+  updated_at: moment.Moment;
+  created_at: moment.Moment;
+  ChainEvent: ChainEventAttributes;
+};
+
+export enum WebsocketNamespaces {
+  ChainEvents = 'chain-events',
+  Chat = 'chat',
 }
 
-export interface IWebsocketsPayload<T> {
-  event: WebsocketMessageType;
-  jwt?: string; // for outgoing payloads
-  chain?: string; // for incoming payloads
-  address?: string; // for incoming payloads
-  data?: T;
+export enum WebsocketEngineEvents {
+  CreateRoom = 'create-room',
+  DeleteRoom = 'delete-room',
 }
 
 export interface InviteCodeAttributes {
   id?: string;
-  community_id?: string;
   community_name?: string;
   chain_id?: string;
   creator_id: number;
@@ -122,13 +155,12 @@ export interface InviteCodeAttributes {
   used?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  OffchainCommunity?: OffchainCommunityAttributes;
   Chain?: ChainAttributes;
 }
 
 export interface IPostNotificationData {
   created_at: any;
-  root_id: string;
+  root_id: number | string;
   root_title: string;
   root_type: string;
   comment_id?: number;
@@ -136,9 +168,11 @@ export interface IPostNotificationData {
   parent_comment_id?: number;
   parent_comment_text?: string;
   chain_id: string;
-  community_id: string;
   author_address: string;
   author_chain: string;
+  view_count?: number;
+  like_count?: number;
+  comment_count?: number;
 }
 
 export interface ICommunityNotificationData {
@@ -146,12 +180,12 @@ export interface ICommunityNotificationData {
   role_id: string | number;
   author_address: string;
   chain: string;
-  community: string;
 }
 
 export interface IChainEventNotificationData {
   chainEvent: any;
   chainEventType: any;
+  chain_id: string;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;
@@ -177,3 +211,7 @@ export type TokenResponse = {
   decimals: number;
   logoURI?: string;
 };
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket'
+}

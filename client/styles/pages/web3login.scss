@@ -1,16 +1,29 @@
 @import 'client/styles/shared';
 
 .Web3LoginPage {
-    .web3login-options {
-        margin: 0 auto;
-        margin-top: calc(50vh - 120px);
-        text-align: center;
-        width: 220px;
-        .cui-button {
-            margin-bottom: 15px;
-        }
-        .web3login-go-home {
-            color: $text-color-light;
-        }
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+
+  .web3-login-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 200px;
+
+    h3 {
+      margin-bottom: 8px;
     }
+
+    .cui-button {
+      margin-bottom: 16px;
+    }
+
+    .web3login-go-home {
+      color: $neutral-500;
+    }
+  }
 }
