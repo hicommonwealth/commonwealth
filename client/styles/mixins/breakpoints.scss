@@ -4,10 +4,10 @@ $breakpoint-medium-small: 905px;
 $breakpoint-small: 600px;
 $breakpoint-extra-small: 0;
 
-// :export {
-//   breakpointLarge: $breakpoint-large;
-//   breakpointMedium: $breakpoint-medium;
-//   breakpointMediumSmall: $breakpoint-medium-small;
-//   breakpointSmall: $breakpoint-small;
-//   breakpointExtraSmall: $breakpoint-extra-small;
-// }
+:export {
+  breakpointLarge: $breakpoint-large;
+  breakpointMedium: $breakpoint-medium;
+  breakpointMediumSmall: $breakpoint-medium-small;
+  breakpointSmall: $breakpoint-small;
+  breakpointExtraSmall: $breakpoint-extra-small;
+}
