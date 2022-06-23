@@ -2,13 +2,14 @@ import { Transaction } from 'sequelize/types';
 import { DB } from '../../database';
 
 // acceptable types for rule arguments, verified in parser
-export type RuleArgumentType = 'balance' | 'balance[]' | 'address' | 'address[]' | 'rule[]';
+export type RuleArgumentType = 'number' | 'string' | 'balance' | 'balance[]' | 'address' | 'address[]' | 'rule[]';
 
 // provided typescript definitions for use in the rules folder
 export type RuleMetadata = {
   name: string;
   description: string;
   arguments: Array<{ name: string, description: string, type: RuleArgumentType }>;
+  optional?: boolean;
 };
 
 export type DefaultSchemaT = Record<string, Array<unknown>>;

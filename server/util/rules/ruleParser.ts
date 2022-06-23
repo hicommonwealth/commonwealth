@@ -69,6 +69,16 @@ function validateArg(type: RuleArgumentType, arg: unknown, depth = 0): void {
       // TODO: validate against proper formatting by base/signing protocol
       break;
     }
+
+    // generic argument types
+    case 'number': {
+      if (typeof arg !== 'number') throw new Error('Invalid number');
+      break;
+    }
+    case 'string': {
+      if (typeof arg !== 'string') throw new Error('Invalid string');
+      break;
+    }
     default: {
       throw new Error(`Unexpected arg: ${arg}`);
     }
