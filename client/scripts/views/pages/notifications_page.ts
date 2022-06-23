@@ -217,11 +217,9 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      const ceNotifs =
-                        app.user.notifications.chainEventNotifications;
-                      if (ceNotifs.length === 0) return;
+                      if (app.user.notifications.chainEventNotifications.length === 0) return;
                       app.user.notifications
-                        .delete(ceNotifs)
+                        .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
                     },
                   }),
