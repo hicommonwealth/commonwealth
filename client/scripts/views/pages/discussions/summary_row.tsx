@@ -12,7 +12,7 @@ import { slugify } from 'utils';
 import { getLastUpdated, isHot } from './helpers';
 
 const getThreadCells = (sortedThreads: Thread[]) => {
-  return sortedThreads.slice(0, 3).map((thread) => {
+  return sortedThreads.slice(0, 5).map((thread) => {
     const discussionLink = getProposalUrlPath(
       thread.slug,
       `${thread.identifier}-${slugify(thread.title)}`

@@ -9,7 +9,7 @@
     width: 640px;
     overflow-y: auto;
 
-    @include xs-max {
+    @include extraSmall {
       width: initial;
     }
     .download-link {

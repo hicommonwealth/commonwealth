@@ -122,6 +122,7 @@ export enum WebsocketMessageNames {
   ChatMessage = 'chat-message',
   JoinChatChannel = 'join-chat-channel',
   LeaveChatChannel = 'leave-chat-channel',
+  Error = 'exception'
 }
 
 export type ChainEventNotification = {
@@ -210,3 +211,7 @@ export type TokenResponse = {
   decimals: number;
   logoURI?: string;
 };
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket'
+}

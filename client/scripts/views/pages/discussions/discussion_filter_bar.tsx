@@ -25,7 +25,7 @@ export class DiscussionFilterBar
   view(vnode) {
     const { topic, stage, disabled, parentState } = vnode.attrs;
 
-    const communityInfo = app.chain?.meta?.chain;
+    const communityInfo = app.chain?.meta;
 
     if (!communityInfo) return;
 

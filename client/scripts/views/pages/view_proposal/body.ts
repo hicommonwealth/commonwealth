@@ -134,7 +134,7 @@ export const ProposalBodyAuthor: m.Component<{
     // Render them as anonymous as the forum is unable to support them.
     if (
       (item instanceof Comment || item instanceof Comment) &&
-      app.chain.meta.chain.type === ChainType.Offchain
+      app.chain.meta.type === ChainType.Offchain
     ) {
       if (
         item.authorChain !== app.chain.id &&
@@ -717,6 +717,31 @@ const countLinesMarkdown = (text) => {
   return text.split('\n').length - 1;
 };
 
+const formatBody = (vnode) => {
+  const { item } = vnode.attrs;
+  if (!item) return;
+
+  const body =
+    item instanceof OffchainComment
+      ? item.text
+      : item instanceof OffchainThread
+      ? item.body
+      : item.description;
+  if (!body) return;
+
+  vnode.state.body = body;
+  try {
+    const doc = JSON.parse(body);
+    if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+      vnode.state.collapsed = true;
+    }
+  } catch (e) {
+    if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
+      vnode.state.collapsed = true;
+    }
+  }
+}
+
 export const ProposalBodyText: m.Component<
   {
     item: AnyProposal | Thread | Comment<any>;
@@ -725,28 +750,10 @@ export const ProposalBodyText: m.Component<
 > = {
   oninit: (vnode) => {
     vnode.state.collapsed = false;
-    const { item } = vnode.attrs;
-    if (!item) return;
-
-    const body =
-      item instanceof Comment
-        ? item.text
-        : item instanceof Thread
-        ? item.body
-        : item.description;
-    if (!body) return;
-
-    vnode.state.body = body;
-    try {
-      const doc = JSON.parse(body);
-      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        vnode.state.collapsed = true;
-      }
-    } catch (e) {
-      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        vnode.state.collapsed = true;
-      }
-    }
+    formatBody(vnode);
+  },
+  onupdate: (vnode) => {
+    formatBody(vnode);
   },
   view: (vnode) => {
     const { body } = vnode.state;

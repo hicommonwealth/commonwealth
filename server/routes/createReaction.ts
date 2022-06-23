@@ -18,6 +18,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -34,6 +35,7 @@ export const Errors = {
 const createReaction = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  banCache: BanCache,
   req: Request,
   res: Response,
   next: NextFunction
@@ -43,6 +45,17 @@ const createReaction = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
+
+  // check if author can react
+  if (chain) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: req.body.address
+    });
+    if (!canInteract) {
+      return next(new Error(banError));
+    }
+  }
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins

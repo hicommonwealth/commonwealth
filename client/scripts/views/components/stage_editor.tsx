@@ -37,9 +37,9 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
   }
 
   view(vnode) {
-    if (!app.chain?.meta?.chain) return;
+    if (!app.chain?.meta) return;
 
-    const { customStages } = app.chain?.meta?.chain;
+    const { customStages } = app.chain?.meta;
 
     const stages = !customStages
       ? [
@@ -85,7 +85,7 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
                 />
               ))}
             </div>,
-            app.chain?.meta?.chain.snapshot && (
+            app.chain?.meta?.snapshot && (
               <SnapshotProposalSelector
                 thread={vnode.attrs.thread}
                 onSelect={(sn) => {

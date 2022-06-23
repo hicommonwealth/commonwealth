@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $discussion-outer-padding: 60px;
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
@@ -66,7 +66,7 @@ $discussion-title-font-size: 1.45rem;
     padding: 24px 0 24px 24px;
     width: 736px;
 
-    @include sm-max {
+    @include small {
       width: 100%;
     }
   }
@@ -108,7 +108,7 @@ $discussion-title-font-size: 1.45rem;
   .threading-level-1 {
     .new-comment-child {
       margin-left: 108px !important;
-      @include xs-max {
+      @include extraSmall {
         margin-left: 0 !important;
         width: 100%;
       }
@@ -152,6 +152,8 @@ $discussion-title-font-size: 1.45rem;
       }
       .proposal-body-link {
         display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
 
         > * div {
           margin-right: 8px;
@@ -185,24 +187,6 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-meta-top-right {
           display: flex;
-          .ExecuteButton,
-          .QueueButton {
-            button {
-              color: $white;
-              background: linear-gradient(
-                268.96deg,
-                #00db8c 2.02%,
-                #1bdebb 94.68%
-              );
-            }
-          }
-          .CancelButton {
-            button {
-              color: $rorange-500;
-              border: 1px solid $rorange-500;
-              background: $white;
-            }
-          }
         }
         .ProposalHeaderOnchainId {
           font-size: 18px;
@@ -221,7 +205,7 @@ $discussion-title-font-size: 1.45rem;
       overflow-x: auto;
       margin-left: $discussion-comment-padding;
       margin-bottom: 40px;
-      @include xs-max {
+      @include extraSmall {
         margin-left: $discussion-comment-padding-mobile;
       }
       .proposal-content-meta {
@@ -265,7 +249,7 @@ $discussion-title-font-size: 1.45rem;
       flex: 1;
       overflow-x: auto;
       padding-left: $discussion-comment-padding;
-      @include xs-max {
+      @include extraSmall {
         padding-left: $discussion-comment-padding-mobile;
       }
     }
@@ -281,7 +265,7 @@ $discussion-title-font-size: 1.45rem;
       padding: 4px 0 2px;
     }
     .comment-body-content {
-      @include xs-max {
+      @include extraSmall {
         margin-right: 10px;
       }
     }
@@ -290,7 +274,7 @@ $discussion-title-font-size: 1.45rem;
   .ProposalComments {
     .new-comment-child {
       margin-left: 72px;
-      @include xs-max {
+      @include extraSmall {
         margin-left: 0 !important;
         width: 100%;
       }
@@ -397,7 +381,7 @@ $discussion-title-font-size: 1.45rem;
     padding: 24px 24px 24px 0;
     width: 296px;
 
-    @include xs-max {
+    @include extraSmall {
       display: none;
     }
   }
@@ -508,11 +492,6 @@ $discussion-title-font-size: 1.45rem;
     .User .user-display-name {
       color: $neutral-500;
     }
-  }
-
-  .comments-error {
-    @include error-text();
-    margin: 30px 0;
   }
 
   .proposal-content,

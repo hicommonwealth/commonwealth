@@ -1,5 +1,5 @@
 import { ChainBase } from 'types';
-import { IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 
 import { SolanaToken } from './types';
@@ -13,7 +13,7 @@ class Solana extends IChainAdapter<SolanaToken, SolanaAccount> {
   public readonly base = ChainBase.Solana;
 
   constructor(
-    meta: NodeInfo,
+    meta: ChainInfo,
     app: IApp,
   ) {
     super(meta, app);

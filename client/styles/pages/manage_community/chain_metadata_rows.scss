@@ -10,11 +10,6 @@
     display: flex;
     flex-direction: column;
 
-    label {
-      @include form-label;
-      margin-bottom: 4px;
-    }
-
     textarea {
       resize: none;
     }
@@ -25,11 +20,6 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
-
-    label {
-      @include form-label;
-      margin-bottom: 4px;
-    }
 
     .toggle-and-label {
       display: flex;
@@ -48,11 +38,6 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 24px;
-
-    label {
-      @include form-label;
-      margin-bottom: 4px;
-    }
 
     .tag-group {
       display: flex;

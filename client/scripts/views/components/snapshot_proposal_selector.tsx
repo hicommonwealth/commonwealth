@@ -34,7 +34,7 @@ export class SnapshotProposalSelector
       this.allProposals = [];
       this.initialized = true;
 
-      loadMultipleSpacesData(app.chain.meta.chain.snapshot).then((data) => {
+      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { proposals } of data) {
           this.allProposals = [...this.allProposals, ...proposals];
         }

@@ -66,7 +66,7 @@
       }
     }
   }
-  @include lg-max {
+  @include mediumSmallInclusive {
     display: block;
     width: 100%;
     .results-column,

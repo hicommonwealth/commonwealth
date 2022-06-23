@@ -17,10 +17,11 @@ import {
 
 import moment from 'moment';
 import app from 'state';
+import { navigateToSubpage } from 'app';
 
 import { ChainBase } from 'types';
 import { Account } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
@@ -141,44 +142,6 @@ const newThread = async (
     console.log(e);
     throw new Error(e.error);
   }
-
-  const wallet = await app.wallets.locateWallet(
-    author,
-    ChainBase.Ethereum
-  );
-
-  /*  try {
-    const wallet = await app.wallets.locateWallet(
-      author.address,
-      ChainBase.Ethereum
-    );
-    if (
-      !(
-        wallet instanceof MetamaskWebWalletController ||
-        wallet instanceof WalletConnectWebWalletController
-      )
-    ) {
-      throw new Error('Invalid wallet.');
-    }
-    msg.sig = await wallet.signMessage(msg.msg);
-
-    const result = await $.post(`${app.serverUrl()}/snapshotAPI/sendMessage`, {
-      ...msg,
-    });
-    if (result.status === 'Failure') {
-      const errorMessage =
-        result && result.message.error_description
-          ? `${result.message.error_description}`
-          : NewThreadErrors.SomethingWentWrong;
-      throw new Error(errorMessage);
-    } else if (result.status === 'Success') {
-      await app.user.notifications.refresh();
-      await app.snapshot.refreshProposals();
-      navigateToSubpage(`/snapshot/${snapshotId}/${result.message.ipfsHash}`);
-    }
-  } catch (err) {
-    notifyError(err.message);
-  } */
 };
 
 const newLink = async (
@@ -195,6 +158,7 @@ const newLink = async (
     space,
     snapshotId
   );
+  console.log('the rro', errors);
   return errors;
 };
 
@@ -482,6 +446,8 @@ const NewProposalForm: m.Component<
                       );
                       vnode.state.saving = false;
                       clearLocalStorage();
+                      notifySuccess('Snapshot Created!');
+                      navigateToSubpage(`/snapshot/${vnode.state.space.id}`);
                     } catch (err) {
                       vnode.state.saving = false;
                       notifyError(capitalize(err.message));

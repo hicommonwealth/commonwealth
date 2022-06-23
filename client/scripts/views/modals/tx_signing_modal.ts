@@ -24,6 +24,7 @@ import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 const createProposalTransactionLabels = {
   // substrate: accounts
@@ -240,7 +241,11 @@ const TXSigningCLIOption: m.Component<
         fluid: true,
         placeholder: 'Signed TX',
       }),
-      vnode.state.error && m('.error-message', vnode.state.error),
+      vnode.state.error &&
+        m(CWValidationText, {
+          message: vnode.state.error,
+          status: 'failure',
+        }),
       submitAction,
       !submitAction &&
         m('p.transaction-loading', 'Still loading transaction...'),
@@ -391,7 +396,7 @@ const TXSigningModalStates: {
       }, 1000);
       // for edgeware mainnet, timeout after 10 sec
       // TODO: remove this after the runtime upgrade to Substrate 2.0 rc3+
-      if (app.chain?.meta?.chain?.id === 'edgeware') {
+      if (app.chain?.meta?.id === 'edgeware') {
         vnode.state.timeoutHandle = global.setTimeout(() => {
           clearInterval(vnode.state.timeoutHandle);
           vnode.attrs.next('SentTransactionSuccess', {

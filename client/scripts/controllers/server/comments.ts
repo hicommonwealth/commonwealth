@@ -176,7 +176,7 @@ class CommentsController {
       const newComment = modelFromServer(result);
       this._store.add(newComment);
       const activeEntity = app.chain;
-      updateLastVisited((activeEntity.meta as NodeInfo).chain, true);
+      updateLastVisited(activeEntity.meta, true);
       return newComment;
     } catch (err) {
       console.log('Failed to create comment');

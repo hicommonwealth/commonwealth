@@ -47,11 +47,7 @@ import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
 } from 'views/pages/discussions/discussion_row_menu';
-import ProposalVotingActions, {
-  CancelButton,
-  ExecuteButton,
-  QueueButton,
-} from 'views/components/proposals/voting_actions';
+import { VotingActions } from 'views/components/proposals/voting_actions';
 import ProposalVotingResults from 'views/components/proposals/voting_results';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
@@ -121,6 +117,12 @@ import {
   ProposalHeaderBlockExplorerLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
+import {
+  QueueButton,
+  ExecuteButton,
+  CancelButton,
+} from '../../components/proposals/voting_actions_components';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -312,11 +314,10 @@ const ProposalHeader: m.Component<
                               getSetGlobalEditingStatus,
                             }),
                           (isAuthor || isAdmin) &&
-                            app.chain?.meta.chain.snapshot.length > 0 &&
+                            app.chain?.meta.snapshot.length > 0 &&
                             m(MenuItem, {
                               onclick: () => {
-                                const snapshotSpaces =
-                                  app.chain.meta.chain.snapshot;
+                                const snapshotSpaces = app.chain.meta.snapshot;
                                 if (snapshotSpaces.length > 1) {
                                   navigateToSubpage('/multiple-snapshots', {
                                     action: 'create-from-thread',
@@ -384,7 +385,7 @@ const ProposalHeader: m.Component<
                         ) => {
                           proposal.stage = stage;
                           proposal.chainEntities = chainEntities;
-                          if (app.chain?.meta.chain.snapshot) {
+                          if (app.chain?.meta.snapshot) {
                             proposal.snapshotProposal = snapshotProposal[0]?.id;
                           }
                           app.threads.fetchThreadsFromId([proposal.identifier]);
@@ -808,7 +809,6 @@ const ProposalComments: m.Component<
     return m(
       '.ProposalComments',
       {
-        class: app.user.activeAccount ? '' : 'no-active-account',
         oncreate: (vvnode) => {
           vnode.state.dom = vvnode.dom;
         },
@@ -823,7 +823,10 @@ const ProposalComments: m.Component<
         // create comment
         // errors
         vnode.state.commentError &&
-          m('.comments-error', vnode.state.commentError),
+          m(CWValidationText, {
+            message: vnode.state.commentError,
+            status: 'failure',
+          }),
       ]
     );
   },
@@ -857,7 +860,7 @@ const ViewProposalPage: m.Component<
       vnode.attrs.type ||
       (isDiscussion
         ? ProposalType.Thread
-        : chainToProposalSlug(app.chain.meta.chain));
+        : chainToProposalSlug(app.chain.meta));
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
     if (typeof identifier !== 'string')
       return m(PageNotFound, { title: headerTitle });
@@ -1359,7 +1362,7 @@ const ViewProposalPage: m.Component<
             !(proposal instanceof Thread) &&
               m(ProposalVotingResults, { proposal }),
             !(proposal instanceof Thread) &&
-              m(ProposalVotingActions, { proposal }),
+              m(VotingActions, { proposal }),
             m(ProposalComments, {
               proposal,
               comments,
@@ -1400,7 +1403,7 @@ const ViewProposalPage: m.Component<
               }),
             proposal instanceof Thread &&
               isAuthor &&
-              (!app.chain?.meta?.chain?.adminOnlyPolling || isAdmin) &&
+              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,

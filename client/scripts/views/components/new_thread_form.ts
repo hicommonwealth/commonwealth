@@ -1,6 +1,5 @@
 /* eslint-disable guard-for-in */
 import 'components/new_thread_form.scss';
-import 'pages/new_thread.scss';
 
 import m from 'mithril';
 import _ from 'lodash';
@@ -109,7 +108,7 @@ const newThread = async (
   stage = ThreadStage.Discussion,
   readOnly?: boolean
 ) => {
-  const topics = app.chain.meta.chain.topics;
+  const topics = app.chain.meta.topics;
 
   if (kind === ThreadKind.Forum) {
     if (!form.threadTitle) {
@@ -451,7 +450,7 @@ export const NewThreadForm: m.Component<
   view: (vnode) => {
     if (!app.chain) return;
     const author = app.user.activeAccount;
-    const activeEntityInfo = app.chain.meta.chain;
+    const activeEntityInfo = app.chain.meta;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
       vnode.state.quillEditorState.container.tabIndex = 8;

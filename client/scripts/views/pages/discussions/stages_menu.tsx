@@ -43,7 +43,6 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
             disabled={disabled}
           />
         }
-        inline={true}
         hasArrow={false}
         transitionDuration={0}
         closeOnContentClick={true}

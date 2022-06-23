@@ -30,7 +30,7 @@ const storeNewTopicOrder = (
 
 const OrderTopicsModal: m.Component<null, { topics: Topic[] }> = {
   oninit: (vnode: VnodeDOM<null, { topics: Topic[] }>) => {
-    vnode.state.topics = app.chain.meta.chain.topics.filter(
+    vnode.state.topics = app.chain.meta.topics.filter(
       (topic) => topic.featuredInSidebar
     );
 

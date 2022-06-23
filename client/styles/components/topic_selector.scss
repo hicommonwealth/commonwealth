@@ -20,7 +20,7 @@
     bottom: -3px;
   }
 
-  @include xs-max {
+  @include extraSmall {
     width: calc(100vw - 53px);
 
     .cui-popover-content {

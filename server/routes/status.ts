@@ -32,16 +32,12 @@ const status = async (
             model: models.Topic,
             as: 'topics',
           },
-        ],
-      }),
-      models.ChainNode.findAll({
-        include: [
           {
-            model: models.Chain,
-            where: { active: true },
-          },
+            model: models.ChainNode,
+          }
         ],
       }),
+      models.ChainNode.findAll(),
       models.ContractCategory.findAll(),
       models.NotificationCategory.findAll(),
       models.ChainCategory.findAll(),
@@ -88,14 +84,14 @@ const status = async (
     const [
       addresses,
       socialAccounts,
-      selectedNode,
+      selectedChain,
       isAdmin,
       disableRichText,
       lastVisited,
     ] = await Promise.all([
       unfilteredAddresses.filter((address) => !!address.verified),
       user.getSocialAccounts(),
-      user.getSelectedNode(),
+      user.getSelectedChain(),
       user.isAdmin,
       user.disableRichText,
       user.lastVisited,
@@ -288,7 +284,7 @@ const status = async (
         jwt: jwtToken,
         addresses,
         socialAccounts,
-        selectedNode,
+        selectedChain,
         isAdmin,
         disableRichText,
         lastVisited: JSON.parse(lastVisited),

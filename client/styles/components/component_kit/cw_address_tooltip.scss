@@ -1,0 +1,12 @@
+@import 'shared';
+
+.AddressTooltip {
+  align-items: center;
+  color: $white;
+  display: flex;
+  flex-direction: row;
+
+  .IconButton {
+    margin-left: 4px;
+  }
+}

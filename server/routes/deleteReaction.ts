@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export const Errors = {
   AddressNotOwned: 'Not owned by this user',
 };
 
-const deleteReaction = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -28,6 +29,18 @@ const deleteReaction = async (models: DB, req: Request, res: Response, next: Nex
       },
       include: [ models.Address ],
     });
+
+    // check if author can delete react
+    if (reaction) {
+      const [canInteract, banError] = await banCache.checkBan({
+        chain: reaction.chain,
+        address: reaction.Address.address,
+      });
+      if (!canInteract) {
+        return next(new Error(banError));
+      }
+    }
+
     // actually delete
     await reaction.destroy();
     return res.json({ status: 'Success' });

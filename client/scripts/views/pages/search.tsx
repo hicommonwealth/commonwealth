@@ -388,9 +388,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
                 <Spinner active={true} fill={true} size="xl" />,
               </div>
             ) : this.errorText ? (
-              <div class="search-error">
-                <div class="error-text">{this.errorText}</div>
-              </div>
+              <div class="search-error">{this.errorText}</div>
             ) : (
               <div class="search-results">
                 <div class="search-results-caption">

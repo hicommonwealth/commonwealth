@@ -8,6 +8,7 @@ import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } f
 import { factory, formatFilename } from '../../shared/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -16,7 +17,7 @@ export const Errors = {
   NoProposal: 'No matching proposal found',
 };
 
-const editComment = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -24,6 +25,15 @@ const editComment = async (models: DB, req: Request, res: Response, next: NextFu
 
   if (!req.body.id) {
     return next(new Error(Errors.NoId));
+  }
+
+  // check if banned
+  const [canInteract, banError] = await banCache.checkBan({
+    chain: chain.id,
+    address: author.address,
+  });
+  if (!canInteract) {
+    return next(new Error(banError));
   }
 
   const attachFiles = async () => {

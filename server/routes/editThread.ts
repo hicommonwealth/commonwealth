@@ -8,6 +8,7 @@ import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/u
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +19,7 @@ export const Errors = {
   InvalidLink: 'Invalid thread URL'
 };
 
-const editThread = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editThread = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   const { body, title, kind, stage, thread_id, version_history, url } = req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
@@ -70,6 +71,17 @@ const editThread = async (models: DB, req: Request, res: Response, next: NextFun
       permission: 'admin'
     }
   });
+
+  // check if banned
+  if (!admin) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: chain.id,
+      address: author.address,
+    });
+    if (!canInteract) {
+      return next(new Error(banError));
+    }
+  }
 
   if (collaboration || admin) {
     thread = await models.Thread.findOne({
