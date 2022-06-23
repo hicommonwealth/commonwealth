@@ -184,7 +184,7 @@ export default async (
   // convert the object to an array which is what the front-end expects
   const subscriptions = [];
   for (const sub_id in subscriptionsObj) {
-    if (!subscriptionsObj[sub_id]) {
+    if (subscriptionsObj[sub_id]) {
       subscriptions.push(subscriptionsObj[sub_id]);
     }
   }
