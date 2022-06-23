@@ -65,11 +65,11 @@ export class NotificationsMenu
   private _previousPage(showingChainEvents: boolean) {
     if (showingChainEvents && this.minChainEventsNotification >= MAX_NOTIFS) {
       this.minChainEventsNotification -= MAX_NOTIFS;
-    } else if (showingChainEvents && this.minChainEventsNotification != 0) {
+    } else if (showingChainEvents && this.minChainEventsNotification !== 0) {
       this.minChainEventsNotification = 0;
     } else if (this.minDiscussionNotification >= MAX_NOTIFS) {
       this.minDiscussionNotification -= MAX_NOTIFS;
-    } else if (this.minDiscussionNotification != 0) {
+    } else if (this.minDiscussionNotification !== 0) {
       this.minDiscussionNotification = 0;
     }
     m.redraw();

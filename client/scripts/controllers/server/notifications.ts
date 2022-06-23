@@ -19,6 +19,10 @@ const post = (route, args, callback) => {
     .catch((e) => console.error(e));
 };
 
+interface NotifOptions {
+  chain_filter: string,
+  maxId: number
+}
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
@@ -274,11 +278,13 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options: any = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId() }
-      : {};
+    
 
-    if (this._maxChainEventNotificationId != Number.POSITIVE_INFINITY)
+    const options: NotifOptions = app.isCustomDomain()
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined};
+
+    if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxChainEventNotificationId;
 
     return post('/viewChainEventNotifications', options, (result) => {
@@ -294,11 +300,11 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options: any = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId() }
-      : {};
+    const options: NotifOptions = app.isCustomDomain()
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined };
 
-    if (this._maxDiscussionNotificationId != Number.POSITIVE_INFINITY)
+    if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxDiscussionNotificationId;
 
     return post('/viewDiscussionNotifications', options, (result) => {
@@ -310,7 +316,7 @@ class NotificationsController {
     });
   }
 
-  private parseNotifications(subscriptions: any) {
+  private parseNotifications(subscriptions) {
     const ceSubs = [];
 
     for (const subscriptionJSON of subscriptions) {

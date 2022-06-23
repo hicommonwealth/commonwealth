@@ -65,7 +65,7 @@ function previousPage() {
   if (minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
     flag = true;
-  } else if (minChainEventsNotification != 0) {
+  } else if (minChainEventsNotification !== 0) {
     minChainEventsNotification = 0;
     flag = true;
   }
@@ -73,7 +73,7 @@ function previousPage() {
   if (minDiscussionNotification >= MAX_NOTIFS) {
     minDiscussionNotification -= MAX_NOTIFS;
     flag = true;
-  } else if (minDiscussionNotification != 0) {
+  } else if (minDiscussionNotification !== 0) {
     minDiscussionNotification = 0;
     flag = true;
   }
@@ -217,11 +217,9 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      const chainEventNotifications =
-                        app.user.notifications.chainEventNotifications;
-                      if (chainEventNotifications.length === 0) return;
+                      if (app.user.notifications.chainEventNotifications.length === 0) return;
                       app.user.notifications
-                        .delete(chainEventNotifications)
+                        .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
                     },
                   }),
