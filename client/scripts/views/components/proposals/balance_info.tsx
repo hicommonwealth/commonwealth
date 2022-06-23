@@ -27,7 +27,7 @@ export class BalanceInfo implements m.ClassComponent {
 
   view() {
     return (
-      <div class="BalanceInfo" style="font-size: 90%;">
+      <>
         <div>
           {`Free: ${this.freeBalance ? formatCoin(this.freeBalance) : '--'}`}
         </div>
@@ -37,7 +37,7 @@ export class BalanceInfo implements m.ClassComponent {
           }`}
         </div>
         <div>{`Total: ${this.balance ? formatCoin(this.balance) : '--'}`}</div>
-      </div>
+      </>
     );
   }
 }
