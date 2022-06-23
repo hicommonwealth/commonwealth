@@ -161,8 +161,10 @@ export const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       return <YesNoRejectVotingResult proposal={proposal} votes={votes} />;
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       // to be implemented
+      return null;
     } else {
       // to be implemented
+      return null;
     }
   },
 };

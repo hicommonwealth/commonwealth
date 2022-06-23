@@ -4,10 +4,17 @@ import m from 'mithril';
 
 import 'components/proposals/vote_listing.scss';
 
+import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
-import { IVote, DepositVote, BinaryVote, AnyProposal } from 'models';
+import {
+  IVote,
+  DepositVote,
+  BinaryVote,
+  AnyProposal,
+  VotingUnit,
+} from 'models';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
 import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';
@@ -17,18 +24,26 @@ import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import { CWText } from '../component_kit/cw_text';
-import { getBalance } from './helpers';
 
 type VoteListingAttrs = {
-  amount?: boolean;
   proposal: AnyProposal;
   votes: Array<IVote<any>>;
-  weight?: boolean;
 };
 
 export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
+  private balancesCache;
+  private balancesCacheInitialized;
+
   view(vnode) {
     const { proposal, votes } = vnode.attrs;
+
+    const balanceWeighted =
+      proposal.votingUnit === VotingUnit.CoinVote ||
+      proposal.votingUnit === VotingUnit.ConvictionCoinVote ||
+      proposal.votingUnit === VotingUnit.PowerVote;
+
+    if (!this.balancesCache) this.balancesCache = {};
+    if (!this.balancesCacheInitialized) this.balancesCacheInitialized = {};
 
     // TODO: show turnout if specific votes not found
     const sortedVotes = votes;
@@ -45,7 +60,39 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
           <CWText className="no-votes">No votes</CWText>
         ) : (
           votes.map((vote) => {
-            const balance = getBalance(proposal, vote);
+            let balance;
+
+            if (balanceWeighted && !(vote instanceof CosmosVote)) {
+              // fetch and display balances
+              if (this.balancesCache[vote.account.address]) {
+                balance = this.balancesCache[vote.account.address];
+              } else if (this.balancesCacheInitialized[vote.account.address]) {
+                // do nothing, fetch already in progress
+                balance = '--';
+              } else {
+                // fetch balance and store in cache
+                this.balancesCacheInitialized[vote.account.address] = true;
+                if (vote instanceof AaveProposalVote) {
+                  balance = vote.power;
+                  this.balancesCache[vote.account.address] = vote.format();
+                  m.redraw();
+                } else if (vote instanceof CompoundProposalVote) {
+                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                  this.balancesCache[vote.account.address] = balance;
+                  m.redraw();
+                } else {
+                  vote.account.balance.then((b) => {
+                    balance = b;
+                    this.balancesCache[vote.account.address] = formatCoin(
+                      b,
+                      true
+                    );
+                    m.redraw();
+                  });
+                  balance = '--';
+                }
+              }
+            }
 
             switch (true) {
               case vote instanceof CosmosVote:
@@ -64,7 +111,13 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                 return (
                   <div class="vote">
                     {m(User, { user: vote.account, linkify: true })}
-                    {balance && <CWText>{balance}</CWText>}
+                    {balance && typeof balance === 'string' && (
+                      <div class="vote-right-container">
+                        <CWText noWrap title={balance}>
+                          {balance}
+                        </CWText>
+                      </div>
+                    )}
                   </div>
                 );
 
@@ -72,7 +125,13 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                 return (
                   <div class="vote">
                     {m(User, { user: vote.account, linkify: true })}
-                    {balance && <CWText>{balance}</CWText>}
+                    {balance && typeof balance === 'string' && (
+                      <div class="vote-right-container">
+                        <CWText noWrap title={balance}>
+                          {balance}
+                        </CWText>
+                      </div>
+                    )}
                   </div>
                 );
 
@@ -80,7 +139,13 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                 return (
                   <div class="vote">
                     {m(User, { user: vote.account, linkify: true })}
-                    {balance && <CWText>{balance}</CWText>}
+                    {balance && typeof balance === 'string' && (
+                      <div class="vote-right-container">
+                        <CWText noWrap title={balance}>
+                          {balance}
+                        </CWText>
+                      </div>
+                    )}
                   </div>
                 );
 
@@ -95,13 +160,25 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                           popover: true,
                         })}
                         <div class="vote-right-container">
-                          <CWText noWrap>
+                          <CWText
+                            noWrap
+                            title={formatCoin(
+                              (vote as SubstrateDemocracyVote).balance,
+                              true
+                            )}
+                          >
                             {formatCoin(
                               (vote as SubstrateDemocracyVote).balance,
                               true
                             )}
                           </CWText>
-                          <CWText noWrap>
+                          <CWText
+                            noWrap
+                            title={
+                              (vote as SubstrateDemocracyVote).weight &&
+                              `${(vote as SubstrateDemocracyVote).weight}x`
+                            }
+                          >
                             {(vote as SubstrateDemocracyVote).weight &&
                               `${(vote as SubstrateDemocracyVote).weight}x`}
                           </CWText>
@@ -129,10 +206,18 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
                           popover: true,
                         })}
                         <div class="vote-right-container">
-                          <CWText noWrap>
+                          <CWText
+                            noWrap
+                            title={(vote as any).amount && (vote as any).amount}
+                          >
                             {(vote as any).amount && (vote as any).amount}
                           </CWText>
-                          <CWText noWrap>
+                          <CWText
+                            noWrap
+                            title={
+                              (vote as any).weight && `${(vote as any).weight}x`
+                            }
+                          >
                             {(vote as any).weight && `${(vote as any).weight}x`}
                           </CWText>
                         </div>
