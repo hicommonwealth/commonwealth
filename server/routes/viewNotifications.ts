@@ -45,7 +45,7 @@ export default async (
   }
 
   const notificationWhereOptions = {};
-  if (notificationCategory == NotificationCategories.ChainEvents) {
+  if (notificationCategory === NotificationCategories.ChainEvents) {
     notificationWhereOptions['category_id'] =
       NotificationCategories.ChainEvents;
   } else {
@@ -60,18 +60,18 @@ export default async (
     },
   });
 
-  let maxId, numNr;
+  let maxId;
   // if maxId is not provided that means this is the first request so load the first 100
   // TODO: if this is too slow create a table keeping track of maxId for each user and query that instead (increment the counters in emitNotifications)
   // TODO: or better yet create onUpdate and onDelete triggers to update the counters
   // TODO: should this always run so we can return number of unread or things like that?
-  numNr = (<any>await models.NotificationsRead.findOne({
+  const numNr = (<any>await models.NotificationsRead.findOne({
     attributes: [<any>models.sequelize.fn('MAX', models.sequelize.col('id'))],
     where: { user_id: req.user.id },
     raw: true,
   })).max;
 
-  if (!req.body.maxId || req.body.maxId == 0) maxId = numNr;
+  if (!req.body.maxId || req.body.maxId === 0) maxId = numNr;
   else maxId = req.body.maxId;
 
   const whereAndOptions: any = [
@@ -183,8 +183,11 @@ export default async (
 
   // convert the object to an array which is what the front-end expects
   const subscriptions = [];
-  for (const sub_id in subscriptionsObj)
-    subscriptions.push(subscriptionsObj[sub_id]);
+  for (const sub_id in subscriptionsObj) {
+    if (!subscriptionsObj[sub_id]) {
+      subscriptions.push(subscriptionsObj[sub_id]);
+    }
+  }
 
   return res.json({
     status: 'Success',
