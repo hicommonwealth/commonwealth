@@ -165,7 +165,6 @@ export default (
       where: findOptions,
       include: models.User,
     });
-    console.log("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>", subscriptions);
 
     // get notification if it already exists
     let notification: NotificationInstance;
@@ -181,7 +180,6 @@ export default (
 
     // if the notification does not yet exist create it here
     // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
-    console.log(notification_data);
     if (!notification) {
       if (isChainEventData) {
         const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
