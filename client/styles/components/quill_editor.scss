@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 @import 'client/styles/quill/quill.core';
 @import 'client/styles/quill/quill.bubble';
 @import 'client/styles/quill/quill.snow';
@@ -21,8 +21,9 @@
 .QuillEditor {
   position: relative;
   word-break: break-word;
+
   ::selection {
-    background: $primary-500;
+    background: $neutral-500;
     color: $white;
   }
 
@@ -31,25 +32,29 @@
     font-size: 1rem;
     padding: 20px 22px 28px;
     max-height: 360px;
+
     a {
       text-decoration: underline;
     }
+
     img {
-      background-color: $primary-400;
+      background-color: $neutral-400;
     }
+
     code,
     kbd,
     samp {
       font-family: $monospace-fonts;
       font-size: 0.75rem;
-      background: $primary-300;
+      background: $neutral-300;
       padding: 2px 5px;
       margin: 0 1px;
       border-radius: 3px;
     }
+
     pre,
     .ql-code-block-container {
-      background: $primary-300;
+      background: $neutral-300;
       color: $neutral-800;
       font-family: $monospace-fonts;
       font-size: 0.75rem;
@@ -61,21 +66,26 @@
       &:first-child {
         margin-top: 2px;
       }
+
       &:last-child {
         margin-bottom: 2px;
       }
     }
+
     ol {
       ::before {
         padding-right: 1em;
       }
+
       li {
         margin: 0;
       }
+
       li[data-list='ordered'] > .ql-ui::before {
         margin-left: -1.85em;
         width: 1.5em;
       }
+
       li[data-list='bullet'] > .ql-ui::before {
         font-size: 125%;
         position: relative;
@@ -93,14 +103,17 @@
       top: -1px;
       left: -4px;
     }
+
     li[data-list='checked'] {
       text-decoration: line-through;
     }
+
     li[data-list='checked'] > .ql-ui::before {
       content: '\f14a';
       color: $neutral-500;
       font-size: 93%;
     }
+
     li[data-list='unchecked'] > .ql-ui::before {
       content: '\f096';
       color: $neutral-400;
@@ -109,14 +122,15 @@
 
   // 3. ql-snow form input styles, ql-bubble styles
   .ql-container.ql-snow {
-    // border: 1px solid #B37DBA;
     border-radius: 0 0 3px 3px;
     // construct-ui input styles
     color: $neutral-900;
   }
+
   .ql-bubble .ql-editor {
     padding: 1px 8px 8px 1px;
   }
+
   .ql-snow .ql-editor,
   .ql-bubble .ql-editor {
     blockquote {
@@ -126,13 +140,13 @@
 
   // 4. toolbar
   .ql-toolbar.ql-snow {
-    // border: 1px solid #B37DBA;
     border-radius: 4px 4px 0 0;
     box-sizing: border-box;
     padding: 5px 8px;
     white-space: nowrap;
     overflow-x: auto;
     min-height: 39px;
+
     @include extraSmall {
       display: flex;
       flex-wrap: wrap;
@@ -140,18 +154,20 @@
       overflow-x: hidden;
     }
   }
+
   .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
-    // border-color: #B37DBA;
   }
+
   .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-    // border-color: #B37DBA;
   }
+
   // link popup
   .ql-tooltip {
     z-index: 9999;
     font-size: 17px;
     padding: 10px 15px 8px;
     border-radius: 5px;
+
     input[type='text'] {
       position: relative;
       top: -1px;
@@ -162,6 +178,7 @@
       font-size: 17px;
       height: 31px;
     }
+
     a.ql-action:hover::after {
       text-decoration: underline;
     }
@@ -173,45 +190,57 @@
       display: none;
     }
   }
+
   .ql-snow.ql-toolbar button.ql-preview {
     display: none;
   }
+
   &.markdown-mode {
     .ql-snow.ql-toolbar button.ql-preview {
       display: inline-block;
     }
   }
+
   .type-selector {
     position: absolute;
     display: flex;
     right: 100px;
     top: 6px;
     margin-right: 8px;
+
     @include extraSmall {
       top: 40px;
     }
+
     user-select: none;
+
     .cui-tag {
       cursor: pointer;
       margin-right: 0;
     }
   }
+
   .preview-button-wrap {
     position: absolute;
     display: flex;
     right: 10px;
     top: 6px;
+
     @include extraSmall {
       top: 40px;
     }
+
     user-select: none;
+
     .preview-button {
       display: flex;
     }
+
     .cui-tag {
       cursor: pointer;
       margin-right: 0;
     }
+
     svg {
       margin-right: 4px;
       top: 1px;
@@ -223,9 +252,11 @@
   .ql-formats > .ql-preview {
     width: initial !important;
   }
+
   .ql-bubble .ql-formats > .ql-preview {
     display: none !important;
   }
+
   .ql-formats > .ql-preview:before {
     position: relative;
     top: -2px;
@@ -265,65 +296,71 @@
 
 // 7. mentions container
 .ql-mention-list-container {
-  background: white;
-  border-top: 1px solid $primary-300;
-  border-left: 1px solid $primary-300;
-  border-right: 1px solid $primary-300;
+  background: $white;
+  border-top: 1px solid $neutral-200;
+  border-left: 1px solid $neutral-200;
+  border-right: 1px solid $neutral-200;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   z-index: 2;
+
   .ql-mention-list {
     list-style: none;
     margin: 0;
     padding: 0;
     cursor: pointer;
+
     li {
-      padding: 5px 10px;
-      border-bottom: 1px solid $primary-300;
+      padding: 8px;
+      border-bottom: 1px solid $neutral-200;
       margin: 0;
       display: flex;
       align-items: center;
+
       > div {
         font-size: 17px;
         display: flex;
         align-items: center;
         width: 100%;
       }
+
       &:first-child {
         border-radius: 4px 4px 0 0;
       }
+
       &:last-child {
         border-radius: 0 0 4px 4px;
       }
     }
+
     > .selected {
-      background: $primary-400;
+      background: $neutral-100;
       cursor: pointer;
     }
-    .ql-mention-list-item > div > span {
-      position: relative;
-      top: 4px;
-    }
+
     .ql-mention-text-wrap {
       width: 100%;
-      position: relative;
-      top: 4px;
+
       .ql-mention-name {
-        margin-right: 15px;
+        font-size: 16px;
+        margin-right: 16px;
       }
+
       .ql-mention-addr {
         float: right;
         color: $neutral-500;
-        font-size: 90%;
+        font-size: 14px;
       }
+
       .ql-mention-la {
         display: block;
         color: $neutral-500;
-        font-size: 90%;
+        font-size: 14px;
         white-space: nowrap;
         margin-bottom: 2px;
       }
     }
+
     .ql-mention-avatar {
       height: 20px;
       width: 20px;
@@ -331,8 +368,9 @@
       min-width: 20px;
       margin-right: 12px;
       border-radius: 9999px;
+
       &.missing {
-        background-color: $primary-300;
+        background-color: $neutral-300;
       }
     }
   }
