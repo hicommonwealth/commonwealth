@@ -25,7 +25,6 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
-import { ChainAttributes } from './server/models/chain';
 
 require('express-async-errors');
 
@@ -285,6 +284,10 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
         description: 'an entity-event as occurred'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewChatMention,
+        description: 'someone mentions a user in chat'
       })
 
       // Admins need to be subscribed to mentions and collaborations

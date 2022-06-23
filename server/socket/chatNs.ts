@@ -1,22 +1,71 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
+import { Op } from 'sequelize';
 import { addPrefix, factory } from '../../shared/logging';
 import {
-  RedisNamespaces,
-  WebsocketEngineEvents,
-  WebsocketMessageNames,
-  WebsocketNamespaces,
-} from '../../shared/types';
+    RedisNamespaces,
+    WebsocketEngineEvents,
+    WebsocketMessageNames,
+    WebsocketNamespaces,
+ NotificationCategories } from '../../shared/types';
+import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../database';
-import { Op } from 'sequelize';
 import { RedisCache } from '../util/redisCache';
+
 
 const log = factory.getLogger(addPrefix(__filename));
 
+const handleMentions = async (models: DB, socket: any, message: any, id: number, chain_id: string) => {
+    // process mentions
+    const bodyText = decodeURIComponent(message.message);
+    let mentionedAddresses;
+    try {
+        const mentions = parseUserMentions(bodyText);
+        if (mentions && mentions.length > 0) {
+            mentionedAddresses = await Promise.all(
+                mentions.map(async (mention) => {
+                const user = await models.Address.findOne({
+                    where: {
+                    chain: mention[0] || null,
+                    address: mention[1],
+                    },
+                    include: [models.User, models.Role],
+                });
+                return user;
+                })
+            );
+            mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
+        }
+    } catch (e) {
+        return socket.emit('Error: Failed to parse mentions', e);
+    }
+
+    if (mentionedAddresses?.length > 0) {
+        await Promise.all(
+          mentionedAddresses.map(async (mentionedAddress) => {
+            // some Addresses may be missing users, e.g. if the user removed the address
+            if (!mentionedAddress.User) return;
+            await models.Subscription.emitNotifications(
+                models,
+                NotificationCategories.NewChatMention,
+                `user-${mentionedAddress.User.id}`,
+                {
+                    message_id: id,
+                    channel_id: message.chat_channel_id,
+                    chain_id,
+                    author_address: message.address,
+                    created_at: new Date(),
+                }
+            );
+          })
+        );
+      }
+}
+
 export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCache) {
-  const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
-  ChatNs.use(authenticate);
+    const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
+    ChatNs.use(authenticate)
 
   ChatNs.on('connection', (socket) => {
     log.info(`${socket.id} connected to Chat`);
@@ -49,11 +98,10 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
             }
           }
 
-          log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
-          for (const channel of chatChannelIds) socket.join(channel);
-        }
+        log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
+        for (const channel of chatChannelIds) socket.join(channel);
       }
-    );
+    });
 
     socket.on(
       WebsocketMessageNames.LeaveChatChannel,
@@ -79,7 +127,7 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
           const userId = await models.Address.findOne({
             attributes: ['user_id'],
             where: {
-              address: address,
+              address,
               user_id: (<any>socket).user.id
             },
           });
@@ -119,6 +167,9 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
           chat_channel_id,
           created_at,
         });
+
+        const channel = await models.ChatChannel.findOne({where: { id: chat_channel_id }});
+        await handleMentions(models, socket, _message, id, channel.chain_id);
       } catch (e) {
         log.error(`An error occurred upon receiving a chat message: ${JSON.stringify(_message)}`, e);
       }

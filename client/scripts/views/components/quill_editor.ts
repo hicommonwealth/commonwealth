@@ -416,10 +416,10 @@ const instantiateEditor = (
         }
       },
     },
-    // Submit on cmd-Enter/ctrl-Enter
+    // Submit on enter if an onkeyboardSubmit function is passed
     submit: {
       key: 'Enter',
-      shortKey: true,
+      shortKey: false,
       handler: () => {
         if (onkeyboardSubmit) {
           onkeyboardSubmit();
