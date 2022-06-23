@@ -1,5 +1,7 @@
+import BN from 'bn.js';
+import $ from 'jquery';
 import { ChainBase } from 'types';
-import { ChainInfo, IChainAdapter } from 'models';
+import { ChainInfo, IChainAdapter, ITokenAdapter } from 'models';
 import { IApp } from 'state';
 import { CosmosToken } from './types';
 import CosmosAccount from './account';
@@ -7,7 +9,7 @@ import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 
-class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
+class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> implements ITokenAdapter {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
@@ -32,6 +34,7 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
   public async initData() {
     await this.governance.init(this.chain, this.accounts);
     await super.initData();
+    await this.activeAddressHasToken(this.app.user?.activeAccount?.address);
   }
 
   public async deinit(): Promise<void> {
@@ -40,6 +43,27 @@ class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> {
     await this.accounts.deinit();
     await this.chain.deinit();
     console.log('Cosmos stopped.');
+  }
+
+  // token adapter implementation
+  public readonly contractAddress: string; // undefined for native tokens
+  public hasToken = false;
+  public tokenBalance = new BN(0);
+  public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
+    if (!activeAddress) return false;
+    this.hasToken = false;
+    const account = this.accounts.get(activeAddress);
+
+    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+      chain: this.meta.id,
+      address: account.address,
+      author_chain: account.chain.id,
+    });
+    if (balanceResp.result) {
+      const balance = new BN(balanceResp.result, 10);
+      this.hasToken = balance && !balance.isZero();
+      if (balance) this.tokenBalance = balance;
+    }
   }
 }
 
