@@ -19,10 +19,10 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
   ChatNs.use(authenticate);
 
   ChatNs.on('connection', (socket) => {
-    log.info(`${socket.id} connected to Chat`);
+    log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} connected to Chat`);
 
     socket.on('disconnect', () => {
-      log.info(`${socket.id} disconnected from Chat`);
+      log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} disconnected from Chat`);
     });
 
     socket.on(
@@ -49,7 +49,7 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
             }
           }
 
-          log.info(`${socket.id} joining ${JSON.stringify(chatChannelIds)}`);
+          log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} joining ${JSON.stringify(chatChannelIds)}`);
           for (const channel of chatChannelIds) socket.join(channel);
         }
       }
@@ -59,7 +59,7 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
       WebsocketMessageNames.LeaveChatChannel,
       (chatChannelIds: string[]) => {
         if (chatChannelIds.length > 0) {
-          log.info(`${socket.id} leaving ${JSON.stringify(chatChannelIds)}`);
+          log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} leaving ${JSON.stringify(chatChannelIds)}`);
           for (const channel of chatChannelIds) socket.leave(channel);
         }
       }
