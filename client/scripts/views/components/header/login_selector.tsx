@@ -259,10 +259,10 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       const addressChainInfo = app.config.chains.getById(a.chain);
       if (addressChainInfo?.base !== activeBase) return false;
 
-      // ensure doesn't already exist
+      // // ensure doesn't already exist
       const addressExists = !!app.user.addresses.find((prev) =>
         activeBase === ChainBase.Substrate &&
-        app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
+        (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
           ? AddressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -272,7 +272,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               currentPrefix: 42,
             })
           : prev.address === a.address
-      );
+      ));
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain
