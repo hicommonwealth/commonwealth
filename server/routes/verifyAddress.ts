@@ -1,14 +1,8 @@
-(global as any).window = { location: { href: '/' } };
-
 import { Request, Response, NextFunction } from 'express';
-import * as jwt from 'jsonwebtoken';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-
-import jscrypto from 'jscrypto';
-import secp256k1 from 'secp256k1';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';

@@ -18,6 +18,9 @@ export default class CosmosAccount extends Account<CosmosToken> {
 
   // TODO: add delegations, validations
   private _balance: CosmosToken;
+  // NOTE: this balance query will not work on Terra, as it uses a nonstandard Cosmos interface.
+  //   We should either deprecate this query and replace it with TokenBalanceCache, or create a
+  //   workaround specific for Terra.
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {

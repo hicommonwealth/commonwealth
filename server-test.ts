@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation */
 import http from 'http';
 import favicon from 'serve-favicon';
-import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -9,6 +8,7 @@ import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import BN from 'bn.js';
+import Rollbar from 'rollbar';
 
 import Rollbar from "rollbar";
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
@@ -40,8 +40,10 @@ class MockTokenBalanceProvider extends TokenBalanceProvider {
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
   public async getEthTokenBalance(
-    tokenAddress: string,
-    userAddress: string
+    address: string,
+    network: string,
+    tokenAddress?: string,
+    userAddress?: string
   ): Promise<BN> {
     if (this.balanceFn) {
       return this.balanceFn(tokenAddress, userAddress);
