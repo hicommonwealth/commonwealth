@@ -17,62 +17,63 @@ export default async (
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
+  const subscriptions = [];
 
-  // locate active subscriptions, filter by category if specified
-  const searchParams: any[] = [
-    { subscriber_id: req.user.id },
-  ];
-  if (req.body.active_only) {
-    searchParams.push({ is_active: true });
-  }
-  if (req.body.categories && req.body.categories.length) {
-    searchParams.push({
-      category_id: {
-        [Op.contained]: req.body.categories,
-      }
-    });
-  }
-  if (req.body.chain_filter) {
-    searchParams.push({
-      chain_id: req.body.chain_filter,
-    });
-  }
+  // // locate active subscriptions, filter by category if specified
+  // const searchParams: any[] = [
+  //   { subscriber_id: req.user.id },
+  // ];
+  // if (req.body.active_only) {
+  //   searchParams.push({ is_active: true });
+  // }
+  // if (req.body.categories && req.body.categories.length) {
+  //   searchParams.push({
+  //     category_id: {
+  //       [Op.contained]: req.body.categories,
+  //     }
+  //   });
+  // }
+  // if (req.body.chain_filter) {
+  //   searchParams.push({
+  //     chain_id: req.body.chain_filter,
+  //   });
+  // }
 
-  const notificationParams: any = {
-    model: models.NotificationsRead,
-    required: false, // send subscriptions regardless of whether user has notifications
-    include: [
-      {
-        model: models.Notification,
-        required: true,
-        include: [
-          {
-            model: models.ChainEvent,
-            required: false,
-            as: 'ChainEvent',
-          },
-        ],
-      },
-    ],
-  };
+  // const notificationParams: any = {
+  //   model: models.NotificationsRead,
+  //   required: false, // send subscriptions regardless of whether user has notifications
+  //   include: [
+  //     {
+  //       model: models.Notification,
+  //       required: true,
+  //       include: [
+  //         {
+  //           model: models.ChainEvent,
+  //           required: false,
+  //           as: 'ChainEvent',
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // };
 
-  if (req.body.unread_only) {
-    notificationParams.where = { is_read: false };
-  }
+  // if (req.body.unread_only) {
+  //   notificationParams.where = { is_read: false };
+  // }
 
-  // perform the query
-  const subscriptions = await models.Subscription.findAll({
-    where: {
-      [Op.and]: searchParams
-    },
-    include: [
-      notificationParams,
-      {
-        model: models.ChainEventType,
-        required: false,
-      },
-    ],
-  });
+  // // perform the query
+  // const subscriptions = await models.Subscription.findAll({
+  //   where: {
+  //     [Op.and]: searchParams
+  //   },
+  //   include: [
+  //     notificationParams,
+  //     {
+  //       model: models.ChainEventType,
+  //       required: false,
+  //     },
+  //   ],
+  // });
 
   return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
 };
