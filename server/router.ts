@@ -703,7 +703,7 @@ function setupRouter(
   router.get('/communityStats', communityStats.bind(this, models));
 
   // snapshot webhook listener
-  router.post('/snapHook', snapshotListener.bind(this, models, snapshotSpaceCache));
+  router.post('/snapshotNotifications', snapshotListener.bind(this, models, snapshotSpaceCache));
 
 
   app.use('/api', router);
