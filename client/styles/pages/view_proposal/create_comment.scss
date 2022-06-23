@@ -5,12 +5,8 @@
   display: flex;
 
   .create-comment-body {
-    @include extraSmall {
-      margin: 0;
-    }
-
     flex: 1;
-    margin-left: 26px;
+    margin-left: 16px;
 
     .form-bottom {
       display: flex;
