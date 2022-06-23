@@ -165,6 +165,7 @@ export default (
       where: findOptions,
       include: models.User,
     });
+    console.log("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>", subscriptions);
 
     // get notification if it already exists
     let notification: NotificationInstance;
@@ -226,8 +227,9 @@ export default (
       else query += ', ';
       replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
     }
-
-    await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
+    if (subscriptions.length > 0) {
+      await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
+    }
 
     // send emails
     for (const subscription of subscriptions) {
