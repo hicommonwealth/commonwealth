@@ -99,9 +99,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     const { account, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
-
     const forUser = scope === 'user';
-
     const forCommunity = scope === 'community';
 
     const avatar = forUser
