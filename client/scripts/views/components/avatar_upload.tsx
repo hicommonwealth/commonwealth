@@ -99,6 +99,13 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     const avatarSize = size === 'small' ? 60 : 108;
     const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
+    const imageExists =
+      !!this.dropzone?.option?.url ||
+      !!app.chain?.meta.iconUrl ||
+      !!account?.profile?.avatarUrl;
+
+    console.log(!!logoURL);
+
     return (
       <div
         class={getClasses<AvatarUploadStyleAttrs>(
@@ -116,7 +123,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         {!this.uploaded && (
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: !!logoURL },
+              { hasNoAvatar: !imageExists },
               'dropzone-attach'
             )}
           >
