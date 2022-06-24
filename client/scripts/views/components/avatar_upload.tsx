@@ -8,6 +8,7 @@ import 'components/avatar_upload.scss';
 
 import app from 'state';
 import { Account } from 'models';
+import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
@@ -18,6 +19,7 @@ type AvatarUploadStyleAttrs = {
 
 type AvatarUploadAttrs = {
   account?: Account<any>;
+  scope: 'community' | 'user';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
 } & AvatarUploadStyleAttrs;
@@ -94,10 +96,19 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   }
 
   view(vnode) {
-    const { account, size = 'small' } = vnode.attrs;
+    const { account, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
-    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
+    const forUser = scope === 'user';
+    const forCommunity = scope === 'community';
+
+    const avatar = forUser
+      ? account?.profile?.getAvatar(avatarSize)
+      : forCommunity
+      ? app.chain?.meta.getAvatar(avatarSize)
+      : undefined;
+
+    const localUploadURL = this.dropzone?.option?.url;
 
     return (
       <div
@@ -116,13 +127,11 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         {!this.uploaded && (
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: !!logoURL },
+              { hasNoAvatar: isUndefined(avatar) },
               'dropzone-attach'
             )}
           >
-            {account?.profile?.avatarUrl
-              ? account?.profile?.getAvatar(avatarSize)
-              : null}
+            {avatar}
           </div>
         )}
         <div
@@ -130,7 +139,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}
-          style={`background-image: url(${logoURL}); background-size: ${avatarSize}px;`}
+          style={`background-image: url(${localUploadURL}); background-size: ${avatarSize}px;`}
         />
       </div>
     );
