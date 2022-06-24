@@ -104,8 +104,6 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
       !!app.chain?.meta.iconUrl ||
       !!account?.profile?.avatarUrl;
 
-    console.log(!!logoURL);
-
     return (
       <div
         class={getClasses<AvatarUploadStyleAttrs>(
