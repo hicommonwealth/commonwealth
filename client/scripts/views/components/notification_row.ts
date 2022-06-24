@@ -349,7 +349,7 @@ const NotificationRow: m.Component<
                     e.preventDefault();
                     e.stopPropagation();
                     vnode.state.scrollOrStop = true;
-                    app.user.notifications.clear([notification]).then(() => {
+                    app.user.notifications.delete([notification]).then(() => {
                       m.redraw();
                     });
                   },
@@ -379,7 +379,89 @@ const NotificationRow: m.Component<
         },
         () => m.redraw.sync()
       );
-    } else {
+    } else if (category === NotificationCategories.NewChatMention) {
+      const {
+        chain_id,
+        author_address,
+        created_at,
+        message_id,
+        channel_id
+      } = JSON.parse(notification.data);
+      const route = app.socket.chatNs.getRouteToMessage(channel_id, message_id, chain_id)
+      const author = new AddressInfo(
+        null,
+        author_address,
+        chain_id,
+        null
+      )
+
+      const authorName = m(User, {
+        user: author,
+        hideAvatar: true,
+        hideIdentityIcon: true,
+      });
+
+      return link(
+          'a.NotificationRow',
+          route,
+          [
+            m(User, {
+              user: author,
+              avatarOnly: true,
+              avatarSize: 26,
+            }),
+            m('.comment-body', [
+              m('.comment-body-title', m('span', [
+                authorName,
+                ' mentioned you in ',
+                m('span.commented-obj', chain_id),
+                ' chat '
+              ])),
+              m('.comment-body-bottom-wrap', [
+                m('.comment-body-created', moment(created_at).fromNow()),
+                !notification.isRead &&
+                  m(
+                    '.comment-body-mark-as-read',
+                    {
+                      onclick: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        vnode.state.markingRead = true;
+                        app.user.notifications
+                          .markAsRead(notifications)
+                          ?.then(() => {
+                            vnode.state.markingRead = false;
+                            m.redraw();
+                          })
+                          .catch(() => {
+                            vnode.state.markingRead = false;
+                            m.redraw();
+                          });
+                      },
+                    },
+                    [
+                      vnode.state.markingRead
+                        ? m(Spinner, { size: 'xs', active: true })
+                        : 'Mark as read',
+                    ]
+                  ),
+              ]),
+            ]),
+          ],
+          {
+            class: notification.isRead ? '' : 'unread',
+            key: notification.id,
+            id: notification.id,
+          },
+          null,
+          () => app.user.notifications.markAsRead(notifications),
+          () => setTimeout(() => {
+            const el = document.getElementById("highlighted")
+            if (el) el.scrollIntoView({behavior: "smooth"})
+          }, 200)
+        );
+    }
+    else {
       const notificationData = notifications.map((notif) =>
         typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
       );

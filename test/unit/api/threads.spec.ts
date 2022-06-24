@@ -447,7 +447,7 @@ describe('Thread Tests', () => {
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.ThreadNotFound);
+      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingRootId);
     });
   });
 

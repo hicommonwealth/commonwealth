@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWExternalLink } from './cw_external_link';
@@ -16,11 +17,15 @@ import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWAccountCreationButton } from './cw_account_creation_button';
+import { NewLoginModal } from '../../modals/login_modal';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
 import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
+import { CWTextArea } from './cw_text_area';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -40,8 +45,8 @@ const radioGroupOptions = [
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
-
 export class ComponentShowcase implements m.ClassComponent {
+  private avatarUrl: string;
   private checkboxChecked: boolean;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
@@ -54,6 +59,27 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <CWButton
+          label="Click for Login modal"
+          onclick={() =>
+            app.modals.create({
+              modal: NewLoginModal,
+            })
+          }
+        />
+        <div class="card-gallery">
+          <h1>Account Creation Button</h1>
+          <CWAccountCreationButton
+            onclick={() => notifySuccess('Account creation button clicked!')}
+          />
+        </div>
+        <div class="card-gallery">
+          <h1>Wallet Row Card</h1>
+          <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+        </div>
         <h1>Popover</h1>
         <div class="tooltip-gallery">
           <CWPopover
@@ -187,10 +213,21 @@ export class ComponentShowcase implements m.ClassComponent {
             placeholder="Type here"
           />
           <CWTextInput
+            label="Text field with icon"
+            name="Text field with icon"
+            placeholder="Type here"
+            iconRight="edit"
+          />
+          <CWTextInput
             name="Text field"
             label="Disabled"
             disabled
             defaultValue="Some disabled text"
+          />
+          <CWTextArea
+            name="Textarea"
+            label="Text area"
+            placeholder="Type here"
           />
         </div>
         <h1>Buttons</h1>

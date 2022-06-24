@@ -203,6 +203,25 @@ export class ChatNamespace {
         }
     }
 
+    public async getChannelData(channel_id: number) {
+        try {
+            const res = await $.get(`${app.serverUrl()}/getChatChannel`, {
+                jwt: app.user.jwt,
+                channel_id
+            })
+
+            if(res.status !== "200") {
+                throw new Error('Failed to get chat messages')
+            }
+
+            const raw = JSON.parse(res.result)
+            return raw
+        } catch (e) {
+            console.error(e)
+            return []
+        }
+    }
+
     public async deleteChatChannel(channel_id: number) {
         try {
             const response = await $.ajax({
@@ -250,10 +269,10 @@ export class ChatNamespace {
         }
     }
 
-    public async renameChatCategory(category: string, new_category: string) {
+    public async editChatCategory(category: string, new_category: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/renameChatCategory`,
+                url: `${app.serverUrl()}/editChatCategory`,
                 data: {
                     category,
                     new_category,
@@ -274,10 +293,10 @@ export class ChatNamespace {
         }
     }
 
-    public async renameChatChannel(channel_id: number, name: string) {
+    public async editChatChannel(channel_id: number, name: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/renameChatChannel`,
+                url: `${app.serverUrl()}/editChatChannel`,
                 data: {
                     channel_id,
                     name,
@@ -296,5 +315,9 @@ export class ChatNamespace {
             console.error(e)
             return false
         }
+    }
+
+    public getRouteToMessage(channel_id: number, message_id: number, chain_id: string) {
+        return `/${chain_id}/chat/${channel_id}?message=${message_id}`
     }
 }

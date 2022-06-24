@@ -28,7 +28,7 @@ import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import { TopicSelector } from 'views/components/topic_selector';
-import EditProfileModal from 'views/modals/edit_profile_modal';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 

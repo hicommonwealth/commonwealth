@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $discussion-outer-padding: 60px;
 $discussion-meta-padding: 12px; // padding between comment meta & comment content
@@ -71,6 +71,8 @@ $discussion-title-font-size: 1.45rem;
     }
   }
   .ProposalHeader {
+    margin-bottom: 24px;
+
     .proposal-content {
       position: relative;
     }
@@ -187,24 +189,6 @@ $discussion-title-font-size: 1.45rem;
         }
         .proposal-meta-top-right {
           display: flex;
-          .ExecuteButton,
-          .QueueButton {
-            button {
-              color: $white;
-              background: linear-gradient(
-                268.96deg,
-                #00db8c 2.02%,
-                #1bdebb 94.68%
-              );
-            }
-          }
-          .CancelButton {
-            button {
-              color: $rorange-500;
-              border: 1px solid $rorange-500;
-              background: $white;
-            }
-          }
         }
         .ProposalHeaderOnchainId {
           font-size: 18px;
@@ -399,7 +383,7 @@ $discussion-title-font-size: 1.45rem;
     padding: 24px 24px 24px 0;
     width: 296px;
 
-    @include extraSmall {
+    @include smallInclusive {
       display: none;
     }
   }

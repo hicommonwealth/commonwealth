@@ -11,7 +11,7 @@ import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 
 const exitWithMagicLoginComplete = () => {
-  $('.LoginModal').trigger('modalforceexit');
+  $('.Login').trigger('modalforceexit');
 
   if (app.user?.activeAccount && !app.user.activeAccount.profile?.name) {
     app.modals.create({

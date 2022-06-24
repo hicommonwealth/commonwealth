@@ -47,7 +47,6 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
           <CWTextInput
             label={title}
             defaultValue={defaultValue}
-            value={value}
             placeholder={placeholder}
             disabled={disabled || false}
             oninput={(e) => {

@@ -26,7 +26,7 @@ import { ChainInfo, RoleInfo, Profile } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 interface SearchParams {
   communityScope?: string;
   chainScope?: string;
@@ -555,7 +555,7 @@ const CreateInviteModal: m.Component<
     return m('.CreateInviteModal', [
       m('.compact-modal-title', [
         m('h3', 'Invite members'),
-        m(CompactModalExitButton),
+        m(ModalExitButton),
       ]),
       m('.compact-modal-body', [
         m(Form, { class: 'add-address-form' }, [
