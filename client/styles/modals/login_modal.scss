@@ -1,0 +1,90 @@
+@import 'shared';
+
+.NewLoginModal {
+  display: flex;
+  height: 424px;
+  width: 664px;
+
+  .body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 424px;
+    justify-content: space-between;
+    padding: 16px 24px;
+    width: 400px;
+
+    svg {
+      align-self: flex-end;
+    }
+
+    .inner-body-container {
+      align-items: center;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 16px;
+
+      &.centered {
+        justify-content: center;
+      }
+
+      .LoginBoilerplate.Text {
+        margin: 32px;
+      }
+
+      .header-container {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        margin-bottom: 16px;
+        row-gap: 4px;
+
+        .header-text.Text {
+          margin-bottom: 0;
+          text-align: center;
+        }
+
+        .LoginBoilerplate.Text {
+          margin: 0 32px;
+        }
+
+        .subheader-text.Text {
+          color: $neutral-500;
+          margin: 0 32px;
+          text-align: center;
+        }
+      }
+
+      .TextInput {
+        width: 100%;
+      }
+
+      .select-row {
+        display: flex;
+        flex-direction: row;
+
+        .Icon {
+          color: $neutral-500;
+          margin-right: 8px;
+        }
+
+        .select-text.Text {
+          color: $neutral-500;
+        }
+      }
+
+      .buttons-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        .Button:first-child {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

@@ -34,11 +34,7 @@ export class SublayoutHeaderLeft
       } else if (isNotNil(chain)) {
         return (
           <>
-            {link(
-              'a',
-              !app.isCustomDomain() ? `/${app.activeChainId()}` : '/',
-              <ChainIcon size={22} chain={chain} />
-            )}
+            <ChainIcon size={22} chain={chain} />
             <h4>
               {link(
                 'a',

@@ -62,20 +62,19 @@ export async function initAppState(
         data.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
-            return app.config.nodes.add(
-              NodeInfo.fromJSON(node)
-            );
+            return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
         data.chains
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
-            return app.config.chains.add(ChainInfo.fromJSON({
-              ChainNode: app.config.nodes.getById(chain.chain_node_id),
-              ...chain
-            }));
+            return app.config.chains.add(
+              ChainInfo.fromJSON({
+                ChainNode: app.config.nodes.getById(chain.chain_node_id),
+                ...chain,
+              })
+            );
           });
-        console.log(app.config);
         app.user.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
@@ -114,7 +113,9 @@ export async function initAppState(
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
-          app.user.setSelectedChain(ChainInfo.fromJSON(data.user.selectedChain));
+          app.user.setSelectedChain(
+            ChainInfo.fromJSON(data.user.selectedChain)
+          );
         }
 
         if (customDomain) {

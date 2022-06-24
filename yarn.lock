@@ -3699,6 +3699,13 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
+"@types/node-sass@^4.11.2":
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/@types/node-sass/-/node-sass-4.11.2.tgz#ecdaa44a1ba8847bf7dea2aadbfe33a91a263514"
+  integrity sha512-pOFlTw/OtZda4e+yMjq6/QYuvY0RDMQ+mxXdWj7rfSyf18V8hS4SfgurO+MasAkQsv6Wt6edOGlwh5QqJml9gw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "13.9.0"
   resolved "https://registry.npmjs.org/@types/node/-/node-13.9.0.tgz"

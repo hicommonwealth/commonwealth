@@ -12,8 +12,9 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'client/scripts/models';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
+import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 
 const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
   view: (vnode) => {
@@ -56,10 +57,10 @@ const ConfirmInviteModal: m.Component<
     vnode.state.accepted = [];
     vnode.state.rejected = [];
   },
-  oncreate: (vnode) => {},
+  oncreate: () => {},
   view: (vnode) => {
     const SelectAddress = (account) => {
-      const isMobile = window.innerWidth < 767.98;
+      const isMobile = isWindowSmallInclusive(window.innerWidth);
       return m(
         '.SwitchAddress.account-menu-item',
         {
@@ -108,7 +109,7 @@ const ConfirmInviteModal: m.Component<
         !vnode.state.isComplete
           ? m('h3', 'Manage Invites')
           : m('h3', 'No more invites'),
-        m(CompactModalExitButton),
+        m(ModalExitButton),
       ]),
       !vnode.state.isComplete &&
         m(SideMenu, {

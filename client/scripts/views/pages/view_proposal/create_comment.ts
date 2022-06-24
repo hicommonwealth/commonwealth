@@ -8,7 +8,7 @@ import app from 'state';
 import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
-import EditProfileModal from 'views/modals/edit_profile_modal';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import QuillEditor from 'views/components/quill_editor';
 import User from 'views/components/widgets/user';
 
@@ -216,10 +216,9 @@ const CreateComment: m.Component<
                       m(
                         'a',
                         {
-                          href:
-                            `/${app.activeChainId()}/account/${
-                              app.user.activeAccount.address
-                            }?base=${app.user.activeAccount.chain}`,
+                          href: `/${app.activeChainId()}/account/${
+                            app.user.activeAccount.address
+                          }?base=${app.user.activeAccount.chain}`,
                           onclick: (e) => {
                             e.preventDefault();
                             app.modals.create({

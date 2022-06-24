@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 @mixin profile-listing {
   h3 {
@@ -283,15 +283,6 @@
   }
   .bio-left {
     width: 94px;
-    .avatar {
-      width: 94px;
-      height: 94px;
-      position: relative;
-      border-radius: 9999px;
-      .avatar-image {
-        background-size: cover;
-      }
-    }
   }
   .bio-right {
     flex: 1;
@@ -319,8 +310,7 @@
   }
   .bio-actions {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
+    gap: 8px;
     margin-top: 12px;
 
     @include mediumSmallInclusive {
@@ -354,9 +344,6 @@
     @include mediumSmallInclusive {
       display: none;
     }
-  }
-  .avatar {
-    display: block;
   }
   .name-row {
     .name,
