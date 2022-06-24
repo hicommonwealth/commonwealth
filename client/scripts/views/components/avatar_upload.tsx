@@ -8,7 +8,6 @@ import 'components/avatar_upload.scss';
 
 import app from 'state';
 import { Account } from 'models';
-import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
@@ -117,7 +116,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         {!this.uploaded && (
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: isUndefined(account) },
+              { hasNoAvatar: !!logoURL },
               'dropzone-attach'
             )}
           >
