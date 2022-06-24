@@ -9,9 +9,11 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
+import QuillFormattedText from '../quill_formatted_text';
+import MarkdownFormattedText from '../markdown_formatted_text';
 
 type BannerAttrs = {
-  bannerContent?: string | m.Vnode;
+  bannerContent: string;
   onClose: () => void;
 };
 
@@ -26,13 +28,39 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
           ComponentType.Banner
         )}
       >
-        {isString(bannerContent) ? (
-          <CWText type="caption">{bannerContent}</CWText>
-        ) : (
-          bannerContent
-        )}
+        <CWText>{bannerContent}</CWText>
         {onClose && (
           <CWIconButton iconName="close" iconSize="small" onclick={onClose} />
+        )}
+      </div>
+    );
+  }
+}
+
+export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
+  view(vnode) {
+    const { bannerContent, onClose } = vnode.attrs;
+
+    return (
+      <div
+        class={getClasses<{ onClose?: boolean }>(
+          { onClose: !!onClose },
+          ComponentType.MessageBanner
+        )}
+      >
+        {m(MarkdownFormattedText, {
+          doc: bannerContent,
+          hideFormatting: true,
+          collapse: true,
+        })}
+        {/* <CWText>{bannerContent}</CWText> */}
+        {onClose && (
+          <CWIconButton
+            iconName="close"
+            iconSize="small"
+            onclick={onClose}
+            iconButtonTheme="primary"
+          />
         )}
       </div>
     );

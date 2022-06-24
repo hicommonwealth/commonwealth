@@ -19,6 +19,7 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import QuillEditor from '../../components/quill_editor';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -52,7 +53,7 @@ export class ChainMetadataRows
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
-  communityBanner: string;
+  communityBanner;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -222,7 +223,7 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        <InputRow
+        {/* <InputRow
           title="Banner"
           name="Banner Text"
           label="Banner"
@@ -231,7 +232,17 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
-        />
+        /> */}
+        {m(QuillEditor, {
+          // Prevent the editor from being filled in with previous content
+          contentsDoc: this.communityBanner,
+          oncreateBind: (state) => {
+            console.log('state', state);
+            this.communityBanner = state;
+          },
+          tabindex: 1,
+          editorNamespace: 'new-banner',
+        })}
         <div class="tag-row">
           <CWLabel label="Community Tags" />
           <div class="tag-group">

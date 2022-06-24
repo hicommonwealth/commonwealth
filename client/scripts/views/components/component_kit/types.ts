@@ -11,6 +11,7 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  MessageBanner = 'MessageBanner',
   Modal = 'Modal',
   Popover = 'Popover',
   RadioButton = 'RadioButton',

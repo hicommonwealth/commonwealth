@@ -708,7 +708,9 @@ const countLinesQuill = (ops) => {
   for (const op of ops) {
     try {
       count += op.insert.split('\n').length - 1;
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }
   return count;
 };
@@ -740,7 +742,7 @@ const formatBody = (vnode) => {
       vnode.state.collapsed = true;
     }
   }
-}
+};
 
 export const ProposalBodyText: m.Component<
   {
@@ -800,7 +802,7 @@ export const ProposalBodyText: m.Component<
 
           return m('.show-more-wrap', [
             m(QuillFormattedText, {
-              doc: doc,
+              doc,
               cutoffText: vnode.state.collapsed
                 ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
                 : doc.ops.length,

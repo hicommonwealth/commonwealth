@@ -1,4 +1,4 @@
-import 'modals/edit_topic_modal.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import $ from 'jquery';
@@ -10,6 +10,8 @@ import {
   FormLabel,
   Checkbox,
 } from 'construct-ui';
+
+import 'modals/edit_topic_modal.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -182,7 +184,9 @@ const EditTopicModal: m.Component<
                   vnode.state.quillEditorState = state;
 
                   let newDraftMarkdown;
+
                   let newDraftDelta;
+
                   if (defaultOffchainTemplate) {
                     try {
                       newDraftDelta = JSON.parse(defaultOffchainTemplate);
