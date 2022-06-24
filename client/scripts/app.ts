@@ -57,7 +57,7 @@ export async function initAppState(
       .then(async (data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
-        app.user.notifications.store.clear();
+        app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
         data.nodes
           .sort((a, b) => a.id - b.id)
@@ -1181,7 +1181,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       .then(async () => {
         if (app.loginState === LoginState.LoggedIn) {
           // refresh notifications once
-          app.user.notifications.refresh().then(() => m.redraw());
           // grab all discussion drafts
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }
