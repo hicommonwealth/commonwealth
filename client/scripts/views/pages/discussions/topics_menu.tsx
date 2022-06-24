@@ -130,7 +130,6 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                               compact={true}
                               onclick={(e) => {
                                 e.preventDefault();
-                                e.stopPropagation();
                                 app.modals.create({
                                   modal: EditTopicModal,
                                   data: {
