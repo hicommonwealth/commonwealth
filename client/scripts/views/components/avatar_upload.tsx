@@ -18,6 +18,7 @@ type AvatarUploadStyleAttrs = {
 
 type AvatarUploadAttrs = {
   account?: Account<any>;
+  scope: 'community' | 'user';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
 } & AvatarUploadStyleAttrs;
@@ -94,15 +95,21 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   }
 
   view(vnode) {
-    const { account, size = 'small' } = vnode.attrs;
+    const { account, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
-    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
-    const imageExists =
-      !!this.dropzone?.option?.url ||
-      !!app.chain?.meta.iconUrl ||
-      !!account?.profile?.avatarUrl;
+    const forProfile = scope === 'user';
+
+    const forCommunity = scope === 'community';
+
+    const imageExists = forProfile
+      ? !!account?.profile?.avatarUrl
+      : forCommunity
+      ? !!app.chain?.meta.iconUrl
+      : false;
+
+    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
 
     return (
       <div

@@ -669,6 +669,7 @@ const LinkNewAddressModal: m.Component<
               ),
               m('.avatar-wrap', [
                 m(AvatarUpload, {
+                  scaope: 'user',
                   uploadStartedCallback: () => {
                     vnode.state.uploadsInProgress = true;
                     m.redraw();
