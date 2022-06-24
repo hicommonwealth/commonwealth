@@ -8,6 +8,7 @@ import 'components/avatar_upload.scss';
 
 import app from 'state';
 import { Account } from 'models';
+import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
@@ -103,11 +104,11 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
 
     const forCommunity = scope === 'community';
 
-    const imageExists = forUser
-      ? account?.profile?.avatarUrl
+    const avatar = forUser
+      ? account?.profile?.getAvatar(avatarSize)
       : forCommunity
-      ? !!app.chain?.meta.iconUrl
-      : false;
+      ? app.chain?.meta.getAvatar(avatarSize)
+      : undefined;
 
     const localUploadURL = this.dropzone?.option?.url;
 
@@ -128,13 +129,11 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
         {!this.uploaded && (
           <div
             class={getClasses<{ hasNoAvatar: boolean }>(
-              { hasNoAvatar: !imageExists },
+              { hasNoAvatar: isUndefined(avatar) },
               'dropzone-attach'
             )}
           >
-            {forUser
-              ? account?.profile?.getAvatar(avatarSize)
-              : app.chain?.meta.getAvatar(avatarSize)}
+            {avatar}
           </div>
         )}
         <div
