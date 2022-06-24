@@ -21,7 +21,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
-import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/avatar_upload';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
@@ -499,13 +499,15 @@ const LinkNewAddressModal: m.Component<
                     link('a', 'https://metamask.io/', 'Get Metamask', {
                       target: '_blank',
                     }),
-                  app.chain.base === ChainBase.CosmosSDK && app.chain.network !== ChainNetwork.Terra &&
+                  app.chain.base === ChainBase.CosmosSDK &&
+                    app.chain.network !== ChainNetwork.Terra &&
                     link('a', 'https://wallet.keplr.app/', 'Get Keplr', {
                       target: '_blank',
                     }),
                   app.chain.network === ChainNetwork.Terra &&
                     link('a', 'https://www.terra.money/', 'Get Terra', {
-                      target: '_blank',}),
+                      target: '_blank',
+                    }),
                 ]),
               webWallet?.enabled &&
                 m('.accounts-caption', [
@@ -667,7 +669,6 @@ const LinkNewAddressModal: m.Component<
               ),
               m('.avatar-wrap', [
                 m(AvatarUpload, {
-                  avatarScope: AvatarScope.Account,
                   uploadStartedCallback: () => {
                     vnode.state.uploadsInProgress = true;
                     m.redraw();

@@ -3,7 +3,7 @@ import { IconName } from './cw_icon_lookup';
 
 type IconButtonTheme = 'neutral' | 'primary';
 
-export type IconSize = 'small' | 'medium' | 'large';
+export type IconSize = 'small' | 'medium' | 'large' | 'xl' | 'xxl';
 
 export type IconStyleAttrs = {
   className?: string;
@@ -18,3 +18,12 @@ export type IconAttrs = IconStyleAttrs & {
   iconName: IconName;
   onclick?: () => void; // should be used by icon button, not by plain icons
 };
+
+export type CustomIconStyleAttrs = {
+  iconSize?: IconSize;
+};
+
+export type CustomIconAttrs = {
+  componentType: ComponentType;
+  iconName: IconName;
+} & CustomIconStyleAttrs;

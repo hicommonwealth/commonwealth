@@ -19,7 +19,7 @@ import { OffchainTopic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 interface IEditTopicModalForm {
@@ -117,10 +117,7 @@ const EditTopicModal: m.Component<
     };
 
     return m('.EditTopicModal', [
-      m('.compact-modal-title', [
-        m('h3', 'Edit topic'),
-        m(CompactModalExitButton),
-      ]),
+      m('.compact-modal-title', [m('h3', 'Edit topic'), m(ModalExitButton)]),
       m('.compact-modal-body', [
         m(Form, [
           m(FormGroup, [

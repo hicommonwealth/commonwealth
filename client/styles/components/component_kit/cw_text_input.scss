@@ -1,73 +1,46 @@
 @import 'shared';
 
-$text-input-border: 2px solid;
-
 .TextInput {
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
   width: 100%;
 
-  input {
-    background-color: $neutral-50;
-    border-radius: $border-radius-corners;
-    border: 2px solid $neutral-200;
-    color: $neutral-800;
+  .input-and-icon-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    position: relative;
 
-    &.small {
-      font-size: 14px;
-      height: 32px;
-      line-height: 20px;
-      padding: 8px;
-    }
+    input {
+      @include inputStyles;
 
-    &.large {
-      font-size: 16px;
-      height: 40px;
-      letter-spacing: 0.02em;
-      line-height: 24px;
-      padding: 6px 8px;
-    }
+      &.small {
+        font-size: 14px;
+        height: 32px;
+        line-height: 20px;
+        padding: 8px;
+      }
 
-    &::placeholder {
-      color: $neutral-300;
-    }
+      &.large {
+        font-size: 16px;
+        height: 40px;
+        letter-spacing: 0.02em;
+        line-height: 24px;
+        padding: 6px 8px;
+      }
 
-    &:focus {
-      outline: none;
-    }
-
-    &:focus-within {
-      border-color: $primary-200;
-
-      &::placeholder {
-        color: $neutral-500;
+      &.hasRightIcon {
+        padding: 8px 24px 8px 8px;
       }
     }
 
-    &.isTyping {
-      border-color: $primary-500;
-    }
-
-    &.success {
-      border-color: $green-500;
-      background-color: $green-50;
-    }
-
-    &.failure {
-      border-color: $rorange-500;
-      background-color: $rorange-50;
-    }
-
-    &.disabled {
-      background-color: $neutral-200;
-      border-color: $neutral-200;
-      color: $white;
-      cursor: not-allowed;
-
-      &::placeholder {
-        color: $white;
-      }
+    .text-input-right-icon.Icon {
+      color: $primary-300;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
     }
   }
 

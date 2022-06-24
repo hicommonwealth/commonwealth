@@ -18,6 +18,7 @@ export const NotificationCategories = {
   CommentEdit: 'comment-edit',
   ChainEvent: 'chain-event',
   EntityEvent: 'entity-event',
+  NewChatMention: 'new-chat-mention',
 };
 
 export enum ProposalType {
@@ -186,6 +187,14 @@ export interface IChainEventNotificationData {
   chainEvent: any;
   chainEventType: any;
   chain_id: string;
+}
+
+export interface IChatNotification {
+  message_id: string | number;
+  channel_id: string | number;
+  chain_id: string;
+  author_address: string;
+  created_at: any;
 }
 
 export const PROFILE_NAME_MAX_CHARS = 40;

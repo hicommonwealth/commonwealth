@@ -1,17 +1,21 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ChainIcon {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+
   .chain-icon {
     align-items: center;
-    border-radius: 1000px;
+    border-radius: $border-radius-round;
     display: flex;
     justify-content: center;
   }
 
-  .chain-icon .no-image {
+  .chain-icon.no-image {
     align-items: center;
     background: $neutral-800;
-    border-radius: 1000px;
+    border-radius: $border-radius-round;
     display: flex;
     justify-content: center;
 
@@ -19,9 +23,6 @@
       color: $white;
       font-size: 16px;
       font-weight: 500;
-      position: relative;
-      text-align: center;
-      top: 0.19em;
     }
   }
 
@@ -33,14 +34,14 @@
 .TokenIcon {
   .token-icon {
     background: $neutral-800;
-    border-radius: 1000px;
+    border-radius: $border-radius-round;
     display: flex;
   }
 
-  .token-icon .no-image {
+  .token-icon.no-image {
     align-items: center;
     background: $neutral-800;
-    border-radius: 1000px;
+    border-radius: $border-radius-round;
     display: flex;
     justify-content: center;
 
@@ -48,9 +49,6 @@
       color: $white;
       font-size: 16px;
       font-weight: 500;
-      position: relative;
-      text-align: center;
-      top: 0.19em;
     }
   }
 

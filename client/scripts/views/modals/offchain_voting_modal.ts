@@ -3,7 +3,7 @@ import 'modals/offchain_voting_modal.scss';
 import m from 'mithril';
 import { OffchainVote, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const OffchainVotingModal: m.Component<{ votes: OffchainVote[] }, {}> = {
   view: (vnode) => {
@@ -13,7 +13,7 @@ const OffchainVotingModal: m.Component<{ votes: OffchainVote[] }, {}> = {
     votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
 
     return m('.OffchainVotingModal', [
-      m('.compact-modal-title', [m('h3', 'Votes'), m(CompactModalExitButton)]),
+      m('.compact-modal-title', [m('h3', 'Votes'), m(ModalExitButton)]),
       m('.compact-modal-body', [
         m('.download-link', [
           m(

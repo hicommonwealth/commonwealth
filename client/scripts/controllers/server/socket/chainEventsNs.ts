@@ -1,11 +1,16 @@
-import {ChainEventNotification, WebsocketMessageNames, WebsocketNamespaces} from 'types';
+import {
+  ChainEventNotification,
+  WebsocketMessageNames,
+  WebsocketNamespaces,
+} from 'types';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
-import {io, Socket} from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export class ChainEventsNamespace {
   private ceNs: Socket;
   private _isConnected = false;
+  private subscriptionRoomsJoined = new Set();
 
   constructor() {}
 
@@ -16,16 +21,27 @@ export class ChainEventsNamespace {
     this.ceNs.on('connect', this.onConnect.bind(this));
     this.ceNs.on('disconnect', this.onDisconnect.bind(this));
     this.ceNs.on(
-        WebsocketMessageNames.ChainEventNotification,
-        this.onChainEvent.bind(this)
+      WebsocketMessageNames.ChainEventNotification,
+      this.onChainEvent.bind(this)
     );
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
-      console.log('Adding Websocket subscriptions for:', eventTypes);
-      this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, eventTypes);
+      const eventTypes = subs
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
+      const roomsToJoin = [];
+      for (const eventType of eventTypes) {
+        if (!this.subscriptionRoomsJoined.has(eventType)) {
+          roomsToJoin.push(eventType);
+          this.subscriptionRoomsJoined.add(eventType);
+        }
+      }
+      if (roomsToJoin.length > 0) {
+        console.log('Adding Websocket subscriptions for:', roomsToJoin);
+        this.ceNs.emit(WebsocketMessageNames.NewSubscriptions, roomsToJoin);
+      }
     } else {
       console.log('ChainEventsNamespace is not connected');
     }
@@ -33,12 +49,21 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs.map((x) => x.ChainEventType?.id).filter((x) => !!x);
-      console.log('Deleting Websocket subscriptions for:', eventTypes);
-      this.ceNs.emit(
-        WebsocketMessageNames.DeleteSubscriptions,
-        subs.map((x) => x.ChainEventType?.id)
-      );
+      const eventTypes = subs
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
+      const roomsToLeave = [];
+      for (const eventType of eventTypes) {
+        if (this.subscriptionRoomsJoined.has(eventType)) {
+          roomsToLeave.push(eventType);
+          this.subscriptionRoomsJoined.delete(eventType);
+        }
+      }
+
+      if (roomsToLeave.length > 0) {
+        console.log('Deleting Websocket subscriptions for:', roomsToLeave);
+        this.ceNs.emit(WebsocketMessageNames.DeleteSubscriptions, roomsToLeave);
+      }
     } else {
       console.log('ChainEventsNamespace is not connected');
     }
@@ -46,11 +71,12 @@ export class ChainEventsNamespace {
 
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
+      (sub) =>
+        sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
-      console.log("Local subscription not found. Re-sync subscriptions!");
+      console.log('Local subscription not found. Re-sync subscriptions!');
       return;
     }
     const notificationObj = Notification.fromJSON(notification, subscription);

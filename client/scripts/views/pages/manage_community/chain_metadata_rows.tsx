@@ -9,7 +9,7 @@ import app from 'state';
 import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
-import AvatarUpload, { AvatarScope } from 'views/components/avatar_upload';
+import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
@@ -81,13 +81,12 @@ export class ChainMetadataRows
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
-          {m(AvatarUpload, {
-            avatarScope: AvatarScope.Chain,
-            uploadStartedCallback: () => {
+          <AvatarUpload
+            uploadStartedCallback={() => {
               this.uploadInProgress = true;
               m.redraw();
-            },
-            uploadCompleteCallback: (files) => {
+            }}
+            uploadCompleteCallback={(files) => {
               files.forEach((f) => {
                 if (!f.uploadURL) return;
                 const url = f.uploadURL.replace(/\?.*/, '');
@@ -96,8 +95,8 @@ export class ChainMetadataRows
               });
               this.uploadInProgress = false;
               m.redraw();
-            },
-          })}
+            }}
+          />
         </div>
         <InputRow
           title="Name"
