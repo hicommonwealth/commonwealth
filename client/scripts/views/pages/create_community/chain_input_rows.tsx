@@ -48,6 +48,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <div class="AvatarUploadRow">
       <CWLabel label="Upload Icon" />
       <AvatarUpload
+        scope="community"
         uploadStartedCallback={() => {
           state.uploadInProgress = true;
           m.redraw();
