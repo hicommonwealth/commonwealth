@@ -18,6 +18,8 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -30,11 +32,13 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to react",
   BalanceCheckFailed: 'Could not verify user token balance',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 const createReaction = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -45,6 +49,46 @@ const createReaction = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
+
+  if (!thread_id && !proposal_id && !comment_id) {
+    return next(new Error(Errors.NoPostId));
+  }
+  if (!reaction) {
+    return next(new Error(Errors.NoReaction));
+  }
+
+  let thread;
+  if (thread_id) {
+    thread = await models.OffchainThread.findOne({
+      where: { id: thread_id },
+    });
+  } else if (comment_id) {
+    const root_id = (
+      await models.OffchainComment.findOne({ where: { id: comment_id } })
+    ).root_id;
+    const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
+    thread = await models.OffchainThread.findOne({
+      where: { id: comment_thread_id },
+    });
+  }
+
+  if (thread) {
+    const topic = await models.OffchainTopic.findOne({
+      include: {
+        model: models.OffchainThread,
+        where: { id: thread.id },
+        required: true,
+        as: 'threads',
+      },
+      attributes: ['rule_id'],
+    });
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      if (!passesRules) {
+        return next(new Error(Errors.RuleCheckFailed));
+      }
+    }
+  }
 
   // check if author can react
   if (chain) {
@@ -66,23 +110,8 @@ const createReaction = async (
         permission: ['admin'],
       },
     });
-    if (!req.user.isAdmin && isAdmin.length === 0) {
+    if (thread && !req.user.isAdmin && isAdmin.length === 0) {
       try {
-        let thread;
-        if (thread_id) {
-          thread = await models.OffchainThread.findOne({
-            where: { id: thread_id },
-          });
-        } else if (comment_id) {
-          const root_id = (
-            await models.OffchainComment.findOne({ where: { id: comment_id } })
-          ).root_id;
-          const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
-          thread = await models.OffchainThread.findOne({
-            where: { id: comment_thread_id },
-          });
-        }
-
         const canReact = await tokenBalanceCache.validateTopicThreshold(
           thread.topic_id,
           req.body.address
@@ -99,13 +128,6 @@ const createReaction = async (
 
   let proposal;
   let root_type;
-
-  if (!thread_id && !proposal_id && !comment_id) {
-    return next(new Error(Errors.NoPostId));
-  }
-  if (!reaction) {
-    return next(new Error(Errors.NoReaction));
-  }
 
   const options = {
     reaction,

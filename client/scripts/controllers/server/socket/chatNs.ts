@@ -269,10 +269,10 @@ export class ChatNamespace {
         }
     }
 
-    public async renameChatCategory(category: string, new_category: string) {
+    public async editChatCategory(category: string, new_category: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/renameChatCategory`,
+                url: `${app.serverUrl()}/editChatCategory`,
                 data: {
                     category,
                     new_category,
@@ -293,10 +293,10 @@ export class ChatNamespace {
         }
     }
 
-    public async renameChatChannel(channel_id: number, name: string) {
+    public async editChatChannel(channel_id: number, name: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/renameChatChannel`,
+                url: `${app.serverUrl()}/editChatChannel`,
                 data: {
                     channel_id,
                     name,
