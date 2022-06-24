@@ -99,17 +99,17 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
 
     const avatarSize = size === 'small' ? 60 : 108;
 
-    const forProfile = scope === 'user';
+    const forUser = scope === 'user';
 
     const forCommunity = scope === 'community';
 
-    const imageExists = forProfile
-      ? !!account?.profile?.avatarUrl
+    const imageExists = forUser
+      ? account?.profile?.avatarUrl
       : forCommunity
       ? !!app.chain?.meta.iconUrl
       : false;
 
-    const logoURL = this.dropzone?.option?.url || app.chain?.meta.iconUrl;
+    const localUploadURL = this.dropzone?.option?.url;
 
     return (
       <div
@@ -132,9 +132,9 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
               'dropzone-attach'
             )}
           >
-            {account?.profile?.avatarUrl
+            {forUser
               ? account?.profile?.getAvatar(avatarSize)
-              : null}
+              : app.chain?.meta.getAvatar(avatarSize)}
           </div>
         )}
         <div
@@ -142,7 +142,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}
-          style={`background-image: url(${logoURL}); background-size: ${avatarSize}px;`}
+          style={`background-image: url(${localUploadURL}); background-size: ${avatarSize}px;`}
         />
       </div>
     );
