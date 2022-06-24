@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation */
 import http from 'http';
 import favicon from 'serve-favicon';
-import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -41,8 +40,10 @@ class MockTokenBalanceProvider extends TokenBalanceProvider {
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
   public async getEthTokenBalance(
-    tokenAddress: string,
-    userAddress: string
+    address: string,
+    network: string,
+    tokenAddress?: string,
+    userAddress?: string
   ): Promise<BN> {
     if (this.balanceFn) {
       return this.balanceFn(tokenAddress, userAddress);
@@ -285,6 +286,10 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
         description: 'an entity-event as occurred'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewChatMention,
+        description: 'someone mentions a user in chat'
       })
 
       // Admins need to be subscribed to mentions and collaborations
