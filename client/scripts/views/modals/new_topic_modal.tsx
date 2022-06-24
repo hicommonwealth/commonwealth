@@ -9,7 +9,7 @@ import 'modals/new_topic_modal.scss';
 import { ChainNetwork } from 'types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
@@ -62,7 +62,7 @@ export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
       <div class="NewTopicModal">
         <div class="compact-modal-title">
           <h3>New topic</h3>
-          <CompactModalExitButton />
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           <CWTextInput
