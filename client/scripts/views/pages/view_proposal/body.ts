@@ -722,9 +722,9 @@ const formatBody = (vnode) => {
   if (!item) return;
 
   const body =
-    item instanceof OffchainComment
+    item instanceof Comment
       ? item.text
-      : item instanceof OffchainThread
+      : item instanceof Thread
       ? item.body
       : item.description;
   if (!body) return;
