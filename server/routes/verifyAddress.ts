@@ -1,14 +1,8 @@
-(global as any).window = { location: { href: '/' } };
-
 import { Request, Response, NextFunction } from 'express';
-import * as jwt from 'jsonwebtoken';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-
-import jscrypto from 'jscrypto';
-import secp256k1 from 'secp256k1';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
@@ -366,6 +360,13 @@ const verifySignature = async (
         object_id: `user-${user.id}`,
         is_active: true,
       });
+      // Automatically create subscription to chat mentions
+      await models.Subscription.create({
+        subscriber_id: user.id,
+        category_id: NotificationCategories.NewChatMention,
+        object_id: `user-${user.id}`,
+        is_active: true,
+      });
       addressModel.user_id = user.id;
     }
   } else if (isValid) {
@@ -514,7 +515,7 @@ const verifyAddress = async (
           isCustomDomain: null,
         });
       }
-      //mixpanelPeopleSet(req.user.id.toString());
+      // mixpanelPeopleSet(req.user.id.toString());
       return res.json({
         status: 'Success',
         result: {

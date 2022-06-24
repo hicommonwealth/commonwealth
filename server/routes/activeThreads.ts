@@ -20,7 +20,7 @@ const activeThreads = async (
     || Number.isNaN(threads_per_topic)
     || threads_per_topic < MIN_THREADS_PER_TOPIC
     || threads_per_topic > MAX_THREADS_PER_TOPIC) {
-    threads_per_topic = 3;
+    threads_per_topic = 5;
   }
 
   const allThreads = [];
@@ -41,33 +41,30 @@ const activeThreads = async (
     await Promise.all(communityTopics.map(async (topic) => {
       const recentTopicThreads = await models.OffchainThread.findAll({
         where: {
-          topic_id: topic.id,
-          last_commented_on: {
-            [Op.not]: null,
-          }
+          topic_id: topic.id
         },
         include: threadInclude,
         limit: threads_per_topic,
-        order: [['last_commented_on', 'DESC']]
+        order: [['created_at', 'DESC'], ['last_commented_on', 'DESC']]
       });
 
       // In absence of X threads with recent activity (comments),
       // commentless threads are fetched and included as active
-      if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
-        const commentlessTopicThreads = await models.OffchainThread.findAll({
-          where: {
-            topic_id: topic.id,
-            last_commented_on: {
-              [Op.is]: null,
-            }
-          },
-          include: threadInclude,
-          limit: threads_per_topic - (recentTopicThreads || []).length,
-          order: [['created_at', 'DESC']]
-        });
+      // if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
+      //   const commentlessTopicThreads = await models.OffchainThread.findAll({
+      //     where: {
+      //       topic_id: topic.id,
+      //       last_commented_on: {
+      //         [Op.is]: null,
+      //       }
+      //     },
+      //     include: threadInclude,
+      //     limit: threads_per_topic - (recentTopicThreads || []).length,
+      //     order: [['created_at', 'DESC']]
+      //   });
 
-        recentTopicThreads.push(...(commentlessTopicThreads || []));
-      }
+      //   recentTopicThreads.push(...(commentlessTopicThreads || []));
+      // }
 
       allThreads.push(...(recentTopicThreads || []));
     })).catch((err) => {
