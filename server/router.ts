@@ -107,8 +107,12 @@ import getChatChannel from './routes/chat/getChatChannel';
 import createChatChannel from './routes/chat/createChatChannel';
 import deleteChatChannel from './routes/chat/deleteChatChannel';
 import deleteChatCategory from './routes/chat/deleteChatCategory';
-import renameChatChannel from './routes/chat/renameChatChannel';
-import renameChatCategory from './routes/chat/renameChatCategory';
+import editChatChannel from './routes/chat/editChatChannel';
+import editChatCategory from './routes/chat/editChatCategory';
+
+import createRule from './routes/rules/createRule';
+import deleteRule from './routes/rules/deleteRule';
+import getRuleTypes from './routes/rules/getRuleTypes';
 
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
@@ -133,6 +137,7 @@ import { DB } from './database';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
+import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
@@ -143,6 +148,7 @@ function setupRouter(
   viewCountCache: ViewCountCache,
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   banCache: BanCache, // TODO: where is this needed?
 ) {
   const router = express.Router();
@@ -235,7 +241,7 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
-    createThread.bind(this, models, tokenBalanceCache, banCache)
+    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
     '/editThread',
@@ -278,7 +284,7 @@ function setupRouter(
   router.post(
     '/updateOffchainVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models, tokenBalanceCache)
+    updateOffchainVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
 
@@ -345,7 +351,7 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
-    createComment.bind(this, models, tokenBalanceCache, banCache)
+    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/editComment',
@@ -397,7 +403,7 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
-    createReaction.bind(this, models, tokenBalanceCache, banCache)
+    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/deleteReaction',
@@ -630,15 +636,31 @@ function setupRouter(
   );
 
   router.put(
-    '/renameChatChannel',
+    '/editChatChannel',
     passport.authenticate('jwt', { session: false }),
-    renameChatChannel.bind(this, models)
+    editChatChannel.bind(this, models)
   );
 
   router.put(
-    '/renameChatCategory',
+    '/editChatCategory',
     passport.authenticate('jwt', { session: false }),
-    renameChatCategory.bind(this, models)
+    editChatCategory.bind(this, models)
+  );
+
+  // rules
+  router.post(
+    '/createRule',
+    passport.authenticate('jwt', { session: false }),
+    createRule.bind(this, models)
+  );
+  router.post(
+    '/deleteRule',
+    passport.authenticate('jwt', { session: false }),
+    deleteRule.bind(this, models)
+  );
+  router.get(
+    '/getRuleTypes',
+    getRuleTypes.bind(this, models)
   );
 
   // settings
