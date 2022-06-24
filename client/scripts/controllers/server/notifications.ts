@@ -19,14 +19,40 @@ const post = (route, args, callback) => {
     .catch((e) => console.error(e));
 };
 
+interface NotifOptions {
+  chain_filter: string,
+  maxId: number
+}
 class NotificationsController {
-  private _store: NotificationStore = new NotificationStore();
-  public get store() {
-    return this._store;
+  private _discussionStore: NotificationStore = new NotificationStore();
+  private _chainEventStore: NotificationStore = new NotificationStore();
+
+  private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
+  private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
+
+  private _numPages = 0;
+  private _numUnread = 0;
+
+  public get numPages(): number {
+    return this._numPages;
   }
 
-  public get notifications(): Notification[] {
-    return this._store.getAll();
+  public get numUnread(): number {
+    return this._numUnread;
+  }
+
+  public get discussionNotifications(): Notification[] {
+    return this._discussionStore.getAll();
+  }
+
+  public get chainEventNotifications(): Notification[] {
+    return this._chainEventStore.getAll();
+  }
+
+  public get allNotifications(): Notification[] {
+    return this._discussionStore
+      .getAll()
+      .concat(this._chainEventStore.getAll());
   }
 
   private _subscriptions: NotificationSubscription[] = [];
@@ -174,16 +200,26 @@ class NotificationsController {
 
   public clearAllRead() {
     return post('/clearReadNotifications', {}, (result) => {
-      const toClear = this._store.getAll().filter((n) => n.isRead);
+      const toClear = this.allNotifications.filter((n) => n.isRead);
       for (const n of toClear) {
-        this._store.remove(n);
+        this.removeFromStore(n);
       }
     });
   }
 
-  public clear(notifications: Notification[]) {
+  public clear() {
+    this._discussionStore.clear();
+    this._chainEventStore.clear();
+  }
+
+  public removeFromStore(n) {
+    if (n.chainEvent) this._chainEventStore.remove(n);
+    else this._discussionStore.remove(n);
+  }
+
+  public delete(notifications: Notification[]) {
     // TODO: Change to PUT /clearNotifications
-    const MAX_NOTIFICATIONS_CLEAR = 100; // clear up to 100 notifications at a time
+    const MAX_NOTIFICATIONS_CLEAR = 100; // delete up to 100 notifications at a time
 
     if (notifications.length === 0) return;
     return post(
@@ -196,9 +232,9 @@ class NotificationsController {
       async (result) => {
         notifications
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
-          .map((n) => this._store.remove(n));
+          .map((n) => this.removeFromStore(n));
         if (notifications.slice(MAX_NOTIFICATIONS_CLEAR).length > 0) {
-          this.clear(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
+          this.delete(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
         }
         // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
       }
@@ -206,8 +242,11 @@ class NotificationsController {
   }
 
   public update(n: Notification) {
-    if (!this._store.getById(n.id)) {
-      this._store.add(n);
+    if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
+      this._chainEventStore.add(n);
+      m.redraw();
+    } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
+      this._discussionStore.add(n);
       m.redraw();
     }
   }
@@ -219,44 +258,119 @@ class NotificationsController {
     this._subscriptions = [];
   }
 
-  public refresh() {
+  public sortNotificationsStore(storeType: string) {
+    if (storeType == 'chain-events') {
+      const unsortedNotifications = this.chainEventNotifications;
+      this._chainEventStore.clear();
+      unsortedNotifications.sort((a, b) => b.id - a.id);
+      for (const notif of unsortedNotifications)
+        this._chainEventStore.add(notif);
+    } else {
+      const unsortedNotifications = this.discussionNotifications;
+      this._discussionStore.clear();
+      unsortedNotifications.sort((a, b) => b.id - a.id);
+      for (const notif of unsortedNotifications)
+        this._discussionStore.add(notif);
+    }
+  }
+
+  public getChainEventNotifications() {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId() }
-      : {};
-    // TODO: Change to GET /notifications
-    return post('/viewNotifications', options, (result) => {
-      this._store.clear();
+    
+
+    const options: NotifOptions = app.isCustomDomain()
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined};
+
+    if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
+      options.maxId = this._maxChainEventNotificationId;
+
+    return post('/viewChainEventNotifications', options, (result) => {
       this._subscriptions = [];
-      const ceSubs = [];
-      for (const subscriptionJSON of result) {
-        const subscription =
-          NotificationSubscription.fromJSON(subscriptionJSON);
-        this._subscriptions.push(subscription);
-        let chainEventType = null;
-        if (subscriptionJSON.ChainEventType) {
-          chainEventType = ChainEventType.fromJSON(
-            subscriptionJSON.ChainEventType
-          );
-        }
-        for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
-          const data = {
-            is_read: notificationsReadJSON.is_read,
-                ...notificationsReadJSON.Notification,
-          };
-          const notification = Notification.fromJSON(
-            data,
-            subscription,
-            chainEventType
-          );
-          this._store.add(notification);
-        }
-        if (subscription.category === 'chain-event') ceSubs.push(subscription);
-      }
-      app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
+      this._numPages = result.numPages;
+      this._numUnread = result.numUnread;
+      this.parseNotifications(result.subscriptions);
+      this.sortNotificationsStore('chain-events');
     });
+  }
+
+  public getDiscussionNotifications() {
+    if (!app.user || !app.user.jwt) {
+      throw new Error('must be logged in to refresh notifications');
+    }
+    const options: NotifOptions = app.isCustomDomain()
+      ? { chain_filter: app.activeChainId(), maxId: undefined }
+      : { chain_filter: undefined, maxId: undefined };
+
+    if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
+      options.maxId = this._maxDiscussionNotificationId;
+
+    return post('/viewDiscussionNotifications', options, (result) => {
+      this._subscriptions = [];
+      this._numPages = result.numPages;
+      this._numUnread = result.numUnread;
+      this.parseNotifications(result.subscriptions);
+      this.sortNotificationsStore('discussion');
+    });
+  }
+
+  private parseNotifications(subscriptions) {
+    const ceSubs = [];
+
+    for (const subscriptionJSON of subscriptions) {
+      // save the subscription
+      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+      this._subscriptions.push(subscription);
+
+      // save the chainEventType for the subscription if the subscription type is chain-event
+      let chainEventType = null;
+      if (subscriptionJSON.ChainEventType) {
+        chainEventType = ChainEventType.fromJSON(
+          subscriptionJSON.ChainEventType
+        );
+      }
+
+      // save the notification read + notification instances if any
+      for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
+        const data = {
+          is_read: notificationsReadJSON.is_read,
+          ...notificationsReadJSON.Notification,
+        };
+        const notification = Notification.fromJSON(
+          data,
+          subscription,
+          chainEventType
+        );
+
+        if (subscription.category === 'chain-event') {
+          if (!this._chainEventStore.getById(notification.id))
+            this._chainEventStore.add(notification);
+          // the minimum id is the new max id for next page
+          if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
+            this._maxChainEventNotificationId = notificationsReadJSON.id;
+            if (notificationsReadJSON.id === 1) this._maxChainEventNotificationId = 0;
+          }
+        } else {
+          if (!this._discussionStore.getById(notification.id))
+            this._discussionStore.add(notification);
+          if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
+            this._maxDiscussionNotificationId = notificationsReadJSON.id;
+            if (notificationsReadJSON.id === 1) this._maxDiscussionNotificationId = 0;
+          }
+        }
+      }
+      if (subscription.category === 'chain-event') ceSubs.push(subscription);
+    }
+    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
+  }
+
+  public async refresh() {
+    return Promise.all([
+      this.getDiscussionNotifications(),
+      this.getChainEventNotifications(),
+    ]);
   }
 }
 

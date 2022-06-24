@@ -3,11 +3,11 @@
 @mixin notificationsButton {
   .cui-button {
     border-radius: 0;
-    border: none;
+    border-right: 1px solid $neutral-300;
     box-shadow: none;
-    flex: 1;
     height: 40px;
-    padding: 0;
+    padding: 0 8px;
+    width: 100%;
 
     .cui-button-label {
       color: $neutral-900;
@@ -21,10 +21,6 @@
     &:active {
       background: $neutral-200;
     }
-  }
-
-  .cui-button:first-child {
-    border-right: 1px solid $neutral-300;
   }
 }
 
