@@ -146,7 +146,7 @@ export class RenameChannel
   view(vnode) {
     const handleSubmit = async () => {
       vnode.attrs.handleClose();
-      await app.socket.chatNs.renameChatChannel(
+      await app.socket.chatNs.editChatChannel(
         vnode.attrs.channel.id,
         this.channel_name
       );
@@ -197,7 +197,7 @@ export class RenameCategory
   }
   view(vnode) {
     const handleSubmit = async () => {
-      await app.socket.chatNs.renameChatCategory(
+      await app.socket.chatNs.editChatCategory(
         vnode.attrs.category,
         this.new_category
       );

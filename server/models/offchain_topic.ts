@@ -3,6 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
+import { RuleAttributes } from './rule';
 
 export type OffchainTopicAttributes = {
   name: string;
@@ -18,15 +19,18 @@ export type OffchainTopicAttributes = {
   deleted_at?: Date;
   token_threshold: number;
   default_offchain_template?: string;
+  rule_id?: number;
 
   // associations
   chain?: ChainAttributes;
   threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
+  Rule?: RuleAttributes;
 }
 
 export type OffchainTopicInstance = ModelInstance<OffchainTopicAttributes> & {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
+  getRule: Sequelize.BelongsToGetAssociationMixin<RuleAttributes>;
 }
 
 export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>;
@@ -49,6 +53,7 @@ export default (
     featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
     order: { type: dataTypes.INTEGER, allowNull: true },
     default_offchain_template: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
+    rule_id: { type: dataTypes.INTEGER, allowNull: true },
   }, {
     timestamps: true,
     createdAt: 'created_at',
@@ -74,6 +79,9 @@ export default (
       as: 'threads',
       foreignKey: 'topic_id',
     });
+    models.OffchainTopic.belongsTo(models.Rule, {
+      foreignKey: 'rule_id',
+    })
   };
 
   return OffchainTopic;

@@ -25,7 +25,7 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
-import { ChainAttributes } from './server/models/chain';
+import RuleCache from './server/util/rules/ruleCache';
 
 require('express-async-errors');
 
@@ -60,6 +60,7 @@ const tokenBalanceCache = new TokenBalanceCache(
   0,
   mockTokenBalanceProvider
 );
+const ruleCache = new RuleCache();
 let server;
 
 const sessionStore = new SequelizeStore({
@@ -286,6 +287,10 @@ const resetServer = (debug = false): Promise<void> => {
         name: NotificationCategories.EntityEvent,
         description: 'an entity-event as occurred'
       })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewChatMention,
+        description: 'someone mentions a user in chat'
+      })
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({
@@ -345,10 +350,9 @@ const setupServer = () => {
   server.on('listening', onListen);
 };
 
-setupPassport(models);
-
 const banCache = new BanCache(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, banCache);
+setupPassport(models);
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, ruleCache, banCache);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

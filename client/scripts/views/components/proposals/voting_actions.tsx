@@ -522,7 +522,7 @@ export class VotingActions
 
     return (
       <div class="VotingActions">
-        <CWText type="h3" className="voting-actions-header">
+        <CWText type="h4" className="voting-actions-header">
           Cast Your Vote
         </CWText>
         {votingActionObj}
