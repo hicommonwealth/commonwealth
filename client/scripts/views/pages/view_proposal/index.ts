@@ -47,8 +47,8 @@ import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
 } from 'views/pages/discussions/discussion_row_menu';
+import { VotingResults } from 'views/components/proposals/voting_results';
 import { VotingActions } from 'views/components/proposals/voting_actions';
-import ProposalVotingResults from 'views/components/proposals/voting_results';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 
@@ -1360,7 +1360,7 @@ const ViewProposalPage: m.Component<
               m(AaveViewProposalDetail, { proposal }),
             ],
             !(proposal instanceof Thread) &&
-              m(ProposalVotingResults, { proposal }),
+              m(VotingResults, { proposal }),
             !(proposal instanceof Thread) &&
               m(VotingActions, { proposal }),
             m(ProposalComments, {

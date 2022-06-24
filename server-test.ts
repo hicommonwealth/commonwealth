@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation */
 import http from 'http';
 import favicon from 'serve-favicon';
-import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -9,6 +8,7 @@ import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import BN from 'bn.js';
+import Rollbar from 'rollbar';
 
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
@@ -25,7 +25,6 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
-import Rollbar from "rollbar";
 
 require('express-async-errors');
 
@@ -40,8 +39,10 @@ class MockTokenBalanceProvider extends TokenBalanceProvider {
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
   public async getEthTokenBalance(
-    tokenAddress: string,
-    userAddress: string
+    address: string,
+    network: string,
+    tokenAddress?: string,
+    userAddress?: string
   ): Promise<BN> {
     if (this.balanceFn) {
       return this.balanceFn(tokenAddress, userAddress);
@@ -283,6 +284,10 @@ const resetServer = (debug = false): Promise<void> => {
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
         description: 'an entity-event as occurred'
+      })
+      await models.NotificationCategory.create({
+        name: NotificationCategories.NewChatMention,
+        description: 'someone mentions a user in chat'
       })
 
       // Admins need to be subscribed to mentions and collaborations

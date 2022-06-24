@@ -7,7 +7,7 @@ import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType, IChatNotification,
 } from '../../shared/types';
 import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
@@ -57,7 +57,7 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   models: DB,
   category_id: string,
   object_id: string,
-  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
+  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
   wss?: WebSocket.Server,
   excludeAddresses?: string[],
@@ -98,7 +98,7 @@ export default (
     models: DB,
     category_id: string,
     object_id: string,
-    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData,
+    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
     webhook_data?: WebhookContent,
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
@@ -180,6 +180,7 @@ export default (
         category_id,
         chain_id: (<IPostNotificationData>notification_data).chain_id
           || (<ICommunityNotificationData>notification_data).chain
+          || (<IChatNotification>notification_data).chain_id
       })
     }
 

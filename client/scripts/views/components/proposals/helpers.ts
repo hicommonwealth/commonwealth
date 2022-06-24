@@ -1,15 +1,21 @@
 import m from 'mithril';
 
+import app from 'state';
+import { formatCoin } from 'adapters/currency';
+import { AnyProposal, IVote, VotingUnit, ProposalStatus } from 'models';
+import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import AaveProposal, {
+  AaveProposalVote,
+} from 'controllers/chain/ethereum/aave/proposal';
 import MolochProposal, {
   MolochProposalState,
   MolochVote,
 } from 'controllers/chain/ethereum/moloch/proposal';
 import CompoundProposal, {
   BravoVote,
+  CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
 import { notifyError } from 'controllers/app/notifications';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { AnyProposal, ProposalStatus } from 'models/types';
 import { CompoundTypes } from '@commonwealth/chain-events';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
@@ -19,7 +25,50 @@ import {
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
+
+export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
+  const balancesCache = {};
+  const balancesCacheInitialized = {};
+
+  const balanceWeighted =
+    proposal.votingUnit === VotingUnit.CoinVote ||
+    proposal.votingUnit === VotingUnit.ConvictionCoinVote ||
+    proposal.votingUnit === VotingUnit.PowerVote;
+
+  let balance;
+
+  if (balanceWeighted && !(vote instanceof CosmosVote)) {
+    // fetch and display balances
+    if (balancesCache[vote.account.address]) {
+      balance = balancesCache[vote.account.address];
+    } else if (balancesCacheInitialized[vote.account.address]) {
+      // do nothing, fetch already in progress
+      balance = '--';
+    } else {
+      // fetch balance and store in cache
+      balancesCacheInitialized[vote.account.address] = true;
+
+      if (vote instanceof AaveProposalVote) {
+        balance = vote.power;
+        balancesCache[vote.account.address] = vote.format();
+        m.redraw();
+      } else if (vote instanceof CompoundProposalVote) {
+        balance = formatCoin(app.chain.chain.coins(vote.power), true);
+        balancesCache[vote.account.address] = balance;
+        m.redraw();
+      } else {
+        vote.account.balance.then((b) => {
+          balance = b;
+          balancesCache[vote.account.address] = formatCoin(b, true);
+          m.redraw();
+        });
+        balance = '--';
+      }
+    }
+  }
+
+  return balance;
+};
 
 export const cancelProposal = (
   e: Event,
