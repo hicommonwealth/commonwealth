@@ -267,6 +267,7 @@ export class AvatarAndUsernameInput
     return (
       <div class="AvatarAndUsernameInput">
         <AvatarUpload
+          scope="user"
           account={account}
           uploadStartedCallback={() => {
             m.redraw();
