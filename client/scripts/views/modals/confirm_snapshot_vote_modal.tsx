@@ -13,7 +13,7 @@ import {
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatNumberShort } from 'adapters/currency';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -42,7 +42,7 @@ export class ConfirmSnapshotVoteModal
       <div class="ConfirmSnapshotVoteModal">
         <div class="compact-modal-title">
           <h3>Confirm vote</h3>
-          <CompactModalExitButton />
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           <h4>
