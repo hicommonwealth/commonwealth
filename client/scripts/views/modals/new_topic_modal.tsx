@@ -25,7 +25,7 @@ type NewTopicModalForm = {
   tokenThreshold: string;
 };
 
-export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
+export class NewTopicModal implements m.ClassComponent {
   private error: string;
   private form: NewTopicModalForm = {
     description: '',
@@ -36,7 +36,7 @@ export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
     tokenThreshold: '0',
   };
   private quillEditorState; // do we have a type for this?
-  private saving: false;
+  private saving: boolean;
 
   view() {
     let disabled = false;
@@ -104,6 +104,7 @@ export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
               return ['success', 'Valid topic name'];
             }}
             autofocus
+            autocomplete="off"
             tabindex={1}
             oncreate={(vvnode) => {
               // use oncreate to focus because autofocus: true fails when component is recycled in a modal
@@ -137,14 +138,14 @@ export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
             <CWCheckbox
               label="Featured in Sidebar"
               checked={this.form.featuredInSidebar}
-              onchange={(e) => {
+              onchange={() => {
                 this.form.featuredInSidebar = !this.form.featuredInSidebar;
               }}
             />
             <CWCheckbox
               label="Featured in New Post"
               checked={this.form.featuredInNewPost}
-              onchange={(e) => {
+              onchange={() => {
                 this.form.featuredInNewPost = !this.form.featuredInNewPost;
               }}
             />
@@ -166,46 +167,52 @@ export class NewTopicModal implements m.ClassComponent<NewTopicModalForm> {
               e.preventDefault();
               const { quillEditorState, form } = this;
 
+              console.log('before', quillEditorState);
+
               if (quillEditorState) {
                 quillEditorState.editor.enable(false);
               }
 
-              const mentionsEle = document.getElementsByClassName(
-                'ql-mention-list-container'
-              )[0];
+              console.log('after', quillEditorState);
 
-              if (mentionsEle)
-                (mentionsEle as HTMLElement).style.visibility = 'hidden';
+              console.log('getText', quillEditorState.editor.getText());
 
-              const defaultOffchainTemplate = !quillEditorState
-                ? ''
-                : quillEditorState.markdownMode
-                ? quillEditorState.editor.getText()
-                : JSON.stringify(quillEditorState.editor.getContents());
+              // const mentionsEle = document.getElementsByClassName(
+              //   'ql-mention-list-container'
+              // )[0];
 
-              app.topics
-                .add(
-                  form.name,
-                  form.description,
-                  null,
-                  form.featuredInSidebar,
-                  form.featuredInNewPost,
-                  this.form.tokenThreshold || '0',
-                  defaultOffchainTemplate
-                )
-                .then(() => {
-                  this.saving = false;
-                  m.redraw();
-                  $(e.target).trigger('modalexit');
-                })
-                .catch(() => {
-                  this.error = 'Error creating topic';
-                  this.saving = false;
-                  m.redraw();
-                });
+              // if (mentionsEle)
+              //   (mentionsEle as HTMLElement).style.visibility = 'hidden';
+
+              // const defaultOffchainTemplate = !quillEditorState
+              //   ? ''
+              //   : quillEditorState.markdownMode
+              //   ? quillEditorState.editor.getText()
+              //   : JSON.stringify(quillEditorState.editor.getContents());
+
+              // app.topics
+              //   .add(
+              //     form.name,
+              //     form.description,
+              //     null,
+              //     form.featuredInSidebar,
+              //     form.featuredInNewPost,
+              //     this.form.tokenThreshold || '0',
+              //     defaultOffchainTemplate
+              //   )
+              //   .then(() => {
+              //     this.saving = false;
+              //     m.redraw();
+              //     $(e.target).trigger('modalexit');
+              //   })
+              //   .catch(() => {
+              //     this.error = 'Error creating topic';
+              //     this.saving = false;
+              //     m.redraw();
+              //   });
             }}
           />
-          {this.error && m('.error-message', this.error)}
+          {this.error && <div class="error-message">{this.error}</div>}
         </div>
       </div>
     );

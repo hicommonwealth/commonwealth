@@ -23,7 +23,7 @@ export class SublayoutBanners
 {
   view(vnode) {
     const { banner, chain, terms, tosStatus } = vnode.attrs;
-    console.log('sublayout banner before CWMessageBanner', banner);
+    // console.log('sublayout banner before CWMessageBanner', banner);
     return (
       <>
         {/* {banner && <CWBanner bannerContent={banner} />} */}
