@@ -26,6 +26,11 @@ export default async (
     return next(new Error(Errors.NotLoggedIn));
   }
 
+  return res.json({
+    status: 'Success',
+    result: { subscriptions: [], numNotifications: 0, numUnread: 0 },
+  });
+
   // locate active subscriptions, filter by category if specified
   const searchParams: any[] = [{ subscriber_id: req.user.id }];
   if (req.body.active_only) {
