@@ -16,7 +16,7 @@ import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificati
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe('Subscriptions Tests', () => {
+describe.skip('Subscriptions Tests', () => {
   let jwtToken;
   let loggedInAddr;
   let loggedInAddrId;
