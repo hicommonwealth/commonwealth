@@ -185,7 +185,7 @@ async function main() {
     secret: SESSION_SECRET,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   });
 
   const setupMiddleware = () => {
