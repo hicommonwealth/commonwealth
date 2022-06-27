@@ -7,7 +7,13 @@ import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType, IChatNotification,
+  IPostNotificationData,
+  ICommunityNotificationData,
+  IChainEventNotificationData,
+  ChainBase,
+  ChainType,
+  IChatNotification,
+  NotificationCategories,
 } from '../../shared/types';
 import {
   createImmediateNotificationEmailObject,
@@ -24,6 +30,7 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
+import notificationCategory from "../../client/scripts/models/NotificationCategory";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -218,16 +225,15 @@ export default (
     const replacements = [];
     for (const subscription of subscriptions) {
       if (subscription.subscriber_id) {
-        query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?))`
-        if (subscriptions[subscriptions.length - 1] == subscription) query += ';';
-        else query += ', ';
+        query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
         replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
       } else {
         // TODO: rollbar reported issue originates from here
-        log.info(`${JSON.stringify(subscription.toJSON)}`);
+        log.info(`Subscription: ${JSON.stringify(subscription.toJSON())}\nNotification_data: ${JSON.stringify(notification_data)}`);
       }
     }
-    if (subscriptions.length > 0) {
+    if (replacements.length > 0) {
+      query = query.slice(0, -2) + ';';
       await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
     }
 
