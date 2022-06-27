@@ -12,7 +12,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
-import { ChainBase } from 'shared/types';
+import { ChainBase } from 'types';
 import CoverImageUpload from './cover_image_upload';
 import {
   validateTitle,

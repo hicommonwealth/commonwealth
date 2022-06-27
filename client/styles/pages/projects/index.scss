@@ -1,8 +1,9 @@
 @import 'shared';
 
 .ProjectListing {
+  width: calc(100% - 200px);
+  margin: 72px 100px;
   .listing-header {
-    background-color: $primary-50;
     height: 88px;
     display: flex;
     align-items: center;
@@ -22,10 +23,8 @@
     }
   }
   .listing-body {
-    width: calc(100% - 200px);
     display: flex;
     justify-content: center;
-    margin: 72px 100px;
 
     .ExplorePage,
     .YourPage,

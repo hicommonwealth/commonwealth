@@ -667,7 +667,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/projects/:subpage': importRoute(
               'views/pages/commonwealth/projects/index.tsx',
-              { scoped: false, hideSidebar: true }
+              { scoped: false, hideSidebar: false }
             ),
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`

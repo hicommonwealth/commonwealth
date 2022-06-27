@@ -38,15 +38,40 @@ export default class ProjectListing implements m.ClassComponent {
       >
         <div class="ProjectListing">
           <div class="listing-header">
+            <CWText type="h1">Crowdfunding</CWText>
+            <Tabs align="left" bordered={false} fluid={true}>
+              <TabItem
+                label={[
+                  <CWText type="h5" fontWeight="semibold">
+                    Explore
+                  </CWText>,
+                ]}
+                active={subpage === ProjectListingSubpage.Explore}
+                onclick={() => {
+                  m.route.set(`/projects/${ProjectListingSubpage.Explore}`);
+                  m.redraw();
+                }}
+              />
+              <TabItem
+                label={[
+                  <CWText type="h5" fontWeight="semibold">
+                    Your Projects
+                  </CWText>,
+                ]}
+                active={subpage === ProjectListingSubpage.Yours}
+                onclick={() => {
+                  if (!app.user) {
+                    notifyInfo(
+                      'Log in or create an account for user dashboard.'
+                    );
+                  }
+                  m.route.set(`/projects/${ProjectListingSubpage.Yours}`);
+                  m.redraw();
+                }}
+              />
+            </Tabs>
             {/* TODO:
-                  - Add chain community selector list, based on user role lookup
-                  - Redirect to a scoped creation form
-                  - Do not allow non-scoped creation forms (e.g. in routes, views)
-                  - Set address by default, based on highest-power role
-                  - Display this role address hard-coded (disabled input) in form next to beneficiary input
-                  - Add copy explaining to user how to change creator address
-                    - e.g. “Want a diff address? Switch active addr in nav bar dropdown”
-                  - Potentially add summary modal pre-TX submission
+                  - Limit project-instantiable communities to ETH chain-base communities
              */}
             <SelectList
               items={app.user.roles.map((role: RoleInfo) => role.chain_id)}
@@ -63,37 +88,6 @@ export default class ProjectListing implements m.ClassComponent {
               }}
               trigger={<CWButton label="Create Project" />}
             />
-            <Tabs align="left" bordered={false} fluid={true}>
-              <TabItem
-                label={[
-                  <CWText type="h3" fontWeight="semibold">
-                    Explore
-                  </CWText>,
-                ]}
-                active={subpage === ProjectListingSubpage.Explore}
-                onclick={() => {
-                  m.route.set(`/projects/${ProjectListingSubpage.Explore}`);
-                  m.redraw();
-                }}
-              />
-              <TabItem
-                label={[
-                  <CWText type="h3" fontWeight="semibold">
-                    Your Projects
-                  </CWText>,
-                ]}
-                active={subpage === ProjectListingSubpage.Yours}
-                onclick={() => {
-                  if (!app.user) {
-                    notifyInfo(
-                      'Log in or create an account for user dashboard.'
-                    );
-                  }
-                  m.route.set(`/projects/${ProjectListingSubpage.Yours}`);
-                  m.redraw();
-                }}
-              />
-            </Tabs>
           </div>
           <div class="listing-body">
             {onExplore && <ExplorePage />}

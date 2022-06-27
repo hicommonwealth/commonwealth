@@ -35,8 +35,7 @@ export default class ExplorePage
 
     return (
       <div class="ExplorePage">
-        <CWText type="h1">Active Projects</CWText>
-        {/* TODO: Implement projects filter */}
+        {/* TODO Graham 6-27-22 v2: Implement projects filter */}
         {/* <div class="projects-filter"> */}
         {/* <CWText type="h3">Show me projects from</CWText> */}
         {/* Dropdown community filter updates filteredProjects */}
