@@ -64,12 +64,8 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   models: DB,
   category_id: string,
   object_id: string,
-<<<<<<< HEAD
   notification_data:
-    IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData,
-=======
-  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
->>>>>>> master
+    IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
   wss?: WebSocket.Server,
   excludeAddresses?: string[],
@@ -110,12 +106,8 @@ export default (
     models: DB,
     category_id: string,
     object_id: string,
-<<<<<<< HEAD
     notification_data:
-      IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData,
-=======
-    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
->>>>>>> master
+      IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData | IChatNotification,
     webhook_data?: WebhookContent,
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
@@ -188,20 +180,6 @@ export default (
     // if the notification does not yet exist create it here
     // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
-<<<<<<< HEAD
-      notification = await models.Notification.create(isChainEventData ? {
-        notification_data: '',
-        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
-        category_id: 'chain-event',
-        chain_id: (<IChainEventNotificationData>notification_data).chain_id
-      } : {
-        notification_data: JSON.stringify(notification_data),
-        category_id,
-        chain_id: (<IPostNotificationData>notification_data).chain_id
-          || (<ICommunityNotificationData>notification_data).chain
-          || (<ISnapshotNotificationData>notification_data).chain_id
-      })
-=======
       if (isChainEventData) {
         const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
         event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
@@ -219,9 +197,9 @@ export default (
           chain_id: (<IPostNotificationData>notification_data).chain_id
             || (<ICommunityNotificationData>notification_data).chain
             || (<IChatNotification>notification_data).chain_id
+            || (<ISnapshotNotificationData>notification_data).chain_id
         });
       }
->>>>>>> master
     }
 
     let msg;
