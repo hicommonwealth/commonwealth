@@ -71,6 +71,8 @@ $discussion-title-font-size: 1.45rem;
     }
   }
   .ProposalHeader {
+    margin-bottom: 24px;
+
     .proposal-content {
       position: relative;
     }
@@ -381,7 +383,7 @@ $discussion-title-font-size: 1.45rem;
     padding: 24px 24px 24px 0;
     width: 296px;
 
-    @include extraSmall {
+    @include smallInclusive {
       display: none;
     }
   }

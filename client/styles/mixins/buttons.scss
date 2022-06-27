@@ -173,7 +173,7 @@
 }
 
 @mixin tertiaryBlue {
-  background-color: $white;
+  background-color: transparent;
 
   @include iconAndText($primary-500);
 
@@ -191,7 +191,7 @@
 }
 
 @mixin tertiaryBlack {
-  background-color: $white;
+  background-color: transparent;
 
   @include iconAndText($neutral-800);
 

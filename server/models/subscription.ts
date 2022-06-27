@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import Sequelize, { DataTypes } from 'sequelize';
+import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
@@ -7,17 +7,23 @@ import { DB } from '../database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ISnapshotNotificationData,
-  ChainBase, ChainType,
+  IPostNotificationData, ICommunityNotificationData, IChainEventNotificationData, ChainBase, ChainType,
+  IChatNotification, ISnapshotNotificationData
 } from '../../shared/types';
-import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
+import {
+  createImmediateNotificationEmailObject,
+  sendImmediateNotificationEmail,
+} from '../scripts/emails';
 import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
-import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import {
+  NotificationsReadAttributes,
+  NotificationsReadInstance,
+} from './notifications_read';
 import { NotificationInstance } from './notification';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -58,8 +64,12 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   models: DB,
   category_id: string,
   object_id: string,
+<<<<<<< HEAD
   notification_data:
     IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData,
+=======
+  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
+>>>>>>> master
   webhook_data?: Partial<WebhookContent>,
   wss?: WebSocket.Server,
   excludeAddresses?: string[],
@@ -100,8 +110,12 @@ export default (
     models: DB,
     category_id: string,
     object_id: string,
+<<<<<<< HEAD
     notification_data:
       IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | ISnapshotNotificationData,
+=======
+    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
+>>>>>>> master
     webhook_data?: WebhookContent,
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
@@ -154,7 +168,7 @@ export default (
     }
 
     // get all relevant subscriptions
-    const subscribers = await models.Subscription.findAll({
+    const subscriptions = await models.Subscription.findAll({
       where: findOptions,
       include: models.User,
     });
@@ -172,7 +186,9 @@ export default (
     });
 
     // if the notification does not yet exist create it here
+    // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
+<<<<<<< HEAD
       notification = await models.Notification.create(isChainEventData ? {
         notification_data: '',
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
@@ -185,6 +201,27 @@ export default (
           || (<ICommunityNotificationData>notification_data).chain
           || (<ISnapshotNotificationData>notification_data).chain_id
       })
+=======
+      if (isChainEventData) {
+        const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
+        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+
+        notification = await models.Notification.create({
+          notification_data: JSON.stringify(event),
+          chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+          category_id: 'chain-event',
+          chain_id: (<IChainEventNotificationData>notification_data).chain_id
+        })
+      } else {
+        notification = await models.Notification.create({
+          notification_data: JSON.stringify(notification_data),
+          category_id,
+          chain_id: (<IPostNotificationData>notification_data).chain_id
+            || (<ICommunityNotificationData>notification_data).chain
+            || (<IChatNotification>notification_data).chain_id
+        });
+      }
+>>>>>>> master
     }
 
     let msg;
@@ -196,14 +233,27 @@ export default (
     }
 
     // create NotificationsRead instances
-    await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
-      subscription_id: subscription.id,
-      notification_id: notification.id,
-      is_read: false
-    })));
+    // await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
+    //   subscription_id: subscription.id,
+    //   notification_id: notification.id,
+    //   is_read: false,
+    //   user_id: subscription.subscriber_id
+    // })));
+
+    let query = `INSERT INTO "NotificationsRead" VALUES `;
+    const replacements = [];
+    for (const subscription of subscriptions) {
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?))`
+      if (subscriptions[subscriptions.length - 1] == subscription) query += ';';
+      else query += ', ';
+      replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
+    }
+    if (subscriptions.length > 0) {
+      await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
+    }
 
     // send emails
-    for (const subscription of subscribers) {
+    for (const subscription of subscriptions) {
       if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL

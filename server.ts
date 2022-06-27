@@ -28,6 +28,7 @@ import IdentityFetchCache, {
 } from './server/util/identityFetchCache';
 import TokenBalanceCache from './server/util/tokenBalanceCache';
 import SnapshotSpaceCache from './server/util/snapshotSpaceCache';
+import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
@@ -78,6 +79,7 @@ async function main() {
 
   const tokenBalanceCache = new TokenBalanceCache(models);
   const snapshotSpaceCache = new SnapshotSpaceCache(models);
+  const ruleCache = new RuleCache();
   const listenChainEvents = async () => {
     try {
       // configure chain list from events
@@ -185,7 +187,7 @@ async function main() {
     secret: SESSION_SECRET,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
   });
 
   const setupMiddleware = () => {
@@ -279,6 +281,7 @@ async function main() {
 
   await tokenBalanceCache.start();
   await snapshotSpaceCache.start();
+  await ruleCache.start();
   const banCache = new BanCache(models);
   setupAPI(
     app,
@@ -286,8 +289,9 @@ async function main() {
     viewCountCache,
     <any>identityFetchCache,
     tokenBalanceCache,
-    snapshotSpaceCache,
+    ruleCache,
     banCache,
+    snapshotSpaceCache,
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

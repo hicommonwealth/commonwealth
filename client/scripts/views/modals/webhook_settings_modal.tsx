@@ -17,7 +17,7 @@ import {
   DydxChainNotificationTypes,
 } from 'helpers/chain_notification_types';
 import { notifyError } from 'controllers/app/notifications';
-import { CompactModalExitButton } from '../components/component_kit/cw_modal';
+import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type WebhookSettingsModalAttrs = {
   updateSuccessCallback: () => void;
@@ -95,7 +95,7 @@ export class WebhookSettingsModal
       <div class="WebhookSettingsModal">
         <div class="compact-modal-title">
           <h3>Webhook Settings</h3>
-          <CompactModalExitButton />
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           <p>Which events should trigger this webhook?</p>

@@ -8,14 +8,16 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
 import { CWValidationText, ValidationStatus } from './cw_validation_text';
+import { CWIcon } from './cw_icons/cw_icon';
 
 type TextInputSize = 'small' | 'large';
 
-type TextInputAttrs = {
+export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
+  containerClassName?: string;
   defaultValue?: string;
-  disabled?: boolean;
+  iconRight?: string;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   name: string;
@@ -24,10 +26,16 @@ type TextInputAttrs = {
   tabindex?: number;
 };
 
-export type InputStyleAttrs = {
+type InputStyleAttrs = {
+  inputClassName?: string;
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
+};
+
+type InputInternalStyleAttrs = {
+  hasRightIcon?: boolean;
+  isTyping: boolean;
 };
 
 export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
@@ -38,10 +46,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
 
   view(vnode) {
     const {
-      autocomplete,
+      autocomplete = 'off',
       autofocus,
+      containerClassName,
       defaultValue,
       disabled,
+      iconRight,
+      inputClassName,
       inputValidationFn,
       label,
       name,
@@ -52,60 +63,81 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class={ComponentType.TextInput}>
-        {label && <CWLabel label={label} />}
-        <input
-          autofocus={autofocus}
-          autocomplete={autocomplete}
-          class={getClasses<InputStyleAttrs & { isTyping: boolean }>({
-            size,
+      <div
+        class={getClasses<{
+          containerClassName?: string;
+          validationStatus?: ValidationStatus;
+        }>(
+          {
+            containerClassName,
             validationStatus: this.validationStatus,
-            disabled,
-            isTyping: this.isTyping,
-          })}
-          disabled={disabled}
-          tabindex={tabindex}
-          name={name}
-          placeholder={placeholder}
-          oninput={(e) => {
-            if (oninput) oninput(e);
+          },
+          ComponentType.TextInput
+        )}
+      >
+        {label && <CWLabel label={label} />}
+        <div class="input-and-icon-container">
+          <input
+            autofocus={autofocus}
+            autocomplete={autocomplete}
+            class={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
+              size,
+              validationStatus: this.validationStatus,
+              disabled,
+              isTyping: this.isTyping,
+              hasRightIcon: !!iconRight,
+              inputClassName,
+            })}
+            disabled={disabled}
+            tabindex={tabindex}
+            name={name}
+            placeholder={placeholder}
+            oninput={(e) => {
+              if (oninput) oninput(e);
 
-            if (e.target.value?.length === 0) {
-              this.isTyping = false;
-              this.validationStatus = undefined;
-              this.statusMessage = undefined;
-              m.redraw();
-            } else {
-              e.stopPropagation();
-              this.isTyping = true;
-              clearTimeout(this.inputTimeout);
-              const timeout = e.target.value?.length > 3 ? 250 : 1000;
-              this.inputTimeout = setTimeout(() => {
-                this.isTyping = false;
-                if (inputValidationFn && e.target.value?.length > 3) {
-                  [this.validationStatus, this.statusMessage] =
-                    inputValidationFn(e.target.value);
-                  m.redraw();
-                }
-              }, timeout);
-            }
-          }}
-          onfocusout={(e) => {
-            if (inputValidationFn) {
               if (e.target.value?.length === 0) {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
                 m.redraw();
               } else {
-                [this.validationStatus, this.statusMessage] = inputValidationFn(
-                  e.target.value
-                );
+                e.stopPropagation();
+                this.isTyping = true;
+                clearTimeout(this.inputTimeout);
+                const timeout = e.target.value?.length > 3 ? 250 : 1000;
+                this.inputTimeout = setTimeout(() => {
+                  this.isTyping = false;
+                  if (inputValidationFn && e.target.value?.length > 3) {
+                    [this.validationStatus, this.statusMessage] =
+                      inputValidationFn(e.target.value);
+                    m.redraw();
+                  }
+                }, timeout);
               }
-            }
-          }}
-          defaultValue={defaultValue}
-        />
+            }}
+            onfocusout={(e) => {
+              if (inputValidationFn) {
+                if (e.target.value?.length === 0) {
+                  this.isTyping = false;
+                  this.validationStatus = undefined;
+                  this.statusMessage = undefined;
+                  m.redraw();
+                } else {
+                  [this.validationStatus, this.statusMessage] =
+                    inputValidationFn(e.target.value);
+                }
+              }
+            }}
+            defaultValue={defaultValue}
+          />
+          {!!iconRight && (
+            <CWIcon
+              iconName={iconRight}
+              iconSize="small"
+              className="text-input-right-icon"
+            />
+          )}
+        </div>
         {this.statusMessage && (
           <CWValidationText
             message={this.statusMessage}

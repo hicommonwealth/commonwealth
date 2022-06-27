@@ -10,9 +10,9 @@ import { getClasses } from './helpers';
 export type CardElevation = 'elevation-1' | 'elevation-2' | 'elevation-3';
 
 type CardStyleAttrs = {
+  className?: string;
   elevation?: CardElevation;
   fullWidth?: boolean;
-  className?: string;
   interactive?: boolean;
 };
 
@@ -42,8 +42,8 @@ export class CWCard implements m.ClassComponent<CardAttrs> {
           {
             elevation,
             fullWidth,
-            className,
             interactive,
+            className,
           },
           ComponentType.Card
         )}

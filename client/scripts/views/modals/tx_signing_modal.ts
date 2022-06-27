@@ -23,7 +23,7 @@ import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import AddressSwapper from 'views/components/addresses/address_swapper';
 import CodeBlock from 'views/components/widgets/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 const createProposalTransactionLabels = {
@@ -349,7 +349,7 @@ const TXSigningModalStates: {
       return m('.TXSigningModalBody.Intro', [
         m('.compact-modal-title', [
           m('h3', ['Sign transaction', txLabel ? `: ${txLabel}` : '']),
-          m(CompactModalExitButton),
+          m(ModalExitButton),
         ]),
         m('.compact-modal-body', [
           m(HorizontalTabs, [

@@ -38,6 +38,7 @@ export default (
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    indexes: [{ fields: ['chain_event_id'], prefix: 'new' }],
   });
 
   Notification.associate = (models) => {

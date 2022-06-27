@@ -6,11 +6,79 @@ import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
-import { sortNotifications } from 'helpers/notifications';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+
+let minDiscussionNotification = 0;
+let minChainEventsNotification = 0;
+const MAX_NOTIFS = 40;
+let init = false;
+let pageKey = 0;
+
+function increment(type: 'chain-event' | 'discussion') {
+  if (type === 'chain-event') {
+    if (
+      app.user.notifications.chainEventNotifications.length >=
+      minChainEventsNotification + MAX_NOTIFS
+    )
+      minChainEventsNotification += MAX_NOTIFS;
+  } else if (type === 'discussion') {
+    if (
+      app.user.notifications.discussionNotifications.length >=
+      minDiscussionNotification + MAX_NOTIFS
+    )
+      minDiscussionNotification += MAX_NOTIFS;
+  }
+}
+
+function nextPage() {
+  const numChainEventNotif =
+    app.user.notifications.chainEventNotifications.length;
+  const numDiscussionNotif =
+    app.user.notifications.discussionNotifications.length;
+
+  if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
+    app.user.notifications.getChainEventNotifications().then(() => {
+      increment('chain-event');
+      m.redraw();
+    });
+  } else {
+    increment('chain-event');
+    m.redraw();
+  }
+
+  if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
+    app.user.notifications.getDiscussionNotifications().then(() => {
+      increment('discussion');
+      m.redraw();
+    });
+  } else {
+    increment('discussion');
+    m.redraw();
+  }
+}
+
+function previousPage() {
+  let flag = false;
+  if (minChainEventsNotification >= MAX_NOTIFS) {
+    minChainEventsNotification -= MAX_NOTIFS;
+    flag = true;
+  } else if (minChainEventsNotification !== 0) {
+    minChainEventsNotification = 0;
+    flag = true;
+  }
+
+  if (minDiscussionNotification >= MAX_NOTIFS) {
+    minDiscussionNotification -= MAX_NOTIFS;
+    flag = true;
+  } else if (minDiscussionNotification !== 0) {
+    minDiscussionNotification = 0;
+    flag = true;
+  }
+  if (flag) m.redraw();
+}
 
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
@@ -40,8 +108,13 @@ const NotificationsPage: m.Component<{}> = {
         ],
       });
 
-    const notifications = app.user.notifications?.notifications || [];
-    const sortedNotifications = sortNotifications(notifications).reverse();
+    const discussionNotifications =
+      app.user.notifications.discussionNotifications;
+    const chainEventNotifications =
+      app.user.notifications.chainEventNotifications;
+
+    // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
+    // console.log("Sorted Notifications:", sortedNotifications);
 
     return m(
       Sublayout,
@@ -65,10 +138,59 @@ const NotificationsPage: m.Component<{}> = {
             },
             [
               m(Button, {
-                label: 'Refresh',
+                label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
-                  app.user.notifications.refresh().then(() => m.redraw());
+                  pageKey -= 1;
+                  console.log(
+                    'Before=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
+                  previousPage();
+                  console.log(
+                    'After=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
+                },
+              }),
+              m(Button, {
+                label: 'Next Page',
+                onclick: (e) => {
+                  e.preventDefault();
+                  pageKey += 1;
+
+                  if (!init) {
+                    init = true;
+                    minDiscussionNotification =
+                      app.user.notifications.discussionNotifications.length;
+                    minChainEventsNotification =
+                      app.user.notifications.chainEventNotifications.length;
+                  }
+                  console.log(
+                    'Before=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
+                  nextPage();
+                  console.log(
+                    'After=\t',
+                    `ChainEvents: ${minChainEventsNotification}-${
+                      minChainEventsNotification + MAX_NOTIFS
+                    }, Discussion: ${minDiscussionNotification}-${
+                      minDiscussionNotification + MAX_NOTIFS
+                    }`
+                  );
                 },
               }),
               m(Button, {
@@ -76,7 +198,9 @@ const NotificationsPage: m.Component<{}> = {
                 onclick: (e) => {
                   e.preventDefault();
                   app.user.notifications
-                    .markAsRead(notifications)
+                    .markAsRead(
+                      discussionNotifications.concat(chainEventNotifications)
+                    )
                     .then(() => m.redraw());
                 },
               }),
@@ -93,13 +217,9 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      const chainEventNotifications =
-                        app.user.notifications.notifications.filter(
-                          (n) => n.chainEvent
-                        );
-                      if (chainEventNotifications.length === 0) return;
+                      if (app.user.notifications.chainEventNotifications.length === 0) return;
                       app.user.notifications
-                        .clear(chainEventNotifications)
+                        .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
                     },
                   }),
@@ -117,19 +237,38 @@ const NotificationsPage: m.Component<{}> = {
             ]
           ),
           m('.NotificationsList', [
-            sortedNotifications.length > 0
-              ? m(Infinite, {
+            (() => {
+              const discussionNotif = discussionNotifications.slice(
+                minDiscussionNotification,
+                minDiscussionNotification + MAX_NOTIFS
+              );
+
+              const chainEventNotif = chainEventNotifications.slice(
+                minChainEventsNotification,
+                minChainEventsNotification + MAX_NOTIFS
+              );
+
+              // TODO: sort this?
+              const allNotifications = discussionNotif.concat(chainEventNotif);
+
+              const totalLength = allNotifications.length;
+              if (totalLength > 0) {
+                return m(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
-                  key: sortedNotifications.length,
-                  pageData: () => sortedNotifications,
+                  key: totalLength,
+                  pageData: () => {
+                    return allNotifications;
+                  },
+                  pageKey: () => {return pageKey},
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
-                      notifications: data,
+                      notifications: [data],
                       onListPage: true,
                     });
                   },
-                })
-              : m('.no-notifications', 'No Notifications'),
+                });
+              } else return m('.no-notifications', 'No Notifications');
+            })(),
           ]),
         ]),
       ]

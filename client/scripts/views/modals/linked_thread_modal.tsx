@@ -7,7 +7,7 @@ import { Button } from 'construct-ui';
 import 'modals/linked_thread_modal.scss';
 
 import { OffchainThread } from 'models';
-import { CompactModalExitButton } from 'views/components/component_kit/cw_modal';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { ThreadSelector } from 'views/components/thread_selector';
 
 type LinkedThreadModalAttrs = {
@@ -26,7 +26,7 @@ export class LinkedThreadModal
       <div class="LinkedThreadModal">
         <div class="compact-modal-title">
           <h3>Link to Existing Threads</h3>
-          <CompactModalExitButton />
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           {m(ThreadSelector, {

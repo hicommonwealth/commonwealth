@@ -9,14 +9,15 @@ import 'pages/chat.scss';
 import app from 'state';
 import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import ResizableTextarea from 'views/components/widgets/resizable_textarea';
 import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import QuillEditor from '../quill_editor';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import QuillFormattedText from '../quill_formatted_text';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -41,6 +42,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
   private shouldScrollToHighlight: boolean;
+  private quillEditorState: any;
 
   oninit(vnode) {
     this.shouldScroll = true;
@@ -92,32 +94,45 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       return acc;
     }, []);
 
-    const handleSubmitMessage = (e) => {
-      if (e.type === 'click' || (e.keyCode === 13 && !e.shiftKey)) {
-        e.preventDefault();
-        if (!app.socket.chatNs.isConnected) return;
-        const $textarea = $(e.target)
-          .closest('form')
-          .find('textarea.ResizableTextarea');
-
-        if ($textarea.val().toString().length === 0) {
-          return;
-        }
-
-        const message = {
-          message: $textarea.val(),
-          chat_channel_id: channel.id,
-          address: app.user.activeAccount.address
-        };
-        app.socket.chatNs.sendMessage(message);
-        mixpanelBrowserTrack({
-          event: MixpanelChatEvents.NEW_CHAT_SENT,
-          community: app.activeChainId(),
-          isCustomDomain: app.isCustomDomain(),
-        });
-        $textarea.val('');
+    const handleSubmitMessage = () => {
+      if (this.quillEditorState.editor.editor.isBlank()) {
+        notifyError("Cannot send a blank message")
+        return;
       }
-    };
+
+      const { quillEditorState } = vnode.state;
+
+      const message = {
+        message: JSON.stringify(quillEditorState.editor.getContents()),
+        chat_channel_id: channel.id,
+        address: app.user.activeAccount.address,
+      };
+      app.socket.chatNs.sendMessage(message);
+      if (quillEditorState.editor) {
+        quillEditorState.editor.enable();
+        quillEditorState.editor.setContents();
+        quillEditorState.clearUnsavedChanges();
+      }
+
+      mixpanelBrowserTrack({
+        event: MixpanelChatEvents.NEW_CHAT_SENT,
+        community: app.activeChainId(),
+        isCustomDomain: app.isCustomDomain(),
+      });
+    }
+
+    const messageToText = (msg: any) => {
+      try {
+        const doc = JSON.parse(msg.message);
+        if (!doc.ops) throw new Error();
+        return m(QuillFormattedText, { doc })
+      } catch {
+        return m(MarkdownFormattedText, {
+          doc: msg.message,
+          openLinksInNewTab: true,
+        })
+      }
+    }
 
     const messageIsHighlighted = (message: any): boolean => {
       return m.route.param('message') && Number(m.route.param('message')) === message.id
@@ -151,11 +166,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
                 <Icon name={Icons.LINK} onclick={async () => {
-                  const route = m.route.get().indexOf("?") > -1
-                    ? m.route.get().slice(0, m.route.get().indexOf("?"))
-                    : m.route.get()
+                  const route = app.socket.chatNs
+                    .getRouteToMessage(grp.messages[0].chat_channel_id, grp.messages[0].id, app.chain.id)
                   navigator.clipboard.writeText(
-                    `https://commonwealth.im${route}?message=${grp.messages[0].id}`
+                    `${window.location.protocol}//${window.location.host}${route}`
                   )
                     .then(() => notifySuccess("Message link copied to clipboard"))
                     .catch(() => notifyError("Could not copy link to keyboard"))
@@ -165,10 +179,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               <div class="clear" />
               {grp.messages.map((msg) => (
                 <div class="chat-message-text">
-                  {m(MarkdownFormattedText, {
-                    doc: msg.message,
-                    openLinksInNewTab: true,
-                  })}
+                  {messageToText(msg)}
                 </div>
               ))}
             </div>
@@ -183,24 +194,25 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           </div>
         ) : !app.socket.chatNs.isConnected ? (
           <div class="chat-composer-unavailable">Waiting for connection</div>
-        ) : (
-          <form
-            class={`chat-composer${
+        ) :
+          <div
+          class={`chat-composer${
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
-            {m(ResizableTextarea, {
-              name: 'chat',
-              rows: 1,
-              disabled: !app.socket.chatNs.isConnected,
-              placeholder: app.socket.chatNs.isConnected
-                ? 'Enter a message...'
-                : 'Disconnected',
-              onkeypress: handleSubmitMessage,
+            {m(QuillEditor, {
+              contentsDoc: '',
+              oncreateBind: (state) => {
+                vnode.state.quillEditorState = state;
+              },
+              editorNamespace: `${document.location.pathname}-chatting`,
+              onkeyboardSubmit: () => {
+                handleSubmitMessage();
+              },
             })}
             <CWIcon iconName="send" onclick={handleSubmitMessage} />
-          </form>
-        )}
+          </div>
+        }
       </div>
     );
   }
@@ -209,7 +221,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     if (this.shouldScroll) {
       if(this.shouldScrollToHighlight) {
         const element = document.getElementById("highlighted")
-        element.scrollIntoView({behavior: "smooth"})
+        if (element) {
+          element.scrollIntoView({behavior: "smooth"})
+        } else {
+          this.scrollToBottom()
+        }
         this.shouldScrollToHighlight = false
         this.shouldScroll = false
       } else {

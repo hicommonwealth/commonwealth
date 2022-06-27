@@ -10,6 +10,8 @@ import {
   OffchainVoteAttributes,
   OffchainVoteInstance,
 } from '../models/offchain_vote';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -18,6 +20,7 @@ export const Errors = {
   InvalidOption: 'Invalid response option',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 type UpdateOffchainVoteReq = {
@@ -33,6 +36,7 @@ type UpdateOffchainVoteResp = OffchainVoteAttributes;
 const updateOffchainVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   req: TypedRequestBody<UpdateOffchainVoteReq>,
   res: TypedResponse<UpdateOffchainVoteResp>,
   next: NextFunction
@@ -75,6 +79,17 @@ const updateOffchainVote = async (
   );
   if (!canVote) {
     return next(new Error(Errors.BalanceCheckFailed));
+  }
+
+  const topic = await models.OffchainTopic.findOne({
+    where: { id: thread.topic_id },
+    attributes: ['rule_id'],
+  });
+  if (topic?.rule_id) {
+    const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+    if (!passesRules) {
+      return next(new Error(Errors.RuleCheckFailed));
+    }
   }
 
   let vote: OffchainVoteInstance;

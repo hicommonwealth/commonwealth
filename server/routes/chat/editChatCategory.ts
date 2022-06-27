@@ -3,7 +3,7 @@ import {DB} from "../../database";
 
 export const Errors = {
     NotLoggedIn: 'Not logged in',
-    NotAdmin: 'Must be an admin to rename a chat category',
+    NotAdmin: 'Must be an admin to edit a chat category',
     NoCommunityId: 'No community id given',
     NoCategory: 'No category given',
     NoNewCategory: 'No new category name given'

@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 $modal-padding: 16px;
 
@@ -24,12 +24,7 @@ $modal-padding: 16px;
     @include popout();
 
     background: $white;
-    border-radius: 3px;
-    max-height: 96%;
-    max-width: 800px;
-    max-width: 92%;
-    min-width: 380px;
-    overflow-y: auto;
+    border-radius: $border-radius-corners;
     overflow: hidden;
     position: relative;
     z-index: 20;
@@ -65,9 +60,10 @@ $modal-padding: 16px;
 
     svg {
       cursor: pointer;
-      fill: currentColor;
+      color: $white;
 
       &:hover {
+        color: $white;
         opacity: 0.6;
       }
     }

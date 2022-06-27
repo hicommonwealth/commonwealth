@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 @mixin bareAvatar {
   position: relative;
@@ -8,6 +8,7 @@
   background: $white;
   border-radius: 9999px;
   overflow: hidden;
+
   .avatar-image {
     background: $neutral-200;
     background-size: cover;
@@ -20,9 +21,11 @@
   margin: 0;
   background: $white;
   box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.1);
+
   svg {
     margin: 2px;
   }
+
   .avatar-image {
     width: 100% !important;
     height: 100% !important;
@@ -70,6 +73,7 @@
 .User {
   display: inline-block;
   white-space: nowrap;
+
   > a {
     // reset link styles
     &,
@@ -78,16 +82,20 @@
       color: inherit;
     }
   }
+
   .user-avatar {
     @include bareAvatar();
   }
+
   .user-avatar-only {
     @include circledAvatar();
   }
+
   a.user-display-name {
     cursor: inherit;
     text-decoration: initial;
   }
+
   .id-short {
     display: inline-block;
     font-size: 75%;
@@ -98,19 +106,24 @@
     padding: 4px 8px;
     text-decoration: none !important;
   }
+
   &.linkified a.user-display-name {
     cursor: pointer;
   }
+
   &.linkified a.user-display-name:hover {
     text-decoration: underline;
   }
+
   // role icons and identity icons
   span.identity-icon {
     @include roleIcon();
   }
+
   .role-icon {
     @include roleIcon();
   }
+
   .role-tag {
     font-size: 14px;
     margin-left: 6px;
@@ -128,75 +141,94 @@
     margin: 0 auto !important;
     font-weight: 500 !important;
   }
+
   .user-avatar {
     @include circledAvatar();
+
     width: 36px !important;
     height: 36px !important;
     margin: 0 auto 12px !important;
   }
+
   .user-name {
     clear: both;
+
     a {
       text-decoration: none !important;
       color: $neutral-800 !important;
     }
+
     a:hover {
       text-decoration: underline !important;
     }
+
     span.identity-icon {
       @include roleIcon();
     }
   }
+
   .user-address,
   .user-chain {
     color: $neutral-500 !important;
   }
+
   .role-tag {
     margin-top: 10px !important;
   }
+
   .role-icon {
     @include roleIcon();
+
     top: 3px !important;
   }
 }
 
 .UserBlock {
   display: flex;
+
   .user-block-left {
     padding-right: 13px;
     position: relative;
   }
+
   .user-block-center {
     flex: 1;
+
     .user-block-name,
     .user-block-address {
       text-align: left;
     }
+
     .user-block-address {
       font-size: 0.85em;
       opacity: 0.6;
       margin-top: -2px;
     }
   }
+
   .user-block-right {
     display: flex;
     align-items: center;
     justify-content: right;
     width: 60px;
+
     .user-block-selected {
       text-align: right;
       position: relative;
       top: -2px;
     }
   }
+
   &.compact {
     .user-block-left {
       top: 2px;
     }
+
     .user-block-center {
       .user-block-name {
         font-size: 0.94em;
       }
+
       .user-block-address {
         font-size: 0.8em;
       }

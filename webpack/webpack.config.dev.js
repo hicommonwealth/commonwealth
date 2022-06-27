@@ -26,15 +26,15 @@ module.exports = merge(common, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development'),
-      CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001')
+      CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
   ],
   module: {
     rules: [
       {
         test: /\.s?css$/i,
-        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
-      }
-    ]
-  }
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      },
+    ],
+  },
 });
