@@ -217,10 +217,15 @@ export default (
     let query = `INSERT INTO "NotificationsRead" VALUES `;
     const replacements = [];
     for (const subscription of subscriptions) {
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?))`
-      if (subscriptions[subscriptions.length - 1] == subscription) query += ';';
-      else query += ', ';
-      replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
+      if (subscription.subscriber_id) {
+        query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?))`
+        if (subscriptions[subscriptions.length - 1] == subscription) query += ';';
+        else query += ', ';
+        replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
+      } else {
+        // TODO: rollbar reported issue originates from here
+        log.info(`${JSON.stringify(subscription.toJSON)}`);
+      }
     }
     if (subscriptions.length > 0) {
       await models.sequelize.query(query, { replacements, type: QueryTypes.INSERT });
