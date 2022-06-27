@@ -9,7 +9,6 @@ import { weiToTokens } from 'helpers';
 import { ProjectCompletionBar, ProjectRole } from './project_card';
 import Sublayout from '../../../sublayout';
 import { AnonymousUser } from '../../../components/widgets/user';
-import { CWButton } from '../../../components/component_kit/cw_button';
 import { PageNotFound } from '../../404';
 import MarkdownFormattedText from '../../../components/markdown_formatted_text';
 import { CWTable } from '../../../components/component_kit/cw_table';

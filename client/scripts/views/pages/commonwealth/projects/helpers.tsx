@@ -1,3 +1,5 @@
+import Web3 from 'web3';
+
 export const validateTitle = (title: string) => {
   if (!title) return false;
   if (title.length < 3 || title.length > 64) return false;
@@ -17,19 +19,19 @@ export const validateDescription = (description: string) => {
 
 export const validateToken = (token: string) => {
   if (!token) return false;
-  // TODO: Valid address check
+  if (!Web3.utils.isAddress(token)) return false;
   return true;
 };
 
 export const validateBeneficiary = (beneficiary: string) => {
   if (!beneficiary) return false;
-  // TODO: Valid address check
+  if (!Web3.utils.isAddress(beneficiary)) return false;
   return true;
 };
 
 export const validateCreator = (creator: string) => {
   if (!creator) return false;
-  // TODO: Valid address check
+  if (!Web3.utils.isAddress(creator)) return false;
   return true;
 };
 
@@ -40,9 +42,10 @@ export const validateFundraiseLength = (length: number) => {
   return true;
 };
 
-export const validateCuratorFee = (fee: number) => {
+export const validateCuratorFee = (fee: string) => {
   if (!fee) return false;
   if (Number.isNaN(+fee)) return false;
+  if (+fee > 100 || +fee < 0) return false;
   return true;
 };
 

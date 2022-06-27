@@ -12,6 +12,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
+import { ChainBase } from 'shared/types';
 import CoverImageUpload from './cover_image_upload';
 import {
   validateTitle,
@@ -23,7 +24,7 @@ import {
   validateFundraiseLength,
   validateCuratorFee,
   validateThreshold,
-} from './project_helpers';
+} from './helpers';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -81,7 +82,12 @@ export class InformationSlide
             return ['success', ''];
           }}
         />
-        {/* TODO: The below should be a textarea */}
+        <CWTextInput
+          defaultValue={app.user.activeAccount.address}
+          disabled={true}
+          label="Creator Address (Switch active address to change)"
+          name="Creator Address"
+        />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
@@ -217,7 +223,6 @@ export class FundraisingSlide
             return ['success', ''];
           }}
           oninput={(e) => {
-            // TODO: Address validation
             vnode.attrs.form.beneficiary = e.target.value;
           }}
         />
@@ -231,10 +236,8 @@ export class FundraisingSlide
             console.log(vnode.attrs.form.curatorFee);
           }}
           inputValidationFn={(value: string) => {
-            // TODO: Better use of validation helpers
-            const isNotNumber = Number.isNaN(+value);
-            const isNotPercent = +value > 100 || +value < 0;
-            if (isNotNumber || isNotPercent) {
+            const isValidCuratorFee = validateCuratorFee(value);
+            if (!isValidCuratorFee) {
               return [
                 'failure',
                 'Input must be valid percentage between 0 and 100',
@@ -278,7 +281,15 @@ export default class CreateProjectForm implements m.ClassComponent {
   private stage: 'information' | 'fundraising' | 'description';
 
   view() {
-    if (!app?.user?.activeAccount || !app.activeChainId()) return;
+    // Create project form must be scoped to an Ethereum page
+    if (
+      !app?.user?.activeAccount ||
+      !app.activeChainId() ||
+      app.user.activeAccount.chainBase !== ChainBase.Ethereum
+    ) {
+      m.route.set(`/projects/explore`);
+    }
+
     if (!this.stage) {
       this.stage = 'information';
     }
@@ -362,7 +373,7 @@ export default class CreateProjectForm implements m.ClassComponent {
               this.stage === 'description' &&
                 m(Button, {
                   label: 'Submit',
-                  onclick: (e) => {
+                  onclick: async (e) => {
                     e.preventDefault();
                     const {
                       title,
@@ -404,7 +415,10 @@ export default class CreateProjectForm implements m.ClassComponent {
                     }
                     this.form.description = this.form.description.getText();
                     this.form.deadline = nowInSeconds + weekInSeconds;
-                    app.projects.createProject(this.form);
+                    const newProject = await app.projects.createProject(
+                      this.form
+                    );
+                    m.route.set(`/project/${newProject.id}`);
                   },
                 }),
             ]

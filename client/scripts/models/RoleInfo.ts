@@ -9,7 +9,15 @@ class RoleInfo {
   public permission: RolePermission;
   public is_user_default: boolean;
 
-  constructor(id, address_id, address, address_chain, chain_id, permission, is_user_default) {
+  constructor(
+    id: number,
+    address_id: number,
+    address: string,
+    address_chain: string,
+    chain_id: string,
+    permission: RolePermission,
+    is_user_default: boolean
+  ) {
     this.id = id;
     this.address_id = address_id;
     this.address = address;
