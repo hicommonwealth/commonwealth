@@ -139,7 +139,7 @@ const dispatchHooks = async (
   excludedAddrs.push(finalThread.Address.address);
 
   // dispatch notifications to subscribers of the given chain
-  await models.Subscription.emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewThread,
     location,
