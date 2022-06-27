@@ -7,12 +7,13 @@ import 'components/component_kit/cw_modal.scss';
 
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
+import { getClasses } from './helpers';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onclick: () => void;
   oncreatemodal: () => void;
-  overlayType: 'blur' | 'image';
+  overlayType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
 };
 
@@ -27,9 +28,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 
   view(vnode) {
-    const { onclick, overlayType = 'blur', spec } = vnode.attrs;
-
-    console.log(overlayType);
+    const { onclick, overlayType = 'centered', spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -37,11 +36,14 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     return (
       <div class={ComponentType.Modal}>
         <div
-          class="overlay"
+          class="modal-overlay"
           onclick={() => onclick(spec, confirmExit, exitCallback)}
         >
           <div
-            class="popup"
+            class={getClasses<{ isFullScreen: boolean }>(
+              { isFullScreen: overlayType === 'fullScreen' },
+              'modal-container'
+            )}
             onclick={(e) => {
               e.stopPropagation();
             }}

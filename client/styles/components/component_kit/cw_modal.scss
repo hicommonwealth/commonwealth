@@ -3,7 +3,7 @@
 $modal-padding: 16px;
 
 .Modal {
-  .overlay {
+  .modal-overlay {
     align-items: center;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(6px);
@@ -17,19 +17,24 @@ $modal-padding: 16px;
     z-index: 101;
   }
 
-  .popup {
+  .modal-container {
     @include popout();
 
     background: $white;
-    bottom: $header-height;
     border-radius: $border-radius-corners;
     overflow: hidden;
     position: relative;
     z-index: 20;
+
+    &.isFullScreen {
+      border-radius: 0;
+      height: 100%;
+      width: 100%;
+    }
   }
 
   @include extraSmall {
-    .popup {
+    .modal-container {
       max-height: calc(100vh - 20px);
       min-width: calc(100vw - 20px);
     }

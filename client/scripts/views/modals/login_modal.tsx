@@ -11,6 +11,7 @@ import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import {
   AvatarAndUsernameInput,
   LoginAddress,
@@ -78,7 +79,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.avatarUrl = undefined;
-    this.bodyType = 'welcome';
+    this.bodyType = 'walletList';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.username = 'elephant-blue.eth';
@@ -86,7 +87,9 @@ export class NewLoginModal implements m.ClassComponent {
   }
 
   view() {
-    return (
+    return isWindowMediumSmallInclusive(window.innerWidth) ? (
+      <div style="background-color: black; height: 100%; width: 100%;"></div>
+    ) : (
       <div class="NewLoginModal">
         <LoginSidebar sidebarType={this.sidebarType} />
         <div class="body">
