@@ -1,126 +1,23 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .VotingActions {
-  background-color: $primary-300;
-  margin: 25px 0;
-  flex-wrap: wrap;
-  border-radius: 3px;
-  padding: 24px 24px 16px;
-
-  .button-row {
-    margin: 0 -5px 10px;
-  }
-  .yes-button,
-  .no-button,
-  .approve-button,
-  .abstain-button,
-  .veto-button {
-    display: inline-block;
-    padding: 0 5px;
-    border-radius: 10px;
-    button {
-      display: block;
-      width: 100%;
-      padding-right: 2px;
-      padding-left: 2px;
-    }
-  }
-  .yes-button,
-  .no-button,
-  .abstain-button,
-  .veto-button {
-    width: 50%;
-  }
-  .approve-button {
-    width: 100%;
-  }
-}
-
-.VotingActions.Snapshot {
-  .button-row {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    .voting-option {
-      min-width: 48%;
-      max-width: 48%;
-      button {
-        width: 100%;
-        margin: 5px 0;
-        span {
-          overflow: clip;
-        }
-      }
-    }
-  }
-}
-
-.VotingActions.AaveProposal {
-  padding: 0;
-  background: none;
-  .button-row {
-    display: flex;
-    justify-content: space-between;
-  }
-  .yes-button,
-  .no-button {
-    width: 48%;
-    max-width: 48%;
-    padding: 0px;
-    button {
-      width: 100%;
-      height: 55px;
-      border-radius: 10px;
-    }
-  }
-  .yes-button {
-    button {
-      background: $green-50;
-      border: 2px solid $green-100;
-      color: $green-500;
-      text-transform: capitalize;
-      font-size: 24px;
-      margin-right: 10px;
-    }
-  }
-  .no-button {
-    button {
-      background: $pink-50 !important;
-      border: 2px solid $pink-100 !important;
-      color: $rorange-500;
-      text-transform: capitalize;
-      font-size: 24px;
-    }
-  }
-}
-
-.CannotVote {
   background-color: $neutral-100;
-  margin: 24px 0;
+  border-radius: $border-radius-corners;
   flex-wrap: wrap;
-  border-radius: 3px;
-  padding: 16px 24px;
+  margin-bottom: 24px;
+  padding: 16px;
 
-  .proposal-voting-box-text {
-  }
-  .proposal-voting-box-action button {
-    display: block;
-    width: 100%;
-  }
-}
+  .button-row {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
 
-.ProposalExtensions {
-  margin-top: 18px;
-  .cui-overlay {
-    width: 100%;
-    position: relative;
-    top: -14px;
+    .Button {
+      flex: 1;
+    }
   }
-  .cui-custom-select .cui-popover-content {
-    min-width: 200px;
-  }
-}
 
-.BalanceInfo {
-  margin-top: 18px;
+  .voting-actions-header.Text {
+    margin-bottom: 8px;
+  }
 }

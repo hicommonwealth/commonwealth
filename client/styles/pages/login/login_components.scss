@@ -148,13 +148,13 @@
       @include visibleScrollbar;
     }
 
-    .no-wallet-link {
+    .trigger-wrapper {
       align-self: flex-end;
-      margin: 8px 12px 8px 0;
 
-      a {
+      .no-wallet-link {
         color: $neutral-500;
         cursor: pointer;
+        margin: 8px 12px 8px 0;
       }
     }
   }
@@ -218,7 +218,7 @@
     }
   }
 
-  &.selected {
+  &.isSelected {
     background-color: $green-50;
     border-color: $green-500;
     box-shadow: none;
@@ -246,5 +246,26 @@
     padding-bottom: 2px;
 
     @include visibleScrollbar;
+  }
+}
+
+.AvatarAndUsernameInput {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  .input-and-address-container {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+
+    .username-input-container {
+      margin: 0 0 8px 0;
+    }
+
+    .abbreviated-address {
+      color: $neutral-500;
+    }
   }
 }

@@ -6,6 +6,7 @@ import { ChainAttributes } from './chain';
 import { OffchainAttachmentAttributes } from './offchain_attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
+import { OffchainTopicAttributes } from './offchain_topic';
 
 export type OffchainThreadAttributes = {
   address_id: number;
@@ -40,6 +41,7 @@ export type OffchainThreadAttributes = {
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
+  topic?: OffchainTopicAttributes;
 };
 
 export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {

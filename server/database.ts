@@ -81,6 +81,7 @@ import OffchainPollFactory, {
 } from './models/offchain_poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
+import RuleFactory, { RuleModelStatic } from './models/rule';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
 } from './models/social_account';
@@ -143,6 +144,7 @@ export type Models = {
   Profile: ProfileModelStatic;
   Project: ProjectModelStatic;
   Role: RoleModelStatic;
+  Rule: RuleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
@@ -225,6 +227,7 @@ const models: Models = {
   Profile: ProfileFactory(sequelize, DataTypes),
   Project: ProjectFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
+  Rule: RuleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),

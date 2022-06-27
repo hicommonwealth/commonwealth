@@ -1,3 +1,4 @@
+import m from 'mithril';
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
@@ -6,6 +7,11 @@ import { ChainNetwork, ChainBase } from 'types';
 import { ChainInstance } from 'server/models/chain';
 import OffchainTopic from './OffchainTopic';
 import NodeInfo from './NodeInfo';
+
+import {
+  CWAvatar,
+  CWJdenticon,
+} from '../views/components/component_kit/cw_avatar';
 
 class ChainInfo {
   public readonly id: string;
@@ -305,6 +311,12 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
+  }
+
+  public getAvatar(size: number) {
+    return this.iconUrl
+      ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
+      : m(CWJdenticon, { address: this.address, size });
   }
 }
 

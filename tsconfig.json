@@ -21,7 +21,8 @@
     "./client/scripts",
     "./shared/adapters",
     "./test",
-    "./eth/types"
+    "./eth/types",
+    "./globals.d.ts"
   ],
   "exclude": ["./node_modules"]
 }

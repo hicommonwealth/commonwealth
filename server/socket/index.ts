@@ -40,7 +40,6 @@ export const authenticate = (
       (err, decodedUser) => {
         if (err)
           return next(new Error('Authentication Error: incorrect JWT token'));
-        console.log(decodedUser);
         (<any>socket).user = decodedUser;
         next();
       }
@@ -68,9 +67,9 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
-    log.trace(`${socket.id} connected`);
+    log.trace(`Socket connected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
     socket.on('disconnect', () => {
-      log.trace(`${socket.id} disconnected`);
+      log.trace(`Socket disconnected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
     });
   });
 

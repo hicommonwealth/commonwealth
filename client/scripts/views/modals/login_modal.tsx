@@ -12,6 +12,7 @@ import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import {
+  AvatarAndUsernameInput,
   LoginAddress,
   LoginBoilerplate,
   LoginSidebar,
@@ -41,6 +42,8 @@ const profiles = [
   { name: 'Another-Name.eth' },
 ];
 
+const dummyAddress = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq';
+
 export type LoginSidebarType =
   | 'connectWallet'
   | 'ethWallet'
@@ -57,16 +60,28 @@ export type LoginBodyType =
   | 'walletList'
   | 'welcome';
 
+// TODO Gabe 6/22/22:
+// 1. Pull in new headers when done
+// 2. Dark mode styles where applicable
+// 3. New PNG backgrounds where applicable
+// 4. Vertical orientation for AvatarAndUsernameInput
+// 5. New ethereum wallet alerts
+// 6. All mobile
+
 export class NewLoginModal implements m.ClassComponent {
+  private avatarUrl: string;
   private bodyType: LoginBodyType;
   private profiles: Array<ProfileRowAttrs>;
   private sidebarType: LoginSidebarType;
+  private username: string;
   private wallets: Array<string>;
 
   oninit() {
-    this.bodyType = 'allSet';
+    this.avatarUrl = undefined;
+    this.bodyType = 'welcome';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
+    this.username = 'elephant-blue.eth';
     this.wallets = Object.values(WalletId);
   }
 
@@ -131,7 +146,16 @@ export class NewLoginModal implements m.ClassComponent {
                   Use a generated username and photo to edit later, or edit now
                 </CWText>
               </div>
-              {/* username and avatar input here */}
+              <AvatarAndUsernameInput
+                address={dummyAddress}
+                defaultValue={this.username}
+                onAvatarChangeHandler={(a) => {
+                  this.avatarUrl = a;
+                }}
+                onUsernameChangeHandler={(u) => {
+                  this.username = u;
+                }}
+              />
               <CWButton label="Finish" />
             </div>
           )}
@@ -186,7 +210,7 @@ export class NewLoginModal implements m.ClassComponent {
                 <CWText type="h5" fontWeight="medium">
                   Linking
                 </CWText>
-                <LoginAddress address="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" />
+                <LoginAddress address={dummyAddress} />
                 <CWText type="h5" fontWeight="medium">
                   to your Profile
                 </CWText>
@@ -204,7 +228,7 @@ export class NewLoginModal implements m.ClassComponent {
                 <CWText type="h5" fontWeight="medium">
                   You have sucessfully linked
                 </CWText>
-                <LoginAddress address="bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq" />
+                <LoginAddress address={dummyAddress} />
                 <CWText type="h5" fontWeight="medium">
                   to your Profile
                 </CWText>

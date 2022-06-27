@@ -1,8 +1,11 @@
 /* eslint-disable no-restricted-syntax */
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction } from 'express';
 import validateChain from '../util/validateChain';
+import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
+import { OffchainTopicAttributes } from '../models/offchain_topic';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,10 +16,32 @@ export const Errors = {
   NotVerified: 'Must have a verified address to edit or feature topics',
   TopicNotFound: 'Topic not found',
   TopicRequired: 'Topic name required',
-  DefaultTemplateRequired: 'Default Template required'
+  DefaultTemplateRequired: 'Default Template required',
+  RuleNotFound: 'Rule not found',
 };
 
-const editTopic = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+type EditTopicReq = {
+  id: number,
+  chain: string,
+  address: string,
+  name?: string,
+  description?: string,
+  telegram?: string,
+  featured_order: number,
+  featured_in_sidebar: string, // boolean
+  featured_in_new_post: string, // boolean
+  default_offchain_template: string,
+  rule_id?: number,
+};
+
+type EditTopicResp = OffchainTopicAttributes;
+
+const editTopic = async (
+  models: DB,
+  req: TypedRequestBody<EditTopicReq>,
+  res: TypedResponse<EditTopicResp>,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!req.body.id) {
@@ -28,26 +53,8 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const adminAddress = await models.Address.findOne({
-    where: {
-      address: req.body.address,
-      user_id: req.user.id,
-    },
-  });
-  if (!adminAddress.verified) {
-    return next(new Error(Errors.NotVerified));
-  }
-
-  const roleWhere = {
-    address_id: adminAddress.id,
-    permission: 'admin',
-    chain_id: chain.id,
-  };
-
-  const requesterIsAdminOrMod = await models.Role.findOne({
-    where: roleWhere,
-  });
-  if (requesterIsAdminOrMod === null) {
+  const requesterIsAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  if (requesterIsAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }
 
@@ -59,7 +66,8 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     featured_order,
     featured_in_sidebar,
     featured_in_new_post,
-    default_offchain_template
+    default_offchain_template,
+    rule_id,
   } = req.body;
   try {
     const topic = await models.OffchainTopic.findOne({ where: { id } });
@@ -70,9 +78,14 @@ const editTopic = async (models: DB, req: Request, res: Response, next: NextFunc
     topic.featured_in_sidebar = !!(featured_in_sidebar === 'true');
     topic.featured_in_new_post = !!(featured_in_new_post === 'true');
     topic.default_offchain_template = default_offchain_template || '';
+    if (rule_id) {
+      const rule = await models.Rule.findOne({ where: { id: rule_id }});
+      if (!rule) return next(new Error(Errors.RuleNotFound));
+      topic.rule_id = rule_id;
+    }
     await topic.save();
 
-    return res.json({ status: 'Success', result: topic.toJSON() });
+    return success(res, topic.toJSON());
   } catch (e) {
     return next(e);
   }

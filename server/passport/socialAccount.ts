@@ -1,5 +1,5 @@
 import passport from 'passport';
-import passportGithub from 'passport-github';
+import passportGithub from 'passport-github2'; // passport-github is not up to date with Github OAuth 3.0
 import passportDiscord from 'passport-discord';
 import { Request } from 'express';
 
@@ -30,12 +30,6 @@ async function authenticateSocialAccount(
   cb,
   models: DB
 ) {
-  // const str = '&state='
-  // const splitState = req.url.substring(req.url.indexOf(str) + str.length)
-  // const state = splitState.substring(splitState.indexOf('='));
-  // console.log(`State check: ${state} vs ${req.sessionID}`);
-  // if (state !== req.sessionID) return cb(null, false)
-
   const account = await models.SocialAccount.findOne({
     where: { provider, provider_userid: profile.id }
   });
@@ -127,6 +121,12 @@ async function authenticateSocialAccount(
       object_id: `user-${newUser.id}`,
       is_active: true,
     });
+    await models.Subscription.create({
+      subscriber_id: newUser.id,
+      category_id: NotificationCategories.NewChatMention,
+      object_id: `user-${newUser.id}`,
+      is_active: true,
+    });
     await newAccount.setUser(newUser);
     return cb(null, newUser);
   }
@@ -150,7 +150,7 @@ export function useSocialAccountAuth(models: DB) {
     scope: DISCORD_OAUTH_SCOPES,
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
-    callbackURL: DISCORD_OAUTH_CALLBACK
+    callbackURL: DISCORD_OAUTH_CALLBACK,
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))

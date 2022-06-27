@@ -240,10 +240,6 @@ const CreateComment: m.Component<
                     vnode.state.quillEditorState = state;
                   },
                   editorNamespace: `${document.location.pathname}-commenting`,
-                  onkeyboardSubmit: () => {
-                    submitComment();
-                    m.redraw(); // ensure button is disabled
-                  },
                   imageUploader: true,
                   tabindex: vnode.attrs.tabindex,
                 }),

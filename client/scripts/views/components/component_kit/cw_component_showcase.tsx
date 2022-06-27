@@ -45,7 +45,6 @@ const radioGroupOptions = [
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
-
 export class ComponentShowcase implements m.ClassComponent {
   private avatarUrl: string;
   private checkboxChecked: boolean;
@@ -212,6 +211,12 @@ export class ComponentShowcase implements m.ClassComponent {
             }}
             label="This input only accepts A-Z"
             placeholder="Type here"
+          />
+          <CWTextInput
+            label="Text field with icon"
+            name="Text field with icon"
+            placeholder="Type here"
+            iconRight="edit"
           />
           <CWTextInput
             name="Text field"
