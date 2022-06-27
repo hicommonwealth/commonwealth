@@ -117,38 +117,38 @@ const addEditors = async (
 
   await thread.save();
 
-  if (collaborators?.length > 0)
-    await Promise.all(
-      collaborators.map(async (collaborator) => {
-        if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+  if (collaborators?.length > 0) {
+    collaborators.map(async (collaborator) => {
+      if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        await models.Subscription.emitNotifications(
-          models,
-          NotificationCategories.NewCollaboration,
-          `user-${collaborator.User.id}`,
-          {
-            created_at: new Date(),
-            root_id: +thread.id,
-            root_type: ProposalType.OffchainThread,
-            root_title: thread.title,
-            comment_text: thread.body,
-            chain_id: thread.chain,
-            author_address: author.address,
-            author_chain: author.chain,
-          },
-          {
-            user: author.address,
-            url: getProposalUrl('discussion', thread),
-            title: req.body.title,
-            bodyUrl: req.body.url,
-            chain: thread.chain,
-            body: thread.body,
-          },
-          req.wss,
-          [author.address]
-        );
-      })
-    );
+      models.Subscription.emitNotifications(
+        models,
+        NotificationCategories.NewCollaboration,
+        `user-${collaborator.User.id}`,
+        {
+          created_at: new Date(),
+          root_id: +thread.id,
+          root_type: ProposalType.OffchainThread,
+          root_title: thread.title,
+          comment_text: thread.body,
+          chain_id: thread.chain,
+          author_address: author.address,
+          author_chain: author.chain,
+        },
+        {
+          user: author.address,
+          url: getProposalUrl('discussion', thread),
+          title: req.body.title,
+          bodyUrl: req.body.url,
+          chain: thread.chain,
+          body: thread.body,
+        },
+        req.wss,
+        [author.address]
+      );
+    })
+  }
+
 
   const finalCollaborations = await models.Collaboration.findAll({
     where: { offchain_thread_id: thread.id },

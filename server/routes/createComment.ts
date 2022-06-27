@@ -357,7 +357,7 @@ const createComment = async (
   excludedAddrs.push(finalComment.Address.address);
 
   // dispatch notifications to root thread
-  await models.Subscription.emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewComment,
     root_id,
@@ -386,7 +386,7 @@ const createComment = async (
 
   // if child comment, dispatch notification to parent author
   if (parent_id && parentComment) {
-    await models.Subscription.emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewComment,
       `comment-${parent_id}`,
@@ -418,13 +418,12 @@ const createComment = async (
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-    await Promise.all(
       mentionedAddresses.map(async (mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser)
-          await models.Subscription.emitNotifications(
+          models.Subscription.emitNotifications(
             models,
             NotificationCategories.NewMention,
             `user-${mentionedAddress.User.id}`,
@@ -450,8 +449,7 @@ const createComment = async (
             req.wss,
             [finalComment.Address.address]
           );
-      })
-    );
+      });
   }
 
   // update author.last_active (no await)
