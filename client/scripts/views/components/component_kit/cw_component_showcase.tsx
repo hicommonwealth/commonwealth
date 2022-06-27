@@ -64,6 +64,7 @@ export class ComponentShowcase implements m.ClassComponent {
           onclick={() =>
             app.modals.create({
               modal: NewLoginModal,
+              data: { overlayType: 'image' },
             })
           }
         />

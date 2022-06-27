@@ -107,15 +107,18 @@ export class AppModals implements m.ClassComponent {
   }
 
   view() {
-    return app.modals.getList().map((spec) => (
-      <CWModal
-        spec={spec}
-        key={spec.id || '-'}
-        oncreatemodal={oncreate}
-        onclick={onclickoverlay}
-      >
-        {m(spec.modal, spec.data)}
-      </CWModal>
-    ));
+    return app.modals.getList().map((spec) => {
+      return (
+        <CWModal
+          spec={spec}
+          key={spec.id || '-'}
+          oncreatemodal={oncreate}
+          onclick={onclickoverlay}
+          overlayType={spec.data?.overlayType}
+        >
+          {m(spec.modal, spec.data)}
+        </CWModal>
+      );
+    });
   }
 }

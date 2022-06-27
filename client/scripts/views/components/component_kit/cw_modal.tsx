@@ -10,9 +10,10 @@ import { CWIconButton } from './cw_icon_button';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  spec: any; // TODO Gabe 2/2/22 - What is a spec?
   onclick: () => void;
   oncreatemodal: () => void;
+  overlayType: 'blur' | 'image';
+  spec: any; // TODO Gabe 2/2/22 - What is a spec?
 };
 
 export class CWModal implements m.ClassComponent<ModalAttrs> {
@@ -26,9 +27,13 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 
   view(vnode) {
-    const { onclick, spec } = vnode.attrs;
+    const { onclick, overlayType = 'blur', spec } = vnode.attrs;
+
+    console.log(overlayType);
+
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
+
     return (
       <div class={ComponentType.Modal}>
         <div

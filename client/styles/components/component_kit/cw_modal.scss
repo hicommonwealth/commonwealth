@@ -6,24 +6,22 @@ $modal-padding: 16px;
   .overlay {
     align-items: center;
     background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
     bottom: 0;
     display: flex;
     justify-content: center;
     left: 0;
     position: fixed;
     right: 0;
-    top: 0;
+    top: $header-height;
     z-index: 101;
-  }
-
-  &:last-child .overlay {
-    background: rgba(0, 0, 0, 0.2);
   }
 
   .popup {
     @include popout();
 
     background: $white;
+    bottom: $header-height;
     border-radius: $border-radius-corners;
     overflow: hidden;
     position: relative;
@@ -85,5 +83,5 @@ $modal-padding: 16px;
 .ban-modal-content {
   display: flex;
   justify-content: center;
-  margin-top: 15px;
+  margin-top: 16px;
 }
