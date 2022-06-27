@@ -418,7 +418,7 @@ const createComment = async (
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map(async (mentionedAddress) => {
+      mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
         const shouldNotifyMentionedUser = true;

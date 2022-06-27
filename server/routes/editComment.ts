@@ -181,7 +181,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
 
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map(async (mentionedAddress) => {
+      mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
         models.Subscription.emitNotifications(
           models,

@@ -118,7 +118,7 @@ const addEditors = async (
   await thread.save();
 
   if (collaborators?.length > 0) {
-    collaborators.map(async (collaborator) => {
+    collaborators.map((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       models.Subscription.emitNotifications(
