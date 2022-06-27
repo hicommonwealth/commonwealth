@@ -8,6 +8,7 @@ import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import SupportProjectModal from 'views/modals/support_project_modal';
 import ProjectCard, { ProjectCardSize } from './project_card';
+import { createNewDummyProject } from './dummy_project';
 
 export default class YourPage implements m.ClassComponent {
   // private supportedProjects: Project[];
@@ -17,6 +18,16 @@ export default class YourPage implements m.ClassComponent {
   private totalEndedProjects = 0;
   private supportedProjectsDisplayed = 6;
   private endedProjectsDisplayed = 6;
+
+  getYoursPageProjects(): Project[] {
+    return [
+      createNewDummyProject({ isAuthor: true }),
+      createNewDummyProject({ isBacker: true }),
+      createNewDummyProject({ isCurator: true })
+      createNewDummyProject({ isAuthor: true }),
+      createNewDummyProject({ isAuthor: true, isFailed: true }),
+      createNewDummyProject({ isCurator: true, isSucceeded: true }),
+    ];
 
   getAuthoredProjects(): Project[] {
     const allProjects: Project[] = [];
@@ -76,7 +87,8 @@ export default class YourPage implements m.ClassComponent {
 
     return (
       <div class="YourPage">
-        <CWText type="h1">Your Projects</CWText>
+        
+        {/* <CWText type="h1">Your Projects</CWText>
         <div class="projects-listing">
           {this.getAuthoredProjects().map((project) => (
             <ProjectCard project={project} size={ProjectCardSize.Large} />
@@ -128,7 +140,7 @@ export default class YourPage implements m.ClassComponent {
               console.log(this.endedProjectsDisplayed);
             }}
           />
-        </div>
+        </div> */}
       </div>
     );
   }
