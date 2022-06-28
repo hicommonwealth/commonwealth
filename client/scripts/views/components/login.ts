@@ -218,41 +218,43 @@ const Login: m.Component<{}, {
         ]),
       ]) : '',
       !vnode.state.showMagicLoginPrompt && [
-        m('.form-divider', 'or'),
-        m(Form, { gutter: 10 }, [
-          m(FormGroup, { span: 12 }, [
-            m(Button, {
-              intent: 'primary',
-              fluid: true,
-              rounded: true,
-              href: `${app.serverUrl()}/auth/github`,
-              onclick: (e) => {
-                localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
-                  timestamp: (+new Date()).toString(),
-                  path: m.route.get()
-                }));
-              },
-              label: 'Continue with Github'
-            }),
+        !app.isCustomDomain() && [
+          m('.form-divider', 'or'),
+          m(Form, { gutter: 10 }, [
+            m(FormGroup, { span: 12 }, [
+              m(Button, {
+                intent: 'primary',
+                fluid: true,
+                rounded: true,
+                href: `${app.serverUrl()}/auth/github`,
+                onclick: (e) => {
+                  localStorage.setItem('githubPostAuthRedirect', JSON.stringify({
+                    timestamp: (+new Date()).toString(),
+                    path: m.route.get()
+                  }));
+                },
+                label: 'Continue with Github'
+              }),
+            ]),
           ]),
-        ]),
-        m(Form, { gutter: 10 }, [
-          m(FormGroup, { span: 12 }, [
-            m(Button, {
-              intent: 'primary',
-              fluid: true,
-              rounded: true,
-              href: `${app.serverUrl()}/auth/discord`,
-              onclick: (e) => {
-                localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
-                  timestamp: (+new Date()).toString(),
-                  path: m.route.get()
-                }));
-              },
-              label: 'Continue with Discord'
-            }),
+          m(Form, { gutter: 10 }, [
+            m(FormGroup, { span: 12 }, [
+              m(Button, {
+                intent: 'primary',
+                fluid: true,
+                rounded: true,
+                href: `${app.serverUrl()}/auth/discord`,
+                onclick: (e) => {
+                  localStorage.setItem('discordPostAuthRedirect', JSON.stringify({
+                    timestamp: (+new Date()).toString(),
+                    path: m.route.get()
+                  }));
+                },
+                label: 'Continue with Discord'
+              }),
+            ]),
           ]),
-        ]),
+        ],
         m(Form, { gutter: 10 }, [
           m(FormGroup, { span: 12 }, [
             m(LoginWithWalletDropdown, {
