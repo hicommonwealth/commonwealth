@@ -30,4 +30,26 @@
     opacity: 0.2;
     pointer-events: none;
   }
+
+  &.isMobile {
+    background-color: $neutral-700;
+    border: 1px solid $neutral-700;
+    box-shadow: none;
+
+    .wallet-option-text.Text {
+      color: $white;
+    }
+
+    &:hover {
+      background-color: $neutral-600;
+    }
+
+    &:active {
+      border-color: $primary-200;
+
+      .wallet-option-text.Text {
+        color: $primary-200;
+      }
+    }
+  }
 }

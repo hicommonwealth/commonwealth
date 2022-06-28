@@ -11,6 +11,13 @@ $width: 360px;
     margin-bottom: 16px;
   }
 
+  .basic-gallery {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $margin-bottom;
+    gap: 16px;
+  }
+
   .tooltip-gallery {
     display: flex;
     flex-direction: column;

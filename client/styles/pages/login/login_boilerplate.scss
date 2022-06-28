@@ -1,0 +1,12 @@
+@import 'shared';
+
+.LoginBoilerplate.Text {
+  color: $neutral-300;
+  display: inline-block;
+  text-align: center;
+
+  .link {
+    color: $neutral-500;
+    cursor: pointer;
+  }
+}

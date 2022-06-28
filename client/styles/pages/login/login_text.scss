@@ -1,0 +1,18 @@
+@import 'shared';
+
+.LoginText {
+  .header-text.Text {
+    @include coloredBottomBorder($yellow-500);
+
+    color: $white;
+    margin-bottom: 8px;
+  }
+
+  .body-text.Text {
+    color: $white;
+  }
+
+  &.bottom-margin {
+    margin-bottom: 48px;
+  }
+}

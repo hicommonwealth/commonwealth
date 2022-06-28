@@ -10,6 +10,7 @@
 @import 'mixins/choice';
 @import 'mixins/inputs';
 @import 'mixins/icons';
+@import 'mixins/text';
 
 // layout parameters
 
@@ -37,6 +38,39 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
 // mobile specs
 
 $text-size-mobile-header: 22px;
+
+@mixin visibleScrollbar($theme) {
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-scrollbar:vertical {
+    height: 88px;
+    width: 8px;
+  }
+
+  @if $theme == light {
+    &::-webkit-scrollbar-track {
+      background: $neutral-50;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-200;
+    }
+  } @else if $theme == dark {
+    &::-webkit-scrollbar-track {
+      background: $neutral-700;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-500;
+    }
+  }
+}
 
 @mixin gov-explainer {
   .stats-box {

@@ -13,7 +13,7 @@ $modal-padding: 16px;
     left: 0;
     position: fixed;
     right: 0;
-    top: $header-height;
+    top: 0;
     z-index: 101;
   }
 
@@ -30,13 +30,6 @@ $modal-padding: 16px;
       border-radius: 0;
       height: 100%;
       width: 100%;
-    }
-  }
-
-  @include extraSmall {
-    .modal-container {
-      max-height: calc(100vh - 20px);
-      min-width: calc(100vw - 20px);
     }
   }
 

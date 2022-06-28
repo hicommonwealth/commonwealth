@@ -12,16 +12,17 @@ import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { LoginAddress } from '../pages/login/login_address';
+import { AvatarAndUsernameInput } from '../pages/login/login_avatar_and_username_input';
+import { LoginBoilerplate } from '../pages/login/login_boilerplate';
+import { LoginSidebar } from '../pages/login/login_sidebar';
+import { LoginText } from '../pages/login/login_text';
 import {
-  AvatarAndUsernameInput,
-  LoginAddress,
-  LoginBoilerplate,
-  LoginSidebar,
-  ProfileRow,
   ProfileRowAttrs,
   ProfilesList,
-  WalletsList,
-} from '../pages/login/login_components';
+  ProfileRow,
+} from '../pages/login/profiles_list';
+import { WalletsList } from '../pages/login/wallets_list';
 
 export class LoginModal implements m.ClassComponent {
   view() {
@@ -79,7 +80,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.avatarUrl = undefined;
-    this.bodyType = 'walletList';
+    this.bodyType = 'welcome';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.username = 'elephant-blue.eth';
@@ -90,22 +91,25 @@ export class NewLoginModal implements m.ClassComponent {
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
       <div class="NewLoginModalMediumSmall">
         <ModalExitButton iconButtonTheme="mobile" />
-        <CWText type="h4" fontWeight="semiBold" className="header-text">
-          Connect Your Wallet
-        </CWText>
-        <CWText type="b2" className="sidebar-body-text">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut imperdiet
-          velit fringilla lorem et. Integer accumsan lobortis cursus amet.
-          Dictum sit morbi elementum.
-        </CWText>
-        <WalletsList
-          connectAnotherWayOnclick={() => {
-            // this.sidebarType = 'ethWallet';
-            // this.bodyType = 'connectWithEmail';
-          }}
-          wallets={this.wallets}
-        />
-        <LoginBoilerplate />
+        <div class="medium-small-container">
+          <LoginText
+            bodyText={`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                imperdiet velit fringilla lorem et. Integer accumsan lobortis
+                cursus amet. Dictum sit morbi elementum.`}
+            headerText="Connect Your Wallet"
+            isMobile
+            className="bottom-margin"
+          />
+          <WalletsList
+            connectAnotherWayOnclick={() => {
+              // this.sidebarType = 'ethWallet';
+              // this.bodyType = 'connectWithEmail';
+            }}
+            isMobile
+            wallets={this.wallets}
+          />
+          <LoginBoilerplate />
+        </div>
       </div>
     ) : (
       <div class="NewLoginModal">

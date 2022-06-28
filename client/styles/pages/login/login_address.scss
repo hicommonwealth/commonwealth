@@ -1,0 +1,15 @@
+@import 'shared';
+
+.LoginAddress {
+  align-items: center;
+  background-color: $neutral-100;
+  border-radius: $border-radius-corners;
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  width: 282px;
+
+  .Text {
+    color: $neutral-500;
+  }
+}

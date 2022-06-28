@@ -79,9 +79,14 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Account creation button clicked!')}
           />
         </div>
-        <div class="card-gallery">
+        <div class="basic-gallery">
           <h1>Wallet Row Card</h1>
           <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+          <CWWalletOptionRow
+            isMobile
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />

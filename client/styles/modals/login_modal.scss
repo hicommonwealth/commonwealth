@@ -91,14 +91,21 @@
 
 .NewLoginModalMediumSmall {
   align-items: center;
-  // background-color: $neutral-700;
   background-image: url('/static/img/login-background.png');
   background-size: cover;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   justify-content: center;
   width: 100%;
 
   .IconButton {
-    // align-self: flex-end;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  .medium-small-container {
+    width: 368px;
   }
 }

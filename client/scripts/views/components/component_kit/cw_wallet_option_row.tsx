@@ -13,6 +13,7 @@ import { getClasses } from './helpers';
 
 type WalletOptionRowStyleAttrs = {
   disabled?: boolean;
+  isMobile?: boolean;
 };
 
 type WalletOptionRowAttrs = {
@@ -28,19 +29,25 @@ export class CWWalletOptionRow
   implements m.ClassComponent<WalletOptionRowAttrs>
 {
   view(vnode) {
-    const { disabled = false, onclick, walletName } = vnode.attrs;
+    const { disabled = false, isMobile, onclick, walletName } = vnode.attrs;
     return (
       <div
         class={getClasses<WalletOptionRowStyleAttrs>(
           {
             disabled,
+            isMobile,
           },
           ComponentType.WalletOptionRow
         )}
         onclick={onclick}
       >
         <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
-        <CWText type="h5" fontWeight="semiBold" noWrap>
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="wallet-option-text"
+          noWrap
+        >
           {getWalletKeyFromValue(walletName)}
         </CWText>
       </div>
