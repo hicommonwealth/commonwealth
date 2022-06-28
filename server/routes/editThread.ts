@@ -156,7 +156,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     });
 
     // dispatch notifications to subscribers of the given chain
-    await models.Subscription.emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.ThreadEdit,
       '',
@@ -214,35 +214,37 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     }
 
     // notify mentioned users, given permissions are in place
-    if (mentionedAddresses?.length > 0) await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
-      if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+    if (mentionedAddresses?.length > 0) {
+      mentionedAddresses.map((mentionedAddress) => {
+        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      await models.Subscription.emitNotifications(
-        models,
-        NotificationCategories.NewMention,
-        `user-${mentionedAddress.User.id}`,
-        {
-          created_at: new Date(),
-          root_id: +finalThread.id,
-          root_type: ProposalType.OffchainThread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
-        },
-        {
-          user: finalThread.Address.address,
-          url: getProposalUrl('discussion', finalThread),
-          title: req.body.title,
-          bodyUrl: req.body.url,
-          chain: finalThread.chain,
-          body: finalThread.body,
-        },
-        req.wss,
-        [ finalThread.Address.address ],
-      );
-    }));
+        models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +finalThread.id,
+            root_type: ProposalType.OffchainThread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.chain,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.chain,
+          },
+          {
+            user: finalThread.Address.address,
+            url: getProposalUrl('discussion', finalThread),
+            title: req.body.title,
+            bodyUrl: req.body.url,
+            chain: finalThread.chain,
+            body: finalThread.body,
+          },
+          req.wss,
+          [ finalThread.Address.address ],
+        );
+      });
+    }
 
     // TODO: update author.last_active
 
