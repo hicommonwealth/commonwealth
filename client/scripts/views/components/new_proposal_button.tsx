@@ -77,7 +77,8 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
           app.chain?.base === ChainBase.CosmosSDK ||
           app.chain?.base === ChainBase.Substrate) &&
           !mobile && <MenuDivider />}
-        {app.chain?.base === ChainBase.CosmosSDK && (
+        {app.chain?.base === ChainBase.CosmosSDK
+          && app.chain?.network !== ChainNetwork.Terra && (
           <MenuItem
             onclick={() => navigateToSubpage('/new/proposal')}
             label="New On-Chain Proposal"
