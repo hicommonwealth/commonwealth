@@ -114,7 +114,7 @@ export class AppModals implements m.ClassComponent {
           key={spec.id || '-'}
           oncreatemodal={oncreate}
           onclick={onclickoverlay}
-          overlayType={spec.data?.overlayType}
+          modalType={spec.data?.modalType}
         >
           {m(spec.modal, spec.data)}
         </CWModal>

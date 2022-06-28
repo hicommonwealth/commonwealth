@@ -88,7 +88,25 @@ export class NewLoginModal implements m.ClassComponent {
 
   view() {
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
-      <div style="background-color: black; height: 100%; width: 100%;"></div>
+      <div class="NewLoginModalMediumSmall">
+        <ModalExitButton iconButtonTheme="mobile" />
+        <CWText type="h4" fontWeight="semiBold" className="header-text">
+          Connect Your Wallet
+        </CWText>
+        <CWText type="b2" className="sidebar-body-text">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut imperdiet
+          velit fringilla lorem et. Integer accumsan lobortis cursus amet.
+          Dictum sit morbi elementum.
+        </CWText>
+        <WalletsList
+          connectAnotherWayOnclick={() => {
+            // this.sidebarType = 'ethWallet';
+            // this.bodyType = 'connectWithEmail';
+          }}
+          wallets={this.wallets}
+        />
+        <LoginBoilerplate />
+      </div>
     ) : (
       <div class="NewLoginModal">
         <LoginSidebar sidebarType={this.sidebarType} />

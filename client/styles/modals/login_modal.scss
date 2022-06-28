@@ -5,15 +5,6 @@
   height: 424px;
   width: 664px;
 
-  @include mediumSmallInclusive {
-    align-items: center;
-    background-image: url('/static/img/login-background.png');
-    background-size: cover;
-    height: 100%;
-    justify-content: center;
-    width: 100%;
-  }
-
   .body {
     align-items: center;
     display: flex;
@@ -23,7 +14,7 @@
     padding: 16px 24px;
     width: 400px;
 
-    svg {
+    .IconButton {
       align-self: flex-end;
     }
 
@@ -95,5 +86,19 @@
         }
       }
     }
+  }
+}
+
+.NewLoginModalMediumSmall {
+  align-items: center;
+  // background-color: $neutral-700;
+  background-image: url('/static/img/login-background.png');
+  background-size: cover;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+
+  .IconButton {
+    // align-self: flex-end;
   }
 }

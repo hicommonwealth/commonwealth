@@ -28,4 +28,17 @@
       color: $primary-500;
     }
   }
+
+  &.mobile {
+    color: $neutral-25;
+    cursor: pointer;
+
+    &:hover {
+      color: $white;
+    }
+
+    &.selected {
+      color: $neutral-50;
+    }
+  }
 }

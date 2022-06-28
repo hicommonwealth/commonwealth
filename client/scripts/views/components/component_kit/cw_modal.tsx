@@ -8,12 +8,13 @@ import 'components/component_kit/cw_modal.scss';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
+import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onclick: () => void;
   oncreatemodal: () => void;
-  overlayType: 'centered' | 'fullScreen';
+  modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
 };
 
@@ -28,7 +29,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 
   view(vnode) {
-    const { onclick, overlayType = 'centered', spec } = vnode.attrs;
+    const { onclick, modalType = 'centered', spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -41,7 +42,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
         >
           <div
             class={getClasses<{ isFullScreen: boolean }>(
-              { isFullScreen: overlayType === 'fullScreen' },
+              { isFullScreen: modalType === 'fullScreen' },
               'modal-container'
             )}
             onclick={(e) => {
@@ -56,10 +57,17 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 }
 
-export class ModalExitButton implements m.ClassComponent {
-  view() {
+export class ModalExitButton
+  implements
+    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconButtonTheme }>
+{
+  view(vnode) {
+    const { disabled, iconButtonTheme } = vnode.attrs;
+
     return (
       <CWIconButton
+        disabled={disabled}
+        iconButtonTheme={iconButtonTheme}
         iconName="close"
         onclick={(e) => {
           e.preventDefault();

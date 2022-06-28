@@ -66,7 +66,7 @@ export class ComponentShowcase implements m.ClassComponent {
             app.modals.create({
               modal: NewLoginModal,
               data: {
-                overlayType: isWindowMediumSmallInclusive(window.innerWidth)
+                modalType: isWindowMediumSmallInclusive(window.innerWidth)
                   ? 'fullScreen'
                   : 'centered',
               },
