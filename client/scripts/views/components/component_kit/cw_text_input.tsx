@@ -57,6 +57,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       label,
       name,
       oninput,
+      onsuccess, // similar to oninput, but only fires if no validation errors
       placeholder,
       size = 'large',
       tabindex,
@@ -93,6 +94,8 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             name={name}
             placeholder={placeholder}
             oninput={(e) => {
+              oninput(e);
+
               if (e.target.value?.length === 0) {
                 this.isTyping = false;
                 this.validationStatus = undefined;
@@ -108,12 +111,12 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                   if (inputValidationFn && e.target.value?.length > 3) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
-                    if (oninput && this.validationStatus === 'success') {
-                      oninput(e);
+                    if (onsuccess && this.validationStatus === 'success') {
+                      onsuccess(e);
                     }
                     m.redraw();
                   } else {
-                    if (oninput) oninput(e);
+                    if (onsuccess) onsuccess(e);
                   }
                 }, timeout);
               }

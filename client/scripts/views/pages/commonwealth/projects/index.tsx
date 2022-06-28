@@ -8,6 +8,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { RoleInfo } from 'client/scripts/models';
+import { ChainBase } from 'shared/types';
 import Sublayout from '../../../sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
@@ -70,11 +71,13 @@ export default class ProjectListing implements m.ClassComponent {
                 }}
               />
             </Tabs>
-            {/* TODO:
-                  - Limit project-instantiable communities to ETH chain-base communities
-             */}
             <SelectList
-              items={app.user.roles.map((role: RoleInfo) => role.chain_id)}
+              items={app.user.roles
+                .map((role: RoleInfo) => role.chain_id)
+                .filter(
+                  (id) =>
+                    app.config.chains.getById(id).base === ChainBase.Ethereum
+                )}
               itemRender={(chainId: string) => {
                 return (
                   <div value={chainId} style="cursor: pointer">
@@ -82,6 +85,10 @@ export default class ProjectListing implements m.ClassComponent {
                   </div>
                 );
               }}
+              emptyContent={m(
+                '',
+                'Join (or create) an Ethereum community to create a project'
+              )}
               filterable={false}
               onSelect={(chainId: string) => {
                 m.route.set(`/${chainId}/new/project`);

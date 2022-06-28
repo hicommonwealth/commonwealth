@@ -7,7 +7,7 @@ import {
 import { ChainInfo, NodeInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'types';
-import { BigNumberish } from 'ethers';
+import { BigNumberish, ContractReceipt } from 'ethers';
 import { attachSigner } from './contractApi';
 
 export type IProjectCreationData = {
@@ -90,7 +90,9 @@ export default class ProjectsController {
     this._initializing = false;
   }
 
-  public async createProject(projectData: IProjectCreationData) {
+  public async createProject(
+    projectData: IProjectCreationData
+  ): Promise<[ContractReceipt, number]> {
     if (!this._initialized) throw new Error('Projects not yet initialized');
 
     // TODO: validate arguments
@@ -184,7 +186,7 @@ export default class ProjectsController {
 
     // refresh metadata + return final result
     await this._loadProjectsFromServer(projectId);
-    return txReceipt;
+    return [txReceipt, projectId];
   }
 
   public async back(projectId: number, value: string) {

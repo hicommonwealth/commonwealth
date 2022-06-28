@@ -177,6 +177,13 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
             iconLeft={mobile ? Icons.PLUS : undefined}
           />
         )}
+        {app.chain.base === ChainBase.Ethereum && (
+          <MenuItem
+            onclick={() => navigateToSubpage('/new/project')}
+            label="New crowdfund"
+            iconLeft={mobile ? Icons.PLUS : undefined}
+          />
+        )}
       </>
     );
   }

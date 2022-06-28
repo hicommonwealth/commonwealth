@@ -1,57 +1,54 @@
 import Web3 from 'web3';
 
-export const validateTitle = (title: string) => {
-  if (!title) return false;
-  if (title.length < 3 || title.length > 64) return false;
-  return true;
-};
+// @Zak and @Gabe for PR review: Thoughts on this validation system, and documenting/standardizing?
+// See logic in create_project_form inputValidationFn (on each text input) + final 'submit' button functionality,
+// especially in conjunction with new `onsuccess` attr
+export const validateProjectForm = (property: string, value: string) => {
+  if (!value)
+    return ['error', `Form is missing a ${property.split(/(?=[A-Z])/)} input.`];
+  let errorMessage: string;
+  switch (property) {
+    case 'title':
+      if (value.length < 8 || value.length > 64) {
+        errorMessage = `Title must be valid string between 3 and 64 characters. Current count: ${value.length}`;
+      }
+      break;
+    case 'shortDescription':
+      if (value.length > 224) {
+        errorMessage = `Input limit is 224 characters. Current count: ${value.length}`;
+      }
+      break;
+    case 'token':
+    case 'beneficiary':
+    case 'creator':
+      if (!Web3.utils.isAddress(value)) {
+        errorMessage = `Invalid ${property} address. Must be a valid Ethereum address.`;
+      }
+      break;
+    case 'fundraiseLength':
+      // TODO: Min fundraiseLength check
+      if (Number.isNaN(+value)) {
+        errorMessage = 'Invalid fundraise length. Must be between [X, Y]';
+      }
+      break;
+    case 'threshold':
+      // TODO: Min threshold check
+      if (Number.isNaN(+value)) {
+        errorMessage = 'Invalid threshold amount. Must be between [X, Y]';
+      }
+      break;
+    case 'curatorFee':
+      if (Number.isNaN(+value) || +value > 100 || +value < 0) {
+        errorMessage = `Curator fee must be a valid number (%) between 0 and 100.`;
+      }
+      break;
+    default:
+      break;
+  }
 
-export const validateShortDescription = (description: string) => {
-  if (!description) return false;
-  if (description.length > 224) return false;
-  return true;
-};
-
-export const validateDescription = (description: string) => {
-  if (!description) return false;
-  return true;
-};
-
-export const validateToken = (token: string) => {
-  if (!token) return false;
-  if (!Web3.utils.isAddress(token)) return false;
-  return true;
-};
-
-export const validateBeneficiary = (beneficiary: string) => {
-  if (!beneficiary) return false;
-  if (!Web3.utils.isAddress(beneficiary)) return false;
-  return true;
-};
-
-export const validateCreator = (creator: string) => {
-  if (!creator) return false;
-  if (!Web3.utils.isAddress(creator)) return false;
-  return true;
-};
-
-export const validateFundraiseLength = (length: number) => {
-  if (!length) return false;
-  if (Number.isNaN(+length)) return false;
-  // TODO: Min fundraiseLength check
-  return true;
-};
-
-export const validateCuratorFee = (fee: string) => {
-  if (!fee) return false;
-  if (Number.isNaN(+fee)) return false;
-  if (+fee > 100 || +fee < 0) return false;
-  return true;
-};
-
-export const validateThreshold = (threshold: number) => {
-  if (!threshold) return false;
-  if (Number.isNaN(+threshold)) return false;
-  // TODO: Min threshold check
-  return true;
+  if (errorMessage) {
+    return ['error', errorMessage];
+  } else {
+    return ['success', `Valid ${property}`];
+  }
 };

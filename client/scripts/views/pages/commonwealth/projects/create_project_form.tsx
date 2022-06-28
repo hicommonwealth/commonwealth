@@ -14,17 +14,7 @@ import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'types';
 import CoverImageUpload from './cover_image_upload';
-import {
-  validateTitle,
-  validateShortDescription,
-  validateDescription,
-  validateToken,
-  validateBeneficiary,
-  validateCreator,
-  validateFundraiseLength,
-  validateCuratorFee,
-  validateThreshold,
-} from './helpers';
+import { validateProjectForm } from './helpers';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -48,7 +38,6 @@ export interface ICreateProjectForm {
   beneficiary: string;
   threshold: number;
   fundraiseLength: number;
-  deadline: number;
   curatorFee: number;
 }
 
@@ -67,20 +56,10 @@ export class InformationSlide
           placeholder="Your Project Name Here"
           label="Name Your Crowdfund"
           name="Name"
-          oninput={(e) => {
-            console.log(e);
+          onsuccess={(e) => {
             vnode.attrs.form.title = e.target.value;
           }}
-          inputValidationFn={(value: string) => {
-            const isValid = validateTitle(value);
-            if (!isValid) {
-              return [
-                'failure',
-                `Name must be between 8-64 characters. Current count: ${value.length}`,
-              ];
-            }
-            return ['success', ''];
-          }}
+          inputValidationFn={validateProjectForm}
         />
         <CWTextInput
           defaultValue={app.user.activeAccount.address}
@@ -92,19 +71,10 @@ export class InformationSlide
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
           name="Short Description"
-          oninput={(e) => {
+          onsuccess={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
-          inputValidationFn={(value: string) => {
-            const isValid = validateShortDescription(value);
-            if (!isValid) {
-              return [
-                'failure',
-                `Input limit is 224 characters. Current count: ${value.length}`,
-              ];
-            }
-            return ['success', ''];
-          }}
+          inputValidationFn={validateProjectForm}
         />
         <CoverImageUpload
           uploadStartedCallback={() => {
@@ -215,14 +185,8 @@ export class FundraisingSlide
           placeholder="Address"
           label="Beneficiary Address"
           name="Beneficiary Address"
-          inputValidationFn={(value: string) => {
-            const isValid = validateBeneficiary(value);
-            if (!isValid) {
-              return ['failure', 'Invalid address'];
-            }
-            return ['success', ''];
-          }}
-          oninput={(e) => {
+          inputValidationFn={validateProjectForm}
+          onsuccess={(e) => {
             vnode.attrs.form.beneficiary = e.target.value;
           }}
         />
@@ -230,21 +194,10 @@ export class FundraisingSlide
           placeholder="Set Quantity"
           label="Curator Fee (%)"
           name="Curator Fee"
-          oninput={(e) => {
-            // Convert to 10000 to capture decimal points
-            vnode.attrs.form.curatorFee = Math.round(e.target.value * 100);
-            console.log(vnode.attrs.form.curatorFee);
+          onsuccess={(e) => {
+            vnode.attrs.form.curatorFee = e.target.value;
           }}
-          inputValidationFn={(value: string) => {
-            const isValidCuratorFee = validateCuratorFee(value);
-            if (!isValidCuratorFee) {
-              return [
-                'failure',
-                'Input must be valid percentage between 0 and 100',
-              ];
-            }
-            return ['success', ''];
-          }}
+          inputValidationFn={validateProjectForm}
         />
       </div>
     );
@@ -306,7 +259,6 @@ export default class CreateProjectForm implements m.ClassComponent {
         curatorFee: 0,
         threshold: 0,
         fundraiseLength: weekInSeconds,
-        deadline: nowInSeconds + weekInSeconds,
         chainId: app.activeChainId(),
       };
     }
@@ -375,50 +327,37 @@ export default class CreateProjectForm implements m.ClassComponent {
                   label: 'Submit',
                   onclick: async (e) => {
                     e.preventDefault();
-                    const {
-                      title,
-                      shortDescription,
-                      description,
-                      coverImage,
-                      token,
-                      threshold,
-                      creator,
-                      beneficiary,
-                      fundraiseLength,
-                      curatorFee,
-                    } = this.form;
-                    const isValidTitle = validateTitle(title);
-                    const isValidDescription = validateDescription(description);
-                    const isValidShortDescription =
-                      validateShortDescription(shortDescription);
-                    const isValidCoverImage = coverImage?.length > 0;
-                    const isValidToken = validateToken(token);
-                    const isValidBeneficiary = validateBeneficiary(beneficiary);
-                    const isValidCreator = validateCreator(creator);
-                    const isValidFundraiseLength =
-                      validateFundraiseLength(fundraiseLength);
-                    const isValidCuratorFee = validateCuratorFee(curatorFee);
-                    const isValidThreshold = validateThreshold(threshold);
-                    if (
-                      !isValidTitle ||
-                      !isValidDescription ||
-                      !isValidShortDescription ||
-                      !isValidCoverImage ||
-                      !isValidToken ||
-                      !isValidBeneficiary ||
-                      !isValidCreator ||
-                      !isValidCuratorFee ||
-                      !isValidFundraiseLength ||
-                      !isValidThreshold
-                    ) {
-                      notifyError('Invalid form. Please check inputs.');
+                    for (const property in this.form) {
+                      if ({}.hasOwnProperty.call(this.form, property)) {
+                        const [state, errorMessage] = validateProjectForm(
+                          property,
+                          this.form[property]
+                        );
+                        if (state !== 'success') {
+                          notifyError(errorMessage);
+                          return;
+                        }
+                      }
                     }
-                    this.form.description = this.form.description.getText();
-                    this.form.deadline = nowInSeconds + weekInSeconds;
-                    const newProject = await app.projects.createProject(
-                      this.form
-                    );
-                    m.route.set(`/project/${newProject.id}`);
+                    const [txReceipt, newProjectId] =
+                      await app.projects.createProject({
+                        title: this.form.title,
+                        description: this.form.description.getText(),
+                        shortDescription: this.form.shortDescription,
+                        coverImage: this.form.coverImage,
+                        chainId: app.activeChainId(),
+                        token: this.form.token,
+                        creator: this.form.creator,
+                        beneficiary: this.form.beneficiary,
+                        threshold: +this.form.threshold,
+                        deadline: nowInSeconds + this.form.fundraiseLength,
+                        curatorFee: Math.round(this.form.curatorFee * 100),
+                      });
+                    if (txReceipt.status !== 1) {
+                      notifyError('Project creation failed');
+                    } else {
+                      m.route.set(`/project/${newProjectId}`);
+                    }
                   },
                 }),
             ]
