@@ -115,7 +115,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
     // dispatch notifications to subscribers of the comment/thread
-    await models.Subscription.emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.CommentEdit,
       '',
@@ -181,9 +181,9 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
 
     // notify mentioned users, given permissions are in place
     if (mentionedAddresses?.length > 0) {
-      await Promise.all(mentionedAddresses.map(async (mentionedAddress) => {
+      mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-        await models.Subscription.emitNotifications(
+        models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,
@@ -209,7 +209,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
           req.wss,
           [ finalComment.Address.address ],
         );
-      }));
+      });
     }
 
     // update author.last_active (no await)
