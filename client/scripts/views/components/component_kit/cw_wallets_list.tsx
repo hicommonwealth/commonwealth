@@ -2,13 +2,13 @@
 
 import m from 'mithril';
 
-import 'pages/login/wallets_list.scss';
+import 'components/component_kit/cw_wallets_list.scss';
 
 import { WalletId } from 'types';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWWalletOptionRow } from '../../components/component_kit/cw_wallet_option_row';
-import { CWTooltip } from '../../components/component_kit/cw_tooltip';
-import { getClasses } from '../../components/component_kit/helpers';
+import { CWText } from './cw_text';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWTooltip } from './cw_tooltip';
+import { getClasses } from './helpers';
 
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
@@ -17,7 +17,7 @@ type WalletsListAttrs = {
   wallets: Array<WalletId>;
 };
 
-export class WalletsList implements m.ClassComponent<WalletsListAttrs> {
+export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
   view(vnode) {
     const {
       connectAnotherWayOnclick,

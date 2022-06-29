@@ -12,17 +12,17 @@ import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { LoginAddress } from '../pages/login/login_address';
-import { AvatarAndUsernameInput } from '../pages/login/login_avatar_and_username_input';
+import { CWAddress } from '../components/component_kit/cw_address';
+import { CWAvatarUsernameInput } from '../components/component_kit/cw_avatar_username_input';
 import { LoginBoilerplate } from '../pages/login/login_boilerplate';
 import { LoginSidebar } from '../pages/login/login_sidebar';
 import { LoginText } from '../pages/login/login_text';
 import {
   ProfileRowAttrs,
-  ProfilesList,
-  ProfileRow,
-} from '../pages/login/profiles_list';
-import { WalletsList } from '../pages/login/wallets_list';
+  CWProfilesList,
+  CWProfileRow,
+} from '../components/component_kit/cw_profiles_list';
+import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
 
 export class LoginModal implements m.ClassComponent {
   view() {
@@ -100,7 +100,7 @@ export class NewLoginModal implements m.ClassComponent {
             isMobile
             className="bottom-margin"
           />
-          <WalletsList
+          <CWWalletsList
             connectAnotherWayOnclick={() => {
               // this.sidebarType = 'ethWallet';
               // this.bodyType = 'connectWithEmail';
@@ -119,7 +119,7 @@ export class NewLoginModal implements m.ClassComponent {
           {this.bodyType === 'walletList' && (
             <div class="inner-body-container centered">
               <LoginBoilerplate />
-              <WalletsList
+              <CWWalletsList
                 connectAnotherWayOnclick={() => {
                   // this.sidebarType = 'ethWallet';
                   // this.bodyType = 'connectWithEmail';
@@ -171,7 +171,7 @@ export class NewLoginModal implements m.ClassComponent {
                   Use a generated username and photo to edit later, or edit now
                 </CWText>
               </div>
-              <AvatarAndUsernameInput
+              <CWAvatarUsernameInput
                 address={dummyAddress}
                 defaultValue={this.username}
                 onAvatarChangeHandler={(a) => {
@@ -195,7 +195,7 @@ export class NewLoginModal implements m.ClassComponent {
                   account.
                 </CWText>
               </div>
-              <WalletsList
+              <CWWalletsList
                 connectAnotherWayOnclick={() => {
                   // this.sidebarType = 'ethWallet';
                   // this.bodyType = 'connectWithEmail';
@@ -216,7 +216,7 @@ export class NewLoginModal implements m.ClassComponent {
                   account.
                 </CWText>
               </div>
-              <WalletsList
+              <CWWalletsList
                 connectAnotherWayOnclick={() => {
                   // this.sidebarType = 'ethWallet';
                   // this.bodyType = 'connectWithEmail';
@@ -235,12 +235,12 @@ export class NewLoginModal implements m.ClassComponent {
                 <CWText type="h5" fontWeight="medium">
                   Linking
                 </CWText>
-                <LoginAddress address={dummyAddress} />
+                <CWAddress address={dummyAddress} />
                 <CWText type="h5" fontWeight="medium">
                   to your Profile
                 </CWText>
               </div>
-              <ProfilesList profiles={this.profiles} />
+              <CWProfilesList profiles={this.profiles} />
               <CWButton label="Finish" />
             </div>
           )}
@@ -253,12 +253,12 @@ export class NewLoginModal implements m.ClassComponent {
                 <CWText type="h5" fontWeight="medium">
                   You have sucessfully linked
                 </CWText>
-                <LoginAddress address={dummyAddress} />
+                <CWAddress address={dummyAddress} />
                 <CWText type="h5" fontWeight="medium">
                   to your Profile
                 </CWText>
               </div>
-              <ProfileRow {...this.profiles[0]} />
+              <CWProfileRow {...this.profiles[0]} />
               <CWButton label="Finish" />
             </div>
           )}

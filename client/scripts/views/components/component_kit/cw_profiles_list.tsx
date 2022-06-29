@@ -2,11 +2,11 @@
 
 import m from 'mithril';
 
-import 'pages/login/profiles_list.scss';
+import 'components/component_kit/cw_profiles_list.scss';
 
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { getClasses } from '../../components/component_kit/helpers';
+import { CWText } from './cw_text';
+import { CWIcon } from './cw_icons/cw_icon';
+import { getClasses } from './helpers';
 
 export type ProfileRowAttrs = {
   isSelected?: boolean;
@@ -14,7 +14,7 @@ export type ProfileRowAttrs = {
   onclick?: () => void;
 };
 
-export class ProfileRow implements m.ClassComponent<ProfileRowAttrs> {
+export class CWProfileRow implements m.ClassComponent<ProfileRowAttrs> {
   view(vnode) {
     const { isSelected, onclick, name } = vnode.attrs;
     return (
@@ -37,7 +37,7 @@ export class ProfileRow implements m.ClassComponent<ProfileRowAttrs> {
   }
 }
 
-export class ProfilesList
+export class CWProfilesList
   implements
     m.ClassComponent<{ onclick: () => void; profiles: Array<ProfileRowAttrs> }>
 {
@@ -47,7 +47,7 @@ export class ProfilesList
       <div class="ProfilesList">
         <div class="profile-rows-container">
           {profiles.map((profile) => (
-            <ProfileRow
+            <CWProfileRow
               isSelected={profile.isSelected}
               name={profile.name}
               onclick={onclick}

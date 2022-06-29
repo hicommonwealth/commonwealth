@@ -2,15 +2,15 @@
 
 import m from 'mithril';
 
-import 'pages/login/login_avatar_and_username_input.scss';
+import 'components/component_kit/cw_avatar_username_input.scss';
 
 import { Account } from 'models';
 import { formatAddressShort } from 'helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import { AvatarUpload } from '../../components/avatar_upload';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWText } from './cw_text';
+import { AvatarUpload } from '../avatar_upload';
+import { CWTextInput } from './cw_text_input';
 
-type AvatarAndUsernameInputAttrs = {
+type AvatarUsernameInputAttrs = {
   account?: Account<any>;
   address: string;
   defaultValue: string;
@@ -18,8 +18,8 @@ type AvatarAndUsernameInputAttrs = {
   onUsernameChangeHandler: (e) => void;
 };
 
-export class AvatarAndUsernameInput
-  implements m.ClassComponent<AvatarAndUsernameInputAttrs>
+export class CWAvatarUsernameInput
+  implements m.ClassComponent<AvatarUsernameInputAttrs>
 {
   view(vnode) {
     const {
