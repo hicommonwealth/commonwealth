@@ -11,6 +11,7 @@ export class SocialSharingCarat
   implements m.ClassComponent<SocialSharingCaratAttrs>
 {
   view(vnode) {
+    const domain = document.location.origin;
     return (
       <PopoverMenu
         transitionDuration={0}
@@ -24,11 +25,11 @@ export class SocialSharingCarat
             onclick={async () => {
               if (!vnode.attrs.commentID) {
                 await navigator.clipboard.writeText(
-                  `https://commonwealth.im${m.route.get()}`
+                  `${domain}${m.route.get()}`
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `https://commonwealth.im${m.route.get()}?comment=${
+                  `${domain}${m.route.get()}?comment=${
                     vnode.attrs.commentID
                   }`
                 );
@@ -41,12 +42,12 @@ export class SocialSharingCarat
             onclick={async () => {
               if (!vnode.attrs.commentID) {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=https://commonwealth.im${m.route.get()}`,
+                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
                   '_blank'
                 );
               } else {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=https://commonwealth.im${m.route.get()}?comment=${
+                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${
                     vnode.attrs.commentID
                   }`,
                   '_blank'
