@@ -2,12 +2,6 @@ import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
-import {DISCORD_OAUTH_CALLBACK, GITHUB_OAUTH_CALLBACK} from '../config';
-
-interface AuthOptions extends passport.AuthenticateOptions {
-  callbackURL: string
-}
-
 interface AuthInfoExtended extends Express.AuthInfo {
   state?: {
     hostname: string
