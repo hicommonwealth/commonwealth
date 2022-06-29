@@ -31,7 +31,7 @@ export class CWAvatarUsernameInput
     } = vnode.attrs;
 
     return (
-      <div class="AvatarAndUsernameInput">
+      <div class="AvatarUsernameInput">
         <AvatarUpload
           scope="user"
           account={account}

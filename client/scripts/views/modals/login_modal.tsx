@@ -2,27 +2,12 @@
 
 import m from 'mithril';
 
-import 'modals/login_modal.scss';
-
 import { WalletId } from 'types';
 import Login from 'views/components/login';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { CWAddress } from '../components/component_kit/cw_address';
-import { CWAvatarUsernameInput } from '../components/component_kit/cw_avatar_username_input';
-import { LoginBoilerplate } from '../pages/login/login_boilerplate';
-import { LoginSidebar } from '../pages/login/login_sidebar';
-import { LoginText } from '../pages/login/login_text';
-import {
-  ProfileRowAttrs,
-  CWProfilesList,
-  CWProfileRow,
-} from '../components/component_kit/cw_profiles_list';
-import { CWWalletsList } from '../components/component_kit/cw_wallets_list';
+import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
+import { LoginDesktop } from '../pages/login/login_desktop';
+import { LoginMobile } from '../pages/login/login_mobile';
 
 export class LoginModal implements m.ClassComponent {
   view() {
@@ -62,13 +47,16 @@ export type LoginBodyType =
   | 'walletList'
   | 'welcome';
 
-// TODO Gabe 6/22/22:
-// 1. Pull in new headers when done
-// 2. Dark mode styles where applicable
-// 3. New PNG backgrounds where applicable
-// 4. Vertical orientation for AvatarAndUsernameInput
-// 5. New ethereum wallet alerts
-// 6. All mobile
+export type LoginAttrs = {
+  address: string;
+  bodyType: string;
+  handleSetAvatar: () => void;
+  handleSetUsername: () => void;
+  profiles: Array<ProfileRowAttrs>;
+  sidebarType: string;
+  username: string;
+  wallets: Array<string>;
+};
 
 export class NewLoginModal implements m.ClassComponent {
   private avatarUrl: string;
@@ -89,181 +77,35 @@ export class NewLoginModal implements m.ClassComponent {
 
   view() {
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
-      <div class="NewLoginModalMediumSmall">
-        <ModalExitButton iconButtonTheme="mobile" />
-        <div class="medium-small-container">
-          <LoginText
-            bodyText={`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                imperdiet velit fringilla lorem et. Integer accumsan lobortis
-                cursus amet. Dictum sit morbi elementum.`}
-            headerText="Connect Your Wallet"
-            isMobile
-            className="bottom-margin"
-          />
-          <CWWalletsList
-            connectAnotherWayOnclick={() => {
-              // this.sidebarType = 'ethWallet';
-              // this.bodyType = 'connectWithEmail';
-            }}
-            isMobile
-            wallets={this.wallets}
-          />
-          <LoginBoilerplate />
-        </div>
-      </div>
+      <LoginMobile
+        address={dummyAddress}
+        bodyType={this.bodyType}
+        handleSetAvatar={(a) => {
+          this.avatarUrl = a;
+        }}
+        handleSetUsername={(u) => {
+          this.username = u;
+        }}
+        profiles={this.profiles}
+        sidebarType={this.sidebarType}
+        username={this.username}
+        wallets={this.wallets}
+      />
     ) : (
-      <div class="NewLoginModal">
-        <LoginSidebar sidebarType={this.sidebarType} />
-        <div class="body">
-          <ModalExitButton />
-          {this.bodyType === 'walletList' && (
-            <div class="inner-body-container centered">
-              <LoginBoilerplate />
-              <CWWalletsList
-                connectAnotherWayOnclick={() => {
-                  // this.sidebarType = 'ethWallet';
-                  // this.bodyType = 'connectWithEmail';
-                }}
-                wallets={this.wallets}
-              />
-            </div>
-          )}
-          {this.bodyType === 'selectAccountType' && (
-            <div class="inner-body-container centered">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
-                  Looks like this address hasn't been connected before.
-                </CWText>
-              </div>
-              <div class="select-row">
-                <CWIcon iconName="arrowLeft" />
-                <CWText type="h5" fontWeight="semiBold" className="select-text">
-                  Select Account Type
-                </CWText>
-              </div>
-            </div>
-          )}
-          {this.bodyType === 'connectWithEmail' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
-                  Connect With Email?
-                </CWText>
-                <LoginBoilerplate />
-              </div>
-              <CWTextInput
-                label="email address"
-                placeholder="your-email@email.com"
-              />
-              <div class="buttons-row">
-                <CWButton label="Back" buttonType="secondary-blue" />
-                <CWButton label="Connect" />
-              </div>
-            </div>
-          )}
-          {this.bodyType === 'welcome' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
-                  Welcome to Common!
-                </CWText>
-                <CWText type="b2" className="subheader-text">
-                  Use a generated username and photo to edit later, or edit now
-                </CWText>
-              </div>
-              <CWAvatarUsernameInput
-                address={dummyAddress}
-                defaultValue={this.username}
-                onAvatarChangeHandler={(a) => {
-                  this.avatarUrl = a;
-                }}
-                onUsernameChangeHandler={(u) => {
-                  this.username = u;
-                }}
-              />
-              <CWButton label="Finish" />
-            </div>
-          )}
-          {this.bodyType === 'ethWalletList' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
-                  Select an Ethereum Wallet
-                </CWText>
-                <CWText type="caption" className="subheader-text">
-                  Manage your profiles, addresses and communities under one
-                  account.
-                </CWText>
-              </div>
-              <CWWalletsList
-                connectAnotherWayOnclick={() => {
-                  // this.sidebarType = 'ethWallet';
-                  // this.bodyType = 'connectWithEmail';
-                }}
-                hasNoWalletsLink={false}
-                wallets={this.wallets}
-              />
-            </div>
-          )}
-          {this.bodyType === 'selectPrevious' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
-                  Select a Previously Linked Address
-                </CWText>
-                <CWText type="caption" className="subheader-text">
-                  Manage your profiles, addresses and communities under one
-                  account.
-                </CWText>
-              </div>
-              <CWWalletsList
-                connectAnotherWayOnclick={() => {
-                  // this.sidebarType = 'ethWallet';
-                  // this.bodyType = 'connectWithEmail';
-                }}
-                hasNoWalletsLink={false}
-                wallets={this.wallets}
-              />
-            </div>
-          )}
-          {this.bodyType === 'selectProfile' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
-                  Select Profile
-                </CWText>
-                <CWText type="h5" fontWeight="medium">
-                  Linking
-                </CWText>
-                <CWAddress address={dummyAddress} />
-                <CWText type="h5" fontWeight="medium">
-                  to your Profile
-                </CWText>
-              </div>
-              <CWProfilesList profiles={this.profiles} />
-              <CWButton label="Finish" />
-            </div>
-          )}
-          {this.bodyType === 'allSet' && (
-            <div class="inner-body-container">
-              <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
-                  You’re All Set!
-                </CWText>
-                <CWText type="h5" fontWeight="medium">
-                  You have sucessfully linked
-                </CWText>
-                <CWAddress address={dummyAddress} />
-                <CWText type="h5" fontWeight="medium">
-                  to your Profile
-                </CWText>
-              </div>
-              <CWProfileRow {...this.profiles[0]} />
-              <CWButton label="Finish" />
-            </div>
-          )}
-        </div>
-      </div>
+      <LoginDesktop
+        address={dummyAddress}
+        bodyType={this.bodyType}
+        handleSetAvatar={(a) => {
+          this.avatarUrl = a;
+        }}
+        handleSetUsername={(u) => {
+          this.username = u;
+        }}
+        profiles={this.profiles}
+        sidebarType={this.sidebarType}
+        username={this.username}
+        wallets={this.wallets}
+      />
     );
   }
 }
