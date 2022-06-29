@@ -1,5 +1,4 @@
 @import 'shared';
-@import './index';
 
 .CreateComment {
   display: flex;
@@ -10,28 +9,20 @@
 
     .form-bottom {
       display: flex;
-      flex-direction: row-reverse;
-      justify-content: space-between;
+      flex-direction: column;
       width: 100%;
 
       .form-buttons {
         display: flex;
         gap: 8px;
-      }
-    }
-
-    > .User {
-      font-size: $discussion-meta-font-size;
-
-      &,
-      a.user-display-name {
-        color: $discussion-meta-color;
+        justify-content: flex-end;
+        width: 100%;
       }
     }
   }
 
   .QuillEditor {
-    margin: 14px 0 18px;
+    margin-bottom: 16px;
 
     .ql-toolbar,
     .ql-editor {
@@ -44,12 +35,8 @@
     }
   }
 
-  .cui-callout {
-    margin-top: 20px;
-  }
-
   .token-requirement {
     color: $neutral-500;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
   }
 }

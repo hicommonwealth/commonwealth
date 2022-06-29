@@ -51,20 +51,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     let { parentComment } = vnode.attrs;
 
-    // console.log(
-    //   'getSetGlobalEditingStatus',
-    //   getSetGlobalEditingStatus(GlobalStatus.Get)
-    // );
-
-    // console.log(
-    //   'editor is blank',
-    //   this.quillEditorState?.editor?.editor?.isBlank()
-    // );
-
-    let disabled =
-      getSetGlobalEditingStatus(GlobalStatus.Get) ||
-      this.quillEditorState?.editor?.editor?.isBlank();
-
     const author = app.user.activeAccount;
 
     const parentType =
@@ -78,7 +64,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       this.uploadsInProgress = 0;
     }
 
-    const submitComment = async (e?) => {
+    const handleSubmitComment = async (e?) => {
       if (!this.quillEditorState || !this.quillEditorState.editor) {
         if (e) e.preventDefault();
         this.error = 'Editor not initialized, please try again';
@@ -177,22 +163,19 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     const { error, sendingComment, uploadsInProgress } = this;
 
-    disabled =
-      getSetGlobalEditingStatus(GlobalStatus.Get) ||
-      this.quillEditorState?.editor?.editor?.isBlank() ||
-      sendingComment ||
-      uploadsInProgress ||
-      !app.user.activeAccount;
-
     // token balance check if needed
     const tokenPostingThreshold: BN =
       TopicGateCheck.getTopicThreshold(activeTopicName);
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
 
-    const topicGated = TopicGateCheck.isGatedTopic(activeTopicName);
-
-    disabled = disabled || (!isAdmin && topicGated);
+    const disabled =
+      getSetGlobalEditingStatus(GlobalStatus.Get) ||
+      this.quillEditorState?.editor?.editor?.isBlank() ||
+      sendingComment ||
+      uploadsInProgress ||
+      !app.user.activeAccount ||
+      (!isAdmin && TopicGateCheck.isGatedTopic(activeTopicName));
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals
@@ -312,7 +295,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                   )}
                   <CWButton
                     disabled={disabled}
-                    onclick={submitComment}
+                    onclick={handleSubmitComment}
                     label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
                   />
                 </div>
