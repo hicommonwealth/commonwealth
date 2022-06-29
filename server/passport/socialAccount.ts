@@ -140,6 +140,7 @@ export function useSocialAccountAuth(models: DB) {
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
+    state: true
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
   }));
@@ -151,6 +152,7 @@ export function useSocialAccountAuth(models: DB) {
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
     callbackURL: DISCORD_OAUTH_CALLBACK,
+    state: true
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))

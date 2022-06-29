@@ -4,6 +4,10 @@ import { DB } from '../database';
 
 import {DISCORD_OAUTH_CALLBACK, GITHUB_OAUTH_CALLBACK} from '../config';
 
+interface AuthOptions extends passport.AuthenticateOptions {
+  callbackURL: string
+}
+
 const startOAuthLogin = async (
   models: DB,
   provider: string,
@@ -11,6 +15,7 @@ const startOAuthLogin = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("Discord logging in");
   let successRedirect = '/';
   const failureRedirect = '#!/login';
   if (req.query.from) {
@@ -34,17 +39,15 @@ const startOAuthLogin = async (
       )}`,
       successRedirect,
       failureRedirect,
-      state: req.sessionID
-    } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
+    } as AuthOptions)(req, res, next);
   }
-
   else {
     // TODO: figure out how to pass a callbackURL without error
+    console.log(`Authenticating with discord.`)
     passport.authenticate('discord', {
       successRedirect,
       failureRedirect,
-      state: req.sessionID
-    } as any)(req, res, next)
+    })(req, res, next)
   }
 };
 
