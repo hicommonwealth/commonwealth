@@ -37,6 +37,27 @@ module.exports = {
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
 
+      const ethChainNodeId = await queryInterface.rawSelect('Chains', {
+        where: {
+          id: 'ethereum'
+        }
+      }, ['chain_node_id']);
+
+      // clone ethereum chain node to avoid revealing private url
+      // const ethNode = await queryInterface.sequelize.query(`
+      //   SELECT url, alt_wallet_url, private_url FROM "ChainNodes" WHERE id = ?
+      // `, { transaction: t, replacements: [ethId] });
+      //
+      // const { url, alt_wallet_url, private_url } = ethNode[0][0];
+      //
+      // const result = await queryInterface.bulkInsert('ChainNodes', [{
+      //   // chain: 'common-protocol',
+      //   url,
+      //   alt_wallet_url,
+      //   private_url,
+      //   eth_chain_id: 1,
+      // }], { transaction: t });
+
       // create dummy CWP chain
       await queryInterface.bulkInsert('Chains', [{
         id: 'common-protocol',
@@ -47,19 +68,7 @@ module.exports = {
         base: 'ethereum',
         active: true,
         description: '',
-      }], { transaction: t });
-
-      // clone ethereum chain node to avoid revealing private url
-      const ethNode = await queryInterface.sequelize.query(`
-        SELECT url, alt_wallet_url, private_url FROM "ChainNodes" WHERE chain = 'ethereum'
-      `, { transaction: t });
-      const { url, alt_wallet_url, private_url } = ethNode[0][0];
-      await queryInterface.bulkInsert('ChainNodes', [{
-        chain: 'common-protocol',
-        url,
-        alt_wallet_url,
-        private_url,
-        eth_chain_id: 1,
+        chain_node_id: ethChainNodeId
       }], { transaction: t });
     });
   },
