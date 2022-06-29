@@ -18,7 +18,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginAttrs } from '../../modals/login_modal';
 import { LoginBoilerplate } from './login_boilerplate';
-import { LoginSidebar } from './login_sidebar';
+import { LoginDesktopSidebar } from './login_desktop_sidebar';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
   view(vnode) {
@@ -35,7 +35,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
 
     return (
       <div class="LoginDesktop">
-        <LoginSidebar sidebarType={sidebarType} />
+        <LoginDesktopSidebar sidebarType={sidebarType} />
         <div class="body">
           <ModalExitButton />
           {bodyType === 'walletList' && (

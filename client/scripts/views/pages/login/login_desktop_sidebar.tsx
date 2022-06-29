@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/login/login_sidebar.scss';
+import 'pages/login/login_desktop_sidebar.scss';
 
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
@@ -10,13 +10,13 @@ import { LoginSidebarType } from '../../modals/login_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
 
-export class LoginSidebar
+export class LoginDesktopSidebar
   implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
 {
   view(vnode) {
     const { sidebarType } = vnode.attrs;
     return (
-      <div class="LoginSidebar">
+      <div class="LoginDesktopSidebar">
         {sidebarType === 'connectWallet' && (
           <div class="connect-wallet">
             <div class="sidebar-content">

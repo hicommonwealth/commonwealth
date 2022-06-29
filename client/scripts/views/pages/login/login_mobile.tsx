@@ -25,7 +25,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
 
     return (
       <div class="LoginMobile">
-        <ModalExitButton iconButtonTheme="mobile" />
+        <ModalExitButton iconButtonTheme="hasBackground" />
         <div class="medium-small-container">
           <LoginText
             bodyText={`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
