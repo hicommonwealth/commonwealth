@@ -4,7 +4,7 @@ import { WalletInterface } from './walletInterface';
 import { getWindow, getWindowTitles, waitForWindow } from '../util';
 
 export class TerraStation implements WalletInterface {
-  private extensionUrl = 'chrome-extension://aiifbnbfobpmeekipheeijimdpnlpgpp/index.html#/auth';
+  private extensionUrl = 'chrome-extension://aiifbnbfobpmeekipheeijimdpnlpgpp/index.html#/auth/import';
 
   // setup/import wallet objects --- OLD
   private importPrivKeyBtn = By.xpath("//h1[text()='Import private key']");

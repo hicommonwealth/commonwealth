@@ -3,6 +3,16 @@
 // `yarn remove chromedriver` then `DETECT_CHROMEDRIVER_VERSION=true yarn add chromedriver --dev`
 // NOTE: TESTS ASSUME THE ADDRESS HAS ALREADY BEEN USED TO LOGIN BEFORE I.E. NO ASKING FOR NAME, HEADLINE, OR BIO (todo?)
 
+/* 
+https://dev.to/ltmenezes/automated-dapps-scrapping-with-selenium-and-metamask-2ae9
+
+Install Metamask on your regular chrome
+Navigate to chrome://extensions/
+Click 'Pack extension' and enter the local path to the Metamask extension 
+This will generate a .crx file that you can use to load as an extension on Chromium. 
+Save the name of the folder where the extension is installed, this will be the 'Extension ID' that we will use later.
+*/
+
 import { HomePage } from '../util/seleniumObjects/Pages/home';
 import { CommunityHome } from '../util/seleniumObjects/Pages/communityHome';
 import chai from 'chai';
@@ -13,6 +23,8 @@ import { ProposalPage } from '../util/seleniumObjects/Pages/proposal';
 
 const { assert } = chai;
 require('dotenv').config();
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 describe('Commonwealth.im Chrome Selenium Tests', function() {
   let driver;
@@ -27,7 +39,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
     })
 
 
-    it('Should login with metamask', async () => {
+    xit('Should login with metamask', async () => {
       const home = new HomePage();
       // creates driver with MetaMask
       await home.initWithMetaMask();
@@ -51,21 +63,20 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
         'MetaMask login flow failed to load Ethereum community page')
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
-      assert(accountName === 'Tim', 'Account loaded from MetaMask is incorrect');
+      assert(accountName === 'Anonymous', 'Account loaded from MetaMask is incorrect');
     }).timeout(60000)
 
     xit('Should login with TerraStation', async () => {
-      const home = new HomePage();
+      const terraHome = new CommunityHome();
 
       // TODO: Switch to use extension page wallet import instead of "on login popup" to ensure consistency across tests
       // terra station does not open window upon installation so only import wallet AFTER clicking Login on commonwealth.im
-      await home.initWithTerraStation();
-      driver = await home.loadPage();
-      assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
-
-      driver = await home.startLogin()
+      await terraHome.initWithTerraStation();
+      driver = await terraHome.loadPage('terra');
+      await delay(5000); // will load default wallet options, wait to load /terra, which has Terra Station
+      driver = await terraHome.startCommunityLogin()
       const loginModal = new LoginModal(driver);
-      await loginModal.connectWallet(WalletName.TERRASTATION, home.terraStation);
+      await loginModal.connectWallet(WalletName.TERRASTATION, terraHome.terraStation);
       await getWindow(driver, 'Commonwealth');
 
       // wait for new url/redirect to load
@@ -76,13 +87,13 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       }, 10000)
 
       assert((await driver.getCurrentUrl()).includes('commonwealth.im/terra/'),
-        'TerraStation login flow failed to load Osmosis community page')
+        'TerraStation login flow failed to load Terra community page')
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
-      assert(accountName === 'Tim', 'Account loaded from TerraStation is incorrect');
+      assert(accountName === 'Anonymous', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    xit('Should login with Polkadot', async () => {
+    it('Should login with Polkadot', async () => {
       const home = new HomePage();
 
       await home.initWithPolkadotJs();
@@ -98,7 +109,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
         'PolkadotJs login flow failed to load Edgeware community page')
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
-      assert(accountName === 'Tim', 'Account loaded from PolkadotJs is incorrect');
+      assert(accountName === 'Anonymous', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
     xit('Should login with Keplr', async () => {
@@ -119,9 +130,10 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
         'Keplr login flow failed to load Osmosis community page')
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
-      assert(accountName === 'Tim', 'Account loaded from Keplr is incorrect');
+      assert(accountName === 'Anonymous', 'Account loaded from Keplr is incorrect');
     }).timeout(600000)
   })
+  
   xdescribe('Chain Connection Tests', function() {
     afterEach('close driver', async function () {
       await driver.quit()

@@ -7,13 +7,12 @@ import { WalletInterface } from '../wallets/walletInterface';
 
 export enum WalletName {
   COSMOS = 'Cosmos Wallet (Keplr)',
-  TERRASTATION = 'Terra Wallet (TerraStation)',
+  TERRASTATION = 'Terra Station',
   INJECTIVE = 'Injective MetaMask Wallet',
-  METAMASK = 'Ethereum Wallet (Metamask)',
+  METAMASK = 'Metamask',
   WALLETCONNECT = 'Ethereum Wallet (WalletConnect)',
   NEAR = 'NEAR Wallet',
   POLKADOT = 'polkadot-js',
-  SUBSTRATE = 'Substrate (command line)'
 }
 
 /**

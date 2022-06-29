@@ -68,9 +68,9 @@ export class BasePage {
   public async initWithTerraStation(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/TerraStation.crx'), { encoding: 'base64' })])
-    chromeOptions.addArguments("--no-sandbox");
-    chromeOptions.addArguments("--disable-dev-shm-usage");
-    chromeOptions.addArguments("--headless");
+    // chromeOptions.addArguments("--no-sandbox");
+    // chromeOptions.addArguments("--disable-dev-shm-usage");
+    // chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
