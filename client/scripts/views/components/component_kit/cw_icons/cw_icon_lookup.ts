@@ -1,8 +1,10 @@
 import * as Icons from './cw_icons';
+import * as CustomIcons from './cw_custom_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,
   arrowRight: Icons.CWArrowRight,
+  backer: Icons.CWBacker,
   badge: Icons.CWBadge,
   bell: Icons.CWBell,
   cautionCircle: Icons.CWCautionCircle,
@@ -12,12 +14,14 @@ export const iconLookup = {
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
   chevronUp: Icons.CWChevronUp,
+  clock: Icons.CWClock,
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
   collapse: Icons.CWCollapse,
   copy: Icons.CWCopy,
   councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
+  curator: Icons.CWCurator,
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
@@ -41,6 +45,7 @@ export const iconLookup = {
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
   jar: Icons.CWJar,
+  link: Icons.CWLink,
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
@@ -65,4 +70,18 @@ export const iconLookup = {
   website: Icons.CWWebsite,
 };
 
+export const customIconLookup = {
+  'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
+  keplr: CustomIcons.CWKeplr,
+  magic: CustomIcons.CWMagic,
+  metamask: CustomIcons.CWMetaMask,
+  near: CustomIcons.CWNearWallet,
+  phantom: CustomIcons.CWPhantom,
+  polkadot: CustomIcons.CWPolkadot,
+  ronin: CustomIcons.CWRonin,
+  terrastation: CustomIcons.CWTerraStation,
+  walletconnect: CustomIcons.CWWalletConnect,
+};
+
 export type IconName = keyof typeof iconLookup;
+export type CustomIconName = keyof typeof customIconLookup;

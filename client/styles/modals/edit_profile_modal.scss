@@ -1,49 +1,19 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .EditProfileModal {
-  width: 620px;
-  @include small {
-    width: initial;
+  width: 480px;
+
+  @include smallInclusive {
+    width: 100%;
   }
-  .form {
-    .avatar {
-      .AvatarUpload {
-        width: 92px;
-        height: 92px;
-      }
-    }
+
+  .AvatarUpload {
+    margin-bottom: 16px;
+  }
+
+  .buttons-row {
     display: flex;
-    flex-direction: column;
-    padding: 26px;
-    .text-input-wrapper {
-      margin: 6px 0 4px 0;
-      label.cui-form-label {
-        display: block;
-        margin-top: 8px;
-        color: $neutral-800;
-      }
-      input,
-      textarea {
-        margin: 8px 0;
-      }
-      textarea {
-        height: 96px !important;
-        padding-top: 15px;
-      }
-    }
-  }
-  .form-bottom {
-    .buttons {
-      margin-top: 12px;
-      display: flex;
-      justify-content: left;
-    }
-    .cui-button {
-      margin-right: 12px;
-    }
-  }
-  .error-message {
-    margin-top: 12px;
-    color: $rorange-500;
+    flex-direction: row;
+    gap: 8px;
   }
 }

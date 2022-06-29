@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ChatPage {
   display: flex;
@@ -62,7 +62,7 @@
         }
       }
 
-      &#highlighted{
+      &#highlighted {
         animation: pulse 2s 0.3s;
       }
     }
@@ -95,7 +95,8 @@
     }
   }
 
-  .chat-composer, .chat-composer-unavailable {
+  .chat-composer,
+  .chat-composer-unavailable {
     align-items: center;
     background-color: $neutral-50;
     border-top: 1px solid $neutral-200;
@@ -106,16 +107,28 @@
     padding: 0 56px;
     width: 100%;
 
-    textarea.ResizableTextarea {
+    .QuillEditor {
       width: 100%;
-      border: 1px solid $neutral-200;
-      border-radius: 5px;
-      resize: none;
-      padding: 8px 32px;
-      max-height: 3em;
+
+      .ql-toolbar,
+      .type-selector,
+      .preview-button-wrap {
+        display: none;
+      }
+
+      .ql-toolbar.ql-snow + .ql-container.ql-snow {
+        border: 1px solid $neutral-100 !important;
+        border-radius: 5px;
+      }
+
+      .ql-container > .ql-editor {
+        padding: 12px 15px;
+        overflow-y: scroll;
+        max-height: 2.5em;
+      }
     }
 
-    svg {
+    .Icon {
       cursor: pointer;
       left: 32px;
       position: relative;
@@ -128,8 +141,9 @@
 }
 
 @keyframes pulse {
-	0%, 100% {
-    background-color: #fff;
+  0%,
+  100% {
+    background-color: $white;
   }
   50% {
     background-color: $purple-50;

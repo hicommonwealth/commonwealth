@@ -5,6 +5,7 @@ import m from 'mithril';
 import { Button, Tabs, TabItem, RadioGroup } from 'construct-ui';
 import moment from 'moment';
 import app from 'state';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
 import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
@@ -22,9 +23,9 @@ import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
@@ -358,7 +359,10 @@ const ViewProposalPage: m.Component<
     }
 
     window.onresize = () => {
-      if (window.innerWidth > 1024 && vnode.state.activeTab !== 'Proposals') {
+      if (
+        isWindowMediumSmallInclusive(window.innerWidth) &&
+        vnode.state.activeTab !== 'Proposals'
+      ) {
         vnode.state.activeTab = 'Proposals';
         m.redraw();
       }

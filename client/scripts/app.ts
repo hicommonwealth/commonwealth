@@ -57,25 +57,24 @@ export async function initAppState(
       .then(async (data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
-        app.user.notifications.store.clear();
+        app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
         data.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
-            return app.config.nodes.add(
-              NodeInfo.fromJSON(node)
-            );
+            return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
         data.chains
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
-            return app.config.chains.add(ChainInfo.fromJSON({
-              ChainNode: app.config.nodes.getById(chain.chain_node_id),
-              ...chain
-            }));
+            return app.config.chains.add(
+              ChainInfo.fromJSON({
+                ChainNode: app.config.nodes.getById(chain.chain_node_id),
+                ...chain,
+              })
+            );
           });
-        console.log(app.config);
         app.user.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
@@ -114,7 +113,9 @@ export async function initAppState(
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
-          app.user.setSelectedChain(ChainInfo.fromJSON(data.user.selectedChain));
+          app.user.setSelectedChain(
+            ChainInfo.fromJSON(data.user.selectedChain)
+          );
         }
 
         if (customDomain) {
@@ -1180,7 +1181,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       .then(async () => {
         if (app.loginState === LoginState.LoggedIn) {
           // refresh notifications once
-          app.user.notifications.refresh().then(() => m.redraw());
           // grab all discussion drafts
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }

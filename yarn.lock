@@ -3347,13 +3347,13 @@
     long "^4.0.0"
     protobufjs "~6.11.2"
 
-"@terra-money/terra.js@3.1.2":
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/@terra-money/terra.js/-/terra.js-3.1.2.tgz#adf77a981bd0b09a22a347387706d8ac23a74f53"
-  integrity sha512-jEvgujX/gbXzq6aTlYORw4chuk8b46weIArThDmpvQN8c3P3GrcMZYsI7uPUFtoWhcKO8+qI++dWzIIFoNhmMQ==
+"@terra-money/terra.js@^3.1.3":
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/@terra-money/terra.js/-/terra.js-3.1.3.tgz#11f78e4f72f0c9b28ad6063f527ad2de72a594f4"
+  integrity sha512-80HU5WXrqf3hZTo2GRhIycH17A+SkLD6afbu8MynMDGGD/A861F3zVv6NQ/Z7PWQGHxgddZEK/A0UQ2uK/xfHg==
   dependencies:
     "@terra-money/legacy.proto" "npm:@terra-money/terra.proto@^0.1.7"
-    "@terra-money/terra.proto" "^0.2.0-beta.4"
+    "@terra-money/terra.proto" "~2.0.0"
     axios "^0.26.1"
     bech32 "^2.0.0"
     bip32 "^2.0.6"
@@ -3367,10 +3367,10 @@
     utf-8-validate "^5.0.5"
     ws "^7.5.5"
 
-"@terra-money/terra.proto@^0.2.0-beta.4":
-  version "0.2.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@terra-money/terra.proto/-/terra.proto-0.2.0-beta.4.tgz#21f79edcd3d53130cd3661d01bb67dfbd8f5696b"
-  integrity sha512-ALwIOpiZgpELvUO27+Lgc4qQz6k5NB58YsUHX2Bf7gocspShRftps5kjj/bovZs/M6AO4J7Qj07QJRBekMinMA==
+"@terra-money/terra.proto@~2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@terra-money/terra.proto/-/terra.proto-2.0.0.tgz#5f861d782208b64bba71ddb88f617168bfddd61f"
+  integrity sha512-ZjyFOFUzrGn8IwzGIgr1OJFcPSsQoz/XAfoSKThJx+OjJA7CLhdcz51+5h7ehNfb+qB9wr7aNME0h24wu9D4SQ==
   dependencies:
     "@improbable-eng/grpc-web" "^0.14.1"
     google-protobuf "^3.17.3"
@@ -3703,6 +3703,13 @@
   dependencies:
     "@types/node" "*"
     form-data "^3.0.0"
+
+"@types/node-sass@^4.11.2":
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/@types/node-sass/-/node-sass-4.11.2.tgz#ecdaa44a1ba8847bf7dea2aadbfe33a91a263514"
+  integrity sha512-pOFlTw/OtZda4e+yMjq6/QYuvY0RDMQ+mxXdWj7rfSyf18V8hS4SfgurO+MasAkQsv6Wt6edOGlwh5QqJml9gw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/node@*":
   version "13.9.0"
@@ -11829,9 +11836,9 @@ jsbn@~0.1.0:
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
 jscrypto@^1.0.1:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/jscrypto/-/jscrypto-1.0.3.tgz#598febca2a939d6f679c54f56e1fe364cef30cc9"
-  integrity sha512-lryZl0flhodv4SZHOqyb1bx5sKcJxj0VBo0Kzb4QMAg3L021IC9uGpl0RCZa+9KJwlRGSK2C80ITcwbe19OKLQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jscrypto/-/jscrypto-1.0.1.tgz#786f0f803b1717a4b7c6247ccfaa8a8230fe062b"
+  integrity sha512-xb+lVDVDGe3cL7i7IZqdvQV0ucMyxxD3Jt+xfrc0GedTOdLto65rBHpIlKOJ8W/X3Qg/z5nEcUva5ziDVParSQ==
 
 jsdom-global@^3.0.2:
   version "3.0.2"
@@ -14442,10 +14449,10 @@ passport-discord@^0.1.4:
   dependencies:
     passport-oauth2 "^1.5.0"
 
-passport-github@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/passport-github/-/passport-github-1.1.0.tgz"
-  integrity sha1-jOHj/NYa11eOsd9ZWDnkrqEjVdQ=
+passport-github2@^0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/passport-github2/-/passport-github2-0.1.12.tgz#a72ebff4fa52a35bc2c71122dcf470d1116f772c"
+  integrity sha512-3nPUCc7ttF/3HSP/k9sAXjz3SkGv5Nki84I05kSQPo01Jqq1NzJACgMblCK0fGcv9pKCG/KXU3AJRDGLqHLoIw==
   dependencies:
     passport-oauth2 "1.x.x"
 
@@ -20015,7 +20022,7 @@ widest-line@^2.0.0:
 wif@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/wif/-/wif-2.0.6.tgz#08d3f52056c66679299726fade0d432ae74b4704"
-  integrity sha1-CNP1IFbGZnkplyb63g1DKudLRwQ=
+  integrity sha512-HIanZn1zmduSF+BQhkE+YXIbEiH0xPr1012QbFEGB0xsKqJii0/SqJjyn8dFv6y36kOznMgMB+LGcbZTJ1xACQ==
   dependencies:
     bs58check "<3.0.0"
 

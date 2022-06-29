@@ -20,6 +20,8 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,6 +36,7 @@ export const Errors = {
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 const dispatchHooks = async (
@@ -136,7 +139,7 @@ const dispatchHooks = async (
   excludedAddrs.push(finalThread.Address.address);
 
   // dispatch notifications to subscribers of the given chain
-  await models.Subscription.emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewThread,
     location,
@@ -200,6 +203,7 @@ const dispatchHooks = async (
 const createThread = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -338,6 +342,19 @@ const createThread = async (
         if (!canReact) {
           return next(new Error(Errors.BalanceCheckFailed));
         }
+      }
+    }
+
+    const topic = await models.OffchainTopic.findOne({
+      where: {
+        id: topic_id
+      },
+      attributes: ['rule_id'],
+    });
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address, transaction);
+      if (!passesRules) {
+        return next(new Error(Errors.RuleCheckFailed));
       }
     }
 

@@ -15,17 +15,17 @@ export function createCeNamespace(io: Server) {
   CeNs.use(authenticate);
 
   CeNs.on('connection', (socket) => {
-    log.info(`${socket.id} connected to Chain-Events`);
+    log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} connected to Chain-Events`);
 
     socket.on('disconnect', () => {
-      log.info(`${socket.id} disconnected from Chain-Events`);
+      log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} disconnected from Chain-Events`);
     });
 
     socket.on(
       WebsocketMessageNames.NewSubscriptions,
       (chainEventTypes: string[]) => {
           if (chainEventTypes.length > 0) {
-              log.info(`${socket.id} joining ${JSON.stringify(chainEventTypes)}`);
+              log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} joining ${JSON.stringify(chainEventTypes)}`);
               socket.join(chainEventTypes);
           }
       }
@@ -35,7 +35,7 @@ export function createCeNamespace(io: Server) {
       WebsocketMessageNames.DeleteSubscriptions,
       (chainEventTypes: string[]) => {
         if (chainEventTypes.length > 0) {
-            log.info(`${socket.id} leaving ${JSON.stringify(chainEventTypes)}`);
+            log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} leaving ${JSON.stringify(chainEventTypes)}`);
             for (const eventType of chainEventTypes) socket.leave(eventType);
         }
       }

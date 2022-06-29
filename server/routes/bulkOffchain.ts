@@ -13,7 +13,8 @@ import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ChatChannelInstance } from '../models/chat_channel';
-import { CommunityBannerInstance } from 'server/models/community_banner';
+import { RuleInstance } from '../models/rule';
+import { CommunityBannerInstance } from '../models/community_banner';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -33,7 +34,7 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, communityBanner] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules, communityBanner] =
     await (<
       Promise<
         [
@@ -43,6 +44,7 @@ const bulkOffchain = async (
           unknown,
           OffchainThreadInstance[],
           ChatChannelInstance[],
+          RuleInstance[],
           CommunityBannerInstance,
         ]
       >
@@ -169,6 +171,11 @@ const bulkOffchain = async (
           required: false // should return channels with no chat messages
         }
       }),
+      models.Rule.findAll({
+        where: {
+          chain_id: chain.id,
+        }
+      }),
       models.CommunityBanner.findOne({
         where: {
           chain_id: chain.id,
@@ -189,6 +196,7 @@ const bulkOffchain = async (
       admins: admins.map((a) => a.toJSON()),
       activeUsers: mostActiveUsers,
       chatChannels: JSON.stringify(chatChannels),
+      rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
     },
   });

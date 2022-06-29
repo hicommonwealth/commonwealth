@@ -18,7 +18,7 @@ import {
 } from 'controllers/app/login';
 
 import User, { UserBlock } from 'views/components/widgets/user';
-import EditProfileModal from 'views/modals/edit_profile_modal';
+import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
@@ -259,10 +259,10 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       const addressChainInfo = app.config.chains.getById(a.chain);
       if (addressChainInfo?.base !== activeBase) return false;
 
-      // ensure doesn't already exist
+      // // ensure doesn't already exist
       const addressExists = !!app.user.addresses.find((prev) =>
         activeBase === ChainBase.Substrate &&
-        app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
+        (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
           ? AddressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -272,7 +272,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               currentPrefix: 42,
             })
           : prev.address === a.address
-      );
+      ));
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain

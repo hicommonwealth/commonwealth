@@ -25,6 +25,8 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
+import checkRule from '../util/rules/checkRule';
+import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 
 const sgMail = require('@sendgrid/mail');
@@ -32,7 +34,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
-  MissingRootId: 'Must provide root_id',
+  MissingRootId: 'Must provide valid root_id',
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
@@ -42,11 +44,13 @@ export const Errors = {
     "Users need to hold some of the community's tokens to comment",
   BalanceCheckFailed: 'Could not verify user token balance',
   NestingTooDeep: 'Comments can only be nested 2 levels deep',
+  RuleCheckFailed: 'Rule check failed',
 };
 
 const createComment = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
+  ruleCache: RuleCache,
   banCache: BanCache,
   req: Request,
   res: Response,
@@ -59,6 +63,16 @@ const createComment = async (
 
   const { parent_id, root_id, text } = req.body;
 
+  if (!root_id || root_id.indexOf('_') === -1) {
+    return next(new Error(Errors.MissingRootId));
+  }
+  if (
+    (!text || !text.trim()) &&
+    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+  ) {
+    return next(new Error(Errors.MissingTextOrAttachment));
+  }
+
   // check if banned
   const [canInteract, banError] = await banCache.checkBan({
     chain: chain.id,
@@ -67,43 +81,6 @@ const createComment = async (
   if (!canInteract) {
     return next(new Error(banError));
   }
-
-  if (chain && chain.type === ChainType.Token) {
-    // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
-    if (!req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-        const thread = await models.OffchainThread.findOne({
-          where: { id: thread_id },
-        });
-        const canReact = await tokenBalanceCache.validateTopicThreshold(
-          thread.topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
-        }
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.BalanceCheckFailed));
-      }
-    }
-  }
-
-  const plaintext = (() => {
-    try {
-      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(text)));
-    } catch (e) {
-      return decodeURIComponent(text);
-    }
-  })();
 
   let parentComment;
   if (parent_id) {
@@ -131,15 +108,62 @@ const createComment = async (
     }
   }
 
-  if (!root_id) {
-    return next(new Error(Errors.MissingRootId));
+  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
+  const thread = await models.OffchainThread.findOne({
+    where: { id: thread_id },
+  });
+
+  if (thread?.id) {
+    const topic = await models.OffchainTopic.findOne({
+      include: {
+        model: models.OffchainThread,
+        where: { id: thread.id },
+        required: true,
+        as: 'threads',
+      },
+      attributes: ['rule_id'],
+    });
+    if (topic?.rule_id) {
+      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      if (!passesRules) {
+        return next(new Error(Errors.RuleCheckFailed));
+      }
+    }
   }
-  if (
-    (!text || !text.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    return next(new Error(Errors.MissingTextOrAttachment));
+
+  if (chain && chain.type === ChainType.Token) {
+    // skip check for admins
+    const isAdmin = await models.Role.findAll({
+      where: {
+        address_id: author.id,
+        chain_id: chain.id,
+        permission: ['admin'],
+      },
+    });
+    if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
+      try {
+        const canReact = await tokenBalanceCache.validateTopicThreshold(
+          thread.topic_id,
+          req.body.address
+        );
+        if (!canReact) {
+          return next(new Error(Errors.BalanceCheckFailed));
+        }
+      } catch (e) {
+        log.error(`hasToken failed: ${e.message}`);
+        return next(new Error(Errors.BalanceCheckFailed));
+      }
+    }
   }
+
+  const plaintext = (() => {
+    try {
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(text)));
+    } catch (e) {
+      return decodeURIComponent(text);
+    }
+  })();
+
   try {
     const quillDoc = JSON.parse(decodeURIComponent(text));
     if (
@@ -333,7 +357,7 @@ const createComment = async (
   excludedAddrs.push(finalComment.Address.address);
 
   // dispatch notifications to root thread
-  await models.Subscription.emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewComment,
     root_id,
@@ -362,7 +386,7 @@ const createComment = async (
 
   // if child comment, dispatch notification to parent author
   if (parent_id && parentComment) {
-    await models.Subscription.emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewComment,
       `comment-${parent_id}`,
@@ -394,13 +418,12 @@ const createComment = async (
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-    await Promise.all(
-      mentionedAddresses.map(async (mentionedAddress) => {
+      mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser)
-          await models.Subscription.emitNotifications(
+          models.Subscription.emitNotifications(
             models,
             NotificationCategories.NewMention,
             `user-${mentionedAddress.User.id}`,
@@ -426,8 +449,7 @@ const createComment = async (
             req.wss,
             [finalComment.Address.address]
           );
-      })
-    );
+      });
   }
 
   // update author.last_active (no await)
