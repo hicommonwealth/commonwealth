@@ -121,13 +121,9 @@ $width: 360px;
   .button-gallery {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: $margin-bottom;
-
-    .Button,
-    .ExternalLink,
-    .EngagementButton {
-      margin-right: 8px;
-    }
   }
 
   .choice-gallery {

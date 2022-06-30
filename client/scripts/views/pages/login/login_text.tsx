@@ -22,17 +22,23 @@ export class LoginText implements m.ClassComponent<LoginTextAttrs> {
       <div
         class={getClasses<{ className?: string }>({ className }, 'LoginText')}
       >
-        <CWText
-          type={isMobile ? 'h2' : 'h4'}
-          fontWeight="semiBold"
-          className="header-text"
-        >
-          {headerText}
-        </CWText>
+        <div class="header-container">
+          <CWText
+            type={isMobile ? 'h2' : 'h4'}
+            fontWeight="semiBold"
+            isCentered={isMobile}
+            className="header-text"
+          >
+            {headerText}
+          </CWText>
+        </div>
         <CWText
           type={isMobile ? 'h5' : 'b2'}
           isCentered={isMobile}
-          className="body-text"
+          className={getClasses<{ isMobile?: boolean }>(
+            { isMobile },
+            'body-text'
+          )}
         >
           {bodyText}
         </CWText>

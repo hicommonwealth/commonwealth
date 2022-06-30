@@ -87,7 +87,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             />
           )}
           {bodyType === 'welcome' && (
-            <>
+            <div class="inner-body-container">
               <CWAvatarUsernameInput
                 address={address}
                 defaultValue={username}
@@ -99,10 +99,10 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                 }}
               />
               <CWButton label="Finish" />
-            </>
+            </div>
           )}
           {bodyType === 'selectProfile' && (
-            <>
+            <div class="inner-body-container">
               <CWText type="h5" fontWeight="medium">
                 You have sucessfully linked
               </CWText>
@@ -112,22 +112,26 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
               </CWText>
               <CWProfilesList profiles={profiles} />
               <CWButton label="Finish" />
-            </>
+            </div>
           )}
           {bodyType === 'connectWithEmail' && (
-            <>
+            <div class="inner-body-container">
               <CWTextInput
                 label="email address"
                 placeholder="your-email@email.com"
               />
               <div class="buttons-row">
-                <CWButton label="Back" buttonType="secondary-blue" />
-                <CWButton label="Connect" />
+                <CWButton label="Back" buttonType="secondary-blue-dark" />
+                <CWButton
+                  label="Connect"
+                  disabled // not sure of conditional
+                  buttonType="primary-blue-dark"
+                />
               </div>
-            </>
+            </div>
           )}
           {bodyType === 'allSet' && (
-            <>
+            <div class="inner-body-container">
               <CWText type="h5" fontWeight="medium">
                 Linking
               </CWText>
@@ -137,7 +141,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
               </CWText>
               <CWProfileRow {...profiles[0]} />
               <CWButton label="Finish" />
-            </>
+            </div>
           )}
         </div>
         {hasBoilerplate && <LoginBoilerplate />}
