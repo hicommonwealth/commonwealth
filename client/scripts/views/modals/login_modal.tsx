@@ -8,6 +8,7 @@ import { isWindowMediumSmallInclusive } from '../components/component_kit/helper
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
+import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
 
 export class LoginModal implements m.ClassComponent {
   view() {
@@ -31,33 +32,6 @@ const profiles = [
 
 const dummyAddress = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq';
 
-export type LoginSidebarType =
-  | 'connectWallet'
-  | 'ethWallet'
-  | 'newAddressLinked'
-  | 'newOrReturning';
-
-export type LoginBodyType =
-  | 'allSet'
-  | 'connectWithEmail'
-  | 'ethWalletList'
-  | 'selectAccountType'
-  | 'selectPrevious'
-  | 'selectProfile'
-  | 'walletList'
-  | 'welcome';
-
-export type LoginAttrs = {
-  address: string;
-  bodyType: string;
-  handleSetAvatar: () => void;
-  handleSetUsername: () => void;
-  profiles: Array<ProfileRowAttrs>;
-  sidebarType: string;
-  username: string;
-  wallets: Array<string>;
-};
-
 export class NewLoginModal implements m.ClassComponent {
   private avatarUrl: string;
   private bodyType: LoginBodyType;
@@ -68,7 +42,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.avatarUrl = undefined;
-    this.bodyType = 'connectWithEmail';
+    this.bodyType = 'welcome';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.username = 'elephant-blue.eth';
@@ -102,7 +76,6 @@ export class NewLoginModal implements m.ClassComponent {
           this.username = u;
         }}
         profiles={this.profiles}
-        sidebarType={this.sidebarType}
         username={this.username}
         wallets={this.wallets}
       />

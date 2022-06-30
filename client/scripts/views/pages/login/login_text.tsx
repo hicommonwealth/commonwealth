@@ -16,7 +16,7 @@ type LoginTextAttrs = {
 
 export class LoginText implements m.ClassComponent<LoginTextAttrs> {
   view(vnode) {
-    const { bodyText, className, headerText, isMobile } = vnode.attrs;
+    const { bodyText, className, headerText, isMobile = false } = vnode.attrs;
 
     return (
       <div

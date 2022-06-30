@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: center;
   width: 100%;
 
   .IconButton {
@@ -16,7 +15,20 @@
     top: 8px;
   }
 
-  .medium-small-container {
+  .walletList {
+    margin-top: 224px;
     width: 368px;
+  }
+
+  .selectAccountType {
+    margin-top: 144px;
+    width: 328px;
+
+    .account-creation-buttons-row {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: center;
+    }
   }
 }

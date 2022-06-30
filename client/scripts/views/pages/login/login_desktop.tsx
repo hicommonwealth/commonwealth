@@ -16,9 +16,9 @@ import {
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
-import { LoginAttrs } from '../../modals/login_modal';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
+import { LoginAttrs } from './types';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
   view(vnode) {
