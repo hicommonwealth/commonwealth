@@ -26,12 +26,12 @@ echo "Connection Successful!"
 lsb_release -a
 
 # clears any existing rabbitmq and redis docker images
-#docker rmi "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')"
-#docker rmi "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')"
+docker rmi "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')"
+docker rmi "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')"
 
 # pull new docker images
-#docker pull rabbitmq:3.10.5-management
-#docker pull redis:6.2
+docker pull rabbitmq:3.10.5-management
+docker pull redis:6.2
 
 EOF
 
