@@ -109,7 +109,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Anonymous', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
-    it('Should login with Keplr', async () => {
+    xit('Should login with Keplr', async () => {
       const home = new HomePage();
 
       await home.initWithKeplr();
@@ -144,8 +144,8 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
 
       await waitForWindow(driver, ['Commonwealth']);
 
-      assert((await driver.getCurrentUrl()).includes('commonwealth.im/solana/'),
-        'Phantom login flow failed to load Osmosis community page')
+      assert((await driver.getCurrentUrl()).includes('commonwealth.im/solana'),
+        'Phantom login flow failed to load Solana community page')
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
       assert(accountName === 'Anonymous', 'Account loaded from Phantom is incorrect');

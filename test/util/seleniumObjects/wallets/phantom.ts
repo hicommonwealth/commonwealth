@@ -14,8 +14,8 @@ export class Phantom implements WalletInterface {
   private nextBtn = By.xpath("//button[text()='Continue']");
 
   // inject wallet objects
+  private connectBtn = By.xpath("//button[text()='Connect']");
   private approveBtn = By.xpath("//button[text()='Approve']");
-  private doneBtn = By.xpath("//button[text()='Finish']");
 
   // sign txn objects
 
@@ -24,17 +24,15 @@ export class Phantom implements WalletInterface {
     await waitForWindow(driver, ['Phantom']);
     await getWindow(driver, 'Phantom');
 
-    await driver.findElement(this.doneBtn).click();
+    await driver.findElement(this.connectBtn).click();
 
     return Promise.resolve(undefined);
   }
 
   async setup(driver: WebDriver): Promise<string> {
-    await driver.switchTo().newWindow('Phantom');
-    await driver.get(this.registrationUrl);
+    await waitForWindow(driver, ['Phantom']);
 
     await driver.findElement(this.createAccBtn).click();
-
     await driver.findElement(this.passwordInput).sendKeys(process.env.PHANTOM_PASSWORD);
     await driver.findElement(this.confPassInput).sendKeys(process.env.PHANTOM_PASSWORD);
     await driver.findElement(this.checkboxInput).click();
@@ -50,7 +48,7 @@ export class Phantom implements WalletInterface {
     await waitForWindow(driver, ['Phantom']);
     await getWindow(driver, 'Phantom')
 
-    await driver.findElement(this.nextBtn).click();
+    await driver.findElement(this.approveBtn).click();
     return Promise.resolve(undefined);
   }
 
