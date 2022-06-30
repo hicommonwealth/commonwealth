@@ -24,7 +24,7 @@ const updateBanner = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) throw new AppError(UpdateBannerErrors.NoChain);
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(UpdateBannerErrors.NoPermission);
 
   const { banner_text } = req.body || {banner_text: ''};
