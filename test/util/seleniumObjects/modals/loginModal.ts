@@ -6,13 +6,14 @@ import { HomePage } from '../Pages/home';
 import { WalletInterface } from '../wallets/walletInterface';
 
 export enum WalletName {
-  COSMOS = 'Cosmos Wallet (Keplr)',
+  COSMOS = 'Keplr',
   TERRASTATION = 'Terra Station',
   INJECTIVE = 'Injective MetaMask Wallet',
   METAMASK = 'Metamask',
   WALLETCONNECT = 'Ethereum Wallet (WalletConnect)',
   NEAR = 'NEAR Wallet',
-  POLKADOT = 'polkadot-js',
+  POLKADOT = 'polkadot.js',
+  SOLANA = 'Phantom',
 }
 
 /**

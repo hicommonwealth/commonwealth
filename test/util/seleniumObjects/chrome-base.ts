@@ -9,7 +9,7 @@ import { getWindowTitles } from './util';
 import { TerraStation } from './wallets/terraStation';
 import { PolkadotJs } from './wallets/polkadotJs';
 import { Keplr } from './wallets/keplr';
-
+import { Phantom } from './wallets/phantom';
 
 export class BasePage {
   protected driver: WebDriver
@@ -21,6 +21,14 @@ export class BasePage {
   protected _polkadotJs: PolkadotJs
 
   protected _keplr: Keplr
+  
+  protected _phantom: Phantom
+
+  /* 
+  protected _near: NEAR
+
+  protected _Axie: Axie
+  */
 
   /**
    * Sets all asynchronous settings like timeouts and window size. It also loads and sets up all the required chrome
@@ -83,9 +91,9 @@ export class BasePage {
   public async initWithPolkadotJs(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/PolkadotJS.crx'), { encoding: 'base64' })])
-    chromeOptions.addArguments("--no-sandbox");
-    chromeOptions.addArguments("--disable-dev-shm-usage");
-    chromeOptions.addArguments("--headless");
+    // chromeOptions.addArguments("--no-sandbox");
+    // chromeOptions.addArguments("--disable-dev-shm-usage");
+    // chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
@@ -98,15 +106,30 @@ export class BasePage {
   public async initWithKeplr(): Promise<WebDriver> {
     const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
       '../fixtures/ChromeExtensions/Keplr.crx'), { encoding: 'base64' })])
-    chromeOptions.addArguments("--no-sandbox");
-    chromeOptions.addArguments("--disable-dev-shm-usage");
-    chromeOptions.addArguments("--headless");
+    // chromeOptions.addArguments("--no-sandbox");
+    // chromeOptions.addArguments("--disable-dev-shm-usage");
+    // chromeOptions.addArguments("--headless");
     this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
 
     await this.init();
 
     this._keplr = new Keplr();
     await this._keplr.setup(this.driver);
+    return this.driver;
+  }
+
+  public async initWithPhantom(): Promise<WebDriver> {
+    const chromeOptions = new chrome.Options().addExtensions([fs.readFileSync(path.resolve(__dirname,
+      '../fixtures/ChromeExtensions/Phantom.crx'), { encoding: 'base64' })])
+    // chromeOptions.addArguments("--no-sandbox");
+    // chromeOptions.addArguments("--disable-dev-shm-usage");
+    // chromeOptions.addArguments("--headless");
+    this.driver = new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
+
+    await this.init();
+
+    this._phantom = new Phantom();
+    await this._phantom.setup(this.driver);
     return this.driver;
   }
 
@@ -124,5 +147,9 @@ export class BasePage {
 
   public get keplr() {
     return this._keplr;
+  }
+
+  public get phantom() {
+    return this._phantom;
   }
 }

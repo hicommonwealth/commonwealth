@@ -6,11 +6,8 @@
 /* 
 https://dev.to/ltmenezes/automated-dapps-scrapping-with-selenium-and-metamask-2ae9
 
-Install Metamask on your regular chrome
-Navigate to chrome://extensions/
-Click 'Pack extension' and enter the local path to the Metamask extension 
+Adding new packedExtensions: https://chrome.google.com/webstore/detail/crx-extractordownloader/ajkhmmldknmfjnmeedkbkkojgobmljda?hl=fr
 This will generate a .crx file that you can use to load as an extension on Chromium. 
-Save the name of the folder where the extension is installed, this will be the 'Extension ID' that we will use later.
 */
 
 import { HomePage } from '../util/seleniumObjects/Pages/home';
@@ -93,7 +90,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Anonymous', 'Account loaded from TerraStation is incorrect');
     }).timeout(60000)
 
-    it('Should login with Polkadot', async () => {
+    xit('Should login with Polkadot', async () => {
       const home = new HomePage();
 
       await home.initWithPolkadotJs();
@@ -112,7 +109,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Anonymous', 'Account loaded from PolkadotJs is incorrect');
     }).timeout(60000)
 
-    xit('Should login with Keplr', async () => {
+    it('Should login with Keplr', async () => {
       const home = new HomePage();
 
       await home.initWithKeplr();
@@ -131,6 +128,47 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const communityHome = new CommunityHome(driver);
       const accountName = await communityHome.getAccountName();
       assert(accountName === 'Anonymous', 'Account loaded from Keplr is incorrect');
+    }).timeout(600000)
+
+    it('Should login with Phantom', async () => {
+      const home = new HomePage();
+
+      await home.initWithPhantom();
+      driver = await home.loadPage();
+
+      assert(await driver.getCurrentUrl() === 'https://commonwealth.im/', 'Home page failed to load');
+
+      driver = await home.startLogin();
+      const loginModal = new LoginModal(driver);
+      await loginModal.connectWallet(WalletName.SOLANA, home.phantom);
+
+      await waitForWindow(driver, ['Commonwealth']);
+
+      assert((await driver.getCurrentUrl()).includes('commonwealth.im/solana/'),
+        'Phantom login flow failed to load Osmosis community page')
+      const communityHome = new CommunityHome(driver);
+      const accountName = await communityHome.getAccountName();
+      assert(accountName === 'Anonymous', 'Account loaded from Phantom is incorrect');
+    }).timeout(600000)
+
+    /* to do */ 
+    xit('Should login with Injective with Metamask Connect', async () => {
+
+    }).timeout(600000)
+
+    /* to do */ 
+    xit('Should login with Wallet Connect', async () => {
+
+    }).timeout(600000)
+
+    /* to do */ 
+    xit('Should login with NEAR OAuth', async () => {
+
+    }).timeout(600000)
+
+    /* to  */ 
+    xit('Should login with Axie / Ronin', async () => {
+
     }).timeout(600000)
   })
   
