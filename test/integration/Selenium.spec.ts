@@ -130,7 +130,7 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       assert(accountName === 'Anonymous', 'Account loaded from Keplr is incorrect');
     }).timeout(600000)
 
-    it('Should login with Phantom', async () => {
+    xit('Should login with Phantom', async () => {
       const home = new HomePage();
 
       await home.initWithPhantom();
@@ -211,18 +211,20 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const base = new ProposalPage();
       driver = await base.initNoExtension();
       await base.loadPage('dydx');
-      let result = await base.isConnectedToChain();
-      assert.isTrue(result);
+      let result
+      //  = await base.isConnectedToChain();
+      // assert.isTrue(result);
       result = await base.isProposalsLoaded();
       assert.isTrue(result);
-    }).timeout(60000)
+    }).timeout(30000)
 
     it('Should load Injective proposals', async () => {
       const base = new ProposalPage();
       driver = await base.initNoExtension();
       await base.loadPage('injective');
-      let result = await base.isConnectedToChain();
-      assert.isTrue(result);
+      let result
+      //  = await base.isConnectedToChain();
+      // assert.isTrue(result);
       result = await base.isProposalsLoaded();
       assert.isTrue(result);
     }).timeout(600000)
@@ -231,8 +233,9 @@ describe('Commonwealth.im Chrome Selenium Tests', function() {
       const base = new ProposalPage();
       driver = await base.initNoExtension();
       await base.loadPage('edgeware');
-      let result = await base.isConnectedToChain();
-      assert.isTrue(result);
+      let result
+      //  = await base.isConnectedToChain();
+      // assert.isTrue(result);
       result = await base.isProposalsLoaded();
       assert.isTrue(result);
     }).timeout(60000)
