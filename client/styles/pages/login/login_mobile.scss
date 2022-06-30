@@ -1,8 +1,19 @@
 @import 'shared';
 
 .LoginMobile {
+  @include mediumSmall {
+    background-image: url('/static/img/login-background-mediumsmall.png');
+  }
+
+  @include small {
+    background-image: url('/static/img/login-background-small.png');
+  }
+
+  @include extraSmall {
+    background-image: url('/static/img/login-background-extrasmall.png');
+  }
+
   align-items: center;
-  background-image: url('/static/img/login-background.png');
   background-size: cover;
   display: flex;
   flex-direction: column;

@@ -61,7 +61,6 @@ export class NewLoginModal implements m.ClassComponent {
           this.username = u;
         }}
         profiles={this.profiles}
-        sidebarType={this.sidebarType}
         username={this.username}
         wallets={this.wallets}
       />
@@ -76,6 +75,7 @@ export class NewLoginModal implements m.ClassComponent {
           this.username = u;
         }}
         profiles={this.profiles}
+        sidebarType={this.sidebarType}
         username={this.username}
         wallets={this.wallets}
       />
