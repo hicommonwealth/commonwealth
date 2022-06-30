@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This script should ONLY be run if updating any image version on the Vultr server. This is meant to make it easy
-# to match the versions of the tools below to the Heroku versions
+# This script should ONLY be run if updating any image version on the server. This is meant to make it easy
+# to match the versions of the tools used on the server and Heroku
 
 
 # load environment variables from a local .env file
