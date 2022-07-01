@@ -1,4 +1,3 @@
-import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
