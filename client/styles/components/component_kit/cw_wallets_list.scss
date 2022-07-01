@@ -12,7 +12,6 @@
 
     .wallets {
       display: grid;
-      height: 172px;
       overflow-y: scroll;
       row-gap: 4px;
       width: 284px;
@@ -23,7 +22,12 @@
 
       @include visibleScrollbar(light);
 
-      &.isMobile {
+      &.darkMode {
+        // no box shadow
+        height: 172px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+
         @include visibleScrollbar(dark);
       }
     }
@@ -36,7 +40,7 @@
         cursor: pointer;
         margin: 8px 12px 8px 0;
 
-        &.isMobile {
+        &.darkMode {
           color: $neutral-400;
         }
       }
@@ -47,6 +51,23 @@
     a {
       color: $primary-500;
       cursor: pointer;
+      text-decoration: none;
+
+      &:hover {
+        color: $primary-400;
+      }
+    }
+
+    &.darkMode {
+      a {
+        color: $primary-200;
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover {
+          color: $primary-100;
+        }
+      }
     }
   }
 }

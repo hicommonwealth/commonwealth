@@ -13,7 +13,7 @@ import { getClasses } from './helpers';
 
 type WalletOptionRowStyleAttrs = {
   disabled?: boolean;
-  isMobile?: boolean;
+  darkMode?: boolean;
 };
 
 type WalletOptionRowAttrs = {
@@ -29,13 +29,13 @@ export class CWWalletOptionRow
   implements m.ClassComponent<WalletOptionRowAttrs>
 {
   view(vnode) {
-    const { disabled = false, isMobile, onclick, walletName } = vnode.attrs;
+    const { disabled = false, darkMode, onclick, walletName } = vnode.attrs;
     return (
       <div
         class={getClasses<WalletOptionRowStyleAttrs>(
           {
             disabled,
-            isMobile,
+            darkMode,
           },
           ComponentType.WalletOptionRow
         )}

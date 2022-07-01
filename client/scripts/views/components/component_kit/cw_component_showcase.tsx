@@ -86,7 +86,7 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
           <CWWalletOptionRow
-            isMobile
+            darkMode
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
@@ -239,8 +239,6 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Text field dark mode"
             label="Dark mode"
             darkMode
-            disabled
-            iconRight="edit"
             placeholder="Type here"
           />
           <CWTextArea

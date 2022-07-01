@@ -77,7 +77,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                 // this.sidebarType = 'ethWallet';
                 // this.bodyType = 'connectWithEmail';
               }}
-              isMobile
+              darkMode
               wallets={wallets}
             />
           )}
@@ -100,14 +100,24 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'selectProfile' && (
             <div class="inner-body-container">
-              <CWText type="h5" fontWeight="medium" className="inner-body-text">
-                Linking
-              </CWText>
-              <CWAddress address={address} darkMode />
-              <CWText type="h5" fontWeight="medium" className="inner-body-text">
-                to your Profile
-              </CWText>
-              <CWProfilesList profiles={profiles} />
+              <div class="inner-inner-body-container">
+                <CWText
+                  type="h5"
+                  fontWeight="medium"
+                  className="inner-body-text"
+                >
+                  Linking
+                </CWText>
+                <CWAddress address={address} darkMode />
+                <CWText
+                  type="h5"
+                  fontWeight="medium"
+                  className="inner-body-text"
+                >
+                  to your Profile
+                </CWText>
+                <CWProfilesList profiles={profiles} darkMode />
+              </div>
               <CWButton label="Finish" />
             </div>
           )}
@@ -129,14 +139,24 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'allSet' && (
             <div class="inner-body-container">
-              <CWText type="h5" fontWeight="medium" className="inner-body-text">
-                You have sucessfully linked
-              </CWText>
-              <CWAddress address={address} darkMode />
-              <CWText type="h5" fontWeight="medium" className="inner-body-text">
-                to your Profile
-              </CWText>
-              <CWProfileRow {...profiles[0]} />
+              <div class="inner-inner-body-container">
+                <CWText
+                  type="h5"
+                  fontWeight="medium"
+                  className="inner-body-text"
+                >
+                  You have sucessfully linked
+                </CWText>
+                <CWAddress address={address} darkMode />
+                <CWText
+                  type="h5"
+                  fontWeight="medium"
+                  className="inner-body-text"
+                >
+                  to your Profile
+                </CWText>
+                <CWProfileRow darkMode {...profiles[0]} />
+              </div>
               <CWButton label="Finish" />
             </div>
           )}

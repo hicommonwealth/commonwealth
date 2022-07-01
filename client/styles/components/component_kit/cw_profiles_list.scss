@@ -48,11 +48,40 @@
       color: $green-500;
     }
   }
+
+  &.darkMode {
+    background-color: $neutral-700;
+    border-color: $neutral-600;
+    box-shadow: none;
+
+    .profile-row-text.Text {
+      color: $neutral-500;
+    }
+
+    &.isSelected {
+      background-color: $neutral-700;
+      border-color: $green-200;
+      justify-content: space-between;
+      pointer-events: none;
+
+      .profile-row-text.Text {
+        color: $neutral-25;
+      }
+
+      .Icon {
+        color: $green-200;
+      }
+    }
+  }
 }
 
 .ProfilesList {
   // needed to compensate for negative margin on inner container
-  margin-bottom: 16px;
+  margin-bottom: 2px;
+
+  &.darkMode {
+    margin-bottom: 0;
+  }
 
   .profile-rows-container {
     display: grid;
@@ -64,6 +93,15 @@
     margin-bottom: -2px;
     padding-bottom: 2px;
 
-    // @include visibleScrollbar;
+    @include visibleScrollbar(light);
+
+    &.darkMode {
+      // no box shadow
+      height: 152px;
+      margin-bottom: 0;
+      padding-bottom: 0;
+
+      @include visibleScrollbar(dark);
+    }
   }
 }

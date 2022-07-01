@@ -12,8 +12,8 @@ import { getClasses } from './helpers';
 
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
+  darkMode?: boolean;
   hasNoWalletsLink?: boolean;
-  isMobile?: boolean;
   wallets: Array<WalletId>;
 };
 
@@ -21,20 +21,20 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
   view(vnode) {
     const {
       connectAnotherWayOnclick,
+      darkMode,
       hasNoWalletsLink = true,
-      isMobile,
       wallets,
     } = vnode.attrs;
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
           <div
-            class={getClasses<{ isMobile?: boolean }>({ isMobile }, 'wallets')}
+            class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
           >
             {wallets.map((w) => (
               <CWWalletOptionRow
                 walletName={w}
-                isMobile={isMobile}
+                darkMode={darkMode}
                 onclick={() => {
                   // link to where?
                 }}
@@ -61,8 +61,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
               trigger={
                 <CWText
                   type="caption"
-                  className={getClasses<{ isMobile?: boolean }>(
-                    { isMobile },
+                  className={getClasses<{ darkMode?: boolean }>(
+                    { darkMode },
                     'no-wallet-link'
                   )}
                 >
@@ -72,7 +72,13 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
             />
           )}
         </div>
-        <CWText type="b2" className="connect-another-way-link">
+        <CWText
+          type="b2"
+          className={getClasses<{ darkMode?: boolean }>(
+            { darkMode },
+            'connect-another-way-link'
+          )}
+        >
           <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
         </CWText>
       </div>
