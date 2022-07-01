@@ -22,12 +22,37 @@ module.exports = {
           addressesToDelete[addressObj.id] = addressesToUpdate[checksumAddress];
         }
       }
+
+      // update admin role now
+      const role = await queryInterface.sequelize.query(
+        `SELECT * FROM "Roles" WHERE permission='admin' AND chain_id='axie-infinity';`,
+        { transaction }
+      );
+
       console.log(JSON.stringify(addressesToDelete));
       for (const [idToDelete, idToUpdate] of Object.entries(addressesToDelete)) {
         await queryInterface.sequelize.query(
           `UPDATE "Collaborations" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
           { transaction }
         );
+
+        const adminRole = await queryInterface.sequelize.query(
+          `SELECT * FROM "Roles" WHERE permission='admin' AND chain_id='axie-infinity' AND address_id = ${idToDelete};`,
+          { transaction }
+        );
+
+        if (adminRole[0].length > 0) {
+          await queryInterface.sequelize.query(
+            `UPDATE "Roles" SET permission='admin' WHERE address_id = ${idToUpdate};`,
+            { transaction }
+          );
+        }
+
+        await queryInterface.sequelize.query(
+          `DELETE FROM "Roles" WHERE address_id=${idToDelete};`,
+          { transaction }
+        );
+
         await queryInterface.sequelize.query(
           `UPDATE "OffchainComments" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
           { transaction }
