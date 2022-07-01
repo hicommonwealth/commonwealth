@@ -46,7 +46,9 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
       bodyType === 'welcome';
 
     const hasWalletList =
-      bodyType === 'walletList' || bodyType === 'ethWalletList';
+      bodyType === 'walletList' ||
+      bodyType === 'selectPrevious' ||
+      bodyType === 'ethWalletList';
 
     const { headerText, bodyText } = getText(bodyType);
 
@@ -124,6 +126,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'connectWithEmail' && (
             <div class="inner-body-container">
               <CWTextInput
+                containerClassName="connect-with-email-input"
                 label="email address"
                 placeholder="your-email@email.com"
               />

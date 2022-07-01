@@ -15,14 +15,11 @@
   .inner-body-container {
     align-items: center;
     display: flex;
-    flex: 1;
     flex-direction: column;
-    justify-content: space-between;
 
     .inner-inner-body-container {
       align-items: center;
       display: flex;
-      flex: 1;
       flex-direction: column;
       margin-bottom: 48px;
 
@@ -36,11 +33,16 @@
       margin-bottom: 48px;
     }
 
+    .connect-with-email-input.TextInput {
+      width: 320px;
+    }
+
     .buttons-row {
       display: flex;
       flex-direction: row;
       gap: 8px;
       justify-content: center;
+      margin-top: 24px;
     }
   }
 }
@@ -72,6 +74,7 @@
   }
 
   .walletList {
+    margin-bottom: 120px;
     margin-top: 224px;
     width: 368px;
 
@@ -104,6 +107,7 @@
   }
 
   .connectWithEmail {
+    margin-bottom: 216px;
     margin-top: 152px;
     width: 368px;
 
@@ -119,6 +123,7 @@
 
   .ethWalletList {
     margin-top: 120px;
+    margin-bottom: 184px;
     width: 408px;
 
     @include innerBodyStyles;
