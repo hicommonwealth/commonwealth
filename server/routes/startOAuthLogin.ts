@@ -2,7 +2,11 @@ import passport from 'passport';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
 
-import {DISCORD_OAUTH_CALLBACK, GITHUB_OAUTH_CALLBACK} from '../config';
+interface AuthInfoExtended extends Express.AuthInfo {
+  state?: {
+    hostname: string
+  }
+}
 
 const startOAuthLogin = async (
   models: DB,
@@ -11,41 +15,26 @@ const startOAuthLogin = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("Auth info startOAuthLogin:", req.authInfo);
   let successRedirect = '/';
-  const failureRedirect = '#!/login';
-  if (req.query.from) {
-    // Validate that req.query.from matches an existing Chain
-    try {
-      const chain = await models.Chain.findOne({ where: { custom_domain: req.query.from } });
-      if (chain) {
-        const tokenObj = await models.LoginToken.createForOAuth(req.query.from);
-        successRedirect = `https://${req.query.from}/api/finishOAuthLogin?token=${tokenObj.token}`;
-        (req as any).loginTokenForRedirect = tokenObj.id;
-      }
-    } catch (e) {
-      console.log('Error:', e);
-    }
-  }
 
-  if (provider === 'github') {
-    passport.authenticate('github', {
-      callbackURL: `${GITHUB_OAUTH_CALLBACK}?from=${encodeURIComponent(
-        req.hostname
-      )}`,
-      successRedirect,
-      failureRedirect,
-      state: req.sessionID
-    } as any)(req, res, next); // TODO: extend AuthenticateOptions typing used here
-  }
+  // custom domain OAuth2.0 login logic. OAuth2.0 login is currently disabled for custom domains.
+  // const hostname = (<AuthInfoExtended>req.authInfo)?.state?.hostname
+  // if (hostname && hostname !== 'localhost') {
+  //   // Validate that req.query.from matches an existing Chain
+  //   try {
+  //     const chain = await models.Chain.findOne({ where: { custom_domain: hostname } });
+  //     if (chain) {
+  //       const tokenObj = await models.LoginToken.createForOAuth(hostname);
+  //       successRedirect = `https://${hostname}/api/finishOAuthLogin?token=${tokenObj.token}`;
+  //       (req as any).loginTokenForRedirect = tokenObj.id;
+  //     }
+  //   } catch (e) {
+  //     console.log('Error:', e);
+  //   }
+  // }
 
-  else {
-    // TODO: figure out how to pass a callbackURL without error
-    passport.authenticate('discord', {
-      successRedirect,
-      failureRedirect,
-      state: req.sessionID
-    } as any)(req, res, next)
-  }
+  res.redirect(successRedirect);
 };
 
 export default startOAuthLogin;

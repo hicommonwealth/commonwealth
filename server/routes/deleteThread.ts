@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { AppError, ServerError } from '../util/errors';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
@@ -22,10 +23,10 @@ const deleteThread = async (
 ) => {
   const { thread_id, chain_id } = req.body;
   if (!req.user) {
-    return next(new Error(DeleteThreadErrors.NoUser));
+    throw new AppError(DeleteThreadErrors.NoUser);
   }
   if (!thread_id) {
-    return next(new Error(DeleteThreadErrors.NoThread));
+    throw new AppError(DeleteThreadErrors.NoThread);
   }
 
   try {
@@ -54,15 +55,15 @@ const deleteThread = async (
         address: thread.Address.address,
       });
       if (!canInteract) {
-        return next(new Error(error));
+        throw new AppError(error);
       }
     }
 
     if (!myThread) {
-      const isAdminOrMod = validateRoles(models, req.user, 'moderator', chain_id);
+      const isAdminOrMod = await validateRoles(models, req.user, 'moderator', chain_id);
 
       if (!isAdminOrMod) {
-        return next(new Error(DeleteThreadErrors.NoPermission));
+        throw new AppError(DeleteThreadErrors.NoPermission);
       }
 
       thread = await models.OffchainThread.findOne({
@@ -73,7 +74,7 @@ const deleteThread = async (
       });
 
       if (!thread) {
-        return next(new Error(DeleteThreadErrors.NoThread));
+        throw new ServerError(DeleteThreadErrors.NoThread);
       }
     }
 
@@ -87,7 +88,7 @@ const deleteThread = async (
     await thread.destroy();
     return res.json({ status: 'Success' });
   } catch (e) {
-    return next(e);
+    throw new ServerError(e);
   }
 };
 

@@ -103,6 +103,16 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       transaction: t,
     });
 
+    await models.sequelize.query(`DELETE FROM "OffchainVotes" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "OffchainPolls" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
     await models.sequelize.query(`DELETE FROM "OffchainThreads" WHERE chain='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
@@ -118,6 +128,16 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
         LEFT JOIN "Addresses" a ON profilesBeingUsedAsReferences.address_id = a.id
         WHERE a.chain = '${chain.id}'
         AND profilesGettingDeleted.address_id  = profilesBeingUsedAsReferences.address_id;`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "ChainCategories" WHERE chain_id='${chain.id}';`, {
+      type: QueryTypes.DELETE,
+      transaction: t,
+    });
+
+    await models.sequelize.query(`DELETE FROM "CommunityBanners" WHERE chain_id='${chain.id}';`, {
       type: QueryTypes.DELETE,
       transaction: t,
     });
