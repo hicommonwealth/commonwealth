@@ -68,7 +68,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     where: {
       chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
-      permission: 'admin'
+      permission: ['admin', 'moderator']
     }
   });
 
