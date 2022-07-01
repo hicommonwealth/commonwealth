@@ -43,7 +43,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
           </div>
           {hasNoWalletsLink && (
             <CWTooltip
-              interactionType="hover"
+              interactionType="click"
               tooltipContents={
                 <>
                   <CWText type="caption">
@@ -57,7 +57,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                   </CWText>
                 </>
               }
-              tooltipType="solidNoArrow"
+              tooltipType="solidArrow"
               trigger={
                 <CWText
                   type="caption"

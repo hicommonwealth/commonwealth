@@ -164,7 +164,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             </div>
           )}
         </div>
-        {hasBoilerplate && <LoginBoilerplate />}
+        {hasBoilerplate && <LoginBoilerplate darkMode />}
       </div>
     );
   }
