@@ -17,6 +17,7 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import { mixpanelBrowserTrack } from '../../helpers/mixpanel_browser_util';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type ConfirmSnapshotVoteModalAttrs = {
   id: string;
@@ -45,22 +46,21 @@ export class ConfirmSnapshotVoteModal
           <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          <h4>
-            Are you sure you want to vote "${proposal.choices[selectedChoice]}"?
-            <br />
-            This action cannot be undone.
-          </h4>
+          <CWText type="h4" fontWeight="semiBold">
+            Are you sure you want to vote {proposal.choices[selectedChoice]}?
+          </CWText>
+          <CWText type="h5">This action cannot be undone.</CWText>
           <div class="vote-info">
-            <div class="d-flex">
-              <span class="text-blue">Option</span>
-              <span>{proposal.choices[selectedChoice]}</span>
+            <div class="vote-info-row">
+              <CWText>Option</CWText>
+              <CWText>{proposal.choices[selectedChoice]}</CWText>
             </div>
-            <div class="d-flex">
-              <span class="text-blue">Your voting power</span>
-              <span>
+            <div class="vote-info-row">
+              <CWText>Your voting power</CWText>
+              <CWText>
                 `${formatNumberShort(totalScore)} $
                 {space.symbol.slice(0, 6).trim()}...`
-              </span>
+              </CWText>
             </div>
           </div>
           <div class="button-group">
