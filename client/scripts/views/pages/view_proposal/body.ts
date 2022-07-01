@@ -759,6 +759,7 @@ export const ProposalBodyText: m.Component<
   },
   view: (vnode) => {
     const { body } = vnode.state;
+    if (!body) return;
 
     const getPlaceholder = () => {
       if (!(vnode.attrs.item instanceof OffchainThread)) return;
@@ -816,7 +817,7 @@ export const ProposalBodyText: m.Component<
               ]),
           ]);
         } catch (e) {
-          if (body.toString().trim() === '') {
+          if (body?.toString().trim() === '') {
             return getPlaceholder();
           }
           return m('.show-more-wrap', [

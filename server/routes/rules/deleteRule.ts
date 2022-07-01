@@ -16,7 +16,7 @@ const deleteRule = async (
   req: TypedRequestBody<DeleteRuleReq>,
   res: TypedResponse<DeleteRuleResp>
 ) => {
-  const isAdmin = validateRoles(models, req.user, 'admin', req.body.chain_id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', req.body.chain_id);
   if (!isAdmin) {
     throw new AppError(Errors.AdminOnly);
   }
