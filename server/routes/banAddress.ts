@@ -25,7 +25,7 @@ const banAddress = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) throw new AppError(BanAddressErrors.NoChain);
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(BanAddressErrors.NoPermission);
 
   const { address } = req.body;

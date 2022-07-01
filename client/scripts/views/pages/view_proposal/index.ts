@@ -346,8 +346,7 @@ const ProposalHeader: m.Component<
                           iconSize: 'small',
                         }),
                       }),
-                    !app.isCustomDomain() &&
-                      m('.CommentSocialHeader', [m(SocialSharingCarat)]),
+                    m('.CommentSocialHeader', [m(SocialSharingCarat)]),
                     vnode.state.editPermissionsIsOpen &&
                       proposal instanceof OffchainThread &&
                       m(ProposalEditorPermissions, {
@@ -605,10 +604,9 @@ const ProposalComment: m.Component<
                 }),
               }),
             ],
-            !app.isCustomDomain() &&
-              m('.CommentSocialHeader', [
-                m(SocialSharingCarat, { commentID: comment.id }),
-              ]),
+            m('.CommentSocialHeader', [
+              m(SocialSharingCarat, { commentID: comment.id }),
+            ]),
             // For now, we are limiting threading to 1 level deep
             // Comments whose parents are other comments should not display the reply option
             // !vnode.state.editing

@@ -569,9 +569,11 @@ const LinkNewAddressModal: m.Component<
                             // get rid of pre-existing wallet info to make way for new account
                             wallet.signOut();
                           }
-                          const redirectUrl = `${
+                          const redirectUrl = (!app.isCustomDomain) ? `${
                             window.location.origin
-                          }/${app.activeChainId()}/finishNearLogin`;
+                          }/${app.activeChainId()}/finishNearLogin` : `${
+                            window.location.origin
+                          }/finishNearLogin`;
                           wallet.requestSignIn({
                             contractId: (app.chain as Near).chain.isMainnet
                               ? 'commonwealth-login.near'

@@ -220,7 +220,8 @@ const createReaction = async (
   const location = thread_id
     ? `discussion_${thread_id}`
     : proposal_id || `comment-${comment_id}`;
-  await models.Subscription.emitNotifications(
+
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,
     location,
@@ -236,6 +237,7 @@ const createReaction = async (
     req.wss,
     [finalReaction.Address.address]
   );
+
   // update author.last_active (no await)
   author.last_active = new Date();
   author.save();
