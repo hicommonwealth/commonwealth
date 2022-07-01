@@ -22,18 +22,26 @@ module.exports = {
           addressesToDelete[addressObj.id] = addressesToUpdate[checksumAddress];
         }
       }
-
-      for (const [idToDelete, idToUpdate] of addressesToDelete) {
+      console.log(JSON.stringify(addressesToDelete));
+      for (const [idToDelete, idToUpdate] of Object.entries(addressesToDelete)) {
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainComments" WHERE address_id=${idToDelete};`,
+          `UPDATE "Collaborations" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
           { transaction }
         );
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainThreads" WHERE address_id=${idToDelete};`,
+          `UPDATE "OffchainComments" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
           { transaction }
         );
         await queryInterface.sequelize.query(
-          `DELETE FROM "OffchainReactions" WHERE address_id=${idToDelete};`,
+          `UPDATE "OffchainThreads" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
+          { transaction }
+        );
+        await queryInterface.sequelize.query(
+          `UPDATE "OffchainReactions" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
+          { transaction }
+        );
+        await queryInterface.sequelize.query(
+          `DELETE FROM "OffchainProfiles" WHERE address_id=${idToDelete};`,
           { transaction }
         );
         await queryInterface.sequelize.query(
