@@ -751,10 +751,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/web3login': importRoute('views/pages/web3login', {
-              scoped: true,
-              deferChain: true,
-            }),
+            // '/web3login': importRoute('views/pages/web3login', {
+            //   scoped: true,
+            //   deferChain: true,
+            // }),
             // Admin
             '/admin': importRoute('views/pages/admin', { scoped: true }),
             '/manage': importRoute('views/pages/manage_community/index', {
@@ -839,7 +839,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/tips': redirectRoute(() => '/tips'),
             '/:scope/validators': redirectRoute(() => '/validators'),
             '/:scope/login': redirectRoute(() => '/login'),
-            '/:scope/web3login': redirectRoute(() => '/web3login'),
+            // '/:scope/web3login': redirectRoute(() => '/web3login'),
             '/:scope/settings': redirectRoute(() => '/settings'),
             '/:scope/admin': redirectRoute(() => '/admin'),
             '/:scope/manage': redirectRoute(() => '/manage'),
@@ -1025,10 +1025,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/web3login': importRoute('views/pages/web3login', {
-              scoped: true,
-              deferChain: true,
-            }),
+            // '/:scope/web3login': importRoute('views/pages/web3login', {
+            //   scoped: true,
+            //   deferChain: true,
+            // }),
             // Admin
             '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
             '/manage': importRoute('views/pages/manage_community/index', {
