@@ -14,7 +14,7 @@ fi
 
 echo "Connecting to root@$VULTR_IP"
 # connect to the Vultr server on which the images will be loaded
-#ssh root@"$VULTR_IP" /bin/bash << "EOF"
+ssh root@"$VULTR_IP" /bin/bash << "EOF"
 echo "Connection Successful!"
 lsb_release -a
 
