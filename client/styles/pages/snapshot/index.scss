@@ -1,16 +1,16 @@
 @import 'shared';
 
+@mixin snapshotProposalCardContent {
+  width: 336px;
+  padding: 24px;
+}
+
 .topic-loading-spinner-wrap {
   height: 120px;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-@mixin padding-x-20 {
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
 .SnapshotViewProposalPage {
@@ -117,40 +117,9 @@
     }
 
     .proposal-info {
-      .proposal-info-box {
-        width: 336px;
-      }
-
-      .proposal-info-box {
-        border: 1px solid $neutral-100;
-        border-radius: 8px;
-        padding: 20px 0;
-        margin-top: 24px;
-        box-shadow: 0px 2px 6px 0px #0000001a;
-
-        & > * {
-          @include padding-x-20;
-        }
-
-        button {
-          margin: 0 20px;
-        }
-        .vote-button-group {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-          margin-left: -20px;
-          .vote-message {
-            margin-top: 5px;
-            color: $neutral-600;
-          }
-        }
-      }
-
-      .title {
-        font-size: 32px;
-        font-weight: 500;
-      }
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
 
       .info-block {
         display: flex;
@@ -208,47 +177,6 @@
           display: block;
           margin-bottom: 14px;
         }
-      }
-
-      .result-choice {
-        font-weight: 500;
-        font-size: 24px;
-        margin-top: 24px;
-      }
-
-      .result-choice-details {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 4px;
-      }
-
-      .vote-balance-for-choice {
-        flex-shrink: 1;
-      }
-
-      .font-medium {
-        font-weight: 500;
-      }
-
-      .symbol {
-        color: $neutral-600;
-        margin-left: 4px;
-      }
-
-      .result-progress {
-        width: 100%;
-      }
-
-      .result-progress::-webkit-progress-bar {
-        width: 100%;
-        height: 6px;
-        border-radius: 5px;
-        background-color: $neutral-100;
-      }
-
-      .result-progress::-webkit-progress-value {
-        border-radius: 5px;
-        background-color: $green-400;
       }
 
       .snapshot-link {

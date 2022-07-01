@@ -1,11 +1,12 @@
 @import 'shared';
+@import 'pages/snapshot/index.scss';
 
 .VoteAction.Card {
+  @include snapshotProposalCardContent;
+
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px;
-  width: 336px;
 
   .vote-action-radio-group {
     display: flex;

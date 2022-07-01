@@ -5,7 +5,7 @@ import m from 'mithril';
 import { Tabs, TabItem } from 'construct-ui';
 import moment from 'moment';
 
-import 'pages/snapshot/view_proposal.scss';
+import 'pages/snapshot/index.scss';
 import 'pages/snapshot/list_proposal.scss';
 
 import app from 'state';
@@ -18,7 +18,7 @@ import {
   SnapshotProposalVote,
   getResults,
 } from 'helpers/snapshot_utils';
-import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
+import { formatNumberLong, formatTimestamp } from 'helpers';
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
@@ -26,6 +26,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { VoteAction } from './vote_action';
+import { SnapshotVotingResults } from './snapshot_voting_results';
 
 type ProposalContentAttrs = {
   proposal: SnapshotProposal;
@@ -127,50 +128,6 @@ class ProposalContent implements m.ClassComponent<ProposalContentAttrs> {
         )}
       </>
     );
-  }
-}
-
-type VotingResultsAttrs = {
-  choices: string[];
-  symbol: string;
-  totals: any;
-  votes: SnapshotProposalVote[];
-};
-
-class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
-  private voteListings: any[];
-
-  view(vnode) {
-    const { choices, totals, symbol } = vnode.attrs;
-
-    if (!choices.length) return;
-
-    this.voteListings = choices.map((choice, idx) => {
-      const totalForChoice = totals.resultsByVoteBalance[idx];
-
-      const voteFrac =
-        totals.sumOfResultsBalance !== 0
-          ? totalForChoice / totals.sumOfResultsBalance
-          : 0;
-
-      return (
-        <>
-          <div class="result-choice">{choice}</div>
-          <div class="result-choice-details">
-            <div class="vote-balance-for-choice">
-              <span class="font-medium">
-                {formatNumberLong(totalForChoice)}
-              </span>
-              <span class="symbol">{symbol}</span>
-            </div>
-            <span class="font-medium">{formatPercent(voteFrac, 2)}</span>
-          </div>
-          <div class="result-progress" max="100" value={voteFrac * 100} />
-        </>
-      );
-    });
-
-    return [this.voteListings];
   }
 }
 
@@ -375,15 +332,12 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
                 votes={this.votes}
               />
               {/* )} */}
-              <div class="proposal-info-box">
-                <div class="title">Current Results</div>
-                <VotingResults
-                  choices={this.proposal.choices}
-                  votes={this.votes}
-                  totals={this.totals}
-                  symbol={this.symbol}
-                />
-              </div>
+              <SnapshotVotingResults
+                choices={this.proposal.choices}
+                votes={this.votes}
+                totals={this.totals}
+                symbol={this.symbol}
+              />
             </div>
           </div>
         </div>
