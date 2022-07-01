@@ -1,7 +1,8 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Tabs, TabItem, RadioGroup } from 'construct-ui';
+
+import { Tabs, TabItem } from 'construct-ui';
 import moment from 'moment';
 
 import 'pages/snapshot/view_proposal.scss';
@@ -11,15 +12,12 @@ import app from 'state';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
-import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 import {
   SnapshotSpace,
   SnapshotProposal,
   SnapshotProposalVote,
   getResults,
-  getPower,
 } from 'helpers/snapshot_utils';
-import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
@@ -27,12 +25,7 @@ import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { CWButton } from '../../components/component_kit/cw_button';
-
-const enum VotingError {
-  NOT_VALIDATED = 'Insufficient Voting Power',
-  ALREADY_VOTED = 'Already Submitted Vote',
-}
+import { VoteAction } from './vote_action';
 
 type ProposalContentAttrs = {
   proposal: SnapshotProposal;
@@ -178,106 +171,6 @@ class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
     });
 
     return [this.voteListings];
-  }
-}
-
-type VoteActionAttrs = {
-  choices: string[];
-  id: string;
-  proposal: SnapshotProposal;
-  scores: number[];
-  space: SnapshotSpace;
-  votes: SnapshotProposalVote[];
-};
-
-class VoteAction implements m.ClassComponent<VoteActionAttrs> {
-  private chosenOption: string;
-  private fetchedPower: boolean;
-  private totalScore: number;
-  private validatedAgainstStrategies: boolean;
-  private votingModalOpen: boolean;
-
-  oninit() {
-    this.fetchedPower = false;
-    this.validatedAgainstStrategies = true;
-  }
-
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-
-    const hasVoted = vnode.attrs.votes.find((vote) => {
-      return vote.voter === app.user?.activeAccount?.address;
-    })?.choice;
-
-    if (!this.fetchedPower) {
-      getPower(
-        vnode.attrs.space,
-        vnode.attrs.proposal,
-        app.user?.activeAccount?.address
-      ).then((vals) => {
-        this.validatedAgainstStrategies = vals.totalScore > 0;
-        this.totalScore = vals.totalScore;
-        m.redraw();
-      });
-      this.fetchedPower = true;
-    }
-
-    const vote = async (selectedChoice: number) => {
-      try {
-        app.modals.create({
-          modal: ConfirmSnapshotVoteModal,
-          data: {
-            space: vnode.attrs.space,
-            proposal: vnode.attrs.proposal,
-            id: vnode.attrs.id,
-            selectedChoice,
-            totalScore: this.totalScore,
-          },
-        });
-        this.votingModalOpen = true;
-      } catch (err) {
-        console.error(err);
-        notifyError('Voting failed');
-      }
-    };
-
-    if (!vnode.attrs.proposal.choices?.length) return;
-
-    const voteText = !this.validatedAgainstStrategies
-      ? VotingError.NOT_VALIDATED
-      : hasVoted
-      ? VotingError.ALREADY_VOTED
-      : '';
-
-    return (
-      <div class="VoteAction">
-        <div class="title">Cast your vote</div>
-        <RadioGroup
-          class="snapshot-votes"
-          options={proposal.choices}
-          value={(hasVoted && proposal.choices[hasVoted]) || this.chosenOption}
-          onchange={(e: Event) => {
-            this.chosenOption = (e.currentTarget as HTMLInputElement).value;
-          }}
-        />
-        <div class="vote-button-group">
-          <CWButton
-            label="Vote"
-            disabled={
-              !this.fetchedPower ||
-              hasVoted !== undefined ||
-              !this.chosenOption ||
-              !this.validatedAgainstStrategies
-            }
-            onclick={() => {
-              vote(proposal.choices.indexOf(this.chosenOption));
-              m.redraw();
-            }}
-          />
-          <div class="vote-message">{voteText}</div>
-        </div>
-      </div>
-    );
   }
 }
 
@@ -472,16 +365,16 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
                   </div>
                 )}
               </div>
-              {isActive && author && (
-                <VoteAction
-                  space={this.space}
-                  proposal={this.proposal}
-                  id={vnode.attrs.identifier}
-                  scores={this.scores}
-                  choices={this.proposal.choices}
-                  votes={this.votes}
-                />
-              )}
+              {/* {isActive && author && ( */}
+              <VoteAction
+                space={this.space}
+                proposal={this.proposal}
+                id={vnode.attrs.identifier}
+                scores={this.scores}
+                choices={this.proposal.choices}
+                votes={this.votes}
+              />
+              {/* )} */}
               <div class="proposal-info-box">
                 <div class="title">Current Results</div>
                 <VotingResults

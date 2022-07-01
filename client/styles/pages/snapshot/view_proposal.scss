@@ -1,4 +1,4 @@
-@import 'shared.scss';
+@import 'shared';
 
 .topic-loading-spinner-wrap {
   height: 120px;
@@ -121,8 +121,7 @@
         width: 336px;
       }
 
-      .proposal-info-box,
-      .VoteAction {
+      .proposal-info-box {
         border: 1px solid $neutral-100;
         border-radius: 8px;
         padding: 20px 0;
