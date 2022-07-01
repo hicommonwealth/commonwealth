@@ -130,9 +130,8 @@ const finishSsoLogin = async (
   // convert address to checksum version before storing in db
   let checksumAddress: string;
   try {
-    // TODO: are ronin addresses properly encoded with chain id checksum? or using mainnet?
-    // TODO: maybe use eth_chain_id from ChainNode instead of hard-code?
-    checksumAddress = toChecksumAddress(jwtPayload.roninAddress, 2020);
+    // NOTE: chainId is technically unused here, no need to provide it
+    checksumAddress = toChecksumAddress(jwtPayload.roninAddress);
   } catch (e) {
     throw new AppError(Errors.TokenBadAddress);
   }
