@@ -42,7 +42,9 @@
     "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
     "migrate-db": "npx sequelize db:migrate",
-    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump"
+    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
+    "install-docker": "./scripts/install-docker.sh",
+    "update-docker-images": "./scripts/update-docker-images.sh"
   },
   "engines": {
     "node": "14.x"
