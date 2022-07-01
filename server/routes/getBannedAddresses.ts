@@ -23,7 +23,7 @@ const getBannedAddresses = async (
 ) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) throw new AppError(GetBannedAddressesErrors.NoChain);
-  const isAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(GetBannedAddressesErrors.NoPermission);
 
   const bans = await models.Ban.findAll({ where: { chain_id: chain.id }});
