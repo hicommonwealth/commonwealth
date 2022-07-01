@@ -235,6 +235,14 @@ export class ComponentShowcase implements m.ClassComponent {
             disabled
             defaultValue="Some disabled text"
           />
+          <CWTextInput
+            name="Text field dark mode"
+            label="Dark mode"
+            darkMode
+            disabled
+            iconRight="edit"
+            placeholder="Type here"
+          />
           <CWTextArea
             name="Textarea"
             label="Text area"

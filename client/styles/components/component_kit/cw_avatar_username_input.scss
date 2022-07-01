@@ -2,9 +2,21 @@
 
 .AvatarUsernameInput {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   width: 100%;
+
+  &.horizontal {
+    flex-direction: row;
+  }
+
+  &.vertical {
+    align-items: center;
+    flex-direction: column;
+
+    .AvatarUpload {
+      margin-bottom: 16px;
+    }
+  }
 
   .input-and-address-container {
     display: flex;

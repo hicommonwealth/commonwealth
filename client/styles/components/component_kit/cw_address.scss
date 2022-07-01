@@ -9,7 +9,18 @@
   justify-content: center;
   width: 282px;
 
-  .Text {
+  .address-text.Text {
     color: $neutral-500;
+  }
+
+  &.darkMode {
+    background-color: $neutral-700;
+    border: 2px solid $green-200;
+    height: 36px;
+    width: 328px;
+
+    .address-text.Text {
+      color: $neutral-25;
+    }
   }
 }

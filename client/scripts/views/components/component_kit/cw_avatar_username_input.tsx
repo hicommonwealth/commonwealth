@@ -9,13 +9,18 @@ import { formatAddressShort } from 'helpers';
 import { CWText } from './cw_text';
 import { AvatarUpload } from '../avatar_upload';
 import { CWTextInput } from './cw_text_input';
+import { getClasses } from './helpers';
+
+type Orientation = 'horizontal' | 'vertical';
 
 type AvatarUsernameInputAttrs = {
   account?: Account<any>;
   address: string;
+  darkMode?: boolean;
   defaultValue: string;
   onAvatarChangeHandler: (e) => void;
   onUsernameChangeHandler: (e) => void;
+  orientation?: Orientation;
 };
 
 export class CWAvatarUsernameInput
@@ -25,15 +30,24 @@ export class CWAvatarUsernameInput
     const {
       account,
       address,
+      darkMode,
       defaultValue,
       onAvatarChangeHandler,
       onUsernameChangeHandler,
+      orientation = 'horizontal',
     } = vnode.attrs;
 
     return (
-      <div class="AvatarUsernameInput">
+      <div
+        class={getClasses<{ orientation?: Orientation }>(
+          { orientation },
+          'AvatarUsernameInput'
+        )}
+      >
         <AvatarUpload
+          darkMode={darkMode}
           scope="user"
+          size={orientation === 'vertical' ? 'large' : 'small'}
           account={account}
           uploadStartedCallback={() => {
             m.redraw();
@@ -49,6 +63,7 @@ export class CWAvatarUsernameInput
         />
         <div class="input-and-address-container">
           <CWTextInput
+            darkMode={darkMode}
             size="small"
             iconRight="edit"
             containerClassName="username-input-container"

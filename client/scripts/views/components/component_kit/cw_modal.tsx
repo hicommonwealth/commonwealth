@@ -65,15 +65,19 @@ export class ModalExitButton
     const { disabled, iconButtonTheme } = vnode.attrs;
 
     return (
-      <CWIconButton
-        disabled={disabled}
-        iconButtonTheme={iconButtonTheme}
-        iconName="close"
-        onclick={(e) => {
-          e.preventDefault();
-          $(e.target).trigger('modalexit');
-        }}
-      />
+      // class is to avoid classname collisions when positioning the button,
+      // since .IconButton will often be used in the same vicinity
+      <div class="ModalExitButton">
+        <CWIconButton
+          disabled={disabled}
+          iconButtonTheme={iconButtonTheme}
+          iconName="close"
+          onclick={(e) => {
+            e.preventDefault();
+            $(e.target).trigger('modalexit');
+          }}
+        />
+      </div>
     );
   }
 }

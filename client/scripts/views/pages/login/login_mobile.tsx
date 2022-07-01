@@ -55,12 +55,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
         <ModalExitButton iconButtonTheme="hasBackground" />
         {hasEthAlert && <div style="color: white;">eth alert</div>}
         <div class={bodyType}>
-          <LoginText
-            headerText={headerText}
-            bodyText={bodyText}
-            isMobile
-            className="bottom-margin"
-          />
+          <LoginText headerText={headerText} bodyText={bodyText} isMobile />
           {hasCreationButtons && (
             <div class="account-creation-buttons-row">
               <CWAccountCreationButton
@@ -90,6 +85,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             <div class="inner-body-container">
               <CWAvatarUsernameInput
                 address={address}
+                darkMode
                 defaultValue={username}
                 onAvatarChangeHandler={(a) => {
                   handleSetAvatar(a);
@@ -97,17 +93,18 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                 onUsernameChangeHandler={(u) => {
                   handleSetUsername(u);
                 }}
+                orientation="vertical"
               />
               <CWButton label="Finish" />
             </div>
           )}
           {bodyType === 'selectProfile' && (
             <div class="inner-body-container">
-              <CWText type="h5" fontWeight="medium">
-                You have sucessfully linked
+              <CWText type="h5" fontWeight="medium" className="inner-body-text">
+                Linking
               </CWText>
-              <CWAddress address={address} />
-              <CWText type="h5" fontWeight="medium">
+              <CWAddress address={address} darkMode />
+              <CWText type="h5" fontWeight="medium" className="inner-body-text">
                 to your Profile
               </CWText>
               <CWProfilesList profiles={profiles} />
@@ -132,11 +129,11 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'allSet' && (
             <div class="inner-body-container">
-              <CWText type="h5" fontWeight="medium">
-                Linking
+              <CWText type="h5" fontWeight="medium" className="inner-body-text">
+                You have sucessfully linked
               </CWText>
-              <CWAddress address={address} />
-              <CWText type="h5" fontWeight="medium">
+              <CWAddress address={address} darkMode />
+              <CWText type="h5" fontWeight="medium" className="inner-body-text">
                 to your Profile
               </CWText>
               <CWProfileRow {...profiles[0]} />

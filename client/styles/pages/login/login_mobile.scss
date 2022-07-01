@@ -1,6 +1,10 @@
 @import 'shared';
 
 @mixin innerBodyStyles {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+
   .account-creation-buttons-row {
     display: flex;
     flex-direction: row;
@@ -14,6 +18,15 @@
     flex: 1;
     flex-direction: column;
     justify-content: space-between;
+
+    .inner-body-text.Text {
+      color: $white;
+      margin: 8px;
+    }
+
+    .AvatarUsernameInput {
+      margin-bottom: 48px;
+    }
 
     .buttons-row {
       display: flex;
@@ -44,7 +57,7 @@
   height: 100%;
   width: 100%;
 
-  .IconButton {
+  .ModalExitButton {
     position: absolute;
     right: 8px;
     top: 8px;
@@ -55,6 +68,10 @@
     width: 368px;
 
     @include innerBodyStyles;
+
+    .AvatarUsernameInput {
+      margin-bottom: 16px;
+    }
   }
 
   .selectAccountType {
