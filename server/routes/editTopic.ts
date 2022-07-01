@@ -53,7 +53,7 @@ const editTopic = async (
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
-  const requesterIsAdmin = validateRoles(models, req.user, 'admin', chain.id);
+  const requesterIsAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (requesterIsAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }
