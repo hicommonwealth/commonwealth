@@ -44,7 +44,11 @@
 
         .header-text.Text {
           margin-bottom: 0;
-          text-align: center;
+        }
+
+        .header-text-eth.Text {
+          margin-bottom: 0;
+          width: 268px;
         }
 
         .LoginBoilerplate {
@@ -54,7 +58,6 @@
         .subheader-text.Text {
           color: $neutral-500;
           margin: 0 32px;
-          text-align: center;
         }
       }
 

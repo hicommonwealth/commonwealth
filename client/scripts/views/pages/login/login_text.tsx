@@ -5,7 +5,10 @@ import m from 'mithril';
 import 'pages/login/login_text.scss';
 
 import { CWText } from '../../components/component_kit/cw_text';
-import { getClasses } from '../../components/component_kit/helpers';
+import {
+  getClasses,
+  isWindowExtraSmall,
+} from '../../components/component_kit/helpers';
 
 type LoginTextAttrs = {
   bodyText: string;
@@ -24,7 +27,13 @@ export class LoginText implements m.ClassComponent<LoginTextAttrs> {
       >
         <div class="header-container">
           <CWText
-            type={isMobile ? 'h2' : 'h4'}
+            type={
+              isWindowExtraSmall(window.innerWidth)
+                ? 'h3'
+                : isMobile
+                ? 'h2'
+                : 'h4'
+            }
             fontWeight="semiBold"
             isCentered={isMobile}
             className="header-text"

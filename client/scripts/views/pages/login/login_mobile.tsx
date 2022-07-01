@@ -16,8 +16,10 @@ import {
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { getText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
+import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import { LoginAttrs } from './types';
 
@@ -33,7 +35,8 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
       wallets,
     } = vnode.attrs;
 
-    const hasEthAlert = bodyType === 'ethWalletList';
+    const hasEthAlert =
+      bodyType === 'connectWithEmail' || bodyType === 'ethWalletList';
 
     const hasBoilerplate =
       bodyType === 'walletList' ||
@@ -55,7 +58,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
     return (
       <div class="LoginMobile">
         <ModalExitButton iconButtonTheme="hasBackground" />
-        {hasEthAlert && <div style="color: white;">eth alert</div>}
+        {hasEthAlert && <LoginEthAlert />}
         <div class={bodyType}>
           <LoginText headerText={headerText} bodyText={bodyText} isMobile />
           {hasCreationButtons && (
@@ -164,7 +167,9 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             </div>
           )}
         </div>
-        {hasBoilerplate && <LoginBoilerplate darkMode />}
+        {hasBoilerplate && !isWindowExtraSmall(window.innerWidth) && (
+          <LoginBoilerplate darkMode />
+        )}
       </div>
     );
   }

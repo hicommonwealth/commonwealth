@@ -53,13 +53,23 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'selectAccountType' && (
             <div class="inner-body-container centered">
               <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="semiBold"
+                  className="header-text"
+                  isCentered
+                >
                   Looks like this address hasn't been connected before.
                 </CWText>
               </div>
               <div class="select-row">
                 <CWIcon iconName="arrowLeft" />
-                <CWText type="h5" fontWeight="semiBold" className="select-text">
+                <CWText
+                  type="h5"
+                  fontWeight="semiBold"
+                  className="select-text"
+                  isCentered
+                >
                   Select Account Type
                 </CWText>
               </div>
@@ -68,7 +78,12 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'connectWithEmail' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="semiBold"
+                  className="header-text"
+                  isCentered
+                >
                   Connect With Email?
                 </CWText>
                 <LoginBoilerplate />
@@ -86,10 +101,15 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'welcome' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="bold"
+                  className="header-text"
+                  isCentered
+                >
                   Welcome to Common!
                 </CWText>
-                <CWText type="b2" className="subheader-text">
+                <CWText type="b2" className="subheader-text" isCentered>
                   Use a generated username and photo to edit later, or edit now
                 </CWText>
               </div>
@@ -109,10 +129,15 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'ethWalletList' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="semiBold"
+                  className="header-text-eth"
+                  isCentered
+                >
                   Select an Ethereum Wallet
                 </CWText>
-                <CWText type="caption" className="subheader-text">
+                <CWText type="caption" className="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
@@ -130,10 +155,15 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'selectPrevious' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="semiBold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="semiBold"
+                  className="header-text"
+                  isCentered
+                >
                   Select a Previously Linked Address
                 </CWText>
-                <CWText type="caption" className="subheader-text">
+                <CWText type="caption" className="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
@@ -151,14 +181,19 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'selectProfile' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="bold"
+                  className="header-text"
+                  isCentered
+                >
                   Select Profile
                 </CWText>
-                <CWText type="h5" fontWeight="medium">
+                <CWText type="h5" fontWeight="medium" isCentered>
                   Linking
                 </CWText>
                 <CWAddress address={address} />
-                <CWText type="h5" fontWeight="medium">
+                <CWText type="h5" fontWeight="medium" isCentered>
                   to your Profile
                 </CWText>
               </div>
@@ -169,14 +204,19 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           {bodyType === 'allSet' && (
             <div class="inner-body-container">
               <div class="header-container">
-                <CWText type="h3" fontWeight="bold" className="header-text">
+                <CWText
+                  type="h3"
+                  fontWeight="bold"
+                  className="header-text"
+                  isCentered
+                >
                   You’re All Set!
                 </CWText>
-                <CWText type="h5" fontWeight="medium">
+                <CWText type="h5" fontWeight="medium" isCentered>
                   You have sucessfully linked
                 </CWText>
                 <CWAddress address={address} />
-                <CWText type="h5" fontWeight="medium">
+                <CWText type="h5" fontWeight="medium" isCentered>
                   to your Profile
                 </CWText>
               </div>
