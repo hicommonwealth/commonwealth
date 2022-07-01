@@ -308,13 +308,6 @@ const ViewProposalPage: m.Component<
     threads: Array<{ id: string; title: string }> | null;
   }
 > = {
-  oncreate: (vnode) => {
-    mixpanelBrowserTrack({
-      event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
-      isCustomDomain: app.isCustomDomain(),
-      space: app.snapshot.space.id,
-    });
-  },
   oninit: (vnode) => {
     vnode.state.activeTab = 'Proposals';
     vnode.state.votes = [];
@@ -349,12 +342,22 @@ const ViewProposalPage: m.Component<
       }
     };
 
+    const mixpanelTrack = () => {
+      mixpanelBrowserTrack({
+        event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
+        isCustomDomain: app.isCustomDomain(),
+        space: app.snapshot.space.id,
+      });
+    }
+
     const snapshotId = vnode.attrs.snapshotId;
     if (!app.snapshot.initialized) {
       app.snapshot.init(snapshotId).then(() => {
+        mixpanelTrack();
         loadVotes();
       });
     } else {
+      mixpanelTrack();
       loadVotes();
     }
 
