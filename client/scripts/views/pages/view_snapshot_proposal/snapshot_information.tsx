@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import moment from 'moment';
+import { capitalize } from 'lodash';
 
 import 'pages/snapshot/snapshot_information.scss';
 
@@ -25,7 +26,9 @@ class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
 
     return (
       <div class="SnapshotInfoRow">
-        <CWText type="caption">{label}</CWText>
+        <CWText type="caption" className="snapshot-info-row-label">
+          {label}
+        </CWText>
         <CWText noWrap>{value}</CWText>
       </div>
     );
@@ -40,7 +43,9 @@ class SnapshotInfoLinkRow
 
     return (
       <div class="SnapshotInfoRow">
-        <CWText type="caption">{label}</CWText>
+        <CWText type="caption" className="snapshot-info-row-label">
+          {label}
+        </CWText>
         <a href={url} target="_blank">
           <CWText className="snapshot-link" noWrap>
             {value}
@@ -62,6 +67,10 @@ export class SnapshotInformation
 {
   view(vnode) {
     const { proposal, threads } = vnode.attrs;
+
+    const votingSystem = capitalize(
+      proposal.type.split('-').join(' ').concat(' voting')
+    );
 
     return (
       <CWCard elevation="elevation-1" className="SnapshotInformation">
@@ -88,10 +97,7 @@ export class SnapshotInformation
             value={`#${proposal.ipfs}`}
             url={`https://ipfs.fleek.co/ipfs/${proposal.ipfs}`}
           />
-          <SnapshotInfoRow
-            label="Voting System"
-            value={proposal.type.split('-').join(' ').concat(' voting')}
-          />
+          <SnapshotInfoRow label="Voting System" value={votingSystem} />
           <SnapshotInfoRow
             label="Start Date"
             value={moment(+proposal.start * 1000).format('lll')}

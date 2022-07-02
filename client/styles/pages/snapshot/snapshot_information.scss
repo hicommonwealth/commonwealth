@@ -7,6 +7,10 @@
   justify-content: space-between;
   width: 100%;
 
+  .snapshot-info-row-label.Text {
+    color: $neutral-500;
+  }
+
   a {
     align-items: center;
     display: flex;
@@ -22,17 +26,17 @@
   @include snapshotProposalCardContent;
 
   .info-rows-container {
-    border-bottom: 1px solid $neutral-100;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding-bottom: 16px;
     width: 100%;
   }
 
   .linked-discussions {
+    border-top: 1px solid $neutral-100;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding-top: 16px;
   }
 }
