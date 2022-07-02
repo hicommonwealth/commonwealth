@@ -22,6 +22,7 @@ import { SnapshotVoteAction } from './snapshot_vote_action';
 import { SnapshotVotingResults } from './snapshot_voting_results';
 import { SnapshotInformation } from './snapshot_information';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -82,6 +83,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     };
 
     const snapshotId = vnode.attrs.snapshotId;
+
     if (!app.snapshot.initialized) {
       app.snapshot.init(snapshotId).then(() => {
         mixpanelTrack();
@@ -93,7 +95,10 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
 
     window.onresize = () => {
-      if (window.innerWidth > 1024 && this.activeTab !== 'Proposals') {
+      if (
+        isWindowMediumSmallInclusive(window.innerWidth) &&
+        this.activeTab !== 'Proposals'
+      ) {
         this.activeTab = 'Proposals';
         m.redraw();
       }

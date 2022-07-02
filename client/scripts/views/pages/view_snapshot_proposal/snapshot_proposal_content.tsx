@@ -12,6 +12,7 @@ import { SnapshotProposal, SnapshotProposalVote } from 'helpers/snapshot_utils';
 import { formatNumberLong, formatTimestamp } from 'helpers';
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type SnapshotProposalContentAttrs = {
   proposal: SnapshotProposal;
@@ -35,22 +36,30 @@ export class SnapshotProposalContent
 
     return (
       <div class="SnapshotProposalContent">
-        <div class="snapshot-proposal-title">{proposal.title}</div>
-        <div class="snapshot-proposal-hash">#${proposal.ipfs}</div>
+        <div class="snapshot-proposal-content-header">
+          <CWText type="h3" fontWeight="semiBold">
+            {proposal.title}
+          </CWText>
+          {/* <CWText noWrap className="snapshot-proposal-hash">
+          #{proposal.ipfs}
+        </CWText>
         <div class="other-details">
-          <div class="submitted-by">submitted by</div>
-          <div class="author-address">
-            {m(User, {
-              user: new AddressInfo(
-                null,
-                proposal.author,
-                app.activeChainId(),
-                null
-              ),
-              linkify: true,
-              popover: true,
-            })}
+          <div class="author-row">
+            <CWText>Submitted by</CWText>
+            <div class="author-address">
+              {m(User, {
+                user: new AddressInfo(
+                  null,
+                  proposal.author,
+                  app.activeChainId(),
+                  null
+                ),
+                linkify: true,
+                popover: true,
+              })}
+            </div>
           </div>
+        </div> */}
           {proposal.state === 'active' ? (
             <div class="active-proposal">
               <span>

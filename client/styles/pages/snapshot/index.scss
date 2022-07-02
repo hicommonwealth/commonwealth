@@ -37,6 +37,10 @@
   }
 
   .snapshot-tabs {
+    margin-bottom: 8px;
+  }
+
+  .snapshot-tabs {
     @include medium {
       display: none;
     }
