@@ -4,10 +4,6 @@
 .SnapshotVoteAction.Card {
   @include snapshotProposalCardContent;
 
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
   .vote-action-radio-group {
     display: flex;
     flex-direction: column;

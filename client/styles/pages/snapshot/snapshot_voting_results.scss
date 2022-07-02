@@ -4,8 +4,6 @@
 .SnapshotVotingResults.Card {
   @include snapshotProposalCardContent;
 
-  gap: 16px;
-
   .result-container {
     width: 100%;
 

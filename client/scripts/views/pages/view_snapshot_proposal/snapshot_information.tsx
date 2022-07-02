@@ -14,6 +14,44 @@ import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
+type SnapshotInfoRowAttrs = {
+  label: string;
+  value: string;
+};
+
+class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
+  view(vnode) {
+    const { label, value } = vnode.attrs;
+
+    return (
+      <div class="SnapshotInfoRow">
+        <CWText type="caption">{label}</CWText>
+        <CWText noWrap>{value}</CWText>
+      </div>
+    );
+  }
+}
+
+class SnapshotInfoLinkRow
+  implements m.ClassComponent<SnapshotInfoRowAttrs & { url: string }>
+{
+  view(vnode) {
+    const { label, url, value } = vnode.attrs;
+
+    return (
+      <div class="SnapshotInfoRow">
+        <CWText type="caption">{label}</CWText>
+        <a href={url} target="_blank">
+          <CWText className="snapshot-link" noWrap>
+            {value}
+          </CWText>
+          <CWIcon iconName="externalLink" iconSize="small" />
+        </a>
+      </div>
+    );
+  }
+}
+
 type SnapshotInformationAttrs = {
   proposal: SnapshotProposal;
   threads: Array<{ id: string; title: string }> | null;
@@ -30,65 +68,58 @@ export class SnapshotInformation
         <CWText type="h3" fontWeight="semiBold">
           Information
         </CWText>
-        <div class="info-block">
-          <div class="labels">
-            <p>Author</p>
-            <p>IPFS</p>
-            <p>Voting System</p>
-            <p>Start Date</p>
-            <p>End Date</p>
-            <p>{proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'}</p>
-            <p>Snapshot</p>
-          </div>
-          <div class="values">
-            {m(User, {
+        <div class="info-rows-container">
+          <SnapshotInfoRow
+            label="Author"
+            value={m(User, {
               user: new AddressInfo(
                 null,
                 proposal.author,
                 app.activeChainId(),
                 null
               ),
+              hideAvatar: true,
               linkify: true,
               popover: true,
             })}
-            <a
-              class="snapshot-link -mt-10"
-              href={`https://ipfs.fleek.co/ipfs/${proposal.ipfs}`}
-              target="_blank"
-            >
-              <div class="truncate">#{proposal.ipfs}</div>
-              <CWIcon iconName="externalLink" iconSize="small" />
-            </a>
-            <div class="snapshot-type">
-              {proposal.type.split('-').join(' ').concat(' voting')}
-            </div>
-            <p>{moment(+proposal.start * 1000).format('lll')}</p>
-            <p>{moment(+proposal.end * 1000).format('lll')}</p>
-            <a
-              class="snapshot-link"
-              href={`https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`}
-              target="_blank"
-            >
-              <div class="truncate">
-                {proposal.strategies.length > 1
-                  ? `${proposal.strategies.length} Strategies`
-                  : proposal.strategies[0].name}
-              </div>
-              <CWIcon iconName="externalLink" iconSize="small" />
-            </a>
-            <a
-              class="snapshot-link"
-              href={`https://etherscan.io/block/${proposal.snapshot}`}
-              target="_blank"
-            >
-              <div class="truncate">#{proposal.snapshot}</div>
-              <CWIcon iconName="externalLink" iconSize="small" />
-            </a>
-          </div>
+          />
+          <SnapshotInfoLinkRow
+            label="IPFS"
+            value={`#${proposal.ipfs}`}
+            url={`https://ipfs.fleek.co/ipfs/${proposal.ipfs}`}
+          />
+          <SnapshotInfoRow
+            label="Voting System"
+            value={proposal.type.split('-').join(' ').concat(' voting')}
+          />
+          <SnapshotInfoRow
+            label="Start Date"
+            value={moment(+proposal.start * 1000).format('lll')}
+          />
+          <SnapshotInfoRow
+            label="End Date"
+            value={moment(+proposal.end * 1000).format('lll')}
+          />
+          <SnapshotInfoLinkRow
+            label={proposal.strategies.length > 1 ? 'Strategies' : 'Strategy'}
+            value={
+              proposal.strategies.length > 1
+                ? `${proposal.strategies.length} Strategies`
+                : proposal.strategies[0].name
+            }
+            url={`https://snapshot.org/#/${app.snapshot.space.id}/proposal/${proposal.id}`}
+          />
+          <SnapshotInfoLinkRow
+            label="Snapshot"
+            value={`#${proposal.snapshot}`}
+            url={`https://etherscan.io/block/${proposal.snapshot}`}
+          />
         </div>
-        {threads !== null && (
-          <div class="linked-discussion">
-            <div class="heading-2">Linked Discussions</div>
+        {!!threads && (
+          <div class="linked-discussions">
+            <CWText type="h5" fontWeight="semiBold">
+              Linked Discussions
+            </CWText>
             {threads.map((thread) => (
               <ProposalHeaderSnapshotThreadLink thread={thread} />
             ))}

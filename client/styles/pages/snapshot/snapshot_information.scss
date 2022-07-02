@@ -1,75 +1,38 @@
 @import 'shared';
 @import 'pages/snapshot/index.scss';
 
+.SnapshotInfoRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+
+  a {
+    align-items: center;
+    display: flex;
+
+    .snapshot-link {
+      color: $purple-400;
+      margin-right: 4px;
+    }
+  }
+}
+
 .SnapshotInformation.Card {
   @include snapshotProposalCardContent;
 
-  .info-block {
+  .info-rows-container {
+    border-bottom: 1px solid $neutral-100;
     display: flex;
-    margin: 16px 0 4px;
-
-    .labels {
-      color: $neutral-600;
-      margin-right: 24px;
-      flex-shrink: 0;
-
-      & > * {
-        margin-bottom: 10px;
-      }
-    }
-
-    .values {
-      overflow: hidden;
-
-      svg {
-        margin-left: 4px;
-      }
-
-      .-mt-10 {
-        margin-top: -10px;
-      }
-
-      .snapshot-type {
-        text-transform: capitalize;
-      }
-
-      & > * {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        margin-bottom: 10px;
-      }
-    }
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 16px;
+    width: 100%;
   }
 
-  .linked-discussion {
-    border-top: 1px solid $neutral-100;
-    padding-top: 16px;
-  }
-
-  .heading-2 {
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
-
-  .snapshot-votes {
-    margin-top: 10px;
-
-    .cui-radio {
-      display: block;
-      margin-bottom: 14px;
-    }
-  }
-
-  .snapshot-link {
-    font-weight: 500;
-    color: $purple-400;
+  .linked-discussions {
     display: flex;
-  }
-
-  .truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex-direction: column;
+    gap: 16px;
   }
 }
