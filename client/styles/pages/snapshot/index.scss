@@ -12,14 +12,6 @@
   }
 }
 
-.topic-loading-spinner-wrap {
-  height: 120px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .SnapshotViewProposalPage {
   display: flex;
   flex-direction: column;
@@ -34,93 +26,6 @@
     .proposal-content {
       width: 100%;
       margin-right: 40px;
-
-      .snapshot-proposal-title {
-        margin-top: 24px;
-        font-size: 32px;
-        font-weight: 500;
-      }
-
-      .snapshot-proposal-hash {
-        font-weight: 600;
-        color: $neutral-600;
-        margin-top: 6px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .ProposalBodyText {
-        margin-top: 32px;
-      }
-
-      .votes-title {
-        margin-top: 64px;
-        display: flex;
-        align-items: baseline;
-
-        .title {
-          font-size: 24px;
-          font-weight: 500;
-          margin-right: 8px;
-        }
-
-        .vote-count {
-          background-color: $neutral-600;
-          color: $white;
-          font-weight: 500;
-          border-radius: 9999px;
-          padding: 4px 8px;
-        }
-      }
-
-      .votes-container {
-        border: 2px solid $neutral-100;
-        border-radius: 10px;
-        background-color: $neutral-50;
-        margin-top: 18px;
-
-        .t-head {
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 2px solid $neutral-100;
-          color: $neutral-600;
-          font-weight: 500;
-          padding: 18px 18px 14px;
-        }
-
-        .user-column {
-          width: 30%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .vote-column {
-          width: 40%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .power-column {
-          width: 25%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          text-align: right;
-        }
-
-        .vote-row {
-          display: flex;
-          padding: 18px 18px 14px;
-          justify-content: space-between;
-        }
-
-        .view-more-button {
-          text-transform: uppercase;
-          width: 100%;
-          padding: 18px 0 14px 0;
-          color: $purple-400;
-          border-top: 1px solid $neutral-100;
-        }
-      }
     }
 
     .proposal-info {

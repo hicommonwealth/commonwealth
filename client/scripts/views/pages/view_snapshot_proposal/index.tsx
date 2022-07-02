@@ -6,7 +6,6 @@ import { Tabs, TabItem } from 'construct-ui';
 import moment from 'moment';
 
 import 'pages/snapshot/index.scss';
-import 'pages/snapshot/list_proposal.scss';
 
 import app from 'state';
 import { MixpanelSnapshotEvents } from 'analytics/types';
@@ -22,7 +21,7 @@ import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { SnapshotVoteAction } from './snapshot_vote_action';
 import { SnapshotVotingResults } from './snapshot_voting_results';
 import { SnapshotInformation } from './snapshot_information';
-import { ProposalContent } from './snapshot_proposal_content';
+import { SnapshotProposalContent } from './snapshot_proposal_content';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -136,7 +135,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
           <div class="proposal-body">
             {activeTab !== 'Info & Results' && (
               <div class="proposal-content">
-                <ProposalContent
+                <SnapshotProposalContent
                   proposal={proposal}
                   votes={votes}
                   symbol={this.symbol}

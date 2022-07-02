@@ -1,0 +1,152 @@
+@import 'shared';
+
+.SnapshotProposalContent {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+
+  .snapshot-proposal-title {
+    margin-top: 24px;
+    font-size: 32px;
+    font-weight: 500;
+  }
+
+  .snapshot-proposal-hash {
+    font-weight: 600;
+    color: $neutral-600;
+    margin-top: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .other-details {
+    margin-top: 14px;
+
+    @include small {
+      display: flex;
+    }
+
+    justify-content: space-between;
+    align-items: baseline;
+
+    .submitted-by {
+      display: inline;
+      color: $neutral-600;
+      margin-right: 16px;
+    }
+
+    .author-address {
+      display: inline;
+      background-color: $neutral-50;
+      padding: 4px 16px;
+      border-radius: 9999px;
+    }
+
+    .closed-proposal {
+      @include extraSmall {
+        margin-top: 14px;
+      }
+
+      background-color: $neutral-500;
+      border-radius: 9999px;
+      max-width: max-content;
+      padding: 4px 8px;
+      color: $white;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+
+    .active-proposal {
+      @include extraSmall {
+        margin-top: 18px;
+      }
+
+      align-items: center;
+      background-color: $neutral-50;
+      border-radius: 9999px;
+      max-width: max-content;
+      margin-top: 14px;
+      display: flex;
+      color: $neutral-600;
+      padding: 4px 16px;
+
+      .active-text {
+        background-color: $green-500;
+        border-radius: 9999px;
+        font-weight: 500;
+        color: $green-700;
+        padding: 4px 8px;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .votes-title {
+    margin-top: 64px;
+    display: flex;
+    align-items: baseline;
+
+    .title {
+      font-size: 24px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    .vote-count {
+      background-color: $neutral-600;
+      color: $white;
+      font-weight: 500;
+      border-radius: 9999px;
+      padding: 4px 8px;
+    }
+  }
+
+  .votes-container {
+    border: 2px solid $neutral-100;
+    border-radius: 10px;
+    background-color: $neutral-50;
+    margin-top: 18px;
+
+    .t-head {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid $neutral-100;
+      color: $neutral-600;
+      font-weight: 500;
+      padding: 18px 18px 14px;
+    }
+
+    .user-column {
+      width: 30%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vote-column {
+      width: 40%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .power-column {
+      width: 25%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: right;
+    }
+
+    .vote-row {
+      display: flex;
+      padding: 18px 18px 14px;
+      justify-content: space-between;
+    }
+
+    .view-more-button {
+      text-transform: uppercase;
+      width: 100%;
+      padding: 18px 0 14px 0;
+      color: $purple-400;
+      border-top: 1px solid $neutral-100;
+    }
+  }
+}

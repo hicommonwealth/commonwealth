@@ -4,8 +4,7 @@ import m from 'mithril';
 
 import moment from 'moment';
 
-import 'pages/snapshot/index.scss';
-import 'pages/snapshot/list_proposal.scss';
+import 'pages/snapshot/snapshot_proposal_content.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
@@ -14,13 +13,15 @@ import { formatNumberLong, formatTimestamp } from 'helpers';
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 
-type ProposalContentAttrs = {
+type SnapshotProposalContentAttrs = {
   proposal: SnapshotProposal;
   symbol: string;
   votes: SnapshotProposalVote[];
 };
 
-export class ProposalContent implements m.ClassComponent<ProposalContentAttrs> {
+export class SnapshotProposalContent
+  implements m.ClassComponent<SnapshotProposalContentAttrs>
+{
   private votersListExpanded: boolean;
 
   oncreate() {
@@ -33,39 +34,35 @@ export class ProposalContent implements m.ClassComponent<ProposalContentAttrs> {
     const votersList = this.votersListExpanded ? votes : votes.slice(0, 10);
 
     return (
-      <>
+      <div class="SnapshotProposalContent">
         <div class="snapshot-proposal-title">{proposal.title}</div>
         <div class="snapshot-proposal-hash">#${proposal.ipfs}</div>
-        <div class="snapshot-proposals-list">
-          <div class="other-details">
-            <div class="submitted-by">submitted by</div>
-            <div class="author-address">
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  proposal.author,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                popover: true,
-              })}
-            </div>
-            {proposal.state === 'active' ? (
-              <div class="active-proposal">
-                <span>
-                  Ends in ${formatTimestamp(moment(+proposal.end * 1000))}
-                </span>
-                <div class="active-text">Active</div>
-              </div>
-            ) : (
-              <div class="closed-proposal">{proposal.state}</div>
-            )}
+        <div class="other-details">
+          <div class="submitted-by">submitted by</div>
+          <div class="author-address">
+            {m(User, {
+              user: new AddressInfo(
+                null,
+                proposal.author,
+                app.activeChainId(),
+                null
+              ),
+              linkify: true,
+              popover: true,
+            })}
           </div>
+          {proposal.state === 'active' ? (
+            <div class="active-proposal">
+              <span>
+                Ends in ${formatTimestamp(moment(+proposal.end * 1000))}
+              </span>
+              <div class="active-text">Active</div>
+            </div>
+          ) : (
+            <div class="closed-proposal">{proposal.state}</div>
+          )}
         </div>
-        <div class="ProposalBodyText">
-          <MarkdownFormattedText doc={proposal.body} />
-        </div>
+        <MarkdownFormattedText doc={proposal.body} />
         {votes.length > 0 && (
           <>
             <div class="votes-title">
@@ -112,7 +109,7 @@ export class ProposalContent implements m.ClassComponent<ProposalContentAttrs> {
             </div>
           </>
         )}
-      </>
+      </div>
     );
   }
 }
