@@ -39,14 +39,6 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private totals: any;
   private votes: SnapshotProposalVote[];
 
-  oncreate() {
-    mixpanelBrowserTrack({
-      event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
-      isCustomDomain: app.isCustomDomain(),
-      space: app.snapshot.space.id,
-    });
-  }
-
   oninit(vnode) {
     this.activeTab = 'Proposals';
     this.votes = [];
@@ -81,12 +73,22 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       }
     };
 
+    const mixpanelTrack = () => {
+      mixpanelBrowserTrack({
+        event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
+        isCustomDomain: app.isCustomDomain(),
+        space: app.snapshot.space.id,
+      });
+    };
+
     const snapshotId = vnode.attrs.snapshotId;
     if (!app.snapshot.initialized) {
       app.snapshot.init(snapshotId).then(() => {
+        mixpanelTrack();
         loadVotes();
       });
     } else {
+      mixpanelTrack();
       loadVotes();
     }
 
