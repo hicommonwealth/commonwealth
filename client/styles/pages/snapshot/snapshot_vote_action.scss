@@ -1,7 +1,7 @@
 @import 'shared';
 @import 'pages/snapshot/index.scss';
 
-.VoteAction.Card {
+.SnapshotVoteAction.Card {
   @include snapshotProposalCardContent;
 
   display: flex;

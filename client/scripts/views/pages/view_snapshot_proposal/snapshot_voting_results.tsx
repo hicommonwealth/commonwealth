@@ -36,17 +36,19 @@ export class SnapshotVotingResults
 
       return (
         <div class="result-container">
-          <div class="result-choice">{choice}</div>
+          <CWText type="h4" fontWeight="semiBold">
+            {choice}
+          </CWText>
           <div class="result-choice-details">
             <div class="vote-balance-for-choice">
-              <span class="font-medium">
+              <CWText fontWeight="medium">
                 {formatNumberLong(totalForChoice)}
-              </span>
-              <span class="symbol">{symbol}</span>
+              </CWText>
+              <CWText className="symbol">{symbol}</CWText>
             </div>
-            <span class="font-medium">{formatPercent(voteFrac, 2)}</span>
+            <CWText fontWeight="medium">{formatPercent(voteFrac, 2)}</CWText>
           </div>
-          <div class="result-progress" max="100" value={voteFrac * 100} />
+          <progress class="result-progress" max="100" value={voteFrac * 100} />
         </div>
       );
     });

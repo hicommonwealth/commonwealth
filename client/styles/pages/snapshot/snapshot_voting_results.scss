@@ -4,12 +4,10 @@
 .SnapshotVotingResults.Card {
   @include snapshotProposalCardContent;
 
+  gap: 16px;
+
   .result-container {
-    .result-choice {
-      font-weight: 500;
-      font-size: 24px;
-      margin-top: 24px;
-    }
+    width: 100%;
 
     .result-choice-details {
       display: flex;
@@ -18,32 +16,28 @@
     }
 
     .vote-balance-for-choice {
-      flex-shrink: 1;
-    }
+      display: flex;
 
-    .font-medium {
-      font-weight: 500;
-    }
-
-    .symbol {
-      color: $neutral-600;
-      margin-left: 4px;
+      .symbol.Text {
+        color: $neutral-600;
+        margin-left: 4px;
+      }
     }
 
     .result-progress {
       width: 100%;
-    }
 
-    .result-progress::-webkit-progress-bar {
-      width: 100%;
-      height: 6px;
-      border-radius: 5px;
-      background-color: $neutral-100;
-    }
+      &::-webkit-progress-bar {
+        background-color: $neutral-100;
+        border-radius: $border-radius-corners;
+        height: 8px;
+        width: 100%;
+      }
 
-    .result-progress::-webkit-progress-value {
-      border-radius: 5px;
-      background-color: $green-400;
+      &::-webkit-progress-value {
+        background-color: $green-400;
+        border-radius: $border-radius-corners;
+      }
     }
   }
 }

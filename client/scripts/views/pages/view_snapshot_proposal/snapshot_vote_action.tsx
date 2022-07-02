@@ -3,7 +3,7 @@
 import m from 'mithril';
 import { RadioGroup } from 'construct-ui';
 
-import 'pages/snapshot/vote_action.scss';
+import 'pages/snapshot/snapshot_vote_action.scss';
 
 import app from 'state';
 import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
@@ -23,7 +23,7 @@ const enum VotingError {
   ALREADY_VOTED = 'Already Submitted Vote',
 }
 
-type VoteActionAttrs = {
+type SnapshotVoteActionAttrs = {
   choices: string[];
   id: string;
   proposal: SnapshotProposal;
@@ -32,7 +32,9 @@ type VoteActionAttrs = {
   votes: SnapshotProposalVote[];
 };
 
-export class VoteAction implements m.ClassComponent<VoteActionAttrs> {
+export class SnapshotVoteAction
+  implements m.ClassComponent<SnapshotVoteActionAttrs>
+{
   private chosenOption: string;
   private fetchedPower: boolean;
   private totalScore: number;
@@ -92,7 +94,7 @@ export class VoteAction implements m.ClassComponent<VoteActionAttrs> {
       : '';
 
     return (
-      <CWCard elevation="elevation-1" className="VoteAction">
+      <CWCard elevation="elevation-1" className="SnapshotVoteAction">
         <CWText type="h3" fontWeight="semiBold">
           Cast your vote
         </CWText>
