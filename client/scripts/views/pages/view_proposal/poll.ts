@@ -7,7 +7,7 @@ import { Button, Icons } from 'construct-ui';
 import moment from 'moment';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import OffchainVotingModal from '../../modals/offchain_voting_modal';
+import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 
 const vote = async (
   poll: OffchainPoll,
