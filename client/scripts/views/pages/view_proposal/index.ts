@@ -110,7 +110,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalPoll } from './poll';
+import { ProposalPoll } from './proposal_poll';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,

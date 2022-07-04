@@ -1,6 +1,10 @@
-import m from 'mithril';
-import app from 'state';
+/* @jsx m */
 
+import m from 'mithril';
+
+import 'pages/view_proposal/proposal_poll.scss';
+
+import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { OffchainThread, OffchainPoll } from 'models';
 import { Button, Icons } from 'construct-ui';
@@ -15,15 +19,21 @@ const vote = async (
   isSelected: boolean
 ) => {
   const { activeAccount } = app.user;
+
   if (!app.isLoggedIn() || !activeAccount || isSelected) return;
+
   const userInfo = [activeAccount.chain.id, activeAccount.address] as const;
+
   let confirmationText;
+
   if (poll.getUserVote(...userInfo)) {
     confirmationText = `Change your vote to '${option}'?`;
   } else {
     confirmationText = `Submit a vote for '${option}'?`;
   }
+
   const confirmed = await confirmationModalWithText(confirmationText)();
+
   if (!confirmed) return;
   // submit vote
   poll
@@ -36,16 +46,18 @@ const vote = async (
     });
 };
 
-export const ProposalPoll: m.Component<
-  { poll: OffchainPoll; thread: OffchainThread },
-  { votesFetched: boolean; threadId: number }
-> = {
-  view: (vnode) => {
+export class ProposalPoll
+  implements m.ClassComponent<{ poll: OffchainPoll; thread: OffchainThread }>
+{
+  private threadId: number;
+  private votesFetched: boolean;
+
+  view(vnode) {
     const { poll, thread } = vnode.attrs;
-    const { threadId, votesFetched } = vnode.state;
+    const { threadId, votesFetched } = this;
 
     if (!votesFetched || threadId !== poll.threadId) {
-      vnode.state.votesFetched = true;
+      this.votesFetched = true;
       // TODO: Is this necessary? Can I initialize elsewhere?
       poll.getVotes();
       // `/api/viewOffchainVotes?thread_id=${proposal.id}${
@@ -63,10 +75,13 @@ export const ProposalPoll: m.Component<
     });
 
     const totalVoteCount = poll.votes.length;
+
     const voteSynopsis = m('.vote-synopsis', [
       optionScopedVotes.map((optionWithVotes) => {
         const optionVoteCount = optionWithVotes.votes.length;
+
         const optionVotePercentage = optionVoteCount / totalVoteCount;
+
         return m('.option-with-votes', [
           m('.option-results-label', [
             m(
@@ -148,5 +163,5 @@ export const ProposalPoll: m.Component<
           : voteSynopsis,
       ]),
     ]);
-  },
-};
+  }
+}
