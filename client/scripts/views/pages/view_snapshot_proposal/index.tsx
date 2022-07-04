@@ -3,7 +3,6 @@
 import m from 'mithril';
 
 import { Tabs, TabItem } from 'construct-ui';
-import moment from 'moment';
 
 import 'pages/snapshot/index.scss';
 
@@ -18,11 +17,9 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotVoteActionCard } from './snapshot_vote_action_card';
-import { SnapshotVotingResultsCard } from './snapshot_voting_results_card';
-import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { SnapshotProposalCards } from './snapshot_proposal_cards';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -107,15 +104,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   }
 
   view(vnode) {
-    const author = app.user.activeAccount;
-
     const { identifier } = vnode.attrs;
-    const { proposal, votes, activeTab, threads } = this;
-
-    const isActive =
-      this.proposal &&
-      moment(+this.proposal.start * 1000) <= moment() &&
-      moment(+this.proposal.end * 1000) > moment();
 
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
@@ -126,76 +115,57 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             <Tabs align="left" class="snapshot-tabs">
               <TabItem
                 label="Proposals"
-                active={activeTab === 'proposals'}
+                active={this.activeTab === 'proposals'}
                 onclick={() => {
                   this.activeTab = 'proposals';
                 }}
               />
               <TabItem
                 label="Info & Results"
-                active={activeTab === 'info-and-results'}
+                active={this.activeTab === 'info-and-results'}
                 onclick={() => {
                   this.activeTab = 'info-and-results';
                 }}
               />
             </Tabs>
-            {activeTab === 'proposals' && (
+            {this.activeTab === 'proposals' && (
               <SnapshotProposalContent
-                proposal={proposal}
-                votes={votes}
+                proposal={this.proposal}
+                votes={this.votes}
                 symbol={this.symbol}
               />
             )}
-            {activeTab === 'info-and-results' && (
+            {this.activeTab === 'info-and-results' && (
               <div class="proposal-cards-container">
-                <SnapshotInformationCard
-                  proposal={proposal}
-                  threads={threads}
-                />
-                {isActive && author && (
-                  <SnapshotVoteActionCard
-                    space={this.space}
-                    proposal={this.proposal}
-                    id={identifier}
-                    scores={this.scores}
-                    choices={this.proposal.choices}
-                    votes={this.votes}
-                  />
-                )}
-                <SnapshotVotingResultsCard
-                  choices={this.proposal.choices}
-                  votes={this.votes}
-                  totals={this.totals}
+                <SnapshotProposalCards
+                  identifier={identifier}
+                  proposal={this.proposal}
+                  scores={this.scores}
+                  space={this.space}
                   symbol={this.symbol}
+                  threads={this.threads}
+                  totals={this.totals}
+                  votes={this.votes}
                 />
               </div>
             )}
           </div>
           <div class="proposal-body">
             <SnapshotProposalContent
-              proposal={proposal}
-              votes={votes}
+              proposal={this.proposal}
+              votes={this.votes}
               symbol={this.symbol}
             />
-            <div class="proposal-cards-container">
-              <SnapshotInformationCard proposal={proposal} threads={threads} />
-              {isActive && author && (
-                <SnapshotVoteActionCard
-                  space={this.space}
-                  proposal={this.proposal}
-                  id={identifier}
-                  scores={this.scores}
-                  choices={this.proposal.choices}
-                  votes={this.votes}
-                />
-              )}
-              <SnapshotVotingResultsCard
-                choices={this.proposal.choices}
-                votes={this.votes}
-                totals={this.totals}
-                symbol={this.symbol}
-              />
-            </div>
+            <SnapshotProposalCards
+              identifier={identifier}
+              proposal={this.proposal}
+              scores={this.scores}
+              space={this.space}
+              symbol={this.symbol}
+              threads={this.threads}
+              totals={this.totals}
+              votes={this.votes}
+            />
           </div>
         </div>
       </Sublayout>
