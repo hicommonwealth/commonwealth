@@ -1,0 +1,85 @@
+@import 'shared';
+
+.SnapshotVotesTable {
+  display: flex;
+  flex-direction: column;
+
+  .votes-header-row {
+    align-items: center;
+    display: flex;
+    padding: 16px 0;
+
+    .vote-count {
+      align-items: center;
+      background-color: $neutral-600;
+      border-radius: $border-radius-rounded-corners;
+      display: flex;
+      height: 24px;
+      justify-content: center;
+      margin-left: 8px;
+      padding: 0px 8px 2px;
+
+      .vote-count-text.Text {
+        color: $white;
+      }
+    }
+  }
+
+  .votes-container {
+    border: 2px solid $neutral-100;
+    border-radius: $border-radius-corners;
+    background-color: $neutral-50;
+
+    .column-header-row {
+      display: flex;
+      border-bottom: 2px solid $neutral-100;
+      padding: 16px;
+    }
+
+    .column-header-text.Text {
+      color: $neutral-500;
+      flex: 2;
+    }
+
+    .vote-column-header-text.Text {
+      color: $neutral-500;
+      flex: 1;
+    }
+
+    .vote-row {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+      padding: 8px 16px;
+
+      .User {
+        display: inline-block;
+        flex: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .vote-column-text.Text {
+        flex: 1;
+      }
+
+      .column-text.Text {
+        flex: 2;
+      }
+    }
+
+    .view-more-footer {
+      align-items: center;
+      border-top: 1px solid $neutral-100;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      padding: 8px 16px;
+
+      .view-more-text.Text {
+        color: $purple-400;
+      }
+    }
+  }
+}
