@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
-import 'pages/snapshot/snapshot_information.scss';
+import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
@@ -57,13 +57,13 @@ class SnapshotInfoLinkRow
   }
 }
 
-type SnapshotInformationAttrs = {
+type SnapshotInformationCardAttrs = {
   proposal: SnapshotProposal;
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export class SnapshotInformation
-  implements m.ClassComponent<SnapshotInformationAttrs>
+export class SnapshotInformationCard
+  implements m.ClassComponent<SnapshotInformationCardAttrs>
 {
   view(vnode) {
     const { proposal, threads } = vnode.attrs;
@@ -73,7 +73,7 @@ export class SnapshotInformation
     );
 
     return (
-      <CWCard elevation="elevation-1" className="SnapshotInformation">
+      <CWCard elevation="elevation-1" className="SnapshotInformationCard">
         <CWText type="h3" fontWeight="semiBold">
           Information
         </CWText>

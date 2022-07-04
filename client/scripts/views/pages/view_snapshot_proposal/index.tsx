@@ -18,9 +18,9 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotVoteAction } from './snapshot_vote_action';
-import { SnapshotVotingResults } from './snapshot_voting_results';
-import { SnapshotInformation } from './snapshot_information';
+import { SnapshotVoteActionCard } from './snapshot_vote_action_card';
+import { SnapshotVotingResultsCard } from './snapshot_voting_results_card';
+import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
@@ -150,9 +150,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
               </div>
             )}
             <div class="proposal-info">
-              <SnapshotInformation proposal={proposal} threads={threads} />
+              <SnapshotInformationCard proposal={proposal} threads={threads} />
               {isActive && author && (
-                <SnapshotVoteAction
+                <SnapshotVoteActionCard
                   space={this.space}
                   proposal={this.proposal}
                   id={vnode.attrs.identifier}
@@ -161,7 +161,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
                   votes={this.votes}
                 />
               )}
-              <SnapshotVotingResults
+              <SnapshotVotingResultsCard
                 choices={this.proposal.choices}
                 votes={this.votes}
                 totals={this.totals}

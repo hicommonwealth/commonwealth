@@ -43,7 +43,7 @@ export class SnapshotVotesTable
             <CWText type="h5" className="column-header-text">
               User
             </CWText>
-            <CWText type="h5" className="vote-column-header-text">
+            <CWText type="h5" className="column-header-text">
               Vote
             </CWText>
             <CWText type="h5" className="column-header-text">
@@ -62,7 +62,7 @@ export class SnapshotVotesTable
                 linkify: true,
                 popover: true,
               })}
-              <CWText className="vote-column-text" noWrap>
+              <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>
               <CWText className="column-text" noWrap>

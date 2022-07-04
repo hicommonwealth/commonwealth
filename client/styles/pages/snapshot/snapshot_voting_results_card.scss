@@ -1,7 +1,7 @@
 @import 'shared';
 @import 'pages/snapshot/index.scss';
 
-.SnapshotVotingResults.Card {
+.SnapshotVotingResultsCard.Card {
   @include snapshotProposalCardContent;
 
   .result-container {

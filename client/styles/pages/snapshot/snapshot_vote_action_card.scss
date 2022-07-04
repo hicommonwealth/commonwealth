@@ -1,7 +1,7 @@
 @import 'shared';
 @import 'pages/snapshot/index.scss';
 
-.SnapshotVoteAction.Card {
+.SnapshotVoteActionCard.Card {
   @include snapshotProposalCardContent;
 
   .vote-action-radio-group {

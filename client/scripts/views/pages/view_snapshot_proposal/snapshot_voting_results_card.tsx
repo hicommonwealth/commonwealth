@@ -2,22 +2,22 @@
 
 import m from 'mithril';
 
-import 'pages/snapshot/snapshot_voting_results.scss';
+import 'pages/snapshot/snapshot_voting_results_card.scss';
 
 import { SnapshotProposalVote } from 'helpers/snapshot_utils';
 import { formatPercent, formatNumberLong } from 'helpers';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 
-type VotingResultsAttrs = {
+type VotingResultsCardAttrs = {
   choices: string[];
   symbol: string;
   totals: any;
   votes: SnapshotProposalVote[];
 };
 
-export class SnapshotVotingResults
-  implements m.ClassComponent<VotingResultsAttrs>
+export class SnapshotVotingResultsCard
+  implements m.ClassComponent<VotingResultsCardAttrs>
 {
   private voteListings: any[];
 
@@ -54,7 +54,7 @@ export class SnapshotVotingResults
     });
 
     return (
-      <CWCard elevation="elevation-1" className="SnapshotVotingResults">
+      <CWCard elevation="elevation-1" className="SnapshotVotingResultsCard">
         <CWText type="h3" fontWeight="semiBold">
           Current Results
         </CWText>
