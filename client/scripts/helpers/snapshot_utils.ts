@@ -34,6 +34,8 @@ async function getApolloClient() {
   return apolloClient;
 }
 
+// Queries from: https://github.com/snapshot-labs/snapshot/blob/develop/src/helpers/queries.ts
+
 export const SPACE_QUERY = gql`
   query Space($space: String) {
     space(id: $space) {
@@ -281,9 +283,9 @@ export async function getResults(
       strategies
     );
     const results = {
-      resultsByVoteBalance: votingClass.resultsByVoteBalance(),
-      resultsByStrategyScore: votingClass.resultsByStrategyScore(),
-      sumOfResultsBalance: votingClass.sumOfResultsBalance(),
+      resultsByVoteBalance: votingClass.getScores(),
+      resultsByStrategyScore: votingClass.getScoresByStrategy(),
+      sumOfResultsBalance: votingClass.getScoresTotal(),
     };
 
     return { votes, results };
