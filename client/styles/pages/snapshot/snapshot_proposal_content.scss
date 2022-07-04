@@ -3,6 +3,8 @@
 .SnapshotProposalContent {
   display: flex;
   flex-direction: column;
+  margin-right: 40px;
+  max-width: 768px;
   width: 100%;
 
   .snapshot-proposal-content-header {

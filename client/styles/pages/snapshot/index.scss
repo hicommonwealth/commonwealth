@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: fit-content;
   padding: 24px;
   width: 336px;
 
@@ -12,35 +13,27 @@
   }
 }
 
+@mixin proposalCardsContainerStyles {
+  .proposal-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
 .SnapshotViewProposalPage {
   display: flex;
+  flex: 1;
   flex-direction: column;
   padding: 24px;
 
-  .proposal-body {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-
-    .proposal-content {
-      width: 100%;
-      margin-right: 40px;
+  .proposal-body-with-tabs {
+    .snapshot-tabs {
+      margin-bottom: 8px;
     }
 
-    .proposal-info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
-    }
-  }
+    @include proposalCardsContainerStyles;
 
-  .snapshot-tabs {
-    margin-bottom: 8px;
-  }
-
-  .snapshot-tabs {
     @include medium {
       display: none;
     }
@@ -49,36 +42,17 @@
       display: none;
     }
   }
-}
 
-.proposal-tab {
   .proposal-body {
-    .proposal-content {
-      @include small {
-        display: block;
-      }
-    }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
 
-    .proposal-info {
-      @include mediumSmallInclusive {
-        display: none;
-      }
-    }
-  }
-}
+    @include proposalCardsContainerStyles;
 
-.info-tab {
-  .proposal-body {
-    .proposal-content {
-      @include small {
-        display: none;
-      }
-    }
-
-    .proposal-info {
-      @include small {
-        display: block;
-      }
+    @include mediumSmallInclusive {
+      display: none;
     }
   }
 }

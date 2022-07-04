@@ -31,7 +31,7 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
-  private activeTab: string;
+  private activeTab: 'proposals' | 'info-and-results';
   private proposal: SnapshotProposal;
   private scores: number[];
   private space: SnapshotSpace;
@@ -41,7 +41,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private votes: SnapshotProposalVote[];
 
   oninit(vnode) {
-    this.activeTab = 'Proposals';
+    this.activeTab = 'proposals';
     this.votes = [];
     this.scores = [];
     this.proposal = null;
@@ -60,6 +60,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
         this.votes = res.votes;
         this.totals = res.results;
       });
+
       m.redraw();
 
       try {
@@ -97,9 +98,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     window.onresize = () => {
       if (
         isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.activeTab !== 'Proposals'
+        this.activeTab !== 'proposals'
       ) {
-        this.activeTab = 'Proposals';
+        this.activeTab = 'proposals';
         m.redraw();
       }
     };
@@ -107,6 +108,8 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
 
   view(vnode) {
     const author = app.user.activeAccount;
+
+    const { identifier } = vnode.attrs;
     const { proposal, votes, activeTab, threads } = this;
 
     const isActive =
@@ -118,44 +121,69 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       <PageLoading />
     ) : (
       <Sublayout title="Snapshot Proposal">
-        <div
-          class={`SnapshotViewProposalPage ${
-            activeTab === 'Proposals' ? 'proposal-tab' : 'info-tab'
-          }`}
-        >
-          <Tabs align="left" class="snapshot-tabs">
-            <TabItem
-              label="Proposals"
-              active={activeTab === 'Proposals'}
-              onclick={() => {
-                this.activeTab = 'Proposals';
-              }}
-            />
-            <TabItem
-              label="Info & Results"
-              active={activeTab === 'Info & Results'}
-              onclick={() => {
-                this.activeTab = 'Info & Results';
-              }}
-            />
-          </Tabs>
-          <div class="proposal-body">
-            {activeTab !== 'Info & Results' && (
-              <div class="proposal-content">
-                <SnapshotProposalContent
+        <div class="SnapshotViewProposalPage">
+          <div class="proposal-body-with-tabs">
+            <Tabs align="left" class="snapshot-tabs">
+              <TabItem
+                label="Proposals"
+                active={activeTab === 'proposals'}
+                onclick={() => {
+                  this.activeTab = 'proposals';
+                }}
+              />
+              <TabItem
+                label="Info & Results"
+                active={activeTab === 'info-and-results'}
+                onclick={() => {
+                  this.activeTab = 'info-and-results';
+                }}
+              />
+            </Tabs>
+            {activeTab === 'proposals' && (
+              <SnapshotProposalContent
+                proposal={proposal}
+                votes={votes}
+                symbol={this.symbol}
+              />
+            )}
+            {activeTab === 'info-and-results' && (
+              <div class="proposal-cards-container">
+                <SnapshotInformationCard
                   proposal={proposal}
-                  votes={votes}
+                  threads={threads}
+                />
+                {isActive && author && (
+                  <SnapshotVoteActionCard
+                    space={this.space}
+                    proposal={this.proposal}
+                    id={identifier}
+                    scores={this.scores}
+                    choices={this.proposal.choices}
+                    votes={this.votes}
+                  />
+                )}
+                <SnapshotVotingResultsCard
+                  choices={this.proposal.choices}
+                  votes={this.votes}
+                  totals={this.totals}
                   symbol={this.symbol}
                 />
               </div>
             )}
-            <div class="proposal-info">
+          </div>
+          <div class="proposal-body">
+            <SnapshotProposalContent
+              proposal={proposal}
+              votes={votes}
+              symbol={this.symbol}
+            />
+            <div class="proposal-cards-container">
               <SnapshotInformationCard proposal={proposal} threads={threads} />
               {isActive && author && (
                 <SnapshotVoteActionCard
                   space={this.space}
                   proposal={this.proposal}
-                  id={vnode.attrs.identifier}
+                  id={identifier}
                   scores={this.scores}
                   choices={this.proposal.choices}
                   votes={this.votes}
