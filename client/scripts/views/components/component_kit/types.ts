@@ -9,6 +9,7 @@ export enum ComponentType {
   Card = 'Card',
   Checkbox = 'Checkbox',
   CustomIcon = 'CustomIcon',
+  Divider = 'Divider',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',

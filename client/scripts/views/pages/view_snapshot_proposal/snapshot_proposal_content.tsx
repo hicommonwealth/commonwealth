@@ -12,6 +12,7 @@ import {
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 type SnapshotProposalContentAttrs = {
   proposal: SnapshotProposal;
@@ -50,15 +51,19 @@ export class SnapshotProposalContent
             <ClosedProposalPill proposalState={proposal.state} />
           )}
         </div>
+        <CWDivider />
         <MarkdownFormattedText doc={proposal.body} />
         {votes.length > 0 && (
-          <SnapshotVotesTable
-            choices={proposal.choices}
-            symbol={symbol}
-            toggleExpandedVoterList={toggleExpandedVoterList}
-            voteCount={votes.length}
-            votersList={votersList}
-          />
+          <>
+            <CWDivider />
+            <SnapshotVotesTable
+              choices={proposal.choices}
+              symbol={symbol}
+              toggleExpandedVoterList={toggleExpandedVoterList}
+              voteCount={votes.length}
+              votersList={votersList}
+            />
+          </>
         )}
       </div>
     );

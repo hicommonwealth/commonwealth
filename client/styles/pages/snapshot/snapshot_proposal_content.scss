@@ -3,15 +3,12 @@
 .SnapshotProposalContent {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   width: 100%;
 
   .snapshot-proposal-content-header {
-    border-bottom: 1px solid $neutral-300;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-bottom: 16px;
 
     .snapshot-proposal-hash.Text {
       color: $neutral-600;
