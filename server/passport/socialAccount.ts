@@ -13,6 +13,58 @@ import { NotificationCategories } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+/**
+ * The OAuth 2.0 authentication strategy authenticates requests using the OAuth
+ * 2.0 framework.
+ *
+ * OAuth 2.0 provides a facility for delegated authentication, whereby users can
+ * authenticate using a third-party service such as Facebook.  Delegating in
+ * this manner involves a sequence of events, including redirecting the user to
+ * the third-party service for authorization.  Once authorization has been
+ * granted, the user is redirected back to the application and an authorization
+ * code can be used to obtain credentials.
+ *
+ * Applications must supply a `verify` callback, for which the function
+ * signature is:
+ *
+ *     function(accessToken, refreshToken, profile, done) { ... }
+ *
+ * The verify callback is responsible for finding or creating the user, and
+ * invoking `done` with the following arguments:
+ *
+ *     done(err, user, info);
+ *
+ * `user` should be set to `false` to indicate an authentication failure.
+ * Additional `info` can optionally be passed as a third argument, typically
+ * used to display informational messages.  If an exception occurred, `err`
+ * should be set.
+ *
+ * Options:
+ *
+ *   - `authorizationURL`  URL used to obtain an authorization grant
+ *   - `tokenURL`          URL used to obtain an access token
+ *   - `clientID`          identifies client to service provider
+ *   - `clientSecret`      secret used to establish ownership of the client identifer
+ *   - `callbackURL`       URL to which the service provider will redirect the user after obtaining authorization
+ *   - `passReqToCallback` when `true`, `req` is the first argument to the verify callback (default: `false`)
+ *
+ * Examples:
+ *
+ *     passport.use(new OAuth2Strategy({
+ *         authorizationURL: 'https://www.example.com/oauth2/authorize',
+ *         tokenURL: 'https://www.example.com/oauth2/token',
+ *         clientID: '123-456-789',
+ *         clientSecret: 'shhh-its-a-secret'
+ *         callbackURL: 'https://www.example.net/auth/example/callback'
+ *       },
+ *       function(accessToken, refreshToken, profile, done) {
+ *         User.findOrCreate(..., function (err, user) {
+ *           done(err, user);
+ *         });
+ *       }
+ *     ));
+ */
+
 enum Providers {
   GITHUB = 'github',
   DISCORD = 'discord',
@@ -34,8 +86,8 @@ async function authenticateSocialAccount(
     where: { provider, provider_userid: profile.id }
   });
 
-  // Existing Github account. If there is already a user logged-in,
-  // transfer the Github link to the current user.
+  // Existing account. If there is already a user logged-in,
+  // transfer the link to the current user.
   if (account !== null) {
     // Handle OAuth for custom domains.
     //
@@ -79,9 +131,9 @@ async function authenticateSocialAccount(
     }
   }
 
-  // New Github account. Either link it to the existing user, or
+  // New account. Either link it to the existing user, or
   // create a new user. As a result it's possible that we end up
-  // with a user with multiple Github accounts linked.
+  // with a user with multiple social accounts linked.
   const newAccount = await models.SocialAccount.create({
     provider,
     provider_userid: profile.id,
@@ -140,6 +192,7 @@ export function useSocialAccountAuth(models: DB) {
     clientSecret: GITHUB_CLIENT_SECRET,
     callbackURL: GITHUB_OAUTH_CALLBACK,
     passReqToCallback: true,
+    store: true
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
   }));
@@ -151,6 +204,8 @@ export function useSocialAccountAuth(models: DB) {
     passReqToCallback: true,
     authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
     callbackURL: DISCORD_OAUTH_CALLBACK,
+    store: true
+    // pass in the 'verify' callback
   }, async (req: Request, accessToken, refreshToken, profile, cb) => {
     await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
   }))

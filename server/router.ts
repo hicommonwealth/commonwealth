@@ -706,19 +706,35 @@ function setupRouter(
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
-
-  router.get('/auth/github', startOAuthLogin.bind(this, models, 'github'));
-  router.get(
-    '/auth/github/callback',
-    startOAuthLogin.bind(this, models, 'github')
-  );
   router.get('/finishOAuthLogin', finishOAuthLogin.bind(this, models));
 
-  router.get('/auth/discord', startOAuthLogin.bind(this, models, 'discord'));
-  router.get(
-    '/auth/discord/callback',
-    startOAuthLogin.bind(this, models, 'discord')
-  );
+  // OAuth2.0 for Discord and GitHub:
+  // The way this works is first the /auth.discord route is hit and passport.authenticate triggers for the first time
+  // to send a request for a code to the discord API passing along a state parameter and a callback. The Discord api
+  // adds the same state parameter to the callback URL (and a new code param) before returning. Once Discord returns,
+  // /auth/discord/callback is called which triggers passport.authenticate for a second time. On this second run the
+  // authenticateSocialAccount function in socialAccount.ts is called. If a successRedirect url is specified, in the
+  // passport.authenticate options then the passport.authenticate function will handle redirecting after the
+  // authenticateSocialAccount function and WILL NOT trigger the route handler for the callback routes (startOAuthLogin)
+
+  // You cac put any data you wish to persist post OAuth into the state object below. The data will be made available
+  // ONLY in the req.authInfo.state object in the callback i.e. startOAuthLogin.ts.
+  // NOTE: if a successfulRedirect url is used in the options then there is no way to access that data.
+
+  router.get('/auth/github', (req, res, next) => {
+    passport.authenticate('github', <any>{state: {hostname: req.hostname}})(req, res, next);
+  })
+  router.get('/auth/github/callback', passport.authenticate('github', {
+    failureRedirect: '/',
+  }), startOAuthLogin.bind(this, models, 'github'))
+
+  router.get('/auth/discord', (req, res, next) => {
+    passport.authenticate('discord', <any>{state: {hostname: req.hostname}})(req, res, next);
+  });
+
+  router.get('/auth/discord/callback', passport.authenticate('discord', {
+    failureRedirect: '/',
+  }), startOAuthLogin.bind(this, models, 'discord'));
 
   router.post(
     '/auth/magic',
