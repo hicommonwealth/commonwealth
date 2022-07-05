@@ -39,7 +39,6 @@ import {
   DepositVote,
 } from 'models';
 
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import { PollEditor } from 'views/components/poll_editor';
@@ -123,6 +122,7 @@ import {
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { jumpHighlightComment } from './helpers';
 
 const MAX_THREAD_LEVEL = 2;
 
