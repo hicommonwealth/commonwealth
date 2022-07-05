@@ -53,7 +53,8 @@ export class ChainMetadataRows
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
-  communityBanner;
+  communityBanner: string;
+  communityBannerQuillEditorState: any;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -223,22 +224,12 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        {/* <InputRow
-          title="Banner"
-          name="Banner Text"
-          label="Banner"
-          placeholder="Text for across the top of your community"
-          defaultValue={this.communityBanner}
-          onChangeHandler={(v) => {
-            this.communityBanner = v;
-          }}
-        /> */}
         {m(QuillEditor, {
           // Prevent the editor from being filled in with previous content
-          contentsDoc: this.communityBanner,
+          contentsDoc: this.communityBanner || '',
           oncreateBind: (state) => {
             console.log('state', state);
-            this.communityBanner = state;
+            this.communityBannerQuillEditorState = state;
           },
           tabindex: 1,
           editorNamespace: 'new-banner',
@@ -305,6 +296,18 @@ export class ChainMetadataRows
                 }
               }
             }
+            // Handle quill editor
+            const { communityBannerQuillEditorState } = this;
+            if (communityBannerQuillEditorState) {
+              communityBannerQuillEditorState.editor.enable(false);
+              this.communityBanner =
+                communityBannerQuillEditorState.markdownMode
+                  ? communityBannerQuillEditorState.editor.getText()
+                  : JSON.stringify(
+                      communityBannerQuillEditorState.editor.getContents()
+                    );
+            }
+
             // Update ChainCategories
             try {
               for (const category of Object.keys(this.selectedTags)) {
@@ -318,7 +321,6 @@ export class ChainMetadataRows
               console.log(err);
             }
             try {
-              // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
                 chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
