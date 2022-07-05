@@ -11,8 +11,8 @@ import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import QuillFormattedText from 'views/components/quill/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
@@ -21,6 +21,7 @@ import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CommunityLabel } from '../components/community_label';
+import { renderQuillTextBody } from '../components/quill/helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -128,24 +129,11 @@ const getDiscussionResult = (thread, searchTerm) => {
           </div>
           <div class="search-results-thread-body">
             {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(thread.body));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(thread.body);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
+              renderQuillTextBody(thread.body, {
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
             })()}
           </div>
         </a>
@@ -194,24 +182,11 @@ const getCommentResult = (comment, searchTerm) => {
           </div>
           <div class="search-results-comment">
             {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(comment.text));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(comment.text);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
+              renderQuillTextBody(comment.text, {
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
             })()}
           </div>
         </a>

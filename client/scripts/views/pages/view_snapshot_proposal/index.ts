@@ -20,7 +20,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 
 import User from '../../components/widgets/user';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import MarkdownFormattedText from '../../components/quill/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
@@ -348,7 +348,7 @@ const ViewProposalPage: m.Component<
         isCustomDomain: app.isCustomDomain(),
         space: app.snapshot.space.id,
       });
-    }
+    };
 
     const snapshotId = vnode.attrs.snapshotId;
     if (!app.snapshot.initialized) {
@@ -497,7 +497,7 @@ const ViewProposalPage: m.Component<
                             m(
                               '.truncate',
                               proposal.strategies.length > 1
-                                ? proposal.strategies.length + ' Strategies'
+                                ? `${proposal.strategies.length} Strategies`
                                 : proposal.strategies[0].name
                             ),
                             m(CWIcon, {

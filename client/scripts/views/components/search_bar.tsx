@@ -23,11 +23,10 @@ import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { ContentType } from 'controllers/server/search';
-import MarkdownFormattedText from './markdown_formatted_text';
-import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
 import { ChainIcon } from './chain_icon';
 import { CommunityLabel } from './community_label';
+import { renderQuillTextBody } from './quill/helpers';
 
 const getMemberPreview = (
   addr,
@@ -171,24 +170,11 @@ const getDiscussionPreview = (
           </div>
           <div class="search-results-thread-body">
             {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(thread.body));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(thread.body);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
+              renderQuillTextBody(thread.body, {
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
             })()}
           </div>
         </a>
@@ -252,24 +238,11 @@ const getCommentPreview = (
           </div>
           <div class="search-results-comment">
             {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(comment.text));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(comment.text);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
+              renderQuillTextBody(comment.text, {
+                hideFormatting: true,
+                collapse: true,
+                searchTerm,
+              });
             })()}
           </div>
         </a>
@@ -310,9 +283,9 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   // TODO: using chainScope instead of communityScope OK?
   const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope();
-  if(types.indexOf(SearchScope.Communities) > 0) {
+  if (types.indexOf(SearchScope.Communities) > 0) {
     types.splice(types.indexOf(SearchScope.Communities), 1);
-    types.unshift(SearchScope.Communities)
+    types.unshift(SearchScope.Communities);
   }
   const results = getBalancedContentListing(
     app.search.getByQuery(searchQuery).results,

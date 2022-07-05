@@ -13,12 +13,16 @@ import {
 } from 'construct-ui';
 
 import { ChainNetwork } from 'types';
-import QuillEditor from 'views/components/quill_editor';
-import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
+import QuillEditor from 'views/components/quill/quill_editor';
+import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { editorIsBlank } from '../components/quill/helpers';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../components/quill/helpers';
 
 interface INewTopicModalForm {
   id: number;
@@ -77,9 +81,9 @@ const NewTopicModal: m.Component<
     const { quillEditorState } = vnode.state;
     if (
       vnode.state.form.featuredInNewPost &&
-      quillEditorState &&
-      quillEditorState.editor &&
-      editorIsBlank(quillEditorState)
+      vnode.state.quillEditorState &&
+      vnode.state.quillEditorState.editor &&
+      editorIsBlank(vnode.state.quillEditorState)
     ) {
       disabled = true;
     }
@@ -203,20 +207,10 @@ const NewTopicModal: m.Component<
               e.preventDefault();
               const { quillEditorState, form } = vnode.state;
 
-              if (quillEditorState) {
-                quillEditorState.editor.enable(false);
-              }
+              disableEditor(quillEditorState);
 
-              const mentionsEle = document.getElementsByClassName(
-                'ql-mention-list-container'
-              )[0];
-              if (mentionsEle)
-                (mentionsEle as HTMLElement).style.visibility = 'hidden';
-              const defaultOffchainTemplate = !quillEditorState
-                ? ''
-                : quillEditorState.markdownMode
-                ? quillEditorState.editor.getText()
-                : JSON.stringify(quillEditorState.editor.getContents());
+              const defaultOffchainTemplate =
+                getQuillTextContents(quillEditorState);
 
               app.topics
                 .add(

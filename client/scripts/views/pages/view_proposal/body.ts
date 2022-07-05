@@ -23,9 +23,9 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import QuillEditor from 'views/components/quill_editor';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import QuillEditor from 'views/components/quill/quill_editor';
+import QuillFormattedText from 'views/components/quill/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import {
@@ -46,6 +46,10 @@ import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import {
+  disableEditor,
+  getQuillTextContents,
+} from '../../components/quill/helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
@@ -604,11 +608,9 @@ export const ProposalBodyCancelEdit: m.Component<{
           onclick: async (e) => {
             e.preventDefault();
             let confirmed = true;
-            const threadText = parentState.quillEditorState.markdownMode
-              ? parentState.quillEditorState.editor.getText()
-              : JSON.stringify(
-                  parentState.quillEditorState.editor.getContents()
-                );
+            const threadText = getQuillTextContents(
+              parentState.quillEditorState
+            );
             if (threadText !== parentState.currentText) {
               confirmed = await confirmationModalWithText(
                 'Cancel editing? Changes will not be saved.'
@@ -658,11 +660,9 @@ export const ProposalBodySaveEdit: m.Component<{
               }
             }
             parentState.saving = true;
-            parentState.quillEditorState.editor.enable(false);
             const { quillEditorState } = parentState;
-            const itemText = quillEditorState.markdownMode
-              ? quillEditorState.editor.getText()
-              : JSON.stringify(quillEditorState.editor.getContents());
+            disableEditor(quillEditorState);
+            const itemText = getQuillTextContents(quillEditorState);
             if (item instanceof OffchainThread) {
               app.threads
                 .edit(

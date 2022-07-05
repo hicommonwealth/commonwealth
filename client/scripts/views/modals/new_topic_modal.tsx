@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/new_topic_modal.scss';
 
 import { ChainNetwork } from 'types';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
@@ -15,7 +15,11 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
-import { editorIsBlank } from '../components/quill/helpers';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../components/quill/helpers';
 
 type NewTopicModalForm = {
   description: string;
@@ -170,26 +174,14 @@ export class NewTopicModal implements m.ClassComponent {
 
               console.log('before', quillEditorState);
 
-              if (quillEditorState) {
-                quillEditorState.editor.enable(false);
-              }
+              disableEditor(quillEditorState);
 
               console.log('after', quillEditorState);
 
               console.log('getText', quillEditorState.editor.getText());
 
-              // const mentionsEle = document.getElementsByClassName(
-              //   'ql-mention-list-container'
-              // )[0];
-
-              // if (mentionsEle)
-              //   (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
-              // const defaultOffchainTemplate = !quillEditorState
-              //   ? ''
-              //   : quillEditorState.markdownMode
-              //   ? quillEditorState.editor.getText()
-              //   : JSON.stringify(quillEditorState.editor.getContents());
+              // const defaultOffchainTemplate =
+              // getQuillTextContents(quillEditorState);
 
               // app.topics
               //   .add(

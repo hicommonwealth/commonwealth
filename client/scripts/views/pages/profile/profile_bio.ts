@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import MarkdownFormattedText from '../../components/quill/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
 import SubstrateIdentity from '../../../controllers/chain/substrate/identity';

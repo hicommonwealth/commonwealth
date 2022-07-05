@@ -16,10 +16,14 @@ import { navigateToSubpage } from 'app';
 import { OffchainTopic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { editorIsBlank } from '../components/quill/helpers';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../components/quill/helpers';
 
 interface IEditTopicModalForm {
   description: string;
@@ -72,19 +76,9 @@ const EditTopicModal: m.Component<
         return false;
       }
 
-      if (quillEditorState) {
-        quillEditorState.editor.enable(false);
-      }
+      disableEditor(quillEditorState);
 
-      const mentionsEle = document.getElementsByClassName(
-        'ql-mention-list-container'
-      )[0];
-      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-      const bodyText = !quillEditorState
-        ? ''
-        : quillEditorState.markdownMode
-        ? quillEditorState.editor.getText()
-        : JSON.stringify(quillEditorState.editor.getContents());
+      const bodyText = getQuillTextContents(quillEditorState);
       const topicInfo = {
         id,
         description: form.description,
