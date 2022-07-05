@@ -19,7 +19,7 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import QuillEditor from '../../components/quill_editor';
+import QuillEditor from '../../components/quill/quill_editor';
 
 type ChainMetadataRowsAttrs = {
   admins: any;

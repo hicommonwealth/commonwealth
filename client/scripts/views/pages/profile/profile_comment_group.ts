@@ -3,12 +3,8 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { OffchainThread, OffchainComment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-
-import User from 'views/components/widgets/user';
-import QuillFormattedText from 'views/components/quill/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {

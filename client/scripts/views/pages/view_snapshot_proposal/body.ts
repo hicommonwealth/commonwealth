@@ -5,7 +5,7 @@ import m from 'mithril';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { AddressInfo } from 'models';
 
-import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';

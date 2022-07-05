@@ -1,9 +1,8 @@
-import 'components/quill_editor.scss';
-
 import m from 'mithril';
-import _ from 'lodash';
 import $ from 'jquery';
 import { Tag, Tooltip } from 'construct-ui';
+
+import 'components/quill/quill_editor.scss';
 
 import app from 'state';
 import SettingsController from 'controllers/app/settings';

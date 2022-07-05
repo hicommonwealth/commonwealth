@@ -9,8 +9,8 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
-import QuillFormattedText from '../quill_formatted_text';
-import MarkdownFormattedText from '../markdown_formatted_text';
+import QuillFormattedText from '../quill/quill_formatted_text';
+import { MarkdownFormattedText } from '../quill/markdown_formatted_text';
 
 type BannerAttrs = {
   bannerContent: string;
@@ -48,11 +48,7 @@ export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
           ComponentType.MessageBanner
         )}
       >
-        {m(MarkdownFormattedText, {
-          doc: bannerContent,
-          hideFormatting: true,
-          collapse: true,
-        })}
+        <MarkdownFormattedText doc={bannerContent} hideFormatting collapse />
         {/* <CWText>{bannerContent}</CWText> */}
         {onClose && (
           <CWIconButton

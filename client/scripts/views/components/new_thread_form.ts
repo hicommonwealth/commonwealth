@@ -33,7 +33,7 @@ import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
 import QuillFormattedText from './quill/quill_formatted_text';
-import MarkdownFormattedText from './quill/markdown_formatted_text';
+import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import {
   disableEditor,

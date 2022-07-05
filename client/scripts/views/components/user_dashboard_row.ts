@@ -19,7 +19,7 @@ import {
 } from 'models';
 
 import QuillFormattedText from 'views/components/quill/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 

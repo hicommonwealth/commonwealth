@@ -11,8 +11,6 @@ import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import QuillFormattedText from 'views/components/quill/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

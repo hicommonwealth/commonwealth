@@ -1,12 +1,15 @@
+/* @jsx m */
 /* eslint-disable no-useless-escape */
-import 'components/quill/markdown_formatted_text.scss';
 
-import $ from 'jquery';
 import m from 'mithril';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 import { marked } from 'marked';
+
+import 'components/quill/markdown_formatted_text.scss';
+
+import { getClasses } from '../component_kit/helpers';
 
 const renderer = new marked.Renderer();
 
@@ -18,21 +21,22 @@ marked.setOptions({
   xhtml: true,
 });
 
-const MarkdownFormattedText: m.Component<
-  {
-    doc: string;
-    hideFormatting?: boolean;
-    collapse?: boolean;
-    searchTerm?: string;
-    openLinksInNewTab?: boolean;
-    cutoffText?: number;
-  },
-  {
-    cachedDocWithHighlights: string;
-    cachedResultWithHighlights;
-  }
-> = {
-  view: (vnode) => {
+type MarkdownFormattedTextAttrs = {
+  collapse?: boolean;
+  cutoffText?: number;
+  doc: string;
+  hideFormatting?: boolean;
+  openLinksInNewTab?: boolean;
+  searchTerm?: string;
+};
+
+export class MarkdownFormattedText
+  implements m.Component<MarkdownFormattedTextAttrs>
+{
+  private cachedDocWithHighlights: string;
+  private cachedResultWithHighlights;
+
+  view(vnode) {
     const {
       doc,
       hideFormatting,
@@ -41,7 +45,9 @@ const MarkdownFormattedText: m.Component<
       openLinksInNewTab,
       cutoffText,
     } = vnode.attrs;
+
     if (!doc) return;
+
     renderer.link = (href, title, text) => {
       return `<a ${
         href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
@@ -53,24 +59,32 @@ const MarkdownFormattedText: m.Component<
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
       // TODO: Switch trim system to match QFT component
-      if (JSON.stringify(doc) !== vnode.state.cachedDocWithHighlights) {
+      if (JSON.stringify(doc) !== this.cachedDocWithHighlights) {
         const unsanitized = marked.parse(doc.toString());
+
         const sanitized = DOMPurify.sanitize(unsanitized, {
           ALLOWED_TAGS: ['a'],
           ADD_ATTR: ['target'],
         });
+
         const vnodes = m.trust(sanitized);
+
         const root = document.createElement('div');
+
         m.render(root, vnodes);
+
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
           .replace(/\ +/g, ' ');
+
         const chunks = findAll({
           searchWords: [searchTerm.trim()],
           textToHighlight,
         });
-        vnode.state.cachedDocWithHighlights = JSON.stringify(doc);
-        vnode.state.cachedResultWithHighlights = chunks.map(
+
+        this.cachedDocWithHighlights = JSON.stringify(doc);
+
+        this.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
             const subString = textToHighlight.substr(start, end - start);
@@ -95,41 +109,50 @@ const MarkdownFormattedText: m.Component<
           }
         );
       }
-      return m(
-        '.MarkdownFormattedText',
-        {
-          class: collapse ? 'collapsed' : '',
-        },
-        vnode.state.cachedResultWithHighlights
+
+      return (
+        <div
+          class={getClasses<{ collapsed?: boolean }>(
+            { collapsed: !!collapse },
+            'MarkdownFormattedText'
+          )}
+        >
+          {this.cachedResultWithHighlights}
+        </div>
+      );
+    } else {
+      let truncatedDoc = doc;
+
+      if (cutoffText)
+        truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffText).join('\n').length
+        );
+
+      const unsanitized = marked.parse(truncatedDoc.toString());
+
+      const sanitized = hideFormatting
+        ? DOMPurify.sanitize(unsanitized, {
+            ALLOWED_TAGS: ['a'],
+            ADD_ATTR: ['target'],
+          })
+        : DOMPurify.sanitize(unsanitized, {
+            USE_PROFILES: { html: true },
+            ADD_ATTR: ['target'],
+          });
+
+      const results = m.trust(sanitized);
+
+      return (
+        <div
+          class={getClasses<{ collapsed?: boolean }>(
+            { collapsed: !!collapse },
+            'MarkdownFormattedText'
+          )}
+        >
+          {results}
+        </div>
       );
     }
-
-    let truncatedDoc = doc;
-    if (cutoffText)
-      truncatedDoc = doc.slice(
-        0,
-        doc.split('\n', cutoffText).join('\n').length
-      );
-    const unsanitized = marked.parse(truncatedDoc.toString());
-    const sanitized = hideFormatting
-      ? DOMPurify.sanitize(unsanitized, {
-          ALLOWED_TAGS: ['a'],
-          ADD_ATTR: ['target'],
-        })
-      : DOMPurify.sanitize(unsanitized, {
-          USE_PROFILES: { html: true },
-          ADD_ATTR: ['target'],
-        });
-    const results = m.trust(sanitized);
-
-    return m(
-      '.MarkdownFormattedText',
-      {
-        class: collapse ? 'collapsed' : '',
-      },
-      results
-    );
-  },
-};
-
-export default MarkdownFormattedText;
+  }
+}

@@ -1,5 +1,5 @@
 import m from 'mithril';
-import MarkdownFormattedText from './markdown_formatted_text';
+import { MarkdownFormattedText } from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 
 export const editorIsBlank = (quillEditorState) => {

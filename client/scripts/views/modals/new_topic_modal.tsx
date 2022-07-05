@@ -174,29 +174,29 @@ export class NewTopicModal implements m.ClassComponent {
 
               disableEditor(quillEditorState);
 
-              // const defaultOffchainTemplate =
-              // getQuillTextContents(quillEditorState);
+              const defaultOffchainTemplate =
+                getQuillTextContents(quillEditorState);
 
-              // app.topics
-              //   .add(
-              //     form.name,
-              //     form.description,
-              //     null,
-              //     form.featuredInSidebar,
-              //     form.featuredInNewPost,
-              //     this.form.tokenThreshold || '0',
-              //     defaultOffchainTemplate
-              //   )
-              //   .then(() => {
-              //     this.saving = false;
-              //     m.redraw();
-              //     $(e.target).trigger('modalexit');
-              //   })
-              //   .catch(() => {
-              //     this.error = 'Error creating topic';
-              //     this.saving = false;
-              //     m.redraw();
-              //   });
+              app.topics
+                .add(
+                  form.name,
+                  form.description,
+                  null,
+                  form.featuredInSidebar,
+                  form.featuredInNewPost,
+                  this.form.tokenThreshold || '0',
+                  defaultOffchainTemplate
+                )
+                .then(() => {
+                  this.saving = false;
+                  m.redraw();
+                  $(e.target).trigger('modalexit');
+                })
+                .catch(() => {
+                  this.error = 'Error creating topic';
+                  this.saving = false;
+                  m.redraw();
+                });
             }}
           />
           {this.error && <div class="error-message">{this.error}</div>}
