@@ -140,7 +140,9 @@ export class ChatSection
   }
 
   onbeforeupdate(vnode, old) {
-    if (!_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)) {
+    if (
+      !_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)
+    ) {
       Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
         this.channels[metadata.category]
@@ -362,7 +364,11 @@ export class ChatSection
         isVisible: true,
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
-        onclick: () => {
+        onclick: (e) => {
+          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            window.open(`/${app.activeChainId()}/chat/${channel.id}`);
+            return;
+          }
           navigateToSubpage(`/chat/${channel.id}`);
           this.activeChannel = channel.id;
           app.socket.chatNs.activeChannel = String(channel.id);

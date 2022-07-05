@@ -177,12 +177,22 @@ export class DiscussionSection
           isVisible: true,
           isUpdated: true,
           isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
+          // eslint-disable-next-line no-loop-func
           onclick: (e, toggle: boolean) => {
+            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+              e.preventDefault();
+              window.open(
+                `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`,
+                ' _blank'
+              );
+              return;
+            }
             e.preventDefault();
             setDiscussionsToggleTree(
               `children.${topic.name}.toggledState`,
               toggle
             );
+
             navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
           },
           displayData: null,

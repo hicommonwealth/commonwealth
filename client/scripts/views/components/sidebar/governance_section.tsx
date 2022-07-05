@@ -260,6 +260,11 @@ export class GovernanceSection
         onMembersPage(m.route.get()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          e.preventDefault();
+          window.open(`/${app.activeChainId()}/members`, ' _blank');
+          return;
+        }
         e.preventDefault();
         setGovernanceToggleTree('children.Members.toggledState', toggle);
         navigateToSubpage('/members');
@@ -283,15 +288,34 @@ export class GovernanceSection
         // Check if we have multiple snapshots for conditional redirect
         const snapshotSpaces = app.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
+          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            window.open(
+              `/${app.activeChainId()}/multiple-snapshots?action=select-space`,
+              ' _blank'
+            );
+            return;
+          }
           navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
         } else {
           if (snapshotSpaces[0].lastIndexOf('/') > -1) {
+            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+              window.open(
+                `/${app.activeChainId()}/snapshot/${snapshotSpaces[0]
+                  .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
+                  .trim()}`
+              );
+              return;
+            }
             navigateToSubpage(
               `/snapshot/${snapshotSpaces[0]
                 .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
                 .trim()}`
             );
           } else {
+            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+              window.open(`/${app.activeChainId()}/snapshot/${snapshotSpaces}`);
+              return;
+            }
             navigateToSubpage(`/snapshot/${snapshotSpaces}`);
           }
         }
@@ -308,6 +332,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/proposals`);
+          return;
+        }
         navigateToSubpage('/proposals');
         setGovernanceToggleTree('children.Proposals.toggledState', toggle);
       },
@@ -326,6 +354,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/treasury`);
+          return;
+        }
         navigateToSubpage('/treasury');
         setGovernanceToggleTree('children.Treasury.toggledState', toggle);
       },
@@ -343,6 +375,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/bounties`);
+          return;
+        }
         navigateToSubpage('/bounties');
         setGovernanceToggleTree('children.Bounties.toggledState', toggle);
       },
@@ -360,6 +396,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/referenda`);
+          return;
+        }
         navigateToSubpage('/referenda');
         setGovernanceToggleTree('children.Referenda.toggledState', toggle);
       },
@@ -377,6 +417,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/tips`);
+          return;
+        }
         navigateToSubpage('/tips');
         setGovernanceToggleTree('children.Tips.toggledState', toggle);
       },
@@ -394,6 +438,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/council`);
+          return;
+        }
         navigateToSubpage('/council');
         setGovernanceToggleTree('children.Councillors.toggledState', toggle);
       },
@@ -411,6 +459,10 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/validators`);
+          return;
+        }
         navigateToSubpage('/validators');
         setGovernanceToggleTree('children.Validators.toggledState', toggle);
       },
@@ -432,6 +484,10 @@ export class GovernanceSection
       isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
+        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          window.open(`/${app.activeChainId()}/delegate`);
+          return;
+        }
         setGovernanceToggleTree('children.Delegate.toggledState', toggle);
         navigateToSubpage('/delegate');
       },
