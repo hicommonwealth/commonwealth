@@ -18,6 +18,7 @@ import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import QuillEditor from '../quill_editor';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import QuillFormattedText from '../quill_formatted_text';
+import { editorIsBlank } from '../quill/helpers';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -46,7 +47,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
   oninit(vnode) {
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(m.route.param("message"))
+    this.shouldScrollToHighlight = Boolean(m.route.param('message'));
     this.scrollToBottom = () => {
       const scroller = $((vnode as any).dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
@@ -95,8 +96,8 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     }, []);
 
     const handleSubmitMessage = () => {
-      if (this.quillEditorState.editor.editor.isBlank()) {
-        notifyError("Cannot send a blank message")
+      if (editorIsBlank(this.quillEditorState)) {
+        notifyError('Cannot send a blank message');
         return;
       }
 
@@ -119,24 +120,27 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
         community: app.activeChainId(),
         isCustomDomain: app.isCustomDomain(),
       });
-    }
+    };
 
     const messageToText = (msg: any) => {
       try {
         const doc = JSON.parse(msg.message);
         if (!doc.ops) throw new Error();
-        return m(QuillFormattedText, { doc })
+        return m(QuillFormattedText, { doc });
       } catch {
         return m(MarkdownFormattedText, {
           doc: msg.message,
           openLinksInNewTab: true,
-        })
+        });
       }
-    }
+    };
 
     const messageIsHighlighted = (message: any): boolean => {
-      return m.route.param('message') && Number(m.route.param('message')) === message.id
-    }
+      return (
+        m.route.param('message') &&
+        Number(m.route.param('message')) === message.id
+      );
+    };
 
     return (
       <div class="ChatPage">
@@ -149,7 +153,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           {groupedMessages.map((grp) => (
             <div
               class="chat-message-group"
-              id={grp.messages.some(messageIsHighlighted) ? "highlighted" : ""}
+              id={grp.messages.some(messageIsHighlighted) ? 'highlighted' : ''}
             >
               <div class="user-and-timestamp-container">
                 {m(User, {
@@ -165,22 +169,31 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
-                <Icon name={Icons.LINK} onclick={async () => {
-                  const route = app.socket.chatNs
-                    .getRouteToMessage(grp.messages[0].chat_channel_id, grp.messages[0].id, app.chain.id)
-                  navigator.clipboard.writeText(
-                    `${window.location.protocol}//${window.location.host}${route}`
-                  )
-                    .then(() => notifySuccess("Message link copied to clipboard"))
-                    .catch(() => notifyError("Could not copy link to keyboard"))
-                  this.shouldScroll = false;
-                }}></Icon>
+                <Icon
+                  name={Icons.LINK}
+                  onclick={async () => {
+                    const route = app.socket.chatNs.getRouteToMessage(
+                      grp.messages[0].chat_channel_id,
+                      grp.messages[0].id,
+                      app.chain.id
+                    );
+                    navigator.clipboard
+                      .writeText(
+                        `${window.location.protocol}//${window.location.host}${route}`
+                      )
+                      .then(() =>
+                        notifySuccess('Message link copied to clipboard')
+                      )
+                      .catch(() =>
+                        notifyError('Could not copy link to keyboard')
+                      );
+                    this.shouldScroll = false;
+                  }}
+                ></Icon>
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (
-                <div class="chat-message-text">
-                  {messageToText(msg)}
-                </div>
+                <div class="chat-message-text">{messageToText(msg)}</div>
               ))}
             </div>
           ))}
@@ -194,9 +207,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           </div>
         ) : !app.socket.chatNs.isConnected ? (
           <div class="chat-composer-unavailable">Waiting for connection</div>
-        ) :
+        ) : (
           <div
-          class={`chat-composer${
+            class={`chat-composer${
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
@@ -212,22 +225,22 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
             })}
             <CWIcon iconName="send" onclick={handleSubmitMessage} />
           </div>
-        }
+        )}
       </div>
     );
   }
 
   onupdate() {
     if (this.shouldScroll) {
-      if(this.shouldScrollToHighlight) {
-        const element = document.getElementById("highlighted")
+      if (this.shouldScrollToHighlight) {
+        const element = document.getElementById('highlighted');
         if (element) {
-          element.scrollIntoView({behavior: "smooth"})
+          element.scrollIntoView({ behavior: 'smooth' });
         } else {
-          this.scrollToBottom()
+          this.scrollToBottom();
         }
-        this.shouldScrollToHighlight = false
-        this.shouldScroll = false
+        this.shouldScrollToHighlight = false;
+        this.shouldScroll = false;
       } else {
         this.scrollToBottom();
       }

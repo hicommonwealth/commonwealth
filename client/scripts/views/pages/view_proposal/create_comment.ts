@@ -20,6 +20,7 @@ import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { editorIsBlank } from '../../components/quill/helpers';
 
 const CreateComment: m.Component<
   {
@@ -71,13 +72,13 @@ const CreateComment: m.Component<
         vnode.state.error = 'Editor not initialized, please try again';
         return;
       }
-      if (vnode.state.quillEditorState.editor.editor.isBlank()) {
+
+      const { quillEditorState } = vnode.state;
+      if (editorIsBlank(quillEditorState)) {
         if (e) e.preventDefault();
         vnode.state.error = 'Comment cannot be blank';
         return;
       }
-
-      const { quillEditorState } = vnode.state;
 
       const mentionsEle = document.getElementsByClassName(
         'ql-mention-list-container'

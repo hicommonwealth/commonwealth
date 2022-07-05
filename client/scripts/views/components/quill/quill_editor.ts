@@ -19,7 +19,7 @@ import SettingsController from 'controllers/app/settings';
 import { Profile } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import PreviewModal from 'views/modals/preview_modal';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // Rich text and Markdown editor.
 //

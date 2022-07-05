@@ -33,6 +33,7 @@ import {
   createProposal,
 } from 'helpers/snapshot_utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { editorIsBlank } from '../../components/quill/helpers';
 
 interface IThreadForm {
   name: string;
@@ -78,7 +79,7 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  if (quillEditorState.editor.editor.isBlank()) {
+  if (editorIsBlank(quillEditorState)) {
     throw new Error(NewThreadErrors.NoBody);
   }
 

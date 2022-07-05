@@ -19,6 +19,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import QuillEditor from 'views/components/quill_editor';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { editorIsBlank } from '../components/quill/helpers';
 
 interface IEditTopicModalForm {
   description: string;
@@ -66,7 +67,7 @@ const EditTopicModal: m.Component<
 
     const updateTopic = async (form) => {
       const { quillEditorState } = vnode.state;
-      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
+      if (form.featuredInNewPost && editorIsBlank(quillEditorState)) {
         vnode.state.error = 'Must provide template.';
         return false;
       }

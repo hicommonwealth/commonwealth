@@ -18,6 +18,7 @@ import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { editorIsBlank } from '../components/quill/helpers';
 
 interface INewTopicModalForm {
   id: number;
@@ -73,11 +74,12 @@ const NewTopicModal: m.Component<
     if (!vnode.state.form.name || !vnode.state.form.name.trim())
       disabled = true;
 
+    const { quillEditorState } = vnode.state;
     if (
       vnode.state.form.featuredInNewPost &&
-      vnode.state.quillEditorState &&
-      vnode.state.quillEditorState.editor &&
-      vnode.state.quillEditorState.editor.editor.isBlank()
+      quillEditorState &&
+      quillEditorState.editor &&
+      editorIsBlank(quillEditorState)
     ) {
       disabled = true;
     }
@@ -101,8 +103,9 @@ const NewTopicModal: m.Component<
             },
             inputValidationFn: (text) => {
               let errorMsg;
-              const currentCommunityTopicNames =
-                app.chain.meta.topics.map((t) => t.name.toLowerCase());
+              const currentCommunityTopicNames = app.chain.meta.topics.map(
+                (t) => t.name.toLowerCase()
+              );
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 vnode.state.error = errorMsg;
