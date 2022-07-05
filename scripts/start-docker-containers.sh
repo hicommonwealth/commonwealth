@@ -45,7 +45,7 @@ fi
 
 echo "Connecting to $VULTR_USER@$VULTR_IP"
 # connect to the Vultr server on which the images will be loaded
-#ssh "$VULTR_USER"@"$VULTR_IP" /bin/bash << "EOF"
+ssh "$VULTR_USER"@"$VULTR_IP" /bin/bash << "EOF"
 echo "Connection Successful!"
 
 # function that returns a randomly chosen open port
@@ -96,8 +96,9 @@ if [[ "$OPEN_RMQ_PORT" != "$VULTR_RABBITMQ_CONTAINER_PORT" || "$OPEN_RMQ_MNGMT_P
   if [ "$(docker ps -aq -f name="$OLD_RMQ_CONTAINER_NAME")" ]; then
     docker rm -f "$OLD_RMQ_CONTAINER_NAME"
   fi
-  docker run "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')" --name "$NEW_RMQ_CONTAINER_NAME" -d \
-    -p $OPEN_RMQ_PORT:5672 -p $OPEN_RMQ_MNGMT_PORT:15672
+  docker run --name "$NEW_RMQ_CONTAINER_NAME" -d -p $OPEN_RMQ_PORT:5672 -p $OPEN_RMQ_MNGMT_PORT:15672 \
+    "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')"
+
   printf "Open port found: %s\n PLEASE COPY THIS PORT TO THE - VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT ENV VAR\n" \
     "--------------------------------\n" "$OPEN_RMQ_PORT"
 else
@@ -113,8 +114,8 @@ else
     printf "RabbitMQ Docker Container is already running! Please don't forget to shutdown your container when you are done!"
   else
     # the docker container was never created i.e. first time running this script
-    docker run "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')" --name "$OLD_RMQ_CONTAINER_NAME" -d \
-      -p $OPEN_RMQ_PORT:5672 -p $OPEN_RMQ_MNGMT_PORT:15672
+    docker run --name "$OLD_RMQ_CONTAINER_NAME" -d -p $OPEN_RMQ_PORT:5672 -p $OPEN_RMQ_MNGMT_PORT:15672 \
+      "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')"
   fi
 fi
 
@@ -136,8 +137,8 @@ if [[ -z "$REDIS_PORT_NOT_AVAILABLE" ]]; then
     printf "RabbitMQ Docker Container is already running! Please don't forget to shutdown your container when you are done!"
   else
     # the docker container was never created i.e. first time running this script
-    docker run "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')" --name "$OLD_REDIS_CONTAINER_NAME" -d \
-      -p $OPEN_REDIS_PORT:6379
+    docker run --name "$OLD_REDIS_CONTAINER_NAME" -d -p $OPEN_REDIS_PORT:6379 \
+      "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')"
   fi
 else
   printf "WARNING: The given Redis port %s is not available!\nSearching for an open port...\n" "$VULTR_REDIS_CONTAINER_PORT"
@@ -149,8 +150,9 @@ else
     docker rm -f "$OLD_REDIS_CONTAINER_NAME"
   fi
   NEW_REDIS_CONTAINER_NAME="$UNIQUE_DOCKER_CONTAINER_ID-Redis-$OPEN_REDIS_PORT"
-  docker run "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')" --name "$NEW_REDIS_CONTAINER_NAME" -d \
-    -p $OPEN_REDIS_PORT:6379
+  docker run --name "$NEW_REDIS_CONTAINER_NAME" -d -p $OPEN_REDIS_PORT:6379 \
+    "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'redis')"
+
   printf "Open port found: %s\n PLEASE COPY THIS PORT TO THE - VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT ENV VAR\n" \
     "--------------------------------\n" "$OPEN_RMQ_PORT"
 fi

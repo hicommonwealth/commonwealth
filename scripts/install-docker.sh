@@ -19,12 +19,12 @@ echo "Connection Successful!"
 lsb_release -a
 
 # clear any existing docker version
-apt-get remove docker docker-engine docker.io containerd runc
+apt-get -y remove docker docker-engine docker.io containerd runc
 
 # Update/setup repositories
 # Update the apt package index and install packages to allow apt to use a repository over HTTPS
-apt-get update
-apt-get install ca-certificates curl gnupg lsb-release
+apt-get -y update
+apt-get -y install ca-certificates curl gnupg lsb-release
 
 # Add Docker’s official GPG key
 mkdir -p /etc/apt/keyrings
@@ -37,16 +37,18 @@ echo \
 
 # if this causes issues run:
 # sudo chmod a+r /etc/apt/keyrings/docker.gpg
-apt-get update
+apt-get -y update
 
 DOCKER_VERSION=$(apt-cache madison docker-ce | head -n 1 | cut -d " " -f 4)
 echo "Installing Docker version: $DOCKER_VERSION"
 
-apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-apt-get install docker-ce="$DOCKER_VERSION" docker-ce-cli="$DOCKER_VERSION" containerd.io docker-compose-plugin
+apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+apt-get -y install docker-ce="$DOCKER_VERSION" docker-ce-cli="$DOCKER_VERSION" containerd.io docker-compose-plugin
 
 # test the installation
 docker run hello-world
+
+apt install -y net-tools
 
 # post-installation setup to avoid having to sudo for everything when signed in as the user
 groupadd docker
