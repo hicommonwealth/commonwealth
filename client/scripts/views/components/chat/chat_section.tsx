@@ -10,6 +10,7 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
+import { isCommandClick } from 'helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -365,7 +366,7 @@ export class ChatSection
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
         onclick: (e) => {
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          if (isCommandClick(e)) {
             window.open(`/${app.activeChainId()}/chat/${channel.id}`);
             return;
           }

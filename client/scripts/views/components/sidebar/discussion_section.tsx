@@ -6,6 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
+import { isCommandClick } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -179,7 +180,7 @@ export class DiscussionSection
           isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
           // eslint-disable-next-line no-loop-func
           onclick: (e, toggle: boolean) => {
-            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            if (isCommandClick(e)) {
               e.preventDefault();
               window.open(
                 `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`,

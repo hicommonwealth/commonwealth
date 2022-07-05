@@ -7,6 +7,7 @@ import 'components/sidebar/index.scss';
 import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
+import { isCommandClick } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -260,7 +261,7 @@ export class GovernanceSection
         onMembersPage(m.route.get()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           e.preventDefault();
           window.open(`/${app.activeChainId()}/members`, ' _blank');
           return;
@@ -288,7 +289,7 @@ export class GovernanceSection
         // Check if we have multiple snapshots for conditional redirect
         const snapshotSpaces = app.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          if (isCommandClick(e)) {
             window.open(
               `/${app.activeChainId()}/multiple-snapshots?action=select-space`,
               ' _blank'
@@ -298,7 +299,7 @@ export class GovernanceSection
           navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
         } else {
           if (snapshotSpaces[0].lastIndexOf('/') > -1) {
-            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            if (isCommandClick(e)) {
               window.open(
                 `/${app.activeChainId()}/snapshot/${snapshotSpaces[0]
                   .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
@@ -312,7 +313,7 @@ export class GovernanceSection
                 .trim()}`
             );
           } else {
-            if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+            if (isCommandClick(e)) {
               window.open(`/${app.activeChainId()}/snapshot/${snapshotSpaces}`);
               return;
             }
@@ -332,7 +333,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/proposals`);
           return;
         }
@@ -354,7 +355,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/treasury`);
           return;
         }
@@ -375,7 +376,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/bounties`);
           return;
         }
@@ -396,7 +397,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/referenda`);
           return;
         }
@@ -417,7 +418,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/tips`);
           return;
         }
@@ -438,7 +439,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/council`);
           return;
         }
@@ -459,7 +460,7 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/validators`);
           return;
         }
@@ -484,7 +485,7 @@ export class GovernanceSection
       isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+        if (isCommandClick(e)) {
           window.open(`/${app.activeChainId()}/delegate`);
           return;
         }

@@ -363,3 +363,7 @@ export const weiToTokens = (input: string, decimals: number) => {
   const valueTokens = value.div(exp);
   return valueTokens.toFixed();
 };
+
+export const isCommandClick = (e: MouseEvent) => {
+  return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
+};
