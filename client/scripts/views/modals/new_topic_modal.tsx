@@ -167,49 +167,43 @@ export class NewTopicModal implements m.ClassComponent {
               e.preventDefault();
               const { quillEditorState, form } = this;
 
-              console.log('before', quillEditorState);
-
               if (quillEditorState) {
                 quillEditorState.editor.enable(false);
               }
 
-              console.log('after', quillEditorState);
+              const mentionsEle = document.getElementsByClassName(
+                'ql-mention-list-container'
+              )[0];
 
-              console.log('getText', quillEditorState.editor.getText());
+              if (mentionsEle)
+                (mentionsEle as HTMLElement).style.visibility = 'hidden';
 
-              // const mentionsEle = document.getElementsByClassName(
-              //   'ql-mention-list-container'
-              // )[0];
+              const defaultOffchainTemplate = !quillEditorState
+                ? ''
+                : quillEditorState.markdownMode
+                ? quillEditorState.editor.getText()
+                : JSON.stringify(quillEditorState.editor.getContents());
 
-              // if (mentionsEle)
-              //   (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
-              // const defaultOffchainTemplate = !quillEditorState
-              //   ? ''
-              //   : quillEditorState.markdownMode
-              //   ? quillEditorState.editor.getText()
-              //   : JSON.stringify(quillEditorState.editor.getContents());
-
-              // app.topics
-              //   .add(
-              //     form.name,
-              //     form.description,
-              //     null,
-              //     form.featuredInSidebar,
-              //     form.featuredInNewPost,
-              //     this.form.tokenThreshold || '0',
-              //     defaultOffchainTemplate
-              //   )
-              //   .then(() => {
-              //     this.saving = false;
-              //     m.redraw();
-              //     $(e.target).trigger('modalexit');
-              //   })
-              //   .catch(() => {
-              //     this.error = 'Error creating topic';
-              //     this.saving = false;
-              //     m.redraw();
-              //   });
+              app.topics
+                .add(
+                  form.name,
+                  form.description,
+                  null,
+                  form.featuredInSidebar,
+                  form.featuredInNewPost,
+                  this.form.tokenThreshold || '0',
+                  defaultOffchainTemplate
+                )
+                .then(() => {
+                  this.saving = false;
+                  m.redraw();
+                  $(e.target).trigger('modalexit');
+                })
+                .catch(() => {
+                  this.error = 'Error creating topic';
+                  this.saving = false;
+                  m.redraw();
+                });
             }}
           />
           {this.error && <div class="error-message">{this.error}</div>}
