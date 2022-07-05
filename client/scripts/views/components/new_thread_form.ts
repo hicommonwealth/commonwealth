@@ -26,7 +26,7 @@ import { OffchainTopic, OffchainThreadKind, OffchainThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { TopicSelector } from 'views/components/topic_selector';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 

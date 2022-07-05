@@ -10,7 +10,7 @@ import { navigateToSubpage } from 'app';
 import { OffchainTopic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';

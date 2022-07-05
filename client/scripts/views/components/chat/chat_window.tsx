@@ -14,7 +14,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import QuillEditor from '../quill/quill_editor';
+import { QuillEditor } from '../quill/quill_editor';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { editorIsBlank, renderQuillTextBody } from '../quill/helpers';
 

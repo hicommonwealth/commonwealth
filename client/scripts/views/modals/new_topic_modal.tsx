@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/new_topic_modal.scss';
 
 import { ChainNetwork } from 'types';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';

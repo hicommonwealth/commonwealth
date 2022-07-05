@@ -22,7 +22,7 @@ import { navigateToSubpage } from 'app';
 import { ChainBase } from 'types';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import {

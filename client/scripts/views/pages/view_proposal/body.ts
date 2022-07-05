@@ -23,7 +23,7 @@ import {
 
 import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import QuillFormattedText from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';

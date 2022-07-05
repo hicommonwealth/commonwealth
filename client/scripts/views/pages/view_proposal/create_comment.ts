@@ -9,7 +9,7 @@ import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
