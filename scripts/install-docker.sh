@@ -48,8 +48,6 @@ apt-get -y install docker-ce="$DOCKER_VERSION" docker-ce-cli="$DOCKER_VERSION" c
 # test the installation
 docker run hello-world
 
-apt install -y net-tools
-
 # post-installation setup to avoid having to sudo for everything when signed in as the user
 groupadd docker
 usermod -aG docker $VULTR_USER
@@ -58,5 +56,8 @@ newgrp docker
 # configure docker to start on server startup
 systemctl enable docker.service
 systemctl enable containerd.service
+
+# install other script dependencies
+apt-get install -y net-tools lsof
 
 EOF

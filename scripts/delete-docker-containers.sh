@@ -1,11 +1,12 @@
+#!/bin/bash
+
 # This script deletes all of the existing docker containers. For use only under extreme circumstances where a hard
 # reset is required. Requires the private key to run.
 
 # In order to avoid confusion, this script is not registered as a yarn command therefore, to run this script the
-# following commands are necessary:
+# following command:
+# chmod +rx ./scripts/delete-docker-containers.sh && VULTR_IP=XXXXXXXXX ./scripts/delete-docker-containers.sh
 
-# chmod +rx ./scripts/delete-docker-containers.sh
-# VULTR_IP=XXXXXXXXX ./scripts/delete-docker-containers.sh
 
 if [[ -z "$VULTR_IP" ]]; then
     echo "Must provide VULTR_IP in .env" 1>&2
