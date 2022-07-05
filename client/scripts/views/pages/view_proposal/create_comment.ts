@@ -9,7 +9,7 @@ import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -20,6 +20,11 @@ import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
 import jumpHighlightComment from './jump_to_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../../components/quill/helpers';
 
 const CreateComment: m.Component<
   {
@@ -71,22 +76,15 @@ const CreateComment: m.Component<
         vnode.state.error = 'Editor not initialized, please try again';
         return;
       }
-      if (vnode.state.quillEditorState.editor.editor.isBlank()) {
+
+      const { quillEditorState } = vnode.state;
+      if (editorIsBlank(quillEditorState)) {
         if (e) e.preventDefault();
         vnode.state.error = 'Comment cannot be blank';
         return;
       }
 
-      const { quillEditorState } = vnode.state;
-
-      const mentionsEle = document.getElementsByClassName(
-        'ql-mention-list-container'
-      )[0];
-      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
-      const commentText = quillEditorState.markdownMode
-        ? quillEditorState.editor.getText()
-        : JSON.stringify(quillEditorState.editor.getContents());
+      const commentText = getQuillTextContents(quillEditorState);
 
       const attachments = [];
       // const attachments = vnode.state.files ?
@@ -94,7 +92,7 @@ const CreateComment: m.Component<
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;
-      quillEditorState.editor.enable(false);
+      disableEditor(quillEditorState);
       const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(

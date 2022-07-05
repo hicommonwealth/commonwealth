@@ -1,15 +1,20 @@
 /* eslint-disable no-restricted-syntax */
 
-import 'components/quill_formatted_text.scss';
+import 'components/quill/quill_formatted_text.scss';
 
 import m from 'mithril';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
+import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
-const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
+const renderQuillDelta = (
+  delta,
+  hideFormatting = false,
+  collapse = false,
+  openLinksInNewTab = false
+) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
@@ -101,7 +106,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
                     'a',
                     {
                       href: child.attributes.link,
-                      target: '_blank',
+                      target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
                       noopener: 'noopener',
                       onclick: (e) => {
@@ -352,6 +357,7 @@ const QuillFormattedText: m.Component<
     collapse?: boolean;
     searchTerm?: string;
     cutoffText?: number;
+    openLinksInNewTab?: boolean;
   },
   {
     cachedDocWithHighlights: string;
@@ -359,10 +365,16 @@ const QuillFormattedText: m.Component<
   }
 > = {
   view: (vnode) => {
-    const { doc, hideFormatting, collapse, searchTerm, cutoffText } =
-      vnode.attrs;
+    const {
+      doc,
+      hideFormatting,
+      collapse,
+      searchTerm,
+      cutoffText,
+      openLinksInNewTab,
+    } = vnode.attrs;
 
-    let truncatedDoc = { ...doc };
+    const truncatedDoc = { ...doc };
     if (cutoffText) truncatedDoc.ops = [...doc.ops.slice(0, cutoffText)];
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
@@ -426,7 +438,12 @@ const QuillFormattedText: m.Component<
             });
         },
       },
-      renderQuillDelta(truncatedDoc, hideFormatting, collapse)
+      renderQuillDelta(
+        truncatedDoc,
+        hideFormatting,
+        collapse,
+        openLinksInNewTab
+      )
     );
   },
 };

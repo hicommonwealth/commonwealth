@@ -18,16 +18,16 @@ import {
   NotificationSubscription,
 } from 'models';
 
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import QuillFormattedText from 'views/components/quill/quill_formatted_text';
+import MarkdownFormattedText from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { getProposalUrlPath } from '../../identifiers';
-import { getProposalUrl } from '../../../../shared/utils';
 
 const getCommentPreview = (commentText) => {
+  // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there
   let decodedCommentText;
   try {
     const doc = JSON.parse(decodeURIComponent(commentText));

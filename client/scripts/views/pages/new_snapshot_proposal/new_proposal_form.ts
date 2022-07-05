@@ -22,7 +22,7 @@ import { navigateToSubpage } from 'app';
 import { ChainBase } from 'types';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import {
@@ -33,6 +33,11 @@ import {
   createProposal,
 } from 'helpers/snapshot_utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../../components/quill/helpers';
 
 interface IThreadForm {
   name: string;
@@ -78,21 +83,13 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  if (quillEditorState.editor.editor.isBlank()) {
+  if (editorIsBlank(quillEditorState)) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  quillEditorState.editor.enable(false);
+  disableEditor(quillEditorState);
 
-  const mentionsEle = document.getElementsByClassName(
-    'ql-mention-list-container'
-  )[0];
-  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-  const bodyText = !quillEditorState
-    ? ''
-    : quillEditorState.markdownMode
-    ? quillEditorState.editor.getText()
-    : JSON.stringify(quillEditorState.editor.getContents());
+  const bodyText = getQuillTextContents(quillEditorState);
 
   form.body = bodyText;
 

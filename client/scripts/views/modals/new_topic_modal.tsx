@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/new_topic_modal.scss';
 
 import { ChainNetwork } from 'types';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
@@ -15,6 +15,11 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../components/quill/helpers';
 
 type NewTopicModalForm = {
   description: string;
@@ -47,7 +52,7 @@ export class NewTopicModal implements m.ClassComponent {
       this.form.featuredInNewPost &&
       this.quillEditorState &&
       this.quillEditorState.editor &&
-      this.quillEditorState.editor.editor.isBlank()
+      editorIsBlank(this.quillEditorState)
     ) {
       disabled = true;
     }
@@ -167,43 +172,31 @@ export class NewTopicModal implements m.ClassComponent {
               e.preventDefault();
               const { quillEditorState, form } = this;
 
-              if (quillEditorState) {
-                quillEditorState.editor.enable(false);
-              }
+              disableEditor(quillEditorState);
 
-              const mentionsEle = document.getElementsByClassName(
-                'ql-mention-list-container'
-              )[0];
+              // const defaultOffchainTemplate =
+              // getQuillTextContents(quillEditorState);
 
-              if (mentionsEle)
-                (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
-              const defaultOffchainTemplate = !quillEditorState
-                ? ''
-                : quillEditorState.markdownMode
-                ? quillEditorState.editor.getText()
-                : JSON.stringify(quillEditorState.editor.getContents());
-
-              app.topics
-                .add(
-                  form.name,
-                  form.description,
-                  null,
-                  form.featuredInSidebar,
-                  form.featuredInNewPost,
-                  this.form.tokenThreshold || '0',
-                  defaultOffchainTemplate
-                )
-                .then(() => {
-                  this.saving = false;
-                  m.redraw();
-                  $(e.target).trigger('modalexit');
-                })
-                .catch(() => {
-                  this.error = 'Error creating topic';
-                  this.saving = false;
-                  m.redraw();
-                });
+              // app.topics
+              //   .add(
+              //     form.name,
+              //     form.description,
+              //     null,
+              //     form.featuredInSidebar,
+              //     form.featuredInNewPost,
+              //     this.form.tokenThreshold || '0',
+              //     defaultOffchainTemplate
+              //   )
+              //   .then(() => {
+              //     this.saving = false;
+              //     m.redraw();
+              //     $(e.target).trigger('modalexit');
+              //   })
+              //   .catch(() => {
+              //     this.error = 'Error creating topic';
+              //     this.saving = false;
+              //     m.redraw();
+              //   });
             }}
           />
           {this.error && <div class="error-message">{this.error}</div>}
