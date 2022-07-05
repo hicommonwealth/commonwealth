@@ -1,10 +1,11 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Select, Switch, TextArea } from 'construct-ui';
+import { Select, Switch } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
+import { CWTextArea } from './component_kit/cw_text_area';
 
 type InputRowAttrs = {
   defaultValue: string;
@@ -25,20 +26,16 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
       placeholder,
       textarea,
       title,
-      value,
     } = vnode.attrs;
 
     return (
       <div class="InputRow">
         {textarea && <CWLabel label={title} />}
         {textarea ? (
-          <TextArea
+          <CWTextArea
             defaultValue={defaultValue}
-            value={value}
             placeholder={placeholder}
-            fluid={true}
             disabled={disabled || false}
-            style={{ height: '296px', marginBottom: '20px' }}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
             }}

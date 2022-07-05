@@ -113,7 +113,7 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.description = v;
           }}
-          textarea={true}
+          textarea
         />
         <InputRow
           title="Website"
@@ -194,7 +194,7 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.customDomain = v;
           }}
-          disabled={true} // Custom domains should be admin configurable only
+          disabled // Custom domains should be admin configurable only
         />
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
@@ -326,7 +326,7 @@ export class ChainMetadataRows
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
-              }).then(({ result }) => {
+              }).then(() => {
                 app.chain.meta.setBanner(this.communityBanner);
               });
             } catch (err) {
