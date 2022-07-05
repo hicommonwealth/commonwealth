@@ -123,8 +123,10 @@ ssh "$VULTR_USER"@"$VULTR_IP" UNIQUE_DOCKER_CONTAINER_ID="$UNIQUE_DOCKER_CONTAIN
   printf "VULTR_REDIS_CONTAINER_PORT=%s\n\n" "$OPEN_REDIS_PORT"
   printf "*******************************************************\n\n"
 
-  echo "That's it! Next time you want to use your remote containers, start them up using"
-  printf "'yarn start-containers' and shut them down at the end of the day with 'yarn shutdown-containers'\n\n"
+  echo "That's it! Your docker containers are currently running."
+  echo "When you are done using your containers you should shut them down using 'yarn shutdown-containers'"
+  echo "The next time you want to use your remote containers, start them up using 'yarn start-containers'"
+  printf "\n\n"
   echo "We're all done. Good luck out there!"
 EOF
 
