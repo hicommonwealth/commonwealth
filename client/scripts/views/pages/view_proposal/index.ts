@@ -110,7 +110,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalPoll } from './proposal_poll';
+import { ProposalPollCard } from './proposal_poll_card';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
@@ -1415,7 +1415,7 @@ const ViewProposalPage: m.Component<
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m(ProposalPoll, { poll, thread: proposal });
+                return m(ProposalPollCard, { poll, thread: proposal });
               }),
           ],
         ]),
