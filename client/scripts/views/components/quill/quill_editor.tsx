@@ -27,6 +27,7 @@ import { getClasses } from '../component_kit/helpers';
 // Modified quill-auto-links for proper behavior with Markdown and pasting.
 
 type QuillEditorAttrs = {
+  className?: string;
   contentsDoc?;
   editorNamespace: string;
   imageUploader?;
@@ -73,11 +74,12 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
     const theme = vnode.attrs.theme || 'snow';
 
     const {
+      className,
+      editorNamespace,
       imageUploader,
+      onkeyboardSubmit,
       placeholder,
       tabindex,
-      editorNamespace,
-      onkeyboardSubmit,
     } = vnode.attrs;
 
     const oncreateBind = vnode.attrs.oncreateBind || (() => null);
@@ -140,8 +142,8 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
     }
     return (
       <div
-        class={getClasses<{ markdownMode?: boolean }>(
-          { markdownMode: !!vnode.state.markdownMode },
+        class={getClasses<{ markdownMode?: boolean; className?: string }>(
+          { className, markdownMode: !!vnode.state.markdownMode },
           'QuillEditor'
         )}
         oncreate={(childVnode) => {

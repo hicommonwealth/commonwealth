@@ -224,16 +224,18 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        {m(QuillEditor, {
+        <CWLabel label="Community Banner" />
+        <QuillEditor
           // Prevent the editor from being filled in with previous content
-          contentsDoc: this.communityBanner || '',
-          oncreateBind: (state) => {
+          className="chain-metadata-quill-editor"
+          contentsDoc={this.communityBanner || ''}
+          oncreateBind={(state) => {
             console.log('state', state);
             this.communityBannerQuillEditorState = state;
-          },
-          tabindex: 1,
-          editorNamespace: 'new-banner',
-        })}
+          }}
+          tabindex={1}
+          editorNamespace="new-banner"
+        />
         <div class="tag-row">
           <CWLabel label="Community Tags" />
           <div class="tag-group">

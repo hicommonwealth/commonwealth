@@ -12,15 +12,15 @@
 // 5. toolbar (markdown mode)
 // 6. preview button
 // 7. mentions container
-// 8. upload spinner
+// 8. upload spinner (TODO)
 //
 // - progress bar
 // - markdown/rich text switcher tooltip
 //
 
 .QuillEditor {
-  position: relative;
-  word-break: break-word;
+  display: flex;
+  flex-direction: column;
 
   ::selection {
     background: $neutral-500;
@@ -63,6 +63,7 @@
       padding: 12px 16px;
       border-radius: 3px;
       overflow-wrap: anywhere;
+
       &:first-child {
         margin-top: 2px;
       }
@@ -142,10 +143,10 @@
   .ql-toolbar.ql-snow {
     border-radius: 4px 4px 0 0;
     box-sizing: border-box;
+    min-height: 39px;
+    overflow-x: auto;
     padding: 5px 8px;
     white-space: nowrap;
-    overflow-x: auto;
-    min-height: 39px;
 
     @include extraSmall {
       display: flex;
@@ -155,18 +156,12 @@
     }
   }
 
-  .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
-  }
-
-  .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-  }
-
   // link popup
   .ql-tooltip {
-    z-index: 9999;
+    border-radius: 5px;
     font-size: 17px;
     padding: 10px 15px 8px;
-    border-radius: 5px;
+    z-index: 9999;
 
     input[type='text'] {
       position: relative;
@@ -202,11 +197,11 @@
   }
 
   .type-selector {
-    position: absolute;
     display: flex;
+    margin-right: 8px;
+    position: absolute;
     right: 100px;
     top: 6px;
-    margin-right: 8px;
 
     @include extraSmall {
       top: 40px;
@@ -373,10 +368,6 @@
         background-color: $neutral-300;
       }
     }
-  }
-  // 8. upload spinner
-  .spinner-wrap.cui-spinner {
-    // TODO
   }
 }
 
