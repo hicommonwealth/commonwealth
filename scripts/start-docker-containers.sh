@@ -197,6 +197,5 @@ ssh "$VULTR_USER"@"$VULTR_IP" UNIQUE_DOCKER_CONTAINER_ID="$UNIQUE_DOCKER_CONTAIN
     fi
     printf "\n\n*******************************************************\n\n"
   fi
-
 EOF
 

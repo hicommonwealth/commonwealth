@@ -1,7 +1,8 @@
-import { RABBITMQ_URI } from '../../config';
+import { RABBITMQ_URI, VULTR_IP } from "../../config";
 
-const vhost = RABBITMQ_URI.includes('localhost') ? '/' : RABBITMQ_URI.split('/')[RABBITMQ_URI.split('/').length - 1]
-const purge = RABBITMQ_URI.includes('localhost')
+const vhost = RABBITMQ_URI.includes('localhost') || RABBITMQ_URI.includes(VULTR_IP) ? '/' :
+  RABBITMQ_URI.split('/')[RABBITMQ_URI.split('/').length - 1]
+const purge = RABBITMQ_URI.includes('localhost') || RABBITMQ_URI.includes(VULTR_IP)
 
 const config = {
   'vhosts': {

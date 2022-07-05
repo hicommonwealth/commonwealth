@@ -1,6 +1,6 @@
 import { createClient } from 'redis';
 import { factory, formatFilename } from '../../shared/logging';
-import { REDIS_URL } from '../config';
+import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -21,15 +21,21 @@ export class RedisCache {
    */
   public async init() {
     if (!REDIS_URL) {
-      log.warn("Redis Url is undefined. Some services (e.g. chat) may not be available.");
+      log.warn(
+        'Redis Url is undefined. Some services (e.g. chat) may not be available.'
+      );
       this.initialized = false;
       return;
     }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
     if (!this.client) {
-      const redisOptions = {}
-      if (!REDIS_URL.includes("localhost") && !REDIS_URL.includes("127.0.0.1")) {
+      const redisOptions = {};
+      if (
+        !REDIS_URL.includes('localhost') &&
+        !REDIS_URL.includes('127.0.0.1') &&
+        !REDIS_URL.includes(VULTR_IP)
+      ) {
         redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           tls: true,
@@ -38,10 +44,10 @@ export class RedisCache {
             if (retries <= 5) {
               return (retries * 10) ** 2;
             } else {
-              return new Error("Failed to connect to Redis!")
+              return new Error('Failed to connect to Redis!');
             }
           },
-        }
+        };
       }
       this.client = createClient(redisOptions);
     }
