@@ -10,7 +10,7 @@ import { createNewDummyProject } from './dummy_project';
 export default class ExplorePage
   implements m.ClassComponent<{ project: Project }>
 {
-  getExploreProjects(): Project[] {
+  getDummyExploreProjects(): Project[] {
     return [
       createNewDummyProject({}),
       createNewDummyProject({ isAuthor: true }),
@@ -28,8 +28,8 @@ export default class ExplorePage
   }
 
   view(vnode) {
-    console.log(this.getExploreProjects());
-    const exploreProjects = this.getExploreProjects().map((project) => (
+    console.log(this.getDummyExploreProjects());
+    const exploreProjects = this.getDummyExploreProjects().map((project) => (
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
 

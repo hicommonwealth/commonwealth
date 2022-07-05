@@ -19,7 +19,7 @@ export default class YourPage implements m.ClassComponent {
   private supportedProjectsDisplayed = 6;
   private endedProjectsDisplayed = 6;
 
-  getYoursPageProjects(): Project[] {
+  getDummyYoursPageProjects(): Project[] {
     return [
       createNewDummyProject({ isAuthor: true }),
       createNewDummyProject({ isBacker: true }),
@@ -30,6 +30,8 @@ export default class YourPage implements m.ClassComponent {
     ];
   }
 
+  // TODO: These split-up methods are ~legacy from a previous design iteration where
+  //       support types were placed in different sections
   getAuthoredProjects(): Project[] {
     const allProjects: Project[] = [];
     app.user.addresses.forEach(({ address, chain }) => {
@@ -85,63 +87,64 @@ export default class YourPage implements m.ClassComponent {
       m.route.set(`/projects/explore`);
       return;
     }
-
-    return (
-      <div class="YourPage">
-        {/* <CWText type="h1">Your Projects</CWText>
-        <div class="projects-listing">
-          {this.getAuthoredProjects().map((project) => (
-            <ProjectCard project={project} size={ProjectCardSize.Large} />
-          ))}
-          <CWButton
-            buttonType="secondary"
-            label="Manage"
-            onclick={() =>
-              app.modals.create({
-                modal: SupportProjectModal,
-                // TODO: Real project attr
-                data: { project: null, supportType: 'curate' },
-              })
-            }
-          />
-        </div>
-        <CWText type="h1">Backed and Curated</CWText>
-        <div class="projects-wrap">
-          <div class="projects-listing">
-            {this.getSupportedProjects().map((project) => (
-              <ProjectCard project={project} size={ProjectCardSize.Medium} />
-            ))}
-          </div>
-          <CWButton
-            label="Show More"
-            buttonType="secondary"
-            disable={
-              this.supportedProjectsDisplayed >= this.totalSupportedProjects
-            }
-            onclick={() => {
-              this.supportedProjectsDisplayed += 6;
-              console.log(this.supportedProjectsDisplayed);
-            }}
-          />
-        </div>
-        <CWText type="h1">Ended Projects</CWText>
-        <div class="projects-wrap">
-          <div class="projects-listing">
-            {this.getEndedProjects().map((project) => (
-              <ProjectCard project={project} size={ProjectCardSize.Small} />
-            ))}
-          </div>
-          <CWButton
-            label="Show More"
-            buttonType="secondary"
-            disable={this.endedProjectsDisplayed >= this.totalEndedProjects}
-            onclick={() => {
-              this.endedProjectsDisplayed += 6;
-              console.log(this.endedProjectsDisplayed);
-            }}
-          />
-        </div> */}
-      </div>
-    );
+    const exploreProjects = this.getDummyYoursPageProjects().map((project) => (
+      <ProjectCard project={project} size={ProjectCardSize.Large} />
+    ));
+    return <div class="YourPage">{exploreProjects}</div>;
   }
 }
+
+// OLD YOUR PAGE CODE FR PREVIOUS DESIGN ITERATION
+/* <CWText type="h1">Your Projects</CWText>
+<div class="projects-listing">
+  {this.getAuthoredProjects().map((project) => (
+    <ProjectCard project={project} size={ProjectCardSize.Large} />
+  ))}
+  <CWButton
+    buttonType="secondary"
+    label="Manage"
+    onclick={() =>
+      app.modals.create({
+        modal: SupportProjectModal,
+        // TODO: Real project attr
+        data: { project: null, supportType: 'curate' },
+      })
+    }
+  />
+</div>
+<CWText type="h1">Backed and Curated</CWText>
+<div class="projects-wrap">
+  <div class="projects-listing">
+    {this.getSupportedProjects().map((project) => (
+      <ProjectCard project={project} size={ProjectCardSize.Medium} />
+    ))}
+  </div>
+  <CWButton
+    label="Show More"
+    buttonType="secondary"
+    disable={
+      this.supportedProjectsDisplayed >= this.totalSupportedProjects
+    }
+    onclick={() => {
+      this.supportedProjectsDisplayed += 6;
+      console.log(this.supportedProjectsDisplayed);
+    }}
+  />
+</div>
+<CWText type="h1">Ended Projects</CWText>
+<div class="projects-wrap">
+  <div class="projects-listing">
+    {this.getEndedProjects().map((project) => (
+      <ProjectCard project={project} size={ProjectCardSize.Small} />
+    ))}
+  </div>
+  <CWButton
+    label="Show More"
+    buttonType="secondary"
+    disable={this.endedProjectsDisplayed >= this.totalEndedProjects}
+    onclick={() => {
+      this.endedProjectsDisplayed += 6;
+      console.log(this.endedProjectsDisplayed);
+    }}
+  />
+</div> */

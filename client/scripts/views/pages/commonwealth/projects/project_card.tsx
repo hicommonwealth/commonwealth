@@ -232,37 +232,14 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
       m.route.set(`project/${project.id}-${slugify(project.title)}`);
     };
 
-    // const ProjectCardMedium = (
-    //   <div class="ProjectCard medium" onclick={onclick}>
-    //     <ProjectHeaderPanel />
-    //     <ProjectCompletionBar completionPercent={project.completionPercent} />
-    //     <ProjectInfoPanel project={project} avatarSize={16} iconSize={24} />
-    //   </div>
-    // );
-
-    // const ProjectCardSmall = (
-    //   <div class="ProjectCard small" onclick={onclick}>
-    //     <div class="top-panel">
-    //       <CWText type="h3">{project.title}</CWText>
-    //       {/* TODO: Implement label in kit */}
-    //     </div>
-    //     <div class={`.project-status.${projectStatus}`}>
-    //       {capitalize(projectStatus)}
-    //     </div>
-    //     <div class="bottom-panel">
-    //       <DummyChainIcon chain={null} onclick={null} size={12} />
-    //       <div class="project-token-name">{project.token}</div>
-    //     </div>
-    //   </div>
-    // );
-
-    // const [userRole, supportAmount] = this.getUserRoles(
-    //   project,
-    //   app.user.addresses
-    // );
-
-    const userRole = ProjectRole.Curator;
-    const supportAmount = '320000000000000000';
+    console.log(app.user.addresses);
+    const [userRole, supportAmount] = this.getUserRoles(
+      project,
+      app.user.addresses
+    );
+    console.log({ userRole, supportAmount });
+    // const userRole = ProjectRole.Curator;
+    // const supportAmount = '320000000000000000';
 
     return (
       <div class="ProjectCard large" onclick={onclick}>
