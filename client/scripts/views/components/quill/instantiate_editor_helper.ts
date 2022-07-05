@@ -13,7 +13,7 @@ import { loadScript } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
-import PreviewModal from 'views/modals/preview_modal';
+import { PreviewModal } from 'views/modals/preview_modal';
 
 const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
 const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
