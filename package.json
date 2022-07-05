@@ -44,7 +44,9 @@
     "migrate-db": "npx sequelize db:migrate",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "install-docker": "./scripts/install-docker.sh",
-    "update-docker-images": "./scripts/update-docker-images.sh"
+    "update-docker-images": "./scripts/update-docker-images.sh",
+    "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
+    "start-containers": "./scripts/start-docker-containers.sh"
   },
   "engines": {
     "node": "14.x"

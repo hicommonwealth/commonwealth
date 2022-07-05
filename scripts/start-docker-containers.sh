@@ -3,7 +3,9 @@
 # NOTE: If server load becomes too high refactor the Docker file to run RabbitMQ and Redis on the same container rather
 # than on individual containers.
 
-# Using UNIQUE_DOCKER_CONTAINER_ID prevents accidentally utilizing the existing docker container of another user
+# Using UNIQUE_DOCKER_CONTAINER_ID prevents accidentally utilizing the existing docker container of another user and
+# uniquely identifies all of a specific users containers. This allows for easy debugging since a user can just provide
+# the server admin with their id and the admin will be able to debug/reset of all of a users containers.
 
 # An extremely rare race condition may occur where by the time this script launches the container the port is in use
 # by another container spun up by another script running almost simultaneously. Since this scenario is so rare (occurs
