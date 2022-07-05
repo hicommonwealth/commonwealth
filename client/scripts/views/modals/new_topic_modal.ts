@@ -101,8 +101,9 @@ const NewTopicModal: m.Component<
             },
             inputValidationFn: (text) => {
               let errorMsg;
-              const currentCommunityTopicNames =
-                app.chain.meta.topics.map((t) => t.name.toLowerCase());
+              const currentCommunityTopicNames = app.chain.meta.topics.map(
+                (t) => t.name.toLowerCase()
+              );
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 vnode.state.error = errorMsg;

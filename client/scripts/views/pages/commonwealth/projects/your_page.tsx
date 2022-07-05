@@ -6,7 +6,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import SupportProjectModal from 'views/modals/support_project_modal';
 import ProjectCard, { ProjectCardSize } from './project_card';
 import { createNewDummyProject } from './dummy_project';
 
@@ -90,7 +89,11 @@ export default class YourPage implements m.ClassComponent {
     const exploreProjects = this.getDummyYoursPageProjects().map((project) => (
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
-    return <div class="YourPage">{exploreProjects}</div>;
+    return (
+      <div class="YourPage">
+        <div class="projects-listing">{exploreProjects}</div>
+      </div>
+    );
   }
 }
 
