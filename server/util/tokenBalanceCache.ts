@@ -131,12 +131,6 @@ export class TokenBalanceProvider {
       throw new Error('No API key found for terra endpoint');
     }
 
-    // verify address is valid before making query
-    const decodedAddress = bech32.decodeUnsafe(userAddress);
-    if (!decodedAddress) {
-      throw new Error('invalid terra address');
-    }
-
     // make balance query
     const queryUrl = `${url}/cosmos/bank/v1beta1/balances/${
       userAddress
@@ -303,6 +297,13 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
       });
       if (!tokenMeta?.address) throw new Error('unsupported token');
       contractAddress = tokenMeta.address;
+    } else if (chain.bech32_prefix && chain.base === ChainBase.CosmosSDK) {
+      // re-encode address with given bech32 prefix if on cosmos
+      const decodedAddress = bech32.decodeUnsafe(address);
+      if (!decodedAddress) {
+        throw new Error('invalid terra address');
+      }
+      address = bech32.encode(chain.bech32_prefix, decodedAddress.words);
     }
 
     const url = node.private_url || node.url;
