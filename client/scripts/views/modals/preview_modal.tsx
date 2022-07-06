@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'modals/preview_modal.scss';
 
-import QuillFormattedText from 'views/components/quill/quill_formatted_text';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';

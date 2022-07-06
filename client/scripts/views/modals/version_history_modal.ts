@@ -4,7 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
 import { OffchainThread, OffchainComment } from 'models';
-import QuillFormattedText from 'views/components/quill/quill_formatted_text';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';

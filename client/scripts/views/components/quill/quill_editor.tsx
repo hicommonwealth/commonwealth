@@ -39,6 +39,7 @@ type QuillEditorAttrs = {
 };
 
 export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
+  // which are private?
   editor;
   markdownMode;
   uploading?: boolean;
@@ -52,21 +53,18 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
   oncreate(vnode) {
     // Only bind the alert if we are actually trying to persist the user's changes
     if (!vnode.attrs.contentsDoc) {
-      vnode.state.beforeunloadHandler = () => {
-        if (
-          vnode.state.unsavedChanges &&
-          vnode.state.unsavedChanges.length() > 0
-        ) {
+      this.beforeunloadHandler = () => {
+        if (this.unsavedChanges && this.unsavedChanges.length() > 0) {
           return 'There are unsaved changes. Are you sure you want to leave?';
         }
       };
-      $(window).on('beforeunload', vnode.state.beforeunloadHandler);
+      $(window).on('beforeunload', this.beforeunloadHandler);
     }
   }
 
   onremove(vnode) {
     if (!vnode.attrs.contentsDoc) {
-      $(window).off('beforeunload', vnode.state.beforeunloadHandler);
+      $(window).off('beforeunload', this.beforeunloadHandler);
     }
   }
 
@@ -90,7 +88,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
 
     if (
       !contentsDoc &&
-      !vnode.state.markdownMode &&
+      !this.markdownMode &&
       localStorage.getItem(
         `${app.activeChainId()}-${editorNamespace}-storedText`
       ) !== null
@@ -102,29 +100,29 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
           )
         );
         if (!contentsDoc.ops) throw new Error();
-        vnode.state.markdownMode = false;
+        this.markdownMode = false;
       } catch (e) {
         contentsDoc = localStorage.getItem(
           `${app.activeChainId()}-${editorNamespace}-storedText`
         );
-        vnode.state.markdownMode = true;
+        this.markdownMode = true;
       }
-    } else if (vnode.state.markdownMode === undefined) {
+    } else if (this.markdownMode === undefined) {
       if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-        vnode.state.markdownMode = true;
+        this.markdownMode = true;
       } else if (
         localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false'
       ) {
-        vnode.state.markdownMode = false;
+        this.markdownMode = false;
       } else {
-        // Otherwise, just set vnode.state.markdownMode based on the app setting
-        vnode.state.markdownMode = !!app.user?.disableRichText;
+        // Otherwise, just set this.markdownMode based on the app setting
+        this.markdownMode = !!app.user?.disableRichText;
       }
     }
 
-    // Set vnode.state.clearUnsavedChanges on first initialization
-    if (vnode.state.clearUnsavedChanges === undefined) {
-      vnode.state.clearUnsavedChanges = () => {
+    // Set this.clearUnsavedChanges on first initialization
+    if (this.clearUnsavedChanges === undefined) {
+      this.clearUnsavedChanges = () => {
         localStorage.removeItem(`${editorNamespace}-markdownMode`);
         localStorage.removeItem(
           `${app.activeChainId()}-${editorNamespace}-storedText`
@@ -143,20 +141,20 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
     return (
       <div
         class={getClasses<{ markdownMode?: boolean; className?: string }>(
-          { className, markdownMode: !!vnode.state.markdownMode },
+          { className, markdownMode: !!this.markdownMode },
           'QuillEditor'
         )}
         oncreate={(childVnode) => {
           const $editor = $(childVnode.dom).find('.quill-editor');
 
-          vnode.state.editor = instantiateEditor(
+          this.editor = instantiateEditor(
             $editor,
             theme,
             true,
             imageUploader,
             placeholder,
             editorNamespace,
-            vnode.state,
+            this,
             onkeyboardSubmit
           );
 
@@ -164,45 +162,43 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
           $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
 
           if (contentsDoc && typeof contentsDoc === 'string') {
-            vnode.state.editor.setText(contentsDoc);
-            vnode.state.markdownMode = true;
+            this.editor.setText(contentsDoc);
+            this.markdownMode = true;
           } else if (contentsDoc && typeof contentsDoc === 'object') {
-            vnode.state.editor.setContents(contentsDoc);
-            vnode.state.markdownMode = false;
+            this.editor.setContents(contentsDoc);
+            this.markdownMode = false;
           }
 
-          oncreateBind(vnode.state);
+          oncreateBind(this);
         }}
       >
         <div class="quill-editor" />
-        {theme !== 'bubble' && vnode.state.markdownMode ? (
+        {theme !== 'bubble' && this.markdownMode ? (
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to Rich Text mode"
             onclick={(e) => {
-              if (!vnode.state.markdownMode) return;
-
-              const cachedContents = vnode.state.editor.getContents();
+              const cachedContents = this.editor.getContents();
 
               // switch editor to rich text
-              vnode.state.markdownMode = false;
+              this.markdownMode = false;
 
               const $editor = $(e.target)
                 .closest('.QuillEditor')
                 .find('.quill-editor');
 
-              vnode.state.editor.container.tabIndex = tabindex;
+              this.editor.container.tabIndex = tabindex;
 
-              vnode.state.editor = instantiateEditor(
+              this.editor = instantiateEditor(
                 $editor,
                 theme,
                 true,
                 imageUploader,
                 placeholder,
                 editorNamespace,
-                vnode.state,
+                this,
                 onkeyboardSubmit
               );
 
@@ -212,13 +208,11 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
                 .find('.ql-editor')
                 .attr('tabindex', tabindex);
 
-              vnode.state.editor.setContents(cachedContents);
+              this.editor.setContents(cachedContents);
 
-              vnode.state.editor.setSelection(
-                vnode.state.editor.getText().length - 1
-              );
+              this.editor.setSelection(this.editor.getText().length - 1);
 
-              vnode.state.editor.focus();
+              this.editor.focus();
 
               // try to save setting
               if (app.isLoggedIn()) {
@@ -235,29 +229,22 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
             className="mode-switcher"
             title="Switch to markdown mode"
             onclick={async (e) => {
-              if (vnode.state.markdownMode) return;
-
               // confirm before removing formatting and switching to markdown mode
               // first, we check if removeFormat() actually does anything; then we ask the user to confirm
               let confirmed = false;
 
-              let cachedContents = vnode.state.editor.getContents();
+              let cachedContents = this.editor.getContents();
 
-              vnode.state.editor.removeFormat(
-                0,
-                vnode.state.editor.getText().length - 1
-              );
+              this.editor.removeFormat(0, this.editor.getText().length - 1);
 
               if (
-                vnode.state.editor.getContents().ops.length ===
+                this.editor.getContents().ops.length ===
                 cachedContents.ops.length
               ) {
                 confirmed = true;
               } else {
-                vnode.state.editor.setContents(cachedContents);
-                vnode.state.editor.setSelection(
-                  vnode.state.editor.getText().length - 1
-                );
+                this.editor.setContents(cachedContents);
+                this.editor.setSelection(this.editor.getText().length - 1);
               }
 
               if (!confirmed) {
@@ -269,27 +256,24 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
               if (!confirmed) return;
 
               // remove formatting, switch editor to markdown
-              vnode.state.editor.removeFormat(
-                0,
-                vnode.state.editor.getText().length - 1
-              );
+              this.editor.removeFormat(0, this.editor.getText().length - 1);
 
-              cachedContents = vnode.state.editor.getContents();
+              cachedContents = this.editor.getContents();
 
-              vnode.state.markdownMode = true;
+              this.markdownMode = true;
 
               const $editor = $(e.target)
                 .closest('.QuillEditor')
                 .find('.quill-editor');
 
-              vnode.state.editor = instantiateEditor(
+              this.editor = instantiateEditor(
                 $editor,
                 theme,
                 true,
                 imageUploader,
                 placeholder,
                 editorNamespace,
-                vnode.state,
+                this,
                 onkeyboardSubmit
               );
 
@@ -299,15 +283,13 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
                 .find('.ql-editor')
                 .attr('tabindex', tabindex);
 
-              vnode.state.editor.container.tabIndex = tabindex;
+              this.editor.container.tabIndex = tabindex;
 
-              vnode.state.editor.setContents(cachedContents);
+              this.editor.setContents(cachedContents);
 
-              vnode.state.editor.setSelection(
-                vnode.state.editor.getText().length - 1
-              );
+              this.editor.setSelection(this.editor.getText().length - 1);
 
-              vnode.state.editor.focus();
+              this.editor.focus();
 
               // try to save setting
               if (app.isLoggedIn()) {
@@ -327,9 +309,9 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
             app.modals.create({
               modal: PreviewModal,
               data: {
-                doc: vnode.state.markdownMode
-                  ? vnode.state.editor.getText()
-                  : JSON.stringify(vnode.state.editor.getContents()),
+                doc: this.markdownMode
+                  ? this.editor.getText()
+                  : JSON.stringify(this.editor.getContents()),
               },
             });
           }}
