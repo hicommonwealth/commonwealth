@@ -9,7 +9,7 @@ import {
 } from './components/component_kit/cw_banner';
 import { ChainInfo, ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
-import { CWText } from './components/component_kit/cw_text';
+import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersAttrs = {
   banner?: string;
@@ -23,37 +23,25 @@ export class SublayoutBanners
 {
   view(vnode) {
     const { banner, chain, terms, tosStatus } = vnode.attrs;
-    // console.log('sublayout banner before CWMessageBanner', banner);
+
     return (
       <>
-        {/* {banner && <CWBanner bannerContent={banner} />} */}
-        <CWMessageBanner
-          bannerContent={banner}
-          onClose={() => console.log('off')}
-        />
-        {/* {app.isLoggedIn() &&
+        {isNonEmptyString(banner.trim()) && ( // probably shouldn't have to trim this to check it...
+          <CWMessageBanner
+            bannerContent={banner}
+            onClose={() => console.log('off')}
+          />
+        )}
+        {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
-          !app.user.activeAccount && ( */}
-        <CWBanner
-          // bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
-          bannerContent={`Link an address that holds POOPCOIN to participate in governance.`}
-        />
-        {/* )} */}
-        {/* {isNonEmptyString(terms) && tosStatus !== 'off' && ( */}
-        <CWBanner
-          bannerContent={
-            <CWText>
-              <a href={terms}>
-                Please read the terms and conditions before interacting with
-                this community.
-              </a>
-            </CWText>
-          }
-          onClose={() =>
-            localStorage.setItem(`${app.activeChainId()}-tos`, 'off')
-          }
-        />
-        {/* )} */}
+          !app.user.activeAccount && (
+            <CWBanner
+              bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
+            />
+          )}
+        {isNonEmptyString(terms) && tosStatus !== 'off' && (
+          <TermsBanner terms={terms} />
+        )}
       </>
     );
   }

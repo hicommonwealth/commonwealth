@@ -1,43 +1,35 @@
 @import 'shared';
 
-.Banner {
-  align-items: center;
-  background-color: $neutral-100;
-  border-bottom: 1px solid $neutral-200;
+@mixin bannerStyles {
+  align-items: flex-start;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  min-height: 32px;
-  padding: 8px;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 16px 16px 16px 192px;
 
-  &.onClose {
-    padding: 8px 32px 8px 8px;
+  @include mediumSmall {
+    padding: 16px 16px 16px 32px;
   }
 
-  .IconButton {
-    margin-left: 8px;
-    position: absolute;
-    right: 8px;
+  @include small {
+    padding: 16px 16px 16px 32px;
+  }
+
+  @include extraSmall {
+    padding: 16px;
   }
 }
 
+.Banner {
+  background-color: $neutral-100;
+  border-bottom: 1px solid $neutral-200;
+
+  @include bannerStyles;
+}
+
 .MessageBanner {
-  align-items: center;
   background-color: $primary-50;
   border-bottom: 1px solid $primary-100;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 32px;
-  padding: 16px 8px;
 
-  &.onClose {
-    padding: 8px 32px 8px 8px;
-  }
-
-  .IconButton {
-    margin-left: 8px;
-    position: absolute;
-    right: 8px;
-  }
+  @include bannerStyles;
 }

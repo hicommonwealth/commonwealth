@@ -12,24 +12,23 @@ import { renderQuillTextBody } from '../quill/helpers';
 
 type BannerAttrs = {
   bannerContent: string;
+  className?: string;
   onClose: () => void;
 };
 
 export class CWBanner implements m.ClassComponent<BannerAttrs> {
   view(vnode) {
-    const { bannerContent, onClose } = vnode.attrs;
+    const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ onClose?: boolean }>(
-          { onClose: !!onClose },
+        class={getClasses<{ className?: string }>(
+          { className },
           ComponentType.Banner
         )}
       >
-        <CWText>{bannerContent}</CWText>
-        {onClose && (
-          <CWIconButton iconName="close" iconSize="small" onclick={onClose} />
-        )}
+        <CWText type="b2">{bannerContent}</CWText>
+        {onClose && <CWIconButton iconName="close" onclick={onClose} />}
       </div>
     );
   }
@@ -37,12 +36,12 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
 
 export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
   view(vnode) {
-    const { bannerContent, onClose } = vnode.attrs;
+    const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ onClose?: boolean }>(
-          { onClose: !!onClose },
+        class={getClasses<{ className?: string }>(
+          { className },
           ComponentType.MessageBanner
         )}
       >
@@ -52,7 +51,6 @@ export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
         {onClose && (
           <CWIconButton
             iconName="close"
-            iconSize="small"
             onclick={onClose}
             iconButtonTheme="primary"
           />
