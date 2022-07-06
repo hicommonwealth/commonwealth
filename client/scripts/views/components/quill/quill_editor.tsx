@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Tag, Tooltip } from 'construct-ui';
 
 import 'components/quill/quill_editor.scss';
 
@@ -11,8 +10,9 @@ import SettingsController from 'controllers/app/settings';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
 import { instantiateEditor } from './instantiate_editor_helper';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
 
 // Rich text and Markdown editor.
 //
@@ -174,184 +174,166 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
           oncreateBind(vnode.state);
         }}
       >
-        <>
-          <div class="quill-editor" />
-          {theme !== 'bubble' && (
-            <div class="type-selector">
-              {vnode.state.markdownMode ? (
-                <Tooltip
-                  trigger={
-                    <Tag
-                      label="Markdown"
-                      size="xs"
-                      onclick={(e) => {
-                        if (!vnode.state.markdownMode) return;
+        <div class="quill-editor" />
+        {theme !== 'bubble' && vnode.state.markdownMode ? (
+          <CWText
+            type="h5"
+            fontWeight="semiBold"
+            className="mode-switcher"
+            title="Switch to Rich Text mode"
+            onclick={(e) => {
+              if (!vnode.state.markdownMode) return;
 
-                        const cachedContents = vnode.state.editor.getContents();
+              const cachedContents = vnode.state.editor.getContents();
 
-                        // switch editor to rich text
-                        vnode.state.markdownMode = false;
+              // switch editor to rich text
+              vnode.state.markdownMode = false;
 
-                        const $editor = $(e.target)
-                          .closest('.QuillEditor')
-                          .find('.quill-editor');
+              const $editor = $(e.target)
+                .closest('.QuillEditor')
+                .find('.quill-editor');
 
-                        vnode.state.editor.container.tabIndex = tabindex;
+              vnode.state.editor.container.tabIndex = tabindex;
 
-                        vnode.state.editor = instantiateEditor(
-                          $editor,
-                          theme,
-                          true,
-                          imageUploader,
-                          placeholder,
-                          editorNamespace,
-                          vnode.state,
-                          onkeyboardSubmit
-                        );
+              vnode.state.editor = instantiateEditor(
+                $editor,
+                theme,
+                true,
+                imageUploader,
+                placeholder,
+                editorNamespace,
+                vnode.state,
+                onkeyboardSubmit
+              );
 
-                        // once editor is instantiated, it can be updated with a tabindex
-                        $(e.target)
-                          .closest('.QuillEditor')
-                          .find('.ql-editor')
-                          .attr('tabindex', tabindex);
+              // once editor is instantiated, it can be updated with a tabindex
+              $(e.target)
+                .closest('.QuillEditor')
+                .find('.ql-editor')
+                .attr('tabindex', tabindex);
 
-                        vnode.state.editor.setContents(cachedContents);
+              vnode.state.editor.setContents(cachedContents);
 
-                        vnode.state.editor.setSelection(
-                          vnode.state.editor.getText().length - 1
-                        );
+              vnode.state.editor.setSelection(
+                vnode.state.editor.getText().length - 1
+              );
 
-                        vnode.state.editor.focus();
+              vnode.state.editor.focus();
 
-                        // try to save setting
-                        if (app.isLoggedIn()) {
-                          SettingsController.disableRichText(false);
-                        }
-                      }}
-                    />
-                  }
-                  content={
-                    <div class="quill-editor-tooltip">Click for rich text</div>
-                  }
-                />
-              ) : (
-                <Tooltip
-                  trigger={
-                    <Tag
-                      label="Rich text"
-                      size="xs"
-                      onclick={async (e) => {
-                        if (vnode.state.markdownMode) return;
-
-                        // confirm before removing formatting and switching to markdown mode
-                        // first, we check if removeFormat() actually does anything; then we ask the user to confirm
-                        let confirmed = false;
-
-                        let cachedContents = vnode.state.editor.getContents();
-
-                        vnode.state.editor.removeFormat(
-                          0,
-                          vnode.state.editor.getText().length - 1
-                        );
-
-                        if (
-                          vnode.state.editor.getContents().ops.length ===
-                          cachedContents.ops.length
-                        ) {
-                          confirmed = true;
-                        } else {
-                          vnode.state.editor.setContents(cachedContents);
-                          vnode.state.editor.setSelection(
-                            vnode.state.editor.getText().length - 1
-                          );
-                        }
-
-                        if (!confirmed) {
-                          confirmed = await confirmationModalWithText(
-                            'All formatting and images will be lost. Continue?'
-                          )();
-                        }
-
-                        if (!confirmed) return;
-
-                        // remove formatting, switch editor to markdown
-                        vnode.state.editor.removeFormat(
-                          0,
-                          vnode.state.editor.getText().length - 1
-                        );
-
-                        cachedContents = vnode.state.editor.getContents();
-
-                        vnode.state.markdownMode = true;
-
-                        const $editor = $(e.target)
-                          .closest('.QuillEditor')
-                          .find('.quill-editor');
-
-                        vnode.state.editor = instantiateEditor(
-                          $editor,
-                          theme,
-                          true,
-                          imageUploader,
-                          placeholder,
-                          editorNamespace,
-                          vnode.state,
-                          onkeyboardSubmit
-                        );
-
-                        // once editor is instantiated, it can be updated with a tabindex
-                        $(e.target)
-                          .closest('.QuillEditor')
-                          .find('.ql-editor')
-                          .attr('tabindex', tabindex);
-
-                        vnode.state.editor.container.tabIndex = tabindex;
-
-                        vnode.state.editor.setContents(cachedContents);
-
-                        vnode.state.editor.setSelection(
-                          vnode.state.editor.getText().length - 1
-                        );
-
-                        vnode.state.editor.focus();
-
-                        // try to save setting
-                        if (app.isLoggedIn()) {
-                          SettingsController.disableRichText(true);
-                        }
-                      }}
-                    />
-                  }
-                  content={
-                    <div class="quill-editor-tooltip">Click for Markdown</div>
-                  }
-                />
-              )}
-            </div>
-          )}
-          <div class="preview-button-wrap">
-            <Tag
-              label={
-                <div class="preview-button">
-                  <CWIcon iconName="search" iconSize="small" />
-                  <span>Preview</span>
-                </div>
+              // try to save setting
+              if (app.isLoggedIn()) {
+                SettingsController.disableRichText(false);
               }
-              size="xs"
-              onclick={(e) => {
-                e.preventDefault();
-                app.modals.create({
-                  modal: PreviewModal,
-                  data: {
-                    doc: vnode.state.markdownMode
-                      ? vnode.state.editor.getText()
-                      : JSON.stringify(vnode.state.editor.getContents()),
-                  },
-                });
-              }}
-            />
-          </div>
-        </>
+            }}
+          >
+            R
+          </CWText>
+        ) : (
+          <CWText
+            type="h5"
+            fontWeight="semiBold"
+            className="mode-switcher"
+            title="Switch to markdown mode"
+            onclick={async (e) => {
+              if (vnode.state.markdownMode) return;
+
+              // confirm before removing formatting and switching to markdown mode
+              // first, we check if removeFormat() actually does anything; then we ask the user to confirm
+              let confirmed = false;
+
+              let cachedContents = vnode.state.editor.getContents();
+
+              vnode.state.editor.removeFormat(
+                0,
+                vnode.state.editor.getText().length - 1
+              );
+
+              if (
+                vnode.state.editor.getContents().ops.length ===
+                cachedContents.ops.length
+              ) {
+                confirmed = true;
+              } else {
+                vnode.state.editor.setContents(cachedContents);
+                vnode.state.editor.setSelection(
+                  vnode.state.editor.getText().length - 1
+                );
+              }
+
+              if (!confirmed) {
+                confirmed = await confirmationModalWithText(
+                  'All formatting and images will be lost. Continue?'
+                )();
+              }
+
+              if (!confirmed) return;
+
+              // remove formatting, switch editor to markdown
+              vnode.state.editor.removeFormat(
+                0,
+                vnode.state.editor.getText().length - 1
+              );
+
+              cachedContents = vnode.state.editor.getContents();
+
+              vnode.state.markdownMode = true;
+
+              const $editor = $(e.target)
+                .closest('.QuillEditor')
+                .find('.quill-editor');
+
+              vnode.state.editor = instantiateEditor(
+                $editor,
+                theme,
+                true,
+                imageUploader,
+                placeholder,
+                editorNamespace,
+                vnode.state,
+                onkeyboardSubmit
+              );
+
+              // once editor is instantiated, it can be updated with a tabindex
+              $(e.target)
+                .closest('.QuillEditor')
+                .find('.ql-editor')
+                .attr('tabindex', tabindex);
+
+              vnode.state.editor.container.tabIndex = tabindex;
+
+              vnode.state.editor.setContents(cachedContents);
+
+              vnode.state.editor.setSelection(
+                vnode.state.editor.getText().length - 1
+              );
+
+              vnode.state.editor.focus();
+
+              // try to save setting
+              if (app.isLoggedIn()) {
+                SettingsController.disableRichText(true);
+              }
+            }}
+          >
+            M
+          </CWText>
+        )}
+        <CWIconButton
+          iconName="search"
+          iconSize="small"
+          iconButtonTheme="primary"
+          onclick={(e) => {
+            e.preventDefault();
+            app.modals.create({
+              modal: PreviewModal,
+              data: {
+                doc: vnode.state.markdownMode
+                  ? vnode.state.editor.getText()
+                  : JSON.stringify(vnode.state.editor.getContents()),
+              },
+            });
+          }}
+        />
       </div>
     );
   }

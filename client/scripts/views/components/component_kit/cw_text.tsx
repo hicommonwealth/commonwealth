@@ -32,15 +32,19 @@ type FontType =
   | 'buttonSm'
   | 'buttonLg';
 
-type TextAttrs = {
+type TextStyleAttrs = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
-  title?: string;
   type: FontType;
 };
+
+type TextAttrs = {
+  onclick?: () => void;
+  title?: string;
+} & TextStyleAttrs;
 
 const getFontWeight = (type: FontType) =>
   type === 'buttonSm' || type === 'buttonLg' ? 'semiBold' : 'regular';
@@ -51,6 +55,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
       className,
       disabled = false,
       fontStyle,
+      onclick,
       noWrap = false,
       title,
       type = 'b1',
@@ -59,18 +64,20 @@ export class CWText implements m.ClassComponent<TextAttrs> {
 
     return (
       <div
-        class={getClasses<TextAttrs>(
+        class={getClasses<TextStyleAttrs & { onclick?: boolean }>(
           {
             type,
             fontWeight,
             disabled,
             fontStyle,
             noWrap,
+            onclick: !!onclick,
             className,
           },
           ComponentType.Text
         )}
         title={title}
+        onclick={onclick}
       >
         {vnode.children}
       </div>

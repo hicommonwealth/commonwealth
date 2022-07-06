@@ -15,6 +15,10 @@
     white-space: nowrap;
   }
 
+  &.onclick {
+    cursor: pointer;
+  }
+
   &.b1 {
     font-family: $font-family-neue-haas-unica;
     font-size: 16px;

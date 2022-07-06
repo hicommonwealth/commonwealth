@@ -21,6 +21,24 @@
 .QuillEditor {
   display: flex;
   flex-direction: column;
+  position: relative;
+
+  .mode-switcher {
+    color: $primary-300;
+    position: absolute;
+    right: 48px;
+    top: 8px;
+
+    &:hover {
+      color: $primary-100;
+    }
+  }
+
+  .IconButton {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+  }
 
   ::selection {
     background: $neutral-500;
@@ -30,8 +48,9 @@
   // 1. editor typography modifications
   .ql-editor {
     font-size: 1rem;
-    padding: 20px 22px 28px;
+    height: 200px;
     max-height: 360px;
+    padding: 8px 16px;
 
     a {
       text-decoration: underline;
@@ -141,18 +160,15 @@
 
   // 4. toolbar
   .ql-toolbar.ql-snow {
+    background-color: $neutral-50;
     border-radius: 4px 4px 0 0;
-    box-sizing: border-box;
-    min-height: 39px;
-    overflow-x: auto;
-    padding: 5px 8px;
-    white-space: nowrap;
+    min-height: 40px;
+    padding: 8px;
 
     @include extraSmall {
       display: flex;
       flex-wrap: wrap;
-      min-height: 78px;
-      overflow-x: hidden;
+      min-height: 80px;
     }
   }
 
@@ -193,53 +209,6 @@
   &.markdown-mode {
     .ql-snow.ql-toolbar button.ql-preview {
       display: inline-block;
-    }
-  }
-
-  .type-selector {
-    display: flex;
-    margin-right: 8px;
-    position: absolute;
-    right: 100px;
-    top: 6px;
-
-    @include extraSmall {
-      top: 40px;
-    }
-
-    user-select: none;
-
-    .cui-tag {
-      cursor: pointer;
-      margin-right: 0;
-    }
-  }
-
-  .preview-button-wrap {
-    position: absolute;
-    display: flex;
-    right: 10px;
-    top: 6px;
-
-    @include extraSmall {
-      top: 40px;
-    }
-
-    user-select: none;
-
-    .preview-button {
-      display: flex;
-    }
-
-    .cui-tag {
-      cursor: pointer;
-      margin-right: 0;
-    }
-
-    svg {
-      margin-right: 4px;
-      top: 1px;
-      position: relative;
     }
   }
 

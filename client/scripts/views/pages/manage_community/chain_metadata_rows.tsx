@@ -226,8 +226,8 @@ export class ChainMetadataRows
         />
         <CWLabel label="Community Banner" />
         <QuillEditor
-          // Prevent the editor from being filled in with previous content
           className="chain-metadata-quill-editor"
+          // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
             console.log('state', state);
