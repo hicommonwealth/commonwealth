@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { isAddress } from 'web3-utils';
+import { isAddress, toChecksumAddress } from 'web3-utils';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
@@ -122,8 +122,17 @@ const finishSsoLogin = async (
     throw new AppError(Errors.TokenExpired);
   }
 
-  // verify address
+  // verify address is an address
   if (!isAddress(jwtPayload.roninAddress)) {
+    throw new AppError(Errors.TokenBadAddress);
+  }
+
+  // convert address to checksum version before storing in db
+  let checksumAddress: string;
+  try {
+    // NOTE: chainId is technically unused here, no need to provide it
+    checksumAddress = toChecksumAddress(jwtPayload.roninAddress);
+  } catch (e) {
     throw new AppError(Errors.TokenBadAddress);
   }
 
@@ -131,7 +140,7 @@ const finishSsoLogin = async (
   const reqUser = req.user;
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { address: jwtPayload.roninAddress },
+      where: { address: checksumAddress },
       include: [
         {
           model: models.SsoToken,
@@ -261,7 +270,7 @@ const finishSsoLogin = async (
       // create new address
       const newAddress = await models.Address.create(
         {
-          address: jwtPayload.roninAddress,
+          address: checksumAddress,
           chain: AXIE_INFINITY_CHAIN_ID,
           verification_token: 'SSO',
           verification_token_expires: null,
@@ -325,7 +334,7 @@ const finishSsoLogin = async (
     if (reqUser) {
       // re-fetch address if existing user
       const newAddress = await models.Address.findOne({
-        where: { address: jwtPayload.roninAddress },
+        where: { address: checksumAddress },
       });
       return success(res, { address: newAddress });
     } else {
