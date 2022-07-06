@@ -6,7 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { isCommandClick } from '../../../helpers';
+import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -180,21 +180,18 @@ export class DiscussionSection
           isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
           // eslint-disable-next-line no-loop-func
           onclick: (e, toggle: boolean) => {
-            if (isCommandClick(e)) {
-              e.preventDefault();
-              window.open(
-                `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`,
-                ' _blank'
-              );
-              return;
-            }
             e.preventDefault();
-            setDiscussionsToggleTree(
-              `children.${topic.name}.toggledState`,
-              toggle
+            handleRedirectClicks(
+              e,
+              `/discussions/${encodeURI(topic.name)}`,
+              app.activeChainId(),
+              () => {
+                setDiscussionsToggleTree(
+                  `children.${topic.name}.toggledState`,
+                  toggle
+                );
+              }
             );
-
-            navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
           },
           displayData: null,
         };

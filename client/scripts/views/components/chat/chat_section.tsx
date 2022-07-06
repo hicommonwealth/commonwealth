@@ -10,7 +10,7 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
-import { isCommandClick } from 'helpers';
+import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -366,13 +366,15 @@ export class ChatSection
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
         onclick: (e) => {
-          if (isCommandClick(e)) {
-            window.open(`/${app.activeChainId()}/chat/${channel.id}`);
-            return;
-          }
-          navigateToSubpage(`/chat/${channel.id}`);
-          this.activeChannel = channel.id;
-          app.socket.chatNs.activeChannel = String(channel.id);
+          handleRedirectClicks(
+            e,
+            `/chat/${channel.id}`,
+            app.activeChainId(),
+            () => {
+              this.activeChannel = channel.id;
+              app.socket.chatNs.activeChannel = String(channel.id);
+            }
+          );
         },
         rightIcon: isAdmin && channelRightIcon(channel),
       };
