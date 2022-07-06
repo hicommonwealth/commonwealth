@@ -19,6 +19,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabled: boolean;
   private _enabling = false;
   private _chainId: string;
+  private _chain: string;
   private _offlineSigner: OfflineDirectSigner;
   private _client: SigningStargateClient;
 
@@ -44,6 +45,11 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public async validateWithAccount(account: Account<any>): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino)
       throw new Error('Missing or misconfigured web wallet');
+
+    if (this._chain !== app.chain.id) {
+      // disable then re-enable on chain switch
+      await this.enable();
+    }
 
     // Get the verification token & placeholder TX to send
     const signDoc = validationTokenToSignDoc(
@@ -138,6 +144,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);
+        this._chain = app.chain.id;
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
