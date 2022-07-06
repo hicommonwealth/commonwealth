@@ -155,16 +155,17 @@ export class NewTopicModal implements m.ClassComponent {
               }}
             />
           </div>
-          {this.form.featuredInNewPost &&
-            m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
+          {this.form.featuredInNewPost && (
+            <QuillEditor
+              contentsDoc=""
+              oncreateBind={(state) => {
                 this.quillEditorState = state;
-              },
-              editorNamespace: 'new-discussion',
-              imageUploader: true,
-              tabindex: 3,
-            })}
+              }}
+              editorNamespace="new-discussion"
+              imageUploader
+              tabindex={3}
+            />
+          )}
           <CWButton
             label="Create topic"
             disabled={this.saving || this.error || disabled}

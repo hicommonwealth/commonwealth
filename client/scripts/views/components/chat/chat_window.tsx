@@ -202,16 +202,16 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
-            {m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
+            <QuillEditor
+              contentsDoc=""
+              oncreateBind={(state) => {
                 vnode.state.quillEditorState = state;
-              },
-              editorNamespace: `${document.location.pathname}-chatting`,
-              onkeyboardSubmit: () => {
+              }}
+              editorNamespace={`${document.location.pathname}-chatting`}
+              onkeyboardSubmit={() => {
                 handleSubmitMessage();
-              },
-            })}
+              }}
+            />
             <CWIcon iconName="send" onclick={handleSubmitMessage} />
           </div>
         )}

@@ -18,7 +18,6 @@ import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
 import {
   disableEditor,
-  editorIsBlank,
   getQuillTextContents,
 } from '../components/quill/helpers';
 
@@ -153,10 +152,10 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
               this.form.featuredInNewPost = !this.form.featuredInNewPost;
             }}
           />
-          {this.form.featuredInNewPost &&
-            m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
+          {this.form.featuredInNewPost && (
+            <QuillEditor
+              contentsDoc=""
+              oncreateBind={(state) => {
                 this.quillEditorState = state;
 
                 let newDraftMarkdown;
@@ -190,11 +189,12 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
                   this.quillEditorState.editor.setText('');
                 }
                 m.redraw();
-              },
-              editorNamespace: 'new-discussion',
-              imageUploader: true,
-              tabindex: 3,
-            })}
+              }}
+              editorNamespace="new-discussion"
+              imageUploader
+              tabindex={3}
+            />
+          )}
           <CWButton
             onclick={async (e) => {
               e.preventDefault();
