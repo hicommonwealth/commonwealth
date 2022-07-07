@@ -57,8 +57,35 @@ export class ComponentShowcase implements m.ClassComponent {
   }
 
   view() {
+    const rendered96by96 =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/0cd580cb-99b2-4f01-a8ea-e443e546e7a2.png';
+
+    const rendered96by71 =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/0cba3851-13cb-4727-9f6e-62892ea80a96.png';
+
+    const rendered97by71whiteOnTransparent =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/2d0b14a7-7be0-4fac-9ddf-6bf925cbfbbc.png';
+
+    const tinyWhiteOnTransparent =
+      'https://assets.coingecko.com/coins/images/13178/thumb/ICQSDa7.png?1628510554';
+
+    const intrinsic25by25 =
+      'https://assets.coingecko.com/coins/images/14360/thumb/hoge.jpg?1615641604';
+
+    const rendered96by89 =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/65a746a5-393a-4cc6-bd07-62bb9057d06f.png';
+
+    const rendered96by86 =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/ccf12010-7f84-47f1-887e-8fde3ced155b.png';
+
+    const verticallyStretched =
+      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/15a8c97b-4a91-4f39-8590-75c8b22b7fc1.jpeg';
+
+    const broken = 'https://ibb.co/233CzZz';
+
     return (
       <div class="ComponentShowcase">
+        <img class="large-chain-icon" src={broken} />
         <CWButton
           label="Click for Login modal"
           onclick={() =>

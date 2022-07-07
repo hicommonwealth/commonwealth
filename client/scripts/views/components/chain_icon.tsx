@@ -48,31 +48,6 @@ export class ChainIcon implements m.ClassComponent<ChainIconAttrs> {
   }
 }
 
-type WalletIconAttrs = BaseChainIconAttrs & { walletName: string };
-
-export class WalletIcon implements m.ClassComponent<WalletIconAttrs> {
-  view(vnode) {
-    const { onclick, size = 32, walletName } = vnode.attrs;
-
-    return walletName ? (
-      <div
-        class={getClasses<{ onclick: boolean }>(
-          { onclick: !!onclick },
-          'ChainIcon'
-        )}
-        style={`width: ${size}px; height: ${size}px;`}
-      >
-        <img
-          class="chain-icon"
-          style={`width: ${size}px; height: ${size}px;`}
-          src={`/static/img/wallets/${walletName}.png`}
-          onclick={onclick}
-        />
-      </div>
-    ) : null;
-  }
-}
-
 type TokenIconAttrs = BaseChainIconAttrs & { token: any };
 
 export class TokenIcon implements m.ClassComponent<TokenIconAttrs> {
