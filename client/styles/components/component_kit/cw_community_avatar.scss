@@ -1,0 +1,51 @@
+@import 'shared';
+
+.CommunityAvatar {
+  align-items: center;
+  border-radius: $border-radius-round;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+
+  &.onclick {
+    cursor: pointer;
+  }
+
+  &.small {
+    height: $small-icon;
+    width: $small-icon;
+  }
+
+  &.medium {
+    height: $medium-icon;
+    width: $medium-icon;
+  }
+
+  &.large {
+    height: $large-icon;
+    width: $large-icon;
+  }
+
+  &.xl {
+    height: $xl-icon;
+    width: $xl-icon;
+  }
+
+  &.xxl {
+    height: $xxl-icon;
+    width: $xxl-icon;
+  }
+
+  .no-image {
+    align-items: center;
+    background: $neutral-800;
+    display: flex;
+    justify-content: center;
+
+    span {
+      color: $white;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}

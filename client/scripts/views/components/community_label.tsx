@@ -4,64 +4,30 @@ import m from 'mithril';
 
 import 'components/community_label.scss';
 
-import { ChainInfo } from 'models';
-import { ChainIcon, TokenIcon } from 'views/components/chain_icon';
-import { ChainStatusIndicator } from 'views/components/chain_status_indicator';
-import { isNotUndefined } from 'helpers/typeGuards';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWText } from './component_kit/cw_text';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
+import { IconSize } from './component_kit/cw_icons/types';
 
 type CommunityLabelAttrs = {
-  chain?: ChainInfo;
+  community: any;
   hasLink?: boolean;
-  showStatus?: boolean;
-  size?: number;
-  token?: any;
-};
-
-const getCommunityNameIcon = (chain: ChainInfo, token: any) => {
-  if (isNotUndefined(chain)) {
-    return <ChainStatusIndicator hideLabel={true} />;
-  } else if (token.privacyEnabled) {
-    return <CWIcon iconName="lock" size="small" />;
-  } else {
-    <CWIcon iconName="website" size="small" />;
-  }
+  size?: IconSize;
 };
 
 export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
   view(vnode) {
-    const { chain, hasLink, showStatus, size = 18, token } = vnode.attrs;
+    const { community, hasLink, size = 'small' } = vnode.attrs;
 
-    if (isNotUndefined(chain) || isNotUndefined(token))
-      return (
-        <div class="CommunityLabel">
-          {chain ? (
-            <ChainIcon
-              size={size}
-              chain={chain}
-              onclick={hasLink ? () => m.route.set(`/${chain.id}`) : null}
-            />
-          ) : (
-            <TokenIcon
-              size={size}
-              token={token}
-              onclick={hasLink ? () => m.route.set(`/${token.id}`) : null}
-            />
-          )}
-          <div
-            class="community-label-name"
-            title={chain ? chain.name : token.name}
-          >
-            {chain ? chain.name : token.name}
-          </div>
-          {showStatus && getCommunityNameIcon(chain, token)}
-        </div>
-      );
-
-    // what's going on here, and why?
     return (
-      <div class="CommunityLabel.CommunityLabelPlaceholder">
-        <div class="visible-sm">Commonwealth</div>
+      <div class="CommunityLabel">
+        <CWCommunityAvatar
+          community={community}
+          onclick={hasLink ? () => m.route.set(`/${community.id}`) : null}
+          size={size}
+        />
+        <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
+          {community.name}
+        </CWText>
       </div>
     );
   }

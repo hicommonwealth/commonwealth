@@ -8,6 +8,7 @@ export enum ComponentType {
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
   Checkbox = 'Checkbox',
+  CommunityAvatar = 'CommunityAvatar',
   CustomIcon = 'CustomIcon',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',

@@ -26,8 +26,8 @@ import { ContentType } from 'controllers/server/search';
 import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
-import { ChainIcon } from './chain_icon';
 import { CommunityLabel } from './community_label';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 const getMemberPreview = (
   addr,
@@ -84,16 +84,18 @@ const getCommunityPreview = (
 ) => {
   const params =
     community.contentType === ContentType.Token
-      ? { token: community }
+      ? { community }
       : community.contentType === ContentType.Chain
-      ? { chain: community }
+      ? { community }
       : null;
 
-  params['size'] = 36;
+  params['size'] = 'large';
 
   const onSelect = () => {
-    if (params.token) {
-      m.route.set(params.token.address ? `/${params.token.address}` : '/');
+    if (params.community) {
+      m.route.set(
+        params.community.address ? `/${params.community.address}` : '/'
+      );
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
@@ -310,9 +312,9 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   // TODO: using chainScope instead of communityScope OK?
   const { chainScope } = searchQuery;
   const types = searchQuery.getSearchScope();
-  if(types.indexOf(SearchScope.Communities) > 0) {
+  if (types.indexOf(SearchScope.Communities) > 0) {
     types.splice(types.indexOf(SearchScope.Communities), 1);
-    types.unshift(SearchScope.Communities)
+    types.unshift(SearchScope.Communities);
   }
   const results = getBalancedContentListing(
     app.search.getByQuery(searchQuery).results,
@@ -650,7 +652,7 @@ export class SearchBar implements m.Component {
     );
 
     const chainOrCommIcon = app.activeChainId() ? (
-      <ChainIcon size={18} chain={app.chain.meta} />
+      <CWCommunityAvatar size="small" community={app.chain.meta} />
     ) : null;
 
     const cancelInputIcon = this.searchTerm ? (

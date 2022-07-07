@@ -1,26 +1,8 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CommunityLabel {
   align-items: center;
   display: flex;
-  justify-content: left;
+  gap: 8px;
   width: 100%;
-
-  .community-label-name {
-    @include header;
-
-    color: $neutral-800;
-    margin: 0 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .visible-sm {
-    display: none;
-
-    @include small {
-      display: block;
-    }
-  }
 }

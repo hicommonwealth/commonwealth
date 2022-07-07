@@ -8,31 +8,23 @@ import 'components/sidebar/sidebar_quick_switcher.scss';
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo } from 'models';
-import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
-
-type SidebarQuickSwitcherItemAttrs = {
-  item: ChainInfo;
-  size: number;
-};
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 class SidebarQuickSwitcherItem
-  implements m.ClassComponent<SidebarQuickSwitcherItemAttrs>
+  implements m.ClassComponent<{ item: ChainInfo }>
 {
   view(vnode) {
-    const { item, size } = vnode.attrs;
+    const { item } = vnode.attrs;
 
     return (
       <div class="SidebarQuickSwitcherItem" key={`chain-${item.id}`}>
-        <ChainIcon
-          size={size}
-          chain={item}
+        <CWCommunityAvatar
+          size="large"
+          community={item}
           onclick={link ? () => m.route.set(`/${item.id}`) : null}
         />
       </div>
@@ -45,7 +37,8 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) => !!item.node // only chains with nodes
+      .filter(
+        (item) => !!item.node // only chains with nodes
       );
 
     const starredCommunities = allCommunities.filter((item) => {
@@ -54,8 +47,6 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
         return false;
       return true;
     });
-
-    const size = 32;
 
     return (
       <div class="SidebarQuickSwitcher">
@@ -88,7 +79,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
         </div>
         <div class="scrollable-community-bar">
           {starredCommunities.map((item) => (
-            <SidebarQuickSwitcherItem item={item} size={size} />
+            <SidebarQuickSwitcherItem item={item} />
           ))}
         </div>
       </div>

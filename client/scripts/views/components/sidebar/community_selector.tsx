@@ -20,7 +20,7 @@ const renderCommunity = (item) => {
   return (
     <ListItem
       class={app.communities.isStarred(item.id) ? 'starred' : ''}
-      label={<CommunityLabel chain={item} />}
+      label={<CommunityLabel community={item} />}
       selected={app.activeChainId() === item.id}
       onclick={(e) => {
         e.preventDefault();
