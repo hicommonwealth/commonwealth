@@ -5,7 +5,7 @@
 printf "Welcome to docker setup help! Lets get you up and running!\n"
 
 if [[ $OSTYPE == 'darwin'* ]]; then
-  export $(grep -v '^#' .env | xargs -E)
+  export $(grep -v '^#' .env | xargs)
   else
     export $(grep -v '^#' .env | xargs -d '\n' -e)
 fi
