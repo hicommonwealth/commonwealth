@@ -162,30 +162,6 @@ $text-size-mobile-header: 22px;
   }
 }
 
-@mixin narrowBrowserHeader {
-  .NewProposalButton {
-    .cui-button {
-      padding: 0 10px;
-
-      .cui-button-label {
-        top: 2px;
-      }
-    }
-  }
-
-  .role-icon {
-    display: none;
-  }
-
-  .LoginSelectorMenu .user-display-name {
-    display: inline;
-  }
-
-  .cui-button-label .cui-icon-user {
-    margin-right: 0;
-  }
-}
-
 title {
   font-family: $fonts;
   font-size: 72px;
