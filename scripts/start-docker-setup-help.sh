@@ -4,7 +4,12 @@
 
 printf "Welcome to docker setup help! Lets get you up and running!\n"
 
-export $(grep -v '^#' .env | xargs -d '\n' -e)
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export $(grep -v '^#' .env | xargs -E)
+  else
+    export $(grep -v '^#' .env | xargs -d '\n' -e)
+fi
+
 sleep 1
 
 if [[ "$VULTR_RABBITMQ_CONTAINER_PORT" && "$VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT" && "$VULTR_REDIS_CONTAINER_PORT" ]]; then
