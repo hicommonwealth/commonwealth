@@ -30,7 +30,7 @@ export default async (
 
   if (!req.body.channel_id) return next(new Error(Errors.NoChannelId));
 
-  const requesterIsAdmin = validateRoles(models, req.user, 'admin', req.body.chain_id);
+  const requesterIsAdmin = await validateRoles(models, req.user, 'admin', req.body.chain_id);
   if (requesterIsAdmin === null) {
     return next(new Error(Errors.NotAdmin));
   }
