@@ -20,6 +20,10 @@ export class CWCommunityAvatar
   view(vnode) {
     const { community, onclick, size = 'large' } = vnode.attrs;
 
+    // aws check
+    // image dimensions check
+    // white on transparent check??
+
     return (
       <div
         class={getClasses<{ onclick: boolean; size: IconSize }>(
