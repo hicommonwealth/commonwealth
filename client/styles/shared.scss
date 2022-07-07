@@ -132,13 +132,6 @@ $text-size-mobile-header: 22px;
   }
 }
 
-title {
-  font-family: $fonts;
-  font-size: 72px;
-  font-style: normal;
-  font-weight: 600;
-}
-
 @mixin header {
   font-family: $fonts;
   font-style: normal;
