@@ -48,6 +48,8 @@ export class RedisCache {
             }
           },
         };
+      } else {
+        redisOptions['url'] = `redis://${REDIS_URL}`;
       }
       this.client = createClient(redisOptions);
     }
