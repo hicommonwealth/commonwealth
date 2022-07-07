@@ -100,36 +100,6 @@ $text-size-mobile-header: 22px;
   }
 }
 
-@mixin card {
-  border-radius: 15px;
-  border: 1px solid $neutral-25;
-  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.07);
-  cursor: pointer;
-  float: left;
-  height: 220px;
-  margin-bottom: 22px;
-  margin-right: 24px;
-  max-width: 320px;
-  overflow-wrap: break-word;
-  padding: 24px 24px 22px;
-  position: relative;
-  width: calc(50% - 24px);
-
-  @include extraSmall {
-    margin-right: 0px;
-    max-width: none;
-    width: 100%;
-  }
-
-  @include mediumSmall {
-    width: calc(33% - 24px);
-  }
-
-  &:hover {
-    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
-  }
-}
-
 @mixin gradientTabs() {
   .cui-tabs-item {
     color: $neutral-500;
@@ -159,30 +129,6 @@ $text-size-mobile-header: 22px;
     border-top: 0;
     border-left: 0;
     border-right: 0;
-  }
-}
-
-@mixin narrowBrowserHeader {
-  .NewProposalButton {
-    .cui-button {
-      padding: 0 10px;
-
-      .cui-button-label {
-        top: 2px;
-      }
-    }
-  }
-
-  .role-icon {
-    display: none;
-  }
-
-  .LoginSelectorMenu .user-display-name {
-    display: inline;
-  }
-
-  .cui-button-label .cui-icon-user {
-    margin-right: 0;
   }
 }
 
