@@ -181,7 +181,7 @@ class CouncilPage implements m.ClassComponent {
             statHeaders={[
               {
                 statName: 'Councillors',
-                statDescription: ` are elected by coin holders to govern the network. The \
+                statDescription: `are elected by coin holders to govern the network. The \
                 council can approve/reject treasury proposals, propose simple-majority referenda, \
                 or create fast-track referenda.`,
               },
