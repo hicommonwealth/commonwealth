@@ -26,12 +26,13 @@ export class SublayoutBanners
 
     return (
       <>
-        {isNonEmptyString(banner.trim()) && ( // probably shouldn't have to trim this to check it...
-          <CWMessageBanner
-            bannerContent={banner}
-            onClose={() => console.log('off')}
-          />
-        )}
+        {banner &&
+          isNonEmptyString(banner.trim()) && ( // probably shouldn't have to trim this to check it...
+            <CWMessageBanner
+              bannerContent={banner}
+              onClose={() => console.log('off')}
+            />
+          )}
         {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
           !app.user.activeAccount && (
