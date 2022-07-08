@@ -11,6 +11,7 @@ if [[ $OSTYPE == 'darwin'* ]]; then
   export $(grep -v '^#' .env | xargs)
   # start ssh-agent if not on
   eval "$(ssh-agent -s)"
+  chmod 600 ~/.ssh/cmn_docker_admin_ssh
   ssh-add ~/.ssh/cmn_docker_admin_ssh
   else
     export $(grep -v '^#' .env | xargs -d '\n' -e)
