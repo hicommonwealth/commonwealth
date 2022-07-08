@@ -13,6 +13,9 @@
 # same randomly chose open port i.e. extremely low probability of occurring) it is not handled and you should simply
 # restart the script to let it find an available port once again.
 
+# start the ssh-agent which allows for password-less ssh login
+eval "$(eval ssh-agent)"
+
 # load environment variables from a local .env file
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs/30969768#30969768
 # the -e option may need to be -E on Mac OS

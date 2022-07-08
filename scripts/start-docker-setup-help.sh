@@ -4,10 +4,19 @@
 
 printf "Welcome to docker setup help! Lets get you up and running!\n"
 
+
+
+
 if [[ $OSTYPE == 'darwin'* ]]; then
   export $(grep -v '^#' .env | xargs)
+  # start ssh-agent if not on
+  eval "$(ssh-agent -s)"
+  ssh-add ~/.ssh/cmn_docker_admin_ssh
   else
     export $(grep -v '^#' .env | xargs -d '\n' -e)
+    # start ssh-agent if not on
+    eval "$(ssh-agent)"
+    ssh-add ~/.ssh/cmn_docker_admin_ssh
 fi
 
 sleep 1
