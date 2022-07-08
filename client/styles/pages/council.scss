@@ -9,6 +9,18 @@
     flex-direction: column;
     justify-content: space-between;
 
+    .User {
+      display: flex;
+      width: 200px;
+      align-items: center;
+
+      .username {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
     .councillor-status-text.Text {
       color: $neutral-400;
     }

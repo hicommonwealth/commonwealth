@@ -20,6 +20,7 @@ import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
 import { GovExplainer } from '../components/gov_explainer';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CWText } from '../components/component_kit/cw_text';
 
 class TipDetail
   implements m.ClassComponent<{ proposal: SubstrateTreasuryTip }>
@@ -29,32 +30,36 @@ class TipDetail
     const beneficiary = app.chain.accounts.get(proposal.data.who);
 
     return (
-      <div
-        class="TipDetail"
-        onclick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
-        <div class="group">
-          <div class="t-row">
-            <p>Reason</p>
-          </div>
-          <div class="t-row">
-            <div class="reason">{proposal.data.reason}</div>
-          </div>
+      <div class="TipDetail">
+        <div class="tip-detail-group">
+          <CWText
+            fontWeight="medium"
+            type="caption"
+            className="reason-header-text"
+          >
+            Reason
+          </CWText>
+          <CWText
+            className="reason-text"
+            type="caption"
+            title={proposal.data.reason}
+          >
+            {proposal.data.reason}
+          </CWText>
         </div>
-        <div class="group">
-          <div class="t-row">
-            <p>Beneficiary</p>
-          </div>
-          <div class="t-row">
-            {m(User, {
-              user: beneficiary,
-              popover: true,
-              showAddressWithDisplayName: true,
-            })}
-          </div>
+        <div class="tip-detail-group">
+          <CWText
+            fontWeight="medium"
+            type="caption"
+            className="reason-header-text"
+          >
+            Beneficiary
+          </CWText>
+          {m(User, {
+            user: beneficiary,
+            popover: true,
+            showAddressWithDisplayName: true,
+          })}
         </div>
       </div>
     );
