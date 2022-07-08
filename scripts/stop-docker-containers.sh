@@ -1,6 +1,15 @@
 #!/bin/bash
 
-export $(grep -v '^#' .env | xargs -d '\n' -e)
+# start the ssh-agent which allows for password-less ssh login
+eval "$(ssh-agent)"
+chmod 600 ~/.ssh/cmn_docker_admin_ssh
+ssh-add ~/.ssh/cmn_docker_admin_ssh
+
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export $(grep -v '^#' .env | xargs)
+  else
+    export $(grep -v '^#' .env | xargs -d '\n' -e)
+fi
 
 if [[ -z "$VULTR_IP" ]]; then
     echo "Must provide VULTR_IP in .env" 1>&2

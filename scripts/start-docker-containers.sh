@@ -14,13 +14,19 @@
 # restart the script to let it find an available port once again.
 
 # start the ssh-agent which allows for password-less ssh login
-eval "$(eval ssh-agent)"
+eval "$(ssh-agent)"
+chmod 600 ~/.ssh/cmn_docker_admin_ssh
+ssh-add ~/.ssh/cmn_docker_admin_ssh
 
 # load environment variables from a local .env file
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs/30969768#30969768
 # the -e option may need to be -E on Mac OS
 # shellcheck disable=SC2046
-export $(grep -v '^#' .env | xargs -d '\n' -e)
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export $(grep -v '^#' .env | xargs)
+  else
+    export $(grep -v '^#' .env | xargs -d '\n' -e)
+fi
 
 # check that all required ENV var were properly loaded into the environment
 if [[ -z "$VULTR_IP" ]]; then
