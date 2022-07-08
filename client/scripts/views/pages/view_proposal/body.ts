@@ -703,18 +703,6 @@ export const ProposalBodySpacer: m.Component<{}> = {
   },
 };
 
-const countLinesQuill = (ops) => {
-  let count = 0;
-  for (const op of ops) {
-    try {
-      count += op.insert.split('\n').length - 1;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return count;
-};
-
 const countLinesMarkdown = (text) => {
   return text.split('\n').length - 1;
 };
@@ -732,16 +720,6 @@ const formatBody = (vnode) => {
   if (!body) return;
 
   vnode.state.body = body;
-  try {
-    const doc = JSON.parse(body);
-    if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-      vnode.state.collapsed = true;
-    }
-  } catch (e) {
-    if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
-      vnode.state.collapsed = true;
-    }
-  }
 };
 
 export const ProposalBodyText: m.Component<
@@ -781,11 +759,6 @@ export const ProposalBodyText: m.Component<
       ]);
     };
 
-    const toggleDisplay = () => {
-      vnode.state.collapsed = !vnode.state.collapsed;
-      m.redraw();
-    };
-
     return m(
       '.ProposalBodyText',
       (() => {
@@ -811,21 +784,10 @@ export const ProposalBodyText: m.Component<
           if (body?.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m('.show-more-wrap', [
-            m(MarkdownFormattedText, {
-              doc: body,
-              cutoffText: vnode.state.collapsed
-                ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
-                : countLinesMarkdown(body),
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(MarkdownFormattedText, {
+            doc: body,
+            cutoffLines: MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
+          });
         }
       })()
     );

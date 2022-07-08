@@ -10,8 +10,13 @@ import { marked } from 'marked';
 import 'components/quill/markdown_formatted_text.scss';
 
 import { getClasses } from '../component_kit/helpers';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const renderer = new marked.Renderer();
+
+const countLinesMarkdown = (text) => {
+  return text.split('\n').length - 1;
+};
 
 marked.setOptions({
   renderer,
@@ -23,11 +28,11 @@ marked.setOptions({
 
 type MarkdownFormattedTextAttrs = {
   collapse?: boolean;
-  cutoffText?: number;
   doc: string;
   hideFormatting?: boolean;
   openLinksInNewTab?: boolean;
   searchTerm?: string;
+  cutoffLines?: number;
 };
 
 export class MarkdownFormattedText
@@ -35,6 +40,22 @@ export class MarkdownFormattedText
 {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
+  truncatedDoc;
+  isTruncated: boolean;
+
+  oninit(vnode) {
+    this.isTruncated =
+      vnode.attrs.cutoffLines &&
+      vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
+    if (this.isTruncated) {
+      this.truncatedDoc = vnode.attrs.doc.slice(
+        0,
+        vnode.attrs.doc.split('\n', vnode.attrs.cutoffLines).join('\n').length
+      );
+    } else {
+      this.truncatedDoc = vnode.attrs.doc;
+    }
+  }
 
   view(vnode) {
     const {
@@ -43,10 +64,23 @@ export class MarkdownFormattedText
       collapse,
       searchTerm,
       openLinksInNewTab,
-      cutoffText,
+      cutoffLines,
     } = vnode.attrs;
 
     if (!doc) return;
+
+    const toggleDisplay = () => {
+      this.isTruncated = !this.isTruncated;
+      if (this.isTruncated) {
+        this.truncatedDoc = doc.slice(
+          0,
+          doc.split('\n', cutoffLines).join('\n').length
+        );
+      } else {
+        this.truncatedDoc = doc;
+      }
+      m.redraw();
+    };
 
     renderer.link = (href, title, text) => {
       return `<a ${
@@ -121,15 +155,13 @@ export class MarkdownFormattedText
         </div>
       );
     } else {
-      let truncatedDoc = doc;
-
-      if (cutoffText)
-        truncatedDoc = doc.slice(
+      if (this.isTruncated)
+        this.truncatedDoc = doc.slice(
           0,
-          doc.split('\n', cutoffText).join('\n').length
+          doc.split('\n', cutoffLines).join('\n').length
         );
 
-      const unsanitized = marked.parse(truncatedDoc.toString());
+      const unsanitized = marked.parse(this.truncatedDoc.toString());
 
       const sanitized = hideFormatting
         ? DOMPurify.sanitize(unsanitized, {
@@ -144,13 +176,22 @@ export class MarkdownFormattedText
       const results = m.trust(sanitized);
 
       return (
-        <div
-          class={getClasses<{ collapsed?: boolean }>(
-            { collapsed: !!collapse },
-            'MarkdownFormattedText'
-          )}
-        >
-          {results}
+        <div class=".show-more-wrap">
+          <div
+            class={getClasses<{ collapsed?: boolean }>(
+              { collapsed: !!collapse },
+              'MarkdownFormattedText'
+            )}
+          >
+            {results}
+          </div>
+          {this.isTruncated &&
+            m('.show-more-button-wrapper', [
+              m('.show-more-button', { onclick: toggleDisplay }, [
+                m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
+                m('.show-more-text', ['Show More']),
+              ]),
+            ])}
         </div>
       );
     }

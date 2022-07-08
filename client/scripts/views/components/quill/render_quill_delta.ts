@@ -300,6 +300,7 @@ export const renderQuillDelta = (
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             const indent = parent.attributes.indent || 0;
+            console.log(indent, content);
 
             if (indent >= temp.length) {
               // indent
@@ -310,6 +311,7 @@ export const renderQuillDelta = (
               temp[indent].push({ tag, content, indent });
             } else if (indent < temp.length - 1) {
               // outdent and unwind
+              console.log('indent here', indent, temp.length);
               while (indent < temp.length - 1) {
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
