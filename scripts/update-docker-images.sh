@@ -3,6 +3,8 @@
 # This script should ONLY be run if updating any image version on the server. This is meant to make it easy
 # to match the versions of the tools used on the server and Heroku
 
+# Must be run with:
+# chmod +rx ./scripts/update-docker-images.sh && VULTR_IP=XXXXXXXXX ./scripts/update-docker-images.sh
 
 # load environment variables from a local .env file
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs/30969768#30969768
@@ -14,16 +16,12 @@ export $(grep -v '^#' .env | xargs -d '\n' -e)
 if [[ -z "$VULTR_IP" ]]; then
     echo "Must provide VULTR_IP in .env" 1>&2
     exit 1
-    elif [[ -z "$VULTR_USER" ]]; then
-      echo "Must provide VULTR_USER in .env" 1>&2
-      exit 1
 fi
 
-echo "Connecting to $VULTR_USER@$VULTR_IP"
+echo "Connecting to root@$VULTR_IP"
 # connect to the Vultr server on which the images will be loaded
 ssh root@"$VULTR_IP" /bin/bash << "EOF"
   echo "Connection Successful!"
-  lsb_release -a
 
   # clears any existing rabbitmq and redis docker images
   docker rmi -f "$(docker images --format '{{.Repository}}:{{.Tag}}' | grep 'rabbitmq')"

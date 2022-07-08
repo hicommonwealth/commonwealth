@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Must be run with:
+# chmod +rx ./scripts/install-docker.sh && VULTR_IP=XXXXXXXXX ./scripts/install-docker.sh
+
 # load environment variables from a local .env file
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs/30969768#30969768
 # the -e option may need to be -E on Mac OS
