@@ -801,21 +801,12 @@ export const ProposalBodyText: m.Component<
             return getPlaceholder();
           }
 
-          return m('.show-more-wrap', [
-            m(QuillFormattedText, {
-              doc,
-              cutoffText: vnode.state.collapsed
-                ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
-                : doc.ops.length,
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(QuillFormattedText, {
+            doc,
+            cutoffLines: QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
+            collapse: false,
+            hideFormatting: false,
+          });
         } catch (e) {
           if (body?.toString().trim() === '') {
             return getPlaceholder();

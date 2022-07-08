@@ -316,7 +316,11 @@ export const renderQuillDelta = (
                   m(
                     getGroupTag(group),
                     temp.pop().map(({ _tag, _content }) => {
-                      return m(_tag, _content);
+                      try {
+                        return m(_tag, _content);
+                      } catch (e) {
+                        return null;
+                      }
                     })
                   )
                 );
