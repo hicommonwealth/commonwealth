@@ -715,7 +715,7 @@ function setupRouter(
   router.get('/auth/github', (req, res, next) => {
     passport.authenticate('github', <any>{state: {hostname: req.hostname}})(req, res, next);
   })
-  router.get('auth/github/callback', passport.authenticate('github', {
+  router.get('/auth/github/callback', passport.authenticate('github', {
     failureRedirect: '/',
   }), startOAuthLogin.bind(this, models, 'github'))
 
