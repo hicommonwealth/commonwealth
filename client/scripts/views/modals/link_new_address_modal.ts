@@ -569,7 +569,7 @@ const LinkNewAddressModal: m.Component<
                             // get rid of pre-existing wallet info to make way for new account
                             wallet.signOut();
                           }
-                          const redirectUrl = (!app.isCustomDomain) ? `${
+                          const redirectUrl = (!app.isCustomDomain()) ? `${
                             window.location.origin
                           }/${app.activeChainId()}/finishNearLogin` : `${
                             window.location.origin
