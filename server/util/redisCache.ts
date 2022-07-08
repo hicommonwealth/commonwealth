@@ -31,11 +31,14 @@ export class RedisCache {
 
     if (!this.client) {
       const redisOptions = {};
+      // TODO: update this
       if (
-        !REDIS_URL.includes('localhost') &&
-        !REDIS_URL.includes('127.0.0.1') &&
-        !REDIS_URL.includes(VULTR_IP)
+        REDIS_URL.includes('localhost') ||
+        REDIS_URL.includes('127.0.0.1') ||
+        REDIS_URL.includes(VULTR_IP)
       ) {
+        redisOptions['url'] = `redis://${REDIS_URL}`;
+      } else {
         redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           tls: true,
@@ -48,8 +51,6 @@ export class RedisCache {
             }
           },
         };
-      } else {
-        redisOptions['url'] = `redis://${REDIS_URL}`;
       }
       this.client = createClient(redisOptions);
     }
