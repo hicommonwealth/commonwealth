@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Tag } from 'construct-ui';
 
 import 'pages/validators.scss';
 
@@ -18,6 +17,7 @@ import { CWCard } from '../components/component_kit/cw_card';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import { CWText } from '../components/component_kit/cw_text';
+import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class Validator implements m.ClassComponent<{ info }> {
   view(vnode) {
@@ -51,21 +51,6 @@ class Validator implements m.ClassComponent<{ info }> {
   }
 }
 
-class ValidatorsTitle implements m.ClassComponent {
-  view() {
-    return (
-      <>
-        Validators
-        <Tag
-          size="xs"
-          label="Beta"
-          style="position: relative; top: -2px; margin-left: 6px"
-        />
-      </>
-    );
-  }
-}
-
 class ValidatorsPage implements m.ClassComponent {
   private validators;
   private totalStaked;
@@ -80,7 +65,7 @@ class ValidatorsPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={<ValidatorsTitle />}
+            title={<BreadCrumbsTitleTag title="Validators" />}
           />
         );
       }
@@ -88,7 +73,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<ValidatorsTitle />}
+          title={<BreadCrumbsTitleTag title="Validators" />}
           showNewProposalButton
         />
       );
@@ -121,7 +106,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Loading validators"
-          title={<ValidatorsTitle />}
+          title={<BreadCrumbsTitleTag title="Validators" />}
           showNewProposalButton
         />
       );
@@ -139,7 +124,10 @@ class ValidatorsPage implements m.ClassComponent {
     ).map((info) => <Validator info={info} />);
 
     return (
-      <Sublayout title={<ValidatorsTitle />} showNewProposalButton>
+      <Sublayout
+        title={<BreadCrumbsTitleTag title="Validators" />}
+        showNewProposalButton
+      >
         <div class="ValidatorsPage">
           <GovExplainer
             statHeaders={[
@@ -162,15 +150,13 @@ class ValidatorsPage implements m.ClassComponent {
             ]}
             statAction={
               app.chain?.meta?.node.url &&
-              m('.stats-box-action', [
-                externalLink(
-                  'a',
-                  `https://polkadot.js.org/apps/?rpc=${encodeURIComponent(
-                    app.chain?.meta?.node.url
-                  )}#/staking`,
-                  'Nominate on polkadot-js'
-                ),
-              ])
+              externalLink(
+                'a',
+                `https://polkadot.js.org/apps/?rpc=${encodeURIComponent(
+                  app.chain?.meta?.node.url
+                )}#/staking`,
+                'Nominate on polkadot-js'
+              )
             }
           />
           <CardsCollection content={validatorCards} header="Validators" />

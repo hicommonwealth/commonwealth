@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Tag } from 'construct-ui';
 
 import 'pages/council.scss';
 
@@ -18,12 +17,13 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import CouncilVotingModal from 'views/modals/council_voting_modal';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
-import loadSubstrateModules from 'views/components/load_substrate_modules';
+import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { CWCard } from '../components/component_kit/cw_card';
 import { CWText } from '../components/component_kit/cw_text';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import { CWButton } from '../components/component_kit/cw_button';
+import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class Councillor implements m.ClassComponent<{ account }> {
   view(vnode) {
@@ -114,21 +114,6 @@ function getModules() {
   }
 }
 
-class CouncilTitle implements m.ClassComponent {
-  view() {
-    return (
-      <>
-        Council
-        <Tag
-          size="xs"
-          label="Beta"
-          style="position: relative; top: -2px; margin-left: 6px"
-        />
-      </>
-    );
-  }
-}
-
 class CouncilPage implements m.ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
@@ -139,7 +124,7 @@ class CouncilPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={<CouncilTitle />}
+            title={<BreadCrumbsTitleTag title="Council" />}
           />
         );
       }
@@ -147,7 +132,7 @@ class CouncilPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<CouncilTitle />}
+          title={<BreadCrumbsTitleTag title="Council" />}
           showNewProposalButton
         />
       );
@@ -175,7 +160,10 @@ class CouncilPage implements m.ClassComponent {
       .activeElection?.endTime.blocknum;
 
     return (
-      <Sublayout title={<CouncilTitle />} showNewProposalButton>
+      <Sublayout
+        title={<BreadCrumbsTitleTag title="Council" />}
+        showNewProposalButton
+      >
         <div class="CouncilPage">
           <GovExplainer
             statHeaders={[
@@ -246,13 +234,17 @@ class CouncilPage implements m.ClassComponent {
             }
           />
           <CardsCollection
-            content={councillors.map((account) => m(Councillor, { account }))}
+            content={councillors.map((account) => (
+              <Councillor account={account} />
+            ))}
             header="Councillors"
           />
           <CardsCollection
             content={candidates
               .filter(([account]) => !councillors.includes(account))
-              .map(([account]) => m(Councillor, { account }))}
+              .map(([account]) => (
+                <Councillor account={account} />
+              ))}
             header="Runners-up"
           />
         </div>

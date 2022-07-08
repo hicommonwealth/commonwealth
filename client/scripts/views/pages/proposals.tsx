@@ -19,7 +19,7 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
-import loadSubstrateModules from 'views/components/load_substrate_modules';
+import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
@@ -331,7 +331,7 @@ const ProposalsPage: m.Component<{}> = {
         </div>
       </Sublayout>
     );
-  }
-}
+  },
+};
 
 export default ProposalsPage;

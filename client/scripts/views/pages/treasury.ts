@@ -14,7 +14,7 @@ import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import ErrorPage from 'views/pages/error';
-import loadSubstrateModules from 'views/components/load_substrate_modules';
+import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { CardsCollection } from '../components/cards_collection';
 
 const SubstrateProposalStats: m.Component<{}, {}> = {
