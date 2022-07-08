@@ -61,6 +61,7 @@ export enum WalletId {
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
   Keplr = 'keplr',
+  KeplrEVM = 'kelpr-evm',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   CosmosEvmMetamask = 'cosm-metamask',
