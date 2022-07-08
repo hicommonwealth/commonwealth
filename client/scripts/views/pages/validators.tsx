@@ -17,7 +17,7 @@ import { CWCard } from '../components/component_kit/cw_card';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import { CWText } from '../components/component_kit/cw_text';
-import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class Validator implements m.ClassComponent<{ info }> {
   view(vnode) {
@@ -65,7 +65,7 @@ class ValidatorsPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={<BreadCrumbsTitleTag title="Validators" />}
+            title={<BreadcrumbsTitleTag title="Validators" />}
           />
         );
       }
@@ -73,7 +73,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadCrumbsTitleTag title="Validators" />}
+          title={<BreadcrumbsTitleTag title="Validators" />}
           showNewProposalButton
         />
       );
@@ -106,7 +106,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Loading validators"
-          title={<BreadCrumbsTitleTag title="Validators" />}
+          title={<BreadcrumbsTitleTag title="Validators" />}
           showNewProposalButton
         />
       );
@@ -125,7 +125,7 @@ class ValidatorsPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadCrumbsTitleTag title="Validators" />}
+        title={<BreadcrumbsTitleTag title="Validators" />}
         showNewProposalButton
       >
         <div class="ValidatorsPage">

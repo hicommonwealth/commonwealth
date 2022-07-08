@@ -23,7 +23,7 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CardsCollection } from '../components/cards_collection';
 import { GovExplainer } from '../components/gov_explainer';
 import { CWButton } from '../components/component_kit/cw_button';
-import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class Councillor implements m.ClassComponent<{ account }> {
   view(vnode) {
@@ -124,7 +124,7 @@ class CouncilPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={<BreadCrumbsTitleTag title="Council" />}
+            title={<BreadcrumbsTitleTag title="Council" />}
           />
         );
       }
@@ -132,7 +132,7 @@ class CouncilPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadCrumbsTitleTag title="Council" />}
+          title={<BreadcrumbsTitleTag title="Council" />}
           showNewProposalButton
         />
       );
@@ -161,7 +161,7 @@ class CouncilPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadCrumbsTitleTag title="Council" />}
+        title={<BreadcrumbsTitleTag title="Council" />}
         showNewProposalButton
       >
         <div class="CouncilPage">

@@ -15,7 +15,7 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import ErrorPage from './error';
 import { CardsCollection } from '../components/cards_collection';
-import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { GovExplainer } from '../components/gov_explainer';
 
 function getModules() {
@@ -63,7 +63,7 @@ class ReferendaPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={<BreadCrumbsTitleTag title="Referenda" />}
+            title={<BreadcrumbsTitleTag title="Referenda" />}
           />
         );
       }
@@ -71,7 +71,7 @@ class ReferendaPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadCrumbsTitleTag title="Referenda" />}
+          title={<BreadcrumbsTitleTag title="Referenda" />}
           showNewProposalButton
         />
       );
@@ -115,7 +115,7 @@ class ReferendaPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadCrumbsTitleTag title="Referenda" />}
+        title={<BreadcrumbsTitleTag title="Referenda" />}
         showNewProposalButton
       >
         <div class="ReferendaPage">

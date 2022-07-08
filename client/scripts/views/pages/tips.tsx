@@ -19,7 +19,7 @@ import User from '../components/widgets/user';
 import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
 import { GovExplainer } from '../components/gov_explainer';
-import { BreadCrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class TipDetail
   implements m.ClassComponent<{ proposal: SubstrateTreasuryTip }>
@@ -85,7 +85,7 @@ class TipsPage implements m.ClassComponent {
         return (
           <ErrorPage
             message="Chain connection timed out"
-            title={<BreadCrumbsTitleTag title="Tips" />}
+            title={<BreadcrumbsTitleTag title="Tips" />}
           />
         );
       }
@@ -93,7 +93,7 @@ class TipsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadCrumbsTitleTag title="Tips" />}
+          title={<BreadcrumbsTitleTag title="Tips" />}
           showNewProposalButton
         />
       );
@@ -113,7 +113,10 @@ class TipsPage implements m.ClassComponent {
 
     const activeTipContent = activeTips.length ? (
       activeTips.map((tip) => (
-        <ProposalCard proposal={tip} injectedContent={<TipDetail />} />
+        <ProposalCard
+          proposal={tip}
+          injectedContent={<TipDetail proposal={tip} />}
+        />
       ))
     ) : (
       <div class="no-proposals">None</div>
@@ -121,7 +124,10 @@ class TipsPage implements m.ClassComponent {
 
     const inactiveTipContent = inactiveTips.length ? (
       inactiveTips.map((tip) => (
-        <ProposalCard proposal={tip} injectedContent={<TipDetail />} />
+        <ProposalCard
+          proposal={tip}
+          injectedContent={<TipDetail proposal={tip} />}
+        />
       ))
     ) : (
       <div class="no-proposals">None</div>
@@ -129,7 +135,7 @@ class TipsPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadCrumbsTitleTag title="Tips" />}
+        title={<BreadcrumbsTitleTag title="Tips" />}
         showNewProposalButton
       >
         <div class="TipsPage">
@@ -150,18 +156,19 @@ class TipsPage implements m.ClassComponent {
               },
             ]}
             statAction={
-              <CWButton
-                disabled={!!activeAccount}
-                onclick={(e) =>
-                  navigateToSubpage('/new/proposal/:type', {
-                    type: ProposalType.SubstrateTreasuryTip,
-                  })
-                }
-                label="New tip"
-              />
+              activeAccount && (
+                <CWButton
+                  onclick={() =>
+                    navigateToSubpage('/new/proposal/:type', {
+                      type: ProposalType.SubstrateTreasuryTip,
+                    })
+                  }
+                  label="New tip"
+                />
+              )
             }
           />
-          <CardsCollection content={activeTipContent} header="Active Tips" />,
+          <CardsCollection content={activeTipContent} header="Active Tips" />
           <CardsCollection
             content={inactiveTipContent}
             header="Inactive Tips"

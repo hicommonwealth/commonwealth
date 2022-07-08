@@ -30,6 +30,7 @@ import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
+import { getStatusText } from '../components/proposal_card/helpers';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -201,7 +202,12 @@ const ProposalsPage: m.Component<{}> = {
                 (activeAaveProposals || []).map((proposal) => (
                   <ProposalCard
                     proposal={proposal}
-                    injectedContent={AaveProposalCardDetail}
+                    injectedContent={
+                      <AaveProposalCardDetail
+                        proposal={proposal}
+                        statusText={getStatusText(proposal)}
+                      />
+                    }
                   />
                 ))
               )
@@ -291,7 +297,12 @@ const ProposalsPage: m.Component<{}> = {
                 (inactiveAaveProposals || []).map((proposal) => (
                   <ProposalCard
                     proposal={proposal}
-                    injectedContent={AaveProposalCardDetail}
+                    injectedContent={
+                      <AaveProposalCardDetail
+                        proposal={proposal}
+                        statusText={getStatusText(proposal)}
+                      />
+                    }
                   />
                 ))
               )

@@ -390,20 +390,26 @@ const BountiesPage: m.Component<{}> = {
       ? activeBounties.map((bounty) =>
           m(ProposalCard, {
             proposal: bounty,
-            injectedContent: BountyDetail,
+            injectedContent: m(BountyDetail, { proposal: bounty }),
           })
         )
       : [m('.no-proposals', 'None')];
 
     const pendingBountyContent = pendingBounties.length
       ? pendingBounties.map((bounty) =>
-          m(ProposalCard, { proposal: bounty, injectedContent: BountyDetail })
+          m(ProposalCard, {
+            proposal: bounty,
+            injectedContent: m(BountyDetail, { proposal: bounty }),
+          })
         )
       : [m('.no-proposals', 'None')];
 
     const inactiveBountyContent = inactiveBounties.length
       ? inactiveBounties.map((bounty) =>
-          m(ProposalCard, { proposal: bounty, injectedContent: BountyDetail })
+          m(ProposalCard, {
+            proposal: bounty,
+            injectedContent: m(BountyDetail, { proposal: bounty }),
+          })
         )
       : [m('.no-proposals', 'None')];
 

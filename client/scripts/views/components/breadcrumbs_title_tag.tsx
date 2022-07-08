@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import { Tag } from 'construct-ui';
 
-export class BreadCrumbsTitleTag
+export class BreadcrumbsTitleTag
   implements m.ClassComponent<{ title: string }>
 {
   view(vnode) {

@@ -7,7 +7,7 @@ import { ChainBase } from 'types';
 import { ProposalModule } from 'models';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import { BreadCrumbsTitleTag } from './breadcrumbs_title_tag';
+import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 
 export const loadSubstrateModules = (
   name: string,
@@ -27,7 +27,7 @@ export const loadSubstrateModules = (
             message={`Failed to initialize chain modules: ${errors.join(
               ', '
             )}.`}
-            title={<BreadCrumbsTitleTag title={name} />}
+            title={<BreadcrumbsTitleTag title={name} />}
           />
         );
       }
@@ -37,7 +37,7 @@ export const loadSubstrateModules = (
       return (
         <PageLoading
           message={`Loading ${name.toLowerCase()}`}
-          title={<BreadCrumbsTitleTag title={name} />}
+          title={<BreadcrumbsTitleTag title={name} />}
           showNewProposalButton
         />
       );
