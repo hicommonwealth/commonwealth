@@ -25,10 +25,6 @@ export class CWCommunityAvatar
     const sizeIsAboveLarge =
       size !== 'small' && size !== 'medium' && size !== 'large';
 
-    // aws check
-    // image dimensions check
-    // white on transparent check??
-
     return (
       <div
         class={getClasses<{ onclick: boolean; size: IconSize }>(

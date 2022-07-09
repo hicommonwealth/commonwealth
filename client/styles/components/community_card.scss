@@ -61,6 +61,7 @@ $small-chain-icon-size: 40px;
       -webkit-line-clamp: 8;
       display: -webkit-box;
       overflow: hidden;
+      word-break: break-word;
 
       @include smallInclusive {
         -webkit-line-clamp: 3;
