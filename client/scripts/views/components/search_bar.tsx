@@ -27,7 +27,6 @@ import MarkdownFormattedText from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
-import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 const getMemberPreview = (
   addr,
@@ -651,10 +650,6 @@ export class SearchBar implements m.Component {
       </List>
     );
 
-    const chainOrCommIcon = app.activeChainId() ? (
-      <CWCommunityAvatar size="small" community={app.chain.meta} />
-    ) : null;
-
     const cancelInputIcon = this.searchTerm ? (
       <Icon
         name={Icons.X}
@@ -684,13 +679,11 @@ export class SearchBar implements m.Component {
           fluid={true}
           tabIndex={-10}
           contentRight={
-            this.searchTerm ? (
+            this.searchTerm && (
               <ControlGroup>
                 {cancelInputIcon}
                 {searchIcon}
               </ControlGroup>
-            ) : (
-              chainOrCommIcon
             )
           }
           defaultValue={m.route.param('q') || this.searchTerm}

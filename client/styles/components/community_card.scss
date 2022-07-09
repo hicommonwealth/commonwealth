@@ -5,72 +5,39 @@ $small-chain-icon-size: 40px;
 
 .community-card.Card {
   align-items: center;
+  gap: 16px;
   height: 336px;
-  justify-content: flex-start;
   width: 240px;
 
   @include smallInclusive {
+    gap: 8px;
     height: 220px;
     width: 136px;
   }
 
-  .large-chain-icon {
-    border-radius: $border-radius-round;
-    height: $large-chain-icon-size;
-    margin-bottom: 8px;
-    width: $large-chain-icon-size;
-
-    @include smallInclusive {
-      height: $small-chain-icon-size;
-      width: $small-chain-icon-size;
-    }
-
-    &.no-image {
-      align-items: center;
-      background: $neutral-800;
-      display: flex;
-      min-height: $large-chain-icon-size;
-      justify-content: center;
-      width: $large-chain-icon-size;
-
-      @include smallInclusive {
-        min-height: $small-chain-icon-size;
-        width: $small-chain-icon-size;
-      }
-
-      .no-image-text.Text {
-        color: $white;
-
-        @include smallInclusive {
-          font-family: $font-family-neue-haas-unica;
-          font-size: 14px;
-          line-height: 20px;
-        }
-      }
-    }
-  }
-
-  .card-body {
+  .top-content {
     align-items: center;
     display: flex;
+    gap: 16px;
     flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-    width: 100%;
 
     .chain-name.Text {
       text-align: center;
       width: 200px;
-      // Gabe 5/24/22: not sure why I have to set this width
-      // to get noWrap to work... to be continued...
 
       @include smallInclusive {
-        font-family: $font-family-silka;
-        font-size: 18px;
-        line-height: 24px;
         width: 96px;
       }
     }
+  }
+
+  .bottom-content {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
 
     .IconButton {
       display: none;
@@ -87,17 +54,16 @@ $small-chain-icon-size: 40px;
     }
 
     .card-description.Text {
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
+      text-align: center;
       color: $neutral-500;
+
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 8;
       display: -webkit-box;
       overflow: hidden;
-      width: 152px;
 
       @include smallInclusive {
-        font-family: $font-family-neue-haas-unica;
-        font-size: 14px;
-        line-height: 20px;
+        -webkit-line-clamp: 3;
         width: 88px;
       }
     }

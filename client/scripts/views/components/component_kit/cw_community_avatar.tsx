@@ -4,12 +4,14 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_community_avatar.scss';
 
+import { ChainInfo } from 'models';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 import { IconSize } from './cw_icons/types';
+import { CWText } from './cw_text';
 
 type CommunityAvatarAttrs = {
-  community: any;
+  community: ChainInfo;
   onclick?: () => void;
   size?: IconSize;
 };
@@ -19,6 +21,9 @@ export class CWCommunityAvatar
 {
   view(vnode) {
     const { community, onclick, size = 'large' } = vnode.attrs;
+
+    const sizeIsAboveLarge =
+      size !== 'small' && size !== 'medium' && size !== 'large';
 
     // aws check
     // image dimensions check
@@ -35,8 +40,14 @@ export class CWCommunityAvatar
         {community.iconUrl ? (
           <img src={community.iconUrl} />
         ) : (
-          <div class="no-image">
-            <span>{community.name.slice(0, 1)}</span>
+          <div class={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
+            <CWText
+              type={sizeIsAboveLarge ? 'h5' : 'caption'}
+              className="avatar-no-image-letter"
+              fontWeight="medium"
+            >
+              {community.name.slice(0, 1)}
+            </CWText>
           </div>
         )}
       </div>
