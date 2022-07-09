@@ -34,7 +34,7 @@ export class CWCommunityAvatar
         onclick={onclick}
       >
         {community.iconUrl ? (
-          <img src={community.iconUrl} />
+          <img class="community-image" src={community.iconUrl} />
         ) : (
           <div class={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
             <CWText
