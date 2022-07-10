@@ -37,69 +37,6 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
 
 $text-size-mobile-header: 22px;
 
-@mixin gov-explainer {
-  .stats-box {
-    background-color: $neutral-50;
-    border-radius: 10px;
-    display: flex;
-    margin-bottom: 24px;
-    padding: 24px;
-
-    .stats-box-left {
-      font-size: 28px;
-      margin-right: 16px;
-    }
-
-    .stats-box-right {
-      p {
-        margin: 4px 0 0;
-      }
-    }
-
-    .stats-box-stat {
-      color: $neutral-500;
-      display: inline-block;
-      margin: 8px 0;
-
-      &::after {
-        content: ' ';
-        margin: 0 12px;
-      }
-    }
-
-    .stats-box-action {
-      color: $neutral-500;
-      display: inline-block;
-      margin: 6px 0 0;
-
-      &::after {
-        content: ' ';
-        margin: 0 12px;
-      }
-    }
-  }
-
-  @include small {
-    .stats-box-left {
-      display: none;
-    }
-  }
-
-  h3 {
-    clear: both;
-    margin-bottom: 0;
-  }
-
-  .clear + h3 {
-    margin-top: 40px;
-  }
-
-  .no-proposals {
-    color: $neutral-500;
-    margin-top: 10px;
-  }
-}
-
 @mixin gradientTabs() {
   .cui-tabs-item {
     color: $neutral-500;

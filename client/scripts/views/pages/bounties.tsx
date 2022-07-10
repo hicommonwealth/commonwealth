@@ -1,22 +1,20 @@
-import 'pages/bounties.scss';
+/* @jsx m */
 
 import m from 'mithril';
-import app from 'state';
-import { Button, Tag } from 'construct-ui';
 
+import 'pages/bounties.scss';
+
+import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'types';
-
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
 import User from 'views/components/widgets/user';
-
 import {
   ApproveBountyModal,
   ProposeCuratorModal,
@@ -25,11 +23,12 @@ import {
 } from 'views/modals/bounty_modals';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-
-import { SubstrateBounty } from 'client/scripts/controllers/chain/substrate/bounty';
 import ErrorPage from './error';
 import { loadSubstrateModules } from '../components/load_substrate_modules';
 import { CardsCollection } from '../components/cards_collection';
+import { CWButton } from '../components/component_kit/cw_button';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { GovExplainer } from '../components/gov_explainer';
 
 function getModules() {
   if (!app || !app.chain || !app.chain.loaded) {
@@ -43,18 +42,10 @@ function getModules() {
   }
 }
 
-const bountyStatusToLabel = (bounty) => {
-  if (bounty.complete) return 'Bounty claimed';
-  if (bounty.isPendingPayout) return 'Pending council review';
-  if (bounty.isActive) return 'Active';
-  if (bounty.isCuratorProposed) return 'Waiting for curator to accept';
-  if (bounty.approved) return 'Waiting for spend period';
-  return 'Waiting for approval';
-};
-
-const BountyDetail = {
-  view: (vnode: m.Vnode<{ proposal: SubstrateBounty }>) => {
+class BountyDetail implements m.ClassComponent {
+  view(vnode) {
     const { proposal: bounty } = vnode.attrs;
+
     const isCouncillor =
       app.chain &&
       ((app.chain as Substrate).phragmenElections.members || [])
@@ -64,14 +55,10 @@ const BountyDetail = {
             a.chain === app.user.activeAccount?.chain &&
             a.address === app.user.activeAccount?.address
         );
-    const isCurator = app.user.activeAccount?.address === bounty.curator;
-    const isRecipient = app.user.activeAccount?.address === bounty.beneficiary;
 
-    const buttonAttrs = {
-      fluid: true,
-      rounded: true,
-      intent: 'primary' as any,
-    };
+    const isCurator = app.user.activeAccount?.address === bounty.curator;
+
+    const isRecipient = app.user.activeAccount?.address === bounty.beneficiary;
 
     return m(
       '.BountyDetail',
@@ -111,8 +98,7 @@ const BountyDetail = {
         m('.action', [
           bounty.isProposed
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Motion to approve',
                   disabled: !isCouncillor,
                   onclick: (e) => {
@@ -125,8 +111,7 @@ const BountyDetail = {
               ]
             : bounty.isApproved
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Waiting for funding',
                   disabled: true,
                 }),
@@ -146,8 +131,7 @@ const BountyDetail = {
               ]
             : bounty.isFunded
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Motion to assign curator',
                   disabled: !isCouncillor,
                   onclick: (e) => {
@@ -164,8 +148,7 @@ const BountyDetail = {
               ]
             : bounty.isCuratorProposed
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: isCurator
                     ? 'Accept curator role'
                     : 'Waiting for curator to accept',
@@ -204,8 +187,7 @@ const BountyDetail = {
               ]
             : bounty.isActive
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Payout to recipient',
                   disabled: !isCurator,
                   onclick: (e) => {
@@ -215,8 +197,7 @@ const BountyDetail = {
                     });
                   },
                 }),
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Extend expiry',
                   disabled: !isCurator,
                   onclick: (e) => {
@@ -261,8 +242,7 @@ const BountyDetail = {
               ]
             : bounty.isPendingPayout
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: 'Payout pending',
                   disabled: true,
                 }),
@@ -280,8 +260,7 @@ const BountyDetail = {
               ]
             : bounty.isPendingPayout
             ? [
-                m(Button, {
-                  ...buttonAttrs,
+                m(CWButton, {
                   label: isRecipient ? 'Claim payout' : 'Payout ready to claim',
                   disabled: !isRecipient,
                   onclick: async (e) => {
@@ -333,59 +312,52 @@ const BountyDetail = {
         ]),
       ]
     );
-  },
-};
+  }
+}
 
-const BountiesPage: m.Component<{}> = {
-  view: (vnode) => {
-    const activeAccount = app.user.activeAccount;
-
+class BountiesPage implements m.ClassComponent {
+  view() {
     if (!app.chain || !app.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
       ) {
-        return m(ErrorPage, {
-          message: 'Chain connection timed out.',
-          title: [
-            'Bounties',
-            m(Tag, {
-              size: 'xs',
-              label: 'Beta',
-              style: 'position: relative; top: -2px; margin-left: 6px',
-            }),
-          ],
-        });
+        return (
+          <ErrorPage
+            message="Could not connect to chain"
+            title={<BreadcrumbsTitleTag title="Bounties" />}
+          />
+        );
       }
-      return m(PageLoading, {
-        message: 'Connecting to chain',
-        title: [
-          'Bounties',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      });
+
+      return (
+        <PageLoading
+          message="Connecting to chain"
+          title={<BreadcrumbsTitleTag title="Council" />}
+          showNewProposalButton
+        />
+      );
     }
 
     const modLoading = loadSubstrateModules('Bounties', getModules);
+
     if (modLoading) return modLoading;
 
     const activeBounties = (app.chain as Substrate).bounties.store
       .getAll()
       .filter((p) => !p.completed && !p.isPendingPayout)
       .sort((a, b) => +a.identifier - +b.identifier);
+
     const pendingBounties = (app.chain as Substrate).bounties.store
       .getAll()
       .filter((p) => !p.completed && p.isPendingPayout)
       .sort((a, b) => +a.identifier - +b.identifier);
+
     const inactiveBounties = (app.chain as Substrate).bounties.store
       .getAll()
       .filter((p) => p.completed)
       .sort((a, b) => +a.identifier - +b.identifier);
+
     const activeBountyContent = activeBounties.length
       ? activeBounties.map((bounty) =>
           m(ProposalCard, {
@@ -413,62 +385,56 @@ const BountiesPage: m.Component<{}> = {
         )
       : [m('.no-proposals', 'None')];
 
-    return m(
-      Sublayout,
-      {
-        title: [
-          'Bounties',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      },
-      m('.BountiesPage', [
-        // stats
-        m('.stats-box', [
-          m('.stats-box-left', '💭'),
-          m('.stats-box-right', [
-            m('', [
-              m('strong', 'Bounties'),
-              m('span', [
-                ' are requests for treasury funding that are assigned by the council to be managed by a curator.',
-              ]),
-            ]),
-            m('', [
-              m('.stats-box-stat', [
-                'Treasury: ',
-                app.chain && formatCoin((app.chain as Substrate).treasury.pot),
-              ]),
-              m('.stats-box-stat', [
-                'Next spend period: ',
-                (app.chain as Substrate).treasury.nextSpendBlock
-                  ? m(CountdownUntilBlock, {
-                      block: (app.chain as Substrate).treasury.nextSpendBlock,
-                      includeSeconds: false,
-                    })
-                  : '--',
-              ]),
-            ]),
-          ]),
-        ]),
-        m(CardsCollection, {
-          content: activeBountyContent,
-          header: 'Active Bounties',
-        }),
-        m(CardsCollection, {
-          content: pendingBountyContent,
-          header: 'Payout Pending Review',
-        }),
-        m(CardsCollection, {
-          content: inactiveBountyContent,
-          header: 'Inactive Bounties',
-        }),
-      ])
+    return (
+      <Sublayout
+        title={<BreadcrumbsTitleTag title="Council" />}
+        showNewProposalButton
+      >
+        <div class="BountiesPage">
+          <GovExplainer
+            statHeaders={[
+              {
+                statName: 'Bounties',
+                statDescription: `are requests for treasury funding that \
+                  are assigned by the council to be managed by a curator.`,
+              },
+            ]}
+            stats={[
+              {
+                statHeading: 'Treasury:',
+                stat:
+                  app.chain &&
+                  formatCoin((app.chain as Substrate).treasury.pot),
+              },
+              {
+                statHeading: 'Next spend period:',
+                stat: (app.chain as Substrate).treasury.nextSpendBlock ? (
+                  <CountdownUntilBlock
+                    block={(app.chain as Substrate).treasury.nextSpendBlock}
+                    includeSeconds={false}
+                  />
+                ) : (
+                  '--'
+                ),
+              },
+            ]}
+          />
+          <CardsCollection
+            content={activeBountyContent}
+            header="Active Bounties"
+          />
+          <CardsCollection
+            content={pendingBountyContent}
+            header="Payout Pending Review"
+          />
+          <CardsCollection
+            content={inactiveBountyContent}
+            header="Inactive Bounties"
+          />
+        </div>
+      </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default BountiesPage;
