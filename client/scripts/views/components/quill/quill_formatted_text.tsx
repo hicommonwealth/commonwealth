@@ -133,26 +133,21 @@ export class QuillFormattedText
       );
     } else {
       return (
-        <div class="show-more-wrap">
-          <div
-            class={getClasses<{ collapsed?: boolean }>(
-              {},
-              'QuillFormattedText'
-            )}
-            oncreate={() => {
-              // if (!(<any>window).twttr) {
-              //   loadScript('//platform.twitter.com/widgets.js').then(() => {
-              //     console.log('Twitter Widgets loaded');
-              //   })
-            }}
-          >
-            {renderQuillDelta(
-              this.truncatedDoc,
-              hideFormatting,
-              collapse,
-              openLinksInNewTab
-            )}
-          </div>
+        <div
+          class={getClasses<{ collapsed?: boolean }>({}, 'QuillFormattedText')}
+          oncreate={() => {
+            // if (!(<any>window).twttr) {
+            //   loadScript('//platform.twitter.com/widgets.js').then(() => {
+            //     console.log('Twitter Widgets loaded');
+            //   })
+          }}
+        >
+          {renderQuillDelta(
+            this.truncatedDoc,
+            hideFormatting,
+            collapse,
+            openLinksInNewTab
+          )}
           {this.isTruncated &&
             m('.show-more-button-wrapper', [
               m('.show-more-button', { onclick: toggleDisplay }, [

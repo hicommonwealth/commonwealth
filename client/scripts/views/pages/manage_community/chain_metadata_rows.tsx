@@ -55,6 +55,7 @@ export class ChainMetadataRows
   uploadInProgress: boolean;
   communityBanner: string;
   communityBannerQuillEditorState: any;
+  bannerStateUpdated: boolean;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -308,6 +309,10 @@ export class ChainMetadataRows
                   : JSON.stringify(
                       communityBannerQuillEditorState.editor.getContents()
                     );
+            }
+
+            if (this.bannerStateUpdated) {
+              localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
             }
 
             // Update ChainCategories

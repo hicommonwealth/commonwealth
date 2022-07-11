@@ -67,6 +67,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const terms = app.chain ? chain.terms : null;
     const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
+    const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
@@ -97,6 +98,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 chain={chain}
                 terms={terms}
                 tosStatus={tosStatus}
+                bannerStatus={bannerStatus}
               />
               <div class="Body" onscroll={onscroll}>
                 {vnode.children}

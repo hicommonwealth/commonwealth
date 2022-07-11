@@ -16,21 +16,25 @@ type SublayoutBannersAttrs = {
   chain: ChainInfo;
   terms?: string;
   tosStatus?: string;
+  bannerStatus?: string;
 };
 
 export class SublayoutBanners
   implements m.ClassComponent<SublayoutBannersAttrs>
 {
   view(vnode) {
-    const { banner, chain, terms, tosStatus } = vnode.attrs;
+    const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (
       <>
         {banner &&
+          bannerStatus !== 'off' &&
           isNonEmptyString(banner.trim()) && ( // probably shouldn't have to trim this to check it...
             <CWMessageBanner
               bannerContent={banner}
-              onClose={() => console.log('off')}
+              onClose={() =>
+                localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
+              }
             />
           )}
         {app.isLoggedIn() &&
