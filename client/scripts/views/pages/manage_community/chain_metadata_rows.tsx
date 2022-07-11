@@ -20,6 +20,11 @@ import {
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import {
+  disableEditor,
+  editorIsBlank,
+  enableEditor,
+} from '../../components/quill/helpers';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -301,8 +306,11 @@ export class ChainMetadataRows
             }
             // Handle quill editor
             const { communityBannerQuillEditorState } = this;
-            if (communityBannerQuillEditorState) {
-              communityBannerQuillEditorState.editor.enable(false);
+            disableEditor(communityBannerQuillEditorState);
+            if (
+              communityBannerQuillEditorState &&
+              !editorIsBlank(communityBannerQuillEditorState)
+            ) {
               this.communityBanner =
                 communityBannerQuillEditorState.markdownMode
                   ? communityBannerQuillEditorState.editor.getText()
@@ -361,6 +369,8 @@ export class ChainMetadataRows
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+            // Re-enable editor, as the user remains on the same form page
+            enableEditor(communityBannerQuillEditorState);
           }}
         />
       </div>

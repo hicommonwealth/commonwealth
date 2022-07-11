@@ -29,7 +29,7 @@ export class SublayoutBanners
       <>
         {banner &&
           bannerStatus !== 'off' &&
-          isNonEmptyString(banner.trim()) && ( // probably shouldn't have to trim this to check it...
+          banner && ( // probably shouldn't have to trim this to check it...
             <CWMessageBanner
               bannerContent={banner}
               onClose={() =>
