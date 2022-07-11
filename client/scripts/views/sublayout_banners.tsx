@@ -27,16 +27,14 @@ export class SublayoutBanners
 
     return (
       <>
-        {banner &&
-          bannerStatus !== 'off' &&
-          banner && ( // probably shouldn't have to trim this to check it...
-            <CWMessageBanner
-              bannerContent={banner}
-              onClose={() =>
-                localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
-              }
-            />
-          )}
+        {banner && bannerStatus !== 'off' && (
+          <CWMessageBanner
+            bannerContent={banner}
+            onClose={() =>
+              localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
+            }
+          />
+        )}
         {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
           !app.user.activeAccount && (
