@@ -121,6 +121,10 @@ class ManageCommunityPage implements m.ClassComponent {
       m.redraw();
     };
 
+    const onSave = () => {
+      m.redraw();
+    };
+
     return !this.loadingFinished ? (
       <PageLoading />
     ) : (
@@ -131,6 +135,9 @@ class ManageCommunityPage implements m.ClassComponent {
             chain={app.config.chains.getById(app.activeChainId())}
             mods={mods}
             onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
+            onSave={() => {
+              onSave();
+            }}
           />
           <AdminPanelTabs
             defaultTab={1}

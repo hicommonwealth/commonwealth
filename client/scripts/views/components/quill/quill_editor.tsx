@@ -108,6 +108,11 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
         this.markdownMode = true;
       }
     } else if (this.markdownMode === undefined) {
+      try {
+        contentsDoc = JSON.parse(contentsDoc);
+      } catch (e) {
+        console.log('Could not parse contents doc');
+      }
       if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
         this.markdownMode = true;
       } else if (

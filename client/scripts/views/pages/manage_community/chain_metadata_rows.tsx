@@ -26,6 +26,7 @@ type ChainMetadataRowsAttrs = {
   chain?: ChainInfo;
   mods: any;
   onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onSave: () => void;
 };
 
 export class ChainMetadataRows
@@ -303,16 +304,16 @@ export class ChainMetadataRows
             const { communityBannerQuillEditorState } = this;
             if (communityBannerQuillEditorState) {
               communityBannerQuillEditorState.editor.enable(false);
-              this.communityBanner =
+              const newCommunityBanner =
                 communityBannerQuillEditorState.markdownMode
                   ? communityBannerQuillEditorState.editor.getText()
                   : JSON.stringify(
                       communityBannerQuillEditorState.editor.getContents()
                     );
-            }
-
-            if (this.bannerStateUpdated) {
-              localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+              if (newCommunityBanner !== this.communityBanner) {
+                this.communityBanner = newCommunityBanner;
+                this.bannerStateUpdated = true;
+              }
             }
 
             // Update ChainCategories
@@ -335,6 +336,9 @@ export class ChainMetadataRows
                 jwt: app.user.jwt,
               }).then(() => {
                 app.chain.meta.setBanner(this.communityBanner);
+                if (this.bannerStateUpdated) {
+                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+                }
               });
             } catch (err) {
               console.log(err);
@@ -357,10 +361,12 @@ export class ChainMetadataRows
                 iconUrl,
                 defaultSummaryView,
               });
+              vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+            m.redraw();
           }}
         />
       </div>
