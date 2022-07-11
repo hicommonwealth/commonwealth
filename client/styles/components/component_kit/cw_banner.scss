@@ -31,5 +31,9 @@
   background-color: $primary-50;
   border-bottom: 1px solid $primary-100;
 
+  @include smallInclusive {
+    border: 4px solid $primary-100;
+  }
+
   @include bannerStyles;
 }

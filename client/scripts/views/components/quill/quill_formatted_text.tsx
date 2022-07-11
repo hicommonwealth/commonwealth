@@ -22,6 +22,7 @@ const countLinesQuill = (ops) => {
   }
   return count;
 };
+
 type QuillFormattedTextAttrs = {
   doc;
   collapse: boolean;
@@ -136,6 +137,8 @@ export class QuillFormattedText
         <div
           class={getClasses<{ collapsed?: boolean }>({}, 'QuillFormattedText')}
           oncreate={() => {
+            // Gabe 7/11/22: I commented this out after converting the file to TSX because now these lines
+            // show a weird error (uncomment to see)
             // if (!(<any>window).twttr) {
             //   loadScript('//platform.twitter.com/widgets.js').then(() => {
             //     console.log('Twitter Widgets loaded');
@@ -148,13 +151,14 @@ export class QuillFormattedText
             collapse,
             openLinksInNewTab
           )}
-          {this.isTruncated &&
-            m('.show-more-button-wrapper', [
-              m('.show-more-button', { onclick: toggleDisplay }, [
-                m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                m('.show-more-text', ['Show More']),
-              ]),
-            ])}
+          {this.isTruncated && (
+            <div class="show-more-button-wrapper">
+              <div class="show-more-button" onclick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div class="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }

@@ -4,7 +4,9 @@ import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText } from './quill_formatted_text';
 
 export const editorIsBlank = (quillEditorState) => {
-  return quillEditorState?.editor?.editor?.isBlank();
+  // No active editor, treat as blank form
+  if (!quillEditorState?.editor?.editor) return true;
+  return quillEditorState.editor.editor.isBlank();
 };
 
 export const disableEditor = (quillEditorState, document?) => {
@@ -20,6 +22,11 @@ export const disableEditor = (quillEditorState, document?) => {
   if (mentionsEle) {
     (mentionsEle as HTMLElement).style.visibility = 'hidden';
   }
+};
+
+export const enableEditor = (quillEditorState) => {
+  if (!quillEditorState?.editor?.editor) return;
+  quillEditorState.editor.enable(true);
 };
 
 export const getQuillTextContents = (quillEditorState) => {
