@@ -18,10 +18,10 @@ import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
-import jumpHighlightComment from './jump_to_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
+import { jumpHighlightComment } from './helpers';
 
 type CreateCommmentAttrs = {
   callback: CallableFunction;
