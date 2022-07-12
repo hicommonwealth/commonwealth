@@ -5,7 +5,8 @@
   border-radius: $border-radius-corners;
   display: flex;
   margin-bottom: 24px;
-  padding: 24px 24px 16px;
+  max-width: 828px;
+  padding: 16px;
 
   .emoji {
     font-size: 28px;
@@ -15,15 +16,12 @@
   .main-container {
     display: flex;
     flex-direction: column;
+    gap: 16px;
 
     .stat-headers-container {
       display: flex;
       flex-direction: column;
-      margin-bottom: 8px;
-
-      .stat-header {
-        margin-bottom: 8px;
-      }
+      gap: 8px;
     }
 
     .stats-container {
@@ -31,13 +29,14 @@
       flex-direction: column;
 
       .stat {
-        color: $neutral-500;
-        margin-bottom: 8px;
-      }
-    }
+        display: flex;
+        flex-wrap: wrap;
 
-    .action {
-      margin: 8px 0;
+        .stat-text.Text {
+          color: $neutral-500;
+          margin-right: 8px;
+        }
+      }
     }
   }
 
