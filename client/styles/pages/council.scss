@@ -1,24 +1,28 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CouncilPage {
+  flex: 1;
   padding: 24px;
 
-  @include gov-explainer;
-
-  h3 {
-    margin-bottom: 16px;
-  }
-
-  .Councillor {
-    @include card;
-    cursor: default;
-    height: initial;
+  .CouncillorCard.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .User {
-      font-weight: 600;
+      display: flex;
+      width: 200px;
+      align-items: center;
+
+      .username {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
-    .councillor-status {
-      color: $neutral-500;
+
+    .councillor-status-text.Text {
+      color: $neutral-400;
     }
   }
 }

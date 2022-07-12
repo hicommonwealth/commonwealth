@@ -1,26 +1,21 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
-import { Tag } from 'construct-ui';
 
 import 'pages/proposals.scss';
 
 import app from 'state';
 import { ChainBase, ChainNetwork } from 'types';
 import { ProposalModule } from 'models';
-
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
-
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card/proposal_card';
-import loadSubstrateModules from 'views/components/load_substrate_modules';
-
+import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
@@ -30,6 +25,8 @@ import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
+import { getStatusText } from '../components/proposal_card/helpers';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -54,7 +51,7 @@ function getModules(): ProposalModule<any, any, any>[] {
 }
 
 const ProposalsPage: m.Component<{}> = {
-  oncreate: (vnode) => {
+  oncreate: () => {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
     if (
@@ -79,14 +76,7 @@ const ProposalsPage: m.Component<{}> = {
         return (
           <ErrorPage
             message="Could not connect to chain"
-            title={[
-              'Proposals',
-              <Tag
-                size="xs"
-                label="Beta"
-                style="position: relative; top: -2px; margin-left: 6px"
-              />,
-            ]}
+            title={<BreadcrumbsTitleTag title="Proposals" />}
           />
         );
       }
@@ -100,15 +90,8 @@ const ProposalsPage: m.Component<{}> = {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={[
-            'Proposals',
-            <Tag
-              size="xs"
-              label="Beta"
-              style="position: relative; top: -2px; margin-left: 6px"
-            />,
-          ]}
-          showNewProposalButton={true}
+          title={<BreadcrumbsTitleTag title="Proposals" />}
+          showNewProposalButton
         />
       );
     }
@@ -120,6 +103,7 @@ const ProposalsPage: m.Component<{}> = {
     const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
+
     if (modLoading) return modLoading;
 
     // active proposals
@@ -128,11 +112,13 @@ const ProposalsPage: m.Component<{}> = {
       (app.chain as Substrate).democracyProposals.store
         .getAll()
         .filter((p) => !p.completed);
+
     const activeCouncilProposals =
       onSubstrate &&
       (app.chain as Substrate).council.store
         .getAll()
         .filter((p) => !p.completed);
+
     const activeCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -140,24 +126,28 @@ const ProposalsPage: m.Component<{}> = {
         .getAll()
         .filter((p) => !p.completed)
         .sort((a, b) => +b.identifier - +a.identifier);
+
     const activeMolochProposals =
       onMoloch &&
       (app.chain as Moloch).governance.store
         .getAll()
         .filter((p) => !p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+
     const activeCompoundProposals =
       onCompound &&
       (app.chain as Compound).governance.store
         .getAll()
         .filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
+
     const activeAaveProposals =
       onAave &&
       (app.chain as Aave).governance.store
         .getAll()
         .filter((p) => !p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+
     const activeSputnikProposals =
       onSputnik &&
       (app.chain as NearSputnik).dao.store
@@ -201,7 +191,12 @@ const ProposalsPage: m.Component<{}> = {
                 (activeAaveProposals || []).map((proposal) => (
                   <ProposalCard
                     proposal={proposal}
-                    injectedContent={AaveProposalCardDetail}
+                    injectedContent={
+                      <AaveProposalCardDetail
+                        proposal={proposal}
+                        statusText={getStatusText(proposal)}
+                      />
+                    }
                   />
                 ))
               )
@@ -218,11 +213,13 @@ const ProposalsPage: m.Component<{}> = {
       (app.chain as Substrate).democracyProposals.store
         .getAll()
         .filter((p) => p.completed);
+
     const inactiveCouncilProposals =
       onSubstrate &&
       (app.chain as Substrate).council.store
         .getAll()
         .filter((p) => p.completed);
+
     const inactiveCosmosProposals =
       app.chain &&
       app.chain.base === ChainBase.CosmosSDK &&
@@ -230,24 +227,28 @@ const ProposalsPage: m.Component<{}> = {
         .getAll()
         .filter((p) => p.completed)
         .sort((a, b) => +b.identifier - +a.identifier);
+
     const inactiveMolochProposals =
       onMoloch &&
       (app.chain as Moloch).governance.store
         .getAll()
         .filter((p) => p.completed)
         .sort((p1, p2) => +p2.data.timestamp - +p1.data.timestamp);
+
     const inactiveCompoundProposals =
       onCompound &&
       (app.chain as Compound).governance.store
         .getAll()
         .filter((p) => p.completed)
         .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
+
     const inactiveAaveProposals =
       onAave &&
       (app.chain as Aave).governance.store
         .getAll()
         .filter((p) => p.completed)
         .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
+
     const inactiveSputnikProposals =
       onSputnik &&
       (app.chain as NearSputnik).dao.store
@@ -291,7 +292,12 @@ const ProposalsPage: m.Component<{}> = {
                 (inactiveAaveProposals || []).map((proposal) => (
                   <ProposalCard
                     proposal={proposal}
-                    injectedContent={AaveProposalCardDetail}
+                    injectedContent={
+                      <AaveProposalCardDetail
+                        proposal={proposal}
+                        statusText={getStatusText(proposal)}
+                      />
+                    }
                   />
                 ))
               )
@@ -304,15 +310,8 @@ const ProposalsPage: m.Component<{}> = {
 
     return (
       <Sublayout
-        title={[
-          'Proposals',
-          <Tag
-            size="xs"
-            label="Beta"
-            style="position: relative; top: -2px; margin-left: 6px"
-          />,
-        ]}
-        showNewProposalButton={true}
+        title={<BreadcrumbsTitleTag title="Proposals" />}
+        showNewProposalButton
       >
         <div class="ProposalsPage">
           {onSubstrate && (
@@ -331,7 +330,7 @@ const ProposalsPage: m.Component<{}> = {
         </div>
       </Sublayout>
     );
-  }
-}
+  },
+};
 
 export default ProposalsPage;

@@ -13,7 +13,6 @@ export const roundVote = (percentage) => {
 
 type AaveProposalCardDetailAttrs = {
   proposal: AaveProposal;
-  statusClass: string;
   statusText: any;
 };
 
@@ -21,7 +20,7 @@ export class AaveProposalCardDetail
   implements m.ClassComponent<AaveProposalCardDetailAttrs>
 {
   view(vnode) {
-    const { proposal, statusClass } = vnode.attrs;
+    const { proposal } = vnode.attrs;
 
     const statusText = Array.isArray(vnode.attrs.statusText)
       ? vnode.attrs.statusText[0]?.split(',')[0]
@@ -53,9 +52,7 @@ export class AaveProposalCardDetail
           </div>
           <div class="aave-status">
             <div class="card-subheader">Status</div>
-            <div class={`proposal-injected-status ${statusClass}`}>
-              {statusText}
-            </div>
+            <div class="proposal-injected-status">{statusText}</div>
           </div>
         </div>
         <div class="aave-voting">

@@ -136,13 +136,7 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
              linked referenda */}
         </div>
         {injectedContent ? (
-          <div class="proposal-injected">
-            {m(injectedContent, {
-              proposal,
-              statusClass: getStatusClass(proposal),
-              statusText: getStatusText(proposal),
-            })}
-          </div>
+          <div class="proposal-injected">{injectedContent}</div>
         ) : proposal.isPassing !== 'none' ? (
           <div class={`proposal-status ${getStatusClass(proposal)}`}>
             {getStatusText(proposal)}
