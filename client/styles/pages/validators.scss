@@ -1,23 +1,22 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ValidatorsPage {
   flex: 1;
   padding: 24px;
 
-  @include gov-explainer;
+  .ValidatorCard.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-  h3 {
-    margin-bottom: 16px;
-  }
+    .user-and-nominator {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-  .Validator {
-    @include card;
-    cursor: default;
-
-    height: initial;
-    .User {
-      font-weight: 600;
-      margin-bottom: 1px;
+    .commission-text.Text {
+      color: $neutral-400;
     }
   }
 }
