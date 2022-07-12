@@ -4,14 +4,8 @@
 .CardsCollection {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   margin-bottom: 24px;
-  padding: 0 24px;
-
-  .header {
-    font-size: 32px;
-    font-weight: 500;
-    margin-bottom: 16px;
-  }
 
   .cards {
     display: grid;

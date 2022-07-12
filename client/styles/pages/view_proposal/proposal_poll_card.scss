@@ -1,0 +1,45 @@
+@import 'shared';
+
+.ProposalPollCard.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 16px;
+
+  .poll-error-text.Text {
+    color: $rorange-500;
+  }
+
+  .poll-option-row {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .poll-timestamp-text.Text {
+    color: $neutral-500;
+    margin: 16px 0;
+  }
+
+  .no-voters-text.Text {
+    color: $neutral-500;
+  }
+
+  .option-with-votes {
+    display: flex;
+    flex-direction: column;
+
+    .option-results-label {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
+    .poll-bar {
+      background-color: $primary-500;
+      border-radius: $border-radius-corners;
+      height: 5px;
+    }
+  }
+}

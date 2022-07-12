@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
-import { QuillFormattedText } from './quill_formatted_text';
+import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';
 
 export const editorIsBlank = (quillEditorState) => {
   // No active editor, treat as blank form
@@ -36,12 +36,18 @@ export const getQuillTextContents = (quillEditorState) => {
     : JSON.stringify(quillEditorState.editor.getContents());
 };
 
-type QuillTextParams = {
-  collapse?: boolean;
-  cutoffText?: number;
-  hideFormatting?: boolean;
-  openLinkInNewTab?: boolean;
-  searchTerm?: string;
+export const countLinesQuill = (ops) => {
+  let count = 0;
+
+  for (const op of ops) {
+    try {
+      count += op.insert.split('\n').length - 1;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  return count;
 };
 
 // TODO Graham 22-6-5: Add option to trim doc to param length

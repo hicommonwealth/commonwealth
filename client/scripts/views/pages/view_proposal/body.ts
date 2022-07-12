@@ -21,7 +21,6 @@ import {
   AddressInfo,
 } from 'models';
 
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User, { AnonymousUser } from 'views/components/widgets/user';
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
@@ -50,6 +49,7 @@ import {
   disableEditor,
   getQuillTextContents,
 } from '../../components/quill/helpers';
+import { jumpHighlightComment } from './helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
