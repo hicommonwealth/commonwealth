@@ -52,6 +52,18 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
+  onbeforeupdate(vnode) {
+    this.isTruncated =
+      vnode.attrs.cutoffLines &&
+      vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
+    if (this.isTruncated) {
+      this.truncatedDoc = {
+        ops: [...vnode.attrs.doc.ops.slice(0, vnode.attrs.cutoffLines)],
+      };
+    } else {
+      this.truncatedDoc = vnode.attrs.doc;
+    }
+  }
   view(vnode) {
     const {
       doc,
