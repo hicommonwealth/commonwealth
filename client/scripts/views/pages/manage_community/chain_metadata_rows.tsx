@@ -307,11 +307,8 @@ export class ChainMetadataRows
             }
             // Handle quill editor
             const { communityBannerQuillEditorState } = this;
-
-            if (
-              communityBannerQuillEditorState &&
-              !editorIsBlank(communityBannerQuillEditorState)
-            ) {
+            const blankEditor = editorIsBlank(communityBannerQuillEditorState);
+            if (communityBannerQuillEditorState && !blankEditor) {
               communityBannerQuillEditorState.editor.enable(false);
               const newCommunityBanner =
                 communityBannerQuillEditorState.markdownMode
@@ -344,7 +341,12 @@ export class ChainMetadataRows
                 auth: true,
                 jwt: app.user.jwt,
               }).then(() => {
-                app.chain.meta.setBanner(this.communityBanner);
+                if (blankEditor) {
+                  app.chain.meta.setBanner(null);
+                } else {
+                  app.chain.meta.setBanner(this.communityBanner);
+                }
+
                 if (this.bannerStateUpdated) {
                   localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
                 }
