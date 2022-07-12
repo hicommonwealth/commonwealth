@@ -14,15 +14,13 @@ import {
 } from 'types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
-
-import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { jumpHighlightComment } from '../pages/view_proposal/helpers';
+import { MarkdownFormattedText } from './quill/markdown_formatted_text';
+import { QuillFormattedText } from './quill/quill_formatted_text';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
