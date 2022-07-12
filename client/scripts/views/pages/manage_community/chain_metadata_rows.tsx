@@ -26,6 +26,7 @@ import {
   enableEditor,
   getQuillTextContents,
 } from '../../components/quill/helpers';
+import Quill from '../../components/quill';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -61,7 +62,7 @@ export class ChainMetadataRows
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
-  bannerEditorState: any;
+  quillBanner: any;
   bannerStateUpdated: boolean;
 
   oninit(vnode) {
@@ -238,7 +239,7 @@ export class ChainMetadataRows
           // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
-            this.bannerEditorState = state;
+            this.quillBanner = new Quill(state);
           }}
           tabindex={1}
           editorNamespace="new-banner"
@@ -306,19 +307,16 @@ export class ChainMetadataRows
               }
             }
             // Handle quill editor
-            const { bannerEditorState } = this;
-            const blankEditor = editorIsBlank(bannerEditorState);
-            if (bannerEditorState) {
-              disableEditor(bannerEditorState);
-              if (blankEditor) {
-                this.communityBanner = null;
-              } else {
-                const newCommunityBanner =
-                  getQuillTextContents(bannerEditorState);
-                if (newCommunityBanner !== this.communityBanner) {
-                  this.communityBanner = newCommunityBanner;
-                  this.bannerStateUpdated = true;
-                }
+            const { quillBanner } = this;
+            quillBanner.disableEditor();
+            const blankEditor = quillBanner.editorIsBlank();
+            if (blankEditor) {
+              this.communityBanner = null;
+            } else {
+              const newCommunityBanner = quillBanner.textContents;
+              if (newCommunityBanner !== this.communityBanner) {
+                this.communityBanner = newCommunityBanner;
+                this.bannerStateUpdated = true;
               }
             }
 
@@ -380,7 +378,7 @@ export class ChainMetadataRows
 
             m.redraw();
             // Re-enable editor, as the user remains on the same form page
-            enableEditor(bannerEditorState);
+            quillBanner.enableEditor();
           }}
         />
       </div>
