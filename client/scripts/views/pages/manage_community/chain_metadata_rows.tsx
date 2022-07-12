@@ -307,6 +307,8 @@ export class ChainMetadataRows
             // Handle quill editor
             const { communityBannerQuillEditorState } = this;
 
+            disableEditor(communityBannerQuillEditorState);
+
             if (
               communityBannerQuillEditorState &&
               !editorIsBlank(communityBannerQuillEditorState)
@@ -374,6 +376,7 @@ export class ChainMetadataRows
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+
             m.redraw();
             // Re-enable editor, as the user remains on the same form page
             enableEditor(communityBannerQuillEditorState);
