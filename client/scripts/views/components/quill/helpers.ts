@@ -6,10 +6,16 @@ import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';
 export const editorIsBlank = (quillEditorState) => {
   // No active editor, treat as blank form
   if (!quillEditorState?.editor?.editor) return true;
-  return (
-    quillEditorState.editor.editor.isBlank() ||
-    !quillEditorState.editor.editor.getText()
-  );
+  const { editor } = quillEditorState.editor;
+  if (editor.isBlank()) return true;
+  if (
+    editor.getText() === '' &&
+    editor.getDelta()?.ops.length === 1 &&
+    editor.getDelta()?.ops[0]?.insert === '\n'
+  ) {
+    return true;
+  }
+  return false;
 };
 
 export const disableEditor = (quillEditorState, document?) => {

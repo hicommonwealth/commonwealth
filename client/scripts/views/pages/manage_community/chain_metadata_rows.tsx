@@ -24,6 +24,7 @@ import {
   disableEditor,
   editorIsBlank,
   enableEditor,
+  getQuillTextContents,
 } from '../../components/quill/helpers';
 
 type ChainMetadataRowsAttrs = {
@@ -60,7 +61,7 @@ export class ChainMetadataRows
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
-  communityBannerQuillEditorState: any;
+  bannerEditorState: any;
   bannerStateUpdated: boolean;
 
   oninit(vnode) {
@@ -237,7 +238,7 @@ export class ChainMetadataRows
           // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
-            this.communityBannerQuillEditorState = state;
+            this.bannerEditorState = state;
           }}
           tabindex={1}
           editorNamespace="new-banner"
@@ -305,21 +306,19 @@ export class ChainMetadataRows
               }
             }
             // Handle quill editor
-            const { communityBannerQuillEditorState } = this;
-            const blankEditor = editorIsBlank(communityBannerQuillEditorState);
-            disableEditor(communityBannerQuillEditorState);
-
-            if (communityBannerQuillEditorState && !blankEditor) {
-              communityBannerQuillEditorState.editor.enable(false);
-              const newCommunityBanner =
-                communityBannerQuillEditorState.markdownMode
-                  ? communityBannerQuillEditorState.editor.getText()
-                  : JSON.stringify(
-                      communityBannerQuillEditorState.editor.getContents()
-                    );
-              if (newCommunityBanner !== this.communityBanner) {
-                this.communityBanner = newCommunityBanner;
-                this.bannerStateUpdated = true;
+            const { bannerEditorState } = this;
+            const blankEditor = editorIsBlank(bannerEditorState);
+            if (bannerEditorState) {
+              disableEditor(bannerEditorState);
+              if (blankEditor) {
+                this.communityBanner = null;
+              } else {
+                const newCommunityBanner =
+                  getQuillTextContents(bannerEditorState);
+                if (newCommunityBanner !== this.communityBanner) {
+                  this.communityBanner = newCommunityBanner;
+                  this.bannerStateUpdated = true;
+                }
               }
             }
 
@@ -381,7 +380,7 @@ export class ChainMetadataRows
 
             m.redraw();
             // Re-enable editor, as the user remains on the same form page
-            enableEditor(communityBannerQuillEditorState);
+            enableEditor(bannerEditorState);
           }}
         />
       </div>
