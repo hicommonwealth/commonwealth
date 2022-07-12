@@ -8,8 +8,7 @@ export const editorIsBlank = (quillEditorState) => {
   if (!quillEditorState?.editor?.editor) return true;
   return (
     quillEditorState.editor.editor.isBlank() ||
-    (quillEditorState.editor.editor.delta.ops.length === 1 &&
-      quillEditorState.editor.editor.delta.ops[0].insert === '\n')
+    !quillEditorState.editor.editor.getText()
   );
 };
 
