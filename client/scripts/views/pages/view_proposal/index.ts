@@ -39,7 +39,6 @@ import {
   DepositVote,
 } from 'models';
 
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import { PollEditor } from 'views/components/poll_editor';
@@ -110,7 +109,7 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalPoll } from './poll';
+import { ProposalPollCard } from './proposal_poll_card';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
@@ -123,6 +122,7 @@ import {
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { jumpHighlightComment } from './helpers';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1416,7 +1416,7 @@ const ViewProposalPage: m.Component<
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m(ProposalPoll, { poll, thread: proposal });
+                return m(ProposalPollCard, { poll, thread: proposal });
               }),
           ],
         ]),
