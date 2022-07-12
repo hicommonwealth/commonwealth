@@ -237,7 +237,6 @@ export class ChainMetadataRows
           // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
-            console.log('state', state);
             this.communityBannerQuillEditorState = state;
           }}
           tabindex={1}
@@ -308,6 +307,8 @@ export class ChainMetadataRows
             // Handle quill editor
             const { communityBannerQuillEditorState } = this;
             const blankEditor = editorIsBlank(communityBannerQuillEditorState);
+            disableEditor(communityBannerQuillEditorState);
+
             if (communityBannerQuillEditorState && !blankEditor) {
               communityBannerQuillEditorState.editor.enable(false);
               const newCommunityBanner =
@@ -377,6 +378,7 @@ export class ChainMetadataRows
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+
             m.redraw();
             // Re-enable editor, as the user remains on the same form page
             enableEditor(communityBannerQuillEditorState);
