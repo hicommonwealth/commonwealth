@@ -237,7 +237,6 @@ export class ChainMetadataRows
           // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
-            console.log('state', state);
             this.communityBannerQuillEditorState = state;
           }}
           tabindex={1}
