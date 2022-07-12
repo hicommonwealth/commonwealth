@@ -1,49 +1,42 @@
 /* @jsx m */
 
-import 'components/quill/quill_formatted_text.scss';
-
 import m from 'mithril';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
+import 'components/quill/quill_formatted_text.scss';
+
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
 import { getClasses } from '../component_kit/helpers';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWButton } from '../component_kit/cw_button';
+import { countLinesQuill } from './helpers';
 
-const countLinesQuill = (ops) => {
-  let count = 0;
-  for (const op of ops) {
-    try {
-      count += op.insert.split('\n').length - 1;
-    } catch (e) {
-      console.log(e);
-    }
-  }
-  return count;
+export type QuillTextParams = {
+  collapse?: boolean;
+  cutoffLines?: number;
+  hideFormatting?: boolean;
+  openLinkInNewTab?: boolean;
+  searchTerm?: string;
 };
 
 type QuillFormattedTextAttrs = {
   doc;
-  collapse: boolean;
-  hideFormatting?: boolean;
-  cutoffLines?: number;
-  openLinksInNewTab?: boolean;
-  searchTerm?: string;
-};
+} & QuillTextParams;
 
 export class QuillFormattedText
   implements m.ClassComponent<QuillFormattedTextAttrs>
 {
-  // which are private
-  cachedDocWithHighlights: string;
-  cachedResultWithHighlights;
-  truncatedDoc;
-  isTruncated: boolean;
+  private cachedDocWithHighlights: string;
+  private cachedResultWithHighlights;
+  private isTruncated: boolean;
+  private truncatedDoc;
+
   oninit(vnode) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
+
     if (this.isTruncated) {
       this.truncatedDoc = {
         ops: [...vnode.attrs.doc.ops.slice(0, vnode.attrs.cutoffLines)],
@@ -52,6 +45,7 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
+
   view(vnode) {
     const {
       doc,
@@ -64,11 +58,13 @@ export class QuillFormattedText
 
     const toggleDisplay = () => {
       this.isTruncated = !this.isTruncated;
+
       if (this.isTruncated) {
         this.truncatedDoc = { ops: [...doc.ops.slice(0, cutoffLines)] };
       } else {
         this.truncatedDoc = doc;
       }
+
       m.redraw();
     };
 
@@ -99,7 +95,9 @@ export class QuillFormattedText
         this.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
+
             const subString = textToHighlight.substr(start, end - start);
+
             let text = smartTruncate(
               subString,
               chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
@@ -111,13 +109,16 @@ export class QuillFormattedText
                 ? {}
                 : { position: middle }
             );
+
             if (subString[subString.length - 1] === ' ') {
               text += ' ';
             }
+
             if (subString[0] === ' ') {
               text = ` ${text}`;
             }
-            return highlight ? m('mark', text) : m('span', text);
+
+            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
           }
         );
       }
@@ -145,18 +146,22 @@ export class QuillFormattedText
             //   })
           }}
         >
-          {renderQuillDelta(
-            this.truncatedDoc,
-            hideFormatting,
-            collapse,
-            openLinksInNewTab
-          )}
+          <div class="formatted-body">
+            {renderQuillDelta(
+              this.truncatedDoc,
+              hideFormatting,
+              collapse,
+              openLinksInNewTab
+            )}
+          </div>
           {this.isTruncated && (
             <div class="show-more-button-wrapper">
-              <div class="show-more-button" onclick={toggleDisplay}>
-                <CWIcon iconName="plus" iconSize="small" />
-                <div class="show-more-text">Show More</div>
-              </div>
+              <CWButton
+                iconName="plus"
+                onclick={toggleDisplay}
+                label="Show More"
+                buttonType="tertiary-blue"
+              />
             </div>
           )}
         </div>
