@@ -17,7 +17,8 @@ import { ChainBase, ChainType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { modelFromServer } from 'client/scripts/controllers/server/reactions';
-import { RoleAttributes } from 'server/models/role';
+import { RoleAttributes } from '../models/role';
+import { AddressInstance } from '../models/address';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,7 +51,8 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  FailedToAssignAdmin: 'Failed to assign admin'
+  FailedToAssignAdmin: 'Failed to assign admin',
+  InvalidWalletType: 'Wallet type does not match chain'
 };
 
 type CreateChainReq = ChainAttributes &
@@ -302,19 +304,78 @@ const createChain = async (
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
   let role;
   try {
-    const addressToBeAdmin = await models.Address.findOne({
-      where: {
-        user_id: req.user.id,
-      },
-      include: [{
-        model: models.Chain,
-        where: { base: chain.base },
-        required: true,
-      }]
-    });
+    // Use the chain base to get the right address from the user
+    let potentialAdmin:(AddressInstance | null);
 
+    // Will get one of the users Ethereum addresses or null
+    if (chain.base === ChainBase.Ethereum) {
+      potentialAdmin = await models.Address.findOne({
+        where: {
+          user_id: req.user.id,
+          address: {
+            [Op.startsWith]: '0x'
+          }
+        },
+        include: [{
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        }]
+      });
+    }
+    // Will get one of the users Near addresses or null
+    else if (chain.base === ChainBase.NEAR) {
+      potentialAdmin = await models.Address.findOne({
+        where: {
+          user_id: req.user.id,
+          address: {
+            [Op.endsWith]: '.near'
+          }
+        },
+        include: [{
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        }]
+      });
+    }
+    // Will get one of the users Solana addresses or null
+    else if (chain.base === ChainBase.Solana) {
+      potentialAdmin = await models.Address.findOne({
+        where: {
+          user_id: req.user.id,
+          address: {
+            // This is the regex formatting for solana addresses per their website
+            [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}'
+          }
+        },
+        include: [{
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        }]
+      });
+    }
+
+    const addressToBeAdmin = potentialAdmin
+    const solanaRegExp = new RegExp('[1-9A-HJ-NP-Za-km-z]{32,44}');
+
+    // Checking the actual address to be admin that is being added to the role
+    // probably redundant now but better safe than sorry
     if (!addressToBeAdmin ||
       [ChainBase.Substrate, ChainBase.CosmosSDK].includes(chain.base)) throw Error(Errors.FailedToAssignAdmin);
+
+    // All Ethererum addresses start with 0x
+    if (chain.base === ChainBase.Ethereum &&
+      !addressToBeAdmin.address.startsWith('0x')) throw Error(Errors.InvalidWalletType);
+
+    // All Near addresses end with .near
+    if (chain.base === ChainBase.NEAR &&
+      !addressToBeAdmin.address.endsWith('.near')) throw Error(Errors.InvalidWalletType);
+
+    // All Solana addresses follow their regex formatting
+    if (chain.base === ChainBase.Solana &&
+      solanaRegExp.test(addressToBeAdmin.address)) throw Error(Errors.InvalidWalletType);
 
     role = await models.Role.create({
       address_id: addressToBeAdmin.id,
@@ -322,8 +383,14 @@ const createChain = async (
       permission: 'admin',
       is_user_default: true,
     });
+
   } catch (err) {
-    throw Error(Errors.FailedToAssignAdmin);
+    console.log(err);
+    // If the issue is an invalid wallet type then log the error and skip making them admin, but still create the chain
+    if (err !== (Errors.InvalidWalletType || Errors.FailedToAssignAdmin)) {
+      console.log(err);
+      throw Error(Errors.FailedToAssignAdmin);
+    }
   }
 
   return success(res, { chain: chain.toJSON(), node: nodeJSON, role: role?.toJSON() });
