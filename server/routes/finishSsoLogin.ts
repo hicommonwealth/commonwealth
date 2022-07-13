@@ -264,7 +264,7 @@ const finishSsoLogin = async (
         profile = user.Profiles[0];
       } else {
         user = reqUser;
-        profile = await models.Profile.findOne({ where: { user_id: user.id } });
+        profile = await models.Profile.findOne({ where: { user_id: user.id }, transaction: t });
       }
 
       // create new address
@@ -315,12 +315,15 @@ const finishSsoLogin = async (
       );
 
       // Automatically create subscription to chat mentions
-      await models.Subscription.create({
-        subscriber_id: user.id,
-        category_id: NotificationCategories.NewChatMention,
-        object_id: `user-${user.id}`,
-        is_active: true,
-      });
+      await models.Subscription.create(
+        {
+          subscriber_id: user.id,
+          category_id: NotificationCategories.NewChatMention,
+          object_id: `user-${user.id}`,
+          is_active: true,
+        },
+        { transaction: t }
+      );
 
       // populate token
       emptyTokenInstance.issuer = jwtPayload.iss;
