@@ -8,7 +8,7 @@ jobs:
 
     defaults:
       run:
-      working-directory: packages/commonwealth
+        working-directory: packages/commonwealth
 
     services:
       postgres:
