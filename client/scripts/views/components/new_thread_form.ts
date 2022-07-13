@@ -453,6 +453,7 @@ export const NewThreadForm: m.Component<
     const activeEntityInfo = app.chain.meta;
     const { isModal, hasTopics } = vnode.attrs;
     if (vnode.state.quillEditorState?.container) {
+      // TODO: WTF?
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
 

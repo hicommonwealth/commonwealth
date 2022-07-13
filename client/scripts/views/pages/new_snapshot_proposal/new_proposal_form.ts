@@ -241,6 +241,7 @@ const NewProposalForm: m.Component<
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
     if (vnode.state.quillEditorState?.container) {
+      // TODO: WTF?
       vnode.state.quillEditorState.container.tabIndex = 8;
     }
 

@@ -8,7 +8,7 @@ import 'components/quill/quill_editor.scss';
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { instantiateEditor } from './instantiate_editor_helper';
+import { QuillEditor } from './instantiate_editor_helper';
 import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
@@ -29,7 +29,7 @@ import {
 // `formats` and the rich text toolbar (there doesn't appear to be a
 // way to unregister formats once the editor has been initialized)
 
-type QuillEditorAttrs = {
+type QuillEditorComponentAttrs = {
   className?: string;
   contentsDoc?;
   editorNamespace: string;
@@ -46,11 +46,13 @@ type QuillEditorAttrs = {
 // - Fix image blots, Twitter blots if broken
 // - Convert generic HTML tags to CWText components
 
-export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
-  private _loaded: boolean;
-  private _defaultContents: QuillTextContents;
+export class QuillEditorComponent
+  implements m.ClassComponent<QuillEditorComponentAttrs>
+{
   private _$editor: JQuery<HTMLElement>;
   private _activeMode: QuillActiveMode;
+  private _defaultContents: QuillTextContents;
+  private _loaded: boolean;
 
   public get activeMode() {
     return this._activeMode;
@@ -60,7 +62,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
   }
 
   // which are private?
-  editor;
+  editor: QuillEditor;
   uploading?: boolean;
   enableSubmission: boolean;
 
@@ -198,7 +200,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
         class={editorClass}
         oncreate={(childVnode) => {
           this._$editor = $(childVnode.dom).find('.quill-editor');
-          this.editor = instantiateEditor(
+          this.editor = new QuillEditor(
             this._$editor,
             theme,
             imageUploader,
@@ -222,7 +224,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
             onclick={(e) => {
               this._defaultContents = this.editor.getContents();
               this._activeMode = 'richText';
-              this.editor = instantiateEditor(
+              this.editor = new QuillEditor(
                 this._$editor,
                 theme,
                 imageUploader,
@@ -255,7 +257,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
               this._defaultContents = this.editor.getContents();
               this._activeMode = 'markdown';
 
-              this.editor = instantiateEditor(
+              this.editor = new QuillEditor(
                 this._$editor,
                 theme,
                 imageUploader,

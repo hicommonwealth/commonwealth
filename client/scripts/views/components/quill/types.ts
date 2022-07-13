@@ -26,3 +26,11 @@ export type QuillDelta = {
 };
 
 export type QuillTextContents = string | QuillDelta;
+
+// Quill modules
+
+export type QuillMention = {
+  name: string;
+  link: string;
+  component: string;
+};
