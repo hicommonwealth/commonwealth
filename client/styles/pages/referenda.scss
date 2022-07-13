@@ -1,8 +1,6 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ReferendaPage {
   flex: 1;
   padding: 24px;
-
-  @include gov-explainer;
 }

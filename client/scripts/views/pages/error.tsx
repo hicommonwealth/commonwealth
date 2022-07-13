@@ -10,8 +10,6 @@ import Sublayout from 'views/sublayout';
 type ErrorPageAttrs = { title?: any; message?: string };
 
 class ErrorPage implements m.ClassComponent<ErrorPageAttrs> {
-  oncreate() {}
-
   view(vnode) {
     const { message, title } = vnode.attrs;
 

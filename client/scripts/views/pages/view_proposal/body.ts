@@ -21,7 +21,6 @@ import {
   AddressInfo,
 } from 'models';
 
-import jumpHighlightComment from 'views/pages/view_proposal/jump_to_comment';
 import User, { AnonymousUser } from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
@@ -46,6 +45,7 @@ import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { jumpHighlightComment } from './helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
