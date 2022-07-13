@@ -116,6 +116,31 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
     }
   }
 
+  private async _confirmRemoveFormatting() {
+    let confirmed = false;
+
+    // If contents pre- and post-formatting are identical, then nothing will be lost,
+    // and there's no reason to confirm the switch.
+    this._defaultContents = this.editor.getContents() as QuillDelta;
+    this.editor.removeFormat(0, this.editor.getText().length - 1);
+    if (
+      this.editor.getContents().ops.length === this._defaultContents.ops.length
+    ) {
+      confirmed = true;
+    } else {
+      confirmed = await confirmationModalWithText(
+        'All formatting and images will be lost. Continue?'
+      )();
+    }
+
+    if (!confirmed) {
+      // Restore formatted contents
+      this.editor.setContents(this._defaultContents);
+      this.editor.setSelection(this.editor.getText().length - 1);
+    }
+    return confirmed;
+  }
+
   // LIFECYCLE HELPERS
 
   oncreate(vnode) {
@@ -150,6 +175,7 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
       oncreateBind,
     } = vnode.attrs;
 
+    // TODO: Sync up SCSS classes to new activeMode schema
     const editorClass = getClasses<{ mode: string; className?: string }>(
       { mode: this._activeMode, className },
       'QuillEditor'
@@ -221,29 +247,8 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
             title="Switch to markdown mode"
             onclick={async (e) => {
               // Confirm before removing formatting and switching to Markdown mode.
-              let confirmed = false;
-
-              // If contents pre- and post-formatting are identical, then nothing will be lost,
-              // and there's no reason to confirm the switch.
-              this._defaultContents = this.editor.getContents() as QuillDelta;
-              this.editor.removeFormat(0, this.editor.getText().length - 1);
-              if (
-                this.editor.getContents().ops.length ===
-                this._defaultContents.ops.length
-              ) {
-                confirmed = true;
-              } else {
-                confirmed = await confirmationModalWithText(
-                  'All formatting and images will be lost. Continue?'
-                )();
-              }
-
-              if (!confirmed) {
-                // Restore formatted contents
-                this.editor.setContents(this._defaultContents);
-                this.editor.setSelection(this.editor.getText().length - 1);
-                return;
-              }
+              const confirmed = await this._confirmRemoveFormatting();
+              if (!confirmed) return;
 
               // Remove formatting, switch to Markdown.
               this.editor.removeFormat(0, this.editor.getText().length - 1);
