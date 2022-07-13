@@ -191,7 +191,6 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
                 m.redraw();
               }}
               editorNamespace="new-discussion"
-              imageUploader
               tabindex={3}
             />
           )}

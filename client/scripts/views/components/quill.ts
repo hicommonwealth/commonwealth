@@ -1,5 +1,7 @@
 // TODO: https://stackoverflow.com/questions/2156129/is-there-a-standard-way-to-organize-methods-within-a-class/2156179
 
+import { QuillEditor } from './quill/quill_editor';
+
 // DOCUMENTATION
 // Standard usage flow:
 // Create a new Quill object, and assign it to a state variable for reuse
@@ -9,8 +11,8 @@
 //    3. Use the textContents getter to grab form data.
 //    4. Re-enable the editor if it will be reused on the page.
 
-export default class Quill {
-  private readonly _editorState;
+export default class QuillEditorState {
+  private readonly _editorState: QuillEditor;
 
   public get outerEditor() {
     return this._editorState.editor;
@@ -21,7 +23,7 @@ export default class Quill {
   }
 
   public get markdownMode() {
-    return this._editorState.markdownMode;
+    return this._editorState.activeMode === 'markdown';
   }
 
   public get textContents() {
@@ -30,7 +32,7 @@ export default class Quill {
       : JSON.stringify(this.outerEditor.getContents());
   }
 
-  constructor(quillEditorState: any) {
+  constructor(quillEditorState: QuillEditor) {
     this._editorState = quillEditorState;
   }
 

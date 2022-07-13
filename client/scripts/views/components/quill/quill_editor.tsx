@@ -6,13 +6,18 @@ import $ from 'jquery';
 import 'components/quill/quill_editor.scss';
 
 import app from 'state';
-import SettingsController from 'controllers/app/settings';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
 import { instantiateEditor } from './instantiate_editor_helper';
 import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
+import {
+  QuillTextContents,
+  QuillActiveMode,
+  QuillMode,
+  QuillDelta,
+} from './types';
 
 // Rich text and Markdown editor.
 //
@@ -24,8 +29,6 @@ import { CWText } from '../component_kit/cw_text';
 // `formats` and the rich text toolbar (there doesn't appear to be a
 // way to unregister formats once the editor has been initialized)
 
-// Modified quill-auto-links for proper behavior with Markdown and pasting.
-
 type QuillEditorAttrs = {
   className?: string;
   contentsDoc?;
@@ -34,21 +37,86 @@ type QuillEditorAttrs = {
   oncreateBind;
   onkeyboardSubmit?;
   placeholder?: string;
-  tabindex?: number;
+  tabIndex?: number;
   theme?: string;
 };
 
+// TODO:
+// - Modularize
+// - Fix image blots, Twitter blots if broken
+// - Convert generic HTML tags to CWText components
+
 export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
+  private _loaded: boolean;
+  private _defaultContents: QuillTextContents;
+  private _$editor: JQuery<HTMLElement>;
+  private _activeMode: QuillActiveMode;
+
+  public get activeMode() {
+    return this._activeMode;
+  }
+  public set activeMode(mode: QuillActiveMode) {
+    this._activeMode = mode;
+  }
+
   // which are private?
   editor;
-  markdownMode;
   uploading?: boolean;
+  enableSubmission: boolean;
+
   // for localStorage drafts:
   alteredText: boolean;
+
+  // Unsaved content alerts
   beforeunloadHandler;
   clearUnsavedChanges;
-  enableSubmission: boolean;
   unsavedChanges;
+
+  loadSavedState(
+    contentsDoc?: string,
+    editorNamespace?: string,
+    mode?: QuillMode
+  ) {
+    const storedDoc: string = localStorage.getItem(
+      `${app.activeChainId()}-${editorNamespace}-storedText`
+    );
+    const storedMode = localStorage.getItem(
+      `${editorNamespace}-_activeMode`
+    ) as QuillActiveMode;
+
+    if (contentsDoc) {
+      // better logic for guessing and parsing, e.g. based on string includes 'op:'
+      try {
+        this._defaultContents = JSON.parse(contentsDoc);
+      } catch (e) {
+        this._defaultContents = contentsDoc;
+      }
+    } else if (storedDoc) {
+      // better logic for guessing and parsing
+      try {
+        this._defaultContents = JSON.parse(storedDoc);
+        this._activeMode = 'richText';
+      } catch (e) {
+        contentsDoc = localStorage.getItem(
+          `${app.activeChainId()}-${editorNamespace}-storedText`
+        );
+        this._activeMode = 'markdown';
+      }
+    }
+
+    if (mode === 'hybrid') {
+      if (storedMode === 'markdown') {
+        this._activeMode = 'markdown';
+      } else if (storedMode === 'richText') {
+        this._activeMode = 'richText';
+      } else {
+        // Otherwise, set this._activeMode based on the app setting
+        this._activeMode = app.user?.disableRichText ? 'markdown' : 'richText';
+      }
+    }
+  }
+
+  // LIFECYCLE HELPERS
 
   oncreate(vnode) {
     // Only bind the alert if we are actually trying to persist the user's changes
@@ -73,233 +141,125 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
 
     const {
       className,
+      contentsDoc,
       editorNamespace,
       imageUploader,
       onkeyboardSubmit,
       placeholder,
-      tabindex,
+      tabIndex,
+      oncreateBind,
     } = vnode.attrs;
 
-    const oncreateBind = vnode.attrs.oncreateBind || (() => null);
+    const editorClass = getClasses<{ mode: string; className?: string }>(
+      { mode: this._activeMode, className },
+      'QuillEditor'
+    );
 
-    // If this component is running for the first time, and the parent has not provided contentsDoc,
-    // try to load it from the drafts and also set markdownMode appropriately
-    let contentsDoc = vnode.attrs.contentsDoc;
-
-    if (
-      !contentsDoc &&
-      !this.markdownMode &&
-      localStorage.getItem(
-        `${app.activeChainId()}-${editorNamespace}-storedText`
-      ) !== null
-    ) {
-      try {
-        contentsDoc = JSON.parse(
-          localStorage.getItem(
-            `${app.activeChainId()}-${editorNamespace}-storedText`
-          )
-        );
-        if (!contentsDoc.ops) throw new Error();
-        this.markdownMode = false;
-      } catch (e) {
-        contentsDoc = localStorage.getItem(
-          `${app.activeChainId()}-${editorNamespace}-storedText`
-        );
-        this.markdownMode = true;
-      }
-    } else if (this.markdownMode === undefined) {
-      try {
-        contentsDoc = JSON.parse(contentsDoc);
-      } catch (e) {
-        console.log('Could not parse contents doc');
-      }
-      if (localStorage.getItem(`${editorNamespace}-markdownMode`) === 'true') {
-        this.markdownMode = true;
-      } else if (
-        localStorage.getItem(`${editorNamespace}-markdownMode`) === 'false'
-      ) {
-        this.markdownMode = false;
-      } else {
-        // Otherwise, just set this.markdownMode based on the app setting
-        this.markdownMode = !!app.user?.disableRichText;
-      }
-    }
-
-    // Set this.clearUnsavedChanges on first initialization
-    if (this.clearUnsavedChanges === undefined) {
+    if (!this._loaded) {
+      this.loadSavedState(contentsDoc, editorNamespace);
       this.clearUnsavedChanges = () => {
-        localStorage.removeItem(`${editorNamespace}-markdownMode`);
-        localStorage.removeItem(
-          `${app.activeChainId()}-${editorNamespace}-storedText`
-        );
-        localStorage.removeItem(
-          `${app.activeChainId()}-${editorNamespace}-storedTitle`
-        );
-        if (
-          localStorage.getItem(`${app.activeChainId()}-post-type`) === 'Link'
-        ) {
-          localStorage.removeItem(`${app.activeChainId()}-new-link-storedLink`);
-        }
-        localStorage.removeItem(`${app.activeChainId()}-post-type`);
+        Object.keys(localStorage)
+          .filter((key) => key.includes(editorNamespace))
+          .forEach((key) => {
+            localStorage.removeItem(key);
+          });
       };
+      this._loaded = true;
     }
+
     return (
       <div
-        class={getClasses<{ markdownMode?: boolean; className?: string }>(
-          { className, markdownMode: !!this.markdownMode },
-          'QuillEditor'
-        )}
+        class={editorClass}
         oncreate={(childVnode) => {
-          const $editor = $(childVnode.dom).find('.quill-editor');
-
+          this._$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = instantiateEditor(
-            $editor,
+            this._$editor,
             theme,
-            true,
             imageUploader,
             placeholder,
             editorNamespace,
             this,
-            onkeyboardSubmit
+            onkeyboardSubmit,
+            this._defaultContents,
+            tabIndex
           );
-
-          // once editor is instantiated, it can be updated with a tabindex
-          $(childVnode.dom).find('.ql-editor').attr('tabindex', tabindex);
-
-          if (contentsDoc && typeof contentsDoc === 'string') {
-            this.editor.setText(contentsDoc);
-            this.markdownMode = true;
-          } else if (contentsDoc && typeof contentsDoc === 'object') {
-            this.editor.setContents(contentsDoc);
-            this.markdownMode = false;
-          }
-
-          oncreateBind(this);
+          if (oncreateBind) oncreateBind(this);
         }}
       >
         <div class="quill-editor" />
-        {theme !== 'bubble' && this.markdownMode ? (
+        {this._activeMode === 'markdown' && (
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to Rich Text mode"
             onclick={(e) => {
-              const cachedContents = this.editor.getContents();
-
-              // switch editor to rich text
-              this.markdownMode = false;
-
-              const $editor = $(e.target)
-                .closest('.QuillEditor')
-                .find('.quill-editor');
-
-              this.editor.container.tabIndex = tabindex;
-
+              this._defaultContents = this.editor.getContents();
+              this._activeMode = 'richText';
               this.editor = instantiateEditor(
-                $editor,
+                this._$editor,
                 theme,
-                true,
                 imageUploader,
                 placeholder,
                 editorNamespace,
                 this,
-                onkeyboardSubmit
+                onkeyboardSubmit,
+                this._defaultContents,
+                tabIndex
               );
-
-              // once editor is instantiated, it can be updated with a tabindex
-              $(e.target)
-                .closest('.QuillEditor')
-                .find('.ql-editor')
-                .attr('tabindex', tabindex);
-
-              this.editor.setContents(cachedContents);
-
-              this.editor.setSelection(this.editor.getText().length - 1);
-
-              this.editor.focus();
-
-              // try to save setting
-              if (app.isLoggedIn()) {
-                SettingsController.disableRichText(false);
-              }
             }}
           >
             R
           </CWText>
-        ) : (
+        )}
+        ,
+        {this._activeMode === 'richText' && (
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to markdown mode"
             onclick={async (e) => {
-              // confirm before removing formatting and switching to markdown mode
-              // first, we check if removeFormat() actually does anything; then we ask the user to confirm
+              // Confirm before removing formatting and switching to Markdown mode.
               let confirmed = false;
 
-              let cachedContents = this.editor.getContents();
-
+              // If contents pre- and post-formatting are identical, then nothing will be lost,
+              // and there's no reason to confirm the switch.
+              this._defaultContents = this.editor.getContents() as QuillDelta;
               this.editor.removeFormat(0, this.editor.getText().length - 1);
-
               if (
                 this.editor.getContents().ops.length ===
-                cachedContents.ops.length
+                this._defaultContents.ops.length
               ) {
                 confirmed = true;
               } else {
-                this.editor.setContents(cachedContents);
-                this.editor.setSelection(this.editor.getText().length - 1);
-              }
-
-              if (!confirmed) {
                 confirmed = await confirmationModalWithText(
                   'All formatting and images will be lost. Continue?'
                 )();
               }
 
-              if (!confirmed) return;
+              if (!confirmed) {
+                // Restore formatted contents
+                this.editor.setContents(this._defaultContents);
+                this.editor.setSelection(this.editor.getText().length - 1);
+                return;
+              }
 
-              // remove formatting, switch editor to markdown
+              // Remove formatting, switch to Markdown.
               this.editor.removeFormat(0, this.editor.getText().length - 1);
-
-              cachedContents = this.editor.getContents();
-
-              this.markdownMode = true;
-
-              const $editor = $(e.target)
-                .closest('.QuillEditor')
-                .find('.quill-editor');
+              this._defaultContents = this.editor.getContents();
+              this._activeMode = 'markdown';
 
               this.editor = instantiateEditor(
-                $editor,
+                this._$editor,
                 theme,
-                true,
                 imageUploader,
                 placeholder,
                 editorNamespace,
                 this,
-                onkeyboardSubmit
+                onkeyboardSubmit,
+                this._defaultContents
               );
-
-              // once editor is instantiated, it can be updated with a tabindex
-              $(e.target)
-                .closest('.QuillEditor')
-                .find('.ql-editor')
-                .attr('tabindex', tabindex);
-
-              this.editor.container.tabIndex = tabindex;
-
-              this.editor.setContents(cachedContents);
-
-              this.editor.setSelection(this.editor.getText().length - 1);
-
-              this.editor.focus();
-
-              // try to save setting
-              if (app.isLoggedIn()) {
-                SettingsController.disableRichText(true);
-              }
             }}
           >
             M
@@ -314,9 +274,10 @@ export class QuillEditor implements m.ClassComponent<QuillEditorAttrs> {
             app.modals.create({
               modal: PreviewModal,
               data: {
-                doc: this.markdownMode
-                  ? this.editor.getText()
-                  : JSON.stringify(this.editor.getContents()),
+                doc:
+                  this._activeMode === 'markdown'
+                    ? this.editor.getText()
+                    : JSON.stringify(this.editor.getContents()),
               },
             });
           }}

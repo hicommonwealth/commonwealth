@@ -25,21 +25,16 @@ import { detectURL } from 'helpers/threads';
 import { OffchainTopic, OffchainThreadKind, OffchainThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { QuillEditor } from 'views/components/quill/quill_editor';
-import { TopicSelector } from 'views/components/topic_selector';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
-
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
+import { confirmationModalWithText } from '../modals/confirm_modal';
+import { EditProfileModal } from '../modals/edit_profile_modal';
+import { TopicSelector } from './topic_selector';
+
+import { QuillEditor } from './quill/quill_editor';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import {
-  disableEditor,
-  editorIsBlank,
-  getQuillTextContents,
-} from './quill/helpers';
 
 interface IThreadForm {
   topicName?: string;
@@ -66,7 +61,11 @@ enum NewDraftErrors {
 }
 
 const saveDraft = async (form, quillEditorState, author, existingDraft?) => {
-  const bodyText = getQuillTextContents(quillEditorState);
+  const bodyText = !quillEditorState
+    ? ''
+    : quillEditorState.markdownMode
+    ? quillEditorState.editor.getText()
+    : JSON.stringify(quillEditorState.editor.getContents());
   const { threadTitle, topicName } = form;
   if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
     throw new Error(NewDraftErrors.InsufficientData);
@@ -127,13 +126,24 @@ const newThread = async (
   if (!form.topicName && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
-  if (kind === OffchainThreadKind.Forum && editorIsBlank(quillEditorState)) {
+  if (
+    kind === OffchainThreadKind.Forum &&
+    quillEditorState.editor.editor.isBlank()
+  ) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  disableEditor(quillEditorState, document);
+  quillEditorState.editor.enable(false);
 
-  const bodyText = getQuillTextContents(quillEditorState);
+  const mentionsEle = document.getElementsByClassName(
+    'ql-mention-list-container'
+  )[0];
+  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
+  const bodyText = !quillEditorState
+    ? ''
+    : quillEditorState.markdownMode
+    ? quillEditorState.editor.getText()
+    : JSON.stringify(quillEditorState.editor.getContents());
 
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;

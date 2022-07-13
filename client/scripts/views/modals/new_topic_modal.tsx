@@ -162,7 +162,6 @@ export class NewTopicModal implements m.ClassComponent {
                 this.quillEditorState = state;
               }}
               editorNamespace="new-discussion"
-              imageUploader
               tabindex={3}
             />
           )}

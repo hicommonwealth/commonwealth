@@ -20,12 +20,6 @@ import {
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { QuillEditor } from '../../components/quill/quill_editor';
-import {
-  disableEditor,
-  editorIsBlank,
-  enableEditor,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
 import Quill from '../../components/quill';
 
 type ChainMetadataRowsAttrs = {

@@ -14,6 +14,7 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
+import { QuillTextContents } from './types';
 
 const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
 const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
@@ -27,12 +28,13 @@ const sliceFromLastWhitespace = (str) => {
 export const instantiateEditor = (
   $editor: any,
   theme: string,
-  hasFormats = true,
-  imageUploader = true,
+  imageUploader = false,
   placeholder: string,
   editorNamespace: string,
   state: any,
-  onkeyboardSubmit: () => void
+  onkeyboardSubmit: () => void,
+  defaultContents?: QuillTextContents,
+  tabIndex?: number
 ) => {
   const Delta = Quill.import('delta');
   const Keyboard = Quill.import('modules/keyboard');
@@ -651,13 +653,11 @@ export const instantiateEditor = (
   quill = new Quill($editor[0], {
     debug: 'error',
     modules: {
-      toolbar: hasFormats
-        ? ([[{ header: 1 }, { header: 2 }]] as any).concat([
-            ['bold', 'italic', 'strike'],
-            ['link', 'code-block', 'blockquote'],
-            [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-          ])
-        : false,
+      toolbar: ([[{ header: 1 }, { header: 2 }]] as any).concat([
+        ['bold', 'italic', 'strike'],
+        ['link', 'code-block', 'blockquote'],
+        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+      ]),
       imageDropAndPaste: {
         handler: imageHandler,
       },
@@ -701,22 +701,20 @@ export const instantiateEditor = (
       },
     },
     placeholder,
-    formats: hasFormats
-      ? [
-          'bold',
-          'italic',
-          'strike',
-          'code',
-          'link',
-          'blockquote',
-          'code-block',
-          'header',
-          'list',
-          'twitter',
-          'video',
-          'mention',
-        ]
-      : [],
+    formats: [
+      'bold',
+      'italic',
+      'strike',
+      'code',
+      'link',
+      'blockquote',
+      'code-block',
+      'header',
+      'list',
+      'twitter',
+      'video',
+      'mention',
+    ],
     theme,
   });
 
@@ -920,6 +918,15 @@ export const instantiateEditor = (
       });
     });
 
+  // Set tab index
+  if (tabIndex) {
+    quill.container.tabIndex = tabIndex;
+    $editor
+      .closest('.QuillEditor')
+      .find('.ql-editor')
+      .attr('tabindex', tabIndex);
+  }
+
   // Save editor content in localStorage
   state.unsavedChanges = new Delta();
   quill.on('text-change', (delta, oldDelta, source) => {
@@ -940,6 +947,18 @@ export const instantiateEditor = (
       m.redraw();
     }
   });
+
+  if (defaultContents && typeof defaultContents === 'string') {
+    quill.setText(defaultContents);
+    // TODO: Conciliate
+    quill.activeMode = 'markdown';
+  } else if (defaultContents && typeof defaultContents === 'object') {
+    quill.setContents(defaultContents);
+    quill.activeMode = 'richText';
+  }
+
+  quill.setSelection(quill.getText().length - 1);
+  quill.focus();
 
   setInterval(() => {
     if (state.unsavedChanges.length() > 0) {
