@@ -372,11 +372,15 @@ export const isCommandClick = (e: MouseEvent) => {
 export const handleRedirectClicks = (
   e: MouseEvent,
   redirectLink: string,
-  activeChainId: string,
+  activeChainId: string | null,
   callback: () => any
 ) => {
   if (isCommandClick(e)) {
-    window.open(`/${activeChainId}`.concat(redirectLink), '_blank');
+    if (activeChainId) {
+      window.open(`/${activeChainId}`.concat(redirectLink), '_blank');
+    } else {
+      window.open(redirectLink, '_blank');
+    }
     return;
   }
 
