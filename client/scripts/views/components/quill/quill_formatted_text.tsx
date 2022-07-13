@@ -9,14 +9,14 @@ import 'components/quill/quill_formatted_text.scss';
 // import { loadScript } from 'helpers';
 import { renderQuillDelta } from './render_quill_delta';
 import { getClasses } from '../component_kit/helpers';
-import { CWButton } from '../component_kit/cw_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { countLinesQuill } from './helpers';
 
 export type QuillTextParams = {
   collapse?: boolean;
-  cutoffLines?: number;
   hideFormatting?: boolean;
-  openLinkInNewTab?: boolean;
+  cutoffLines?: number;
+  openLinksInNewTab?: boolean;
   searchTerm?: string;
 };
 
@@ -45,10 +45,12 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
+
   onbeforeupdate(vnode) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
+
     if (this.isTruncated) {
       this.truncatedDoc = {
         ops: [...vnode.attrs.doc.ops.slice(0, vnode.attrs.cutoffLines)],
@@ -57,6 +59,7 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
+
   view(vnode) {
     const {
       doc,
@@ -106,9 +109,7 @@ export class QuillFormattedText
         this.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
-
             const subString = textToHighlight.substr(start, end - start);
-
             let text = smartTruncate(
               subString,
               chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
@@ -120,16 +121,13 @@ export class QuillFormattedText
                 ? {}
                 : { position: middle }
             );
-
             if (subString[subString.length - 1] === ' ') {
               text += ' ';
             }
-
             if (subString[0] === ' ') {
               text = ` ${text}`;
             }
-
-            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
+            return highlight ? m('mark', text) : m('span', text);
           }
         );
       }
@@ -149,30 +147,24 @@ export class QuillFormattedText
         <div
           class={getClasses<{ collapsed?: boolean }>({}, 'QuillFormattedText')}
           oncreate={() => {
-            // Gabe 7/11/22: I commented this out after converting the file to TSX because now these lines
-            // show a weird error (uncomment to see)
             // if (!(<any>window).twttr) {
             //   loadScript('//platform.twitter.com/widgets.js').then(() => {
             //     console.log('Twitter Widgets loaded');
             //   })
           }}
         >
-          <div class="formatted-body">
-            {renderQuillDelta(
-              this.truncatedDoc,
-              hideFormatting,
-              collapse,
-              openLinksInNewTab
-            )}
-          </div>
+          {renderQuillDelta(
+            this.truncatedDoc,
+            hideFormatting,
+            collapse,
+            openLinksInNewTab
+          )}
           {this.isTruncated && (
             <div class="show-more-button-wrapper">
-              <CWButton
-                iconName="plus"
-                onclick={toggleDisplay}
-                label="Show More"
-                buttonType="tertiary-blue"
-              />
+              <div class="show-more-button" onclick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div class="show-more-text">Show More</div>
+              </div>
             </div>
           )}
         </div>

@@ -25,6 +25,8 @@ export class SublayoutBanners
   view(vnode) {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
+    console.log(banner);
+
     return (
       <>
         {banner && bannerStatus !== 'off' && (

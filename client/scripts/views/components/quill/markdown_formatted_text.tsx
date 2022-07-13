@@ -176,7 +176,7 @@ export class MarkdownFormattedText
       const results = m.trust(sanitized);
 
       return (
-        <div class=".show-more-wrap">
+        <div class="show-more-wrap">
           <div
             class={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
@@ -185,13 +185,14 @@ export class MarkdownFormattedText
           >
             {results}
           </div>
-          {this.isTruncated &&
-            m('.show-more-button-wrapper', [
-              m('.show-more-button', { onclick: toggleDisplay }, [
-                m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                m('.show-more-text', ['Show More']),
-              ]),
-            ])}
+          {this.isTruncated && (
+            <div class="show-more-button-wrapper">
+              <div class="show-more-button" onclick={toggleDisplay}>
+                <CWIcon iconName="plus" iconSize="small" />
+                <div class="show-more-text">Show More</div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }

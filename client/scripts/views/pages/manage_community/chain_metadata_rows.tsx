@@ -19,20 +19,12 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { QuillEditor } from '../../components/quill/quill_editor';
-import {
-  disableEditor,
-  editorIsBlank,
-  enableEditor,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
   chain?: ChainInfo;
   mods: any;
   onRoleUpdate: (oldRole: string, newRole: string) => void;
-  onSave: () => void;
 };
 
 export class ChainMetadataRows
@@ -61,8 +53,6 @@ export class ChainMetadataRows
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
-  bannerEditorState: any;
-  bannerStateUpdated: boolean;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -202,7 +192,7 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.customDomain = v;
           }}
-          disabled // Custom domains should be admin configurable only
+          disabled={true} // Custom domains should be admin configurable only
         />
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
@@ -232,16 +222,17 @@ export class ChainMetadataRows
             this.terms = v;
           }}
         />
-        <CWLabel label="Community Banner" />
-        <QuillEditor
-          className="chain-metadata-quill-editor"
-          // Prevent the editor from being filled in with previous content
-          contentsDoc={this.communityBanner || ''}
-          oncreateBind={(state) => {
-            this.bannerEditorState = state;
+        <InputRow
+          title="Banner"
+          name="Banner Text"
+          label="Banner"
+          maxlength={512}
+          textarea
+          placeholder="Text for across the top of your community"
+          defaultValue={this.communityBanner}
+          onChangeHandler={(v) => {
+            this.communityBanner = v;
           }}
-          tabindex={1}
-          editorNamespace="new-banner"
         />
         <div class="tag-row">
           <CWLabel label="Community Tags" />
@@ -305,23 +296,6 @@ export class ChainMetadataRows
                 }
               }
             }
-            // Handle quill editor
-            const { bannerEditorState } = this;
-            const blankEditor = editorIsBlank(bannerEditorState);
-            if (bannerEditorState) {
-              disableEditor(bannerEditorState);
-              if (blankEditor) {
-                this.communityBanner = null;
-              } else {
-                const newCommunityBanner =
-                  getQuillTextContents(bannerEditorState);
-                if (newCommunityBanner !== this.communityBanner) {
-                  this.communityBanner = newCommunityBanner;
-                  this.bannerStateUpdated = true;
-                }
-              }
-            }
-
             // Update ChainCategories
             try {
               for (const category of Object.keys(this.selectedTags)) {
@@ -335,21 +309,14 @@ export class ChainMetadataRows
               console.log(err);
             }
             try {
+              // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
                 chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
               }).then(() => {
-                if (blankEditor) {
-                  app.chain.meta.setBanner(null);
-                } else {
-                  app.chain.meta.setBanner(this.communityBanner);
-                }
-
-                if (this.bannerStateUpdated) {
-                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
-                }
+                app.chain.meta.setBanner(this.communityBanner);
               });
             } catch (err) {
               console.log(err);
@@ -372,15 +339,10 @@ export class ChainMetadataRows
                 iconUrl,
                 defaultSummaryView,
               });
-              vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
-
-            m.redraw();
-            // Re-enable editor, as the user remains on the same form page
-            enableEditor(bannerEditorState);
           }}
         />
       </div>

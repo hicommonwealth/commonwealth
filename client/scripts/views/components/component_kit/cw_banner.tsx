@@ -45,9 +45,7 @@ export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
           ComponentType.MessageBanner
         )}
       >
-        {renderQuillTextBody(bannerContent, {
-          cutoffLines: 5,
-        })}
+        <CWText type="b2">{bannerContent}</CWText>
         {onClose && (
           <CWIconButton
             iconName="close"

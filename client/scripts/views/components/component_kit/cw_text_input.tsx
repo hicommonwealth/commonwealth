@@ -20,6 +20,7 @@ export type TextInputAttrs = {
   iconRight?: string;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
+  maxlength?: number;
   name: string;
   oninput?: (e) => void;
   placeholder?: string;
@@ -55,6 +56,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       inputClassName,
       inputValidationFn,
       label,
+      maxlength,
       name,
       oninput,
       placeholder,
@@ -90,6 +92,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             })}
             disabled={disabled}
             tabindex={tabindex}
+            maxlength={maxlength}
             name={name}
             placeholder={placeholder}
             oninput={(e) => {

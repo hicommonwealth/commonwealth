@@ -121,7 +121,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     };
 
     const messageToText = (msg: any) => {
-      renderQuillTextBody(msg.message, { openLinkInNewTab: true });
+      renderQuillTextBody(msg.message, { openLinksInNewTab: true });
     };
 
     const messageIsHighlighted = (message: any): boolean => {

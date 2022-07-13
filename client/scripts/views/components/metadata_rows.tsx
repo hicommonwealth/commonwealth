@@ -10,6 +10,7 @@ import { CWTextArea } from './component_kit/cw_text_area';
 type InputRowAttrs = {
   defaultValue: string;
   disabled?: boolean;
+  maxlength?: number;
   onChangeHandler: (e) => void;
   placeholder?: string;
   textarea?: boolean;
@@ -22,6 +23,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
     const {
       defaultValue,
       disabled,
+      maxlength,
       onChangeHandler,
       placeholder,
       textarea,
@@ -36,6 +38,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             defaultValue={defaultValue}
             placeholder={placeholder}
             disabled={disabled || false}
+            maxlength={maxlength}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
@@ -45,6 +48,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             label={title}
             defaultValue={defaultValue}
             placeholder={placeholder}
+            maxlength={maxlength}
             disabled={disabled || false}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
