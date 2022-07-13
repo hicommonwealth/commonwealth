@@ -264,7 +264,7 @@ const finishSsoLogin = async (
         profile = user.Profiles[0];
       } else {
         user = reqUser;
-        profile = await models.Profile.findOne({ where: { user_id: user.id } });
+        profile = await models.Profile.findOne({ where: { user_id: user.id }, transaction: t });
       }
 
       // create new address
