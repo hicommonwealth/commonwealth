@@ -1,6 +1,8 @@
 {
   "private": true,
   "scripts": {
+    "postinstall": "if [ $CW_ENV ]; then npm run postinstall-cw; else echo no environment detected, please set CW_ENV; fi",
+    "postinstall-cw": "cd packages/commonwealth && yarn && yarn build"
   },
   "engines": {
     "node": "14.x"
