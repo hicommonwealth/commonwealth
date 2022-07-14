@@ -1,9 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "heroku-postbuild": "tsc --project packages/commonwealth/server/tsconfig.json",
     "start": "yarn --cwd packages/commonwealth start",
-    "build": "yarn --cwd packages/commonwealth build"
+    "build": "yarn --cwd packages/commonwealth heroku-postbuild"
   },
   "engines": {
     "node": "14.x"
