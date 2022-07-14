@@ -46,20 +46,6 @@ export class QuillFormattedText
     }
   }
 
-  onbeforeupdate(vnode) {
-    this.isTruncated =
-      vnode.attrs.cutoffLines &&
-      vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
-
-    if (this.isTruncated) {
-      this.truncatedDoc = {
-        ops: [...vnode.attrs.doc.ops.slice(0, vnode.attrs.cutoffLines)],
-      };
-    } else {
-      this.truncatedDoc = vnode.attrs.doc;
-    }
-  }
-
   view(vnode) {
     const {
       doc,
@@ -71,6 +57,7 @@ export class QuillFormattedText
     } = vnode.attrs;
 
     const toggleDisplay = () => {
+      console.log('clicky');
       this.isTruncated = !this.isTruncated;
 
       if (this.isTruncated) {
