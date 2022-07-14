@@ -37,6 +37,7 @@ type TextAttrs = {
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
+  isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
   title?: string;
   type: FontType;
@@ -50,6 +51,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
     const {
       className,
       disabled = false,
+      isCentered,
       fontStyle,
       noWrap = false,
       title,
@@ -66,6 +68,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
             disabled,
             fontStyle,
             noWrap,
+            isCentered,
             className,
           },
           ComponentType.Text

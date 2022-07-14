@@ -10,12 +10,9 @@ import { link } from 'helpers';
 import { ChainInfo } from 'models';
 import { ChainIcon } from 'views/components/chain_icon';
 import { CommunitySelector } from 'views/components/sidebar/community_selector';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-} from 'analytics/types';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 type SidebarQuickSwitcherItemAttrs = {
   item: ChainInfo;
@@ -45,7 +42,8 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     const allCommunities = app.config.chains
       .getAll()
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) => !!item.node // only chains with nodes
+      .filter(
+        (item) => !!item.node // only chains with nodes
       );
 
     const starredCommunities = allCommunities.filter((item) => {

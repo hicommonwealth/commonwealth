@@ -207,3 +207,60 @@
     @include disabled;
   }
 }
+
+@mixin primaryBlueDark {
+  background-color: $primary-500;
+  box-shadow: $elevation-1;
+
+  @include iconAndText($white);
+
+  &:hover {
+    background-color: $primary-300;
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: $primary-200;
+    box-shadow: none;
+
+    @include iconAndText($primary-300);
+  }
+
+  &.disabled {
+    background-color: $neutral-700;
+    box-shadow: none;
+    pointer-events: none;
+
+    @include iconAndText($neutral-500);
+  }
+}
+
+@mixin secondaryBlueDark {
+  background-color: transparent;
+  border-color: $primary-200;
+
+  @include iconAndText($primary-200);
+
+  &:hover {
+    background-color: $primary-50;
+    border-color: $primary-300;
+
+    @include iconAndText($primary-300);
+  }
+
+  &:active {
+    background-color: $primary-100;
+    border-color: $primary-200;
+
+    @include iconAndText($primary-200);
+  }
+
+  &.disabled {
+    background-color: transparent;
+    border-color: $neutral-600;
+    box-shadow: none;
+    pointer-events: none;
+
+    @include iconAndText($neutral-600);
+  }
+}

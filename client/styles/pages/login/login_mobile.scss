@@ -1,0 +1,200 @@
+@import 'shared';
+
+@mixin innerBodyStyles {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+
+  @include extraSmall {
+    gap: 24px;
+  }
+
+  .account-creation-buttons-row {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .inner-body-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+
+    .inner-inner-body-container {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 48px;
+
+      @include extraSmall {
+        width: 100%;
+      }
+
+      .inner-body-text.Text {
+        color: $white;
+        margin: 8px;
+      }
+    }
+
+    .AvatarUsernameInput {
+      margin-bottom: 48px;
+
+      @include extraSmall {
+        margin-bottom: 16px;
+      }
+    }
+
+    .connect-with-email-input.TextInput {
+      width: 320px;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+  }
+}
+
+.LoginMobile {
+  @include mediumSmall {
+    background-image: url('/static/img/login-background-mediumsmall.png');
+  }
+
+  @include small {
+    background-image: url('/static/img/login-background-small.png');
+  }
+
+  @include extraSmall {
+    background-image: url('/static/img/login-background-extrasmall.png');
+  }
+
+  align-items: center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  overflow-y: auto;
+  padding: 24px;
+  width: 100%;
+
+  .ModalExitButton {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  .walletList {
+    margin-bottom: 120px;
+    margin-top: 224px;
+    width: 368px;
+
+    @include innerBodyStyles;
+
+    .AvatarUsernameInput {
+      margin-bottom: 16px;
+    }
+
+    @include extraSmall {
+      margin-top: 24px;
+      width: 100%;
+    }
+  }
+
+  .selectAccountType {
+    margin-top: 144px;
+    width: 328px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 40px;
+      width: 100%;
+    }
+  }
+
+  .selectPrevious {
+    margin-top: 120px;
+    width: 368px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 8px;
+      width: 100%;
+    }
+  }
+
+  .welcome {
+    margin-top: 120px;
+    width: 392px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 8px;
+      width: 100%;
+    }
+  }
+
+  .connectWithEmail {
+    width: 368px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      width: 100%;
+    }
+  }
+
+  .selectProfile {
+    margin-top: 256px;
+    width: 440px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 16px;
+      width: 100%;
+
+      .Address {
+        width: 100%;
+      }
+    }
+  }
+
+  .ethWalletList {
+    width: 408px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 16px;
+      width: 100%;
+    }
+  }
+
+  .allSet {
+    margin-top: 264px;
+    width: 440px;
+
+    @include innerBodyStyles;
+
+    @include extraSmall {
+      margin-top: 80px;
+      width: 100%;
+
+      .Address {
+        width: 100%;
+      }
+
+      .ProfileRow {
+        width: 100%;
+      }
+    }
+  }
+}
