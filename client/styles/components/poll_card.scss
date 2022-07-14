@@ -1,1 +1,28 @@
 @import 'shared';
+
+.PollCard {
+  .poll-title-section {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    height: 56px;
+    width: 100%;
+    border-bottom: 1px solid #e6e5e7;
+
+    .title {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+
+      color: $neutral-800;
+    }
+  }
+}
+
+.Card {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
