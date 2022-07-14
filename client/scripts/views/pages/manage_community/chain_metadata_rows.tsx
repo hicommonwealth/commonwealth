@@ -55,6 +55,8 @@ export class ChainMetadataRows
   communityBanner: string;
 
   oninit(vnode) {
+    console.log(vnode.attrs.chain);
+
     this.name = vnode.attrs.chain.name;
     this.description = vnode.attrs.chain.description;
     this.website = vnode.attrs.chain.website;
@@ -288,6 +290,7 @@ export class ChainMetadataRows
               iconUrl,
               defaultSummaryView,
             } = this;
+
             for (const space of snapshot) {
               if (space !== '') {
                 if (space.slice(space.length - 4) !== '.eth') {
@@ -296,6 +299,7 @@ export class ChainMetadataRows
                 }
               }
             }
+
             // Update ChainCategories
             try {
               for (const category of Object.keys(this.selectedTags)) {
@@ -308,8 +312,8 @@ export class ChainMetadataRows
             } catch (err) {
               console.log(err);
             }
+
             try {
-              // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
                 chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
@@ -317,6 +321,13 @@ export class ChainMetadataRows
                 jwt: app.user.jwt,
               }).then(() => {
                 app.chain.meta.setBanner(this.communityBanner);
+
+                if (
+                  localStorage.getItem(`${app.activeChainId()}-banner`) ===
+                  'off'
+                ) {
+                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+                }
               });
             } catch (err) {
               console.log(err);

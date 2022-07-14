@@ -35,16 +35,16 @@ export class SublayoutBanners
             }
           />
         )}
-        {/* {app.isLoggedIn() &&
+        {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
-          !app.user.activeAccount && ( */}
-        <CWBanner
-          bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
-        />
-        {/* )} */}
-        {/* {isNonEmptyString(terms) && tosStatus !== 'off' && ( */}
-        <TermsBanner terms={terms} />
-        {/* )} */}
+          !app.user.activeAccount && (
+            <CWBanner
+              bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
+            />
+          )}
+        {isNonEmptyString(terms) && tosStatus !== 'off' && (
+          <TermsBanner terms={terms} />
+        )}
       </>
     );
   }
