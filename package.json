@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "postinstall": "if [ $CW_ENV ]; then npm run postinstall-cw; else echo no environment detected, please set CW_ENV; fi",
-    "postinstall-cw": "cd packages/commonwealth && yarn && yarn build"
+    "start": "yarn --cwd packages/commonwealth start",
+    "build": "yarn --cwd packages/commonwealth build"
   },
   "engines": {
     "node": "14.x"
@@ -12,6 +12,9 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "keywords": [],
+  "workspaces": [
+    "packages/commonwealth"
+  ],
   "dependencies": {
   },
   "devDependencies": {

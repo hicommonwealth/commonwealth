@@ -1,4 +1,6 @@
 {
+  "name": "commonwealth",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && tsc --project server/tsconfig.json",
