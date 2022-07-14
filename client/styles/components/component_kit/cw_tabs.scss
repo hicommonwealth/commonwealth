@@ -1,27 +1,34 @@
 @import 'shared';
 
-.Tabs {
-  .tab-bar {
-    border-bottom: 1px solid $neutral-100;
-    margin-bottom: 30px;
+.Tab {
+  cursor: pointer;
 
-    @include extraSmall {
-      margin-bottom: 16px;
-    }
+  .tab-label-text.Text {
+    color: $neutral-500;
+  }
 
-    .tab-entry {
-      text-decoration: none;
+  &:hover {
+    .tab-label-text.Text {
       color: $neutral-600;
-      padding: 8px 10px;
-      margin-right: 4px;
-      display: inline-block;
-      font-weight: 500;
-
-      &.isActive {
-        color: $neutral-700;
-        border-bottom: 3px solid $neutral-500;
-        padding-bottom: 8px;
-      }
     }
   }
+
+  &.isSelected {
+    .tab-label-text.Text {
+      color: $neutral-800;
+    }
+  }
+
+  &.disabled {
+    pointer-events: none;
+
+    .tab-label-text.Text {
+      color: $neutral-300;
+    }
+  }
+}
+
+.TabBar {
+  display: flex;
+  gap: 40px;
 }

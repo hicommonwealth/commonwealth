@@ -14,7 +14,7 @@ import { OffchainThread, OffchainComment, Profile } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CWTabs } from 'views/components/component_kit/cw_tabs';
+import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 
 import {
   decodeAddress,
@@ -426,13 +426,13 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
 
     const allTabTitle =
       proposals && comments
-        ? ['All ', m('.count', proposals.length + comments.length)]
+        ? ['All ', proposals.length + comments.length]
         : 'All';
     const threadsTabTitle = proposals
-      ? ['Threads ', m('.count', proposals.length)]
+      ? ['Threads ', proposals.length]
       : 'Threads';
     const commentsTabTitle = comments
-      ? ['Comments ', m('.count', comments.length)]
+      ? ['Comments ', comments.length]
       : 'Comments';
 
     return m(
@@ -459,56 +459,62 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   vnode.state.refreshProfile = true;
                 },
               }),
-              m(CWTabs, [
-                {
-                  name: allTabTitle,
+              m(CWTabBar, [
+                m(CWTab, {
+                  label: allTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 0;
                   },
-                  content: m(ProfileContent, {
-                    account,
-                    type: UserContent.All,
-                    content: allContent,
-                    count: vnode.state.allContentCount,
-                    // eslint-disable-next-line max-len
-                    localStorageScrollYKey: `profile-${
-                      vnode.attrs.address
-                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
-                  }),
-                },
-                {
-                  name: threadsTabTitle,
+                  isSelected: vnode.state.tabSelected === 0,
+                }),
+                m(CWTab, {
+                  label: threadsTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 1;
                   },
-                  content: m(ProfileContent, {
-                    account,
-                    type: UserContent.Threads,
-                    content: proposals,
-                    count: vnode.state.proposalsContentCount,
-                    // eslint-disable-next-line max-len
-                    localStorageScrollYKey: `profile-${
-                      vnode.attrs.address
-                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
-                  }),
-                },
-                {
-                  name: commentsTabTitle,
+                  isSelected: vnode.state.tabSelected === 1,
+                }),
+                m(CWTab, {
+                  label: commentsTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 2;
                   },
-                  content: m(ProfileContent, {
-                    account,
-                    type: UserContent.Comments,
-                    content: comments,
-                    count: vnode.state.commentsContentCount,
-                    // eslint-disable-next-line max-len
-                    localStorageScrollYKey: `profile-${
-                      vnode.attrs.address
-                    }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
-                  }),
-                },
+                  isSelected: vnode.state.tabSelected === 2,
+                }),
               ]),
+              vnode.state.tabSelected === 0 &&
+                m(ProfileContent, {
+                  account,
+                  type: UserContent.All,
+                  content: allContent,
+                  count: vnode.state.allContentCount,
+                  // eslint-disable-next-line max-len
+                  localStorageScrollYKey: `profile-${
+                    vnode.attrs.address
+                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                }),
+              vnode.state.tabSelected === 1 &&
+                m(ProfileContent, {
+                  account,
+                  type: UserContent.Threads,
+                  content: proposals,
+                  count: vnode.state.proposalsContentCount,
+                  // eslint-disable-next-line max-len
+                  localStorageScrollYKey: `profile-${
+                    vnode.attrs.address
+                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                }),
+              vnode.state.tabSelected === 2 &&
+                m(ProfileContent, {
+                  account,
+                  type: UserContent.Comments,
+                  content: comments,
+                  count: vnode.state.commentsContentCount,
+                  // eslint-disable-next-line max-len
+                  localStorageScrollYKey: `profile-${
+                    vnode.attrs.address
+                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                }),
             ]),
             m('.xs-display-none .col-md-4', [
               m(ProfileBio, {
