@@ -176,7 +176,7 @@ export class MarkdownFormattedText
       const results = m.trust(sanitized);
 
       return (
-        <div class="show-more-wrap">
+        <>
           <div
             class={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
@@ -193,7 +193,7 @@ export class MarkdownFormattedText
               </div>
             </div>
           )}
-        </div>
+        </>
       );
     }
   }

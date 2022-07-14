@@ -121,13 +121,16 @@ export class QuillFormattedText
                 ? {}
                 : { position: middle }
             );
+
             if (subString[subString.length - 1] === ' ') {
               text += ' ';
             }
+
             if (subString[0] === ' ') {
               text = ` ${text}`;
             }
-            return highlight ? m('mark', text) : m('span', text);
+
+            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
           }
         );
       }
@@ -145,7 +148,10 @@ export class QuillFormattedText
     } else {
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>({}, 'QuillFormattedText')}
+          class={getClasses<{ collapsed?: boolean }>(
+            { collapsed: collapse },
+            'QuillFormattedText'
+          )}
           oncreate={() => {
             // if (!(<any>window).twttr) {
             //   loadScript('//platform.twitter.com/widgets.js').then(() => {
