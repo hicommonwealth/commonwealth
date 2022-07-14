@@ -12,11 +12,19 @@
     text-align: center;
   }
 
+  .cui-tabs {
+    flex-wrap: wrap;
+  }
+
   .CreateCommunityForm {
     display: flex;
     flex-direction: column;
     margin: 32px auto auto;
     width: 480px;
+
+    @include extraSmall {
+      width: 100%;
+    }
 
     .InputRow {
       display: flex;

@@ -1,0 +1,73 @@
+@import 'shared';
+
+.WalletsList {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  .wallets-and-link-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+
+    .wallets {
+      display: grid;
+      overflow-y: scroll;
+      row-gap: 4px;
+      width: 284px;
+      // preserves box shadow in scroll container
+      height: 174px;
+      margin-bottom: -4px;
+      padding-bottom: 4px;
+
+      @include visibleScrollbar(light);
+
+      &.darkMode {
+        // no box shadow
+        height: 172px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+
+        @include visibleScrollbar(dark);
+      }
+    }
+
+    .trigger-wrapper {
+      align-self: flex-end;
+
+      .no-wallet-link {
+        color: $neutral-500;
+        cursor: pointer;
+        margin: 8px 12px 8px 0;
+
+        &.darkMode {
+          color: $neutral-400;
+        }
+      }
+    }
+  }
+
+  .connect-another-way-link {
+    a {
+      color: $primary-500;
+      cursor: pointer;
+      text-decoration: none;
+
+      &:hover {
+        color: $primary-400;
+      }
+    }
+
+    &.darkMode {
+      a {
+        color: $primary-200;
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover {
+          color: $primary-100;
+        }
+      }
+    }
+  }
+}

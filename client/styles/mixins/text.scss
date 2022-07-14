@@ -1,0 +1,5 @@
+@mixin coloredBottomBorder($color) {
+  border-bottom: 4px solid $color;
+  padding-bottom: 4px;
+  width: fit-content;
+}
