@@ -121,7 +121,9 @@ export class MarkdownFormattedText
         this.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
+
             const subString = textToHighlight.substr(start, end - start);
+
             let text = smartTruncate(
               subString,
               chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
@@ -133,13 +135,16 @@ export class MarkdownFormattedText
                 ? {}
                 : { position: middle }
             );
+
             if (subString[subString.length - 1] === ' ') {
               text += ' ';
             }
+
             if (subString[0] === ' ') {
               text = ` ${text}`;
             }
-            return highlight ? m('mark', text) : m('span', text);
+
+            return highlight ? <mark>{text}</mark> : <span>{text}</span>;
           }
         );
       }

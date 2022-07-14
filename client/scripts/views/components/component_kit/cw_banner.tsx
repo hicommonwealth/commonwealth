@@ -45,7 +45,9 @@ export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
           ComponentType.MessageBanner
         )}
       >
-        <CWText type="b2">{bannerContent}</CWText>
+        <CWText type="b1" fontWeight="semiBold">
+          {bannerContent}
+        </CWText>
         {onClose && (
           <CWIconButton
             iconName="close"

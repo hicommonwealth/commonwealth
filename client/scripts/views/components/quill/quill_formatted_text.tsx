@@ -57,7 +57,6 @@ export class QuillFormattedText
     } = vnode.attrs;
 
     const toggleDisplay = () => {
-      console.log('clicky');
       this.isTruncated = !this.isTruncated;
 
       if (this.isTruncated) {
@@ -96,7 +95,9 @@ export class QuillFormattedText
         this.cachedResultWithHighlights = chunks.map(
           ({ end, highlight, start }, index) => {
             const middle = 15;
+
             const subString = textToHighlight.substr(start, end - start);
+
             let text = smartTruncate(
               subString,
               chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
