@@ -14,7 +14,7 @@ import { OffchainThread, OffchainComment, Profile } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { Tabs } from 'client/scripts/views/components/component_kit/cw_tabs';
+import { CWTabs } from 'views/components/component_kit/cw_tabs';
 
 import {
   decodeAddress,
@@ -459,7 +459,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   vnode.state.refreshProfile = true;
                 },
               }),
-              m(Tabs, [
+              m(CWTabs, [
                 {
                   name: allTabTitle,
                   onclick: () => {

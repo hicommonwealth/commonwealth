@@ -7,7 +7,7 @@ import 'components/component_kit/cw_tabs.scss';
 
 import { getClasses } from './helpers';
 
-export class Tabs implements m.ClassComponent {
+export class CWTabs implements m.ClassComponent {
   view(vnode) {
     if (!_.every(vnode.children, (c) => !!c.name && !!c.content)) {
       throw new Error('Must provide name and content for each tab');
