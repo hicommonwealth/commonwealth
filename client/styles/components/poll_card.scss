@@ -1,6 +1,12 @@
 @import 'shared';
 
+$default-card-width: 260px;
+
 .PollCard {
+  display: flex;
+  width: $default-card-width;
+  flex-direction: column;
+
   .poll-title-section {
     display: flex;
     text-align: center;
@@ -15,8 +21,68 @@
       font-weight: 400;
       font-size: 14px;
       line-height: 20px;
-
+      text-align: start;
+      padding: 10px;
       color: $neutral-800;
+    }
+  }
+
+  .poll-voting-section {
+    padding: 15px 10px 15px 10px;
+    border-bottom: 1px solid #e6e5e7;
+    .cast-vote-section {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+
+      .time-remaining-text {
+        margin-left: 5px;
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+        text-align: right;
+        color: $neutral-500;
+        letter-spacing: 0.02em;
+      }
+    }
+  }
+
+  .poll-results-section {
+    display: flex;
+    padding: 15px 10px 15px 10px;
+    flex-direction: column;
+    .results-header {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+      gap: 116px;
+      .results {
+        font-style: normal;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.02em;
+        color: $neutral-800;
+      }
+      .total-count {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+        text-align: right;
+        letter-spacing: 0.02em;
+        color: $neutral-500;
+      }
+    }
+
+    .poll-bar {
+      background-color: $primary-500;
+      border-radius: 3px;
+      height: 4px;
     }
   }
 }
