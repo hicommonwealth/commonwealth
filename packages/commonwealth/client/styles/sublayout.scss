@@ -17,9 +17,9 @@
       border-bottom: 1px solid $neutral-50;
       display: flex;
       flex-direction: row;
-      height: 88px;
+      height: $header-height;
       justify-content: space-between;
-      min-height: 88px;
+      min-height: $header-height;
       padding: 0 24px;
 
       @include smallInclusive {
@@ -36,7 +36,7 @@
     width: 100%;
 
     @include smallInclusive {
-      margin-top: 88px;
+      margin-top: $header-height;
     }
 
     .body-and-sticky-headers-container {

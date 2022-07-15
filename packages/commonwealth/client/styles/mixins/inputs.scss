@@ -45,3 +45,53 @@
     }
   }
 }
+
+@mixin darkModeInputStyles {
+  background-color: $neutral-600;
+  border: 2px solid $neutral-600;
+  border-radius: $border-radius-corners;
+  color: $neutral-50;
+
+  &::placeholder {
+    color: $neutral-500;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-within {
+    border-color: $primary-300;
+
+    &::placeholder {
+      color: $neutral-500;
+    }
+  }
+
+  &.isTyping {
+    border-color: $primary-200;
+  }
+
+  &.success {
+    border-color: $green-500;
+    background-color: $green-50;
+    color: $neutral-800;
+  }
+
+  &.failure {
+    border-color: $rorange-500;
+    background-color: $rorange-50;
+    color: $neutral-800;
+  }
+
+  &.disabled {
+    background-color: $neutral-200;
+    border-color: $neutral-200;
+    color: $white;
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: $white;
+    }
+  }
+}

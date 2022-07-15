@@ -11,7 +11,7 @@
       width: 60px;
 
       &.hasNoAvatar {
-        background-color: $neutral-800;
+        background-color: $neutral-500;
       }
     }
 
@@ -33,7 +33,7 @@
       width: 108px;
 
       &.hasNoAvatar {
-        background-color: $neutral-800;
+        background-color: $neutral-500;
       }
     }
 
@@ -67,10 +67,18 @@
     position: absolute;
     right: 0;
     top: 0;
-  }
 
-  &:hover {
-    border-color: $primary-500;
+    &.darkMode {
+      background-color: $neutral-800;
+
+      .IconButton {
+        color: $primary-200;
+
+        &:hover {
+          color: $primary-400;
+        }
+      }
+    }
   }
 
   .dropzone-preview-container {
