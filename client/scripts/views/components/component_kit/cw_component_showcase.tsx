@@ -26,6 +26,7 @@ import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
+import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -64,6 +65,11 @@ export class ComponentShowcase implements m.ClassComponent {
           onclick={() =>
             app.modals.create({
               modal: NewLoginModal,
+              data: {
+                modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                  ? 'fullScreen'
+                  : 'centered',
+              },
             })
           }
         />
@@ -73,9 +79,14 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Account creation button clicked!')}
           />
         </div>
-        <div class="card-gallery">
+        <div class="basic-gallery">
           <h1>Wallet Row Card</h1>
           <CWWalletOptionRow
+            walletName="metamask"
+            onclick={() => notifySuccess('MetaMask clicked!')}
+          />
+          <CWWalletOptionRow
+            darkMode
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
@@ -224,6 +235,12 @@ export class ComponentShowcase implements m.ClassComponent {
             disabled
             defaultValue="Some disabled text"
           />
+          <CWTextInput
+            name="Text field dark mode"
+            label="Dark mode"
+            darkMode
+            placeholder="Type here"
+          />
           <CWTextArea
             name="Textarea"
             label="Text area"
@@ -343,13 +360,27 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large tertiary blue "
+            label="Large tertiary blue"
             buttonType="lg-tertiary-blue"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Large tertiary disabled "
+            label="Large tertiary disabled"
             buttonType="lg-tertiary-blue"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            label="Primary blue dark disabled"
+            buttonType="primary-blue-dark"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Secondary blue dark"
+            buttonType="secondary-blue-dark"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />

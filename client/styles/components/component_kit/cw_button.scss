@@ -80,4 +80,16 @@
 
     @include secondaryBlue;
   }
+
+  &.primary-blue-dark {
+    height: 40px;
+
+    @include primaryBlueDark;
+  }
+
+  &.secondary-blue-dark {
+    height: 40px;
+
+    @include secondaryBlueDark;
+  }
 }

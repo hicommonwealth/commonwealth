@@ -15,6 +15,10 @@
     input {
       @include inputStyles;
 
+      &.darkMode {
+        @include darkModeInputStyles;
+      }
+
       &.small {
         font-size: 14px;
         height: 32px;

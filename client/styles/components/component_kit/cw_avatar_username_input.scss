@@ -1,0 +1,34 @@
+@import 'shared';
+
+.AvatarUsernameInput {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  &.horizontal {
+    flex-direction: row;
+  }
+
+  &.vertical {
+    align-items: center;
+    flex-direction: column;
+
+    .AvatarUpload {
+      margin-bottom: 16px;
+    }
+  }
+
+  .input-and-address-container {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+
+    .username-input-container {
+      margin: 0 0 8px 0;
+    }
+
+    .abbreviated-address {
+      color: $neutral-500;
+    }
+  }
+}

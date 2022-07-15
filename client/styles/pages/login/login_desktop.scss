@@ -1,6 +1,6 @@
 @import 'shared';
 
-.NewLoginModal {
+.LoginDesktop {
   display: flex;
   height: 424px;
   width: 664px;
@@ -14,7 +14,7 @@
     padding: 16px 24px;
     width: 400px;
 
-    svg {
+    .ModalExitButton {
       align-self: flex-end;
     }
 
@@ -30,7 +30,7 @@
         justify-content: center;
       }
 
-      .LoginBoilerplate.Text {
+      .LoginBoilerplate {
         margin: 32px;
       }
 
@@ -44,17 +44,20 @@
 
         .header-text.Text {
           margin-bottom: 0;
-          text-align: center;
         }
 
-        .LoginBoilerplate.Text {
+        .header-text-eth.Text {
+          margin-bottom: 0;
+          width: 268px;
+        }
+
+        .LoginBoilerplate {
           margin: 0 32px;
         }
 
         .subheader-text.Text {
           color: $neutral-500;
           margin: 0 32px;
-          text-align: center;
         }
       }
 
@@ -79,11 +82,8 @@
       .buttons-row {
         display: flex;
         flex-direction: row;
+        gap: 8px;
         justify-content: center;
-
-        .Button:first-child {
-          margin-right: 8px;
-        }
       }
     }
   }
