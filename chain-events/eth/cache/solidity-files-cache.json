@@ -1,0 +1,4335 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorBravoDelegate.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "b636a1659296bfd0f5db16bf0df899b7",
+      "sourceName": "contracts/Compound/GovernorBravoDelegate.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GovernorBravoInterfaces.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.16"
+      ],
+      "artifacts": [
+        "GovernorBravoDelegate"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorBravoInterfaces.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "11aa0d13fefe79d7491dc09c4b9b7a3a",
+      "sourceName": "contracts/Compound/GovernorBravoInterfaces.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.16"
+      ],
+      "artifacts": [
+        "CompInterface",
+        "GovernorBravoDelegateStorageV1",
+        "GovernorBravoDelegatorStorage",
+        "GovernorBravoEvents",
+        "TimelockInterface"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorBravoDelegator.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "1c3012bdb09f2feaa8125d0ec817143a",
+      "sourceName": "contracts/Compound/GovernorBravoDelegator.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GovernorBravoInterfaces.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.16"
+      ],
+      "artifacts": [
+        "GovernorBravoDelegator"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorBravoDelegateMock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "2f54125d1f4180e87df2faec94eac863",
+      "sourceName": "contracts/Compound/GovernorBravoDelegateMock.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GovernorBravoInterfaces.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.16"
+      ],
+      "artifacts": [
+        "GovernorBravoDelegateMock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorBravoImmutable.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "bbfbbf26794894db322ce9d3f3357716",
+      "sourceName": "contracts/Compound/GovernorBravoImmutable.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GovernorBravoDelegateMock.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.16"
+      ],
+      "artifacts": [
+        "GovernorBravoImmutable"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/Timelock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "4fbb0c231b955793949bc77fe331ff52",
+      "sourceName": "contracts/Compound/Timelock.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "Timelock"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/math/SafeMath.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "d208da96b6f6c1d204ee8248087cf2d7",
+      "sourceName": "@openzeppelin/contracts/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV2/Moloch.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "bf7dff80727b341b5551d364cb68978b",
+      "sourceName": "contracts/MolochV2/Moloch.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./GuildBank.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "Moloch2"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "183ff1f5e5f04bcfa85cee597bcb0236",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV2/GuildBank.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "0a3f256ef14f6cf3bfe576505082c429",
+      "sourceName": "contracts/MolochV2/GuildBank.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "GuildBank2"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/ownership/Ownable.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "cd44b8402a71c35a4f725f828ced4cae",
+      "sourceName": "@openzeppelin/contracts/ownership/Ownable.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../GSN/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/GSN/Context.sol": {
+      "lastModificationDate": 1639603270949,
+      "contentHash": "32a66f6f4d0584b403f26f8e5e4d17b5",
+      "sourceName": "@openzeppelin/contracts/GSN/Context.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC777/ERC777.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "89fce997c781ddf3d06ef10ea582e991",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/ERC777.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC777.sol",
+        "./IERC777Recipient.sol",
+        "./IERC777Sender.sol",
+        "../../token/ERC20/IERC20.sol",
+        "../../math/SafeMath.sol",
+        "../../utils/Address.sol",
+        "../../introspection/IERC1820Registry.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC777"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC777/IERC777.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "917c9d8b5420a5305b17079044b2edfa",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "c8356252aa47e25f2207afe31af8f3e4",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777Recipient"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC777/IERC777Sender.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "e93388eb410b16a1252b3a5b157ff1eb",
+      "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777Sender.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC777Sender"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/utils/Address.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "a41701ff3cdbb98920cd49750549d127",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/introspection/IERC1820Registry.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "b5d83d6f12509787adf2ffd784ca10c3",
+      "sourceName": "@openzeppelin/contracts/introspection/IERC1820Registry.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC1820Registry"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "81c352cf56ebc1ee63da6fd3da32310b",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC721.sol",
+        "./IERC721Receiver.sol",
+        "../../math/SafeMath.sol",
+        "../../utils/Address.sol",
+        "../../drafts/Counters.sol",
+        "../../introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC721"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "521544d4b3261c8e186ffde31310f84f",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC721"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "68f1063a3b1ba2ea6f98738f0b959bb2",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC721Receiver"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/drafts/Counters.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "2e4e5055539646b55f7d05ea1436d66a",
+      "sourceName": "@openzeppelin/contracts/drafts/Counters.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Counters"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/introspection/ERC165.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "0b47821c476c3f23aa689c2d6d8134de",
+      "sourceName": "@openzeppelin/contracts/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/introspection/IERC165.sol": {
+      "lastModificationDate": 1639603270956,
+      "contentHash": "90b6ff61fbb96331143b12e0803eedcd",
+      "sourceName": "@openzeppelin/contracts/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1639603272229,
+      "contentHash": "22fd452b5721fdbf411ef554c2c80b76",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../GSN/Context.sol",
+        "./IERC20.sol",
+        "../../math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV2/Helper.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "68d77f8e1c298f5164e6ddd4096bb1ad",
+      "sourceName": "contracts/MolochV2/Helper.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/token/ERC777/ERC777.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.0"
+      ],
+      "artifacts": [
+        "Helper"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/GuildBank.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "6cbebf4f1f9091edfacc8baf235e93e4",
+      "sourceName": "contracts/MolochV1/GuildBank.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/ownership/Ownable.sol",
+        "@openzeppelin/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "GuildBank1"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/Moloch.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "78046efd40c5c17048b1f9adb4b2cff1",
+      "sourceName": "contracts/MolochV1/Moloch.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./GuildBank.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.3"
+      ],
+      "artifacts": [
+        "Moloch1"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/TimelockMock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "b7666143217bf2b443ad5d34c283289e",
+      "sourceName": "contracts/Compound/TimelockMock.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "TimelockMock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/oz/ERC20.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "2d789384bcd85604ac088b6a8e577c79",
+      "sourceName": "contracts/MolochV1/oz/ERC20.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/oz/IERC20.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "c4b9722866e5f2ce911dffe13d60ddaa",
+      "sourceName": "contracts/MolochV1/oz/IERC20.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/oz/SafeMath.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "871d67eab68a325ed7adea6eefc0a6a8",
+      "sourceName": "contracts/MolochV1/oz/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/MolochV1/Token.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "6db10d95f5d747bc3d480fe20bfa321b",
+      "sourceName": "contracts/MolochV1/Token.sol",
+      "solcConfig": {
+        "version": "0.5.16",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./oz/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.5.2"
+      ],
+      "artifacts": [
+        "Token"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/mocks/SelfdestructTransfer.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "ed16f0edec9773b8bc25fc80e145c3c0",
+      "sourceName": "contracts/AAVE/mocks/SelfdestructTransfer.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.6.12"
+      ],
+      "artifacts": [
+        "SelfdestructTransfer"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorAlpha.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "75ebd248a23b28d6dd6c2cda9c82d597",
+      "sourceName": "contracts/Compound/GovernorAlpha.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "GovernorAlpha",
+        "MPondInterface",
+        "TimelockInterface"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorAlphaMock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "b291690b91096fb964e2107f49ad1be9",
+      "sourceName": "contracts/Compound/GovernorAlphaMock.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "GovernorAlphaMock",
+        "MPondInterface",
+        "TimelockInterface"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/MPond.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "db91352c0ae4a34c862bfd8fc859f51e",
+      "sourceName": "contracts/Compound/MPond.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "MPond"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Migrations.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "12fd2380819c237d4200d96c2b893ae7",
+      "sourceName": "contracts/Migrations.sol",
+      "solcConfig": {
+        "version": "0.6.12",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.21 <0.7.0"
+      ],
+      "artifacts": [
+        "Migrations"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/Address.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "a277a38926173e10ff85d81045b78ce9",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Address.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/BaseUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "d1d48c097b0d270739a305dae2b66357",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/BaseUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Proxy.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "BaseUpgradeabilityProxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/Proxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "00c754ef12972849020b756b1117eb09",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Proxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Proxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/InitializableUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "723bfd109d4849d4b41b4d5796e04d0e",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/InitializableUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "InitializableUpgradeabilityProxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/InitializableAdminUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "fcea10e05a9c69a66a9d6706b3ed4675",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/InitializableAdminUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseAdminUpgradeabilityProxy.sol",
+        "./InitializableUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "InitializableAdminUpgradeabilityProxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/BaseAdminUpgradeabilityProxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "5d44a5902ff8cebcdf6ef2ecb1faa170",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/BaseAdminUpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./UpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "BaseAdminUpgradeabilityProxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/UpgradeabilityProxy.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "5e5997c0c94a647c0a6115a999646065",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/UpgradeabilityProxy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BaseUpgradeabilityProxy.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "UpgradeabilityProxy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/Context.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "a47ebfadd2e21e8d0a9cb398b3e9d3f5",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Context.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/Ownable.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "a2d8c1d60675d28ea83f831f63b833df",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/Ownable.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Context.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/governance/AaveGovernanceV2.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "6cabe48985f64873b49e69c76e39bf6b",
+      "sourceName": "contracts/AAVE/governance/AaveGovernanceV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IVotingStrategy.sol",
+        "../interfaces/IExecutorWithTimelock.sol",
+        "../interfaces/IProposalValidator.sol",
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../dependencies/open-zeppelin/Ownable.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol",
+        "../misc/Helpers.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveGovernanceV2"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IVotingStrategy.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "893b56e7e6782298462a659c824ceb78",
+      "sourceName": "contracts/AAVE/interfaces/IVotingStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IVotingStrategy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IExecutorWithTimelock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "60ac5ebeb5ab8ba0516aaa3621728391",
+      "sourceName": "contracts/AAVE/interfaces/IExecutorWithTimelock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAaveGovernanceV2.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IExecutorWithTimelock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IProposalValidator.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "2475b8a67a3e33bac3001bbd020d5195",
+      "sourceName": "contracts/AAVE/interfaces/IProposalValidator.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAaveGovernanceV2.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IProposalValidator"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IGovernanceStrategy.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "64b52a6ce44a880dfef1d2ae271fad80",
+      "sourceName": "contracts/AAVE/interfaces/IGovernanceStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernanceStrategy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IAaveGovernanceV2.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "42957c095b64103806fe228299f25638",
+      "sourceName": "contracts/AAVE/interfaces/IAaveGovernanceV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IExecutorWithTimelock.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IAaveGovernanceV2"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/dependencies/open-zeppelin/SafeMath.sol": {
+      "lastModificationDate": 1638813751480,
+      "contentHash": "b068409c6ed83b5ab749cc3fa9951c44",
+      "sourceName": "contracts/AAVE/dependencies/open-zeppelin/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/misc/Helpers.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "965a972705863224b8640a12fd6e2a97",
+      "sourceName": "contracts/AAVE/misc/Helpers.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": []
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/governance/ProposalValidator.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "43cc3ea1e8941a493e99217217bf6d08",
+      "sourceName": "contracts/AAVE/governance/ProposalValidator.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IProposalValidator.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ProposalValidator"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/mocks/FlashAttacks.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "d96618bfab7199a40f8d2227e7ca4cf2",
+      "sourceName": "contracts/AAVE/mocks/FlashAttacks.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IAaveGovernanceV2.sol",
+        "./interfaces/IERC20.sol",
+        "../interfaces/IExecutorWithTimelock.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "FlashAttacks"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/mocks/interfaces/IERC20.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "e31fae0867b26fbbf2093b709f244514",
+      "sourceName": "contracts/AAVE/mocks/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/governance/ExecutorWithTimelock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "da7554ed7da55421314685649613e832",
+      "sourceName": "contracts/AAVE/governance/ExecutorWithTimelock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IExecutorWithTimelock.sol",
+        "../interfaces/IAaveGovernanceV2.sol",
+        "../dependencies/open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ExecutorWithTimelock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/governance/Executor.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "bf180f435e78d329459be867dbcaeec1",
+      "sourceName": "contracts/AAVE/governance/Executor.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ExecutorWithTimelock.sol",
+        "./ProposalValidator.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "Executor"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/governance/GovernanceStrategy.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "4faab1c2d0127a7706aa1669caf450c4",
+      "sourceName": "contracts/AAVE/governance/GovernanceStrategy.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IGovernanceStrategy.sol",
+        "../interfaces/IERC20.sol",
+        "../interfaces/IGovernancePowerDelegationToken.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "GovernanceStrategy"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IERC20.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "b95cdf222151c9a9083e139ea148afcc",
+      "sourceName": "contracts/AAVE/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/interfaces/IGovernancePowerDelegationToken.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "26a80705ff1011552c8beeee4e776bbd",
+      "sourceName": "contracts/AAVE/interfaces/IGovernancePowerDelegationToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernancePowerDelegationToken"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/mocks/AaveTokenV1Mock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "d01529556a7d1ccb416ae3dc87117ba3",
+      "sourceName": "contracts/AAVE/mocks/AaveTokenV1Mock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@aave/aave-token/contracts/token/AaveToken.sol"
+      ],
+      "versionPragmas": [],
+      "artifacts": [
+        "AaveTokenV1Mock"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/token/AaveToken.sol": {
+      "lastModificationDate": 1639603272202,
+      "contentHash": "0b998abecc295aa101628224a100d603",
+      "sourceName": "@aave/aave-token/contracts/token/AaveToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../open-zeppelin/ERC20.sol",
+        "../interfaces/ITransferHook.sol",
+        "../utils/VersionedInitializable.sol",
+        "../open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveToken"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/open-zeppelin/ERC20.sol": {
+      "lastModificationDate": 1639603272206,
+      "contentHash": "e119abac181194cd14259346e0b67ce5",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/ERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Context.sol",
+        "../interfaces/IERC20.sol",
+        "./SafeMath.sol",
+        "./Address.sol"
+      ],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/interfaces/ITransferHook.sol": {
+      "lastModificationDate": 1639603272202,
+      "contentHash": "ccc5a79ae4a195dee026c32a905b4fbf",
+      "sourceName": "@aave/aave-token/contracts/interfaces/ITransferHook.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "ITransferHook"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/utils/VersionedInitializable.sol": {
+      "lastModificationDate": 1639603272206,
+      "contentHash": "196f68401e5666d2c2fbd4fb2b8bf3fe",
+      "sourceName": "@aave/aave-token/contracts/utils/VersionedInitializable.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "VersionedInitializable"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/open-zeppelin/SafeMath.sol": {
+      "lastModificationDate": 1639603272206,
+      "contentHash": "518fea8eabd2249b119db6360ee6e737",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "SafeMath"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/open-zeppelin/Context.sol": {
+      "lastModificationDate": 1639603272206,
+      "contentHash": "ed5ceec77fe91523955253390385875d",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/Context.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1639603272202,
+      "contentHash": "ccc213596370d9d9c74bc3eac0a9d9ac",
+      "sourceName": "@aave/aave-token/contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/open-zeppelin/Address.sol": {
+      "lastModificationDate": 1639603272206,
+      "contentHash": "f46221be9e8fee851fc058e4b409d2c1",
+      "sourceName": "@aave/aave-token/contracts/open-zeppelin/Address.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.7.5"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/token/base/GovernancePowerDelegationERC20.sol": {
+      "lastModificationDate": 1639603272859,
+      "contentHash": "2a93f5bd960f8bf7faf31ae855bed3ff",
+      "sourceName": "@aave/aave-token/contracts/token/base/GovernancePowerDelegationERC20.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../open-zeppelin/SafeMath.sol",
+        "../../open-zeppelin/ERC20.sol",
+        "../../interfaces/IGovernancePowerDelegationToken.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "GovernancePowerDelegationERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/interfaces/IGovernancePowerDelegationToken.sol": {
+      "lastModificationDate": 1639603272202,
+      "contentHash": "c2477d7691a1cd7d1f5f3dd181ce9c08",
+      "sourceName": "@aave/aave-token/contracts/interfaces/IGovernancePowerDelegationToken.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "IGovernancePowerDelegationToken"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@aave/aave-token/contracts/token/AaveTokenV2.sol": {
+      "lastModificationDate": 1639603272202,
+      "contentHash": "2bf0d036570be64824ea39e923e10e22",
+      "sourceName": "@aave/aave-token/contracts/token/AaveTokenV2.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../open-zeppelin/ERC20.sol",
+        "../interfaces/ITransferHook.sol",
+        "../utils/VersionedInitializable.sol",
+        "./base/GovernancePowerDelegationERC20.sol",
+        "../open-zeppelin/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "0.7.5"
+      ],
+      "artifacts": [
+        "AaveTokenV2"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/AAVE/mocks/AaveTokenV2Mock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "4cd16aafdebb3e292550e7b1f95148f2",
+      "sourceName": "contracts/AAVE/mocks/AaveTokenV2Mock.sol",
+      "solcConfig": {
+        "version": "0.7.5",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@aave/aave-token/contracts/token/AaveTokenV2.sol"
+      ],
+      "versionPragmas": [],
+      "artifacts": [
+        "AaveTokenV2Mock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Commonwealth/DataTypes.sol": {
+      "lastModificationDate": 1650492591078,
+      "contentHash": "e979c80aeceff350dce93d267479a6ff",
+      "sourceName": "contracts/Commonwealth/DataTypes.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "DataTypes"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Commonwealth/IProjectBaseFactory.sol": {
+      "lastModificationDate": 1650492591078,
+      "contentHash": "84fd3c0134995ef774f06b197292f09a",
+      "sourceName": "contracts/Commonwealth/IProjectBaseFactory.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./DataTypes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IProjectBaseFactory"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Commonwealth/ICuratedProjectFactory.sol": {
+      "lastModificationDate": 1650492591078,
+      "contentHash": "061917ae034e4a08eeccf3f6fd8bd2ac",
+      "sourceName": "contracts/Commonwealth/ICuratedProjectFactory.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IProjectBaseFactory.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ICuratedProjectFactory"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Commonwealth/IProjectBase.sol": {
+      "lastModificationDate": 1650492591078,
+      "contentHash": "4f1416d60a16ff519af615d0aad0eef8",
+      "sourceName": "contracts/Commonwealth/IProjectBase.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./DataTypes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IProjectBase"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Commonwealth/ICuratedProject.sol": {
+      "lastModificationDate": 1650492591078,
+      "contentHash": "a7090e6a47cc50a3c87c6646fb0e26cb",
+      "sourceName": "contracts/Commonwealth/ICuratedProject.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IProjectBase.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ICuratedProject"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/ERC20VotesMock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "6a837dd27f0a4e6cffba3b121e6cf554",
+      "sourceName": "contracts/Compound/ERC20VotesMock.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20Votes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20VotesMock"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20Votes.sol": {
+      "lastModificationDate": 1639603272869,
+      "contentHash": "12740705b7cfca947ece1a76662e808f",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20Votes.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./draft-ERC20Permit.sol",
+        "../../../utils/math/Math.sol",
+        "../../../utils/math/SafeCast.sol",
+        "../../../utils/cryptography/ECDSA.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20Votes"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/extensions/draft-ERC20Permit.sol": {
+      "lastModificationDate": 1639603272869,
+      "contentHash": "6e6e1b4929e8a364cbfa97be4e3ef410",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/extensions/draft-ERC20Permit.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./draft-IERC20Permit.sol",
+        "../ERC20.sol",
+        "../../../utils/cryptography/draft-EIP712.sol",
+        "../../../utils/cryptography/ECDSA.sol",
+        "../../../utils/Counters.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20Permit"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/math/Math.sol": {
+      "lastModificationDate": 1639603272279,
+      "contentHash": "4e138d2b21c8844ab1799e37d232fb5e",
+      "sourceName": "@openzeppelin/contracts-governance/utils/math/Math.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Math"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/math/SafeCast.sol": {
+      "lastModificationDate": 1639603272282,
+      "contentHash": "b8980ba70f1a32dd81c98fda7e3aac07",
+      "sourceName": "@openzeppelin/contracts-governance/utils/math/SafeCast.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "SafeCast"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/cryptography/ECDSA.sol": {
+      "lastModificationDate": 1639603272279,
+      "contentHash": "197dbfaf7146845fa76331a4c9980e9f",
+      "sourceName": "@openzeppelin/contracts-governance/utils/cryptography/ECDSA.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ECDSA"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/extensions/draft-IERC20Permit.sol": {
+      "lastModificationDate": 1639603272869,
+      "contentHash": "0266cd0875ab6ce1b05e87cce62120c0",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/extensions/draft-IERC20Permit.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20Permit"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1639603272279,
+      "contentHash": "2cd550cedf51b8d294607dad5023d717",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/cryptography/draft-EIP712.sol": {
+      "lastModificationDate": 1639603272279,
+      "contentHash": "549712dc273f006b866af22f6fb3cadc",
+      "sourceName": "@openzeppelin/contracts-governance/utils/cryptography/draft-EIP712.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ECDSA.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "EIP712"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/Counters.sol": {
+      "lastModificationDate": 1639603271166,
+      "contentHash": "b7811964d33f23b2d45ed3ebb76a4548",
+      "sourceName": "@openzeppelin/contracts-governance/utils/Counters.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Counters"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1639603272279,
+      "contentHash": "0eac3e1a83ee62326ca007811285b274",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/extensions/IERC20Metadata.sol": {
+      "lastModificationDate": 1639603272869,
+      "contentHash": "aa1be06992a99bb7393b26a6af3c4dfb",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/extensions/IERC20Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20Metadata"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/Context.sol": {
+      "lastModificationDate": 1639603271166,
+      "contentHash": "851485d5b925529b1a2f34a0be077891",
+      "sourceName": "@openzeppelin/contracts-governance/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorVotes.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "7ca148bd1c18cc41e9db0ecc0c318a49",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorVotes.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Governor.sol",
+        "../../token/ERC20/extensions/ERC20Votes.sol",
+        "../../utils/math/Math.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorVotes"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/Governor.sol": {
+      "lastModificationDate": 1639603271149,
+      "contentHash": "bbce04cad2e7c8f73aeffc9f1ae6c171",
+      "sourceName": "@openzeppelin/contracts-governance/governance/Governor.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/cryptography/ECDSA.sol",
+        "../utils/cryptography/draft-EIP712.sol",
+        "../utils/introspection/ERC165.sol",
+        "../utils/math/SafeCast.sol",
+        "../utils/Address.sol",
+        "../utils/Context.sol",
+        "../utils/Timers.sol",
+        "./IGovernor.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Governor"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/introspection/ERC165.sol": {
+      "lastModificationDate": 1639603272282,
+      "contentHash": "a9a5319dff9088c6ffe757ea1c2a6729",
+      "sourceName": "@openzeppelin/contracts-governance/utils/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/Address.sol": {
+      "lastModificationDate": 1639603271166,
+      "contentHash": "c5f6c4e4df069c789e7d84b4c3011913",
+      "sourceName": "@openzeppelin/contracts-governance/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/Timers.sol": {
+      "lastModificationDate": 1639603271166,
+      "contentHash": "06f7a84c7f78eb55dbcabd379dc0d51c",
+      "sourceName": "@openzeppelin/contracts-governance/utils/Timers.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Timers"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/IGovernor.sol": {
+      "lastModificationDate": 1639603271149,
+      "contentHash": "e1d6036a7197b3949b60d1f5ff048761",
+      "sourceName": "@openzeppelin/contracts-governance/governance/IGovernor.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IGovernor"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/introspection/IERC165.sol": {
+      "lastModificationDate": 1639603272282,
+      "contentHash": "9a04322bb8f6b8f2767d8358d1d2537b",
+      "sourceName": "@openzeppelin/contracts-governance/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorCountingSimple.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "504da4e45292dd36aee8f13b85b99b6c",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorCountingSimple.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Governor.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorCountingSimple"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/GovernorMock.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "02b460c09fc7be5499796733237193c2",
+      "sourceName": "contracts/Compound/GovernorMock.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockControl.sol",
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorCountingSimple.sol",
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorVotesQuorumFraction.sol",
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorProposalThreshold.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorMock"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockControl.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "18c9d011aa8c608cf2dca2316fdfdf98",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockControl.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IGovernorTimelock.sol",
+        "../Governor.sol",
+        "../TimelockController.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorTimelockControl"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorVotesQuorumFraction.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "fb97b3040ba5ab7b81751a7ba4b7a840",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorVotesQuorumFraction.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./GovernorVotes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorVotesQuorumFraction"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorProposalThreshold.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "f8f1774ff3a2f1080dff9ee1088c6fee",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorProposalThreshold.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Governor.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorProposalThreshold"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/IGovernorTimelock.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "3121c14abab5b4ce70e0513dfe07e886",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/IGovernorTimelock.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IGovernor.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IGovernorTimelock"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/TimelockController.sol": {
+      "lastModificationDate": 1639603271149,
+      "contentHash": "1063e950050b753e06183de3977ec0eb",
+      "sourceName": "@openzeppelin/contracts-governance/governance/TimelockController.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../access/AccessControl.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TimelockController"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/access/AccessControl.sol": {
+      "lastModificationDate": 1639603271159,
+      "contentHash": "74fb01cf14d85fd1e7f25b22c6472e6e",
+      "sourceName": "@openzeppelin/contracts-governance/access/AccessControl.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IAccessControl.sol",
+        "../utils/Context.sol",
+        "../utils/Strings.sol",
+        "../utils/introspection/ERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AccessControl"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/access/IAccessControl.sol": {
+      "lastModificationDate": 1639603271159,
+      "contentHash": "e2ed3260ca37d27f68b0ab41f692b407",
+      "sourceName": "@openzeppelin/contracts-governance/access/IAccessControl.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IAccessControl"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/utils/Strings.sol": {
+      "lastModificationDate": 1639603271166,
+      "contentHash": "62142442bed149f965c5ed971fae4182",
+      "sourceName": "@openzeppelin/contracts-governance/utils/Strings.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Strings"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/compatibility/GovernorCompatibilityBravo.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "0169fc5fe729ca51a5bfdf31d67def43",
+      "sourceName": "@openzeppelin/contracts-governance/governance/compatibility/GovernorCompatibilityBravo.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/Counters.sol",
+        "../../utils/math/SafeCast.sol",
+        "../extensions/IGovernorTimelock.sol",
+        "../extensions/GovernorProposalThreshold.sol",
+        "../Governor.sol",
+        "./IGovernorCompatibilityBravo.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorCompatibilityBravo"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/compatibility/IGovernorCompatibilityBravo.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "0878f3d9bc312ca10e4a788d9902f4e4",
+      "sourceName": "@openzeppelin/contracts-governance/governance/compatibility/IGovernorCompatibilityBravo.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IGovernor.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IGovernorCompatibilityBravo"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockCompound.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "722183167f4f584c67f32818db6e7fb1",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockCompound.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IGovernorTimelock.sol",
+        "../Governor.sol",
+        "../../utils/math/SafeCast.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorTimelockCompound",
+        "ICompoundTimelock"
+      ]
+    },
+    "/home/jake/cw/chain-events/eth/contracts/Compound/FeiDao.sol": {
+      "lastModificationDate": 1638813751484,
+      "contentHash": "9e49eb098774196bbe7ff229c53d9518",
+      "sourceName": "contracts/Compound/FeiDao.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-governance/governance/compatibility/GovernorCompatibilityBravo.sol",
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorTimelockCompound.sol",
+        "@openzeppelin/contracts-governance/governance/extensions/GovernorVotesComp.sol",
+        "@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20VotesComp.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.4"
+      ],
+      "artifacts": [
+        "FeiDAO"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/governance/extensions/GovernorVotesComp.sol": {
+      "lastModificationDate": 1639603272269,
+      "contentHash": "d87bff33165836058a8206fc99aa2436",
+      "sourceName": "@openzeppelin/contracts-governance/governance/extensions/GovernorVotesComp.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../Governor.sol",
+        "../../token/ERC20/extensions/ERC20VotesComp.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "GovernorVotesComp"
+      ]
+    },
+    "/home/jake/cw/chain-events/node_modules/@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20VotesComp.sol": {
+      "lastModificationDate": 1639603272869,
+      "contentHash": "e48d37d5a40aca9a708443e3dd1b4c03",
+      "sourceName": "@openzeppelin/contracts-governance/token/ERC20/extensions/ERC20VotesComp.sol",
+      "solcConfig": {
+        "version": "0.8.4",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "istanbul",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ERC20Votes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20VotesComp"
+      ]
+    }
+  }
+}

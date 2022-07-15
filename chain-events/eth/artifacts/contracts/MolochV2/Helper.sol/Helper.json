@@ -1,0 +1,17 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Helper",
+  "sourceName": "contracts/MolochV2/Helper.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }
+  ],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603e80601d6000396000f3fe6080604052600080fdfea265627a7a723158202318504db24e93bafe106985e6872d197e5e3f15ef6c8f510faa0adf8cd7e1aa64736f6c63430005100032",
+  "deployedBytecode": "0x6080604052600080fdfea265627a7a723158202318504db24e93bafe106985e6872d197e5e3f15ef6c8f510faa0adf8cd7e1aa64736f6c63430005100032",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
