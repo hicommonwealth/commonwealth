@@ -18,6 +18,7 @@ import { ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
 import { CWText } from './components/component_kit/cw_text';
 import { SublayoutBanners } from './sublayout_banners';
+import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -75,7 +76,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     return (
       <div class="Sublayout">
-        {!app.isCustomDomain() && <SidebarQuickSwitcher />}
         <div class="header-and-body-container">
           <MobileHeader />
           <div class="header-container">
@@ -91,6 +91,10 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
+            {!app.isCustomDomain() &&
+              !isWindowMediumSmallInclusive(window.innerWidth) && (
+                <SidebarQuickSwitcher />
+              )}
             <Sidebar />
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners

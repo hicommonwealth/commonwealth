@@ -29,6 +29,7 @@ export type TextInputAttrs = {
 
 type InputStyleAttrs = {
   inputClassName?: string;
+  darkMode?: boolean;
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
@@ -50,6 +51,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       autocomplete = 'off',
       autofocus,
       containerClassName,
+      darkMode,
       defaultValue,
       disabled,
       iconRight,
@@ -88,6 +90,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               disabled,
               isTyping: this.isTyping,
               hasRightIcon: !!iconRight,
+              darkMode,
               inputClassName,
             })}
             disabled={disabled}
@@ -133,7 +136,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             }}
             defaultValue={defaultValue}
           />
-          {!!iconRight && (
+          {!!iconRight && !disabled && (
             <CWIcon
               iconName={iconRight}
               iconSize="small"

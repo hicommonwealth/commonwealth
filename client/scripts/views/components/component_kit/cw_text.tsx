@@ -37,6 +37,7 @@ type TextStyleAttrs = {
   disabled?: boolean;
   fontStyle?: FontStyle;
   fontWeight: FontWeight;
+  isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
   type: FontType;
 };
@@ -54,6 +55,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
     const {
       className,
       disabled = false,
+      isCentered,
       fontStyle,
       onclick,
       noWrap = false,
@@ -72,6 +74,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
             fontStyle,
             noWrap,
             onclick: !!onclick,
+            isCentered,
             className,
           },
           ComponentType.Text

@@ -10,6 +10,7 @@
 @import 'mixins/choice';
 @import 'mixins/inputs';
 @import 'mixins/icons';
+@import 'mixins/text';
 
 // layout parameters
 
@@ -28,6 +29,39 @@ $font-family-silka: Silka, sans-serif;
 
 $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+@mixin visibleScrollbar($theme) {
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-scrollbar:vertical {
+    height: 88px;
+    width: 8px;
+  }
+
+  @if $theme == light {
+    &::-webkit-scrollbar-track {
+      background: $neutral-50;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-200;
+    }
+  } @else if $theme == dark {
+    &::-webkit-scrollbar-track {
+      background: $neutral-700;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-500;
+    }
+  }
+}
 
 @mixin gradientTabs() {
   .cui-tabs-item {
