@@ -174,7 +174,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
         {isOpen ? (
           <CWPortal>
             <div
-              class="overlay"
+              class="popover-overlay"
               onclick={() => {
                 if (!interactionType || interactionType === 'click') {
                   this.togglePopOver(onToggle);

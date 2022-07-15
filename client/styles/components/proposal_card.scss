@@ -3,7 +3,6 @@
 .ProposalCard {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: 24px;
   width: 260px;
 
@@ -15,6 +14,7 @@
 
   .proposal-injected {
     display: flex;
+    height: 100%;
     margin-bottom: 4px;
     padding: 0 2px;
     width: 100%;

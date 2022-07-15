@@ -3,6 +3,7 @@
 import m from 'mithril';
 
 import 'components/gov_explainer.scss';
+import { CWText } from './component_kit/cw_text';
 
 type StatHeader = {
   statName: string;
@@ -30,19 +31,26 @@ export class GovExplainer implements m.ClassComponent<GovExplainerAttrs> {
         <div class="main-container">
           <div class="stat-headers-container">
             {statHeaders.map((s) => (
-              <div class="stat-header">
-                <strong>{s.statName}</strong> <span>{s.statDescription}</span>
-              </div>
+              <CWText>
+                <div>
+                  <b>{s.statName}</b> {s.statDescription}
+                </div>
+              </CWText>
             ))}
           </div>
           <div class="stats-container">
             {stats.map((s) => (
               <div class="stat">
-                {s.statHeading} {s.stat}
+                <CWText type="b1" fontWeight="medium" className="stat-text">
+                  {s.statHeading}
+                </CWText>
+                <CWText type="b1" fontWeight="medium">
+                  {s.stat}
+                </CWText>
               </div>
             ))}
           </div>
-          <div class="action">{statAction}</div>
+          {statAction}
         </div>
       </div>
     );

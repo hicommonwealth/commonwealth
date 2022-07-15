@@ -131,4 +131,10 @@
   &.uppercase {
     text-transform: uppercase;
   }
+
+  &.isCentered {
+    // at least one of these should apply depending on context
+    justify-content: center;
+    text-align: center;
+  }
 }

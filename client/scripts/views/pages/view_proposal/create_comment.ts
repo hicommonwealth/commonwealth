@@ -18,8 +18,8 @@ import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { GlobalStatus } from './body';
 import { IProposalPageState } from '.';
-import jumpHighlightComment from './jump_to_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { jumpHighlightComment } from './helpers';
 
 const CreateComment: m.Component<
   {

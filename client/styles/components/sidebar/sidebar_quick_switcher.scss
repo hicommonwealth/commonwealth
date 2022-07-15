@@ -8,10 +8,6 @@
   overflow: hidden;
   min-width: $quick-switcher-width;
 
-  @include mediumSmallInclusive {
-    display: none;
-  }
-
   .community-nav-bar {
     align-items: center;
     background: $white;
@@ -22,7 +18,7 @@
     justify-content: flex-start;
     padding: 16px 8px 0;
     position: fixed;
-    top: 0;
+    top: $header-height;
     width: $quick-switcher-width;
 
     // Gabe 3/21/22 - dumb construct overrides

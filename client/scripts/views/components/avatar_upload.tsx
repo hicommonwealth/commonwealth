@@ -19,6 +19,7 @@ type AvatarUploadStyleAttrs = {
 
 type AvatarUploadAttrs = {
   account?: Account<any>;
+  darkMode?: boolean;
   scope: 'community' | 'user';
   uploadCompleteCallback?: CallableFunction;
   uploadStartedCallback?: CallableFunction;
@@ -96,7 +97,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   }
 
   view(vnode) {
-    const { account, scope, size = 'small' } = vnode.attrs;
+    const { account, darkMode, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
     const forUser = scope === 'user';
@@ -117,7 +118,12 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           ComponentType.AvatarUpload
         )}
       >
-        <div class="icon-button-container">
+        <div
+          class={getClasses<{ darkMode?: boolean }>(
+            { darkMode },
+            'icon-button-container'
+          )}
+        >
           <CWIconButton
             iconButtonTheme="primary"
             iconName="plusCircle"
