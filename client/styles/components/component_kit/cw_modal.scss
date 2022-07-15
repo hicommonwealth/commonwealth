@@ -3,9 +3,10 @@
 $modal-padding: 16px;
 
 .Modal {
-  .overlay {
+  .modal-overlay {
     align-items: center;
     background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
     bottom: 0;
     display: flex;
     justify-content: center;
@@ -16,11 +17,7 @@ $modal-padding: 16px;
     z-index: 101;
   }
 
-  &:last-child .overlay {
-    background: rgba(0, 0, 0, 0.2);
-  }
-
-  .popup {
+  .modal-container {
     @include popout();
 
     background: $white;
@@ -28,12 +25,11 @@ $modal-padding: 16px;
     overflow: hidden;
     position: relative;
     z-index: 20;
-  }
 
-  @include extraSmall {
-    .popup {
-      max-height: calc(100vh - 20px);
-      min-width: calc(100vw - 20px);
+    &.isFullScreen {
+      border-radius: 0;
+      height: 100%;
+      width: 100%;
     }
   }
 
@@ -85,5 +81,5 @@ $modal-padding: 16px;
 .ban-modal-content {
   display: flex;
   justify-content: center;
-  margin-top: 15px;
+  margin-top: 16px;
 }

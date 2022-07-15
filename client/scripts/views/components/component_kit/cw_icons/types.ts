@@ -1,7 +1,7 @@
 import { ComponentType } from '../types';
 import { IconName } from './cw_icon_lookup';
 
-type IconButtonTheme = 'neutral' | 'primary';
+export type IconButtonTheme = 'neutral' | 'primary' | 'hasBackground';
 
 export type IconSize = 'small' | 'medium' | 'large' | 'xl' | 'xxl';
 
