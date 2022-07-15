@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
