@@ -6,7 +6,7 @@ $default-card-height: 100px;
 .Card {
   align-items: flex-start;
   background: $white;
-  border-radius: 10px;
+  border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
   cursor: pointer;
   display: flex;
