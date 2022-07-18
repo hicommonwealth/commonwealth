@@ -26,7 +26,6 @@ import { ContentType } from 'controllers/server/search';
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
-import { ChainIcon } from './chain_icon';
 import { CommunityLabel } from './community_label';
 
 const getMemberPreview = (
@@ -84,16 +83,18 @@ const getCommunityPreview = (
 ) => {
   const params =
     community.contentType === ContentType.Token
-      ? { token: community }
+      ? { community }
       : community.contentType === ContentType.Chain
-      ? { chain: community }
+      ? { community }
       : null;
 
-  params['size'] = 36;
+  params['size'] = 'large';
 
   const onSelect = () => {
-    if (params.token) {
-      m.route.set(params.token.address ? `/${params.token.address}` : '/');
+    if (params.community) {
+      m.route.set(
+        params.community.address ? `/${params.community.address}` : '/'
+      );
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
@@ -649,10 +650,6 @@ export class SearchBar implements m.Component {
       </List>
     );
 
-    const chainOrCommIcon = app.activeChainId() ? (
-      <ChainIcon size={18} chain={app.chain.meta} />
-    ) : null;
-
     const cancelInputIcon = this.searchTerm ? (
       <Icon
         name={Icons.X}
@@ -682,13 +679,11 @@ export class SearchBar implements m.Component {
           fluid={true}
           tabIndex={-10}
           contentRight={
-            this.searchTerm ? (
+            this.searchTerm && (
               <ControlGroup>
                 {cancelInputIcon}
                 {searchIcon}
               </ControlGroup>
-            ) : (
-              chainOrCommIcon
             )
           }
           defaultValue={m.route.param('q') || this.searchTerm}

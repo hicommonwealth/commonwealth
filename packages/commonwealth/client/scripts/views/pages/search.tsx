@@ -60,16 +60,18 @@ const getMemberResult = (addr, searchTerm) => {
 const getCommunityResult = (community) => {
   const params =
     community.contentType === ContentType.Token
-      ? { token: community }
+      ? { community }
       : community.contentType === ContentType.Chain
-      ? { chain: community }
+      ? { community }
       : null;
 
-  params['size'] = 36;
+  params['size'] = 'large';
 
   const onSelect = () => {
-    if (params.token) {
-      m.route.set(params.token.address ? `/${params.token.address}` : '/');
+    if (params.community) {
+      m.route.set(
+        params.community.address ? `/${params.community.address}` : '/'
+      );
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
