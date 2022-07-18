@@ -1,0 +1,14 @@
+@import 'shared';
+
+.VoteButton {
+  align-items: center;
+  background-color: $neutral-25;
+  border-radius: $border-radius-corners;
+  border: 2px solid $neutral-300;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 112px;
+  justify-content: center;
+  width: 40px;
+}

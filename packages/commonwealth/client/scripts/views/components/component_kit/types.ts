@@ -25,6 +25,7 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
+  VoteButton = 'VoteButton',
   WalletOptionRow = 'WalletOptionRow',
   ValidationText = 'ValidationText',
 }

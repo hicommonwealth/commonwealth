@@ -26,6 +26,7 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { isWindowMediumSmallInclusive } from './helpers';
+import { CWVoteButton } from './cw_vote_button';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -52,6 +53,7 @@ export class ComponentShowcase implements m.ClassComponent {
   private radioGroupSelection: string;
   private selectedIconButton: number;
   private selectedTab: number;
+  private hasVoted: boolean;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
@@ -74,6 +76,16 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         /> */}
+        <div class="basic-gallery">
+          <h1>Vote Button</h1>
+          <CWVoteButton
+            onclick={() => {
+              this.hasVoted = !this.hasVoted;
+            }}
+            voteCount={this.hasVoted ? 1 : 0}
+            voteType="upvote"
+          />
+        </div>
         <div class="basic-gallery">
           <h1>Tabs</h1>
           <CWTabBar>
