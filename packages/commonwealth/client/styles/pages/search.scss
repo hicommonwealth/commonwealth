@@ -72,10 +72,10 @@
         border-top: none;
         border-bottom: none;
         min-height: 100px;
-        padding: 5px 5px 5px 10px;
+        padding: 16px;
 
         &:hover {
-          background-color: $primary-400;
+          background-color: $neutral-100;
         }
 
         .cui-list-item-content-left {
@@ -109,9 +109,7 @@
             color: $neutral-500;
 
             mark {
-              background: $primary-300;
-              border-radius: 5px;
-              color: $black !important;
+              background-color: $purple-100;
             }
           }
 
@@ -156,10 +154,8 @@
           .search-results-thread-body,
           .search-results-comment {
             mark {
-              background: $primary-300;
-              padding: 5px 2px 0;
-              margin: 0 3px;
-              border-radius: 5px;
+              background-color: $purple-100;
+              padding: 0 4px;
             }
           }
         }

@@ -4,12 +4,12 @@ import m from 'mithril';
 
 import 'components/community_card.scss';
 
-import app from 'state';
-import { ChainInfo, NodeInfo } from 'models';
+import { ChainInfo } from 'models';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWText } from './component_kit/cw_text';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 type CommunityCardAttrs = { chain: ChainInfo };
 
@@ -33,27 +33,17 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
           : `${chain.description}.`;
     }
 
-    const iconUrl = chain.iconUrl;
-
     return (
       <CWCard
         elevation="elevation-2"
-        interactive={true}
+        interactive
         className="community-card"
         onclick={redirectFunction}
       >
-        {iconUrl ? (
-          <img class="large-chain-icon" src={iconUrl} />
-        ) : (
-          <div class="large-chain-icon no-image">
-            <CWText type="h2" fontWeight="bold" className="no-image-text">
-              {chain.name.slice(0, 1)}
-            </CWText>
-          </div>
-        )}
-        <div class="card-body">
+        <div class="top-content">
+          <CWCommunityAvatar community={chain} size="xxl" />
           <CWText
-            type="h3"
+            type="h4"
             fontWeight="semiBold"
             className="chain-name"
             title={chain.name}
@@ -61,7 +51,13 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
           >
             {chain.name}
           </CWText>
-          <CWText className="card-description" title={prettyDescription}>
+        </div>
+        <div class="bottom-content">
+          <CWText
+            className="card-description"
+            type="caption"
+            title={prettyDescription}
+          >
             {prettyDescription}
           </CWText>
           <CWButton
