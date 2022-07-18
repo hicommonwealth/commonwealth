@@ -1,14 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import {
-  Icons,
-  Menu,
-  MenuDivider,
-  MenuItem,
-  TabItem,
-  Tabs,
-} from 'construct-ui';
+import { Icons, Menu, MenuDivider, MenuItem } from 'construct-ui';
 import { capitalize } from 'lodash';
 
 import 'mobile/mobile_sidebar.scss';
@@ -25,6 +18,7 @@ import { LoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
 import { ChatSection } from '../components/chat/chat_section';
+import { CWTabBar, CWTab } from '../components/component_kit/cw_tabs';
 
 enum MenuTabs {
   CurrentCommunity = 'currentCommunity',
@@ -127,11 +121,11 @@ export class MobileSidebar implements m.ClassComponent {
 
     return (
       <div class="MobileSidebar">
-        <Tabs>
+        <CWTabBar>
           {app.activeChainId() && (
-            <TabItem
+            <CWTab
               label={capitalize(app.activeChainId())}
-              active={this.activeTab === MenuTabs.CurrentCommunity}
+              isSelected={this.activeTab === MenuTabs.CurrentCommunity}
               onclick={(e) => {
                 e.stopPropagation();
                 this.activeTab = MenuTabs.CurrentCommunity;
@@ -139,24 +133,24 @@ export class MobileSidebar implements m.ClassComponent {
             />
           )}
           {app.activeChainId() && (
-            <TabItem
+            <CWTab
               label="Communities"
-              active={this.activeTab === MenuTabs.AllCommunities}
+              isSelected={this.activeTab === MenuTabs.AllCommunities}
               onclick={(e) => {
                 e.stopPropagation();
                 this.activeTab = MenuTabs.AllCommunities;
               }}
             />
           )}
-          <TabItem
+          <CWTab
             label="Account"
-            active={this.activeTab === MenuTabs.Account}
+            isSelected={this.activeTab === MenuTabs.Account}
             onclick={(e) => {
               e.stopPropagation();
               this.activeTab = MenuTabs.Account;
             }}
           />
-        </Tabs>
+        </CWTabBar>
         {this.activeTab === MenuTabs.CurrentCommunity ? (
           CurrentCommunityMenu
         ) : this.activeTab === MenuTabs.AllCommunities ? (

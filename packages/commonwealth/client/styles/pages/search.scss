@@ -19,10 +19,6 @@
     margin: 21px 0 8px;
   }
 
-  .cui-tabs {
-    @include gradientTabs();
-  }
-
   .search-results-wrapper {
     display: flex;
     flex-direction: column;

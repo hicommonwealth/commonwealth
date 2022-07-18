@@ -1,13 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
-import * as Cui from 'construct-ui';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
 import { Webhook } from 'models';
 import { WebhooksForm } from './webhooks_form';
 import { UpgradeRolesForm } from './upgrade_roles_form';
+import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 
 type AdminPanelTabsAttrs = {
   defaultTab: number;
@@ -26,22 +26,22 @@ export class AdminPanelTabs implements m.ClassComponent<AdminPanelTabsAttrs> {
   view(vnode) {
     return (
       <div class="AdminPanelTabs">
-        <Cui.Tabs align="left" bordered={true} fluid={true}>
-          <Cui.TabItem
+        <CWTabBar>
+          <CWTab
             label="Admins"
-            active={this.index === 1}
+            isSelected={this.index === 1}
             onclick={() => {
               this.index = 1;
             }}
           />
-          <Cui.TabItem
+          <CWTab
             label="Webhooks"
-            active={this.index === 2}
+            isSelected={this.index === 2}
             onclick={() => {
               this.index = 2;
             }}
           />
-        </Cui.Tabs>
+        </CWTabBar>
         {this.index === 1 && (
           <UpgradeRolesForm
             roleData={vnode.attrs.roleData}

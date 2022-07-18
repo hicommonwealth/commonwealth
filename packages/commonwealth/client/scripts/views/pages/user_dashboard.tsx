@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { TabItem, Tabs, Spinner } from 'construct-ui';
+import { Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard.scss';
 
@@ -14,6 +14,7 @@ import Sublayout from 'views/sublayout';
 import { notifyInfo } from 'controllers/app/notifications';
 import DashboardExplorePreview from '../components/dashboard_explore_preview';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
+import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
 
 enum DashboardViews {
   ForYou = 'For You',
@@ -177,15 +178,10 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                 <CWIcon iconName="externalLink" iconSize="small" />
               </div>
             </div>
-            <Tabs
-              class="dashboard-tabs"
-              align="left"
-              bordered={false}
-              fluid={true}
-            >
-              <TabItem
+            <CWTabBar>
+              <CWTab
                 label={DashboardViews.ForYou}
-                active={activePage === DashboardViews.ForYou}
+                isSelected={activePage === DashboardViews.ForYou}
                 onclick={() => {
                   if (!loggedIn) {
                     notifyInfo(
@@ -197,23 +193,23 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                   m.redraw();
                 }}
               />
-              <TabItem
+              <CWTab
                 label={DashboardViews.Global}
-                active={activePage === DashboardViews.Global}
+                isSelected={activePage === DashboardViews.Global}
                 onclick={() => {
                   m.route.set('/dashboard/global');
                   m.redraw();
                 }}
               />
-              <TabItem
+              <CWTab
                 label={DashboardViews.Chain}
-                active={activePage === DashboardViews.Chain}
+                isSelected={activePage === DashboardViews.Chain}
                 onclick={() => {
                   m.route.set('/dashboard/chain-events');
                   m.redraw();
                 }}
               />
-            </Tabs>
+            </CWTabBar>
             {loadingData && (
               <div class="dashboard-row-wrap">
                 <div class="Spinner">

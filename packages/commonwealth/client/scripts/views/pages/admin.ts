@@ -15,7 +15,6 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { DropdownFormField } from 'views/components/forms';
-import Tabs from 'views/components/widgets/tabs';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
 
@@ -378,14 +377,7 @@ const AdminPage: m.Component<{}> = {
     return m(
       Sublayout,
       m('.AdminPage', [
-        m(Tabs, [
-          {
-            name: 'Admin',
-            content: app.chain
-              ? [m(AdminActions), m(SudoForm), m(ChainStats)]
-              : [],
-          },
-        ]),
+        app.chain ? [m(AdminActions), m(SudoForm), m(ChainStats)] : [],
       ])
     );
   },
