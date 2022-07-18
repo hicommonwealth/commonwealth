@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ManageCommunityPage {
   align-items: flex-start;
@@ -9,7 +9,7 @@
   padding: 24px;
   width: 480px;
 
-  @include extraSmall {
+  @include smallInclusive {
     width: 100%;
   }
 }

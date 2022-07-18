@@ -21,6 +21,8 @@ export enum ComponentType {
   Popover = 'Popover',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  Tab = 'Tab',
+  TabBar = 'TabBar',
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',

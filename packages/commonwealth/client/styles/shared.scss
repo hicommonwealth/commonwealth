@@ -63,38 +63,6 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   }
 }
 
-@mixin gradientTabs() {
-  .cui-tabs-item {
-    color: $neutral-500;
-    margin: 0 24px 0 0;
-
-    @include smallInclusive {
-      margin: 0 16px 0 0;
-    }
-  }
-
-  .cui-tabs-item:hover {
-    // these styles can't be alphabetized or else they'll apply incorrectly
-    color: $neutral-600;
-    border-width: 2px;
-    border-color: $neutral-25;
-    border-style: solid;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
-  }
-
-  .cui-tabs-item.cui-active {
-    // these styles can't be alphabetized or else they'll apply incorrectly
-    color: $neutral-800;
-    border-width: 2px;
-    border-style: solid;
-    border-top: 0;
-    border-left: 0;
-    border-right: 0;
-  }
-}
-
 @mixin header {
   font-family: $fonts;
   font-style: normal;
