@@ -1,59 +1,50 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .MembersPage {
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 24px;
   padding: 24px;
 
-  .title {
-    font-size: 32px;
-    padding-left: 12px;
+  .header-row {
+    display: flex;
+    justify-content: space-between;
   }
 
-  th {
-    color: $neutral-600;
-    font-weight: 400;
-    border: 0;
-  }
+  .members-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-  td {
-    border: 0;
-  }
+    .member-row {
+      display: flex;
+      justify-content: space-between;
 
-  .align-right {
-    text-align: right;
-  }
+      a {
+        color: $neutral-800;
+        text-decoration: none;
 
-  .members-item-info {
-    a {
-      color: $neutral-800;
-      text-decoration: none;
+        .User {
+          align-items: center;
+          display: flex;
+
+          .username {
+            align-items: center;
+            display: flex;
+          }
+        }
+      }
     }
-
-    .User {
-      font-weight: 400;
-      font-size: 18px;
-    }
   }
 
-  .infinite-scroll-reached-end {
-    color: $neutral-500;
-    font-size: 0.94rem;
-    margin: 20px 0;
-    text-align: center;
-  }
-
-  .topic-loading-spinner-wrap,
-  .infinite-scroll-spinner-wrap {
-    height: 70px;
-    width: 100%;
+  .infinite-scroll-wrapper {
+    align-items: center;
     display: flex;
     justify-content: center;
-    align-items: center;
-  }
 
-  .topic-loading-spinner-wrap {
-    height: 120px;
+    .infinite-scroll-reached-end-text.Text {
+      color: $neutral-500;
+    }
   }
 }
