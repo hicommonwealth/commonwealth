@@ -12,6 +12,20 @@
   width: 12px;
 }
 
+@mixin radioCore($color) {
+  display: grid;
+  place-content: center;
+
+  &::after {
+    color: $color;
+    content: '';
+    width: 6px;
+    height: 6px;
+    box-shadow: inset 12px 12px;
+    clip-path: circle(50%);
+  }
+}
+
 @mixin hoverColors {
   background-color: $primary-50;
   border-color: $primary-300;

@@ -326,6 +326,12 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
+            iconName="person"
+            label="Large secondary red with icon"
+            buttonType="mini"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
             label="Large secondary blue"
             buttonType="lg-secondary-blue"
             onclick={() => notifySuccess('Button clicked!')}

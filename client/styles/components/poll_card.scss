@@ -19,7 +19,7 @@ $default-card-width: 260px;
     .title {
       font-style: normal;
       font-weight: 400;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 20px;
       text-align: start;
       padding: 10px;
@@ -28,17 +28,21 @@ $default-card-width: 260px;
   }
 
   .poll-voting-section {
-    padding: 15px 10px 15px 10px;
+    padding: 15px 1px 15px 1px;
     border-bottom: 1px solid #e6e5e7;
+    margin: 0px 8px 0px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     .cast-vote-section {
-      margin-top: 10px;
+      margin-top: 20px;
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
       align-items: center;
 
       .time-remaining-text {
-        margin-left: 5px;
+        margin-left: 15px;
         font-style: normal;
         font-weight: 400;
         font-size: 12px;
@@ -59,7 +63,7 @@ $default-card-width: 260px;
       flex-direction: row;
       width: 100%;
       align-items: center;
-      gap: 116px;
+      justify-content: space-between;
       .results {
         font-style: normal;
         font-weight: 700;
@@ -83,6 +87,10 @@ $default-card-width: 260px;
       background-color: $primary-500;
       border-radius: 3px;
       height: 4px;
+    }
+
+    .progress-bar-wrapper {
+      margin-top: 10px;
     }
   }
 }

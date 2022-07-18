@@ -24,10 +24,12 @@ export type ButtonType =
   | 'lg-secondary-red'
   | 'lg-secondary-blue'
   | 'lg-tertiary-red'
-  | 'lg-tertiary-blue';
+  | 'lg-tertiary-blue'
+  | 'mini';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
+  selected?: boolean;
 } & StyleAttrs;
 
 export type ButtonAttrs = {
@@ -43,6 +45,7 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
       className,
       disabled = false,
       iconName,
+      selected,
       label,
       onclick,
     } = vnode.attrs;
@@ -53,6 +56,7 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
             disabled,
             className,
             buttonType,
+            selected,
           },
           ComponentType.Button
         )}

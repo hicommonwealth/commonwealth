@@ -1,19 +1,5 @@
 @import 'shared';
 
-@mixin radioCore($color) {
-  display: grid;
-  place-content: center;
-
-  &::after {
-    color: $color;
-    content: '';
-    width: 6px;
-    height: 6px;
-    box-shadow: inset 12px 12px;
-    clip-path: circle(50%);
-  }
-}
-
 .RadioButton {
   align-items: center;
   cursor: pointer;

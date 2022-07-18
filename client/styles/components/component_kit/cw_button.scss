@@ -80,4 +80,10 @@
 
     @include secondaryBlue;
   }
+
+  &.mini {
+    height: 24px;
+
+    @include mini;
+  }
 }

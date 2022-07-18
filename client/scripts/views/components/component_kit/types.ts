@@ -24,6 +24,7 @@ export enum ComponentType {
   TextInput = 'TextInput',
   WalletOptionRow = 'WalletOptionRow',
   ValidationText = 'ValidationText',
+  ProgressBar = 'ProgressBar',
 }
 
 export type StyleAttrs = {
