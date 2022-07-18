@@ -25,7 +25,7 @@ import { formatTimestamp } from 'helpers/index';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { getProposalUrlPath } from '../../identifiers';
-import { getProposalUrl } from '../../../../shared/utils';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 const getCommentPreview = (commentText) => {
   let decodedCommentText;
@@ -393,9 +393,8 @@ const UserDashboardRow: m.Component<
         },
         [
           m('.activity-content', [
-            m('img.chain-icon', {
-              style: `width: 25px; height: 25px;`,
-              src: iconUrl,
+            m(CWCommunityAvatar, {
+              community: chain,
             }),
             m('.new-comment', [
               m('span.header', [

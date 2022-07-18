@@ -7,9 +7,9 @@ import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { IWebWallet } from 'models';
-import { WalletIcon } from 'views/components/chain_icon';
 import { ChainBase, ChainNetwork } from 'types';
 import _ from 'underscore';
+import { CWCustomIcon } from './component_kit/cw_icons/cw_custom_icon';
 
 // Returns a default chain for a chainbase
 export function baseToNetwork(n: ChainBase): ChainNetwork {
@@ -89,14 +89,14 @@ const LoginWithWalletDropdown: m.Component<{
       const createItem = (webWallet?: IWebWallet<any>) =>
         m(MenuItem, {
           label: m('.chain-login-label', [
-            webWallet &&
-              m(WalletIcon, { walletName: webWallet.name, size: 20 }),
+            webWallet && m(CWCustomIcon, { iconName: webWallet.name }),
             m('.chain-login-label-name', [webWallet.label]),
           ]),
           onclick: (e) => {
             $('.Login').trigger('modalexit');
             const defaultChainId =
-              (webWallet?.specificChains && webWallet.specificChains[0]) || baseToNetwork(base);
+              (webWallet?.specificChains && webWallet.specificChains[0]) ||
+              baseToNetwork(base);
             if (app.activeChainId()) {
               navigateToSubpage('/web3login', web3loginParams);
             } else {
