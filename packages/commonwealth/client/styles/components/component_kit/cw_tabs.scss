@@ -15,7 +15,9 @@
 
   &.isSelected {
     .tab-label-text.Text {
+      border-bottom: 2px solid $primary-500;
       color: $neutral-800;
+      width: fit-content;
     }
   }
 
@@ -30,5 +32,6 @@
 
 .TabBar {
   display: flex;
-  gap: 40px;
+  gap: 16px;
+  flex-wrap: wrap;
 }

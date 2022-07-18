@@ -70,23 +70,6 @@
     }
   }
 
-  .dashboard-tabs {
-    @include gradientTabs();
-
-    .cui-tabs-item {
-      &:first-child {
-        padding-left: 0px;
-      }
-      color: $neutral-100;
-      font-size: 24px;
-      font-weight: 500;
-
-      &.cui-active {
-        color: $black;
-      }
-    }
-  }
-
   .dashboard-row-wrap {
     margin-top: 20px;
   }

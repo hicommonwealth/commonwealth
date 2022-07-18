@@ -24,6 +24,7 @@ import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
+import { CWTab, CWTabBar } from './cw_tabs';
 import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
@@ -50,15 +51,17 @@ export class ComponentShowcase implements m.ClassComponent {
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
+  private selectedTab: number;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
+    this.selectedTab = 1;
   }
 
   view() {
     return (
       <div class="ComponentShowcase">
-        <CWButton
+        {/* <CWButton
           label="Click for Login modal"
           onclick={() =>
             app.modals.create({
@@ -70,7 +73,33 @@ export class ComponentShowcase implements m.ClassComponent {
               },
             })
           }
-        />
+        /> */}
+        <div class="basic-gallery">
+          <h1>Tabs</h1>
+          <CWTabBar>
+            <CWTab
+              label="A tab"
+              onclick={() => {
+                this.selectedTab = 1;
+              }}
+              isSelected={this.selectedTab === 1}
+            />
+            <CWTab
+              label="Another tab"
+              onclick={() => {
+                this.selectedTab = 2;
+              }}
+              isSelected={this.selectedTab === 2}
+            />
+            <CWTab
+              label="Yet another tab"
+              onclick={() => {
+                this.selectedTab = 3;
+              }}
+              isSelected={this.selectedTab === 3}
+            />
+          </CWTabBar>
+        </div>
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
           <CWAccountCreationButton

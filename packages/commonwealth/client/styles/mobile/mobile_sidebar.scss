@@ -11,35 +11,6 @@
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   }
 
-  .cui-tabs {
-    margin-bottom: 16px;
-    width: 100%;
-
-    @include extraSmall {
-      display: flex;
-      flex-direction: column;
-    }
-
-    @include gradientTabs();
-
-    .cui-tabs-item.cui-active {
-      border-image: linear-gradient(
-          to right,
-          #79e0e8,
-          #bf8e60,
-          #d69fcc,
-          #6086d1,
-          #b37dba
-        )
-        1 !important;
-    }
-
-    .cui-tabs-item {
-      font-size: $text-size-mobile-header;
-      width: initial;
-    }
-  }
-
   .CommunitySelectList {
     overflow-x: hidden;
 
