@@ -6,10 +6,10 @@ import 'sublayout_header_left.scss';
 
 import app from 'state';
 import { link } from 'helpers';
-import { ChainIcon } from 'views/components/chain_icon';
 import { isNotNil, isNotUndefined, isUndefined } from 'helpers/typeGuards';
 import { ChainInfo } from 'client/scripts/models';
 import { CommunityOptionsPopover } from './components/community_options_popover';
+import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 
 type SublayoutHeaderLeftAttrs = {
   alwaysShowTitle?: boolean;
@@ -34,7 +34,7 @@ export class SublayoutHeaderLeft
       } else if (isNotNil(chain)) {
         return (
           <>
-            <ChainIcon size={22} chain={chain} />
+            <CWCommunityAvatar size="medium" community={chain} />
             <h4>
               {link(
                 'a',
