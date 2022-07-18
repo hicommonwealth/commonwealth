@@ -7,9 +7,7 @@ import 'components/component_kit/cw_component_showcase.scss';
 import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
-import { CWExternalLink } from './cw_external_link';
 import { CWRadioGroup } from './cw_radio_group';
-import { CWEngagementButton } from './cw_engagement_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
@@ -382,44 +380,6 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Secondary blue dark"
             buttonType="secondary-blue-dark"
             disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <h1>External Link Buttons</h1>
-        <div class="button-gallery">
-          <CWExternalLink
-            label="Button external link"
-            target="https://edgewa.re/"
-            linkType="button"
-          />
-          <CWExternalLink
-            label="Inline external link"
-            target="https://edgewa.re/"
-            linkType="inline"
-          />
-        </div>
-        <h1>Engagement Buttons</h1>
-        <div class="button-gallery">
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="sm"
-            label="Small"
-            disabled={true}
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWEngagementButton
-            buttonSize="lg"
-            label="Big"
-            disabled={true}
             onclick={() => notifySuccess('Button clicked!')}
           />
         </div>
