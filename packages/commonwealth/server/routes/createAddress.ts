@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
 
-import AddressSwapper from '../util/addressSwapper';
+import { AddressSwapper } from '../util/addressSwapper';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ChainBase, WalletId } from '../../shared/types';

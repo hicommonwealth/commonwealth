@@ -1,8 +1,13 @@
 import { isU8a, isHex } from '@polkadot/util';
-import { checkAddress, decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
 
-const AddressSwapper = (options: {
-  address: string, currentPrefix: number,
+export const AddressSwapper = (options: {
+  address: string;
+  currentPrefix: number;
 }): string => {
   if (!options.address) throw new Error('No address provided to swap');
   if (!options.currentPrefix) return options.address;
@@ -17,7 +22,10 @@ const AddressSwapper = (options: {
     throw new Error('failed to decode address');
   }
   // check if it is valid with the current prefix & reencode if needed
-  const [valid, errorMsg] = checkAddress(options.address, options.currentPrefix);
+  const [valid, errorMsg] = checkAddress(
+    options.address,
+    options.currentPrefix
+  );
   if (!valid) {
     try {
       return encodeAddress(decodedAddress, options.currentPrefix);
@@ -28,5 +36,3 @@ const AddressSwapper = (options: {
     return options.address;
   }
 };
-
-export default AddressSwapper;

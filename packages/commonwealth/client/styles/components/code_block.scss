@@ -1,21 +1,24 @@
-@import 'client/styles/shared';
+@import 'shared';
 
-pre.CodeBlock {
-  padding: 12px 16px 11px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+.CodeBlock {
   background: $neutral-800;
+  border-radius: 4px;
   color: $white;
   font-family: $monospace-fonts;
   font-size: 13px;
+  margin-bottom: 20px;
+  padding: 12px 16px 11px;
   white-space: pre-wrap;
   word-break: break-word;
-  &.click-to-select {
+
+  &.clickToSelect {
     cursor: pointer;
   }
-  &.click-to-select:active {
+
+  &.clickToSelect:active {
     opacity: 0.9;
   }
+
   &::selection {
     background: $yellow-300;
   }

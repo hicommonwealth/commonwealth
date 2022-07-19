@@ -38,7 +38,7 @@ import {
   NotificationCategories,
   WalletId,
 } from '../../shared/types';
-import AddressSwapper from '../util/addressSwapper';
+import { AddressSwapper } from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -144,14 +144,16 @@ const verifySignature = async (
     } catch (e) {
       isValid = false;
     }
-  } else if (chain.base === ChainBase.CosmosSDK && chain.bech32_prefix === 'terra') {
-        //
+  } else if (
+    chain.base === ChainBase.CosmosSDK &&
+    chain.bech32_prefix === 'terra'
+  ) {
+    //
     // cosmos-sdk address handling
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { signature: stdSignature } =
-      JSON.parse(signatureString);
+    const { signature: stdSignature } = JSON.parse(signatureString);
 
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
@@ -170,7 +172,7 @@ const verifySignature = async (
       if (generatedAddress === addressModel.address) {
         try {
           // directly verify the generated signature, generated via SignBytes
-          const { pubkey, signature } = decodeSignature(stdSignature)
+          const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
             Buffer.from(addressModel.verification_token.trim())
@@ -217,7 +219,6 @@ const verifySignature = async (
         generatedAddress === addressModel.address ||
         generatedAddressWithCosmosPrefix === addressModel.address
       ) {
-
         let generatedSignDoc: StdSignDoc;
 
         try {
@@ -242,7 +243,7 @@ const verifySignature = async (
         if (
           generatedSignDoc &&
           serializeSignDoc(signed).toString() ===
-          serializeSignDoc(generatedSignDoc).toString()
+            serializeSignDoc(generatedSignDoc).toString()
         ) {
           // ensure valid signature
           const { pubkey, signature } = decodeSignature(stdSignature);
@@ -251,7 +252,6 @@ const verifySignature = async (
           const messageHash = new Sha256(
             serializeSignDoc(generatedSignDoc)
           ).digest();
-
 
           isValid = await Secp256k1.verifySignature(
             secpSignature,
@@ -283,7 +283,10 @@ const verifySignature = async (
     //
     try {
       const node = await chain.getChainNode();
-      const typedMessage = constructTypedMessage(node.eth_chain_id || 1, addressModel.verification_token.trim());
+      const typedMessage = constructTypedMessage(
+        node.eth_chain_id || 1,
+        addressModel.verification_token.trim()
+      );
       const address = recoverTypedSignature({
         data: typedMessage,
         signature: signatureString.trim(),

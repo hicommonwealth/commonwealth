@@ -22,7 +22,7 @@ import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import AddressSwapper from 'views/components/addresses/address_swapper';
+import { AddressSwapper } from 'views/components/addresses/address_swapper';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 enum LinkNewAddressSteps {
@@ -569,11 +569,11 @@ const LinkNewAddressModal: m.Component<
                             // get rid of pre-existing wallet info to make way for new account
                             wallet.signOut();
                           }
-                          const redirectUrl = (!app.isCustomDomain()) ? `${
-                            window.location.origin
-                          }/${app.activeChainId()}/finishNearLogin` : `${
-                            window.location.origin
-                          }/finishNearLogin`;
+                          const redirectUrl = !app.isCustomDomain()
+                            ? `${
+                                window.location.origin
+                              }/${app.activeChainId()}/finishNearLogin`
+                            : `${window.location.origin}/finishNearLogin`;
                           wallet.requestSignIn({
                             contractId: (app.chain as Near).chain.isMainnet
                               ? 'commonwealth-login.near'

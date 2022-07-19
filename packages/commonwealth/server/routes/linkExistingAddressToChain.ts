@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import AddressSwapper from '../util/addressSwapper';
+import { AddressSwapper } from '../util/addressSwapper';
 import { DB } from '../database';
 import { ChainBase } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
@@ -40,7 +40,7 @@ const linkExistingAddressToChain = async (
   const userId = req.user.id;
 
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain }
+    where: { id: req.body.chain },
   });
 
   if (!chain) {
@@ -48,52 +48,72 @@ const linkExistingAddressToChain = async (
   }
 
   // check if the original address is verified and is owned by the user
-  const originalAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.originChain, address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
-  });
+  const originalAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: {
+        chain: req.body.originChain,
+        address: req.body.address,
+        user_id: userId,
+        verified: { [Op.ne]: null },
+      },
+    }
+  );
 
   if (!originalAddress) {
     return next(new Error(Errors.NotVerifiedAddressOrUser));
   }
 
   const originalProfile = await models.OffchainProfile.findOne({
-    where: { address_id: originalAddress.id }
+    where: { address_id: originalAddress.id },
   });
 
-  const profileData = originalProfile && originalProfile.data ? originalProfile.data : null;
+  const profileData =
+    originalProfile && originalProfile.data ? originalProfile.data : null;
 
   // check if the original address's token is expired. refer edge case 1)
   let verificationToken = originalAddress.verification_token;
   let verificationTokenExpires = originalAddress.verification_token_expires;
-  const isOriginalTokenValid = verificationTokenExpires && +verificationTokenExpires <= +(new Date());
+  const isOriginalTokenValid =
+    verificationTokenExpires && +verificationTokenExpires <= +new Date();
 
   if (!isOriginalTokenValid) {
     const chains = await models.Chain.findAll({
-      where: { base: chain.base }
+      where: { base: chain.base },
     });
 
     verificationToken = crypto.randomBytes(18).toString('hex');
-    verificationTokenExpires = new Date(+(new Date()) + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000);
+    verificationTokenExpires = new Date(
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+    );
 
-    await models.Address.update({
-      verification_token: verificationToken,
-      verification_token_expires: verificationTokenExpires
-    }, {
-      where: {
-        user_id: originalAddress.user_id,
-        address: req.body.address,
-        chain: { [Op.in]: chains.map((ch) => ch.id) }
+    await models.Address.update(
+      {
+        verification_token: verificationToken,
+        verification_token_expires: verificationTokenExpires,
+      },
+      {
+        where: {
+          user_id: originalAddress.user_id,
+          address: req.body.address,
+          chain: { [Op.in]: chains.map((ch) => ch.id) },
+        },
       }
-    });
+    );
   }
 
   try {
-    const encodedAddress = chain.base === ChainBase.Substrate
-      ? AddressSwapper({ address: req.body.address, currentPrefix: chain.ss58_prefix })
-      : req.body.address;
+    const encodedAddress =
+      chain.base === ChainBase.Substrate
+        ? AddressSwapper({
+            address: req.body.address,
+            currentPrefix: chain.ss58_prefix,
+          })
+        : req.body.address;
 
-    const existingAddress = await models.Address.scope('withPrivateData').findOne({
-      where: { chain: req.body.chain, address: encodedAddress }
+    const existingAddress = await models.Address.scope(
+      'withPrivateData'
+    ).findOne({
+      where: { chain: req.body.chain, address: encodedAddress },
     });
 
     let addressId: number;
@@ -107,7 +127,7 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
-		  const updatedObj = await existingAddress.save();
+      const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
       const newObj = await models.Address.create({
@@ -128,17 +148,20 @@ const linkExistingAddressToChain = async (
     }
 
     const existingProfile = await models.OffchainProfile.findOne({
-      where: { address_id: addressId }
+      where: { address_id: addressId },
     });
 
     if (existingProfile) {
-      await models.OffchainProfile.update({
-        data: profileData,
-      }, {
-        where: {
-          address_id: addressId
+      await models.OffchainProfile.update(
+        {
+          data: profileData,
+        },
+        {
+          where: {
+            address_id: addressId,
+          },
         }
-      });
+      );
     } else {
       await models.OffchainProfile.create({
         address_id: addressId,
@@ -147,14 +170,14 @@ const linkExistingAddressToChain = async (
     }
 
     const ownedAddresses = await models.Address.findAll({
-      where: { user_id: originalAddress.user_id }
+      where: { user_id: originalAddress.user_id },
     });
 
     const role = await models.Role.findOne({
       where: {
         address_id: addressId,
         chain_id: req.body.chain,
-      }
+      },
     });
 
     if (!role) {
@@ -171,8 +194,8 @@ const linkExistingAddressToChain = async (
         verification_token: verificationToken,
         addressId,
         addresses: ownedAddresses.map((a) => a.toJSON()),
-        encodedAddress
-      }
+        encodedAddress,
+      },
     });
   } catch (e) {
     log.error(e.message);

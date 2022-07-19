@@ -1,4 +1,9 @@
-import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polkadot/extension-dapp';
+import {
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+  isWeb3Injected,
+} from '@polkadot/extension-dapp';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
@@ -6,9 +11,11 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 
 import { ChainBase, WalletId } from 'types';
 import { Account, IWebWallet } from 'models';
-import AddressSwapper from 'views/components/addresses/address_swapper';
+import { AddressSwapper } from 'views/components/addresses/address_swapper';
 
-class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta> {
+class PolkadotWebWalletController
+  implements IWebWallet<InjectedAccountWithMeta>
+{
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];

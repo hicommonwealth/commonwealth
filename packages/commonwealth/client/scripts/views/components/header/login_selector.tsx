@@ -22,7 +22,7 @@ import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import FeedbackModal from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import AddressSwapper from 'views/components/addresses/address_swapper';
+import { AddressSwapper } from 'views/components/addresses/address_swapper';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const CHAINBASE_SHORT = {
@@ -260,19 +260,20 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       if (addressChainInfo?.base !== activeBase) return false;
 
       // // ensure doesn't already exist
-      const addressExists = !!app.user.addresses.find((prev) =>
-        activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
-          ? AddressSwapper({
-              address: prev.address,
-              currentPrefix: 42,
-            }) ===
-            AddressSwapper({
-              address: a.address,
-              currentPrefix: 42,
-            })
-          : prev.address === a.address
-      ));
+      const addressExists = !!app.user.addresses.find(
+        (prev) =>
+          activeBase === ChainBase.Substrate &&
+          (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
+            ? AddressSwapper({
+                address: prev.address,
+                currentPrefix: 42,
+              }) ===
+              AddressSwapper({
+                address: a.address,
+                currentPrefix: 42,
+              })
+            : prev.address === a.address)
+      );
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain
