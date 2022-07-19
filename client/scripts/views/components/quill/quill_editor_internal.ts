@@ -14,7 +14,6 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillEditorComponent } from './quill_editor_component';
 import { QuillActiveMode, QuillTextContents } from './types';
 
 const Delta = Quill.import('delta');
@@ -25,17 +24,26 @@ const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
 
 export default class QuillEditorInternal {
   protected _quill: Quill;
+  protected _alteredText: boolean;
+  protected _unsavedChanges; // Quill Delta
+  protected _activeMode: QuillActiveMode;
+  private readonly _$editor: JQuery<HTMLElement>;
+  private readonly _editorNamespace: string;
+  private readonly _onkeyboardSubmit: () => void;
 
   constructor(
-    // TODO: Make readonly where possible
-    private _$editor: JQuery<HTMLElement>,
-    protected _activeMode: QuillActiveMode,
-    private _editorNamespace: string,
-    protected _parentState: QuillEditorComponent,
-    private _onkeyboardSubmit: () => void
-  ) {}
+    $editor: JQuery<HTMLElement>,
+    defaultMode: QuillActiveMode,
+    editorNamespace: string,
+    onkeyboardSubmit: () => void
+  ) {
+    this._$editor = $editor;
+    this._activeMode = defaultMode;
+    this._editorNamespace = editorNamespace;
+    this._onkeyboardSubmit = onkeyboardSubmit;
+  }
 
-  public initializeEditor(
+  protected _initializeEditor(
     theme: string,
     imageUploader: boolean,
     placeholder: string,
@@ -134,8 +142,7 @@ export default class QuillEditorInternal {
         .attr('tabindex', tabIndex);
     }
 
-    // Add changes listener to editor content in localStorage & parentState
-    this._parentState.unsavedChanges = new Delta();
+    this._unsavedChanges = new Delta();
     this._addChangesListener();
 
     // Restore defaultContent
@@ -143,7 +150,7 @@ export default class QuillEditorInternal {
 
     // TODO: What is the purpose of this??
     setInterval(() => {
-      if (this._parentState.unsavedChanges.length() > 0) {
+      if (this._unsavedChanges.length() > 0) {
         if (this._quill.isEnabled()) {
           // Save the entire updated text to localStorage
           const data = JSON.stringify(this._quill.getContents());
@@ -157,12 +164,20 @@ export default class QuillEditorInternal {
             `${app.activeChainId()}-${this._editorNamespace}-storedText`,
             data
           );
-          this._parentState.unsavedChanges = new Delta();
+          this._unsavedChanges = new Delta();
         }
       }
     }, 2500);
 
     return this._quill;
+  }
+
+  protected _clearUnsavedChanges() {
+    Object.keys(localStorage)
+      .filter((key) => key.includes(this._editorNamespace))
+      .forEach((key) => {
+        localStorage.removeItem(key);
+      });
   }
 
   private _handleAutolinks(range, context) {
@@ -896,24 +911,11 @@ export default class QuillEditorInternal {
 
   private _addChangesListener() {
     this._quill.on('text-change', (delta, oldDelta, source) => {
-      this._parentState.unsavedChanges =
-        this._parentState.unsavedChanges.compose(delta);
+      this._unsavedChanges = this._unsavedChanges.compose(delta);
       // Log that the this._quill doc has been altered, so that
       // newThread draft system prompts w/ save confirmation modal
-      if (source === 'user' && !this._parentState.alteredText) {
-        this._parentState.alteredText = true;
-        m.redraw();
-      }
-      // Log that the editor isBlank status has changed, to change
-      // enabled/disabled this._parentState of submission button
-      if (this._parentState.enableSubmission && this._quill.editor.isBlank()) {
-        this._parentState.enableSubmission = false;
-        m.redraw();
-      } else if (
-        !this._parentState.enableSubmission &&
-        !this._quill.editor.isBlank()
-      ) {
-        this._parentState.enableSubmission = true;
+      if (source === 'user' && !this._alteredText) {
+        this._alteredText = true;
         m.redraw();
       }
     });

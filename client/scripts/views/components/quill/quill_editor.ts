@@ -1,7 +1,7 @@
 import { Quill, Editor } from 'quill';
 import { QuillEditorComponent } from './quill_editor_component';
 import QuillEditorInternal from './quill_editor_internal';
-import { QuillActiveMode, QuillTextContents } from './types';
+import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
 // DOCUMENTATION
 // Standard usage flow:
@@ -31,33 +31,33 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   public get textContents(): QuillTextContents {
+    // TODO: Check on this vs inner editor
     return this.markdownMode
-      ? this.outerEditor.getText()
-      : JSON.stringify(this.outerEditor.getContents());
+      ? this._quill.getText()
+      : JSON.stringify(this._quill.getContents());
   }
 
   public get alteredText(): boolean {
-    return this._parentState.alteredText;
+    return this._alteredText;
   }
 
   public set alteredText(bool: boolean) {
-    this._parentState.alteredText = bool;
+    this._alteredText = bool;
   }
 
   constructor(
     $editor: JQuery<HTMLElement>,
-    activeMode: QuillActiveMode,
+    defaultMode: QuillActiveMode,
     theme: string,
     imageUploader: boolean,
     placeholder: string,
     editorNamespace: string,
-    parentState: QuillEditorComponent,
     onkeyboardSubmit: () => void,
     defaultContents: QuillTextContents,
     tabIndex?: number
   ) {
-    super($editor, activeMode, editorNamespace, parentState, onkeyboardSubmit);
-    this.initializeEditor(
+    super($editor, defaultMode, editorNamespace, onkeyboardSubmit);
+    this._initializeEditor(
       theme,
       imageUploader,
       placeholder,
@@ -66,8 +66,12 @@ export class QuillEditor extends QuillEditorInternal {
     );
   }
 
+  public clearUnsavedChanges(): void {
+    this._clearUnsavedChanges();
+  }
+
   public disable(document?: Document): void {
-    this.outerEditor.enable(false);
+    this._quill.enable(false);
 
     // Disable mentions container
     if (document) {
@@ -81,11 +85,12 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   public isBlank(): boolean {
-    if (this.innerEditor.isBlank()) return true;
+    // TODO: Check on this vs outer editor
+    if (this._quill.editor.isBlank()) return true;
     if (
-      this.innerEditor.getText() === '' &&
-      this.innerEditor.getDelta()?.ops.length === 1 &&
-      this.innerEditor.getDelta()?.ops[0]?.insert === '\n'
+      this._quill.editor.getText() === '' &&
+      this._quill.editor.getDelta()?.ops.length === 1 &&
+      this._quill.editor.getDelta()?.ops[0]?.insert === '\n'
     ) {
       return true;
     }
@@ -93,21 +98,41 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   public enable(): void {
-    this.outerEditor.enable(true);
+    this._quill.enable(true);
   }
 
   public getTextContents(stringifyDelta = false): QuillTextContents | string {
     return this.markdownMode
-      ? this.innerEditor.getText()
+      ? this._quill.getText()
       : stringifyDelta
       ? JSON.stringify(this.innerEditor.getContents())
-      : this.innerEditor.getContents();
+      : this._quill.getContents();
   }
 
   public resetEditor(): void {
     this.enable();
-    this.innerEditor.setContents([{ insert: '\n' }]);
-    this._parentState.clearUnsavedChanges();
-    this._parentState.alteredText = false;
+    this._quill.setContents([{ insert: '\n' }]);
+    this._clearUnsavedChanges();
+    this._alteredText = false;
+  }
+
+  public getContents(): QuillDelta {
+    return this._quill.innerEditor.getContents() as QuillDelta;
+  }
+
+  public setContents(contents: QuillDelta) {
+    this._quill.innerEditor.setContents(contents);
+  }
+
+  public getText(): string {
+    return this._quill.innerEditor.getText();
+  }
+
+  public setSelection(index: number) {
+    this._quill.innerEditor.setSelection(index);
+  }
+
+  public removeFormat(startIndex: number, endIndex: number) {
+    return this._quill.innerEditor.removeFormat(startIndex, endIndex);
   }
 }

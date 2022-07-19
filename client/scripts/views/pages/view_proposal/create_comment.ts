@@ -79,10 +79,6 @@ const CreateComment: m.Component<
 
       const commentText = quillEditorState.getTextContents(true) as string;
 
-      const attachments = [];
-      // const attachments = vnode.state.files ?
-      //   vnode.state.files.map((f) => f.uploadURL.replace(/\?.*/, '')) : [];
-
       vnode.state.error = null;
       vnode.state.sendingComment = true;
       quillEditorState.disable();
@@ -93,8 +89,7 @@ const CreateComment: m.Component<
           rootProposal.uniqueIdentifier,
           chainId,
           commentText,
-          proposalPageState.parentCommentId,
-          attachments
+          proposalPageState.parentCommentId
         );
         callback();
         vnode.state.quillEditorState.resetEditor();

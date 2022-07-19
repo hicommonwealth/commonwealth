@@ -49,13 +49,7 @@ type QuillEditorComponentAttrs = {
 export class QuillEditorComponent
   implements m.ClassComponent<QuillEditorComponentAttrs>
 {
-  // which are private?
-  private _quill: QuillEditor;
-  private _uploading?: boolean;
-  public enableSubmission: boolean;
-
-  // for localStorage drafts:
-  public alteredText: boolean;
+  private _quillEditor: QuillEditor;
 
   // Unsaved content alerts
   private _beforeunloadHandler: () => void | string;
@@ -68,27 +62,7 @@ export class QuillEditorComponent
   private _loaded: boolean;
 
   public get activeMode(): QuillActiveMode {
-    return this._activeMode;
-  }
-
-  private _getContents(): QuillDelta {
-    return this._quill.innerEditor.getContents() as QuillDelta;
-  }
-
-  private _setContents(contents: QuillDelta) {
-    this._quill.innerEditor.setContents(contents);
-  }
-
-  private _getText(): string {
-    return this._quill.innerEditor.getText();
-  }
-
-  private _setSelection(index: number) {
-    this._quill.innerEditor.setSelection(index);
-  }
-
-  private _removeFormat(startIndex: number, endIndex: number) {
-    return this._quill.innerEditor.removeFormat(startIndex, endIndex);
+    return this._quillEditor.activeMode;
   }
 
   private _loadSavedState(
@@ -140,9 +114,12 @@ export class QuillEditorComponent
 
     // If contents pre- and post-formatting are identical, then nothing will be lost,
     // and there's no reason to confirm the switch.
-    this._defaultContents = this._getContents();
-    this._removeFormat(0, this._getText().length - 1);
-    if (this._getContents().ops.length === this._defaultContents.ops.length) {
+    this._defaultContents = this._quillEditor.getContents();
+    this._quillEditor.removeFormat(0, this._quillEditor.getText().length - 1);
+    if (
+      this._quillEditor.getContents().ops.length ===
+      this._defaultContents.ops.length
+    ) {
       confirmed = true;
     } else {
       confirmed = await confirmationModalWithText(
@@ -152,8 +129,8 @@ export class QuillEditorComponent
 
     if (!confirmed) {
       // Restore formatted contents
-      this._setContents(this._defaultContents);
-      this._setSelection(this._getText().length - 1);
+      this._quillEditor.setContents(this._defaultContents);
+      this._quillEditor.setSelection(this._quillEditor.getText().length - 1);
     }
     return confirmed;
   }
@@ -200,13 +177,6 @@ export class QuillEditorComponent
 
     if (!this._loaded) {
       this._loadSavedState(contentsDoc, editorNamespace);
-      this.clearUnsavedChanges = () => {
-        Object.keys(localStorage)
-          .filter((key) => key.includes(editorNamespace))
-          .forEach((key) => {
-            localStorage.removeItem(key);
-          });
-      };
       this._loaded = true;
     }
 
@@ -215,19 +185,18 @@ export class QuillEditorComponent
         class={editorClass}
         oncreate={(childVnode) => {
           this._$editor = $(childVnode.dom).find('.quill-editor');
-          this._quill = new QuillEditor(
+          this._quillEditor = new QuillEditor(
             this._$editor,
             this._activeMode,
             theme,
             imageUploader,
             placeholder,
             editorNamespace,
-            this,
             onkeyboardSubmit,
             this._defaultContents,
             tabIndex
           );
-          if (oncreateBind) oncreateBind(this._quill);
+          if (oncreateBind) oncreateBind(this._quillEditor);
         }}
       >
         <div class="quill-editor" />
@@ -238,16 +207,15 @@ export class QuillEditorComponent
             className="mode-switcher"
             title="Switch to Rich Text mode"
             onclick={(e) => {
-              this._defaultContents = this._getContents();
+              this._defaultContents = this._quillEditor.getContents();
               this._activeMode = 'richText';
-              this._quill = new QuillEditor(
+              this._quillEditor = new QuillEditor(
                 this._$editor,
                 this._activeMode,
                 theme,
                 imageUploader,
                 placeholder,
                 editorNamespace,
-                this,
                 onkeyboardSubmit,
                 this._defaultContents,
                 tabIndex
@@ -270,18 +238,20 @@ export class QuillEditorComponent
               if (!confirmed) return;
 
               // Remove formatting, switch to Markdown.
-              this._removeFormat(0, this._getText().length - 1);
-              this._defaultContents = this._getContents();
+              this._quillEditor.removeFormat(
+                0,
+                this._quillEditor.getText().length - 1
+              );
+              this._defaultContents = this._quillEditor.getContents();
               this._activeMode = 'markdown';
 
-              this._quill = new QuillEditor(
+              this._quillEditor = new QuillEditor(
                 this._$editor,
                 this._activeMode,
                 theme,
                 imageUploader,
                 placeholder,
                 editorNamespace,
-                this,
                 onkeyboardSubmit,
                 this._defaultContents
               );
@@ -301,8 +271,8 @@ export class QuillEditorComponent
               data: {
                 doc:
                   this._activeMode === 'markdown'
-                    ? this._getText()
-                    : JSON.stringify(this._getContents()),
+                    ? this._quillEditor.getText()
+                    : JSON.stringify(this._quillEditor.getContents()),
               },
             });
           }}
