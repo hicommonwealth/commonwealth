@@ -44,7 +44,10 @@
     "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
     "migrate-db": "npx sequelize db:migrate",
-    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump"
+    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
+    "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
+    "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
+    "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh"
   },
   "engines": {
     "node": "14.x"
