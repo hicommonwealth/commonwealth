@@ -169,9 +169,8 @@ export class NewTopicModal implements m.ClassComponent {
 
               quillEditorState.disable();
 
-              const defaultOffchainTemplate = quillEditorState.getTextContents(
-                true
-              ) as string;
+              const defaultOffchainTemplate =
+                quillEditorState.getTextContents(true);
 
               app.topics
                 .add(
@@ -181,7 +180,7 @@ export class NewTopicModal implements m.ClassComponent {
                   form.featuredInSidebar,
                   form.featuredInNewPost,
                   this.form.tokenThreshold || '0',
-                  defaultOffchainTemplate
+                  defaultOffchainTemplate as string
                 )
                 .then(() => {
                   this.saving = false;

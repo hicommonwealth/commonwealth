@@ -85,7 +85,7 @@ const newThread = async (
 
   quillEditorState.disable();
 
-  const bodyText = quillEditorState.getTextContents();
+  const bodyText = quillEditorState.getTextContents(true);
 
   form.body = bodyText;
 
