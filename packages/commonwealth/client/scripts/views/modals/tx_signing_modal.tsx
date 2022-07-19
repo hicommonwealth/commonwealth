@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import $ from 'jquery';
 import m from 'mithril';
 import { EventEmitter } from 'events';
@@ -15,14 +17,15 @@ import {
   ITXData,
   ITransactionResult,
 } from 'models';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import Substrate from 'controllers/chain/substrate/main';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
-import { AddressSwapper } from 'views/components/addresses/address_swapper';
 import { CodeBlock } from 'views/components/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { getClasses } from '../components/component_kit/helpers';
 
 const createProposalTransactionLabels = {
   // substrate: accounts
@@ -66,36 +69,36 @@ const getTransactionLabel = (txname) => {
   return createProposalTransactionLabels[txname];
 };
 
-//
-// shared components
-//
-
-const TXSigningTransactionBox: m.Component<{
-  success: boolean;
-  status: string;
-  blockHash: string;
-  blockNum: string;
-  timestamp: string;
-}> = {
-  view: (vnode) => {
+class TXSigningTransactionBox
+  implements
+    m.ClassComponent<{
+      blockHash: string;
+      blockNum: string;
+      status: string;
+      success: boolean;
+      timestamp: string;
+    }>
+{
+  view(vnode) {
     return m('.TXSigningTransactionBox', [
       m('.txbox-header', 'Status'),
-      m(
-        '.txbox-content',
-        {
-          class: vnode.attrs.success ? 'txbox-success' : 'txbox-fail',
-        },
-        vnode.attrs.status
-      ),
-      m('.txbox-header', 'Block Hash'),
-      m('.txbox-content', vnode.attrs.blockHash),
-      m('.txbox-header', 'Block Number'),
-      m('.txbox-content', vnode.attrs.blockNum),
-      m('.txbox-header', 'Timestamp'),
-      m('.txbox-content', vnode.attrs.timestamp),
+      <div
+        class={getClasses<{ success?: boolean }>(
+          { success: vnode.attrs.success },
+          'txbox-content'
+        )}
+      >
+        {vnode.attrs.status}
+      </div>,
+      <div class="txbox-header">Block Hash</div>,
+      <div class="txbox-content">{vnode.attrs.blockHash}</div>,
+      <div class="txbox-header">Block Number</div>,
+      <div class="txbox-content">{vnode.attrs.blockNum}</div>,
+      <div class="txbox-header">Timestamp</div>,
+      <div class="txbox-content">{vnode.attrs.timestamp}</div>,
     ]);
-  },
-};
+  }
+}
 
 type TxDataState = Partial<ITransactionResult> & {
   error?: Error;
@@ -283,7 +286,7 @@ const TXSigningWebWalletOption: m.Component<
       webWallet &&
       !!webWallet.accounts.find((v) => {
         return (
-          AddressSwapper({
+          addressSwapper({
             address: v.address,
             currentPrefix: (app.chain as Substrate).chain.ss58Format,
           }) === vnode.attrs.author.address

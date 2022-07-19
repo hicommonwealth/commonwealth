@@ -25,6 +25,7 @@ import {
 
 import nacl from 'tweetnacl';
 
+import { addressSwapper } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
@@ -38,7 +39,6 @@ import {
   NotificationCategories,
   WalletId,
 } from '../../shared/types';
-import { AddressSwapper } from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -482,7 +482,7 @@ const verifyAddress = async (
 
   const address =
     chain.base === ChainBase.Substrate
-      ? AddressSwapper({
+      ? addressSwapper({
           address: req.body.address,
           currentPrefix: chain.ss58_prefix,
         })

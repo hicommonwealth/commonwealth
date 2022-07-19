@@ -1,5 +1,32 @@
 @import 'shared';
 
+.TXSigningTransactionBox {
+  border-radius: 4px;
+  border: 1px solid $primary-300;
+  margin: 5px 0;
+  padding: 24px 28px 12px;
+  text-align: left;
+  width: 360px;
+
+  .txbox-header {
+    font-weight: 500;
+    margin-bottom: 1px;
+  }
+
+  .txbox-content {
+    margin-bottom: 14px;
+    word-break: break-word;
+  }
+
+  .txbox-content {
+    color: $rorange-500;
+
+    &.success {
+      color: $green-500;
+    }
+  }
+}
+
 .TXSigningModalBody {
   .compact-modal-body {
     padding-bottom: 15px;
@@ -76,32 +103,5 @@
   .cui-spinner {
     margin: 20px 0 26px;
     width: 100%;
-  }
-
-  .TXSigningTransactionBox {
-    border: 1px solid $primary-300;
-    padding: 24px 28px 12px;
-    border-radius: 4px;
-    text-align: left;
-    width: 360px;
-    margin: 5px 0;
-
-    .txbox-header {
-      font-weight: 500;
-      margin-bottom: 1px;
-    }
-
-    .txbox-content {
-      margin-bottom: 14px;
-      word-break: break-word;
-    }
-
-    .txbox-content.txbox-success {
-      color: $green-500;
-    }
-
-    .txbox-content.txbox-fail {
-      color: $rorange-500;
-    }
   }
 }

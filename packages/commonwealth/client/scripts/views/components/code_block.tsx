@@ -1,6 +1,6 @@
 import m from 'mithril';
 
-import 'components/widgets/code_block.scss';
+import 'components/code_block.scss';
 
 import { getClasses } from './component_kit/helpers';
 

@@ -22,7 +22,7 @@ import Near from 'controllers/chain/near/main';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import User from 'views/components/widgets/user';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { AddressSwapper } from 'views/components/addresses/address_swapper';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 enum LinkNewAddressSteps {
@@ -97,7 +97,7 @@ const LinkAccountItem: m.Component<
     } = vnode.attrs;
     const address =
       base === ChainBase.Substrate
-        ? AddressSwapper({
+        ? addressSwapper({
             address: account.address,
             currentPrefix: (app.chain as Substrate).chain.ss58Format,
           })
