@@ -1,0 +1,11 @@
+.SnapshotProposalsPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 24px;
+
+  .no-proposals {
+    display: flex;
+    flex-direction: row;
+  }
+}
