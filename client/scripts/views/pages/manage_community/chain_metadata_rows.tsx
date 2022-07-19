@@ -19,8 +19,8 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
-import Quill from '../../components/quill';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -228,12 +228,12 @@ export class ChainMetadataRows
           }}
         />
         <CWLabel label="Community Banner" />
-        <QuillEditor
+        <QuillEditorComponent
           className="chain-metadata-quill-editor"
           // Prevent the editor from being filled in with previous content
           contentsDoc={this.communityBanner || ''}
           oncreateBind={(state) => {
-            this.quillBanner = new Quill(state);
+            this.quillBanner = state;
           }}
           tabindex={1}
           editorNamespace="new-banner"

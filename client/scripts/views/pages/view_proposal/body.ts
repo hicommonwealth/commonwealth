@@ -22,7 +22,7 @@ import {
 } from 'models';
 
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
@@ -45,10 +45,6 @@ import { ChainType } from '../../../../../shared/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import {
-  disableEditor,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
 import { jumpHighlightComment } from './helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
@@ -608,9 +604,7 @@ export const ProposalBodyCancelEdit: m.Component<{
           onclick: async (e) => {
             e.preventDefault();
             let confirmed = true;
-            const threadText = getQuillTextContents(
-              parentState.quillEditorState
-            );
+            const threadText = parentState.quillEditorState.getTextContents();
             if (threadText !== parentState.currentText) {
               confirmed = await confirmationModalWithText(
                 'Cancel editing? Changes will not be saved.'
@@ -661,8 +655,8 @@ export const ProposalBodySaveEdit: m.Component<{
             }
             parentState.saving = true;
             const { quillEditorState } = parentState;
-            disableEditor(quillEditorState);
-            const itemText = getQuillTextContents(quillEditorState);
+            quillEditorState.disable();
+            const itemText = quillEditorState.getTextContents();
             if (item instanceof OffchainThread) {
               app.threads
                 .edit(
@@ -876,11 +870,11 @@ export const ProposalBodyEditor: m.Component<
 
     if (!body) return;
     if (savedEdits && restoreEdits === undefined) {
-      return m(QuillEditor);
+      return m(QuillEditorComponent);
     }
 
     return m('.ProposalBodyEditor', [
-      m(QuillEditor, {
+      m(QuillEditorComponent, {
         contentsDoc: (() => {
           try {
             const doc = JSON.parse(body);

@@ -22,7 +22,7 @@ import { navigateToSubpage } from 'app';
 import { ChainBase } from 'types';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import {
@@ -33,11 +33,7 @@ import {
   createProposal,
 } from 'helpers/snapshot_utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import {
-  disableEditor,
-  editorIsBlank,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
 interface IThreadForm {
   name: string;
@@ -83,13 +79,13 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  if (editorIsBlank(quillEditorState)) {
+  if (quillEditorState.isBlank()) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  disableEditor(quillEditorState);
+  quillEditorState.disable();
 
-  const bodyText = getQuillTextContents(quillEditorState);
+  const bodyText = quillEditorState.getTextContents();
 
   form.body = bodyText;
 
@@ -102,18 +98,18 @@ const newThread = async (
   form.start = Math.floor(form.start / 1000);
   form.end = Math.floor(form.end / 1000);
 
-  const version = await getVersion();
+  // const version = await getVersion();
 
-  const msg: any = {
-    address: author.address,
-    msg: JSON.stringify({
-      version,
-      timestamp: (Date.now() / 1e3).toFixed(),
-      space: space.id,
-      type: 'proposal',
-      payload: form,
-    }),
-  };
+  // const msg = {
+  //   address: author.address,
+  //   msg: JSON.stringify({
+  //     version,
+  //     timestamp: (Date.now() / 1e3).toFixed(),
+  //     space: space.id,
+  //     type: 'proposal',
+  //     payload: form,
+  //   }),
+  // };
 
   const proposalPayload = {
     space: space.id,
@@ -132,7 +128,7 @@ const newThread = async (
   };
 
   try {
-    const res = await createProposal(author.address, proposalPayload);
+    await createProposal(author.address, proposalPayload);
     await app.user.notifications.refresh();
     await app.snapshot.refreshProposals();
   } catch (e) {
@@ -163,11 +159,11 @@ const NewProposalForm: m.Component<
   { snapshotId: string },
   {
     form: IThreadForm;
-    quillEditorState;
+    quillEditorState: QuillEditor;
     saving: boolean;
     space: SnapshotSpace;
     members: string[];
-    userScore: any;
+    userScore: number;
     isFromExistingProposal: boolean;
     initialized: boolean;
     snapshotScoresFetched: boolean;
@@ -240,9 +236,9 @@ const NewProposalForm: m.Component<
     }
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
-    if (vnode.state.quillEditorState?.container) {
+    if (vnode.state.quillEditorState?.outerEditor.container) {
       // TODO: WTF?
-      vnode.state.quillEditorState.container.tabIndex = 8;
+      vnode.state.quillEditorState.outerEditor.container.tabIndex = 8;
     }
 
     const saveToLocalStorage = () => {
@@ -412,7 +408,7 @@ const NewProposalForm: m.Component<
                 }),
               ]),
               m(FormGroup, [
-                m(QuillEditor, {
+                m(QuillEditorComponent, {
                   // Prevent the editor from being filled in with previous content
                   contentsDoc: vnode.state.form.body
                     ? vnode.state.form.body

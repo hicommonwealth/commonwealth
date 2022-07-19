@@ -2,7 +2,7 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
-import Quill from 'quill-2.0-dev/quill';
+import Quill from 'quill';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
@@ -14,8 +14,8 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillEditorComponent } from './quill_editor';
-import { QuillTextContents } from './types';
+import { QuillEditorComponent } from './quill_editor_component';
+import { QuillActiveMode, QuillTextContents } from './types';
 
 const Delta = Quill.import('delta');
 const Clipboard = Quill.import('modules/clipboard') as any;
@@ -24,27 +24,21 @@ const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
 const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
 
 export default class QuillEditorInternal {
-  private _quill;
-
-  private get activeMode() {
-    // TODO: Can't we store internally? Seems unneccessary/fragile
-    return this._$editor.parent('.markdown-mode').length > 0
-      ? 'markdown'
-      : 'richText';
-  }
+  protected _quill: Quill;
 
   constructor(
     // TODO: Make readonly where possible
     private _$editor: JQuery<HTMLElement>,
-    private _theme: string,
-    private _imageUploader: boolean,
-    private _placeholder: string,
+    protected _activeMode: QuillActiveMode,
     private _editorNamespace: string,
-    private _parentState: QuillEditorComponent,
+    protected _parentState: QuillEditorComponent,
     private _onkeyboardSubmit: () => void
   ) {}
 
   public initializeEditor(
+    theme: string,
+    imageUploader: boolean,
+    placeholder: string,
     defaultContents: QuillTextContents,
     tabIndex: number
   ) {
@@ -68,10 +62,10 @@ export default class QuillEditorInternal {
         },
         // TODO: Currently works, but throws Parchment error. Smooth functionality
         // requires troubleshooting
-        imageUploader: false,
+        imageUploader,
         markdownShortcuts: {
           suppress: () => {
-            return this.activeMode === 'markdown';
+            return this._activeMode === 'markdown';
           },
         },
         keyboard: { bindings: this._getKeyBindings() },
@@ -105,7 +99,7 @@ export default class QuillEditorInternal {
           ],
         },
       },
-      placeholder: this._placeholder,
+      placeholder,
       formats: [
         'bold',
         'italic',
@@ -120,7 +114,7 @@ export default class QuillEditorInternal {
         'video',
         'mention',
       ],
-      theme: this._theme,
+      theme,
     });
 
     // Set up auto-hyperlinking of pasted URIs
@@ -172,7 +166,7 @@ export default class QuillEditorInternal {
   }
 
   private _handleAutolinks(range, context) {
-    if (this.activeMode === 'markdown') return true;
+    if (this._activeMode === 'markdown') return true;
     const url = this._sliceFromLastWhitespace(context.prefix);
     const retain = range.index - url.length;
     const ops = (retain ? [{ retain }] : []) as any;
@@ -212,7 +206,7 @@ export default class QuillEditorInternal {
         } else if (text || files.length > 1) {
           this.onPaste(
             range,
-            this.activeMode === 'markdown' ? { text } : { html, text }
+            this._activeMode === 'markdown' ? { text } : { html, text }
           );
         }
       }
@@ -484,7 +478,7 @@ export default class QuillEditorInternal {
       text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
     const beforeText = text.slice(0, cursorIdx - mentionLength);
     const afterText = text.slice(cursorIdx).replace(/\n$/, '');
-    if (this.activeMode === 'markdown') {
+    if (this._activeMode === 'markdown') {
       const fullText = `${beforeText}[@${item.name}](${
         item.link
       }) ${afterText.replace(/^ /, '')}`;
@@ -696,7 +690,7 @@ export default class QuillEditorInternal {
       if (typeof node.data !== 'string') return;
 
       const matches = node.data.match(REGEXP_GLOBAL);
-      if (matches && matches.length > 0 && this.activeMode === 'richText') {
+      if (matches && matches.length > 0 && this._activeMode === 'richText') {
         const ops = [];
         let str = node.data;
         matches.forEach((match) => {
@@ -746,7 +740,7 @@ export default class QuillEditorInternal {
 
     const makeMarkdownToolbarHandlerInline = (handler, fmt) => {
       toolbar.addHandler(handler, (value) => {
-        if (this.activeMode === 'richText')
+        if (this._activeMode === 'richText')
           return this._quill.format(handler, value);
         const { index, length } = this._quill.getSelection();
         const text = this._quill.getText();
@@ -776,7 +770,7 @@ export default class QuillEditorInternal {
     const makeMarkdownToolbarHandler = (handler, fmtOption) => {
       toolbar.addHandler(handler, (value) => {
         if (value === 'check') value = 'unchecked';
-        if (this.activeMode === 'richText')
+        if (this._activeMode === 'richText')
           return this._quill.format(handler, value);
 
         const { index, length } = this._quill.getSelection();
@@ -833,7 +827,7 @@ export default class QuillEditorInternal {
     // Set up remaining couple of Markdown toolbar options
     const defaultLinkHandler = this._quill.theme.modules.toolbar.handlers.link;
     toolbar.addHandler('link', (value) => {
-      if (this.activeMode === 'richText')
+      if (this._activeMode === 'richText')
         return defaultLinkHandler.call({ quill: this._quill }, value);
 
       const { index, length } = this._quill.getSelection();
@@ -888,7 +882,7 @@ export default class QuillEditorInternal {
       .parent()
       .find('button.ql-preview')
       .on('click', (e) => {
-        const markdownMode = this.activeMode === 'markdown';
+        const markdownMode = this._activeMode === 'markdown';
         app.modals.create({
           modal: PreviewModal,
           data: {
@@ -941,7 +935,7 @@ export default class QuillEditorInternal {
   // HANDLERS
 
   private _inlineFormatHandler(context, formatType: string) {
-    if (this.activeMode === 'richText')
+    if (this._activeMode === 'richText')
       this._quill.format(
         formatType,
         !context.format[formatType],
@@ -951,7 +945,7 @@ export default class QuillEditorInternal {
   }
 
   private _newLineHandler(range, context) {
-    if (this.activeMode === 'markdown') return true;
+    if (this._activeMode === 'markdown') return true;
     const [line, offset] = this._quill.getLine(range.index);
     const { textContent } = line.domNode;
     const isEmbed = this._insertEmbeds(textContent);
@@ -1007,7 +1001,7 @@ export default class QuillEditorInternal {
   }
 
   private _listAutofillHandler(range, context) {
-    if (this.activeMode === 'markdown') return true;
+    if (this._activeMode === 'markdown') return true;
     const length = context.prefix.length;
     const [line, offset] = this._quill.getLine(range.index);
 

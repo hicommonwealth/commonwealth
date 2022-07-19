@@ -9,7 +9,7 @@ import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import User from 'views/components/widgets/user';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -18,13 +18,9 @@ import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { IProposalPageState } from '.';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import {
-  disableEditor,
-  editorIsBlank,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
 import { jumpHighlightComment } from './helpers';
 import { GlobalStatus } from './body';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
 const CreateComment: m.Component<
   {
@@ -37,7 +33,7 @@ const CreateComment: m.Component<
     tabindex?: number;
   },
   {
-    quillEditorState: any;
+    quillEditorState: QuillEditor;
     uploadsInProgress;
     error;
     saving: boolean;
@@ -55,7 +51,7 @@ const CreateComment: m.Component<
     let { parentComment } = vnode.attrs;
     let disabled =
       getSetGlobalEditingStatus(GlobalStatus.Get) ||
-      vnode.state.quillEditorState?.editor?.editor?.isBlank();
+      vnode.state.quillEditorState?.isBlank();
 
     const author = app.user.activeAccount;
     const parentType =
@@ -68,23 +64,20 @@ const CreateComment: m.Component<
     }
 
     const submitComment = async (e?) => {
-      if (
-        !vnode.state.quillEditorState ||
-        !vnode.state.quillEditorState.editor
-      ) {
+      if (!vnode.state.quillEditorState?.outerEditor) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
         return;
       }
 
       const { quillEditorState } = vnode.state;
-      if (editorIsBlank(quillEditorState)) {
+      if (quillEditorState.isBlank()) {
         if (e) e.preventDefault();
         vnode.state.error = 'Comment cannot be blank';
         return;
       }
 
-      const commentText = getQuillTextContents(quillEditorState);
+      const commentText = quillEditorState.getTextContents(true) as string;
 
       const attachments = [];
       // const attachments = vnode.state.files ?
@@ -92,7 +85,7 @@ const CreateComment: m.Component<
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;
-      disableEditor(quillEditorState);
+      quillEditorState.disable();
       const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(
@@ -104,11 +97,7 @@ const CreateComment: m.Component<
           attachments
         );
         callback();
-        if (vnode.state.quillEditorState.editor) {
-          vnode.state.quillEditorState.editor.enable();
-          vnode.state.quillEditorState.editor.setContents();
-          vnode.state.quillEditorState.clearUnsavedChanges();
-        }
+        vnode.state.quillEditorState.resetEditor();
         vnode.state.sendingComment = false;
         proposalPageState.recentlySubmitted = res.id;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
@@ -119,9 +108,7 @@ const CreateComment: m.Component<
       } catch (err) {
         console.log(err);
         notifyError(err.message || 'Comment submission failed.');
-        if (vnode.state.quillEditorState.editor) {
-          vnode.state.quillEditorState.editor.enable();
-        }
+        vnode.state.quillEditorState.enable();
         vnode.state.error = err.message;
         vnode.state.sendingComment = false;
         m.redraw();
@@ -149,7 +136,7 @@ const CreateComment: m.Component<
     const { error, sendingComment, uploadsInProgress } = vnode.state;
     disabled =
       getSetGlobalEditingStatus(GlobalStatus.Get) ||
-      vnode.state.quillEditorState?.editor?.editor?.isBlank() ||
+      vnode.state.quillEditorState?.isBlank() ||
       sendingComment ||
       uploadsInProgress ||
       !app.user.activeAccount;
@@ -232,7 +219,7 @@ const CreateComment: m.Component<
                       ),
                     ],
                   }),
-                m(QuillEditor, {
+                m(QuillEditorComponent, {
                   contentsDoc: '',
                   oncreateBind: (state) => {
                     vnode.state.quillEditorState = state;

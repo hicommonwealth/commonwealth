@@ -4,7 +4,7 @@ import 'components/new_thread_form.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import Quill from 'quill-2.0-dev/quill';
+import Quill from 'quill';
 import {
   Callout,
   Tabs,
@@ -31,10 +31,11 @@ import { confirmationModalWithText } from '../modals/confirm_modal';
 import { EditProfileModal } from '../modals/edit_profile_modal';
 import { TopicSelector } from './topic_selector';
 
-import { QuillEditor } from './quill/quill_editor';
+import { QuillEditorComponent } from './quill/quill_editor_component';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { QuillEditor } from './quill/quill_editor';
 
 interface IThreadForm {
   topicName?: string;
@@ -364,7 +365,7 @@ export const NewThreadForm: m.Component<
     form: IThreadForm;
     fromDraft?: number;
     postType: string;
-    quillEditorState;
+    quillEditorState: QuillEditor;
     overwriteConfirmationModal: boolean;
     recentlyDeletedDrafts: number[];
     saving: boolean;
@@ -452,10 +453,6 @@ export const NewThreadForm: m.Component<
     const author = app.user.activeAccount;
     const activeEntityInfo = app.chain.meta;
     const { isModal, hasTopics } = vnode.attrs;
-    if (vnode.state.quillEditorState?.container) {
-      // TODO: WTF?
-      vnode.state.quillEditorState.container.tabIndex = 8;
-    }
 
     const updateTopicState = (topicName: string, topicId?: number) => {
       localStorage.setItem(`${app.activeChainId()}-active-topic`, topicName);
@@ -535,7 +532,7 @@ export const NewThreadForm: m.Component<
       postType === PostType.Discussion &&
       (!author ||
         vnode.state.saving ||
-        vnode.state.quillEditorState?.editor?.editor?.isBlank() ||
+        vnode.state.quillEditorState?.isBlank() ||
         !vnode.state.form?.threadTitle ||
         (hasTopics && !vnode.state.form?.topicName) ||
         vnode.state.uploadsInProgress > 0);
@@ -716,7 +713,7 @@ export const NewThreadForm: m.Component<
                 }),
               ]),
               m(FormGroup, { order: 4 }, [
-                m(QuillEditor, {
+                m(QuillEditorComponent, {
                   contentsDoc: '', // Prevent the editor from being filled in with previous content
                   oncreateBind: (state) => {
                     vnode.state.quillEditorState = state;
@@ -857,7 +854,7 @@ export const NewThreadForm: m.Component<
                 ]
               ),
               m(FormGroup, { order: 4 }, [
-                m(QuillEditor, {
+                m(QuillEditorComponent, {
                   contentsDoc: '',
                   oncreateBind: (state) => {
                     vnode.state.quillEditorState = state;
@@ -939,14 +936,11 @@ export const NewThreadForm: m.Component<
                         fromDraft_
                       );
                       vnode.state.saving = false;
-                      vnode.state.quillEditorState.alteredText = false;
                       if (isModal) {
                         notifySuccess('Draft saved');
                       }
                       clearLocalStorage(PostType.Discussion);
-                      vnode.state.quillEditorState.editor.setContents([
-                        { insert: '\n' },
-                      ]);
+                      quillEditorState.resetEditor();
                       title.val('');
                       vnode.state.activeTopic = false;
                       delete vnode.state.fromDraft;

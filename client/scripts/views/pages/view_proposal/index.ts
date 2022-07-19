@@ -123,6 +123,7 @@ import {
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -203,7 +204,7 @@ const ProposalHeader: m.Component<
     savedEdit: string;
     editing: boolean;
     saving: boolean;
-    quillEditorState: any;
+    quillEditorState: QuillEditor;
     currentText: any;
     topicEditorIsOpen: boolean;
     editPermissionsIsOpen: boolean;
@@ -535,7 +536,7 @@ const ProposalComment: m.Component<
     editing: boolean;
     saving: boolean;
     replying: boolean;
-    quillEditorState: any;
+    quillEditorState: QuillEditor;
   }
 > = {
   view: (vnode) => {

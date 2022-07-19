@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/new_topic_modal.scss';
 
 import { ChainNetwork } from 'types';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
@@ -15,11 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
-import {
-  disableEditor,
-  editorIsBlank,
-  getQuillTextContents,
-} from '../components/quill/helpers';
+import { QuillEditor } from '../components/quill/quill_editor';
 
 type NewTopicModalForm = {
   description: string;
@@ -40,7 +36,7 @@ export class NewTopicModal implements m.ClassComponent {
     name: '',
     tokenThreshold: '0',
   };
-  private quillEditorState; // do we have a type for this?
+  private quillEditorState: QuillEditor;
   private saving: boolean;
 
   view() {
@@ -51,8 +47,7 @@ export class NewTopicModal implements m.ClassComponent {
     if (
       this.form.featuredInNewPost &&
       this.quillEditorState &&
-      this.quillEditorState.editor &&
-      editorIsBlank(this.quillEditorState)
+      this.quillEditorState.isBlank()
     ) {
       disabled = true;
     }
@@ -156,9 +151,9 @@ export class NewTopicModal implements m.ClassComponent {
             />
           </div>
           {this.form.featuredInNewPost && (
-            <QuillEditor
+            <QuillEditorComponent
               contentsDoc=""
-              oncreateBind={(state) => {
+              oncreateBind={(state: QuillEditor) => {
                 this.quillEditorState = state;
               }}
               editorNamespace="new-discussion"
@@ -172,10 +167,11 @@ export class NewTopicModal implements m.ClassComponent {
               e.preventDefault();
               const { quillEditorState, form } = this;
 
-              disableEditor(quillEditorState);
+              quillEditorState.disable();
 
-              const defaultOffchainTemplate =
-                getQuillTextContents(quillEditorState);
+              const defaultOffchainTemplate = quillEditorState.getTextContents(
+                true
+              ) as string;
 
               app.topics
                 .add(
