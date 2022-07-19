@@ -42,7 +42,7 @@ export class CWCommunityAvatar
               className="avatar-no-image-letter"
               fontWeight="medium"
             >
-              {community.name.slice(0, 1)}
+              {community.name?.slice(0, 1)}
             </CWText>
           </div>
         )}
