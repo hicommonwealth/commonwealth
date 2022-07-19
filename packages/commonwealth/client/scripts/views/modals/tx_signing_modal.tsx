@@ -2,257 +2,26 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { EventEmitter } from 'events';
-import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
+import { Button, Grid, Col, Spinner } from 'construct-ui';
 
 import 'modals/tx_signing_modal.scss';
 
 import app from 'state';
 import { link } from 'helpers';
-import { ChainBase } from 'types';
-import {
-  ITXModalData,
-  TransactionStatus,
-  IWebWallet,
-  ITXData,
-  ITransactionResult,
-} from 'models';
+import { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import Substrate from 'controllers/chain/substrate/main';
-import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
-import { CodeBlock } from 'views/components/code_block';
 import HorizontalTabs from 'views/components/widgets/horizontal_tabs';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { getClasses } from '../components/component_kit/helpers';
-
-const createProposalTransactionLabels = {
-  // substrate: accounts
-  balanceTransfer: 'Transfer balance',
-  // substrate: collective
-  createCouncilMotion: 'Create council motion',
-  voteCouncilMotions: 'Vote on council motion',
-  // substrate: elections
-  submitCandidacy: 'Submit candidacy',
-  setApprovals: 'Set election votes',
-  retractVoter: 'Retract election votes',
-  presentWinner: 'Present election winner',
-  reapInactiveVoter: 'Claim inactive voter bond',
-  // substrate: democracy
-  createDemocracyProposal: 'Create democracy proposal',
-  notePreimage: 'Note preimage',
-  noteImminentPreimage: 'Note imminnet preimage',
-  secondDemocracyProposal: 'Second democracy proposal',
-  submitDemocracyVote: 'Vote on democracy proposal',
-  submitProxyDemocracyVote: 'Vote on democracy proposal (proxy)',
-  setProxy: 'Set proxy',
-  resignProxy: 'Resign proxy',
-  removeProxy: 'Remove proxy',
-  delegate: 'Set delegate',
-  undelegate: 'Remove delegate',
-  // edgeware: treasury
-  proposeSpend: 'Propose treasury spend',
-  contractInteraction: 'Interact with contract',
-  // cosmos: accounts
-  MsgSend: 'Send balance',
-  MsgDelegate: 'Delegate stake',
-  MsgUndelegate: 'Undelegate stake',
-  MsgRedelegate: 'Redelegate stake',
-  // cosmos: governance
-  MsgDeposit: 'Increase proposal deposit',
-  MsgVote: 'Submit vote',
-  MsgSubmitProposal: 'Submit proposal',
-};
-
-const getTransactionLabel = (txname) => {
-  return createProposalTransactionLabels[txname];
-};
-
-class TXSigningTransactionBox
-  implements
-    m.ClassComponent<{
-      blockHash: string;
-      blockNum: string;
-      status: string;
-      success: boolean;
-      timestamp: string;
-    }>
-{
-  view(vnode) {
-    return m('.TXSigningTransactionBox', [
-      m('.txbox-header', 'Status'),
-      <div
-        class={getClasses<{ success?: boolean }>(
-          { success: vnode.attrs.success },
-          'txbox-content'
-        )}
-      >
-        {vnode.attrs.status}
-      </div>,
-      <div class="txbox-header">Block Hash</div>,
-      <div class="txbox-content">{vnode.attrs.blockHash}</div>,
-      <div class="txbox-header">Block Number</div>,
-      <div class="txbox-content">{vnode.attrs.blockNum}</div>,
-      <div class="txbox-header">Timestamp</div>,
-      <div class="txbox-content">{vnode.attrs.timestamp}</div>,
-    ]);
-  }
-}
-
-type TxDataState = Partial<ITransactionResult> & {
-  error?: Error;
-  events?: EventEmitter;
-};
-type NextFn = (newState: string, newData?: TxDataState) => void;
-
-//
-// tx signing options
-//
-
-const setupEventListeners = (
-  vnode: m.Vnode<
-    {
-      next: NextFn;
-    } & ITXModalData,
-    { timerHandle?: NodeJS.Timeout } | {}
-  >
-) => {
-  vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {
-    vnode.attrs.next('WaitingToConfirmTransaction', {
-      events: vnode.attrs.txData.events,
-    });
-  });
-  vnode.attrs.txData.events.once(
-    TransactionStatus.Error.toString(),
-    ({ err }) => {
-      vnode.attrs.txData.events.removeAllListeners();
-      vnode.attrs.next('SentTransactionRejected', {
-        error: new Error('Transaction Failed'),
-        hash: null,
-        err,
-      });
-    }
-  );
-  vnode.attrs.txData.events.once(
-    TransactionStatus.Failed.toString(),
-    ({ hash, blocknum, err, timestamp }) => {
-      // the transaction may be submitted twice, so only go to a
-      // failure state if transaction has not already succeeded
-      if ((vnode.state as { timerHandle?: NodeJS.Timeout }).timerHandle) {
-        clearInterval(
-          (vnode.state as { timerHandle?: NodeJS.Timeout }).timerHandle
-        );
-      }
-      vnode.attrs.txData.events.removeAllListeners();
-      vnode.attrs.next('SentTransactionRejected', {
-        error: err,
-        hash,
-        blocknum,
-        timestamp,
-      });
-    }
-  );
-  vnode.attrs.txData.events.once(
-    TransactionStatus.Success.toString(),
-    ({ hash, blocknum, timestamp }) => {
-      vnode.attrs.txData.events.removeAllListeners();
-      const $modal = $('.TXSigningModal');
-      $modal.trigger('modalcomplete');
-      vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
-    }
-  );
-};
-
-interface ITXSigningCLIOptionState {
-  calldata?: ITXData;
-  error?: string;
-}
-
-type TXSigningCLIOptionAttrs = ITXModalData & { next: NextFn };
-const TXSigningCLIOption: m.Component<
-  TXSigningCLIOptionAttrs,
-  ITXSigningCLIOptionState
-> = {
-  oncreate: async (vnode) => {
-    if (vnode.state.calldata === undefined) {
-      vnode.state.calldata = await vnode.attrs.txData.unsignedData();
-      m.redraw();
-    }
-  },
-  view: (
-    vnode: m.VnodeDOM<TXSigningCLIOptionAttrs, ITXSigningCLIOptionState>
-  ) => {
-    const transact = (...args) => {
-      setupEventListeners(vnode);
-      vnode.attrs.txData.transact(...args);
-    };
-
-    let signBlock = m(CodeBlock, { clickToSelect: true }, [
-      'Loading transaction data... ',
-    ]);
-    let instructions;
-    let submitAction;
-    if (
-      vnode.state.calldata &&
-      app.chain &&
-      app.chain.base === ChainBase.Substrate
-    ) {
-      const calldata = vnode.state.calldata as ISubstrateTXData;
-      instructions = m('.instructions', [
-        'Use subkey to sign this transaction:',
-      ]);
-      signBlock = m(CodeBlock, { clickToSelect: true }, [
-        `subkey ${calldata.isEd25519 ? '-e ' : ''}sign-transaction \\
-  --call ${calldata.call.slice(2)} \\
-  --nonce ${calldata.nonce} \\
-  --prior-block-hash ${calldata.blockHash.slice(2)} \\
-  --password "" \\
-  --suri "`,
-        m('span.no-select', 'secret phrase'),
-        '"',
-      ]);
-      submitAction = m(Button, {
-        intent: 'primary',
-        type: 'submit',
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          try {
-            const signedTx = $(vnode.dom)
-              .find('textarea.signedtx')
-              .val()
-              .toString()
-              .trim();
-            transact(signedTx);
-          } catch (err) {
-            throw new Error('Failed to execute signed transaction');
-          }
-        },
-        label: 'Send transaction',
-      });
-    }
-    return m('.TXSigningCLIOption', [
-      instructions,
-      signBlock,
-      // action
-      m('p', 'Enter the output here:'),
-      m(TextArea, {
-        class: 'signedtx',
-        fluid: true,
-        placeholder: 'Signed TX',
-      }),
-      vnode.state.error &&
-        m(CWValidationText, {
-          message: vnode.state.error,
-          status: 'failure',
-        }),
-      submitAction,
-      !submitAction &&
-        m('p.transaction-loading', 'Still loading transaction...'),
-    ]);
-  },
-};
+import { TXSigningTransactionBox } from '../components/tx_signing/tx_signing_transaction_box';
+import {
+  getTransactionLabel,
+  setupEventListeners,
+} from '../components/tx_signing/helpers';
+import { NextFn, TxDataState } from '../components/tx_signing/types';
+import { TXSigningCLIOption } from '../components/tx_signing/tx_signing_cli_option';
+// import { getClasses } from '../components/component_kit/helpers';
 
 const TXSigningWebWalletOption: m.Component<
   {

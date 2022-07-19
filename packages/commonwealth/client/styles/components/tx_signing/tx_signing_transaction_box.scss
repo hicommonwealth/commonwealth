@@ -1,0 +1,28 @@
+@import 'shared';
+
+.TXSigningTransactionBox {
+  border-radius: 4px;
+  border: 1px solid $primary-300;
+  margin: 5px 0;
+  padding: 24px 28px 12px;
+  text-align: left;
+  width: 360px;
+
+  .txbox-header {
+    font-weight: 500;
+    margin-bottom: 1px;
+  }
+
+  .txbox-content {
+    margin-bottom: 14px;
+    word-break: break-word;
+  }
+
+  .txbox-content {
+    color: $rorange-500;
+
+    &.success {
+      color: $green-500;
+    }
+  }
+}
