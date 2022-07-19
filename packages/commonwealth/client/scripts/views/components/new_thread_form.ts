@@ -4,7 +4,7 @@ import 'components/new_thread_form.scss';
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import Quill from 'quill-2.0-dev/quill';
+import Quill from 'quill';
 import {
   Callout,
   Tabs,
