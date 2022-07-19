@@ -1,6 +1,6 @@
 import m from 'mithril';
 import moment from 'moment';
-
+import $ from 'jquery';
 import app from 'state';
 import { OffchainPoll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
