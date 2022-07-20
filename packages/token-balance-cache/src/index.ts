@@ -57,11 +57,13 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
         rejectUnauthorized: false,
       },
     });
+    await db.connect();
     const nodeQuery = await db.query<ChainNodeT>(`SELECT * FROM "ChainNodes";`);
     const nodeArray = nodeQuery.rows;
     for (const n of nodeArray) {
       this._nodes[n.id] = n;
     }
+    await db.end();
 
     // kick off job
     super.start();
