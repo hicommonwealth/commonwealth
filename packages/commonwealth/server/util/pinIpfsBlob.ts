@@ -4,7 +4,7 @@ const FormData = require('form-data');
 import models from '../database';
 import { ServerError } from './errors';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 require('dotenv').config();
 

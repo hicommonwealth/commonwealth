@@ -7,7 +7,7 @@ import 'pages/view_proposal/proposal_header_links.scss';
 import { externalLink, extractDomain, link } from 'helpers';
 import { OffchainThread, AnyProposal } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 // if you add a link when you create the thread

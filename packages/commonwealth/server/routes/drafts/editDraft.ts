@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
-import { factory, formatFilename } from '../../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
 
 const log = factory.getLogger(formatFilename(__filename));

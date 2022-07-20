@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login

@@ -24,7 +24,7 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import {
   ITXModalData,
   ProposalModule,

@@ -2,7 +2,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { IChainAdapter, ChainEntity, ChainEvent, NodeInfo, ChainInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';

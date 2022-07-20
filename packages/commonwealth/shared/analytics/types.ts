@@ -1,5 +1,5 @@
 import { CommunityType } from 'client/scripts/views/pages/create_community';
-import { ChainBase } from 'shared/types';
+import { ChainBase } from 'common-common/src/types';
 
 // Base Payload - Required for All Events
 export interface BaseMixpanelPayload {

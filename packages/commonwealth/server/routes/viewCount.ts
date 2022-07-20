@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { sequelize, DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));

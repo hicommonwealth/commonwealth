@@ -7,7 +7,7 @@ import {
   DemocracyThreshold,
   formatCall,
 } from 'adapters/chain/substrate/types';
-import { ChainBase, ProposalType } from 'types';
+import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   Account, ChainEntity, ChainEvent

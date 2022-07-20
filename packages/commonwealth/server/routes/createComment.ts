@@ -6,7 +6,7 @@ import {
   ChainType,
   NotificationCategories,
   ProposalType,
-} from '../../shared/types';
+} from 'common-common/src/types';
 import { DB } from '../database';
 
 import validateChain from '../util/validateChain';
@@ -18,7 +18,7 @@ import {
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,

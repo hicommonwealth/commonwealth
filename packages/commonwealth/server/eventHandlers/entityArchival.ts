@@ -13,7 +13,7 @@ import {
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 
-import { factory, addPrefix } from '../../shared/logging';
+import { factory, addPrefix } from 'common-common/src/logging';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';

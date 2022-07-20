@@ -2,7 +2,7 @@ import passport from 'passport';
 import passportJWT from 'passport-jwt';
 
 import { DB } from '../database';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { JWT_SECRET } from '../config';
 import { useSocialAccountAuth } from './socialAccount';
 import { useMagicAuth } from './magic';

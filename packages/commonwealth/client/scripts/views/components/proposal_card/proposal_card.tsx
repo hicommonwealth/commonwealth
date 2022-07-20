@@ -9,7 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { AnyProposal } from 'models';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import {
   proposalSlugToChainEntityType,
   chainEntityTypeToProposalShortName,

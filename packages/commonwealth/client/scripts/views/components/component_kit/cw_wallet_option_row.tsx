@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 
-import { WalletId } from 'types';
+import { WalletId } from 'common-common/src/types';
 
 import { ComponentType } from './types';
 import { CWText } from './cw_text';

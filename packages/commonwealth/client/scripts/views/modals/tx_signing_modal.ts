@@ -7,7 +7,7 @@ import { Button, TextArea, Grid, Col, Spinner } from 'construct-ui';
 
 import app from 'state';
 import { link } from 'helpers';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import {
   ITXModalData,
   TransactionStatus,

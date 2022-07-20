@@ -3,7 +3,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
 import app from 'state';
 import {

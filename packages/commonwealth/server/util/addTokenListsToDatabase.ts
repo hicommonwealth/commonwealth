@@ -3,7 +3,7 @@ import _ from 'underscore';
 import { slugify } from '../../shared/utils';
 import { DB } from '../database';
 import { TokenResponse } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenAttributes } from '../models/token';
 const log = factory.getLogger(formatFilename(__filename));
 

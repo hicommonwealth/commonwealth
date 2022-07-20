@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { WalletId } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { WalletId } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
