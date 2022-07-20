@@ -55,8 +55,6 @@ export class ChainMetadataRows
   communityBanner: string;
 
   oninit(vnode) {
-    console.log(vnode.attrs.chain);
-
     this.name = vnode.attrs.chain.name;
     this.description = vnode.attrs.chain.description;
     this.website = vnode.attrs.chain.website;
