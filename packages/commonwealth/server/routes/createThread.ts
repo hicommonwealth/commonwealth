@@ -5,14 +5,15 @@ import {
   ProposalType,
   ChainType,
 } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import TokenBalanceCache from 'token-balance-cache/src/index';
 
+import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
-import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB, sequelize } from '../database';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
@@ -335,7 +336,9 @@ const createThread = async (
         transaction,
       });
       if (!req.user.isAdmin && isAdmin.length === 0) {
-        const canReact = await tokenBalanceCache.validateTopicThreshold(
+        const canReact = await validateTopicThreshold(
+          tokenBalanceCache,
+          models,
           topic_id,
           req.body.address
         );
