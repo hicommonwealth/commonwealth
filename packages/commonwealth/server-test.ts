@@ -9,17 +9,17 @@ import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import BN from 'bn.js';
 import Rollbar from 'rollbar';
-
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
-import setupAPI from './server/router'; // performance note: this takes 15 seconds
-import setupPassport from './server/passport';
-import models from './server/database';
 import {
   ChainBase,
   ChainNetwork,
   NotificationCategories,
   ChainType,
-} from './shared/types';
+} from 'common-common/src/types';
+
+import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import setupAPI from './server/router'; // performance note: this takes 15 seconds
+import setupPassport from './server/passport';
+import models from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import TokenBalanceCache, { TokenBalanceProvider } from './server/util/tokenBalanceCache';

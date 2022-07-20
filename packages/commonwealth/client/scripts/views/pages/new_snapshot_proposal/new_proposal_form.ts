@@ -19,7 +19,7 @@ import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import QuillEditor from 'views/components/quill_editor';

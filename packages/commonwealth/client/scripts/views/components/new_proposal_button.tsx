@@ -15,7 +15,7 @@ import 'components/new_proposal_button.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import NewThreadModal from 'views/modals/new_thread_modal';
 
 type NewProposalMenuAttrs = {

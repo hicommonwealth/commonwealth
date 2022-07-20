@@ -15,14 +15,14 @@ import BN from 'bn.js';
 import { providers } from 'ethers';
 import { WhereOptions } from 'sequelize/types';
 
-import { ERC20__factory, ERC721__factory } from '../../shared/eth/types';
+import { ERC20__factory, ERC721__factory } from 'common-common/src/eth/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 
 import JobRunner from './cacheJobRunner';
 
 import { ChainAttributes } from '../models/chain';
-import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

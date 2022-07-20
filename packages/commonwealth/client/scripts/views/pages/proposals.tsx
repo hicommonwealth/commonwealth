@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/proposals.scss';
 
 import app from 'state';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Cosmos from 'controllers/chain/cosmos/main';

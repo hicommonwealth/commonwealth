@@ -10,7 +10,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
   VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 
 import SubstrateChain from './shared';

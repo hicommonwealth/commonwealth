@@ -7,7 +7,7 @@ import 'pages/landing/community_cards.scss';
 
 import app from 'state';
 import { ChainInfo } from 'models';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';

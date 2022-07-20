@@ -3,7 +3,7 @@ import { Near as NearApi, Account as NearApiAccount } from 'near-api-js';
 import { ITXModalData, ProposalModule } from 'models';
 import { NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import NearSputnikProposal from './proposal';
 import {
   INearSputnikProposal,

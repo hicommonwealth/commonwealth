@@ -1,5 +1,5 @@
 import { ChainInfo, NodeInfo } from 'models';
-import { IAaveGovernanceV2__factory } from 'eth/types';
+import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';
 import AaveApi from './api';

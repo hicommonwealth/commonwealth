@@ -10,7 +10,7 @@ import { isFunction } from '@polkadot/util';
 
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import { formatProposalHashShort } from 'helpers';
-import { ChainBase, ProposalType } from 'types';
+import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, Account, ChainEntity, ChainEvent

@@ -21,7 +21,7 @@ import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
 
 import app from 'state';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, RoleInfo, Profile } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { UserBlock } from 'views/components/widgets/user';

@@ -5,7 +5,7 @@ import { Button } from 'construct-ui';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { idToProposal } from 'identifiers';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';

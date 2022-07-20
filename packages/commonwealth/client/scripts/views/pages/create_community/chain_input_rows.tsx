@@ -8,7 +8,7 @@ import { InputRow, SelectRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import {
   ChainFormDefaultFields,
   ChainFormState,
