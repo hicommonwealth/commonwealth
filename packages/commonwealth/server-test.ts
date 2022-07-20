@@ -14,6 +14,7 @@ import {
   ChainNetwork,
   NotificationCategories,
   ChainType,
+  BalanceType,
 } from 'common-common/src/types';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import TokenBalanceProvider from 'token-balance-cache/src/provider';
@@ -123,6 +124,7 @@ const resetServer = (debug = false): Promise<void> => {
           models.ChainNode.create({
             url,
             eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+            balance_type: BalanceType.Ethereum,
           })
         )
       );
