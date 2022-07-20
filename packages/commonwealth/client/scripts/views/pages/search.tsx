@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
+import { ListItem, Select, Spinner, Tag } from 'construct-ui';
 
 import 'pages/search.scss';
 
@@ -20,6 +20,7 @@ import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CommunityLabel } from '../components/community_label';
 import { renderQuillTextBody } from '../components/quill/helpers';
+import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -282,9 +283,9 @@ class SearchPage implements m.Component<SearchPageAttrs> {
 
     const getTab = (searchScope: SearchScope) => {
       return (
-        <TabItem
+        <CWTab
           label={searchScope}
-          active={this.activeTab === searchScope}
+          isSelected={this.activeTab === searchScope}
           onclick={() => {
             this.pageCount = 1;
             this.activeTab = searchScope;
@@ -352,8 +353,8 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         alwaysShowTitle={true}
       >
         <div class="SearchPage">
-          <Tabs>{tabs}</Tabs>
-          <div class="search-results-wrapper">
+          <CWTabBar>{tabs}</CWTabBar>
+          <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
               <div class="search-loading">
                 <Spinner active={true} fill={true} size="xl" />,
@@ -384,7 +385,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
                 <div class="search-results-list">{tabScopedListing}</div>
               </div>
             )}
-          </div>
+          </>
         </div>
       </Sublayout>
     );

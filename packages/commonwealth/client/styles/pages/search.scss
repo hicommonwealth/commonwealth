@@ -5,10 +5,15 @@
   flex: 1;
   flex-direction: column;
   margin: 0 auto;
-  width: 904px;
+  padding: 24px;
+  width: 800px;
 
   @include smallInclusive {
     width: 100%;
+  }
+
+  .TabBar {
+    justify-content: center;
   }
 
   .search-page-input {
@@ -19,145 +24,135 @@
     margin: 21px 0 8px;
   }
 
-  .search-results-wrapper {
+  .search-results {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-results-caption {
+    margin: 16px;
+    text-align: center;
+    color: $neutral-500;
+
+    .search-results-clear {
+      margin-left: 10px;
+    }
+  }
+
+  .search-all-communities {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .search-results-filters {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+
+    .cui-select > select {
+      padding-left: 5px;
+      padding-right: 30px;
+    }
+  }
+
+  .search-results-list {
     display: flex;
     flex-direction: column;
 
-    .search-results {
-      display: flex;
-      flex-direction: column;
+    .cui-list {
+      max-height: none !important;
     }
 
-    .search-results-caption {
-      margin: 16px;
-      text-align: center;
-      color: $neutral-500;
+    .cui-list-item {
+      border-top: none;
+      border-bottom: none;
+      padding: 16px;
 
-      .search-results-clear {
-        margin-left: 10px;
-      }
-    }
-    .search-all-communities {
       &:hover {
+        background-color: $neutral-100;
+      }
+
+      .cui-list-item-content-left {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin-right: 16px;
+      }
+
+      .search-results-item {
+        color: $neutral-800;
+        overflow: hidden;
         text-decoration: none;
-      }
-    }
-    .search-results-filters {
-      display: flex;
-      flex-direction: row;
-      align-items: baseline;
-      justify-content: center;
+        width: 100%;
 
-      h4 {
-        margin-right: 10px;
-      }
-
-      .cui-select > select {
-        padding-left: 5px;
-        padding-right: 30px;
-      }
-    }
-    .search-results-list {
-      padding: 10px 20px;
-
-      .cui-list {
-        max-height: none !important;
-      }
-
-      .cui-list-item {
-        border-top: none;
-        border-bottom: none;
-        min-height: 100px;
-        padding: 16px;
-
-        &:hover {
-          background-color: $neutral-100;
+        /* Member results */
+        .user-block-name {
+          opacity: 1;
+          font-weight: 500;
+          margin-bottom: 2px;
         }
 
-        .cui-list-item-content-left {
-          height: 100px;
-          width: 50px;
-          min-width: 50px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-right: 4px;
+        .user-block-address {
+          font-size: 18px;
+          margin-top: 2px;
+          opacity: 1;
+          color: $neutral-500;
+
+          mark {
+            background-color: $purple-100;
+          }
         }
 
-        .search-results-item {
-          padding: 20px;
-          color: $neutral-800;
-          text-decoration: none;
-          width: 100%;
+        .search-results-thread-header {
+          color: $neutral-500;
+          text-transform: uppercase;
+          font-size: 13px;
+          margin-bottom: 2px;
+        }
+
+        /* Thread results */
+        .search-results-thread-title {
+          font-weight: 500;
           overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
 
-          /* Member results */
-          .user-block-name {
-            opacity: 1;
-            font-weight: 500;
-            margin-bottom: 2px;
-          }
+        .search-results-thread-subtitle {
+          margin: 2px 0 3px;
 
-          .user-block-address {
-            font-size: 18px;
-            margin-top: 2px;
-            opacity: 1;
-            color: $neutral-500;
-
-            mark {
-              background-color: $purple-100;
-            }
-          }
-
-          .search-results-thread-header {
-            color: $neutral-500;
-            text-transform: uppercase;
-            font-size: 13px;
-            margin-bottom: 2px;
-          }
-
-          /* Thread results */
-          .search-results-thread-title {
-            font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          .search-results-thread-subtitle {
-            margin: 2px 0 3px;
-
-            .created-at {
-              font-weight: 400;
-              color: $neutral-500;
-            }
-
-            .User {
-              margin-left: 14px;
-              font-weight: 400;
-              color: $neutral-500;
-            }
-          }
-
-          .search-results-thread-body {
+          .created-at {
+            font-weight: 400;
             color: $neutral-500;
           }
 
-          .search-results-comment {
+          .User {
+            margin-left: 14px;
+            font-weight: 400;
             color: $neutral-500;
-          }
-
-          .search-results-thread-body,
-          .search-results-comment {
-            mark {
-              background-color: $purple-100;
-            }
           }
         }
 
-        .search-results-item:hover {
-          cursor: pointer;
+        .search-results-thread-body {
+          color: $neutral-500;
         }
+
+        .search-results-comment {
+          color: $neutral-500;
+        }
+
+        .search-results-thread-body,
+        .search-results-comment {
+          mark {
+            background-color: $purple-100;
+          }
+        }
+      }
+
+      .search-results-item:hover {
+        cursor: pointer;
       }
     }
   }
