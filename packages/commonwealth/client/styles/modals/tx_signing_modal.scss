@@ -1,80 +1,82 @@
 @import 'shared';
 
-.TXSigningModalBody {
-  .compact-modal-body {
-    padding-bottom: 15px;
-  }
-
-  &.Intro .compact-modal-body {
-    padding: 0;
-  }
-
-  .no-select {
-    opacity: 0.8;
-    user-select: none;
-  }
-
-  button {
-    margin-top: 15px;
-  }
-
-  .instructions {
-    margin-bottom: 15px;
-  }
-
-  .CodeBlock {
-    min-height: 175px;
-  }
-
-  .gaiacli-codeblock .CodeBlock {
-    min-height: 130px;
-  }
-
-  // signing option selector
-  .HorizontalTabs {
-    border: none;
-    margin-bottom: 0;
-  }
-
-  .HorizontalTabs .tab-bar {
-    width: 160px;
-  }
-
-  .HorizontalTabs .tab-content {
-    width: 490px;
-    min-height: 450px;
-
-    @include smallInclusive {
-      width: initial;
+.TXSigningModal {
+  .TXSigningModalBody {
+    .compact-modal-body {
+      padding-bottom: 15px;
     }
-  }
 
-  &.Intro {
-    width: 710px;
-  }
+    &.Intro .compact-modal-body {
+      padding: 0;
+    }
 
-  // reusable components
-  .TXSigningCancelAction {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
+    .no-select {
+      opacity: 0.8;
+      user-select: none;
+    }
 
-    a {
-      color: $neutral-500;
-      text-decoration: none;
+    button {
+      margin-top: 15px;
+    }
 
-      &:hover {
-        text-decoration: underline;
+    .instructions {
+      margin-bottom: 15px;
+    }
+
+    .CodeBlock {
+      min-height: 175px;
+    }
+
+    .gaiacli-codeblock .CodeBlock {
+      min-height: 130px;
+    }
+
+    // signing option selector
+    .HorizontalTabs {
+      border: none;
+      margin-bottom: 0;
+    }
+
+    .HorizontalTabs .tab-bar {
+      width: 160px;
+    }
+
+    .HorizontalTabs .tab-content {
+      width: 490px;
+      min-height: 450px;
+
+      @include smallInclusive {
+        width: initial;
       }
     }
-  }
 
-  .TXSigningBodyText {
-    margin-bottom: 20px;
-  }
+    &.Intro {
+      width: 710px;
+    }
 
-  .cui-spinner {
-    margin: 20px 0 26px;
-    width: 100%;
+    // reusable components
+    .TXSigningCancelAction {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+
+      a {
+        color: $neutral-500;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .TXSigningBodyText {
+      margin-bottom: 20px;
+    }
+
+    .cui-spinner {
+      margin: 20px 0 26px;
+      width: 100%;
+    }
   }
 }

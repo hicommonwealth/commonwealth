@@ -8,11 +8,9 @@ type CodeBlockAttrs = {
   clickToSelect: boolean;
 };
 
-export const CodeBlock: m.Component<CodeBlockAttrs> = {
-  view: (vnode: m.VnodeDOM<CodeBlockAttrs>) => {
-    const clickToSelect = !!vnode.attrs.clickToSelect;
-
-    // CodeBlock'
+export class CodeBlock implements m.ClassComponent<CodeBlockAttrs> {
+  view(vnode) {
+    const { clickToSelect } = vnode.attrs;
 
     return (
       <pre
@@ -38,5 +36,5 @@ export const CodeBlock: m.Component<CodeBlockAttrs> = {
         {vnode.children}
       </pre>
     );
-  },
-};
+  }
+}

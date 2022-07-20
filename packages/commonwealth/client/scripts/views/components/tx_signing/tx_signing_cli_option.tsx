@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Button, TextArea } from 'construct-ui';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -14,14 +13,16 @@ import { CodeBlock } from 'views/components/code_block';
 import { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWValidationText } from '../component_kit/cw_validation_text';
+import { CWButton } from '../component_kit/cw_button';
+import { CWTextArea } from '../component_kit/cw_text_area';
 
 type TXSigningCLIOptionAttrs = ITXModalData & { next: NextFn };
 
 export class TXSigningCLIOption
   implements m.ClassComponent<TXSigningCLIOptionAttrs>
 {
-  calldata?: ITXData;
-  error?: string;
+  private calldata?: ITXData;
+  private error?: string;
 
   async oncreate(vnode) {
     if (this.calldata === undefined) {
@@ -36,9 +37,9 @@ export class TXSigningCLIOption
       vnode.attrs.txData.transact(...args);
     };
 
-    let signBlock = m(CodeBlock, { clickToSelect: true }, [
-      'Loading transaction data... ',
-    ]);
+    let signBlock = (
+      <CodeBlock clickToSelect>Loading transaction data...</CodeBlock>
+    );
 
     let instructions;
 
@@ -47,59 +48,56 @@ export class TXSigningCLIOption
     if (this.calldata && app.chain && app.chain.base === ChainBase.Substrate) {
       const calldata = this.calldata as ISubstrateTXData;
 
-      instructions = m('.instructions', [
-        'Use subkey to sign this transaction:',
-      ]);
+      instructions = (
+        <div class="instructions">Use subkey to sign this transaction:</div>
+      );
 
-      signBlock = m(CodeBlock, { clickToSelect: true }, [
-        `subkey ${calldata.isEd25519 ? '-e ' : ''}sign-transaction \\
-  --call ${calldata.call.slice(2)} \\
-  --nonce ${calldata.nonce} \\
-  --prior-block-hash ${calldata.blockHash.slice(2)} \\
-  --password "" \\
-  --suri "`,
-        m('span.no-select', 'secret phrase'),
-        '"',
-      ]);
+      signBlock = (
+        <CodeBlock clickToSelect>
+          {`subkey ${calldata.isEd25519 ? '-e ' : ''}sign-transaction \\
+          --call ${calldata.call.slice(2)} \\
+          --nonce ${calldata.nonce} \\
+          --prior-block-hash ${calldata.blockHash.slice(2)} \\ --password "" \\
+          --suri "`}
+          <span class="no-select">secret phrase</span>
+          {`"`}
+        </CodeBlock>
+      );
 
-      submitAction = m(Button, {
-        intent: 'primary',
-        type: 'submit',
-        rounded: true,
-        onclick: (e) => {
-          e.preventDefault();
-          try {
-            const signedTx = $(vnode.dom)
-              .find('textarea.signedtx')
-              .val()
-              .toString()
-              .trim();
-            transact(signedTx);
-          } catch (err) {
-            throw new Error('Failed to execute signed transaction');
-          }
-        },
-        label: 'Send transaction',
-      });
+      submitAction = (
+        <CWButton
+          onclick={(e) => {
+            e.preventDefault();
+            try {
+              const signedTx = $(vnode.dom)
+                .find('TextArea')
+                .val()
+                .toString()
+                .trim();
+              transact(signedTx);
+            } catch (err) {
+              throw new Error('Failed to execute signed transaction');
+            }
+          }}
+          label="Send transaction"
+        />
+      );
     }
 
-    return m('.TXSigningCLIOption', [
-      instructions,
-      signBlock,
-      m('p', 'Enter the output here:'),
-      m(TextArea, {
-        class: 'signedtx',
-        fluid: true,
-        placeholder: 'Signed TX',
-      }),
-      this.error &&
-        m(CWValidationText, {
-          message: this.error,
-          status: 'failure',
-        }),
-      submitAction,
-      !submitAction &&
-        m('p.transaction-loading', 'Still loading transaction...'),
-    ]);
+    return (
+      <div class="TXSigningCLIOption">
+        {instructions}
+        {signBlock}
+        <p>Enter the output here:</p>
+        <CWTextArea placeholder="Signed TX" />
+        {this.error && (
+          <CWValidationText message={this.error} status="failure" />
+        )}
+        {submitAction}
+        {!submitAction && (
+          <p class="transaction-loading">Still loading transaction...</p>
+        )}
+      </div>
+    );
   }
 }

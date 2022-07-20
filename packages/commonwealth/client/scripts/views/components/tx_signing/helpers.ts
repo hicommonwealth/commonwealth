@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 import { ITXModalData, TransactionStatus } from 'models';
-import { NextFn } from './types';
+import { NextFn, StageName } from './types';
 
 const createProposalTransactionLabels = {
   // substrate: accounts
@@ -102,4 +102,16 @@ export const setupEventListeners = (
       vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
     }
   );
+};
+
+export const getModalTitle = (stageName: StageName, txLabel?: string) => {
+  if (stageName === 'intro') {
+    return `Sign transaction ${txLabel ? `: ${txLabel}` : ''}`;
+  } else if (stageName === 'waiting') {
+    return 'Confirm transaction';
+  } else if (stageName === 'success') {
+    return 'Transaction confirmed';
+  } else {
+    return 'Transaction rejected';
+  }
 };

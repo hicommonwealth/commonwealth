@@ -7,3 +7,5 @@ export type TxDataState = Partial<ITransactionResult> & {
 };
 
 export type NextFn = (newState: string, newData?: TxDataState) => void;
+
+export type StageName = 'intro' | 'waiting' | 'success' | 'rejected';
