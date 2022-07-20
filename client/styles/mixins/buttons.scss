@@ -212,7 +212,7 @@
   align-items: center;
   padding: 4px 12px;
   background: $neutral-800;
-  border-radius: 24px;
+  border-radius: $border-radius-rounded-corners;
 
   &:hover {
     background: $neutral-700;

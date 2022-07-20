@@ -7,7 +7,7 @@ import {
   Button,
   Input,
 } from 'construct-ui';
-
+import moment from 'moment';
 import 'pages/view_proposal/index.scss';
 import 'pages/view_proposal/tips.scss';
 
@@ -123,6 +123,9 @@ import {
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
+import { PollCard, PollType } from '../../components/polls';
+import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
+import { connect } from 'superagent';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1415,7 +1418,39 @@ const ViewProposalPage: m.Component<
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m(ProposalPollCard, { poll, thread: proposal });
+                return m('.lol', {}, [
+                  m(ProposalPollCard, { poll, thread: proposal }),
+                  m(PollCard, {
+                    pollType: PollType.Offchain,
+                    multiSelect: false,
+                    pollEnded:
+                      poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                    hasVoted:
+                      app.user.activeAccount &&
+                      poll.getUserVote(
+                        app.user.activeAccount.chain.id,
+                        app.user.activeAccount.address
+                      ),
+                    proposalTitle: poll.prompt,
+                    timeRemainingString: getProposalPollTimestamp(
+                      poll,
+                      poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                    ),
+                    voteDirectionString: '', // TODO: implement
+                    totalVoteCount: poll.votes?.length,
+                    voteInformation: poll.options.map((option) => {
+                      return {
+                        label: option,
+                        value: option,
+                        voteCount: poll.votes.filter((v) => v.option === option)
+                          .length,
+                        onVoteCast: () => console.log('oted'),
+                      };
+                    }),
+                    offchainPoll: poll,
+                    offchainThread: proposal,
+                  }),
+                ]);
               }),
           ],
         ]),

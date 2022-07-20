@@ -2,6 +2,16 @@
 
 $default-card-width: 260px;
 
+@mixin timeRemainingText {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  color: $neutral-500;
+  letter-spacing: 0.02em;
+}
+
 .PollCard {
   display: flex;
   width: $default-card-width;
@@ -43,13 +53,29 @@ $default-card-width: 260px;
 
       .time-remaining-text {
         margin-left: 15px;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 16px;
-        text-align: right;
-        color: $neutral-500;
-        letter-spacing: 0.02em;
+        @include timeRemainingText;
+      }
+    }
+
+    .voted-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      width: 100%;
+      .vote-direction {
+        display: flex;
+        .vote-direction-text {
+          margin-left: 5px;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 16px;
+        }
+      }
+      .time-remaining-text {
+        margin-top: 3px;
+        @include timeRemainingText;
       }
     }
   }
