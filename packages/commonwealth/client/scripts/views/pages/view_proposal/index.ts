@@ -1430,12 +1430,12 @@ const ViewProposalPage: m.Component<
                     hasVoted:
                       app.user.activeAccount &&
                       poll.getUserVote(
-                        app.user.activeAccount.chain.id,
-                        app.user.activeAccount.address
+                        app.user.activeAccount?.chain?.id,
+                        app.user.activeAccount?.address
                       ),
                     votedFor: poll.getUserVote(
-                      app.user.activeAccount.chain.id,
-                      app.user.activeAccount.address
+                      app.user.activeAccount?.chain?.id,
+                      app.user.activeAccount?.address
                     )?.option,
                     proposalTitle: poll.prompt,
                     timeRemainingString: getProposalPollTimestamp(

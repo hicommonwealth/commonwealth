@@ -17,6 +17,8 @@ type CWProgressBarAttrs = {
   progressStatus?: CWProgressBarStatus;
   progressHeight?: number;
   label?: string;
+  tokenCount?: number;
+  token?: string;
 };
 
 export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
@@ -26,10 +28,13 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
     return (
       <>
         {label && (
-          <div className="progress-label">
-            <div className="progress-title">{label}</div>
-            <div className="progress-percentage">{`${progress}%`}</div>
-          </div>
+          <>
+            <div className="progress-label">
+              <div className="progress-title">{label}</div>
+              <div className="progress-percentage">{`${progress}%`}</div>
+            </div>
+            {}
+          </>
         )}
         <div
           className="progress-background"

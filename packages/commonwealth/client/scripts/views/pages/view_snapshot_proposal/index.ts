@@ -26,6 +26,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { PollCard, PollType } from '../../components/component_kit/polls';
 
 const enum VotingError {
   NOT_VALIDATED = 'Insufficient Voting Power',
@@ -90,7 +91,7 @@ const ProposalContent: m.Component<
       ]),
       votes.length > 0 && [
         m('.votes-title', [
-          m('.title', 'Votes'),
+          m('.box-title', 'Votes'),
           m('.vote-count', votes.length),
         ]),
         m('.votes-container', [
@@ -348,7 +349,7 @@ const ViewProposalPage: m.Component<
         isCustomDomain: app.isCustomDomain(),
         space: app.snapshot.space.id,
       });
-    }
+    };
 
     const snapshotId = vnode.attrs.snapshotId;
     if (!app.snapshot.initialized) {
@@ -382,6 +383,27 @@ const ViewProposalPage: m.Component<
       moment(+vnode.state.proposal.start * 1000) <= moment() &&
       moment(+vnode.state.proposal.end * 1000) > moment();
 
+    const buildVoteInformation = (
+      choices,
+      snapshotVotes: SnapshotProposalVote[]
+    ) => {
+      const voteInfo = [];
+
+      for (let i = 0; i < choices.length; i++) {
+        const totalVotes = snapshotVotes
+          .filter((vote) => vote.choice === i)
+          .reduce((sum, vote) => sum + vote.balance, 0);
+        voteInfo.push({
+          label: choices[i],
+          value: choices[i],
+          voteCount: totalVotes,
+        });
+      }
+
+      return voteInfo;
+    };
+
+    console.log(vnode.state.proposal?.choices, vnode.state.votes);
     return !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
       ? m(PageLoading)
       : m(
@@ -438,7 +460,7 @@ const ViewProposalPage: m.Component<
                 ],
                 m('.proposal-info', [
                   m('.proposal-info-box', [
-                    m('.title', 'Information'),
+                    m('.box-title', 'Information'),
                     m('.info-block', [
                       m('.labels', [
                         m('p', 'Author'),
@@ -497,7 +519,7 @@ const ViewProposalPage: m.Component<
                             m(
                               '.truncate',
                               proposal.strategies.length > 1
-                                ? proposal.strategies.length + ' Strategies'
+                                ? `${proposal.strategies.length} Strategies`
                                 : proposal.strategies[0].name
                             ),
                             m(CWIcon, {
@@ -544,7 +566,7 @@ const ViewProposalPage: m.Component<
                       votes: vnode.state.votes,
                     }),
                   m('.proposal-info-box', [
-                    m('.title', 'Current Results'),
+                    m('.box-title', 'Current Results'),
                     m(VotingResults, {
                       choices: vnode.state.proposal.choices,
                       votes: vnode.state.votes,
@@ -552,6 +574,25 @@ const ViewProposalPage: m.Component<
                       symbol: vnode.state.symbol,
                     }),
                   ]),
+                  m(PollCard, {
+                    pollType: PollType.Snapshot,
+                    multiSelect: false,
+                    pollEnded: !isActive,
+                    hasVoted:
+                      vnode.state.votes.find((vote) => {
+                        return vote.voter === app.user?.activeAccount?.address;
+                      })?.choice !== undefined,
+                    votedFor: '',
+                    proposalTitle: proposal.title,
+                    timeRemainingString: '',
+                    totalVoteCount: vnode.state.totals.sumOfResultsBalance,
+                    voteInformation: buildVoteInformation(
+                      vnode.state.proposal?.choices,
+                      vnode.state.votes
+                    ),
+                    onVoteCast: () => console.log('hi'),
+                    tokenSymbol: vnode.state.symbol,
+                  }),
                 ]),
               ]),
             ]

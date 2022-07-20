@@ -37,6 +37,7 @@ export type PollCardAttrs = {
   totalVoteCount: number;
   voteInformation: VoteInformation[];
   onVoteCast: () => any;
+  tokenSymbol?: string;
 };
 
 export function buildVoteDirectionString(voteOption: string) {
@@ -68,6 +69,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       timeRemainingString,
       voteInformation,
       onVoteCast,
+      tokenSymbol,
     } = vnode.attrs;
 
     console.log('votedFor: ', votedFor);
@@ -77,7 +79,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
     }
 
     return (
-      <CWCard elevation="elevation-1">
+      <CWCard elevation="elevation-1" className="poll-card">
         <div className="PollCard">
           <div className="poll-title-section">
             <div className="title">{proposalTitle}</div>
@@ -168,7 +170,9 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           <div className="poll-results-section">
             <div className="results-header">
               <div className="results">{resultString}</div>
-              <div className="total-count">{`${this.totalVoteCount} votes`}</div>
+              <div className="total-count">{`${
+                Math.floor(this.totalVoteCount * 100) / 100
+              } ${tokenSymbol ?? 'votes'}`}</div>
             </div>
             <div className="results-content">
               {voteInformation
