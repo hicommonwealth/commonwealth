@@ -40,7 +40,6 @@ export { default as Webhook } from './Webhook';
 export { DepositVote, BinaryVote } from './votes';
 
 export {
-  ThreadKind,
   OffchainThreadStage,
   TransactionStatus,
   ProposalStatus,

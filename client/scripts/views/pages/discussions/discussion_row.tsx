@@ -19,18 +19,14 @@ import {
   extractDomain,
   offchainThreadStageToLabel,
 } from 'helpers';
-import {
-  OffchainThread,
-  ThreadKind,
-  OffchainThreadStage,
-  AddressInfo,
-} from 'models';
+import { OffchainThread, OffchainThreadStage, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { DiscussionRowMenu } from './discussion_row_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { DiscussionRowReactionButton } from '../../components/reaction_button/discussion_row_reaction_button';
+import { ThreadKind } from '../../components/new_thread_form/types';
 
 type DiscussionRowAttrs = {
   onSelect?: any;

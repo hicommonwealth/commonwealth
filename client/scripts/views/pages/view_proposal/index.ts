@@ -28,7 +28,6 @@ import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
   OffchainThread,
-  ThreadKind,
   OffchainComment,
   OffchainTopic,
   OffchainThreadStage,
@@ -124,6 +123,7 @@ import {
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { ThreadKind } from '../../components/new_thread_form/types';
 
 const MAX_THREAD_LEVEL = 2;
 

@@ -5,13 +5,14 @@ import moment from 'moment';
 import { ProposalType } from 'types';
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
-import { ThreadKind, OffchainThreadStage } from './types';
+import { OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
 import OffchainPoll from './OffchainPoll';
+import { ThreadKind } from '../views/components/new_thread_form/types';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
