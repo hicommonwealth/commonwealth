@@ -1,0 +1,49 @@
+@import 'shared';
+
+.ProgressBar {
+  border-radius: 3px;
+
+  &.ongoing {
+    background-color: $neutral-800;
+  }
+
+  &.passed {
+    background-color: $green-500;
+  }
+
+  &.failed {
+    background-color: $rorange-500;
+  }
+
+  &.neutral {
+    background-color: $neutral-500;
+  }
+}
+
+.progress-background {
+  background-color: $neutral-200;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.progress-label {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  .progress-title {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: $neutral-800;
+  }
+  .progress-percentage {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    color: $neutral-500;
+  }
+}

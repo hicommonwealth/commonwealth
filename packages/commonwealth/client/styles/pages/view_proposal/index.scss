@@ -386,6 +386,9 @@ $discussion-title-font-size: 1.45rem;
     @include smallInclusive {
       display: none;
     }
+    .poll-card-wrapper {
+      margin-bottom: 24px;
+    }
   }
 
   .ProposalSidebarPollEditorModule,

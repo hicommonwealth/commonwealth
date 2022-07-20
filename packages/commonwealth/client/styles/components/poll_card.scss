@@ -1,0 +1,128 @@
+@import 'shared';
+
+$default-card-width: 260px;
+
+@mixin timeRemainingText {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  color: $neutral-500;
+  letter-spacing: 0.02em;
+}
+
+.PollCard {
+  display: flex;
+  width: $default-card-width;
+  flex-direction: column;
+
+  .poll-title-section {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    height: 56px;
+    width: 100%;
+    border-bottom: 1px solid #e6e5e7;
+
+    .title {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 15px;
+      line-height: 20px;
+      text-align: start;
+      padding: 10px;
+      color: $neutral-800;
+    }
+  }
+
+  .poll-voting-section {
+    padding: 15px 1px 15px 1px;
+    border-bottom: 1px solid #e6e5e7;
+    margin: 0px 8px 0px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    .cast-vote-section {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+
+      .time-remaining-text {
+        margin-left: 15px;
+        @include timeRemainingText;
+      }
+    }
+
+    .voted-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      width: 100%;
+      .vote-direction {
+        display: flex;
+        .vote-direction-text {
+          margin-left: 5px;
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          line-height: 16px;
+        }
+      }
+      .time-remaining-text {
+        margin-top: 3px;
+        @include timeRemainingText;
+      }
+    }
+  }
+
+  .poll-results-section {
+    display: flex;
+    padding: 15px 10px 15px 10px;
+    flex-direction: column;
+    .results-header {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      .results {
+        font-style: normal;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.02em;
+        color: $neutral-800;
+      }
+      .total-count {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 16px;
+        text-align: right;
+        letter-spacing: 0.02em;
+        color: $neutral-500;
+      }
+    }
+
+    .poll-bar {
+      background-color: $primary-500;
+      border-radius: 3px;
+      height: 4px;
+    }
+
+    .progress-bar-wrapper {
+      margin-top: 10px;
+    }
+  }
+}
+
+.Card {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}

@@ -122,7 +122,13 @@ import {
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
+import {
+  getProposalPollTimestamp,
+  handleProposalPollVote,
+  jumpHighlightComment,
+} from './helpers';
+import { PollCard, PollType } from '../../components/component_kit/polls';
+import moment from 'moment';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1415,7 +1421,40 @@ const ViewProposalPage: m.Component<
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m(ProposalPollCard, { poll, thread: proposal });
+                return m('.poll-card-wrapper', {}, [
+                  m(PollCard, {
+                    pollType: PollType.Offchain,
+                    multiSelect: false,
+                    pollEnded:
+                      poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                    hasVoted:
+                      app.user.activeAccount &&
+                      poll.getUserVote(
+                        app.user.activeAccount.chain.id,
+                        app.user.activeAccount.address
+                      ),
+                    votedFor: poll.getUserVote(
+                      app.user.activeAccount.chain.id,
+                      app.user.activeAccount.address
+                    )?.option,
+                    proposalTitle: poll.prompt,
+                    timeRemainingString: getProposalPollTimestamp(
+                      poll,
+                      poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                    ),
+                    totalVoteCount: poll.votes?.length,
+                    voteInformation: poll.options.map((option) => {
+                      return {
+                        label: option,
+                        value: option,
+                        voteCount: poll.votes.filter((v) => v.option === option)
+                          .length,
+                      };
+                    }),
+                    onVoteCast: (option, isSelected) =>
+                      handleProposalPollVote(poll, option, isSelected),
+                  }),
+                ]);
               }),
           ],
         ]),
