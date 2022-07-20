@@ -7,7 +7,7 @@
   margin: 0 auto;
   width: 904px;
 
-  @include small {
+  @include smallInclusive {
     width: 100%;
   }
 
@@ -29,7 +29,7 @@
     }
 
     .search-results-caption {
-      margin: 20px 0;
+      margin: 16px;
       text-align: center;
       color: $neutral-500;
 
@@ -151,7 +151,6 @@
           .search-results-comment {
             mark {
               background-color: $purple-100;
-              padding: 0 4px;
             }
           }
         }
