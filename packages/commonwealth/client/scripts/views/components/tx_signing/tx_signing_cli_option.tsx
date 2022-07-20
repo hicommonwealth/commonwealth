@@ -6,7 +6,7 @@ import m from 'mithril';
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
 import app from 'state';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { ITXModalData, ITXData } from 'models';
 import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import { CodeBlock } from 'views/components/code_block';

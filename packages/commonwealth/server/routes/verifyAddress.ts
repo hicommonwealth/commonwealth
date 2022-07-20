@@ -31,6 +31,7 @@ import {
   WalletId,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { addressSwapper } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';

@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import crypto from 'crypto';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { DB } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
