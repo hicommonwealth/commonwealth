@@ -11,7 +11,7 @@ import {
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 import {
   AddressInfo,
   DashboardActivityNotification,

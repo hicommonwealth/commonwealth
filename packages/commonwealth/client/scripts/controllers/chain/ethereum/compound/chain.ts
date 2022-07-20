@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { ChainInfo } from 'models';
-import { ERC20Votes } from 'eth/types';
+import { ERC20Votes } from 'common-common/src/eth/types';
 import { BigNumber } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from '../chain';

@@ -9,8 +9,8 @@ import { Vec } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 
 import UserFlagsHandler from '../eventHandlers/userFlags';
-import { ChainBase } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,13 +1,14 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { addPrefix, factory } from '../../shared/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
+import { NotificationCategories } from 'common-common/src/types';
 import {
     RedisNamespaces,
     WebsocketEngineEvents,
     WebsocketMessageNames,
     WebsocketNamespaces,
- NotificationCategories } from '../../shared/types';
+} from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../database';

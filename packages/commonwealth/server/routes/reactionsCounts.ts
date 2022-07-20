@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { OffchainReactionInstance } from '../models/offchain_reaction';
 

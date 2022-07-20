@@ -6,7 +6,7 @@ import 'pages/referenda.scss';
 
 import app from 'state';
 import { blockperiodToDuration } from 'helpers';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import Substrate from 'controllers/chain/substrate/main';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

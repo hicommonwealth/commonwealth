@@ -3,7 +3,7 @@ import { OffchainCommentAttributes } from '../models/offchain_comment';
 import { OffchainThreadAttributes } from '../models/offchain_thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 import { DB } from '../database';
 

@@ -7,7 +7,7 @@ import { Button, Input, Spinner, TextArea } from 'construct-ui';
 
 import { initAppState } from 'app';
 import { isSameAccount, link } from 'helpers';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { Account, AddressInfo, IWebWallet } from 'models';
 import app, { ApiStatus } from 'state';
 

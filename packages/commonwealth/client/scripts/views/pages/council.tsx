@@ -6,7 +6,7 @@ import 'pages/council.scss';
 
 import app, { ApiStatus } from 'state';
 import { navigateToSubpage } from 'app';
-import { ProposalType, ChainBase } from 'types';
+import { ProposalType, ChainBase } from 'common-common/src/types';
 import { pluralize } from 'helpers';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

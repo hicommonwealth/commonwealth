@@ -5,17 +5,17 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
 import { ProfileAttributes } from '../models/profile';
+import { DynamicTemplate } from '../../shared/types';
 import {
-  DynamicTemplate,
   NotificationCategories,
   WalletId,
-} from '../../shared/types';
+} from 'common-common/src/types';
 
 import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   redirectWithLoginError,
   redirectWithLoginSuccess,

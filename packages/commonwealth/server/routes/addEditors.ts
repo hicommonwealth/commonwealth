@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from '../../shared/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { DB } from '../database';
 
 export const Errors = {

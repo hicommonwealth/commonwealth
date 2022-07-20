@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 

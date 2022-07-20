@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { addPrefix, factory } from '../../shared/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
 import {
   ChainEventNotification,
   WebsocketEngineEvents,

@@ -8,7 +8,7 @@ import { Tag, Popover } from 'construct-ui';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';

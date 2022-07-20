@@ -7,11 +7,11 @@ import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
 
 import app from 'state';
+import { IPostNotificationData } from 'types';
 import {
   NotificationCategories,
-  IPostNotificationData,
   ProposalType,
-} from 'types';
+} from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';

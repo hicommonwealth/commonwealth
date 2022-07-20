@@ -4,7 +4,7 @@ import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController, {
   EntityRefreshOption,

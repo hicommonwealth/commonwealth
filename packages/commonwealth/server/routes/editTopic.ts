@@ -2,7 +2,7 @@
 import { NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { OffchainTopicAttributes } from '../models/offchain_topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';

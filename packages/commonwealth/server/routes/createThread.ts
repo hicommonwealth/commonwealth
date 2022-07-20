@@ -4,7 +4,7 @@ import {
   NotificationCategories,
   ProposalType,
   ChainType,
-} from '../../shared/types';
+} from 'common-common/src/types';
 
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -12,7 +12,7 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 import { DB, sequelize } from '../database';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { OffchainThreadInstance } from '../models/offchain_thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';

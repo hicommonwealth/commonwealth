@@ -6,7 +6,7 @@ import { navigateToSubpage } from 'app';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import {
   proposalSlugToClass,
   proposalSlugToFriendlyName,

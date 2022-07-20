@@ -5,10 +5,11 @@ import {
   Label as ChainEventLabel, CWEvent, IEventLabel, SupportedNetwork, IChainEventData
 } from '@commonwealth/chain-events';
 
+import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories } from 'common-common/src/types';
 import { SENDGRID_API_KEY, } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import { IPostNotificationData, NotificationCategories, DynamicTemplate } from '../../shared/types';
+import { IPostNotificationData, DynamicTemplate } from '../../shared/types';
 import { DB } from '../database';
 import { UserAttributes } from '../models/user';
 

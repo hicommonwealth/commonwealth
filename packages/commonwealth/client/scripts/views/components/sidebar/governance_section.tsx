@@ -6,7 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'types';
+import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,

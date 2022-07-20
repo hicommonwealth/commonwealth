@@ -6,7 +6,7 @@ import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@common
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {

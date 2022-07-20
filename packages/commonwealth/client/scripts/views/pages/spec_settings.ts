@@ -3,7 +3,7 @@ import 'pages/spec_settings.scss';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { initChain, selectChain } from 'app';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, RolePermission } from 'models';
 import { Button, TextArea, Form, Grid, Col } from 'construct-ui';
 import $ from 'jquery';
