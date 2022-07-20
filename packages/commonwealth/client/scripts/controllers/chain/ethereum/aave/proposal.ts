@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import $ from 'jquery';
 import bs58 from 'bs58';
 import { AaveTypes } from '@commonwealth/chain-events';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';

@@ -7,7 +7,7 @@ import 'pages/discussions/discussion_row_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 import { OffchainThread, OffchainTopic, OffchainThreadStage } from 'models';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';

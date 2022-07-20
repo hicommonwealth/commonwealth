@@ -10,7 +10,7 @@ import {
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 
-import { addPrefix, factory } from '../../shared/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
 
 // A mapping of supported Event Kinds to create empty profiles for, along with
 // the specific field to use in fetching the address.

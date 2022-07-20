@@ -8,7 +8,7 @@ import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 

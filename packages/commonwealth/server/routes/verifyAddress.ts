@@ -25,26 +25,22 @@ import {
 
 import nacl from 'tweetnacl';
 
-import { addressSwapper } from '../../shared/utils';
+import {
+  ChainBase,
+  NotificationCategories,
+  WalletId,
+} from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
-import {
-  DynamicTemplate,
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-} from '../../shared/types';
-import { AppError, ServerError } from '../util/errors';
+import { DynamicTemplate } from '../../shared/types';
+import { AppError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

@@ -14,7 +14,7 @@ import 'pages/view_proposal/tips.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
-import { ProposalType, ChainBase } from 'types';
+import { ProposalType, ChainBase } from 'common-common/src/types';
 import {
   chainToProposalSlug,
   getProposalUrlPath,

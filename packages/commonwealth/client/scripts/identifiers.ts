@@ -1,7 +1,7 @@
 import { StorageModule, ProposalModule, ChainInfo } from 'models';
 import { SubstrateTypes, IChainEntityKind } from '@commonwealth/chain-events';
 import { ProposalStore } from 'stores';
-import { ProposalType, ChainBase, ChainNetwork } from 'types';
+import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { requiresTypeSlug } from 'utils';
 import app from './state';
 import ThreadsController from './controllers/server/threads';

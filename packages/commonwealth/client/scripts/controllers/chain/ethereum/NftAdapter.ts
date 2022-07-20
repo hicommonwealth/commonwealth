@@ -1,5 +1,5 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
-import { ERC721, ERC721__factory } from 'eth/types';
+import { ERC721, ERC721__factory } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 import Ethereum from 'controllers/chain/ethereum/main';
 

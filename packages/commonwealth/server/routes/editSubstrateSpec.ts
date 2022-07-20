@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
+import { ChainBase } from 'common-common/src/types';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 

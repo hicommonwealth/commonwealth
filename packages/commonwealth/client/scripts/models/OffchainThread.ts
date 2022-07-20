@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 import moment from 'moment';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';

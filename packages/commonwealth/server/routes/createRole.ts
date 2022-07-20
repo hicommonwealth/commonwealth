@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { NotificationCategories } from '../../shared/types';
+import { NotificationCategories } from 'common-common/src/types';
 import { DB } from '../database';
 
 export const Errors = {

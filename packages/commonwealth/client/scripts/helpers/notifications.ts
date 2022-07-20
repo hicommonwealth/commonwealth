@@ -1,5 +1,5 @@
 import { Notification, NotificationSubscription } from 'models';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 
 export const batchNotifications = (n: Notification[], prop: string, prop2: string) => {
   return Object.values(n.reduce((acc, obj) => {

@@ -8,7 +8,7 @@ import 'components/header/login_selector.scss';
 
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { AddressInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { notifySuccess } from 'controllers/app/notifications';

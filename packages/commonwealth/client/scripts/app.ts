@@ -14,7 +14,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import { WebSocketController } from 'controllers/server/socket';

@@ -82,8 +82,10 @@ module.exports = {
       '../shared',
       'node_modules', // local node modules
       '../node_modules', // global node modules
-      '../eth/types',
     ],
+    alias: {
+      "common-common": path.resolve(__dirname, '../../common-common')
+    }
   },
   module: {
     rules: [
@@ -116,7 +118,7 @@ module.exports = {
         include: [
           path.resolve(__dirname, '../client'),
           path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../eth/types'),
+          path.resolve(__dirname, '../../common-common'),
         ],
         loader: 'esbuild-loader',
         options: {

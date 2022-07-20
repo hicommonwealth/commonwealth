@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
+import { ChainBase } from 'common-common/src/types';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS,
-  ChainBase,
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';

@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import Sequelize from 'sequelize';
 import crypto from 'crypto';
-import { addressSwapper } from '../../shared/utils';
+import { ChainBase } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
-
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;

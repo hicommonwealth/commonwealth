@@ -6,7 +6,7 @@ import {
   SubstrateTypes,
 } from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
-import { addPrefix, factory } from '../../shared/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
 
 export default class extends IEventHandler {
   public readonly name = 'Identity';

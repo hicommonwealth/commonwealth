@@ -1,4 +1,4 @@
-import { ProposalType } from '../../shared/types';
+import { ProposalType } from 'common-common/src/types';
 import { SubstrateTypes, MolochTypes, CompoundTypes, AaveTypes } from '@commonwealth/chain-events';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
