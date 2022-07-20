@@ -8,6 +8,8 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
+      "common-common": ["../../../packages/common-common"],
+      "common-common/*": ["../../../packages/common-common/*"],
       "*": ["../*", "../shared/*", "../client/scripts/*"]
     },
     "resolveJsonModule": true,
@@ -20,10 +22,9 @@
     "../client",
     "../client/scripts",
     "../shared/adapters",
-    "../",
+    "../"
   ],
   "exclude": [
-    "../node_modules",
-    "../client/scripts/controllers/chain/ethereum/contracts/*"
+    "../node_modules"
   ]
 }
