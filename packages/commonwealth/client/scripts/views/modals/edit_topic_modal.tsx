@@ -138,20 +138,22 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
               this.form.description = (e.target as HTMLInputElement).value;
             }}
           />
-          <CWCheckbox
-            label="Featured in Sidebar"
-            checked={this.form.featuredInSidebar}
-            onchange={() => {
-              this.form.featuredInSidebar = !this.form.featuredInSidebar;
-            }}
-          />
-          <CWCheckbox
-            label="Featured in New Post"
-            checked={this.form.featuredInNewPost}
-            onchange={() => {
-              this.form.featuredInNewPost = !this.form.featuredInNewPost;
-            }}
-          />
+          <div class="checkboxes-container">
+            <CWCheckbox
+              label="Featured in Sidebar"
+              checked={this.form.featuredInSidebar}
+              onchange={() => {
+                this.form.featuredInSidebar = !this.form.featuredInSidebar;
+              }}
+            />
+            <CWCheckbox
+              label="Featured in New Post"
+              checked={this.form.featuredInNewPost}
+              onchange={() => {
+                this.form.featuredInNewPost = !this.form.featuredInNewPost;
+              }}
+            />
+          </div>
           {this.form.featuredInNewPost && (
             <QuillEditor
               contentsDoc=""
@@ -195,47 +197,49 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
               tabindex={3}
             />
           )}
-          <CWButton
-            onclick={async (e) => {
-              e.preventDefault();
-              const { form } = this;
-              updateTopic(form)
-                .then((closeModal) => {
-                  if (closeModal) {
+          <div class="buttons-row">
+            <CWButton
+              onclick={async (e) => {
+                e.preventDefault();
+                const { form } = this;
+                updateTopic(form)
+                  .then((closeModal) => {
+                    if (closeModal) {
+                      $(e.target).trigger('modalexit');
+                      navigateToSubpage(
+                        `/discussions/${encodeURI(form.name.toString().trim())}`
+                      );
+                    }
+                  })
+                  .catch(() => {
+                    this.saving = false;
+                    m.redraw();
+                  });
+              }}
+              label="Save changes"
+            />
+            <CWButton
+              buttonType="primary-red"
+              disabled={this.saving}
+              onclick={async (e) => {
+                e.preventDefault();
+                const confirmed = await confirmationModalWithText(
+                  'Delete this topic?'
+                )();
+                if (!confirmed) return;
+                deleteTopic(this.form)
+                  .then(() => {
                     $(e.target).trigger('modalexit');
-                    navigateToSubpage(
-                      `/discussions/${encodeURI(form.name.toString().trim())}`
-                    );
-                  }
-                })
-                .catch(() => {
-                  this.saving = false;
-                  m.redraw();
-                });
-            }}
-            label="Save changes"
-          />
-          <CWButton
-            buttonType="primary-red"
-            disabled={this.saving}
-            onclick={async (e) => {
-              e.preventDefault();
-              const confirmed = await confirmationModalWithText(
-                'Delete this topic?'
-              )();
-              if (!confirmed) return;
-              deleteTopic(this.form)
-                .then(() => {
-                  $(e.target).trigger('modalexit');
-                  navigateToSubpage('/');
-                })
-                .catch(() => {
-                  this.saving = false;
-                  m.redraw();
-                });
-            }}
-            label="Delete topic"
-          />
+                    navigateToSubpage('/');
+                  })
+                  .catch(() => {
+                    this.saving = false;
+                    m.redraw();
+                  });
+              }}
+              label="Delete topic"
+            />
+          </div>
         </div>
         {this.error && (
           <CWValidationText message={this.error} status="failure" />
