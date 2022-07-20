@@ -5,9 +5,6 @@
 .idea
 /venv
 /build
-/eth/build
-shared/eth/artifacts
-shared/eth/cache
 node_modules/
 jsconfig.json
 .vscode
@@ -34,9 +31,6 @@ out.png
 
 # Cosmos TX
 tx.json
-
-# Ethereum contracts
-contractbase/eth/build
 
 # Webpack profiling
 stats.json
