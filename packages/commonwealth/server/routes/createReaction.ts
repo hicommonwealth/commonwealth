@@ -4,14 +4,14 @@ import { Request, Response, NextFunction } from 'express';
 import BN from 'bn.js';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { ChainType, NotificationCategories } from '../../shared/types';
+import { ChainType, NotificationCategories } from 'common-common/src/types';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import TokenBalanceCache from '../util/tokenBalanceCache';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {

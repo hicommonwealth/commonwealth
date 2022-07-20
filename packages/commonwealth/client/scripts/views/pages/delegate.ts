@@ -2,7 +2,7 @@ import 'pages/delegate.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

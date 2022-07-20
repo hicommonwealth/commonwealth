@@ -1,5 +1,5 @@
 import { createClient } from 'redis';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { REDIS_URL } from '../config';
 import { RedisNamespaces } from '../../shared/types';
 

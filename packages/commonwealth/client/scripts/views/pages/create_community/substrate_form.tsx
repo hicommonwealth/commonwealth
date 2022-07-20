@@ -9,7 +9,7 @@ import 'pages/create_community.scss';
 import app from 'state';
 import { initAppState } from 'app';
 import { slugify } from 'utils';
-import { ChainBase, ChainType } from 'types';
+import { ChainBase, ChainType } from 'common-common/src/types';
 import { constructSubstrateUrl } from 'substrate';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow } from 'views/components/metadata_rows';

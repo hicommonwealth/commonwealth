@@ -10,7 +10,7 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainType } from 'types';
+import { ChainBase, ChainType } from 'common-common/src/types';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState, EthFormFields } from './types';
 import { IdRow, InputRow } from '../../components/metadata_rows';

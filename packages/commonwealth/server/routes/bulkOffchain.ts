@@ -7,7 +7,7 @@
 import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import validateChain from '../util/validateChain';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { OffchainTopicInstance } from '../models/offchain_topic';
 import { RoleInstance } from '../models/role';

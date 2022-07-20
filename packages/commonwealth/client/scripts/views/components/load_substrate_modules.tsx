@@ -3,7 +3,7 @@
 import m from 'mithril';
 
 import app from 'state';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { ProposalModule } from 'models';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';

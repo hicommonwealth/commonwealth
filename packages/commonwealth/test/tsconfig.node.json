@@ -21,7 +21,6 @@
     "../client/scripts",
     "../shared/adapters",
     "../",
-    "../eth/types"
   ],
   "exclude": [
     "../node_modules",

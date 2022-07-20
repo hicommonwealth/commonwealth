@@ -16,10 +16,10 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
+import { ChainBase } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import { ChainBase } from './shared/types';
-import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';

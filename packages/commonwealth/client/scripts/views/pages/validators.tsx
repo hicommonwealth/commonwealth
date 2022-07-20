@@ -6,7 +6,7 @@ import 'pages/validators.scss';
 
 import app from 'state';
 import { pluralize, externalLink } from 'helpers';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { AddressInfo } from 'models';
 import Substrate from 'controllers/chain/substrate/main';
 import Sublayout from 'views/sublayout';

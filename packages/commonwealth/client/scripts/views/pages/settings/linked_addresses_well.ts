@@ -12,7 +12,7 @@ import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import { WalletId } from 'types';
+import { WalletId } from 'common-common/src/types';
 
 const AccountRow: m.Component<{ account: AddressInfo, onclick?: (e: Event) => any }, { removing }> = {
   view: (vnode): m.Vnode => {

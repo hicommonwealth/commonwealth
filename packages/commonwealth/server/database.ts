@@ -4,7 +4,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from '../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import BanFactory, { BanModelStatic } from './models/ban';

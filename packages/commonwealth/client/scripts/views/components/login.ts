@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Input, Form, FormGroup } from 'construct-ui';
 import app from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import { loginWithMagicLink } from 'controllers/app/login';
 import { notifySuccess } from 'controllers/app/notifications';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';

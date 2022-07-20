@@ -8,7 +8,7 @@ import 'modals/webhook_settings_modal.scss';
 
 import app from 'state';
 import { Webhook } from 'models';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 import {
   EdgewareChainNotificationTypes,
   KusamaChainNotificationTypes,

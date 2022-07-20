@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { getLastEdited } from '../util/getLastEdited';
 

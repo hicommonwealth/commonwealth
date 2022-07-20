@@ -1,9 +1,9 @@
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
-import { ChainBase } from '../../shared/types';
+import { ChainBase } from 'common-common/src/types';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
