@@ -14,7 +14,7 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillActiveMode, QuillTextContents } from './types';
+import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
 const Delta = Quill.import('delta');
 const Clipboard = Quill.import('modules/clipboard') as any;
@@ -23,10 +23,11 @@ const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g;
 const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/;
 
 export default class QuillEditorInternal {
-  protected _quill: Quill;
-  protected _alteredText: boolean;
-  protected _unsavedChanges; // Quill Delta
   protected _activeMode: QuillActiveMode;
+  protected _alteredText: boolean;
+  protected _quill: Quill;
+  protected _unsavedChanges; // TODO: Figure out type
+
   private readonly _$editor: JQuery<HTMLElement>;
   private readonly _editorNamespace: string;
   private readonly _onkeyboardSubmit: () => void;
@@ -48,7 +49,7 @@ export default class QuillEditorInternal {
     imageUploader: boolean,
     placeholder: string,
     defaultContents: QuillTextContents,
-    tabIndex: number
+    tabIndex?: number
   ) {
     // Remove existing editor, if there is one
     this._$editor.empty();
@@ -172,6 +173,20 @@ export default class QuillEditorInternal {
     return this._quill;
   }
 
+  // CHANGE LISTENERS & CONTENT RESTORATION
+
+  protected _addChangesListener() {
+    this._quill.on('text-change', (delta, oldDelta, source) => {
+      this._unsavedChanges = this._unsavedChanges.compose(delta);
+      // Log that the this._quill doc has been altered, so that
+      // newThread draft system prompts w/ save confirmation modal
+      if (source === 'user' && !this._alteredText) {
+        this._alteredText = true;
+        m.redraw();
+      }
+    });
+  }
+
   protected _clearUnsavedChanges() {
     Object.keys(localStorage)
       .filter((key) => key.includes(this._editorNamespace))
@@ -180,574 +195,20 @@ export default class QuillEditorInternal {
       });
   }
 
-  private _handleAutolinks(range, context) {
-    if (this._activeMode === 'markdown') return true;
-    const url = this._sliceFromLastWhitespace(context.prefix);
-    const retain = range.index - url.length;
-    const ops = (retain ? [{ retain }] : []) as any;
-    ops.push(
-      { delete: url.length },
-      { insert: url, attributes: { link: url } }
-    );
-    this._quill.updateContents({ ops });
-    return true;
-  }
-
-  private _registerModules() {
-    // Register image uploader extension
-    Quill.register('modules/imageUploader', ImageUploader);
-
-    // Register drag'n'paste module
-    Quill.register('modules/imageDropAndPaste', QuillImageDropAndPaste);
-
-    // Register markdown shortcuts
-    Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
-
-    // Register mentions module
-    Quill.register({ 'modules/mention': QuillMention });
-
-    // Register a patch to prevent pasting into long documents causing the editor to jump
-    class CustomClipboard extends Clipboard {
-      onCapturePaste(e) {
-        if (e.defaultPrevented || !this._quill.isEnabled()) return;
-        e.preventDefault();
-        const range = this._quill.getSelection(true);
-        if (range == null) return;
-        const html = e.clipboardData.getData('text/html');
-        const text = e.clipboardData.getData('text/plain');
-        const files = Array.from(e.clipboardData.files || []);
-        if (!html && files.length > 0) {
-          this._quill.uploader.upload(range, files);
-        } else if (text || files.length > 1) {
-          this.onPaste(
-            range,
-            this._activeMode === 'markdown' ? { text } : { html, text }
-          );
-        }
-      }
+  protected _restoreSavedContents(contents) {
+    if (typeof contents === 'string') {
+      this._quill.setText(contents);
+      this._quill.activeMode = 'markdown';
+    } else if (typeof contents === 'object') {
+      this._quill.setContents(contents);
+      this._quill.activeMode = 'richText';
     }
 
-    // preemptively load Twitter Widgets, so users won't be confused by loading lag &
-    // abandon an embed attempt
-    if (!(<any>window).twttr)
-      loadScript('//platform.twitter.com/widgets.js').then(() =>
-        console.log('Twitter Widgets loaded')
-      );
-
-    const BlockEmbed = Quill.import('blots/block/embed');
-    class TwitterBlot extends BlockEmbed {
-      public static blotName = 'twitter';
-      public static className = 'ql-twitter';
-      public static tagName = 'div';
-
-      public static create(id) {
-        const node = super.create(id);
-        node.dataset.id = id;
-        if (!(<any>window).twttr) {
-          loadScript('//platform.twitter.com/widgets.js').then(() => {
-            setTimeout(() => {
-              // eslint-disable-next-line
-              (<any>window).twttr?.widgets?.load();
-              // eslint-disable-next-line
-              (<any>window).twttr?.widgets?.createTweet(id, node);
-            }, 1);
-          });
-        } else {
-          setTimeout(() => {
-            // eslint-disable-next-line
-            (<any>window).twttr?.widgets?.load();
-            // eslint-disable-next-line
-            (<any>window).twttr?.widgets?.createTweet(id, node);
-          }, 1);
-        }
-        return node;
-      }
-
-      public static value(domNode) {
-        const { id } = domNode.dataset;
-        return { id };
-      }
-    }
-
-    class VideoBlot extends BlockEmbed {
-      public static blotName = 'video';
-      public static className = 'ql-video';
-      public static tagName = 'iframe';
-      domNode: any;
-
-      public static create(url) {
-        const node = super.create(url);
-        node.setAttribute('src', url);
-        // Set non-format related attributes with static values
-        node.setAttribute('frameborder', '0');
-        node.setAttribute('allowfullscreen', true);
-        // TODO: Set height/width values according to Quill editor dimensions
-        return node;
-      }
-
-      public static formats(node) {
-        // We still need to report unregistered embed formats
-        const format = {};
-        if (node.hasAttribute('height')) {
-          format['height'] = node.getAttribute('height');
-        }
-        if (node.hasAttribute('width')) {
-          format['width'] = node.getAttribute('width');
-        }
-        return format;
-      }
-
-      public static value(node) {
-        return node.getAttribute('src');
-      }
-
-      format(name, value) {
-        // Handle unregistered embed formats
-        if (name === 'height' || name === 'width') {
-          if (value) {
-            this.domNode.setAttribute(name, value);
-          } else {
-            this.domNode.removeAttribute(name, value);
-          }
-        } else {
-          super.format(name, value);
-        }
-      }
-    }
-
-    Quill.register('modules/clipboard', CustomClipboard, true);
-    Quill.register('formats/twitter', TwitterBlot, true);
-    Quill.register('formats/video', VideoBlot, true);
+    this._quill.setSelection(this._quill.getText().length - 1);
+    this._quill.focus();
   }
 
-  private _sliceFromLastWhitespace(str: string) {
-    const whitespaceI = str.lastIndexOf(' ');
-    const sliceI = whitespaceI === -1 ? 0 : whitespaceI + 1;
-    return str.slice(sliceI);
-  }
-
-  private _insertEmbeds(text: string) {
-    const twitterRe =
-      /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
-    const videoRe =
-      /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
-    const embeddableTweet = twitterRe.test(text);
-    const embeddableVideo = videoRe.test(text);
-    const insertionIdx = this._quill.getSelection().index;
-    // TODO: Build out embeds for non-Vimeo/YT players
-    if (embeddableTweet) {
-      const id = text.match(twitterRe)[1];
-      this._quill.insertEmbed(insertionIdx, 'twitter', id, 'user');
-      this._quill.insertText(insertionIdx + 1, '\n', 'user');
-      this._quill.setSelection(insertionIdx + 2, 'silent');
-      setTimeout(() => {
-        const embedEle = document.querySelectorAll(`div[data-id='${id}']`)[0];
-        const widgetsEle = embedEle?.children[0];
-        const isRendered =
-          widgetsEle &&
-          Array.from(widgetsEle.classList).includes('twitter-tweet-rendered');
-        const isVisible =
-          (embedEle?.children[0] as HTMLElement)?.style['visibility'] !==
-          'hidden';
-        if (isRendered && isVisible) {
-          this._quill.deleteText(insertionIdx - text.length, text.length + 1);
-          this._quill.setSelection(insertionIdx - text.length + 1, 'silent');
-        } else {
-          // Nested setTimeouts ensure that the embedded URL is deleted both more quickly
-          // and more reliably than would be the case with a single .750ms timeout
-          setTimeout(() => {
-            const _embedEle = document.querySelectorAll(
-              `div[data-id='${id}']`
-            )[0];
-            const _widgetsEle = _embedEle?.children[0];
-            const _isRendered =
-              _widgetsEle &&
-              Array.from(_widgetsEle.classList).includes(
-                'twitter-tweet-rendered'
-              );
-            const _isVisible =
-              (_embedEle?.children[0] as HTMLElement)?.style['visibility'] !==
-              'hidden';
-            if (_isRendered && _isVisible) {
-              this._quill.deleteText(
-                insertionIdx - text.length,
-                text.length + 1
-              );
-              this._quill.setSelection(
-                insertionIdx - text.length + 1,
-                'silent'
-              );
-            }
-          }, 500);
-        }
-      }, 250);
-      return true;
-    } else if (embeddableVideo) {
-      let url = `https://${text.match(videoRe)[1]}`;
-      if (url.indexOf('watch?v=') !== -1) {
-        url = url.replace('watch?v=', 'embed/');
-        url = url.replace(/&.*$/, '');
-      } else {
-        url = url.replace('vimeo.com', 'player.vimeo.com/video');
-      }
-      this._quill.insertEmbed(insertionIdx, 'video', url, 'user');
-      this._quill.insertText(insertionIdx + 1, '\n', 'user');
-      this._quill.setSelection(insertionIdx + 2, 'silent');
-      setTimeout(() => {
-        if (document.querySelectorAll(`iframe[src='${url}']`).length) {
-          this._quill.deleteText(insertionIdx - text.length, text.length + 1);
-          this._quill.setSelection(insertionIdx - text.length + 2, 'silent');
-        }
-      }, 1);
-      return true;
-    }
-    return false;
-  }
-
-  private async _queryMentions(
-    searchTerm: string,
-    renderList: (formattedMatches: QuillMention, searchTerm: string) => null,
-    mentionChar: string
-  ) {
-    if (mentionChar !== '@') return;
-
-    let members = [];
-    let formattedMatches;
-    if (searchTerm.length === 0) {
-      const node = document.createElement('div');
-      const tip = document.createElement('span');
-      tip.innerText = 'Type to tag a member';
-      node.appendChild(tip);
-      formattedMatches = [
-        {
-          link: '#',
-          name: '',
-          component: node.outerHTML,
-        },
-      ];
-      renderList(formattedMatches, searchTerm);
-    } else if (searchTerm.length > 0) {
-      members = await app.search.searchMentionableAddresses(searchTerm, {
-        resultSize: 6,
-      });
-      formattedMatches = members.map((addr) => {
-        const profile: Profile = app.profiles.getProfile(
-          addr.chain,
-          addr.address
-        );
-        const node = document.createElement('div');
-
-        let avatar;
-        if (profile.avatarUrl) {
-          avatar = document.createElement('img');
-          (avatar as HTMLImageElement).src = profile.avatarUrl;
-          avatar.className = 'ql-mention-avatar';
-          node.appendChild(avatar);
-        } else {
-          avatar = document.createElement('div');
-          avatar.className = 'ql-mention-avatar';
-          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 20);
-        }
-
-        const nameSpan = document.createElement('span');
-        nameSpan.innerText = addr.name;
-        nameSpan.className = 'ql-mention-name';
-
-        const addrSpan = document.createElement('span');
-        addrSpan.innerText =
-          addr.chain === 'near'
-            ? addr.address
-            : `${addr.address.slice(0, 6)}...`;
-        addrSpan.className = 'ql-mention-addr';
-
-        const lastActiveSpan = document.createElement('span');
-        lastActiveSpan.innerText = profile.lastActive
-          ? `Last active ${moment(profile.lastActive).fromNow()}`
-          : null;
-        lastActiveSpan.className = 'ql-mention-la';
-
-        const textWrap = document.createElement('div');
-        textWrap.className = 'ql-mention-text-wrap';
-
-        node.appendChild(avatar);
-        textWrap.appendChild(nameSpan);
-        textWrap.appendChild(addrSpan);
-        textWrap.appendChild(lastActiveSpan);
-        node.appendChild(textWrap);
-
-        return {
-          link: `/${addr.chain}/account/${addr.address}`,
-          name: addr.name,
-          component: node.outerHTML,
-        };
-      });
-    }
-    renderList(formattedMatches, searchTerm);
-  }
-
-  private _selectMention(item: QuillMention) {
-    if (item.link === '#' && item.name === '') return;
-    const text = this._quill.getText();
-    const cursorIdx = this._quill.selection.savedRange.index;
-    const mentionLength =
-      text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
-    const beforeText = text.slice(0, cursorIdx - mentionLength);
-    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
-    if (this._activeMode === 'markdown') {
-      const fullText = `${beforeText}[@${item.name}](${
-        item.link
-      }) ${afterText.replace(/^ /, '')}`;
-      this._quill.setText(fullText);
-      this._quill.setSelection(
-        fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0)
-      );
-    } else {
-      const delta = new Delta()
-        .retain(beforeText.length)
-        .delete(mentionLength)
-        .insert(`@${item.name}`, { link: item.link });
-      if (!afterText.startsWith(' ')) delta.insert(' ');
-      this._quill.updateContents(delta);
-      this._quill.setSelection(
-        this._quill.getLength() -
-          afterText.length -
-          (afterText.startsWith(' ') ? 0 : 1),
-        0
-      );
-    }
-  }
-
-  // Setup custom keyboard bindings, override Quill default bindings where necessary
-  private _getKeyBindings() {
-    return {
-      // Don't insert hard tabs
-      tab: {
-        key: 'Tab',
-        handler: () => true,
-      },
-      // Check for embeds on return
-      'new line': {
-        key: 'Enter',
-        shortKey: false,
-        shiftKey: null,
-        handler: this._newLineHandler,
-      },
-      // Check for mentions on return
-      'add-mention': {
-        key: 'Enter',
-        shortKey: false,
-        shiftKey: null,
-        handler: this._mentionHandler,
-      },
-      // Submit on enter if an onkeyboardSubmit function is passed
-      submit: {
-        key: 'Enter',
-        shortKey: false,
-        // TODO: Gate with Meta key, universalize submission
-        handler: this._onkeyboardSubmitHandler,
-      },
-      // Close headers, code blocks, and blockquotes when backspacing the start of a line
-      'header backspace': {
-        key: 'Backspace',
-        collapsed: true,
-        format: ['header'],
-        offset: 0,
-        handler: (range, context) => {
-          this._quill.format('header', false, 'user');
-        },
-      },
-      'blockquote backspace': {
-        key: 'Backspace',
-        collapsed: true,
-        format: ['blockquote'],
-        offset: 0,
-        handler: (range, context) => {
-          this._quill.format('blockquote', false, 'user');
-        },
-      },
-      'code backspace': {
-        key: 'Backspace',
-        collapsed: true,
-        format: ['code-block'],
-        offset: 0,
-        suffix: /^\s+$/,
-        handler: (range, context) => {
-          this._quill.format('code-block', false, 'user');
-        },
-      },
-      // Only start a list when 1. is typed, not other numeric indices.
-      // Don't start lists in Markdown mode
-      'list autofill': {
-        key: ' ',
-        collapsed: true,
-        format: { list: false },
-        prefix: /^\s*(1{1,1}\.|\*|-)$/,
-        handler: this._listAutofillHandler,
-      },
-      // Don't boldface, italicize, or underline text when hotkeys are pressed in Markdown mode
-      bold: {
-        key: 'b',
-        shortKey: true,
-        handler: (range, context) => this._inlineFormatHandler(context, 'bold'),
-      },
-      italic: {
-        key: 'i',
-        shortKey: true,
-        handler: (range, context) =>
-          this._inlineFormatHandler(context, 'italic'),
-      },
-      underline: {
-        key: 'u',
-        shortKey: true,
-        handler: (range, context) =>
-          this._inlineFormatHandler(context, 'underline'),
-      },
-      // Check for links
-      autolinks: {
-        collapsed: true,
-        key: ' ',
-        prefix: REGEXP_WITH_PRECEDING_WS,
-        handler: this._handleAutolinks,
-      },
-      autolinks2: {
-        collapsed: true,
-        key: 'Enter',
-        prefix: REGEXP_WITH_PRECEDING_WS,
-        handler: this._handleAutolinks,
-      },
-    };
-  }
-
-  private _createSpinner() {
-    const ele = document.createElement('div');
-    ele.classList.add('cui-spinner');
-    ele.classList.add('cui-spinner-active');
-    ele.classList.add('cui-spinner-fill');
-    ele.classList.add('spinner-wrap');
-    const firstChild = document.createElement('div');
-    const secondChild = document.createElement('div');
-    firstChild.classList.add('cui-spinner-content');
-    secondChild.classList.add('cui-spinner-icon');
-    firstChild.appendChild(secondChild);
-    ele.appendChild(firstChild);
-    return ele;
-  }
-
-  private _dataURLtoFile(dataurl: string, type: string) {
-    const arr = dataurl.split(',');
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) u8arr[n] = bstr.charCodeAt(n);
-    const filename = new Date().getTime().toString();
-    return new File([u8arr], filename, { type });
-  }
-
-  private async _uploadImage(file) {
-    return new Promise((resolve, reject) => {
-      document
-        .getElementsByClassName('ql-container')[0]
-        .appendChild(this._createSpinner());
-      // TODO: Change to POST /uploadSignature
-      // TODO: Reuse code since this is used in other places
-      $.post(`${app.serverUrl()}/getUploadSignature`, {
-        name: file.name, // tokyo.png
-        mimetype: file.type, // image/png
-        auth: true,
-        jwt: app.user.jwt,
-      })
-        .then((response) => {
-          if (response.status !== 'Success') {
-            document.getElementsByClassName('spinner-wrap')[0].remove();
-            alert('Upload failed');
-            return reject(
-              new Error(
-                `Failed to get an S3 signed upload URL: ${response.error}`
-              )
-            );
-          }
-          $.ajax({
-            type: 'PUT',
-            url: response.result,
-            contentType: file.type,
-            processData: false, // don't send as form
-            data: file,
-          })
-            .then(() => {
-              // file uploaded
-              const trimmedURL = response.result.slice(
-                0,
-                response.result.indexOf('?')
-              );
-              document.getElementsByClassName('spinner-wrap')[0].remove();
-              resolve(trimmedURL);
-              console.log(`Upload succeeded: ${trimmedURL}`);
-            })
-            .catch((err) => {
-              // file not uploaded
-              document.getElementsByClassName('spinner-wrap')[0].remove();
-              alert('Upload failed');
-              console.log(`Upload failed: ${response.result}`);
-              reject(new Error(`Upload failed: ${err}`));
-            });
-        })
-        .catch((err: any) => {
-          document.getElementsByClassName('spinner-wrap')[0].remove();
-          err = err.responseJSON ? err.responseJSON.error : err.responseText;
-          reject(new Error(`Failed to get an S3 signed upload URL: ${err}`));
-        });
-    });
-  }
-
-  private _configureAutoLinkPaste() {
-    // Set up autolinks pasting
-    this._quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
-      if (typeof node.data !== 'string') return;
-
-      const matches = node.data.match(REGEXP_GLOBAL);
-      if (matches && matches.length > 0 && this._activeMode === 'richText') {
-        const ops = [];
-        let str = node.data;
-        matches.forEach((match) => {
-          const split = str.split(match);
-          const beforeLink = split.shift();
-          ops.push({ insert: beforeLink });
-          ops.push({ insert: match, attributes: { link: match } });
-          str = split.join(match);
-        });
-        ops.push({ insert: str });
-        delta.ops = ops;
-      }
-      return delta;
-    });
-  }
-
-  // Helper function to add formatting around multiline text blocks
-  // Special cases:
-  // - string formatters with newlines are always applied around the whole block (e.g. ```)
-  // - block formatters are not applied on empty lines, unless:
-  //    - they have passed a function to generate the format for each line (e.g. ordered lists)
-  //    - all the lines are empty, in which case we apply the formatter once, at the start
-  private _addFmt(fmt, text, isInlineFormatter = false) {
-    if (typeof fmt === 'string' && fmt.indexOf('\n') !== -1) {
-      return (fmt + text + fmt).trim();
-    }
-    if (typeof fmt === 'string' && text.trim() === '') {
-      return fmt + text;
-    }
-    return text
-      .split('\n')
-      .map((line, index) => {
-        if (typeof fmt === 'string' && line.trim() === '') return line;
-        else if (typeof fmt === 'string')
-          return isInlineFormatter ? fmt + line + fmt : fmt + line;
-        else
-          return isInlineFormatter
-            ? fmt(index) + line + fmt(index)
-            : fmt(index) + line;
-      })
-      .join('\n');
-  }
+  // FORMAT & TOOLBAR
 
   // Set up toolbar
   private _configureToolbar() {
@@ -909,59 +370,497 @@ export default class QuillEditorInternal {
       });
   }
 
-  private _addChangesListener() {
-    this._quill.on('text-change', (delta, oldDelta, source) => {
-      this._unsavedChanges = this._unsavedChanges.compose(delta);
-      // Log that the this._quill doc has been altered, so that
-      // newThread draft system prompts w/ save confirmation modal
-      if (source === 'user' && !this._alteredText) {
-        this._alteredText = true;
-        m.redraw();
+  // Setup custom keyboard bindings, override Quill default bindings where necessary
+  private _getKeyBindings() {
+    return {
+      // Don't insert hard tabs
+      tab: {
+        key: 'Tab',
+        handler: () => true,
+      },
+      // Check for embeds on return
+      'new line': {
+        key: 'Enter',
+        shortKey: false,
+        shiftKey: null,
+        handler: this._newLineHandler,
+      },
+      // Check for mentions on return
+      'add-mention': {
+        key: 'Enter',
+        shortKey: false,
+        shiftKey: null,
+        handler: this._mentionHandler,
+      },
+      // Submit on enter if an onkeyboardSubmit function is passed
+      submit: {
+        key: 'Enter',
+        shortKey: false,
+        // TODO: Gate with Meta key, universalize submission
+        handler: this._onkeyboardSubmitHandler,
+      },
+      // Close headers, code blocks, and blockquotes when backspacing the start of a line
+      'header backspace': {
+        key: 'Backspace',
+        collapsed: true,
+        format: ['header'],
+        offset: 0,
+        handler: (range, context) => {
+          this._quill.format('header', false, 'user');
+        },
+      },
+      'blockquote backspace': {
+        key: 'Backspace',
+        collapsed: true,
+        format: ['blockquote'],
+        offset: 0,
+        handler: (range, context) => {
+          this._quill.format('blockquote', false, 'user');
+        },
+      },
+      'code backspace': {
+        key: 'Backspace',
+        collapsed: true,
+        format: ['code-block'],
+        offset: 0,
+        suffix: /^\s+$/,
+        handler: (range, context) => {
+          this._quill.format('code-block', false, 'user');
+        },
+      },
+      // Only start a list when 1. is typed, not other numeric indices.
+      // Don't start lists in Markdown mode
+      'list autofill': {
+        key: ' ',
+        collapsed: true,
+        format: { list: false },
+        prefix: /^\s*(1{1,1}\.|\*|-)$/,
+        handler: this._listAutofillHandler,
+      },
+      // Don't boldface, italicize, or underline text when hotkeys are pressed in Markdown mode
+      bold: {
+        key: 'b',
+        shortKey: true,
+        handler: (range, context) => this._inlineFormatHandler(context, 'bold'),
+      },
+      italic: {
+        key: 'i',
+        shortKey: true,
+        handler: (range, context) =>
+          this._inlineFormatHandler(context, 'italic'),
+      },
+      underline: {
+        key: 'u',
+        shortKey: true,
+        handler: (range, context) =>
+          this._inlineFormatHandler(context, 'underline'),
+      },
+      // Check for links
+      autolinks: {
+        collapsed: true,
+        key: ' ',
+        prefix: REGEXP_WITH_PRECEDING_WS,
+        handler: this._handleAutolinks,
+      },
+      autolinks2: {
+        collapsed: true,
+        key: 'Enter',
+        prefix: REGEXP_WITH_PRECEDING_WS,
+        handler: this._handleAutolinks,
+      },
+    };
+  }
+
+  // Helper function to add formatting around multiline text blocks
+  // Special cases:
+  // - string formatters with newlines are always applied around the whole block (e.g. ```)
+  // - block formatters are not applied on empty lines, unless:
+  //    - they have passed a function to generate the format for each line (e.g. ordered lists)
+  //    - all the lines are empty, in which case we apply the formatter once, at the start
+  private _addFmt(fmt, text, isInlineFormatter = false) {
+    if (typeof fmt === 'string' && fmt.indexOf('\n') !== -1) {
+      return (fmt + text + fmt).trim();
+    }
+    if (typeof fmt === 'string' && text.trim() === '') {
+      return fmt + text;
+    }
+    return text
+      .split('\n')
+      .map((line, index) => {
+        if (typeof fmt === 'string' && line.trim() === '') return line;
+        else if (typeof fmt === 'string')
+          return isInlineFormatter ? fmt + line + fmt : fmt + line;
+        else
+          return isInlineFormatter
+            ? fmt(index) + line + fmt(index)
+            : fmt(index) + line;
+      })
+      .join('\n');
+  }
+
+  private _configureAutoLinkPaste() {
+    // Set up autolinks pasting
+    this._quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
+      if (typeof node.data !== 'string') return;
+
+      const matches = node.data.match(REGEXP_GLOBAL);
+      if (matches && matches.length > 0 && this._activeMode === 'richText') {
+        const ops = [];
+        let str = node.data;
+        matches.forEach((match) => {
+          const split = str.split(match);
+          const beforeLink = split.shift();
+          ops.push({ insert: beforeLink });
+          ops.push({ insert: match, attributes: { link: match } });
+          str = split.join(match);
+        });
+        ops.push({ insert: str });
+        delta.ops = ops;
       }
+      return delta;
     });
   }
 
-  private _restoreSavedContents(defaultContents) {
-    if (typeof defaultContents === 'string') {
-      this._quill.setText(defaultContents);
-      this._quill.activeMode = 'markdown';
-    } else if (typeof defaultContents === 'object') {
-      this._quill.setContents(defaultContents);
-      this._quill.activeMode = 'richText';
+  private _handleAutolinks(range, context) {
+    if (this._activeMode === 'markdown') return true;
+    const url = this._sliceFromLastWhitespace(context.prefix);
+    const retain = range.index - url.length;
+    const ops = (retain ? [{ retain }] : []) as any;
+    ops.push(
+      { delete: url.length },
+      { insert: url, attributes: { link: url } }
+    );
+    this._quill.updateContents({ ops });
+    return true;
+  }
+
+  private _insertEmbeds(text: string) {
+    const twitterRe =
+      /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
+    const videoRe =
+      /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
+    const embeddableTweet = twitterRe.test(text);
+    const embeddableVideo = videoRe.test(text);
+    const insertionIdx = this._quill.getSelection().index;
+    // TODO: Build out embeds for non-Vimeo/YT players
+    if (embeddableTweet) {
+      const id = text.match(twitterRe)[1];
+      this._quill.insertEmbed(insertionIdx, 'twitter', id, 'user');
+      this._quill.insertText(insertionIdx + 1, '\n', 'user');
+      this._quill.setSelection(insertionIdx + 2, 'silent');
+      setTimeout(() => {
+        const embedEle = document.querySelectorAll(`div[data-id='${id}']`)[0];
+        const widgetsEle = embedEle?.children[0];
+        const isRendered =
+          widgetsEle &&
+          Array.from(widgetsEle.classList).includes('twitter-tweet-rendered');
+        const isVisible =
+          (embedEle?.children[0] as HTMLElement)?.style['visibility'] !==
+          'hidden';
+        if (isRendered && isVisible) {
+          this._quill.deleteText(insertionIdx - text.length, text.length + 1);
+          this._quill.setSelection(insertionIdx - text.length + 1, 'silent');
+        } else {
+          // Nested setTimeouts ensure that the embedded URL is deleted both more quickly
+          // and more reliably than would be the case with a single .750ms timeout
+          setTimeout(() => {
+            const _embedEle = document.querySelectorAll(
+              `div[data-id='${id}']`
+            )[0];
+            const _widgetsEle = _embedEle?.children[0];
+            const _isRendered =
+              _widgetsEle &&
+              Array.from(_widgetsEle.classList).includes(
+                'twitter-tweet-rendered'
+              );
+            const _isVisible =
+              (_embedEle?.children[0] as HTMLElement)?.style['visibility'] !==
+              'hidden';
+            if (_isRendered && _isVisible) {
+              this._quill.deleteText(
+                insertionIdx - text.length,
+                text.length + 1
+              );
+              this._quill.setSelection(
+                insertionIdx - text.length + 1,
+                'silent'
+              );
+            }
+          }, 500);
+        }
+      }, 250);
+      return true;
+    } else if (embeddableVideo) {
+      let url = `https://${text.match(videoRe)[1]}`;
+      if (url.indexOf('watch?v=') !== -1) {
+        url = url.replace('watch?v=', 'embed/');
+        url = url.replace(/&.*$/, '');
+      } else {
+        url = url.replace('vimeo.com', 'player.vimeo.com/video');
+      }
+      this._quill.insertEmbed(insertionIdx, 'video', url, 'user');
+      this._quill.insertText(insertionIdx + 1, '\n', 'user');
+      this._quill.setSelection(insertionIdx + 2, 'silent');
+      setTimeout(() => {
+        if (document.querySelectorAll(`iframe[src='${url}']`).length) {
+          this._quill.deleteText(insertionIdx - text.length, text.length + 1);
+          this._quill.setSelection(insertionIdx - text.length + 2, 'silent');
+        }
+      }, 1);
+      return true;
+    }
+    return false;
+  }
+
+  private async _queryMentions(
+    searchTerm: string,
+    renderList: (formattedMatches: QuillMention, searchTerm: string) => null,
+    mentionChar: string
+  ) {
+    if (mentionChar !== '@') return;
+
+    let members = [];
+    let formattedMatches;
+    if (searchTerm.length === 0) {
+      const node = document.createElement('div');
+      const tip = document.createElement('span');
+      tip.innerText = 'Type to tag a member';
+      node.appendChild(tip);
+      formattedMatches = [
+        {
+          link: '#',
+          name: '',
+          component: node.outerHTML,
+        },
+      ];
+      renderList(formattedMatches, searchTerm);
+    } else if (searchTerm.length > 0) {
+      members = await app.search.searchMentionableAddresses(searchTerm, {
+        resultSize: 6,
+      });
+      formattedMatches = members.map((addr) => {
+        const profile: Profile = app.profiles.getProfile(
+          addr.chain,
+          addr.address
+        );
+        const node = document.createElement('div');
+
+        let avatar;
+        if (profile.avatarUrl) {
+          avatar = document.createElement('img');
+          (avatar as HTMLImageElement).src = profile.avatarUrl;
+          avatar.className = 'ql-mention-avatar';
+          node.appendChild(avatar);
+        } else {
+          avatar = document.createElement('div');
+          avatar.className = 'ql-mention-avatar';
+          avatar.innerHTML = Profile.getSVGAvatar(addr.address, 20);
+        }
+
+        const nameSpan = document.createElement('span');
+        nameSpan.innerText = addr.name;
+        nameSpan.className = 'ql-mention-name';
+
+        const addrSpan = document.createElement('span');
+        addrSpan.innerText =
+          addr.chain === 'near'
+            ? addr.address
+            : `${addr.address.slice(0, 6)}...`;
+        addrSpan.className = 'ql-mention-addr';
+
+        const lastActiveSpan = document.createElement('span');
+        lastActiveSpan.innerText = profile.lastActive
+          ? `Last active ${moment(profile.lastActive).fromNow()}`
+          : null;
+        lastActiveSpan.className = 'ql-mention-la';
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'ql-mention-text-wrap';
+
+        node.appendChild(avatar);
+        textWrap.appendChild(nameSpan);
+        textWrap.appendChild(addrSpan);
+        textWrap.appendChild(lastActiveSpan);
+        node.appendChild(textWrap);
+
+        return {
+          link: `/${addr.chain}/account/${addr.address}`,
+          name: addr.name,
+          component: node.outerHTML,
+        };
+      });
+    }
+    renderList(formattedMatches, searchTerm);
+  }
+
+  private _registerModules() {
+    // Register image uploader extension
+    Quill.register('modules/imageUploader', ImageUploader);
+
+    // Register drag'n'paste module
+    Quill.register('modules/imageDropAndPaste', QuillImageDropAndPaste);
+
+    // Register markdown shortcuts
+    Quill.register('modules/markdownShortcuts', MarkdownShortcuts);
+
+    // Register mentions module
+    Quill.register({ 'modules/mention': QuillMention });
+
+    // Register a patch to prevent pasting into long documents causing the editor to jump
+    class CustomClipboard extends Clipboard {
+      onCapturePaste(e) {
+        if (e.defaultPrevented || !this._quill.isEnabled()) return;
+        e.preventDefault();
+        const range = this._quill.getSelection(true);
+        if (range == null) return;
+        const html = e.clipboardData.getData('text/html');
+        const text = e.clipboardData.getData('text/plain');
+        const files = Array.from(e.clipboardData.files || []);
+        if (!html && files.length > 0) {
+          this._quill.uploader.upload(range, files);
+        } else if (text || files.length > 1) {
+          this.onPaste(
+            range,
+            this._activeMode === 'markdown' ? { text } : { html, text }
+          );
+        }
+      }
     }
 
-    this._quill.setSelection(this._quill.getText().length - 1);
-    this._quill.focus();
+    // preemptively load Twitter Widgets, so users won't be confused by loading lag &
+    // abandon an embed attempt
+    if (!(<any>window).twttr)
+      loadScript('//platform.twitter.com/widgets.js').then(() =>
+        console.log('Twitter Widgets loaded')
+      );
+
+    const BlockEmbed = Quill.import('blots/block/embed');
+    class TwitterBlot extends BlockEmbed {
+      public static blotName = 'twitter';
+      public static className = 'ql-twitter';
+      public static tagName = 'div';
+
+      public static create(id) {
+        const node = super.create(id);
+        node.dataset.id = id;
+        if (!(<any>window).twttr) {
+          loadScript('//platform.twitter.com/widgets.js').then(() => {
+            setTimeout(() => {
+              // eslint-disable-next-line
+              (<any>window).twttr?.widgets?.load();
+              // eslint-disable-next-line
+              (<any>window).twttr?.widgets?.createTweet(id, node);
+            }, 1);
+          });
+        } else {
+          setTimeout(() => {
+            // eslint-disable-next-line
+            (<any>window).twttr?.widgets?.load();
+            // eslint-disable-next-line
+            (<any>window).twttr?.widgets?.createTweet(id, node);
+          }, 1);
+        }
+        return node;
+      }
+
+      public static value(domNode) {
+        const { id } = domNode.dataset;
+        return { id };
+      }
+    }
+
+    class VideoBlot extends BlockEmbed {
+      public static blotName = 'video';
+      public static className = 'ql-video';
+      public static tagName = 'iframe';
+      domNode: any;
+
+      public static create(url) {
+        const node = super.create(url);
+        node.setAttribute('src', url);
+        // Set non-format related attributes with static values
+        node.setAttribute('frameborder', '0');
+        node.setAttribute('allowfullscreen', true);
+        // TODO: Set height/width values according to Quill editor dimensions
+        return node;
+      }
+
+      public static formats(node) {
+        // We still need to report unregistered embed formats
+        const format = {};
+        if (node.hasAttribute('height')) {
+          format['height'] = node.getAttribute('height');
+        }
+        if (node.hasAttribute('width')) {
+          format['width'] = node.getAttribute('width');
+        }
+        return format;
+      }
+
+      public static value(node) {
+        return node.getAttribute('src');
+      }
+
+      format(name, value) {
+        // Handle unregistered embed formats
+        if (name === 'height' || name === 'width') {
+          if (value) {
+            this.domNode.setAttribute(name, value);
+          } else {
+            this.domNode.removeAttribute(name, value);
+          }
+        } else {
+          super.format(name, value);
+        }
+      }
+    }
+
+    Quill.register('modules/clipboard', CustomClipboard, true);
+    Quill.register('formats/twitter', TwitterBlot, true);
+    Quill.register('formats/video', VideoBlot, true);
+  }
+
+  private _selectMention(item: QuillMention) {
+    if (item.link === '#' && item.name === '') return;
+    const text = this._quill.getText();
+    const cursorIdx = this._quill.selection.savedRange.index;
+    const mentionLength =
+      text.slice(0, cursorIdx).split('').reverse().indexOf('@') + 1;
+    const beforeText = text.slice(0, cursorIdx - mentionLength);
+    const afterText = text.slice(cursorIdx).replace(/\n$/, '');
+    if (this._activeMode === 'markdown') {
+      const fullText = `${beforeText}[@${item.name}](${
+        item.link
+      }) ${afterText.replace(/^ /, '')}`;
+      this._quill.setText(fullText);
+      this._quill.setSelection(
+        fullText.length - afterText.length + (afterText.startsWith(' ') ? 1 : 0)
+      );
+    } else {
+      const delta = new Delta()
+        .retain(beforeText.length)
+        .delete(mentionLength)
+        .insert(`@${item.name}`, { link: item.link });
+      if (!afterText.startsWith(' ')) delta.insert(' ');
+      this._quill.updateContents(delta);
+      this._quill.setSelection(
+        this._quill.getLength() -
+          afterText.length -
+          (afterText.startsWith(' ') ? 0 : 1),
+        0
+      );
+    }
   }
 
   // HANDLERS
 
-  private _inlineFormatHandler(context, formatType: string) {
-    if (this._activeMode === 'richText')
-      this._quill.format(
-        formatType,
-        !context.format[formatType],
-        Quill.sources.USER
-      );
-    return false;
-  }
-
-  private _newLineHandler(range, context) {
-    if (this._activeMode === 'markdown') return true;
-    const [line, offset] = this._quill.getLine(range.index);
-    const { textContent } = line.domNode;
-    const isEmbed = this._insertEmbeds(textContent);
-    // If embed, stopPropogation; otherwise continue.
-    return !isEmbed;
-  }
-
-  // handle drag-and-drop and paste events
+  // Drag-and-drop and paste events
   private async _imageHandler(imageDataUrl, type) {
     if (!type) type = 'image/png';
     const index =
       (this._quill.getSelection() || {}).index || this._quill.getLength() || 0;
 
-    // filter out base64 format images from Quill
+    // Filter out base64 format images from Quill
     const contents = this._quill.getContents();
     const indexesToFilter = [];
     contents.ops.forEach((op, idx) => {
@@ -1002,6 +901,16 @@ export default class QuillEditorInternal {
       });
   }
 
+  private _inlineFormatHandler(context, formatType: string) {
+    if (this._activeMode === 'richText')
+      this._quill.format(
+        formatType,
+        !context.format[formatType],
+        Quill.sources.USER
+      );
+    return false;
+  }
+
   private _listAutofillHandler(range, context) {
     if (this._activeMode === 'markdown') return true;
     const length = context.prefix.length;
@@ -1040,6 +949,15 @@ export default class QuillEditorInternal {
     }
   }
 
+  private _newLineHandler(range, context) {
+    if (this._activeMode === 'markdown') return true;
+    const [line, offset] = this._quill.getLine(range.index);
+    const { textContent } = line.domNode;
+    const isEmbed = this._insertEmbeds(textContent);
+    // If embed, stopPropogation; otherwise continue.
+    return !isEmbed;
+  }
+
   private _onkeyboardSubmitHandler(range, context) {
     if (this._onkeyboardSubmit) {
       this._onkeyboardSubmit();
@@ -1047,5 +965,94 @@ export default class QuillEditorInternal {
     } else {
       return true;
     }
+  }
+
+  // HELPERS
+
+  private _createSpinner() {
+    const ele = document.createElement('div');
+    ele.classList.add('cui-spinner');
+    ele.classList.add('cui-spinner-active');
+    ele.classList.add('cui-spinner-fill');
+    ele.classList.add('spinner-wrap');
+    const firstChild = document.createElement('div');
+    const secondChild = document.createElement('div');
+    firstChild.classList.add('cui-spinner-content');
+    secondChild.classList.add('cui-spinner-icon');
+    firstChild.appendChild(secondChild);
+    ele.appendChild(firstChild);
+    return ele;
+  }
+
+  private _dataURLtoFile(dataurl: string, type: string) {
+    const arr = dataurl.split(',');
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    const filename = new Date().getTime().toString();
+    return new File([u8arr], filename, { type });
+  }
+
+  private _sliceFromLastWhitespace(str: string) {
+    const whitespaceI = str.lastIndexOf(' ');
+    const sliceI = whitespaceI === -1 ? 0 : whitespaceI + 1;
+    return str.slice(sliceI);
+  }
+
+  private async _uploadImage(file) {
+    return new Promise((resolve, reject) => {
+      document
+        .getElementsByClassName('ql-container')[0]
+        .appendChild(this._createSpinner());
+      // TODO: Change to POST /uploadSignature
+      // TODO: Reuse code since this is used in other places
+      $.post(`${app.serverUrl()}/getUploadSignature`, {
+        name: file.name, // tokyo.png
+        mimetype: file.type, // image/png
+        auth: true,
+        jwt: app.user.jwt,
+      })
+        .then((response) => {
+          if (response.status !== 'Success') {
+            document.getElementsByClassName('spinner-wrap')[0].remove();
+            alert('Upload failed');
+            return reject(
+              new Error(
+                `Failed to get an S3 signed upload URL: ${response.error}`
+              )
+            );
+          }
+          $.ajax({
+            type: 'PUT',
+            url: response.result,
+            contentType: file.type,
+            processData: false, // don't send as form
+            data: file,
+          })
+            .then(() => {
+              // file uploaded
+              const trimmedURL = response.result.slice(
+                0,
+                response.result.indexOf('?')
+              );
+              document.getElementsByClassName('spinner-wrap')[0].remove();
+              resolve(trimmedURL);
+              console.log(`Upload succeeded: ${trimmedURL}`);
+            })
+            .catch((err) => {
+              // file not uploaded
+              document.getElementsByClassName('spinner-wrap')[0].remove();
+              alert('Upload failed');
+              console.log(`Upload failed: ${response.result}`);
+              reject(new Error(`Upload failed: ${err}`));
+            });
+        })
+        .catch((err: any) => {
+          document.getElementsByClassName('spinner-wrap')[0].remove();
+          err = err.responseJSON ? err.responseJSON.error : err.responseText;
+          reject(new Error(`Failed to get an S3 signed upload URL: ${err}`));
+        });
+    });
   }
 }

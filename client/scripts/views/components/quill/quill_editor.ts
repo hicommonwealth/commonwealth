@@ -1,5 +1,4 @@
 import { Quill, Editor } from 'quill';
-import { QuillEditorComponent } from './quill_editor_component';
 import QuillEditorInternal from './quill_editor_internal';
 import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
@@ -9,17 +8,40 @@ import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 // When submitting a form:
 //    1. Call disableEditor() to freeze editor state.
 //    2. Use editorIsBlank() to check text state
-//    3. Use the textContents getter to grab form data.
+//    3. Use the textContentsAsString getter to grab form data.
 //    4. Re-enable the editor if it will be reused on the page.
 
-// TODO: https://stackoverflow.com/questions/2156129/is-there-a-standard-way-to-organize-methods-within-a-class/2156179
 export class QuillEditor extends QuillEditorInternal {
   public get activeMode(): QuillActiveMode {
     return this._activeMode;
   }
 
-  public get outerEditor(): Quill {
-    return this._quill;
+  public set activeMode(mode: QuillActiveMode) {
+    this._activeMode = mode;
+  }
+
+  // Tracks whether document state has changed, for triggering saves
+  public get alteredText(): boolean {
+    return this._alteredText;
+  }
+
+  public set alteredText(bool: boolean) {
+    this._alteredText = bool;
+  }
+
+  // Returns editor contents as Delta. Ideal for RichText.
+  public get contents(): QuillDelta {
+    return this._quill._editor.getContents() as QuillDelta;
+  }
+
+  public set contents(contents: QuillDelta) {
+    this._quill._editor.setContents(contents);
+    this._quill._editor.setSelection(this.endIndex);
+  }
+
+  // Final indexed, used to set cursor and clear formatting
+  public get endIndex(): number {
+    return this._quill.editor.getText().length - 1;
   }
 
   public get innerEditor(): Editor {
@@ -30,19 +52,25 @@ export class QuillEditor extends QuillEditorInternal {
     return this._activeMode === 'markdown';
   }
 
-  public get textContents(): QuillTextContents {
-    // TODO: Check on this vs inner editor
+  public get outerEditor(): Quill {
+    return this._quill;
+  }
+
+  // Returns editor contents as string. Ideal for Markdown.
+  public get text(): string {
+    return this._quill._editor.getText();
+  }
+
+  public set text(contents: string) {
+    this._quill._editor.setText(contents);
+    this._quill._editor.setSelection(this.endIndex);
+  }
+
+  // TODO: Check on this vs inner editor
+  public get textContentsAsString(): string {
     return this.markdownMode
       ? this._quill.getText()
       : JSON.stringify(this._quill.getContents());
-  }
-
-  public get alteredText(): boolean {
-    return this._alteredText;
-  }
-
-  public set alteredText(bool: boolean) {
-    this._alteredText = bool;
   }
 
   constructor(
@@ -73,7 +101,7 @@ export class QuillEditor extends QuillEditorInternal {
   public disable(document?: Document): void {
     this._quill.enable(false);
 
-    // Disable mentions container
+    // Disable mentions plugin container
     if (document) {
       const mentionsEle = document.getElementsByClassName(
         'ql-mention-list-container'
@@ -84,8 +112,12 @@ export class QuillEditor extends QuillEditorInternal {
     }
   }
 
+  public enable(): void {
+    this._quill.enable(true);
+  }
+
+  // TODO: Check on this vs outer editor
   public isBlank(): boolean {
-    // TODO: Check on this vs outer editor
     if (this._quill.editor.isBlank()) return true;
     if (
       this._quill.editor.getText() === '' &&
@@ -97,42 +129,29 @@ export class QuillEditor extends QuillEditorInternal {
     return false;
   }
 
-  public enable(): void {
-    this._quill.enable(true);
+  // Load a template or draft and overwrite activeMode
+  public loadDocument(document: string) {
+    try {
+      const documentDelta = JSON.parse(document)?.ops;
+      if (!documentDelta.ops) throw new Error();
+      this.activeMode = 'richText';
+      this.contents = documentDelta;
+    } catch (e) {
+      this.activeMode = 'markdown';
+      this.text = document;
+    }
   }
 
-  public getTextContents(stringifyDelta = false): QuillTextContents | string {
-    return this.markdownMode
-      ? this._quill.getText()
-      : stringifyDelta
-      ? JSON.stringify(this.innerEditor.getContents())
-      : this._quill.getContents();
+  // Strips all formatting, e.g. when switching from RichText to Markdown
+  public removeFormat(startIndex: number, endIndex: number) {
+    return this._quill.innerEditor.removeFormat(startIndex, endIndex);
   }
 
+  // Clears editor and resets state
   public resetEditor(): void {
     this.enable();
     this._quill.setContents([{ insert: '\n' }]);
     this._clearUnsavedChanges();
     this._alteredText = false;
-  }
-
-  public getContents(): QuillDelta {
-    return this._quill.innerEditor.getContents() as QuillDelta;
-  }
-
-  public setContents(contents: QuillDelta) {
-    this._quill.innerEditor.setContents(contents);
-  }
-
-  public getText(): string {
-    return this._quill.innerEditor.getText();
-  }
-
-  public setSelection(index: number) {
-    this._quill.innerEditor.setSelection(index);
-  }
-
-  public removeFormat(startIndex: number, endIndex: number) {
-    return this._quill.innerEditor.removeFormat(startIndex, endIndex);
   }
 }

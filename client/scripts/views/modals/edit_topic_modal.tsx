@@ -81,7 +81,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
 
       quillEditorState.disable();
 
-      const bodyText = quillEditorState.getTextContents(true) as string;
+      const bodyText = quillEditorState.textContentsAsString as string;
 
       const topicInfo = {
         id,

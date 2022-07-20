@@ -51,6 +51,7 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
         {topics.map((t) => (
           <MenuItem
             onclick={() => {
+              // TODO Graham 6-19-22: Let's find a non-localStorage solution
               localStorage.setItem(
                 `${app.activeChainId()}-active-topic`,
                 t.name
@@ -77,14 +78,14 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
           app.chain?.base === ChainBase.CosmosSDK ||
           app.chain?.base === ChainBase.Substrate) &&
           !mobile && <MenuDivider />}
-        {app.chain?.base === ChainBase.CosmosSDK
-          && app.chain?.network !== ChainNetwork.Terra && (
-          <MenuItem
-            onclick={() => navigateToSubpage('/new/proposal')}
-            label="New On-Chain Proposal"
-            iconLeft={mobile ? Icons.PLUS : undefined}
-          />
-        )}
+        {app.chain?.base === ChainBase.CosmosSDK &&
+          app.chain?.network !== ChainNetwork.Terra && (
+            <MenuItem
+              onclick={() => navigateToSubpage('/new/proposal')}
+              label="New On-Chain Proposal"
+              iconLeft={mobile ? Icons.PLUS : undefined}
+            />
+          )}
         {app.chain?.base === ChainBase.Ethereum &&
           app.chain?.network === ChainNetwork.Aave && (
             <MenuItem

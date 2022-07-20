@@ -54,7 +54,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     const { _quillEditorState } = this;
 
     const message = {
-      message: _quillEditorState.getTextContents(true),
+      message: _quillEditorState.textContentsAsString,
       chat_channel_id: this._channel.id,
       address: app.user.activeAccount.address,
     };

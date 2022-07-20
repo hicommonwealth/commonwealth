@@ -307,7 +307,7 @@ export class ChainMetadataRows
             if (blankEditor) {
               this.communityBanner = null;
             } else {
-              const newCommunityBanner = quillBanner.textContents;
+              const newCommunityBanner = quillBanner.textContentsAsString;
               if (newCommunityBanner !== this.communityBanner) {
                 this.communityBanner = newCommunityBanner;
                 this.bannerStateUpdated = true;

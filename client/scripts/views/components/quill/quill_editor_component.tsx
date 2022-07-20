@@ -114,11 +114,10 @@ export class QuillEditorComponent
 
     // If contents pre- and post-formatting are identical, then nothing will be lost,
     // and there's no reason to confirm the switch.
-    this._defaultContents = this._quillEditor.getContents();
-    this._quillEditor.removeFormat(0, this._quillEditor.getText().length - 1);
+    this._defaultContents = this._quillEditor.contents;
+    this._quillEditor.removeFormat(0, this._quillEditor.endIndex);
     if (
-      this._quillEditor.getContents().ops.length ===
-      this._defaultContents.ops.length
+      this._quillEditor.contents.ops.length === this._defaultContents.ops.length
     ) {
       confirmed = true;
     } else {
@@ -129,8 +128,7 @@ export class QuillEditorComponent
 
     if (!confirmed) {
       // Restore formatted contents
-      this._quillEditor.setContents(this._defaultContents);
-      this._quillEditor.setSelection(this._quillEditor.getText().length - 1);
+      this._quillEditor.contents = this._defaultContents;
     }
     return confirmed;
   }
@@ -207,7 +205,7 @@ export class QuillEditorComponent
             className="mode-switcher"
             title="Switch to Rich Text mode"
             onclick={(e) => {
-              this._defaultContents = this._quillEditor.getContents();
+              this._defaultContents = this._quillEditor.contents;
               this._activeMode = 'richText';
               this._quillEditor = new QuillEditor(
                 this._$editor,
@@ -238,11 +236,8 @@ export class QuillEditorComponent
               if (!confirmed) return;
 
               // Remove formatting, switch to Markdown.
-              this._quillEditor.removeFormat(
-                0,
-                this._quillEditor.getText().length - 1
-              );
-              this._defaultContents = this._quillEditor.getContents();
+              this._quillEditor.removeFormat(0, this._quillEditor.endIndex);
+              this._defaultContents = this._quillEditor.contents;
               this._activeMode = 'markdown';
 
               this._quillEditor = new QuillEditor(
@@ -271,8 +266,8 @@ export class QuillEditorComponent
               data: {
                 doc:
                   this._activeMode === 'markdown'
-                    ? this._quillEditor.getText()
-                    : JSON.stringify(this._quillEditor.getContents()),
+                    ? this._quillEditor.text
+                    : JSON.stringify(this._quillEditor.contents),
               },
             });
           }}

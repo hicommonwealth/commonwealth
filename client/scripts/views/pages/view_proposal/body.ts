@@ -605,7 +605,7 @@ export const ProposalBodyCancelEdit: m.Component<{
             e.preventDefault();
             let confirmed = true;
             const threadText =
-              parentState.quillEditorState.getTextContents(true);
+              parentState.quillEditorState.textContentsAsString;
             if (threadText !== parentState.currentText) {
               confirmed = await confirmationModalWithText(
                 'Cancel editing? Changes will not be saved.'
@@ -657,7 +657,7 @@ export const ProposalBodySaveEdit: m.Component<{
             parentState.saving = true;
             const { quillEditorState } = parentState;
             quillEditorState.disable();
-            const itemText = quillEditorState.getTextContents(true);
+            const itemText = quillEditorState.textContentsAsString;
             if (item instanceof OffchainThread) {
               app.threads
                 .edit(

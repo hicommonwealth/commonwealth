@@ -25,6 +25,14 @@ const modelFromServer = (draft) => {
   );
 };
 
+export type DraftParams = {
+  existingDraftId?: number;
+  title: string;
+  body: string;
+  topicName: string;
+  attachments?: string[];
+};
+
 class DraftsController {
   private _store = new DraftStore();
 
@@ -38,19 +46,15 @@ class DraftsController {
     return this._initialized;
   }
 
-  public async create(
-    title: string,
-    body: string,
-    topicName: string,
-    attachments?: string[]
-  ) {
+  public async create(params: DraftParams) {
+    const { title, body, topicName, attachments } = params;
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
         chain: app.activeChainId(),
-        title: title,
-        body: body,
+        title,
+        body,
         topic: topicName,
         'attachments[]': attachments,
         jwt: app.user.jwt,
@@ -67,14 +71,12 @@ class DraftsController {
     }
   }
 
-  public async edit(
-    id: number,
-    title: string,
-    body: string,
-    topicName: string,
-    attachments?: string[]
-  ) {
-    // Todo: handle attachments
+  // TODO: Handle attachments
+  public async edit(params: DraftParams) {
+    const { existingDraftId, title, body, topicName, attachments } = params;
+    if (!existingDraftId) {
+      throw new Error('Must include id of draft being edited.');
+    }
     try {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
@@ -82,9 +84,9 @@ class DraftsController {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
           chain: app.activeChainId(),
-          id: id,
-          title: title,
-          body: body,
+          id: existingDraftId,
+          title,
+          body,
           topic: topicName,
           'attachments[]': attachments,
           jwt: app.user.jwt,
@@ -113,7 +115,7 @@ class DraftsController {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
           chain: app.activeChainId(),
-          id: id,
+          id,
           jwt: app.user.jwt,
         },
       });

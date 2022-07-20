@@ -28,7 +28,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
   OffchainThread,
-  OffchainThreadKind,
+  ThreadKind,
   OffchainComment,
   OffchainTopic,
   OffchainThreadStage,
@@ -436,7 +436,7 @@ const ProposalHeader: m.Component<
             ),
             m('.proposal-body-link', [
               proposal instanceof OffchainThread &&
-                proposal.kind === OffchainThreadKind.Link && [
+                proposal.kind === ThreadKind.Link && [
                   vnode.state.editing
                     ? m(ProposalLinkEditor, {
                         item: proposal,

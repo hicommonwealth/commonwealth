@@ -21,7 +21,7 @@ import {
 } from 'helpers';
 import {
   OffchainThread,
-  OffchainThreadKind,
+  ThreadKind,
   OffchainThreadStage,
   AddressInfo,
 } from 'models';
@@ -135,7 +135,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 label={offchainThreadStageToLabel(proposal.stage)}
               />
             )}
-            {proposal.kind === OffchainThreadKind.Link &&
+            {proposal.kind === ThreadKind.Link &&
               proposal.url &&
               externalLink(
                 'a.external-discussion-link',

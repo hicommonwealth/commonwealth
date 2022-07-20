@@ -170,7 +170,7 @@ export class NewTopicModal implements m.ClassComponent {
               quillEditorState.disable();
 
               const defaultOffchainTemplate =
-                quillEditorState.getTextContents(true);
+                quillEditorState.textContentsAsString;
 
               app.topics
                 .add(

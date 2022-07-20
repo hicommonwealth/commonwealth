@@ -28,7 +28,7 @@ import { ProposalType, ChainBase, ChainNetwork } from 'types';
 import {
   ITXModalData,
   ProposalModule,
-  OffchainThreadKind,
+  ThreadKind,
   OffchainThreadStage,
 } from 'models';
 import { proposalSlugToClass } from 'identifiers';
@@ -232,7 +232,7 @@ const NewProposalForm = {
         app.threads
           .create(
             author.address,
-            OffchainThreadKind.Forum,
+            ThreadKind.Forum,
             OffchainThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,

@@ -77,7 +77,7 @@ const CreateComment: m.Component<
         return;
       }
 
-      const commentText = quillEditorState.getTextContents(true) as string;
+      const commentText = quillEditorState.textContentsAsString as string;
 
       vnode.state.error = null;
       vnode.state.sendingComment = true;

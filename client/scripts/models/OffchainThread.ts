@@ -5,7 +5,7 @@ import moment from 'moment';
 import { ProposalType } from 'types';
 import { IChainEntityKind } from '@commonwealth/chain-events';
 import { IUniqueId } from './interfaces';
-import { OffchainThreadKind, OffchainThreadStage } from './types';
+import { ThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
@@ -38,7 +38,7 @@ class OffchainThread implements IUniqueId {
   public readonly body: string;
   public readonly plaintext: string;
   public readonly pinned: boolean;
-  public readonly kind: OffchainThreadKind;
+  public readonly kind: ThreadKind;
   public stage: OffchainThreadStage;
   public readonly attachments: OffchainAttachment[];
   public readonly readOnly: boolean;
@@ -97,7 +97,7 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment;
     lastCommentedOn: moment.Moment;
     topic: OffchainTopic;
-    kind: OffchainThreadKind;
+    kind: ThreadKind;
     stage: OffchainThreadStage;
     versionHistory: VersionHistory[];
     chain: string;
