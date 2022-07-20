@@ -47,7 +47,6 @@ export const handleProposalPollVote = async (
   isSelected: boolean
 ) => {
   const { activeAccount } = app.user;
-
   if (!app.isLoggedIn() || !activeAccount || isSelected) return;
 
   const userInfo = [activeAccount.chain.id, activeAccount.address] as const;

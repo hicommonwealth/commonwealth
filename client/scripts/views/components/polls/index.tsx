@@ -1,10 +1,5 @@
 /* @jsx m */
 
-import {
-  SnapshotProposal,
-  SnapshotProposalVote,
-} from 'client/scripts/helpers/snapshot_utils';
-import { OffchainPoll, OffchainThread } from 'client/scripts/models';
 import m from 'mithril';
 import moment from 'moment';
 import _ from 'lodash';
@@ -19,6 +14,7 @@ import {
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from '../component_kit/cw_checkbox';
 import { CWRadioButton } from '../component_kit/cw_radio_button';
+import { OffchainPoll, OffchainThread } from '../../../models';
 
 // Extend as use cases expand.
 export const enum PollType {
@@ -32,7 +28,6 @@ export type VoteInformation = {
   label: string;
   value: string;
   voteCount: number;
-  onVoteCast: (value: any) => void;
 };
 
 export type PollCardAttrs = {
@@ -40,44 +35,46 @@ export type PollCardAttrs = {
   multiSelect: boolean;
   pollEnded: boolean;
   hasVoted: boolean;
+  votedFor: string;
   proposalTitle: string;
   timeRemainingString: string;
-  voteDirectionString: string;
   totalVoteCount: number;
   voteInformation: VoteInformation[];
-  offchainPoll?: OffchainPoll;
-  offchainThread?: OffchainThread;
-  snapshotProposal?: SnapshotProposal;
-  snapshotVotes?: SnapshotProposalVote[];
-  snapshotSymbol?: string;
+  onVoteCast: () => any;
 };
 
+export function buildVoteDirectionString(voteOption: string) {
+  return `You voted "${voteOption}"`;
+}
 export class PollCard implements m.ClassComponent<PollCardAttrs> {
   hasVoted: boolean; // keep
   voteDirectionString: string; // keep
   totalVoteCount: number; // keep
+  selectedOptions: string[];
 
   oninit(vnode) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
-    this.voteDirectionString = vnode.attrs.voteDirectionString;
+    this.voteDirectionString = vnode.attrs.votedFor
+      ? buildVoteDirectionString(vnode.attrs.votedFor)
+      : '';
     this.totalVoteCount = vnode.attrs.totalVoteCount;
+    this.selectedOptions = [];
   }
 
   view(vnode) {
-    const dummyRadioOptions = [
-      { label: 'Yes', value: 'Yes' },
-      { label: 'No', value: 'No' },
-    ];
     const {
       pollType,
       multiSelect,
       pollEnded,
       proposalTitle,
+      votedFor,
       timeRemainingString,
       voteInformation,
+      onVoteCast,
     } = vnode.attrs;
 
+    console.log('votedFor: ', votedFor);
     let resultString;
     if (pollType === PollType.Offchain) {
       resultString = 'Results'; // TODO: handle this and other poll types.
@@ -92,25 +89,34 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           {!pollEnded && (
             <div className="poll-voting-section">
               {!this.hasVoted ? (
-                <>
+                <div>
                   <div className="vote-options">
-                    {!multiSelect ? (
+                    {multiSelect ? (
                       <div className="multi-select-votes">
-                        {dummyRadioOptions.map((option) => (
+                        {voteInformation.map((option) => (
                           <CWCheckbox
                             checked={false}
                             label={option.label}
-                            onchange={() => console.log('wtf')}
+                            onchange={() => {
+                              // TODO: Build this out when multiple vote options are introduced.
+                              // Something like: this.selectedOptions.push(option.value);
+                              console.log('A vote for multiple options');
+                            }}
                           />
                         ))}
                       </div>
                     ) : (
                       <div className="single-select-votes">
-                        {dummyRadioOptions.map((option) => (
+                        {voteInformation.map((option) => (
                           <CWRadioButton
-                            checked={false}
+                            checked={
+                              this.selectedOptions.length > 0 &&
+                              option.value === this.selectedOptions[0]
+                            }
                             groupName="votes"
-                            onchange={() => console.log('hi')}
+                            onchange={() => {
+                              this.selectedOptions[0] = option.value;
+                            }}
                             label={option.label}
                             value={option.value}
                           />
@@ -119,12 +125,35 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                     )}
                   </div>
                   <div className="cast-vote-section">
-                    <CWButton label="Vote" buttonType="mini" />
+                    <CWButton
+                      label="Vote"
+                      buttonType="mini"
+                      onclick={async () => {
+                        if (
+                          pollType === PollType.Offchain &&
+                          !multiSelect &&
+                          this.selectedOptions[0] !== votedFor
+                        ) {
+                          await onVoteCast(
+                            this.selectedOptions[0],
+                            this.selectedOptions.length === 0
+                          );
+                          if (!votedFor) {
+                            this.totalVoteCount += 1;
+                          }
+                          this.voteDirectionString = buildVoteDirectionString(
+                            this.selectedOptions[0]
+                          );
+                          this.hasVoted = true;
+                          m.redraw();
+                        }
+                      }}
+                    />
                     <div className="time-remaining-text">
                       {timeRemainingString}
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="voted-display">
                   <div className="vote-direction">
