@@ -192,6 +192,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                         progressStatus={CWProgressBarStatus.passed}
                         progressHeight={4}
                         label={option.label}
+                        count={option.voteCount}
+                        token={tokenSymbol ?? ''}
                       />
                     </div>
                   );

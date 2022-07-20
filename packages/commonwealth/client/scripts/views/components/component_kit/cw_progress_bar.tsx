@@ -17,24 +17,37 @@ type CWProgressBarAttrs = {
   progressStatus?: CWProgressBarStatus;
   progressHeight?: number;
   label?: string;
-  tokenCount?: number;
+  count?: number;
   token?: string;
 };
 
 export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
   view(vnode) {
-    const { className, progress, progressStatus, progressHeight, label } =
-      vnode.attrs;
+    const {
+      className,
+      progress,
+      progressStatus,
+      progressHeight,
+      label,
+      count,
+      token,
+    } = vnode.attrs;
     return (
       <>
         {label && (
-          <>
-            <div className="progress-label">
+          <div className="progress-label">
+            <div>
               <div className="progress-title">{label}</div>
-              <div className="progress-percentage">{`${progress}%`}</div>
+              {token.length > 0 && (
+                <div className="progress-percentage">{`${
+                  Math.floor(count * 1000) / 1000
+                } ${token}`}</div>
+              )}
             </div>
-            {}
-          </>
+            <div className="progress-percentage">{`${
+              Math.floor(progress * 1000) / 1000
+            }%`}</div>
+          </div>
         )}
         <div
           className="progress-background"

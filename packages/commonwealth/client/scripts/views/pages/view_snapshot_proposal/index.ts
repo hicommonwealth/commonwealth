@@ -1,6 +1,3 @@
-import 'pages/snapshot/view_proposal.scss';
-import 'pages/snapshot/list_proposal.scss';
-
 import m from 'mithril';
 import { Button, Tabs, TabItem, RadioGroup } from 'construct-ui';
 import moment from 'moment';
@@ -18,7 +15,8 @@ import {
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
-
+import 'pages/snapshot/list_proposal.scss';
+import 'pages/snapshot/view_proposal.scss';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
@@ -391,7 +389,7 @@ const ViewProposalPage: m.Component<
 
       for (let i = 0; i < choices.length; i++) {
         const totalVotes = snapshotVotes
-          .filter((vote) => vote.choice === i)
+          .filter((vote) => vote.choice === i + 1)
           .reduce((sum, vote) => sum + vote.balance, 0);
         voteInfo.push({
           label: choices[i],
@@ -403,7 +401,6 @@ const ViewProposalPage: m.Component<
       return voteInfo;
     };
 
-    console.log(vnode.state.proposal?.choices, vnode.state.votes);
     return !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
       ? m(PageLoading)
       : m(
