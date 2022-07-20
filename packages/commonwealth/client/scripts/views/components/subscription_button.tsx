@@ -4,7 +4,7 @@ import { isNotUndefined } from 'helpers/typeGuards';
 import m from 'mithril';
 
 import app from 'state';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 import { CWButton } from './component_kit/cw_button';
 
 export class SubscriptionButton implements m.ClassComponent {

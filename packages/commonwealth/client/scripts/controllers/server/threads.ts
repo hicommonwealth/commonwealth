@@ -17,7 +17,7 @@ import {
   NotificationSubscription,
   OffchainPoll,
 } from 'models';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 
 import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';

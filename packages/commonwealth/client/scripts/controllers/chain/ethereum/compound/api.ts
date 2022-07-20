@@ -7,7 +7,7 @@ import {
   ERC20VotesComp,
   MPond__factory,
   ERC20VotesComp__factory,
-} from 'eth/types';
+} from 'common-common/src/eth/types';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import { utils } from 'ethers';
 

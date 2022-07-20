@@ -41,7 +41,7 @@ import {
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
-import { ChainType } from '../../../../../shared/types';
+import { ChainType } from 'common-common/src/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';

@@ -9,8 +9,8 @@ import {
   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK,
   DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES
 } from '../config';
-import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { NotificationCategories } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 /**

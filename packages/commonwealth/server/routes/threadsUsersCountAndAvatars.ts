@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 import { groupBy } from 'lodash';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB, sequelize } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));

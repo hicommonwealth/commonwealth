@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import '../types';
 import {DB, sequelize} from '../database';
 import { ServerError } from '../util/errors';

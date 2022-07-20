@@ -6,7 +6,7 @@ import 'pages/bounties.scss';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';

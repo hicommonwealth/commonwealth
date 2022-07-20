@@ -1,0 +1,25 @@
+{
+  "name": "common-common",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "14.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicommonwealth/commonwealth.git"
+  },
+  "keywords": [],
+  "scripts": {
+    "build-contracts": "cd src/eth && npx hardhat compile"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@typechain/ethers-v5": "^6.0.0",
+    "hardhat": "^2.3.0",
+    "hardhat-typechain": "^0.3.5",
+    "ts-generator": "^0.1.1",
+    "typechain": "^4.0.1",
+    "typescript-logging": "^0.6.4"
+  }
+}

@@ -8,7 +8,7 @@ import bs58 from 'bs58';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { OffchainThread, OffchainComment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';

@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { sequelize } from '../../database';
-import { factory, formatFilename } from '../../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));

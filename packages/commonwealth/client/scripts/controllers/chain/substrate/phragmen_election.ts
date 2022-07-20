@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import { ChainBase, ProposalType } from 'types';
+import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal,
   IVote,

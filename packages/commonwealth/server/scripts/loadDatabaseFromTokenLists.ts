@@ -1,6 +1,6 @@
 import addTokenListsToDatabase from '../util/addTokenListsToDatabase';
 import models from '../database';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 async function main() {

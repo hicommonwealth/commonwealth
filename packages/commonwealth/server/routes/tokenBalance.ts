@@ -7,7 +7,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AddressInstance } from '../models/address';
 import TokenBalanceCache from '../util/tokenBalanceCache';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

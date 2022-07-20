@@ -1,4 +1,4 @@
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 import { IApp } from 'state';
 

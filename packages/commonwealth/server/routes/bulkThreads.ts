@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
 import validateChain from '../util/validateChain';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
 import { OffchainThreadInstance } from '../models/offchain_thread';

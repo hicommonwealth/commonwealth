@@ -7,7 +7,7 @@ import 'pages/tips.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { formatCoin } from 'adapters/currency';
-import { ProposalType, ChainBase } from 'types';
+import { ProposalType, ChainBase } from 'common-common/src/types';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from 'views/sublayout';

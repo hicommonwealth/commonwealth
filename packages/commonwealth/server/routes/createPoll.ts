@@ -2,7 +2,7 @@ import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { getNextOffchainPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
 
