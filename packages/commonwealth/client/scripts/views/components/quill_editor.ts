@@ -4,7 +4,7 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
-import Quill from 'quill-2.0-dev/quill';
+import Quill from 'quill';
 import { Tag, Tooltip } from 'construct-ui';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
