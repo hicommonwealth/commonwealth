@@ -64,37 +64,41 @@ const CreateComment: m.Component<
     }
 
     const submitComment = async (e?) => {
-      if (!vnode.state.quillEditorState?.outerEditor) {
+      vnode.state.error = null;
+      vnode.state.sendingComment = true;
+
+      const { quillEditorState } = vnode.state;
+      if (!quillEditorState) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
+        vnode.state.sendingComment = false;
         return;
       }
 
-      const { quillEditorState } = vnode.state;
+      quillEditorState.disable();
+
       if (quillEditorState.isBlank()) {
         if (e) e.preventDefault();
         vnode.state.error = 'Comment cannot be blank';
+        vnode.state.sendingComment = false;
+        quillEditorState.enable();
         return;
       }
 
-      const commentText = quillEditorState.textContentsAsString as string;
-
-      vnode.state.error = null;
-      vnode.state.sendingComment = true;
-      quillEditorState.disable();
-      const chainId = app.activeChainId();
       try {
         const res = await app.comments.create(
           author.address,
           rootProposal.uniqueIdentifier,
-          chainId,
-          commentText,
+          app.activeChainId(),
+          quillEditorState.textContentsAsString,
           proposalPageState.parentCommentId
         );
         callback();
         vnode.state.quillEditorState.resetEditor();
+        vnode.state.error = null;
         vnode.state.sendingComment = false;
         proposalPageState.recentlySubmitted = res.id;
+
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
@@ -216,7 +220,7 @@ const CreateComment: m.Component<
                   }),
                 m(QuillEditorComponent, {
                   contentsDoc: '',
-                  oncreateBind: (state) => {
+                  oncreateBind: (state: QuillEditor) => {
                     vnode.state.quillEditorState = state;
                   },
                   editorNamespace: `${document.location.pathname}-commenting`,

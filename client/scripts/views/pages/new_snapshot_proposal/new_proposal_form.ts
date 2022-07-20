@@ -35,6 +35,7 @@ import {
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { QuillEditor } from '../../components/quill/quill_editor';
 
+// TODO Graham 7-20-22: Reconcile against NewThreadForm
 interface IThreadForm {
   name: string;
   body: string;
@@ -43,7 +44,13 @@ interface IThreadForm {
   start: number;
   end: number;
   snapshot: number;
-  metadata: {};
+  metadata: {
+    network?: string;
+    strategies?: {
+      name: string;
+      params: any;
+    }[];
+  };
   type: string;
 }
 
@@ -56,9 +63,10 @@ enum NewThreadErrors {
   SomethingWentWrong = 'Something went wrong!',
 }
 
+// Don't call it a new thread if it ain't a new thread.
 const newThread = async (
-  form,
-  quillEditorState,
+  form: IThreadForm,
+  quillEditorState: QuillEditor,
   author: Account<any>,
   space: SnapshotSpace,
   snapshotId: string
@@ -138,8 +146,8 @@ const newThread = async (
 };
 
 const newLink = async (
-  form,
-  quillEditorState,
+  form: IThreadForm,
+  quillEditorState: QuillEditor,
   author: Account<any>,
   space: SnapshotSpace,
   snapshotId: string
@@ -236,10 +244,6 @@ const NewProposalForm: m.Component<
     }
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
-    if (vnode.state.quillEditorState?.outerEditor.container) {
-      // TODO: WTF?
-      vnode.state.quillEditorState.outerEditor.container.tabIndex = 8;
-    }
 
     const saveToLocalStorage = () => {
       localStorage.setItem(
@@ -407,13 +411,10 @@ const NewProposalForm: m.Component<
                   },
                 }),
               ]),
-              m(FormGroup, [
+              m(FormGroup, {}, [
                 m(QuillEditorComponent, {
-                  // Prevent the editor from being filled in with previous content
-                  contentsDoc: vnode.state.form.body
-                    ? vnode.state.form.body
-                    : ' ',
-                  oncreateBind: (state) => {
+                  contentsDoc: vnode.state.form.body || ' ',
+                  oncreateBind: (state: QuillEditor) => {
                     vnode.state.quillEditorState = state;
                   },
                   placeholder: 'What is your proposal?',

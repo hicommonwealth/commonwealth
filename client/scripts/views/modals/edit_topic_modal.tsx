@@ -73,15 +73,12 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
 
     const updateTopic = async (form) => {
       const { quillEditorState } = this;
+      quillEditorState.disable();
 
       if (form.featuredInNewPost && quillEditorState.isBlank()) {
         this.error = 'Must provide template.';
         return false;
       }
-
-      quillEditorState.disable();
-
-      const bodyText = quillEditorState.textContentsAsString as string;
 
       const topicInfo = {
         id,
@@ -91,7 +88,9 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
         telegram: null,
         featured_in_sidebar: form.featuredInSidebar,
         featured_in_new_post: form.featuredInNewPost,
-        default_offchain_template: bodyText,
+        default_offchain_template: form.featuredInNewPost
+          ? quillEditorState.textContentsAsString
+          : null,
       };
 
       try {

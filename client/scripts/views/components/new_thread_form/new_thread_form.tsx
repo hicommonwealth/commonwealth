@@ -681,7 +681,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                   intent: 'none',
                   rounded: true,
                   onclick: async (e) => {
-                    // TODO Graham 6-19-22: This needs to be reduced / cleaned up / broken out
+                    // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
                     const { quillEditorState } = this;
                     this.saving = true;
                     const title = $(e.target)

@@ -51,7 +51,7 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
         {topics.map((t) => (
           <MenuItem
             onclick={() => {
-              // TODO Graham 6-19-22: Let's find a non-localStorage solution
+              // TODO Graham 7-19-22: Let's find a non-localStorage solution
               localStorage.setItem(
                 `${app.activeChainId()}-active-topic`,
                 t.name

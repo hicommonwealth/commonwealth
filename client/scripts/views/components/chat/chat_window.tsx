@@ -202,8 +202,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
             }`}
           >
             <QuillEditorComponent
+              // TODO Graham 7/20/22: I hate this usage of contentsDoc—can it be improved?
               contentsDoc=""
-              oncreateBind={(state) => {
+              oncreateBind={(state: QuillEditor) => {
                 vnode.state.quillEditorState = state;
               }}
               editorNamespace={`${document.location.pathname}-chatting`}
