@@ -92,8 +92,11 @@ const getCommunityPreview = (
   const onSelect = () => {
     if (params.community) {
       m.route.set(
-        params.community.address ? `/${params.community.address}`
-          : params.community.id ? `/${params.community.id}` : '/'
+        params.community.address
+          ? `/${params.community.address}`
+          : params.community.id
+          ? `/${params.community.id}`
+          : '/'
       );
     }
     closeResultsFn();
@@ -169,13 +172,11 @@ const getDiscussionPreview = (
             })}
           </div>
           <div class="search-results-thread-body">
-            {(() => {
-              renderQuillTextBody(thread.body, {
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            })()}
+            {renderQuillTextBody(thread.body, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }
@@ -237,13 +238,11 @@ const getCommentPreview = (
             })}
           </div>
           <div class="search-results-comment">
-            {(() => {
-              renderQuillTextBody(comment.text, {
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            })()}
+            {renderQuillTextBody(comment.text, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }
