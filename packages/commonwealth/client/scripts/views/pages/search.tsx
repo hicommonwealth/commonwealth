@@ -128,13 +128,11 @@ const getDiscussionResult = (thread, searchTerm) => {
             })}
           </div>
           <div class="search-results-thread-body">
-            {(() => {
-              renderQuillTextBody(thread.body, {
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            })()}
+            {renderQuillTextBody(thread.body, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }
@@ -181,13 +179,11 @@ const getCommentResult = (comment, searchTerm) => {
             })}
           </div>
           <div class="search-results-comment">
-            {(() => {
-              renderQuillTextBody(comment.text, {
-                hideFormatting: true,
-                collapse: true,
-                searchTerm,
-              });
-            })()}
+            {renderQuillTextBody(comment.text, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }

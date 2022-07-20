@@ -49,10 +49,9 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
           m('.proposal-comment', [
             m(
               '.comment-text',
-              (() =>
-                renderQuillTextBody(comment.text, {
-                  collapse: true,
-                }))()
+              renderQuillTextBody(comment.text, {
+                collapse: true,
+              })
             ),
           ])
         ),
