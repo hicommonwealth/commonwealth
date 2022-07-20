@@ -135,9 +135,7 @@ class ManageCommunityPage implements m.ClassComponent {
             chain={app.config.chains.getById(app.activeChainId())}
             mods={mods}
             onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
-            onSave={() => {
-              onSave();
-            }}
+            onSave={() => onSave()}
           />
           <AdminPanelTabs
             defaultTab={1}
