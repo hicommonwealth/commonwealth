@@ -93,10 +93,9 @@ const getCommunityPreview = (
   const onSelect = () => {
     if (params.community) {
       m.route.set(
-        params.community.address ? `/${params.community.address}` : '/'
+        params.community.address ? `/${params.community.address}`
+          : params.community.id ? `/${params.community.id}` : '/'
       );
-    } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
     }
     closeResultsFn();
   };
