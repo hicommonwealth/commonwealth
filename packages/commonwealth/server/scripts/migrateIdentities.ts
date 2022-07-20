@@ -9,9 +9,9 @@ import _ from 'underscore';
 import { SubstrateEvents } from '@commonwealth/chain-events';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
-import { ChainBase } from '../../shared/types';
+import { ChainBase } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {

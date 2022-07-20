@@ -1,5 +1,5 @@
 import { Account, IWebWallet } from 'models';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import app from 'state';
 import $ from 'jquery';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';

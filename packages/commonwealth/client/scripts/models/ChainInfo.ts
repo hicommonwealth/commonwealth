@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase } from 'types';
+import { ChainNetwork, ChainBase } from 'common-common/src/types';
 import { ChainInstance } from 'server/models/chain';
 import OffchainTopic from './OffchainTopic';
 import NodeInfo from './NodeInfo';

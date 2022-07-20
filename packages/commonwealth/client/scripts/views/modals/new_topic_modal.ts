@@ -12,7 +12,7 @@ import {
   Checkbox,
 } from 'construct-ui';
 
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import QuillEditor from 'views/components/quill_editor';
 import { pluralizeWithoutNumberPrefix, tokensToWei } from 'helpers';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';

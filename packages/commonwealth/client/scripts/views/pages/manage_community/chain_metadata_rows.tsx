@@ -6,7 +6,7 @@ import m from 'mithril';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
+import { ChainBase, ChainCategoryType, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';

@@ -6,7 +6,7 @@ import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { IApp } from 'state';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import SubstratePhragmenElections from './phragmen_elections';

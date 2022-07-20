@@ -1,4 +1,4 @@
-import { ProposalType } from './types';
+import { ProposalType } from 'common-common/src/types';
 
 export const getNextOffchainPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,

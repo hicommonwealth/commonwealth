@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';

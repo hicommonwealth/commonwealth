@@ -30,14 +30,14 @@ import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { DynamicTemplate } from '../../shared/types';
 import {
-  DynamicTemplate,
   ChainBase,
   NotificationCategories,
   WalletId,
-} from '../../shared/types';
+} from 'common-common/src/types';
 import AddressSwapper from '../util/addressSwapper';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';

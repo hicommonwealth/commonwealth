@@ -22,9 +22,9 @@ import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { default as models, sequelize } from '../database';
-import { ChainBase, ChainNetwork } from '../../shared/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
 

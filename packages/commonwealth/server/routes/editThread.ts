@@ -5,8 +5,8 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
 

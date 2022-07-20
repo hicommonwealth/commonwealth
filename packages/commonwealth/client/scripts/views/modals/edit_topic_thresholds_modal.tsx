@@ -7,7 +7,7 @@ import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
 import { OffchainTopic } from 'models';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
