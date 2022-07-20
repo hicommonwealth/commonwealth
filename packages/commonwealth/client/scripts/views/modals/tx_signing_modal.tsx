@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import $ from 'jquery';
 import m from 'mithril';
 
 import 'modals/tx_signing_modal.scss';
@@ -9,7 +8,6 @@ import app from 'state';
 import { ITXModalData } from 'models';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { TXSigningTransactionBox } from '../components/tx_signing/tx_signing_transaction_box';
 import {
   getModalTitle,
   getTransactionLabel,
@@ -17,9 +15,10 @@ import {
 import { StageName, TxDataState } from '../components/tx_signing/types';
 import {
   TxSigningModalIntroStage,
+  TxSigningModalRejectedStage,
+  TxSigningModalSuccessStage,
   TxSigningModalWaitingStage,
 } from '../components/tx_signing/tx_signing_modal_stages';
-import { CWButton } from '../components/component_kit/cw_button';
 
 class TXSigningModal implements m.ClassComponent<ITXModalData> {
   private data: TxDataState;
@@ -66,66 +65,17 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
             />
           )}
           {this.stageName === 'waiting' && <TxSigningModalWaitingStage />}
-          {this.stageName === 'success' && (
-            <>
-              <TXSigningTransactionBox
-                success
-                status="Success"
-                blockHash={vnode.attrs.stateData.hash}
-                blockNum={vnode.attrs.stateData.blocknum || '--'}
-                timestamp={
-                  vnode.attrs.stateData.timestamp?.format
-                    ? `${vnode.attrs.stateData.timestamp.format()}`
-                    : '--'
-                }
-              />
-              <CWButton
-                oncreate={(vvnode) => $(vvnode.dom).focus()}
-                onclick={(e) => {
-                  e.preventDefault();
-                  $(vnode.dom).trigger('modalexit');
-                }}
-                label="Done"
-              />
-            </>
+          {/* {this.stageName === 'success' && (
+            <TxSigningModalSuccessStage blocknum={} hash={} timestamp={} />
           )}
           {this.stageName === 'rejected' && (
-            <>
-              <TXSigningTransactionBox
-                success={false}
-                status={vnode.attrs.stateData.error.toString()}
-                blockHash={
-                  vnode.attrs.stateData.hash
-                    ? `${vnode.attrs.stateData.hash}`
-                    : '--'
-                }
-                blockNum={
-                  vnode.attrs.stateData.blocknum
-                    ? `${vnode.attrs.stateData.blocknum}`
-                    : '--'
-                }
-                timestamp={
-                  vnode.attrs.stateData.timestamp
-                    ? `${vnode.attrs.stateData.timestamp.format()}`
-                    : '--'
-                }
-              />
-              <CWButton
-                onclick={(e) => {
-                  e.preventDefault();
-                  $(vnode.dom).trigger('modalexit');
-                }}
-                label="Done"
-              />
-              <CWButton
-                oncreate={(vvnode) => $(vvnode.dom).focus()}
-                onclick={() => {
-                  vnode.attrs.next('Intro');
-                }}
-                label="Try again"
-              />
-            </>
-          )}
+            <TxSigningModalRejectedStage
+              blocknum={}
+              error={}
+              hash={}
+              timestamp={}
+            />
+          )} */}
         </div>
       </div>
     );

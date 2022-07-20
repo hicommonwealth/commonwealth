@@ -6,6 +6,6 @@ export type TxDataState = Partial<ITransactionResult> & {
   events?: EventEmitter;
 };
 
-export type NextFn = (newState: string, newData?: TxDataState) => void;
-
 export type StageName = 'intro' | 'waiting' | 'success' | 'rejected';
+
+export type NextFn = (newState: StageName, newData?: TxDataState) => void;

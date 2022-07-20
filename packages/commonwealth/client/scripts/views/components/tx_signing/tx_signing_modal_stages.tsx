@@ -8,7 +8,9 @@ import { ITXModalData, IWebWallet } from 'models';
 import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
 import { TXSigningCLIOption } from './tx_signing_cli_option';
 import { TXSigningWebWalletOption } from './tx_signing_web_wallet_option';
-import { NextFn } from './types';
+import { NextFn, TxDataState } from './types';
+import { CWButton } from '../component_kit/cw_button';
+import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 
 export class TxSigningModalIntroStage
   implements m.ClassComponent<ITXModalData & NextFn & IWebWallet<any>>
@@ -83,9 +85,11 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
     if (app.chain?.meta?.id === 'edgeware') {
       this.timeoutHandle = global.setTimeout(() => {
         clearInterval(this.timeoutHandle);
+
         vnode.attrs.next('SentTransactionSuccess', {
           hash: 'Not available',
         });
+
         $parent.trigger('modalcomplete');
       }, 10000);
     }
@@ -105,6 +109,68 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
         </div>
         <Spinner active />
         <div>`Waiting ${this.timer || 0}s...</div>
+      </>
+    );
+  }
+}
+
+export class TxSigningModalSuccessStage
+  implements m.ClassComponent<TxDataState>
+{
+  view(vnode) {
+    const { blocknum, hash, timestamp } = vnode.attrs;
+
+    return (
+      <>
+        <TXSigningTransactionBox
+          success
+          status="Success"
+          blockHash={hash}
+          blockNum={blocknum || '--'}
+          timestamp={timestamp ? timestamp.format() : '--'}
+        />
+        <CWButton
+          oncreate={(vvnode) => $(vvnode.dom).focus()}
+          onclick={(e) => {
+            e.preventDefault();
+            $(vnode.dom).trigger('modalexit');
+          }}
+          label="Done"
+        />
+      </>
+    );
+  }
+}
+
+export class TxSigningModalRejectedStage
+  implements m.ClassComponent<TxDataState>
+{
+  view(vnode) {
+    const { blocknum, error, hash, timestamp } = vnode.attrs;
+
+    return (
+      <>
+        <TXSigningTransactionBox
+          success={false}
+          status={error.toString()}
+          blockHash={hash || '--'}
+          blockNum={blocknum || '--'}
+          timestamp={timestamp ? timestamp.format() : '--'}
+        />
+        <CWButton
+          onclick={(e) => {
+            e.preventDefault();
+            $(vnode.dom).trigger('modalexit');
+          }}
+          label="Done"
+        />
+        <CWButton
+          oncreate={(vvnode) => $(vvnode.dom).focus()}
+          onclick={() => {
+            vnode.attrs.next('Intro');
+          }}
+          label="Try again"
+        />
       </>
     );
   }

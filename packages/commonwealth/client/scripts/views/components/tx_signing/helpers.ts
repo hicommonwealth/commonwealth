@@ -54,7 +54,7 @@ export const setupEventListeners = (
   >
 ) => {
   vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {
-    vnode.attrs.next('WaitingToConfirmTransaction', {
+    vnode.attrs.next('waiting', {
       events: vnode.attrs.txData.events,
     });
   });
@@ -63,7 +63,7 @@ export const setupEventListeners = (
     TransactionStatus.Error.toString(),
     ({ err }) => {
       vnode.attrs.txData.events.removeAllListeners();
-      vnode.attrs.next('SentTransactionRejected', {
+      vnode.attrs.next('rejected', {
         error: new Error('Transaction Failed'),
         hash: null,
         err,
@@ -84,7 +84,7 @@ export const setupEventListeners = (
 
       vnode.attrs.txData.events.removeAllListeners();
 
-      vnode.attrs.next('SentTransactionRejected', {
+      vnode.attrs.next('rejected', {
         error: err,
         hash,
         blocknum,
@@ -99,7 +99,7 @@ export const setupEventListeners = (
       vnode.attrs.txData.events.removeAllListeners();
       const $modal = $('.TXSigningModal');
       $modal.trigger('modalcomplete');
-      vnode.attrs.next('SentTransactionSuccess', { hash, blocknum, timestamp });
+      vnode.attrs.next('success', { hash, blocknum, timestamp });
     }
   );
 };
