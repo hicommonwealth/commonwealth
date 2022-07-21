@@ -1,12 +1,14 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import BN from 'bn.js';
-import { parseUserMentions } from '../util/parseUserMentions';
 import {
   ChainType,
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import TokenBalanceCache from 'token-balance-cache/src/index';
+import validateTopicThreshold from '../util/validateTopicThreshold';
+import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
 
 import validateChain from '../util/validateChain';
@@ -17,8 +19,6 @@ import {
   renderQuillDeltaToText,
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -142,7 +142,9 @@ const createComment = async (
     });
     if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const canReact = await tokenBalanceCache.validateTopicThreshold(
+        const canReact = await validateTopicThreshold(
+          tokenBalanceCache,
+          models,
           thread.topic_id,
           req.body.address
         );

@@ -1,3 +1,5 @@
+import TokenBalanceCache from 'token-balance-cache/src/index';
+import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError } from '../util/errors';
@@ -5,9 +7,8 @@ import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AddressInstance } from '../models/address';
-import TokenBalanceCache from '../util/tokenBalanceCache';
+import { ChainNetwork } from '../../../common-common/src/types';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -45,7 +46,15 @@ const tokenBalance = async (
   }
 
   try {
-    const balance = await tokenBalanceCache.getBalance(chain, author.address);
+    const balance = await tokenBalanceCache.getBalance(
+      chain.chain_node_id,
+      author.address,
+      chain.address,
+      chain.network === ChainNetwork.ERC20
+        ? 'erc20' : chain.network === ChainNetwork.ERC721
+          ? 'erc721' : chain.network === ChainNetwork.SPL
+            ? 'spl-token' : undefined,
+    );
     return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
