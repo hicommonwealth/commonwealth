@@ -29,7 +29,7 @@ import {
   ITXData,
 } from 'models';
 
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from 'chain-events/src';
 import { EventEmitter } from 'events';
 
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';

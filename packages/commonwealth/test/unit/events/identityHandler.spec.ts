@@ -9,7 +9,7 @@ import {
   CWEvent,
   SubstrateTypes,
   SupportedNetwork,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import * as modelUtils from '../../util/modelUtils';
 import { resetDatabase, getIdentityFetchCache } from '../../../server-test';

@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { AddressAttributes } from './address';
 import { ModelStatic, ModelInstance } from './types';
 

@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IChainEntityKind } from '@commonwealth/chain-events';
+import { IChainEntityKind } from 'chain-events/src';
 import { IUniqueId } from './interfaces';
 import { OffchainThreadKind, OffchainThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
