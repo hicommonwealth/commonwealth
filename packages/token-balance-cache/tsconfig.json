@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false
+  },
+  "include": [
+    "./src",
+    "./test"
+  ],
+  "exclude": ["./node_modules"]
+}
