@@ -30,6 +30,7 @@ const ConfirmSnapshotVoteModal: m.Component<
     totalScore: number;
     scores: any;
     snapshot: any;
+    successCallback: () => any;
   },
   {
     error: any;
@@ -47,6 +48,7 @@ const ConfirmSnapshotVoteModal: m.Component<
       totalScore,
       scores,
       snapshot,
+      successCallback,
     } = vnode.attrs;
 
     return m('.ConfirmSnapshotVoteModal', [
@@ -108,6 +110,7 @@ const ConfirmSnapshotVoteModal: m.Component<
               try {
                 castVote(author.address, votePayload).then(() => {
                   $(e.target).trigger('modalexit');
+                  successCallback();
                   m.redraw();
                 });
                 mixpanelBrowserTrack({

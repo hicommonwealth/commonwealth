@@ -37,6 +37,7 @@ export type PollCardAttrs = {
   totalVoteCount: number;
   voteInformation: VoteInformation[];
   onVoteCast: () => any;
+  disableVoteButton: boolean;
   tokenSymbol?: string;
 };
 
@@ -69,10 +70,10 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       timeRemainingString,
       voteInformation,
       onVoteCast,
+      disableVoteButton = false,
       tokenSymbol,
     } = vnode.attrs;
 
-    console.log('votedFor: ', votedFor);
     let resultString;
     if (pollType === PollType.Offchain) {
       resultString = 'Results'; // TODO: handle this and other poll types.
@@ -126,25 +127,53 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                     <CWButton
                       label="Vote"
                       buttonType="mini"
+                      disabled={disableVoteButton}
                       onclick={async () => {
+                        console.log(
+                          'Voting for:',
+                          this.selectedOptions,
+                          votedFor
+                        );
                         if (
-                          pollType === PollType.Offchain &&
-                          !multiSelect &&
-                          this.selectedOptions[0] !== votedFor
+                          multiSelect ||
+                          this.selectedOptions[0] === votedFor ||
+                          this.selectedOptions.length === 0
                         ) {
+                          // TODO: Build this out when multiple vote options are introduced.
+                          return;
+                        }
+                        if (pollType === PollType.Offchain) {
                           await onVoteCast(
                             this.selectedOptions[0],
-                            this.selectedOptions.length === 0
+                            this.selectedOptions.length === 0,
+                            () => {
+                              if (!votedFor) {
+                                this.totalVoteCount += 1;
+                              }
+                              this.voteDirectionString =
+                                buildVoteDirectionString(
+                                  this.selectedOptions[0]
+                                );
+                              this.hasVoted = true;
+                            }
                           );
-                          if (!votedFor) {
-                            this.totalVoteCount += 1;
+                        } else if (pollType === PollType.Snapshot) {
+                          try {
+                            await onVoteCast(this.selectedOptions[0], () => {
+                              if (!votedFor) {
+                                this.totalVoteCount += 1;
+                              }
+                              this.voteDirectionString =
+                                buildVoteDirectionString(
+                                  this.selectedOptions[0]
+                                );
+                              this.hasVoted = true;
+                            });
+                          } catch (e) {
+                            console.log(e);
                           }
-                          this.voteDirectionString = buildVoteDirectionString(
-                            this.selectedOptions[0]
-                          );
-                          this.hasVoted = true;
-                          m.redraw();
                         }
+                        m.redraw();
                       }}
                     />
                     <div className="time-remaining-text">

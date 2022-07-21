@@ -44,7 +44,8 @@ export const jumpHighlightComment = (
 export const handleProposalPollVote = async (
   poll: OffchainPoll,
   option: string,
-  isSelected: boolean
+  isSelected: boolean,
+  callback: () => any
 ) => {
   const { activeAccount } = app.user;
 
@@ -66,7 +67,10 @@ export const handleProposalPollVote = async (
   // submit vote
   poll
     .submitOffchainVote(...userInfo, option)
-    .then(() => m.redraw())
+    .then(() => {
+      callback();
+      m.redraw();
+    })
     .catch(async () => {
       await alertModalWithText(
         'Error submitting vote. Maybe the poll has already ended?'

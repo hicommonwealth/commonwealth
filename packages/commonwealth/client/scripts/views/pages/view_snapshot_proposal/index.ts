@@ -250,7 +250,7 @@ const VoteAction: m.Component<
 
     if (!vnode.attrs.proposal.choices?.length) return;
 
-    const voteText = !vnode.state.validatedAgainstStrategies
+    const voteErrorText = !vnode.state.validatedAgainstStrategies
       ? VotingError.NOT_VALIDATED
       : hasVoted
       ? VotingError.ALREADY_VOTED
@@ -282,7 +282,7 @@ const VoteAction: m.Component<
             m.redraw();
           },
         }),
-        m('.vote-message', voteText),
+        m('.vote-message', voteErrorText),
       ]),
     ]);
   },
@@ -305,6 +305,8 @@ const ViewProposalPage: m.Component<
     scores: number[];
     activeTab: string;
     threads: Array<{ id: string; title: string }> | null;
+    fetchedPower: boolean;
+    validatedAgainstStrategies: boolean;
   }
 > = {
   oninit: (vnode) => {
@@ -313,6 +315,8 @@ const ViewProposalPage: m.Component<
     vnode.state.scores = [];
     vnode.state.proposal = null;
     vnode.state.threads = null;
+    vnode.state.fetchedPower = false;
+    vnode.state.validatedAgainstStrategies = true;
 
     const loadVotes = async () => {
       vnode.state.proposal = app.snapshot.proposals.find(
@@ -328,6 +332,17 @@ const ViewProposalPage: m.Component<
         vnode.state.totals = res.results;
       });
       m.redraw();
+
+      getPower(
+        vnode.state.space,
+        vnode.state.proposal,
+        app.user?.activeAccount?.address
+      ).then((vals) => {
+        vnode.state.validatedAgainstStrategies = vals.totalScore > 0;
+        vnode.state.totalScore = vals.totalScore;
+        vnode.state.fetchedPower = true;
+        m.redraw();
+      });
 
       try {
         app.threads
@@ -400,6 +415,45 @@ const ViewProposalPage: m.Component<
 
       return voteInfo;
     };
+
+    const castSnapshotVote = async (
+      selectedChoice: string,
+      callback: () => any
+    ) => {
+      const choiceNumber =
+        vnode.state.proposal?.choices.indexOf(selectedChoice);
+      try {
+        app.modals.create({
+          modal: ConfirmSnapshotVoteModal,
+          data: {
+            space: vnode.state.space,
+            proposal: vnode.state.proposal,
+            id: vnode.attrs.identifier,
+            selectedChoice: choiceNumber,
+            totalScore: vnode.state.totalScore,
+            scores: vnode.state.scores,
+            snapshot: vnode.state.proposal.snapshot,
+            state: vnode.state,
+            successCallback: callback,
+          },
+        });
+        // vnode.state.votingModalOpen = true;
+      } catch (err) {
+        console.error(err);
+        notifyError('Voting failed');
+      }
+    };
+
+    const hasVoted =
+      vnode.state.votes.find((vote) => {
+        return vote.voter === app.user?.activeAccount?.address;
+      })?.choice !== undefined;
+
+    const voteErrorText = !vnode.state.validatedAgainstStrategies
+      ? VotingError.NOT_VALIDATED
+      : hasVoted
+      ? VotingError.ALREADY_VOTED
+      : '';
 
     return !vnode.state.votes || !vnode.state.totals || !vnode.state.proposal
       ? m(PageLoading)
@@ -552,44 +606,29 @@ const ViewProposalPage: m.Component<
                         ),
                       ]),
                   ]),
-                  isActive &&
-                    author &&
-                    m(VoteAction, {
-                      space: vnode.state.space,
-                      proposal: vnode.state.proposal,
-                      id: vnode.attrs.identifier,
-                      scores: vnode.state.scores,
-                      choices: vnode.state.proposal.choices,
-                      votes: vnode.state.votes,
-                    }),
-                  m('.proposal-info-box', [
-                    m('.box-title', 'Current Results'),
-                    m(VotingResults, {
-                      choices: vnode.state.proposal.choices,
-                      votes: vnode.state.votes,
-                      totals: vnode.state.totals,
-                      symbol: vnode.state.symbol,
+                  m('.poll-card-wrapper', [
+                    m(PollCard, {
+                      pollType: PollType.Snapshot,
+                      multiSelect: false,
+                      pollEnded: !isActive,
+                      hasVoted,
+                      votedFor: '',
+                      disableVoteButton:
+                        vnode.state.fetchedPower && voteErrorText !== '',
+                      proposalTitle: proposal.title,
+                      timeRemainingString: voteErrorText, // repurposed for snapshots if we have insufficient power
+                      totalVoteCount: vnode.state.totals.sumOfResultsBalance,
+                      voteInformation: buildVoteInformation(
+                        vnode.state.proposal?.choices,
+                        vnode.state.votes
+                      ),
+                      onVoteCast: (choice: string, callback: () => any) => {
+                        castSnapshotVote(choice, callback);
+                        m.redraw();
+                      },
+                      tokenSymbol: vnode.state.symbol,
                     }),
                   ]),
-                  m(PollCard, {
-                    pollType: PollType.Snapshot,
-                    multiSelect: false,
-                    pollEnded: !isActive,
-                    hasVoted:
-                      vnode.state.votes.find((vote) => {
-                        return vote.voter === app.user?.activeAccount?.address;
-                      })?.choice !== undefined,
-                    votedFor: '',
-                    proposalTitle: proposal.title,
-                    timeRemainingString: '',
-                    totalVoteCount: vnode.state.totals.sumOfResultsBalance,
-                    voteInformation: buildVoteInformation(
-                      vnode.state.proposal?.choices,
-                      vnode.state.votes
-                    ),
-                    onVoteCast: () => console.log('hi'),
-                    tokenSymbol: vnode.state.symbol,
-                  }),
                 ]),
               ]),
             ]

@@ -38,6 +38,7 @@ import {
   ProposalModule,
   DepositVote,
 } from 'models';
+import moment from 'moment';
 
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
@@ -109,7 +110,6 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalPollCard } from './proposal_poll_card';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
@@ -128,7 +128,6 @@ import {
   jumpHighlightComment,
 } from './helpers';
 import { PollCard, PollType } from '../../components/component_kit/polls';
-import moment from 'moment';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1451,8 +1450,13 @@ const ViewProposalPage: m.Component<
                           .length,
                       };
                     }),
-                    onVoteCast: (option, isSelected) =>
-                      handleProposalPollVote(poll, option, isSelected),
+                    onVoteCast: (option, isSelected, callback) =>
+                      handleProposalPollVote(
+                        poll,
+                        option,
+                        isSelected,
+                        callback
+                      ),
                   }),
                 ]);
               }),
