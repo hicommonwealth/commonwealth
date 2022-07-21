@@ -1,4 +1,4 @@
-import JobRunner from './cacheJobRunner';
+import JobRunner from 'common-common/src/cacheJobRunner';
 
 type CacheT = { [viewerId: string]: { [objectId: string]: number } };
 

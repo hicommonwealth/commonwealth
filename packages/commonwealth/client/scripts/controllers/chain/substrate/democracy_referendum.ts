@@ -12,7 +12,7 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';

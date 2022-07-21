@@ -6,7 +6,7 @@ import {
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';

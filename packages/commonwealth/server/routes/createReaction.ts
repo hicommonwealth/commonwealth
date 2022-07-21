@@ -1,17 +1,17 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import BN from 'bn.js';
+import { ChainType, NotificationCategories } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import TokenBalanceCache from 'token-balance-cache/src/index';
+import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { ChainType, NotificationCategories } from 'common-common/src/types';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-import TokenBalanceCache from '../util/tokenBalanceCache';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -112,7 +112,9 @@ const createReaction = async (
     });
     if (thread && !req.user.isAdmin && isAdmin.length === 0) {
       try {
-        const canReact = await tokenBalanceCache.validateTopicThreshold(
+        const canReact = await validateTopicThreshold(
+          tokenBalanceCache,
+          models,
           thread.topic_id,
           req.body.address
         );
