@@ -2,7 +2,27 @@ name: CI
 on: [push]
 
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      commonwealth: ${{ steps.filter.outputs.commonwealth }}
+      chain-events: ${{ steps.filter.outputs.chain-events }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          commonwealth:
+            - 'packages/commonwealth/**'
+          chain-events:
+            - 'packages/chain-events/**'
+
   commonwealth:
+    needs: changes
+    if: ${{ needs.changes.outputs.commonwealth == 'true' }}
     name: Commonwealth Tests
     runs-on: ubuntu-latest
 
@@ -66,6 +86,8 @@ jobs:
           path: coverage
 
   chain-events:
+    needs: changes
+    if: ${{ needs.changes.outputs.chain-events == 'true' }}
     name: Chain Events Tests
     runs-on: ubuntu-latest
     defaults:
