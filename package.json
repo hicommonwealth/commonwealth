@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
-    "build": "yarn --cwd packages/commonwealth heroku-postbuild"
+    "build": "yarn --cwd packages/commonwealth heroku-postbuild",
+    "psql": "yarn --cwd packages/commonwealth psql"
   },
   "engines": {
     "node": "14.x"
