@@ -1,0 +1,36 @@
+@import 'shared';
+
+.SnapshotProposalContent {
+  display: flex;
+  flex-direction: column;
+  margin-right: 40px;
+  max-width: 768px;
+  width: 100%;
+
+  .snapshot-proposal-content-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .snapshot-proposal-hash.Text {
+      color: $neutral-600;
+    }
+
+    .other-details {
+      display: flex;
+      flex-direction: column;
+
+      .author-row {
+        display: flex;
+        gap: 8px;
+
+        .author-address {
+          background-color: $neutral-50;
+          border-radius: $border-radius-rounded-corners;
+          padding: 4px 16px;
+          width: fit-content;
+        }
+      }
+    }
+  }
+}
