@@ -8,7 +8,7 @@ import app from 'state';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import { AddressInfo } from 'models';
-import ConfirmSnapshotVoteModal from 'views/modals/confirm_snapshot_vote_modal';
+import { ConfirmSnapshotVoteModal } from 'views/modals/confirm_snapshot_vote_modal';
 import {
   SnapshotSpace,
   SnapshotProposal,
@@ -20,7 +20,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { formatPercent, formatNumberLong, formatTimestamp } from 'helpers';
 
 import User from '../../components/widgets/user';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';

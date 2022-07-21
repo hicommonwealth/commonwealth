@@ -29,7 +29,7 @@ export class CWCard implements m.ClassComponent<CardAttrs> {
       className,
       elevation,
       fullWidth,
-      interactive,
+      interactive = false,
       onclick,
       onmouseenter,
       onmouseleave,
