@@ -2,8 +2,6 @@
 
 import m from 'mithril';
 
-import { Tabs, TabItem } from 'construct-ui';
-
 import 'pages/snapshot/index.scss';
 
 import app from 'state';
@@ -20,6 +18,7 @@ import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { SnapshotProposalCards } from './snapshot_proposal_cards';
+import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -112,22 +111,22 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       <Sublayout title="Snapshot Proposal">
         <div class="SnapshotViewProposalPage">
           <div class="proposal-body-with-tabs">
-            <Tabs align="left" class="snapshot-tabs">
-              <TabItem
+            <CWTabBar>
+              <CWTab
                 label="Proposals"
-                active={this.activeTab === 'proposals'}
+                isSelected={this.activeTab === 'proposals'}
                 onclick={() => {
                   this.activeTab = 'proposals';
                 }}
               />
-              <TabItem
+              <CWTab
                 label="Info & Results"
-                active={this.activeTab === 'info-and-results'}
+                isSelected={this.activeTab === 'info-and-results'}
                 onclick={() => {
                   this.activeTab = 'info-and-results';
                 }}
               />
-            </Tabs>
+            </CWTabBar>
             {this.activeTab === 'proposals' && (
               <SnapshotProposalContent
                 proposal={this.proposal}
