@@ -587,16 +587,27 @@ export const CWDots: m.Component<IconAttrs> = {
 
 export const CWDownvote: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M16.73 27.828a.843.843 0 01-1.46 0L2.113 5.018a.845.845 0 01.731-1.268h26.31c.65 0 1.055.704.73 1.267l-13.154 22.81z"></path>
       </svg>
@@ -1564,16 +1575,27 @@ export const CWTwitter: m.Component<IconAttrs> = {
 
 export const CWUpvote: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M15.27 4.172a.843.843 0 011.46 0l13.156 22.81a.845.845 0 01-.731 1.268H2.845a.845.845 0 01-.73-1.267l13.154-22.81z"></path>
       </svg>

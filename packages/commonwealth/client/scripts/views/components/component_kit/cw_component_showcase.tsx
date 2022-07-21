@@ -17,7 +17,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { NewLoginModal } from '../../modals/login_modal';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
 import { CWPopover } from './cw_popover/cw_popover';
@@ -25,8 +24,9 @@ import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
-import { isWindowMediumSmallInclusive } from './helpers';
-import { CWVoteButton } from './cw_vote_button';
+import { CWVoteButton, PreviousVote } from './cw_vote_button';
+// import { NewLoginModal } from '../../modals/login_modal';
+// import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -47,17 +47,18 @@ const radioGroupOptions = [
   { label: 'Group', value: 'Group' },
 ];
 export class ComponentShowcase implements m.ClassComponent {
-  private avatarUrl: string;
   private checkboxChecked: boolean;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
   private selectedTab: number;
-  private hasVoted: boolean;
+  private voteCount: number;
+  private previousVote: PreviousVote;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
     this.selectedTab = 1;
+    this.voteCount = 0;
   }
 
   view() {
@@ -79,11 +80,16 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWVoteButton
-            onclick={() => {
-              this.hasVoted = !this.hasVoted;
+            onUpvote={() => {
+              this.voteCount += 1;
+              this.previousVote = 'previousUpvote';
             }}
-            voteCount={this.hasVoted ? 1 : 0}
-            voteType="upvote"
+            onDownvote={() => {
+              this.voteCount -= 1;
+              this.previousVote = 'previousDownvote';
+            }}
+            voteCount={this.voteCount}
+            previousVote={this.previousVote}
           />
         </div>
         <div class="basic-gallery">

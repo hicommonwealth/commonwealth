@@ -7,26 +7,72 @@ import 'components/component_kit/cw_vote_button.scss';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
+import { getClasses } from './helpers';
 
-type VoteType = 'upvote' | 'downvote';
+export type PreviousVote = 'previousUpvote' | 'previousDownvote';
 
 type VoteButtonAttrs = {
-  onclick: () => void;
+  onDownvote: () => void;
+  onUpvote: () => void;
+  previousVote: PreviousVote;
   voteCount: number;
-  voteType: VoteType;
 };
 
 export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
+  private isHoveringUpvote: boolean;
+  private isHoveringDownvote: boolean;
+
   view(vnode) {
-    const { onclick, voteCount, voteType } = vnode.attrs;
+    const { onDownvote, onUpvote, previousVote, voteCount } = vnode.attrs;
 
     return (
-      <div class={ComponentType.VoteButton} onclick={onclick}>
-        <CWIcon iconName="upvote" iconSize="small" />
-        <CWText type="caption" fontWeight="medium">
+      <div
+        class={getClasses<{
+          isHoveringUpvote: boolean;
+          isHoveringDownvote: boolean;
+          previousVote: PreviousVote;
+        }>(
+          {
+            isHoveringUpvote: this.isHoveringUpvote,
+            isHoveringDownvote: this.isHoveringDownvote,
+            previousVote,
+          },
+          ComponentType.VoteButton
+        )}
+      >
+        <CWIcon
+          iconName="upvote"
+          iconSize="small"
+          onclick={previousVote === 'previousUpvote' ? undefined : onUpvote}
+          className={getClasses<{ previousUpvote: boolean }>(
+            { previousUpvote: previousVote === 'previousUpvote' },
+            'upvote-button'
+          )}
+          onmouseenter={() => {
+            this.isHoveringUpvote = true;
+          }}
+          onmouseleave={() => {
+            this.isHoveringUpvote = false;
+          }}
+        />
+        <CWText type="caption" fontWeight="medium" className="vote-count">
           {voteCount}
         </CWText>
-        <CWIcon iconName="downvote" iconSize="small" />
+        <CWIcon
+          iconName="downvote"
+          iconSize="small"
+          onclick={previousVote === 'previousDownvote' ? undefined : onDownvote}
+          onmouseenter={() => {
+            this.isHoveringDownvote = true;
+          }}
+          onmouseleave={() => {
+            this.isHoveringDownvote = false;
+          }}
+          className={getClasses<{ previousDownvote: boolean }>(
+            { previousDownvote: previousVote === 'previousDownvote' },
+            'downvote-button'
+          )}
+        />
       </div>
     );
   }
