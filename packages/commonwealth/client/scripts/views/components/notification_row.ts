@@ -15,7 +15,7 @@ import {
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';

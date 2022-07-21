@@ -1,0 +1,46 @@
+@import 'shared';
+
+@mixin snapshotProposalCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: fit-content;
+  padding: 24px;
+  width: 336px;
+
+  @include extraSmall {
+    width: 100%;
+  }
+}
+
+.SnapshotViewProposalPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
+  .proposal-body-with-tabs {
+    .snapshot-tabs {
+      margin-bottom: 8px;
+    }
+
+    @include medium {
+      display: none;
+    }
+
+    @include large {
+      display: none;
+    }
+  }
+
+  .proposal-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+
+    @include mediumSmallInclusive {
+      display: none;
+    }
+  }
+}
