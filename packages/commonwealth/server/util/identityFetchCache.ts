@@ -1,9 +1,9 @@
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from 'chain-events/src';
+import JobRunner from 'common-common/src/cacheJobRunner';
+import { factory, formatFilename } from 'common-common/src/logging';
 import models from '../database';
 import IdentityEventHandler from '../eventHandlers/identity';
-import JobRunner from './cacheJobRunner';
 
-import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 // list of identities to fetch

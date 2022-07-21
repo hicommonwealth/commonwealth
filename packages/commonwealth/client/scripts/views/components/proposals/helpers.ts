@@ -16,7 +16,7 @@ import CompoundProposal, {
   CompoundProposalVote,
 } from 'controllers/chain/ethereum/compound/proposal';
 import { notifyError } from 'controllers/app/notifications';
-import { CompoundTypes } from '@commonwealth/chain-events';
+import { CompoundTypes } from 'chain-events/src';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikProposalStatus,

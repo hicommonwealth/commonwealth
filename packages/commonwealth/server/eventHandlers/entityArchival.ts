@@ -11,9 +11,9 @@ import {
   IChainEntityKind,
   IChainEventData,
   SubstrateTypes,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
-import { factory, addPrefix } from '../../shared/logging';
+import { factory, addPrefix } from 'common-common/src/logging';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';

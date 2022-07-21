@@ -1,11 +1,11 @@
 import BN from 'bn.js';
 import { ProposalModule, ITXModalData } from 'models';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { CompoundEvents, CompoundTypes } from '@commonwealth/chain-events';
+import { CompoundEvents, CompoundTypes } from 'chain-events/src';
 import { IApp } from 'state';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import { GovernorCompatibilityBravo } from 'eth/types';
+import { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import CompoundAPI, { GovernorType } from './api';
 import CompoundProposal from './proposal';
 import CompoundChain from './chain';

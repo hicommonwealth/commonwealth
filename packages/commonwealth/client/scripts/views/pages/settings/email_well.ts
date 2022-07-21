@@ -9,7 +9,7 @@ import { Button, Colors, Input, Icons, Icon } from 'construct-ui';
 
 import { SocialAccount } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { WalletId } from 'types';
+import { WalletId } from 'common-common/src/types';
 
 interface IState {
   email: string;

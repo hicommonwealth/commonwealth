@@ -8,6 +8,12 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
+      "common-common": ["../../../packages/common-common"],
+      "common-common/*": ["../../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
+      "token-balance-cache": ["../../../packages/token-balance-cache"],
+      "token-balance-cache/*": ["../../../packages/token-balance-cache/*"],
       "*": ["../*", "../shared/*", "../client/scripts/*"]
     },
     "resolveJsonModule": true,
@@ -20,11 +26,9 @@
     "../client",
     "../client/scripts",
     "../shared/adapters",
-    "../",
-    "../eth/types"
+    "../"
   ],
   "exclude": [
-    "../node_modules",
-    "../client/scripts/controllers/chain/ethereum/contracts/*"
+    "../node_modules"
   ]
 }

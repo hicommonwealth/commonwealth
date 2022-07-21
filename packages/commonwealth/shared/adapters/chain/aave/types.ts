@@ -1,4 +1,4 @@
-import { AaveTypes } from '@commonwealth/chain-events';
+import { AaveTypes } from 'chain-events/src';
 import { ICompletable } from '../../shared';
 
 export type IAaveProposalResponse = Omit<AaveTypes.IProposalCreated, 'kind'> & ICompletable & {

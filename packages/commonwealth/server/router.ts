@@ -2,6 +2,8 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
+import TokenBalanceCache from 'token-balance-cache/src/index';
+
 import domain from './routes/domain';
 import status from './routes/status';
 import createAddress from './routes/createAddress';
@@ -120,7 +122,6 @@ import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
-import TokenBalanceCache from './util/tokenBalanceCache';
 import updateChainCategory from './routes/updateChainCategory';
 
 import startSsoLogin from './routes/startSsoLogin';

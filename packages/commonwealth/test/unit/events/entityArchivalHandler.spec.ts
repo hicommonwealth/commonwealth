@@ -8,13 +8,12 @@ import {
   CWEvent,
   SubstrateTypes,
   SupportedNetwork,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
 import EntityArchivalHandler from '../../../server/eventHandlers/entityArchival';
-import { WebsocketMessageNames } from '../../../shared/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;

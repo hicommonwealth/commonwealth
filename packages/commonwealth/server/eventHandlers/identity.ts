@@ -4,9 +4,9 @@ import {
   CWEvent,
   IChainEventData,
   SubstrateTypes,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { OffchainProfileInstance } from '../models/offchain_profile';
-import { addPrefix, factory } from '../../shared/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
 
 export default class extends IEventHandler {
   public readonly name = 'Identity';

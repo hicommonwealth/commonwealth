@@ -5,7 +5,7 @@ import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXM
 import { NearToken } from 'adapters/chain/near/types';
 import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import NearChain from 'controllers/chain/near/chain';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import NearSputnikDao from './dao';
 import {
   INearSputnikProposal,

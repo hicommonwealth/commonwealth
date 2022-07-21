@@ -7,12 +7,12 @@ import {
   DemocracyThreshold,
   formatCall,
 } from 'adapters/chain/substrate/types';
-import { ChainBase, ProposalType } from 'types';
+import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
   Account, ChainEntity, ChainEvent
 } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { Coin } from 'adapters/currency';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';

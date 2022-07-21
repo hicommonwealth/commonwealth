@@ -1,4 +1,4 @@
-import { WalletId } from "types";
+import { WalletId } from 'common-common/src/types';
 
 class AddressInfo {
   public readonly id: number;

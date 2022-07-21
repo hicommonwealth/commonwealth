@@ -7,7 +7,7 @@ import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_p
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
 import { SsoTokenInstance } from './sso_token';
-import { WalletId } from '../../shared/types';
+import { WalletId } from 'common-common/src/types';
 
 export type AddressAttributes = {
 	address: string;

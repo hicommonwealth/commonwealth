@@ -9,7 +9,7 @@ import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import { PolkadotExtension } from '@magic-ext/polkadot';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   ChainInfo,
   SocialAccount,

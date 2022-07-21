@@ -12,8 +12,8 @@ import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
-import { ChainBase, ChainType } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 const log = factory.getLogger(formatFilename(__filename));

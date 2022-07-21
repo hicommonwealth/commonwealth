@@ -7,9 +7,9 @@ import {
   IChainEventKind,
   SubstrateTypes,
   Erc20Types,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import Sequelize from 'sequelize';
-import { addPrefix, factory, formatFilename } from '../../shared/logging';
+import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;

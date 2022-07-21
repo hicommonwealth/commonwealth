@@ -1,4 +1,4 @@
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from 'chain-events/src';
 import session from 'express-session';
 import express from 'express';
 import webpack from 'webpack';
@@ -16,17 +16,17 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
+import { ChainBase } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import TokenBalanceCache from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import { ChainBase } from './shared/types';
-import { factory, formatFilename } from './shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache, {
   IdentityFetchCacheNew,
 } from './server/util/identityFetchCache';
-import TokenBalanceCache from './server/util/tokenBalanceCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
@@ -76,7 +76,7 @@ async function main() {
     identityFetchCache = new IdentityFetchCacheNew();
   }
 
-  const tokenBalanceCache = new TokenBalanceCache(models);
+  const tokenBalanceCache = new TokenBalanceCache();
   const ruleCache = new RuleCache();
   const listenChainEvents = async () => {
     try {

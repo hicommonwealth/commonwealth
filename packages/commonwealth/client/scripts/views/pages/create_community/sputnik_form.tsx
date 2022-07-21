@@ -9,7 +9,7 @@ import 'pages/create_community.scss';
 
 import app from 'state';
 import { initAppState } from 'app';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';

@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import app, { IApp } from 'state';
 import { Coin } from 'adapters/currency';
-import { ChainBase, ChainType, WalletId } from 'types';
+import { ChainBase, ChainType, WalletId } from 'common-common/src/types';
 
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
