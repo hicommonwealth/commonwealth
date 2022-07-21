@@ -7,7 +7,7 @@ import {
   CWEvent,
   Label as ChainEventLabel,
   // CompoundEvents
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import moment from 'moment';
 
 import app from 'state';

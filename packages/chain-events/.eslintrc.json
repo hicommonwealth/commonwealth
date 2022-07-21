@@ -1,0 +1,42 @@
+{
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "import/extensions": [".js", ".ts"],
+    "import/resolver": {
+      "node": {},
+      "webpack": {
+        "config": "webpack/webpack.common.js"
+      }
+    }
+  },
+  "ignorePatterns": ["contractTypes", "eth", "dist"],
+  "rules": {  
+    "@typescript-eslint/interface-name-prefix": "off",
+    "import/prefer-default-export": 0,
+    "import/extensions": 0,
+    "import/no-cycle": 0,
+    "import/order": ["error", {
+      "newlines-between": "always"
+    }],
+    "max-classes-per-file": "off",
+    "no-await-in-loop": "off",
+    "no-import-cycles": "off",
+    "no-nested-ternary": "off",
+    "no-param-reassign": "off",
+    "no-plusplus": "off",
+    "no-restricted-syntax": "off",
+    "no-underscore-dangle": "off",
+    "no-useless-constructor": "off",
+    "class-methods-use-this": "off"
+  }
+}

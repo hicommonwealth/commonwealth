@@ -3,7 +3,7 @@ import moment from 'moment';
 import { capitalize } from 'lodash';
 import {
   Label as ChainEventLabel, CWEvent, IEventLabel, SupportedNetwork, IChainEventData
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';

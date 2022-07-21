@@ -3,7 +3,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril'; // required for getStatusText
 import moment from 'moment';
-import { AaveTypes, CompoundTypes } from '@commonwealth/chain-events';
+import { AaveTypes, CompoundTypes } from 'chain-events/src';
 
 import 'components/proposal_card.scss';
 

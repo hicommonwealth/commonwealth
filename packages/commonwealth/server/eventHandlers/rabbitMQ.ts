@@ -1,4 +1,4 @@
-import { CWEvent, IEventHandler } from '@commonwealth/chain-events';
+import { CWEvent, IEventHandler } from 'chain-events/src';
 import Rascal from 'rascal';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 

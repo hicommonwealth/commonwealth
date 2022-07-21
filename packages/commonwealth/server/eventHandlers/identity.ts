@@ -4,7 +4,7 @@ import {
   CWEvent,
   IChainEventData,
   SubstrateTypes,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { OffchainProfileInstance } from '../models/offchain_profile';
 import { addPrefix, factory } from 'common-common/src/logging';
 

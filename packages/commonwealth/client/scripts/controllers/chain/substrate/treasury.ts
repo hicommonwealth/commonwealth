@@ -7,7 +7,7 @@ import {
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { ProposalModule } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import { formatAddressShort } from '../../../../../shared/utils';

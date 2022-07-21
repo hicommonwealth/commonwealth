@@ -1,10 +1,11 @@
 import moment from 'moment';
 import { NextFunction } from 'express';
+import TokenBalanceCache from 'token-balance-cache/src/index';
 
+import validateTopicThreshold from '../util/validateTopicThreshold';
 import { sequelize, DB } from '../database';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import TokenBalanceCache from '../util/tokenBalanceCache';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import {
   OffchainVoteAttributes,
@@ -73,7 +74,9 @@ const updateOffchainVote = async (
   if (!thread) return next(new Error(Errors.NoThread));
 
   // check token balance threshold if needed
-  const canVote = await tokenBalanceCache.validateTopicThreshold(
+  const canVote = await validateTopicThreshold(
+    tokenBalanceCache,
+    models,
     thread.topic_id,
     address
   );

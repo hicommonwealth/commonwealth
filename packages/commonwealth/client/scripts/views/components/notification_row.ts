@@ -4,7 +4,7 @@ import { Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
+import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 import { IPostNotificationData } from 'types';

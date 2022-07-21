@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { IEventHandler, CWEvent } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent } from 'chain-events/src';
 
 import { generateHandlers } from './setupChainEventListeners';
 import { default as models, sequelize } from '../database';

@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import BN from 'bn.js';
 import jwt from 'jsonwebtoken';
-import TokenBalanceCache from 'server/util/tokenBalanceCache';
+import TokenBalanceCache from 'token-balance-cache/src/index';
 import { resetDatabase, getTokenBalanceCache, getMockBalanceProvider } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
