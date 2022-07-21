@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 import { ContractTransaction, utils } from 'ethers';
 import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
 
-import { CompoundTypes } from '@commonwealth/chain-events';
+import { CompoundTypes } from 'chain-events/src';
 import { ProposalType } from 'common-common/src/types';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';

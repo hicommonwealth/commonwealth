@@ -1,4 +1,4 @@
-import { IChainEventData, SupportedNetwork } from '@commonwealth/chain-events';
+import { IChainEventData, SupportedNetwork } from 'chain-events/src';
 import {
   NodeInfo,
   Notification,

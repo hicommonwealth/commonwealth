@@ -11,7 +11,7 @@ import {
   IChainEntityKind,
   IChainEventData,
   SubstrateTypes,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { factory, addPrefix } from 'common-common/src/logging';
 

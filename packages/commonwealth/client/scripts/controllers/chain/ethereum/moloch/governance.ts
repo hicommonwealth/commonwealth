@@ -7,7 +7,7 @@ import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 
-import { MolochEvents } from '@commonwealth/chain-events';
+import { MolochEvents } from 'chain-events/src';
 
 import { IApp } from 'state';
 

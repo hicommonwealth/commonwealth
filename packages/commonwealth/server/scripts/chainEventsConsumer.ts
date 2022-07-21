@@ -1,4 +1,4 @@
-import { SubstrateTypes, CWEvent } from '@commonwealth/chain-events';
+import { SubstrateTypes, CWEvent } from 'chain-events/src';
 import * as WebSocket from 'ws';
 import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';

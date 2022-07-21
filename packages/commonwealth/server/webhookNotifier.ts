@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { Label as ChainEventLabel, CWEvent } from '@commonwealth/chain-events';
+import { Label as ChainEventLabel, CWEvent } from 'chain-events/src';
 
 import { NotificationCategories } from 'common-common/src/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';

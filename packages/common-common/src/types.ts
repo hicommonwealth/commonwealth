@@ -111,3 +111,11 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
 }
+
+export enum BalanceType {
+  AxieInfinity = 'axie-infinity',
+  Terra = 'terra',
+  Ethereum = 'ethereum',
+  Solana = 'solana',
+  Cosmos = 'cosmos',
+}
