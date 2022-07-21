@@ -11,6 +11,8 @@
     "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
       "token-balance-cache": ["../../packages/token-balance-cache"],
       "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]

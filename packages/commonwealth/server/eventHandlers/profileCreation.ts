@@ -6,7 +6,7 @@ import {
   IEventHandler,
   CWEvent,
   SubstrateTypes,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 

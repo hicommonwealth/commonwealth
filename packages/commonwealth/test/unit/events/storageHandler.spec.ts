@@ -8,7 +8,7 @@ import {
   CWEvent,
   SubstrateTypes,
   SupportedNetwork,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';

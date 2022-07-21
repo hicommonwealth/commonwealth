@@ -10,7 +10,7 @@ import {
   MolochEvents,
   CompoundEvents,
   AaveEvents,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { ChainAttributes, ChainInstance } from '../models/chain';
 import EventStorageHandler, {

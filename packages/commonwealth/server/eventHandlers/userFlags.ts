@@ -2,7 +2,7 @@
  * Event handler that processes changes in validator and councillor sets
  * and updates user-related flags in the database accordingly.
  */
-import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from '@commonwealth/chain-events';
+import { IEventHandler, CWEvent, IChainEventKind, SubstrateTypes } from 'chain-events/src';
 import Sequelize from 'sequelize';
 const Op = Sequelize.Op;
 

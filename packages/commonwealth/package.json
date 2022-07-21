@@ -63,7 +63,6 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/register": "^7.4.0",
-    "@commonwealth/chain-events": "^0.13.3",
     "@cosmjs/amino": "^0.26.1",
     "@cosmjs/proto-signing": "^0.26.1",
     "@ethersproject/abi": "^5.0.1",
