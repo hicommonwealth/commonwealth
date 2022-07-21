@@ -1,4 +1,4 @@
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from 'chain-events/src';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
 import models from '../database';

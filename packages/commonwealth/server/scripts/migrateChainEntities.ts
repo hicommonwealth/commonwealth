@@ -11,7 +11,7 @@ import {
   CompoundEvents,
   AaveEvents,
   IDisconnectedRange,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';

@@ -6,7 +6,7 @@ import {
   IEventHandler,
   CWEvent,
   IChainEventKind,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';

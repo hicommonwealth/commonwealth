@@ -11,7 +11,7 @@ import {
   CWEvent,
   LoggingHandler,
   SupportedNetwork,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';

@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import { BlockNumber } from '@polkadot/types/interfaces';
 import { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { ITXModalData, ProposalModule } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';

@@ -15,6 +15,7 @@
   "keywords": [],
   "workspaces": [
     "packages/common-common",
+    "packages/chain-events",
     "packages/token-balance-cache",
     "packages/commonwealth"
   ],

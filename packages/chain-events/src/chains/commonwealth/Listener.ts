@@ -25,8 +25,6 @@ export class Listener extends BaseListener<
   Subscriber,
   EventKind
 > {
-  public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
-
   private readonly _options: CommonwealthListenerOptions;
 
   protected readonly log;

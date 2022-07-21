@@ -33,8 +33,6 @@ export class Listener extends BaseListener<
 
   private _poller: IEventPoller<ApiPromise, Block>;
 
-  public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
-
   protected readonly log;
 
   constructor(

@@ -15,7 +15,7 @@ import {
   SubstrateTypes,
   IChainEntityKind,
   SupportedNetwork,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { notifyError } from '../app/notifications';
 
 export enum EntityRefreshOption {

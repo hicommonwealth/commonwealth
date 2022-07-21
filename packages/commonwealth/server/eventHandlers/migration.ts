@@ -8,7 +8,7 @@ import {
   entityToFieldName,
   IChainEventData,
   EntityEventKind,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { WhereOptions } from 'sequelize';
 
 import { DB } from '../database';
