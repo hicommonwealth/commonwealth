@@ -16,32 +16,21 @@
     justify-content: center;
   }
 
-  .search-page-input {
-    margin-top: 30px;
-  }
-
-  .search-error {
-    margin: 21px 0 8px;
-  }
-
   .search-results {
     display: flex;
     flex-direction: column;
-  }
+    gap: 8px;
 
-  .search-results-caption {
-    margin: 16px;
-    text-align: center;
-    color: $neutral-500;
+    .search-results-caption.Text {
+      color: $neutral-500;
 
-    .search-results-clear {
-      margin-left: 10px;
-    }
-  }
+      .search-all-communities {
+        margin-left: 8px;
 
-  .search-all-communities {
-    &:hover {
-      text-decoration: none;
+        &:hover {
+          text-decoration: none;
+        }
+      }
     }
   }
 
@@ -50,16 +39,12 @@
     align-items: baseline;
     justify-content: center;
     gap: 8px;
-
-    .cui-select > select {
-      padding-left: 5px;
-      padding-right: 30px;
-    }
   }
 
   .search-results-list {
     display: flex;
     flex-direction: column;
+    gap: 8px;
 
     .cui-list {
       max-height: none !important;
@@ -82,7 +67,8 @@
       }
 
       .search-results-item {
-        color: $neutral-800;
+        display: flex;
+        flex-direction: column;
         overflow: hidden;
         text-decoration: none;
         width: 100%;
@@ -105,32 +91,22 @@
           }
         }
 
-        .search-results-thread-header {
+        .thread-header.Text {
           color: $neutral-500;
-          text-transform: uppercase;
-          font-size: 13px;
-          margin-bottom: 2px;
-        }
-
-        /* Thread results */
-        .search-results-thread-title {
-          font-weight: 500;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
         }
 
         .search-results-thread-subtitle {
-          margin: 2px 0 3px;
-
-          .created-at {
-            font-weight: 400;
-            color: $neutral-500;
-          }
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
 
           .User {
-            margin-left: 14px;
-            font-weight: 400;
+            align-items: center;
+            color: $neutral-500;
+            display: flex;
+          }
+
+          .created-at.Text {
             color: $neutral-500;
           }
         }
