@@ -10,6 +10,7 @@ export enum ComponentType {
   Checkbox = 'Checkbox',
   CommunityAvatar = 'CommunityAvatar',
   CustomIcon = 'CustomIcon',
+  Divider = 'Divider',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',

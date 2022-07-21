@@ -16,6 +16,7 @@ type RadioGroupAttrs = {
 export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
   view(vnode) {
     const { options, onchange, name, toggledOption } = vnode.attrs;
+
     return (
       <div class={ComponentType.RadioGroup}>
         {options.map((o) => {

@@ -8,12 +8,15 @@ $default-card-height: 100px;
   background: $white;
   border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   min-height: $default-card-height;
   padding: 16px;
   width: $default-card-width;
+
+  &.interactive {
+    cursor: pointer;
+  }
 
   &.fullWidth {
     width: 100%;
