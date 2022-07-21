@@ -96,7 +96,7 @@ import {
   EditPermissionsButton,
   ProposalEditorPermissions,
 } from './body';
-import CreateComment from './create_comment';
+import { CreateComment } from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
 import User from '../../components/widgets/user';
 import MarkdownFormattedText from '../../components/markdown_formatted_text';
@@ -1155,6 +1155,7 @@ const ViewProposalPage: m.Component<
 
     const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.editing;
+
       if (call === GlobalStatus.Set && status !== undefined) {
         vnode.state.editing = status;
         if (status === false) {
