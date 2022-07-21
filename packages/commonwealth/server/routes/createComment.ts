@@ -6,7 +6,7 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';

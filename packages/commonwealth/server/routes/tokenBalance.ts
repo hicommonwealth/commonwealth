@@ -1,4 +1,4 @@
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';

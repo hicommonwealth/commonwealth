@@ -18,7 +18,7 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 const log = factory.getLogger(formatFilename(__filename));

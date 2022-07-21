@@ -16,7 +16,7 @@ import {
   ChainType,
   BalanceType,
 } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import TokenBalanceProvider from 'token-balance-cache/src/provider';
 
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';

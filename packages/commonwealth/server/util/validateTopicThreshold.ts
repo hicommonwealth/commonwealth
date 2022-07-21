@@ -1,6 +1,6 @@
 import { WhereOptions } from 'sequelize/types';
 import { ChainNetwork, ChainType } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../database';

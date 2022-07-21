@@ -3,7 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ChainType, NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import TokenBalanceCache from 'token-balance-cache/src/cache';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
