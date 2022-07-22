@@ -65,7 +65,7 @@ export const handleProposalPollVote = async (
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(...userInfo, option)
+    .submitVote(...userInfo, option)
     .then(() => m.redraw())
     .catch(async () => {
       await alertModalWithText(
@@ -75,7 +75,7 @@ export const handleProposalPollVote = async (
 };
 
 export const getProposalPollTimestamp = (
-  poll: OffchainPoll,
+  poll: Poll,
   pollingEnded: boolean
 ) => {
   return pollingEnded
