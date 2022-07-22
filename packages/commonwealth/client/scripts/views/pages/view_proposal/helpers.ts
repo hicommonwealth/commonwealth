@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import $ from 'jquery';
 import app from 'state';
-import { OffchainPoll } from 'models';
+import { Poll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
@@ -42,7 +42,7 @@ export const jumpHighlightComment = (
 };
 
 export const handleProposalPollVote = async (
-  poll: OffchainPoll,
+  poll: Poll,
   option: string,
   isSelected: boolean
 ) => {
