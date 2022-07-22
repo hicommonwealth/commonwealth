@@ -57,16 +57,16 @@ import OffchainAttachmentFactory, {
 } from './models/offchain_attachment';
 import OffchainCommentFactory, {
   OffchainCommentModelStatic,
-} from './models/offchain_comment';
+} from './models/comment';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
 } from './models/offchain_profile';
 import OffchainReactionFactory, {
   OffchainReactionModelStatic,
 } from './models/offchain_reaction';
-import OffchainThreadFactory, {
-  OffchainThreadModelStatic,
-} from './models/offchain_thread';
+import ThreadFactory, {
+  ThreadModelStatic,
+} from './models/thread';
 import OffchainTopicFactory, {
   OffchainTopicModelStatic,
 } from './models/offchain_topic';
@@ -136,7 +136,7 @@ export type Models = {
   OffchainPoll: OffchainPollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   OffchainReaction: OffchainReactionModelStatic;
-  OffchainThread: OffchainThreadModelStatic;
+  Thread: ThreadModelStatic;
   OffchainTopic: OffchainTopicModelStatic;
   OffchainViewCount: OffchainViewCountModelStatic;
   OffchainVote: OffchainVoteModelStatic;
@@ -218,7 +218,7 @@ const models: Models = {
   OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),
-  OffchainThread: OffchainThreadFactory(sequelize, DataTypes),
+  Thread: ThreadFactory(sequelize, DataTypes),
   OffchainTopic: OffchainTopicFactory(sequelize, DataTypes),
   OffchainViewCount: OffchainViewCountFactory(sequelize, DataTypes),
   OffchainVote: OffchainVoteFactory(sequelize, DataTypes),
