@@ -1450,6 +1450,7 @@ const ViewProposalPage: m.Component<
                           .length,
                       };
                     }),
+                    incrementalVoteCast: 1,
                     onVoteCast: (option, isSelected, callback) =>
                       handleProposalPollVote(
                         poll,

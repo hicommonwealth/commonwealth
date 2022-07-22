@@ -38,6 +38,7 @@ export type PollCardAttrs = {
   voteInformation: VoteInformation[];
   onVoteCast: () => any;
   disableVoteButton: boolean;
+  incrementalVoteCast: number;
   tokenSymbol?: string;
 };
 
@@ -72,6 +73,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       onVoteCast,
       disableVoteButton = false,
       tokenSymbol,
+      incrementalVoteCast,
     } = vnode.attrs;
 
     let resultString;
@@ -161,7 +163,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                           try {
                             await onVoteCast(this.selectedOptions[0], () => {
                               if (!votedFor) {
-                                this.totalVoteCount += 1;
+                                console.log('i should be incrementing');
+                                this.totalVoteCount += incrementalVoteCast;
                               }
                               this.voteDirectionString =
                                 buildVoteDirectionString(
@@ -205,10 +208,14 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
             </div>
             <div className="results-content">
               {voteInformation
-                .sort(
-                  (option1, option2) => option1.voteCount > option2.voteCount
-                )
-                .map((option) => {
+                .sort((option1, option2) => {
+                  if (pollEnded) {
+                    return option2.voteCount - option1.voteCount;
+                  } else {
+                    return 0;
+                  }
+                })
+                .map((option, index) => {
                   return (
                     <div className="progress-bar-wrapper">
                       <CWProgressBar
@@ -218,7 +225,13 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                             ? (option.voteCount / this.totalVoteCount) * 100
                             : 0
                         }
-                        progressStatus={CWProgressBarStatus.passed}
+                        progressStatus={
+                          !pollEnded
+                            ? CWProgressBarStatus.ongoing
+                            : index === 0
+                            ? CWProgressBarStatus.passed
+                            : CWProgressBarStatus.neutral
+                        }
                         progressHeight={4}
                         label={option.label}
                         count={option.voteCount}
