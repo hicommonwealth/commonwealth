@@ -1,0 +1,23 @@
+@import 'shared';
+@import 'pages/snapshot/index.scss';
+
+.SnapshotVoteActionCard.Card {
+  @include snapshotProposalCardContent;
+
+  .vote-action-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vote-button-and-vote-text-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    width: 288px;
+
+    .vote-text.Text {
+      color: $neutral-400;
+    }
+  }
+}

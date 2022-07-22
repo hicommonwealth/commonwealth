@@ -8,10 +8,7 @@ import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 import { IPostNotificationData } from 'types';
-import {
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
