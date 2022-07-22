@@ -63,7 +63,6 @@ export class SnapshotProposalCards
     const userVote = votes.find((vote) => {
       return vote.voter === app.user?.activeAccount?.address;
     })?.choice;
-    console.log('userVote', userVote);
     const hasVoted = userVote !== undefined;
 
     const voteErrorText = !validatedAgainstStrategies
@@ -96,8 +95,7 @@ export class SnapshotProposalCards
       selectedChoice: string,
       callback: () => any
     ) => {
-      const choiceNumber =
-        vnode.state.proposal?.choices.indexOf(selectedChoice);
+      const choiceNumber = proposal?.choices.indexOf(selectedChoice);
       try {
         app.modals.create({
           modal: ConfirmSnapshotVoteModal,
@@ -127,7 +125,7 @@ export class SnapshotProposalCards
           pollType={PollType.Snapshot}
           multiSelect={false}
           pollEnded={!isActive}
-          hasVoted
+          hasVoted={hasVoted}
           votedFor={hasVoted ? userVote : ''}
           disableVoteButton={fetchedPower && voteErrorText !== ''}
           proposalTitle={proposal.title}
@@ -138,6 +136,7 @@ export class SnapshotProposalCards
             castSnapshotVote(choice, callback);
             m.redraw();
           }}
+          incrementalVoteCast={totalScore}
         />
       </div>
     );

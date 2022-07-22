@@ -60,8 +60,9 @@ export class ConfirmSnapshotVoteModal
             <div class="vote-info-row">
               <CWText>Your voting power</CWText>
               <CWText>
-                `${formatNumberShort(totalScore)} $
-                {space.symbol.slice(0, 6).trim()}...`
+                {`${formatNumberShort(totalScore)} ${space.symbol
+                  .slice(0, 6)
+                  .trim()}...`}
               </CWText>
             </div>
           </div>
