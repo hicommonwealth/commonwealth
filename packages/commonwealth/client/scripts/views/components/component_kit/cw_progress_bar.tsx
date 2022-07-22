@@ -12,10 +12,10 @@ export const enum CWProgressBarStatus {
 }
 
 type CWProgressBarAttrs = {
-  className: string;
   progress: number; // Percentage of progress.
-  progressStatus?: CWProgressBarStatus;
+  progressStatus: CWProgressBarStatus;
   progressHeight?: number;
+  className?: string;
   label?: string;
   count?: number;
   token?: string;
@@ -27,7 +27,7 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
       className,
       progress,
       progressStatus,
-      progressHeight,
+      progressHeight = 4,
       label,
       count,
       token,
@@ -38,7 +38,7 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
           <div className="progress-label">
             <div>
               <div className="progress-title">{label}</div>
-              {token.length > 0 && (
+              {token && token.length > 0 && (
                 <div className="progress-percentage">{`${
                   Math.floor(count * 1000) / 1000
                 } ${token}`}</div>

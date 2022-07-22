@@ -131,11 +131,6 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                       buttonType="mini"
                       disabled={disableVoteButton}
                       onclick={async () => {
-                        console.log(
-                          'Voting for:',
-                          this.selectedOptions,
-                          votedFor
-                        );
                         if (
                           multiSelect ||
                           this.selectedOptions[0] === votedFor ||
@@ -163,7 +158,6 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                           try {
                             await onVoteCast(this.selectedOptions[0], () => {
                               if (!votedFor) {
-                                console.log('i should be incrementing');
                                 this.totalVoteCount += incrementalVoteCast;
                               }
                               this.voteDirectionString =

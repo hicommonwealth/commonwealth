@@ -11,6 +11,13 @@ $width: 360px;
     margin-bottom: 16px;
   }
 
+  .progress-gallery {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: $margin-bottom;
+    width: 50%;
+  }
+
   .basic-gallery {
     display: flex;
     flex-direction: column;

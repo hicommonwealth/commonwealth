@@ -26,6 +26,7 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { isWindowMediumSmallInclusive } from './helpers';
+import { CWProgressBar, CWProgressBarStatus } from './cw_progress_bar';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -99,6 +100,35 @@ export class ComponentShowcase implements m.ClassComponent {
               isSelected={this.selectedTab === 3}
             />
           </CWTabBar>
+        </div>
+        <div class="progress-gallery">
+          <h1>Progress Bars</h1>
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Success)"
+            progressStatus={CWProgressBarStatus.passed}
+            count={50}
+          />
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Failed)"
+            progressStatus={CWProgressBarStatus.failed}
+            count={50}
+          />
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Neutral) With Token"
+            progressStatus={CWProgressBarStatus.neutral}
+            count={50}
+            token="CMN"
+          />
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Ongoing) With Token"
+            progressStatus={CWProgressBarStatus.ongoing}
+            count={50}
+            token="CMN"
+          />
         </div>
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
@@ -408,6 +438,19 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             label="Secondary blue dark"
             buttonType="secondary-blue-dark"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            label="Mini"
+            buttonType="mini"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Mini Disabled"
+            buttonType="mini"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />
