@@ -96,16 +96,16 @@ const getCommunityResult = (community) => {
 
 const getDiscussionResult = (thread, searchTerm) => {
   const proposalId = thread.proposalid;
-  const chainOrComm = thread.chain || thread.offchain_community;
+  const chain = thread.chain;
 
-  if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
+  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
   return (
     <ListItem
       allowOnContentClick={true}
       contentLeft={<CWIcon iconName="feedback" />}
       onclick={() => {
-        m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
+        m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
       }}
       label={
         <a class="search-results-item">
@@ -158,9 +158,9 @@ const getDiscussionResult = (thread, searchTerm) => {
 
 const getCommentResult = (comment, searchTerm) => {
   const proposalId = comment.proposalid;
-  const chainOrComm = comment.chain || comment.offchain_community;
+  const chain = comment.chain;
 
-  if (app.isCustomDomain() && app.customDomainId() !== chainOrComm) return;
+  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
   return (
     <ListItem
@@ -168,7 +168,7 @@ const getCommentResult = (comment, searchTerm) => {
       contentLeft={<CWIcon iconName="feedback" />}
       onclick={() => {
         m.route.set(
-          `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
+          `/${chain}/proposal/${proposalId.split('_')[0]}/${
             proposalId.split('_')[1]
           }`
         );

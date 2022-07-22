@@ -14,7 +14,7 @@ import 'pages/discussions/stages_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ThreadStage } from 'models';
-import { offchainThreadStageToLabel } from 'helpers';
+import { threadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
   disabled: boolean;
@@ -35,7 +35,7 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
             compact={true}
             label={
               selectedStage
-                ? `Stage: ${offchainThreadStageToLabel(selectedStage)}`
+                ? `Stage: ${threadStageToLabel(selectedStage)}`
                 : 'All Stages'
             }
             iconRight={Icons.CHEVRON_DOWN}
@@ -72,7 +72,7 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
                 }}
                 label={
                   <div class="stages-item">
-                    {offchainThreadStageToLabel(targetStage)}
+                    {threadStageToLabel(targetStage)}
                     {targetStage === ThreadStage.Voting && (
                       <div class="discussions-stage-count">
                         {app.threads.numVotingThreads}

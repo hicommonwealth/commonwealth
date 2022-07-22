@@ -6,7 +6,7 @@ import { Button, Classes, Dialog, Icons } from 'construct-ui';
 import 'components/stage_editor.scss';
 
 import app from 'state';
-import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
+import { threadStageToLabel, parseCustomStages } from 'helpers';
 import { ChainEntity, Thread, ThreadStage } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { SnapshotProposalSelector } from './snapshot_proposal_selector';
@@ -78,7 +78,7 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
                   iconLeft={this.stage === targetStage ? Icons.CHECK : null}
                   rounded={true}
                   size="sm"
-                  label={offchainThreadStageToLabel(targetStage)}
+                  label={threadStageToLabel(targetStage)}
                   onclick={() => {
                     this.stage = targetStage;
                   }}

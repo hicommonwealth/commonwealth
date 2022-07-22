@@ -17,7 +17,7 @@ import {
   link,
   externalLink,
   extractDomain,
-  offchainThreadStageToLabel,
+  threadStageToLabel,
 } from 'helpers';
 import {
   Thread,
@@ -132,7 +132,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 }
                 size="xs"
                 compact={true}
-                label={offchainThreadStageToLabel(proposal.stage)}
+                label={threadStageToLabel(proposal.stage)}
               />
             )}
             {proposal.kind === ThreadKind.Link &&

@@ -303,17 +303,17 @@ const createThread = async (
     if (topic_id) {
       threadContent['topic_id'] = +topic_id;
     } else if (topic_name) {
-      let offchainTopic;
+      let topic;
       try {
-        [offchainTopic] = await models.Topic.findOrCreate({
+        [topic] = await models.Topic.findOrCreate({
           where: {
             name: topic_name,
             chain_id: chain?.id || null,
           },
           transaction,
         });
-        threadContent['topic_id'] = offchainTopic.id;
-        topic_id = offchainTopic.id;
+        threadContent['topic_id'] = topic.id;
+        topic_id = topic.id;
       } catch (err) {
         return next(err);
       }

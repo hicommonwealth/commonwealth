@@ -8,7 +8,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 
-import { pluralize, link, offchainThreadStageToLabel } from 'helpers';
+import { pluralize, link, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import { Thread, ThreadStage, AnyProposal } from 'models';
 
@@ -94,7 +94,7 @@ export const ProposalHeaderStage: m.Component<{ proposal: Thread }> = {
             ? 'negative'
             : 'positive',
       },
-      offchainThreadStageToLabel(proposal.stage)
+      threadStageToLabel(proposal.stage)
     );
   },
 };

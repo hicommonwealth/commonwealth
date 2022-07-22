@@ -129,14 +129,14 @@ const getDiscussionPreview = (
 ) => {
   const proposalId = thread.proposalid;
 
-  const chainOrComm = thread.chain || thread.offchain_community;
+  const chain = thread.chain;
 
   const onSelect = () => {
-    if (!chainOrComm) {
+    if (!chain) {
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(`/${chainOrComm}/proposal/discussion/${proposalId}`);
+    m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
     closeResultsFn();
   };
 
@@ -206,15 +206,15 @@ const getCommentPreview = (
 ) => {
   const proposalId = comment.proposalid;
 
-  const chainOrComm = comment.chain || comment.offchain_community;
+  const chain = comment.chain;
 
   const onSelect = () => {
-    if (!chainOrComm) {
+    if (!chain) {
       notifyError('Discussion not found.');
       return;
     }
     m.route.set(
-      `/${chainOrComm}/proposal/${proposalId.split('_')[0]}/${
+      `/${chain}/proposal/${proposalId.split('_')[0]}/${
         proposalId.split('_')[1]
       }`
     );

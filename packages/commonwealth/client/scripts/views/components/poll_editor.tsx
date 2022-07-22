@@ -38,7 +38,7 @@ const getPollDurationCopy = (
       .local()
       .format('lll')}.`;
   } else {
-    return `By default, offchain polls run for at least 5 days, ending on the 1st
+    return `By default, polls run for at least 5 days, ending on the 1st
         and 15th of each month. If started now, this poll would stay open until
         ${getNextPollEndingTime(moment())
           .local()

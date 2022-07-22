@@ -30,7 +30,6 @@ class NotificationSubscription {
     Chain?,
     ChainEventType?,
     Comment?,
-    OffchainCommunity?,
     Thread?,
   ) {
     this.id = id;
@@ -56,7 +55,6 @@ class NotificationSubscription {
       json.chain_id,
       json.ChainEventType || json.chain_event_type_id,
       json.Comment || json.offchain_comment_id,
-      json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?
       json.Thread || json.offchain_thread_id,
     );
   }
