@@ -1,16 +1,16 @@
-// import { CompoundTypes } from '@commonwealth/chain-events';
+// import { CompoundTypes } from 'chain-events/src';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import { IChainAdapter, ChainEntity, ChainEvent, ChainInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
-import { CompoundTypes } from '@commonwealth/chain-events';
+import { CompoundTypes } from 'chain-events/src';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';
 

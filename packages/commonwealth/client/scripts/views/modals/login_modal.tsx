@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import { WalletId } from 'types';
+import { WalletId } from 'common-common/src/types';
 import Login from 'views/components/login';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';

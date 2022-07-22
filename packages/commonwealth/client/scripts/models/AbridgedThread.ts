@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { IUniqueId } from './interfaces';
 import OffchainTopic from './OffchainTopic';
 

@@ -7,7 +7,7 @@ import {
   GovernanceStrategy__factory,
   AaveTokenV2,
   AaveTokenV2__factory
-} from 'eth/types';
+} from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export interface AaveExecutor {

@@ -2,10 +2,10 @@ import moment from 'moment';
 import BN from 'bn.js';
 import { capitalize } from 'lodash';
 import { ContractTransaction, utils } from 'ethers';
-import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'eth/types';
+import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
 
-import { CompoundTypes } from '@commonwealth/chain-events';
-import { ProposalType } from 'types';
+import { CompoundTypes } from 'chain-events/src';
+import { ProposalType } from 'common-common/src/types';
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';

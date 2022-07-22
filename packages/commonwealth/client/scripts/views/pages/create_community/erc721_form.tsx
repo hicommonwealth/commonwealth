@@ -13,9 +13,9 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugify, slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { IERC721Metadata__factory } from 'eth/types';
+import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import {
   initChainForm,

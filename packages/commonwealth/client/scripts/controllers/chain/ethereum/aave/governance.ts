@@ -1,8 +1,8 @@
 import { ProposalModule, ITXModalData } from 'models';
 import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents, AaveTypes } from '@commonwealth/chain-events';
-import { Executor } from 'eth/types';
+import { AaveEvents, AaveTypes } from 'chain-events/src';
+import { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import AaveProposal from './proposal';

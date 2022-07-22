@@ -11,14 +11,14 @@ import {
   CompoundEvents,
   AaveEvents,
   IDisconnectedRange,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainInstance } from '../models/chain';
-import { ChainBase, ChainNetwork } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));

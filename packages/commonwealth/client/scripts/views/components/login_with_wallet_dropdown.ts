@@ -7,7 +7,7 @@ import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { IWebWallet } from 'models';
-import { ChainBase, ChainNetwork } from 'types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import _ from 'underscore';
 import { CWCustomIcon } from './component_kit/cw_icons/cw_custom_icon';
 

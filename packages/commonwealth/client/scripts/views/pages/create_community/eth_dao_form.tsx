@@ -11,10 +11,10 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
 
-import { IAaveGovernanceV2__factory } from 'eth/types';
+import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import CompoundAPI, {

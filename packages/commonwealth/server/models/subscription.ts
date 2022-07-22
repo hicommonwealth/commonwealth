@@ -1,5 +1,7 @@
 import WebSocket from 'ws';
 import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
@@ -10,16 +12,12 @@ import {
   IPostNotificationData,
   ICommunityNotificationData,
   IChainEventNotificationData,
-  ChainBase,
-  ChainType,
   IChatNotification,
-  NotificationCategories,
 } from '../../shared/types';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import { factory, formatFilename } from '../../shared/logging';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';

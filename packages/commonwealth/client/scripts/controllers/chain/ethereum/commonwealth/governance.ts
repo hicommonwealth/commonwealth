@@ -7,7 +7,7 @@ import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
-// import { CommonwealthEvents } from '@commonwealth/chain-events';
+// import { CommonwealthEvents } from 'chain-events/src';
 
 import { IApp } from 'state';
 

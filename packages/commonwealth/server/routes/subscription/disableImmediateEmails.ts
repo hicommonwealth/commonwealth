@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { sequelize } from '../../database';
-import { factory, formatFilename } from '../../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import Errors from './errors';
 
 const Op = Sequelize.Op;

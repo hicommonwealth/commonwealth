@@ -11,7 +11,7 @@ import { ChainCommunityErrors } from 'server/util/lookupCommunityIsVisibleToUser
 import { JWT_SECRET } from 'server/config';
 import * as modelUtils from '../../util/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
-import { NotificationCategories } from '../../../shared/types';
+import { NotificationCategories } from 'common-common/src/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;

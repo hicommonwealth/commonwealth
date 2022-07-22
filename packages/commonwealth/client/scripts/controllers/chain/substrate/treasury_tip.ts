@@ -5,9 +5,9 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData,
   VotingType, VotingUnit, ChainEntity, ChainEvent, DepositVote,
 } from 'models';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';

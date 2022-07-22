@@ -8,7 +8,7 @@ import {
   entityToFieldName,
   IChainEventData,
   EntityEventKind,
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import { WhereOptions } from 'sequelize';
 
 import { DB } from '../database';
@@ -17,7 +17,7 @@ import {
   ChainEventInstance,
 } from '../models/chain_event';
 
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {

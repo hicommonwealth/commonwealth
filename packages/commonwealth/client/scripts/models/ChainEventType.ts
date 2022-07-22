@@ -1,4 +1,4 @@
-import { IChainEventKind, SupportedNetwork } from '@commonwealth/chain-events';
+import { IChainEventKind, SupportedNetwork } from 'chain-events/src';
 
 class ChainEventType {
   public readonly id: string;

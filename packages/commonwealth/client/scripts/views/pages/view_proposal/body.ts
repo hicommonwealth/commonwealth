@@ -24,7 +24,7 @@ import {
 import User, { AnonymousUser } from 'views/components/widgets/user';
 import QuillEditor from 'views/components/quill_editor';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import {
@@ -41,7 +41,7 @@ import {
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
-import { ChainType } from '../../../../../shared/types';
+import { ChainType } from 'common-common/src/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -717,7 +717,7 @@ const countLinesMarkdown = (text) => {
   return text.split('\n').length - 1;
 };
 
-const formatBody = (vnode) => {
+const formatBody = (vnode, updateCollapse) => {
   const { item } = vnode.attrs;
   if (!item) return;
 
@@ -730,14 +730,16 @@ const formatBody = (vnode) => {
   if (!body) return;
 
   vnode.state.body = body;
-  try {
-    const doc = JSON.parse(body);
-    if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-      vnode.state.collapsed = true;
-    }
-  } catch (e) {
-    if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
-      vnode.state.collapsed = true;
+  if (updateCollapse) {
+    try {
+      const doc = JSON.parse(body);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
+    } catch (e) {
+      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
     }
   }
 };
@@ -750,10 +752,10 @@ export const ProposalBodyText: m.Component<
 > = {
   oninit: (vnode) => {
     vnode.state.collapsed = false;
-    formatBody(vnode);
+    formatBody(vnode, true);
   },
   onupdate: (vnode) => {
-    formatBody(vnode);
+    formatBody(vnode, false);
   },
   view: (vnode) => {
     const { body } = vnode.state;

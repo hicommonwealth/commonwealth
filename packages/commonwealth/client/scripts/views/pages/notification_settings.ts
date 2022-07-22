@@ -18,7 +18,7 @@ import {
 } from 'construct-ui';
 
 import app from 'state';
-import { ChainNetwork, ProposalType, NotificationCategories } from 'types';
+import { ChainNetwork, ProposalType, NotificationCategories } from 'common-common/src/types';
 import { NotificationSubscription, ChainInfo } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 

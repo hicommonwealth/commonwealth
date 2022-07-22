@@ -6,8 +6,8 @@ import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
-import { ProposalType } from 'types';
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { ProposalType } from 'common-common/src/types';
+import { SubstrateTypes } from 'chain-events/src';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';

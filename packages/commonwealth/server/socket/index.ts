@@ -20,7 +20,7 @@ import {
   WEBSOCKET_ADMIN_USERNAME,
   WEBSOCKET_ADMIN_PASSWORD,
 } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
 import { RedisCache } from '../util/redisCache';

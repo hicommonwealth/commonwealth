@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import BN from 'bn.js';
 
-import { SubstrateTypes } from '@commonwealth/chain-events';
+import { SubstrateTypes } from 'chain-events/src';
 import { ApiPromise } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
@@ -10,7 +10,7 @@ import { isFunction } from '@polkadot/util';
 
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import { formatProposalHashShort } from 'helpers';
-import { ChainBase, ProposalType } from 'types';
+import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
   VotingType, VotingUnit, Account, ChainEntity, ChainEvent

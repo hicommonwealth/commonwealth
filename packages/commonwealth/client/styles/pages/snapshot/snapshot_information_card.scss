@@ -1,0 +1,42 @@
+@import 'shared';
+@import 'pages/snapshot/index.scss';
+
+.SnapshotInfoRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+
+  .snapshot-info-row-label.Text {
+    color: $neutral-500;
+  }
+
+  a {
+    align-items: center;
+    display: flex;
+
+    .snapshot-link {
+      color: $purple-400;
+      margin-right: 4px;
+    }
+  }
+}
+
+.SnapshotInformationCard.Card {
+  @include snapshotProposalCardContent;
+
+  .info-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .linked-discussions {
+    border-top: 1px solid $neutral-100;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+  }
+}
