@@ -11,7 +11,7 @@ export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
-export function offchainThreadStageToLabel(stage: ThreadStage) {
+export function threadStageToLabel(stage: ThreadStage) {
   if (stage === ThreadStage.Discussion) {
     return 'Discussion';
   } else if (stage === ThreadStage.ProposalInReview) {

@@ -187,11 +187,11 @@ class TopicsController {
       topics.forEach((t) => this._store.add(new Topic(t)));
       this._initialized = true;
     } catch (err) {
-      console.log('Failed to load offchain topics');
+      console.log('Failed to load topics');
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
-          : 'Error loading offchain topics'
+          : 'Error loading topics'
       );
     }
   }

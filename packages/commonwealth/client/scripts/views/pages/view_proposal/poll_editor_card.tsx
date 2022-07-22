@@ -27,9 +27,9 @@ export class PollEditorCard
           rounded={true}
           compact={true}
           fluid={true}
-          disabled={!!proposal.offchainVotingEndsAt}
+          disabled={!!proposal.votingEndTime}
           label={
-            proposal.offchainVotingEndsAt ? 'Polling enabled' : 'Create poll'
+            proposal.votingEndTime ? 'Polling enabled' : 'Create poll'
           }
           onclick={(e) => {
             e.preventDefault();
