@@ -27,8 +27,8 @@ module.exports = {
         SET root_id = 
         FROM "Comments";
       `, {transaction: t, raw: true, type: 'RAW'});
-    });
     */
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -39,9 +39,10 @@ module.exports = {
       await queryInterface.renameColumn('Subscriptions', 'comment_id', 'offchain_comment_id', { transaction: t });
       await queryInterface.renameColumn('Collaborations', 'thread_id', 'offchain_thread_id', { transaction: t });
       /*
-      await queryInterface.removeColumn('OffchainComments', 'root_id')
+      await queryInterface.removeColumn('OffchainComments', 'root_id');
       await queryInterface.renameColumn('OffchainComments', 'deprecated_root_id', 'root_id', { transaction: t });
-      await queryInterface.removeColumn('OffchainThreads', 'chain_entity_id')
+      await queryInterface.removeColumn('OffchainThreads', 'chain_entity_id');
       */
+    });
   }
 };
