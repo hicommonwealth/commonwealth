@@ -1,0 +1,42 @@
+@import 'shared';
+
+.OffchainVotingModal {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+
+  .compact-modal-body {
+    overflow-y: auto;
+    width: 640px;
+
+    @include extraSmall {
+      width: initial;
+    }
+
+    .download-link {
+      cursor: pointer;
+      padding-bottom: 20px;
+    }
+
+    .offchain-poll-voter {
+      display: flex;
+
+      .User {
+        display: inline;
+      }
+
+      .offchain-poll-voter-user {
+        flex: 1;
+        padding-right: 5px;
+      }
+
+      .offchain-poll-voter-choice {
+        display: inline;
+        flex: 2;
+        font-weight: 600;
+        margin-bottom: 5px;
+        text-align: right;
+      }
+    }
+  }
+}

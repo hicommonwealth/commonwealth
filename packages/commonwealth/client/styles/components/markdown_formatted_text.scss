@@ -1,0 +1,57 @@
+@import 'shared';
+@import 'components/quill_formatted_text';
+
+.MarkdownFormattedText {
+  position: relative;
+
+  @include formatted-text();
+  @include collapsible();
+  @include hidden-formatting();
+
+  p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+  }
+
+  table {
+    width: 100%;
+
+    thead {
+      border-bottom: 1px solid $black;
+    }
+
+    tr:first-child {
+      td {
+        padding-top: 10px;
+      }
+    }
+
+    th,
+    td {
+      word-break: normal;
+      padding: 5px;
+      text-align: left;
+    }
+
+    th {
+      vertical-align: bottom;
+    }
+
+    td {
+      vertical-align: top;
+    }
+
+    th[align='center'],
+    td[align='center'] {
+      text-align: center;
+    }
+
+    th[align='right'],
+    td[align='right'] {
+      text-align: right;
+    }
+  }
+}

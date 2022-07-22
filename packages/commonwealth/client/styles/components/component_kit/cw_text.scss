@@ -1,0 +1,140 @@
+@import 'shared';
+
+.Text {
+  color: $neutral-800;
+  display: flex;
+
+  &.disabled {
+    color: $neutral-300;
+  }
+
+  &.noWrap {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.b1 {
+    font-family: $font-family-neue-haas-unica;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    line-height: 24px;
+  }
+
+  &.b2 {
+    font-family: $font-family-neue-haas-unica;
+    font-size: 14px;
+    line-height: 20px;
+
+    &.bold,
+    &.italic {
+      letter-spacing: 0.02em;
+    }
+  }
+
+  &.h1 {
+    font-family: $font-family-silka;
+    font-size: 42px;
+    line-height: 56px;
+  }
+
+  &.h2 {
+    font-family: $font-family-silka;
+    font-size: 35px;
+    line-height: 48px;
+  }
+
+  &.h3 {
+    font-family: $font-family-silka;
+    font-size: 29px;
+    line-height: 36px;
+  }
+
+  &.h4 {
+    font-family: $font-family-silka;
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  &.h5 {
+    font-family: $font-family-silka;
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  &.d1 {
+    font-family: $font-family-silka;
+    font-size: 67px;
+    letter-spacing: -0.02em;
+    line-height: 80px;
+  }
+
+  &.d2 {
+    font-family: $font-family-silka;
+    font-size: 54px;
+    letter-spacing: -0.01em;
+    line-height: 64px;
+  }
+
+  &.caption {
+    font-family: $font-family-neue-haas-unica;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    line-height: 16px;
+
+    &.uppercase {
+      font-weight: 500;
+    }
+  }
+
+  &.buttonSm {
+    font-family: $font-family-silka;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 24px;
+  }
+
+  &.buttonLg {
+    font-family: $font-family-silka;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 28px;
+  }
+
+  &.regular {
+    font-weight: 400;
+  }
+
+  &.medium {
+    font-weight: 500;
+  }
+
+  &.semiBold {
+    font-weight: 600;
+  }
+
+  &.bold {
+    font-weight: 700;
+  }
+
+  &.black {
+    font-weight: 900;
+  }
+
+  &.italic {
+    font-style: italic;
+  }
+
+  &.uppercase {
+    text-transform: uppercase;
+  }
+
+  &.isCentered {
+    // at least one of these should apply depending on context
+    justify-content: center;
+    text-align: center;
+  }
+}

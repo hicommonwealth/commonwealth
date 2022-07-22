@@ -1,0 +1,6 @@
+src/eth/build
+src/eth/artifacts
+src/eth/cache
+
+# Ethereum contracts
+contractbase/eth/build
