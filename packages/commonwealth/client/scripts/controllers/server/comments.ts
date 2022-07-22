@@ -7,12 +7,12 @@ import { uniqueIdToProposal } from 'identifiers';
 
 import { CommentsStore } from 'stores';
 import {
-  OffchainComment,
+  Comment,
   OffchainAttachment,
   IUniqueId,
   AddressInfo,
   NodeInfo,
-  OffchainThread,
+  Thread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
@@ -26,7 +26,7 @@ export enum CommentParent {
 }
 
 export enum CommentRefreshOption {
-  ResetAndLoadOffchainComments = 'ResetAndLoadOffchainComments',
+  ResetAndLoadComments = 'ResetAndLoadComments',
   LoadProposalComments = 'LoadProposalComments',
 }
 
@@ -113,7 +113,7 @@ export const modelFromServer = (comment) => {
           deleted: false,
         };
 
-  return new OffchainComment(commentParams);
+  return new Comment(commentParams);
 };
 
 class CommentsController {
@@ -189,7 +189,7 @@ class CommentsController {
   }
 
   public async edit(
-    comment: OffchainComment<any>,
+    comment: Comment<any>,
     body: string,
     attachments?: string[]
   ) {
@@ -236,7 +236,7 @@ class CommentsController {
             plaintext: '[deleted]',
             versionHistory: [],
           });
-          const softDeletion = new OffchainComment(revisedComment);
+          const softDeletion = new Comment(revisedComment);
           this._store.remove(existing);
           this._store.add(softDeletion);
           resolve(result);

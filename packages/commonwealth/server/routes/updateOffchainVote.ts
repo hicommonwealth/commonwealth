@@ -68,7 +68,7 @@ const updateOffchainVote = async (
     return next(new Error(Errors.InvalidOption));
   }
 
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: { id: poll.thread_id },
   });
   if (!thread) return next(new Error(Errors.NoThread));

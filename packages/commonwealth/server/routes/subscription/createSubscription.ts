@@ -46,17 +46,17 @@ export default async (
     case 'new-comment-creation':
     case 'new-reaction': {
       if (p_entity === 'discussion') {
-        const thread = await models.OffchainThread.findOne({
+        const thread = await models.Thread.findOne({
           where: { id: Number(p_id) },
         });
         if (!thread) return next(new Error(Errors.NoThread));
-        obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
+        obj = { thread_id: Number(p_id), chain_id: thread.chain };
       } else if (p_entity === 'comment') {
-        const comment = await models.OffchainComment.findOne({
+        const comment = await models.Comment.findOne({
           where: { id: Number(p_id) },
         });
         if (!comment) return next(new Error(Errors.NoComment));
-        obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
+        obj = { comment_id: Number(p_id), chain_id: comment.chain };
       } else {
         if (!req.body.chain_id)
           return next(new Error(Errors.ChainRequiredForEntity));

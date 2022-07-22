@@ -37,7 +37,7 @@ const addEditors = async (
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },
@@ -80,7 +80,7 @@ const addEditors = async (
 
         await models.Collaboration.findOrCreate({
           where: {
-            offchain_thread_id: thread.id,
+            thread_id: thread.id,
             address_id: collaborator.id,
           },
         });
@@ -92,7 +92,7 @@ const addEditors = async (
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewComment,
             object_id: `discussion_${thread.id}`,
-            offchain_thread_id: thread.id,
+            thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
           },
@@ -102,7 +102,7 @@ const addEditors = async (
             subscriber_id: collaborator.User.id,
             category_id: NotificationCategories.NewReaction,
             object_id: `discussion_${thread.id}`,
-            offchain_thread_id: thread.id,
+            thread_id: thread.id,
             chain_id: thread.chain,
             is_active: true,
           },
@@ -128,7 +128,7 @@ const addEditors = async (
         {
           created_at: new Date(),
           root_id: +thread.id,
-          root_type: ProposalType.OffchainThread,
+          root_type: ProposalType.Thread,
           root_title: thread.title,
           comment_text: thread.body,
           chain_id: thread.chain,
@@ -151,7 +151,7 @@ const addEditors = async (
 
 
   const finalCollaborations = await models.Collaboration.findAll({
-    where: { offchain_thread_id: thread.id },
+    where: { thread_id: thread.id },
     include: [
       {
         model: models.Address,

@@ -14,7 +14,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -43,7 +43,7 @@ export const Errors = {
 const dispatchHooks = async (
   models: DB,
   req: Request,
-  finalThread: OffchainThreadInstance
+  finalThread: ThreadInstance
 ) => {
   // auto-subscribe thread creator to comments & reactions
   try {
@@ -51,7 +51,7 @@ const dispatchHooks = async (
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewComment,
       object_id: `discussion_${finalThread.id}`,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });
@@ -59,7 +59,7 @@ const dispatchHooks = async (
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewReaction,
       object_id: `discussion_${finalThread.id}`,
-      offchain_thread_id: finalThread.id,
+      thread_id: finalThread.id,
       chain_id: finalThread.chain,
       is_active: true,
     });
@@ -78,10 +78,10 @@ const dispatchHooks = async (
       FROM "Subscriptions"
       WHERE subscriber_id IN (
         SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND offchain_thread_id = ? AND chain_id = ? AND is_active = true
+      ) AND category_id = ? AND object_id = ? AND thread_id = ? AND chain_id = ? AND is_active = true
     )
-    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, offchain_thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as offchain_thread_id, ? as chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
+    INSERT INTO "Subscriptions"(subscriber_id, category_id, object_id, thread_id, chain_id, is_active, created_at, updated_at)
+    SELECT subscriber_id, ? as category_id, ? as object_id, ? as thread_id, ? as chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
     FROM "Subscriptions"
     WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
   `,
@@ -147,7 +147,7 @@ const dispatchHooks = async (
     {
       created_at: new Date(),
       root_id: finalThread.id,
-      root_type: ProposalType.OffchainThread,
+      root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
@@ -180,7 +180,7 @@ const dispatchHooks = async (
         {
           created_at: new Date(),
           root_id: finalThread.id,
-          root_type: ProposalType.OffchainThread,
+          root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
@@ -361,9 +361,9 @@ const createThread = async (
       }
     }
 
-    let thread: OffchainThreadInstance;
+    let thread: ThreadInstance;
     try {
-      thread = await models.OffchainThread.create(threadContent, {
+      thread = await models.Thread.create(threadContent, {
         transaction,
       });
     } catch (err) {
@@ -417,7 +417,7 @@ const createThread = async (
 
     try {
       // re-fetch thread once created
-      return await models.OffchainThread.findOne({
+      return await models.Thread.findOne({
         where: { id: thread.id },
         include: [
           { model: models.Address, as: 'Address' },

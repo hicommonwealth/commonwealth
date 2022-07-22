@@ -72,7 +72,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
-  } else if (root_type === ProposalType.OffchainThread) {
+  } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
 
@@ -184,7 +184,7 @@ const getBatchNotificationFields = (
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
-  } else if (root_type === ProposalType.OffchainThread) {
+  } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
 

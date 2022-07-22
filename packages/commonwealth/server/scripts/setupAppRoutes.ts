@@ -110,7 +110,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
 
     if (proposalType === 'discussion' && proposalId !== null) {
       // Retrieve offchain discussion
-      const proposal = await models.OffchainThread.findOne({
+      const proposal = await models.Thread.findOne({
         where: { id: proposalId },
         include: [{
           model: models.Chain,
@@ -148,7 +148,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
 
   app.get('/:scope/discussion/:identifier', async (req, res, next) => {
     const scope = req.params.scope;
-    const proposalType = ProposalType.OffchainThread;
+    const proposalType = ProposalType.Thread;
     const proposalId = req.params.identifier.split('-')[0];
     await renderProposal(scope, proposalType, proposalId, res);
   });

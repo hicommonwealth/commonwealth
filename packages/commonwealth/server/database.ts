@@ -55,8 +55,8 @@ import NotificationCategoryFactory, {
 import OffchainAttachmentFactory, {
   OffchainAttachmentModelStatic,
 } from './models/offchain_attachment';
-import OffchainCommentFactory, {
-  OffchainCommentModelStatic,
+import CommentFactory, {
+  CommentModelStatic,
 } from './models/comment';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
@@ -132,7 +132,7 @@ export type Models = {
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
   OffchainAttachment: OffchainAttachmentModelStatic;
-  OffchainComment: OffchainCommentModelStatic;
+  Comment: CommentModelStatic;
   OffchainPoll: OffchainPollModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   OffchainReaction: OffchainReactionModelStatic;
@@ -214,7 +214,7 @@ const models: Models = {
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   OffchainAttachment: OffchainAttachmentFactory(sequelize, DataTypes),
-  OffchainComment: OffchainCommentFactory(sequelize, DataTypes),
+  Comment: CommentFactory(sequelize, DataTypes),
   OffchainPoll: OffchainPollFactory(sequelize, DataTypes),
   OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
   OffchainReaction: OffchainReactionFactory(sequelize, DataTypes),

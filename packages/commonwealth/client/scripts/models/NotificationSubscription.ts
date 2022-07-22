@@ -7,8 +7,8 @@ class NotificationSubscription {
   public readonly createdAt: moment.Moment;
   public readonly Chain: string;
   public readonly ChainEventType: any;
-  public readonly OffchainComment: any;
-  public readonly OffchainThread: any;
+  public readonly Comment: any;
+  public readonly Thread: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() { return this._immediateEmail; }
@@ -29,9 +29,9 @@ class NotificationSubscription {
     immediateEmail,
     Chain?,
     ChainEventType?,
-    OffchainComment?,
+    Comment?,
     OffchainCommunity?,
-    OffchainThread?,
+    Thread?,
   ) {
     this.id = id;
     this.category = category;
@@ -41,8 +41,8 @@ class NotificationSubscription {
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
     this.ChainEventType = ChainEventType;
-    this.OffchainComment = OffchainComment;
-    this.OffchainThread = OffchainThread;
+    this.Comment = Comment;
+    this.Thread = Thread;
   }
 
   public static fromJSON(json) {
@@ -55,9 +55,9 @@ class NotificationSubscription {
       json.immediate_email,
       json.chain_id,
       json.ChainEventType || json.chain_event_type_id,
-      json.OffchainComment || json.offchain_comment_id,
+      json.Comment || json.comment_id,
       json.OffchainCommunity || json.offchain_community_id, // TODO: safe to remove?
-      json.OffchainThread || json.offchain_thread_id,
+      json.Thread || json.thread_id,
     );
   }
 }

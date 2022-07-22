@@ -15,7 +15,7 @@ const getThreads = async (
 
   let threads;
   try {
-    threads = await models.OffchainThread.findAll({
+    threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
         chain: chain.id

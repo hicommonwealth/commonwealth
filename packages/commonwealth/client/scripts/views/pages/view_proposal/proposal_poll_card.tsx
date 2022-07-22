@@ -7,14 +7,14 @@ import 'pages/view_proposal/proposal_poll_card.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainThread, OffchainPoll } from 'models';
+import { Thread, OffchainPoll } from 'models';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCard } from '../../components/component_kit/cw_card';
 
-type ProposalPollCardAttrs = { poll: OffchainPoll; thread: OffchainThread };
+type ProposalPollCardAttrs = { poll: OffchainPoll; thread: Thread };
 
 export class ProposalPollCard
   implements m.ClassComponent<ProposalPollCardAttrs>

@@ -52,8 +52,8 @@ export default (
   OffchainReaction.associate = (models) => {
     models.OffchainReaction.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.OffchainReaction.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainComment, { foreignKey: 'comment_id', targetKey: 'id' });
-    models.OffchainReaction.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.OffchainReaction.belongsTo(models.Comment, { foreignKey: 'comment_id', targetKey: 'id' });
+    models.OffchainReaction.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
   };
 
   return OffchainReaction;

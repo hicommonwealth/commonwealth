@@ -59,15 +59,15 @@ const createReaction = async (
 
   let thread;
   if (thread_id) {
-    thread = await models.OffchainThread.findOne({
+    thread = await models.Thread.findOne({
       where: { id: thread_id },
     });
   } else if (comment_id) {
     const root_id = (
-      await models.OffchainComment.findOne({ where: { id: comment_id } })
+      await models.Comment.findOne({ where: { id: comment_id } })
     ).root_id;
     const comment_thread_id = root_id.substring(root_id.indexOf('_') + 1);
-    thread = await models.OffchainThread.findOne({
+    thread = await models.Thread.findOne({
       where: { id: comment_thread_id },
     });
   }
@@ -75,7 +75,7 @@ const createReaction = async (
   if (thread) {
     const topic = await models.OffchainTopic.findOne({
       include: {
-        model: models.OffchainThread,
+        model: models.Thread,
         where: { id: thread.id },
         required: true,
         as: 'threads',
@@ -169,13 +169,13 @@ const createReaction = async (
   let comment;
   let cwUrl;
   if (comment_id) {
-    comment = await models.OffchainComment.findByPk(Number(comment_id));
+    comment = await models.Comment.findByPk(Number(comment_id));
     if (!comment) return next(new Error(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
-      proposal = await models.OffchainThread.findOne({
+      proposal = await models.Thread.findOne({
         where: { id },
       });
       cwUrl = getProposalUrl(prefix, proposal, comment);
@@ -191,7 +191,7 @@ const createReaction = async (
     }
     root_type = prefix;
   } else if (thread_id) {
-    proposal = await models.OffchainThread.findByPk(Number(thread_id));
+    proposal = await models.Thread.findByPk(Number(thread_id));
     if (!proposal) return next(new Error(Errors.NoProposalMatch));
     cwUrl = getProposalUrl('discussion', proposal, comment);
     root_type = 'discussion';
@@ -204,7 +204,7 @@ const createReaction = async (
     created_at: new Date(),
     root_id: comment
       ? comment.root_id.split('_')[1]
-      : proposal instanceof models.OffchainThread
+      : proposal instanceof models.Thread
       ? proposal.id
       : proposal?.root_id,
     root_title,

@@ -5,7 +5,7 @@ import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
 import { IChainEntityKind } from 'chain-events/src';
 import { IUniqueId } from './interfaces';
-import { OffchainThreadKind, OffchainThreadStage } from './types';
+import { ThreadKind, ThreadStage } from './types';
 import OffchainAttachment from './OffchainAttachment';
 import OffchainTopic from './OffchainTopic';
 import OffchainVote from './OffchainVote';
@@ -29,7 +29,7 @@ interface IThreadCollaborator {
   address: string;
   chain: string;
 }
-class OffchainThread implements IUniqueId {
+class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
   public chainEntities?: any[];
@@ -38,8 +38,8 @@ class OffchainThread implements IUniqueId {
   public readonly body: string;
   public readonly plaintext: string;
   public readonly pinned: boolean;
-  public readonly kind: OffchainThreadKind;
-  public stage: OffchainThreadStage;
+  public readonly kind: ThreadKind;
+  public stage: ThreadStage;
   public readonly attachments: OffchainAttachment[];
   public readonly readOnly: boolean;
 
@@ -50,7 +50,7 @@ class OffchainThread implements IUniqueId {
   public readonly createdAt: moment.Moment;
   public readonly lastCommentedOn: moment.Moment;
   public topic: OffchainTopic;
-  public readonly slug = ProposalType.OffchainThread;
+  public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
@@ -97,8 +97,8 @@ class OffchainThread implements IUniqueId {
     createdAt: moment.Moment;
     lastCommentedOn: moment.Moment;
     topic: OffchainTopic;
-    kind: OffchainThreadKind;
-    stage: OffchainThreadStage;
+    kind: ThreadKind;
+    stage: ThreadStage;
     versionHistory: VersionHistory[];
     chain: string;
     readOnly: boolean;
@@ -153,4 +153,4 @@ class OffchainThread implements IUniqueId {
   }
 }
 
-export default OffchainThread;
+export default Thread;

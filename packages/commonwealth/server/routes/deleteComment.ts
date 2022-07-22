@@ -22,7 +22,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    let comment = await models.OffchainComment.findOne({
+    let comment = await models.Comment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -42,7 +42,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
     }
 
     if (!comment) {
-      comment = await models.OffchainComment.findOne({
+      comment = await models.Comment.findOne({
         where: {
           id: req.body.comment_id,
         },
@@ -63,7 +63,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
     // find and delete all associated subscriptions
     await models.Subscription.destroy({
       where: {
-        offchain_comment_id: comment.id,
+        comment_id: comment.id,
       },
     });
 

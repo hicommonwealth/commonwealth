@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { OffchainCommentAttributes } from './comment';
+import { CommentAttributes } from './comment';
 import { ThreadAttributes } from './thread';
 
 export type OffchainAttachmentAttributes = {
@@ -14,7 +14,7 @@ export type OffchainAttachmentAttributes = {
   updated_at?: Date;
 
   // associations
-  comment?: OffchainCommentAttributes | OffchainCommentAttributes['id'];
+  comment?: CommentAttributes | CommentAttributes['id'];
   thread?: ThreadAttributes | ThreadAttributes['id'];
 }
 
@@ -47,7 +47,7 @@ export default (
   );
 
   OffchainAttachment.associate = (models) => {
-    models.OffchainAttachment.belongsTo(models.OffchainComment, {
+    models.OffchainAttachment.belongsTo(models.Comment, {
       foreignKey: 'attachment_id',
       constraints: false,
       as: 'comment',

@@ -36,7 +36,7 @@ const updateLinkedThreads = async (
   const userOwnedAddressIds = userOwnedAddresses
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const isAuthor = await models.OffchainThread.findOne({
+  const isAuthor = await models.Thread.findOne({
     where: {
       id: linking_thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },
@@ -47,7 +47,7 @@ const updateLinkedThreads = async (
     if (!isAuthor) {
       const collaboration = await models.Collaboration.findOne({
         where: {
-          offchain_thread_id: linking_thread_id,
+          thread_id: linking_thread_id,
           address_id: { [Op.in]: userOwnedAddressIds },
         },
       });
@@ -72,10 +72,10 @@ const updateLinkedThreads = async (
     if (remove_link === 'true') {
       await models.LinkedThread.destroy({ where: params });
     } else {
-      const linkedThread = await models.OffchainThread.findOne({
+      const linkedThread = await models.Thread.findOne({
         where: { id: linked_thread_id },
       });
-      const linkingThread = await models.OffchainThread.findOne({
+      const linkingThread = await models.Thread.findOne({
         where: { id: linking_thread_id },
       });
       const threadsShareChain =
@@ -87,7 +87,7 @@ const updateLinkedThreads = async (
       }
     }
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: {
         id: linking_thread_id,
       },

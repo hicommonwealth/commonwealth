@@ -20,7 +20,7 @@ import {
 } from '../scripts/emails';
 import { ChainAttributes } from './chain';
 import { ThreadAttributes } from './thread';
-import { OffchainCommentAttributes } from './comment';
+import { CommentAttributes } from './comment';
 import { ChainEventTypeAttributes } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 import {
@@ -44,8 +44,8 @@ export type SubscriptionAttributes = {
   created_at?: Date;
   updated_at?: Date;
   chain_id?: string;
-  offchain_thread_id?: number;
-  offchain_comment_id?: number;
+  thread_id?: number;
+  comment_id?: number;
   chain_event_type_id?: string;
   chain_entity_id?: number;
 
@@ -54,7 +54,7 @@ export type SubscriptionAttributes = {
   NotificationsRead?: NotificationsReadAttributes[];
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
-  OffchainComment?: OffchainCommentAttributes;
+  Comment?: CommentAttributes;
   ChainEventType?: ChainEventTypeAttributes;
   ChainEntity?: ChainEntityAttributes;
 }
@@ -89,8 +89,8 @@ export default (
       immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
       // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
-      offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
-      offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
+      thread_id: { type: dataTypes.INTEGER, allowNull: true },
+      comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
     }, {
@@ -278,8 +278,8 @@ export default (
     models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
     models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.OffchainComment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Comment, { foreignKey: 'comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
   };

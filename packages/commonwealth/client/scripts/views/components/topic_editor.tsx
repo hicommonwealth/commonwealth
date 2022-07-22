@@ -4,12 +4,12 @@ import m from 'mithril';
 import { Button, Classes, Dialog } from 'construct-ui';
 
 import app from 'state';
-import { OffchainThread, OffchainTopic } from 'models';
+import { Thread, OffchainTopic } from 'models';
 import { TopicSelector } from './topic_selector';
 
 type TopicWindowAttrs = {
   onChangeHandler: () => void;
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 class TopicWindow implements m.ClassComponent<TopicWindowAttrs> {
@@ -36,7 +36,7 @@ class TopicWindow implements m.ClassComponent<TopicWindowAttrs> {
 type TopicEditorAttrs = {
   onChangeHandler: () => void;
   popoverMenu?: boolean;
-  thread: OffchainThread;
+  thread: Thread;
   openStateHandler: () => void;
 };
 

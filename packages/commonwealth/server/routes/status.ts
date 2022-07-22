@@ -57,12 +57,12 @@ const status = async (
       const threadCountQueryData: ThreadCountQueryData[] =
         await models.sequelize.query(
           `
-        SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
-        FROM "OffchainThreads"
-        WHERE "OffchainThreads".deleted_at IS NULL
-        AND NOT "OffchainThreads".pinned
-        AND "OffchainThreads".chain IS NOT NULL
-        GROUP BY "OffchainThreads".chain;
+        SELECT "Threads".chain, COUNT("Threads".id) 
+        FROM "Threads"
+        WHERE "Threads".deleted_at IS NULL
+        AND NOT "Threads".pinned
+        AND "Threads".chain IS NOT NULL
+        GROUP BY "Threads".chain;
         `,
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
@@ -117,13 +117,13 @@ const status = async (
     const threadCountQueryData: ThreadCountQueryData[] =
       await models.sequelize.query(
         `
-      SELECT "OffchainThreads".chain, COUNT("OffchainThreads".id) 
-      FROM "OffchainThreads"
+      SELECT "Threads".chain, COUNT("Threads".id) 
+      FROM "Threads"
       WHERE 
-        "OffchainThreads".deleted_at IS NULL
-          AND NOT "OffchainThreads".pinned
-          AND "OffchainThreads".chain IS NOT NULL
-      GROUP BY "OffchainThreads".chain;
+        "Threads".deleted_at IS NULL
+          AND NOT "Threads".pinned
+          AND "Threads".chain IS NOT NULL
+      GROUP BY "Threads".chain;
       `,
         {
           replacements: {
@@ -175,7 +175,7 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT id, chain FROM "OffchainThreads" WHERE (kind IN ('forum', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`
+      query += `SELECT id, chain FROM "Threads" WHERE (kind IN ('forum', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`
       if (i == commsAndChains.length - 1) query += ';';
     }
 
@@ -213,7 +213,7 @@ const status = async (
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
       replacements.push(name, time.getTime())
       // append the SELECT query
-      query += `SELECT root_id, chain FROM "OffchainComments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
+      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
       if (i == commsAndChains.length - 1) query += ';';
     }
 

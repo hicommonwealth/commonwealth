@@ -23,7 +23,7 @@ describe('Thread queries', () => {
     }))[0];
     expect(address.id).to.not.be.null;
     expect(address.id).to.be.greaterThan(0);
-    const thread = (await models.OffchainThread.findOrCreate({
+    const thread = (await models.Thread.findOrCreate({
       where: {
         chain: chain.id,
         address_id: address.id,
@@ -37,10 +37,10 @@ describe('Thread queries', () => {
     const collaboration = await models.Collaboration.findOrCreate({
       where: {
         address_id: thread.address_id,
-        offchain_thread_id: thread.id,
+        thread_id: thread.id,
       },
     });
-    const threads = await models.OffchainThread.findAll({
+    const threads = await models.Thread.findAll({
       where: { id: thread.id },
       include: [
         {

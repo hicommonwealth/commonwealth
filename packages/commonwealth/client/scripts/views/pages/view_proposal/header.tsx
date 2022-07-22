@@ -8,9 +8,9 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 
-import { pluralize, link, offchainThreadStageToLabel } from 'helpers';
+import { pluralize, link, ThreadStageToLabel } from 'helpers';
 import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
-import { OffchainThread, OffchainThreadStage, AnyProposal } from 'models';
+import { Thread, ThreadStage, AnyProposal } from 'models';
 
 import { notifySuccess } from 'controllers/app/notifications';
 
@@ -30,12 +30,12 @@ export const ProposalHeaderSpacer: m.Component = {
 };
 
 export const ProposalHeaderTopics: m.Component<{
-  proposal: AnyProposal | OffchainThread;
+  proposal: AnyProposal | Thread;
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (!(proposal instanceof OffchainThread)) return;
+    if (!(proposal instanceof Thread)) return;
     if (!proposal.topic) return;
 
     return m('.ProposalHeaderTopics', [
@@ -49,14 +49,14 @@ export const ProposalHeaderTopics: m.Component<{
 };
 
 export const ProposalHeaderTitle: m.Component<{
-  proposal: AnyProposal | OffchainThread;
+  proposal: AnyProposal | Thread;
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
     return m('.ProposalHeaderTitle', [
       proposal.title,
-      proposal instanceof OffchainThread &&
+      proposal instanceof Thread &&
         proposal.readOnly &&
         m(Tag, {
           size: 'xs',
@@ -69,11 +69,11 @@ export const ProposalHeaderTitle: m.Component<{
   },
 };
 
-export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
+export const ProposalHeaderStage: m.Component<{ proposal: Thread }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;
     if (!proposal) return;
-    if (proposal.stage === OffchainThreadStage.Discussion) return;
+    if (proposal.stage === ThreadStage.Discussion) return;
 
     return m(
       'a.ProposalHeaderStage',
@@ -84,17 +84,17 @@ export const ProposalHeaderStage: m.Component<{ proposal: OffchainThread }> = {
           navigateToSubpage(`?stage=${proposal.stage}`);
         },
         class:
-          proposal.stage === OffchainThreadStage.ProposalInReview
+          proposal.stage === ThreadStage.ProposalInReview
             ? 'positive'
-            : proposal.stage === OffchainThreadStage.Voting
+            : proposal.stage === ThreadStage.Voting
             ? 'positive'
-            : proposal.stage === OffchainThreadStage.Passed
+            : proposal.stage === ThreadStage.Passed
             ? 'positive'
-            : proposal.stage === OffchainThreadStage.Failed
+            : proposal.stage === ThreadStage.Failed
             ? 'negative'
             : 'positive',
       },
-      offchainThreadStageToLabel(proposal.stage)
+      ThreadStageToLabel(proposal.stage)
     );
   },
 };
@@ -246,7 +246,7 @@ export const ProposalTitleCancelEdit: m.Component<{
 };
 
 export const ProposalTitleEditor: m.Component<{
-  item: OffchainThread | AnyProposal;
+  item: Thread | AnyProposal;
   getSetGlobalEditingStatus;
   parentState;
 }> = {
@@ -256,7 +256,7 @@ export const ProposalTitleEditor: m.Component<{
   view: (vnode) => {
     const { item, parentState, getSetGlobalEditingStatus } = vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
 
     return m('.ProposalTitleEditor', [
       m(Input, {
@@ -288,12 +288,12 @@ export const ProposalTitleEditor: m.Component<{
 };
 
 export const ProposalLinkEditor: m.Component<{
-  item: OffchainThread | AnyProposal;
+  item: Thread | AnyProposal;
   parentState;
 }> = {
   oninit: (vnode) => {
     vnode.attrs.parentState.updatedUrl = (
-      vnode.attrs.item as OffchainThread
+      vnode.attrs.item as Thread
     ).url;
   },
   view: (vnode) => {
@@ -317,13 +317,13 @@ export const ProposalLinkEditor: m.Component<{
 };
 
 export const ProposalHeaderPrivacyMenuItems: m.Component<{
-  proposal: AnyProposal | OffchainThread;
+  proposal: AnyProposal | Thread;
   getSetGlobalEditingStatus: CallableFunction;
 }> = {
   view: (vnode) => {
     const { proposal, getSetGlobalEditingStatus } = vnode.attrs;
     if (!proposal) return;
-    if (!(proposal instanceof OffchainThread)) return;
+    if (!(proposal instanceof Thread)) return;
 
     return [
       m(MenuItem, {

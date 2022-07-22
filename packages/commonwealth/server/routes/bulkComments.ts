@@ -14,17 +14,17 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
-  if (req.query.offchain_threads_only && req.query.proposals_only) {
+  if (req.query.threads_only && req.query.proposals_only) {
     return next(new Error(Errors.MutuallyExclusive));
   }
   const whereOptions: any = {};
   whereOptions.chain = chain.id;
-  if (req.query.offchain_threads_only) {
+  if (req.query.threads_only) {
     whereOptions.root_id = { [Op.like]: 'discussion%' };
   } else if (req.query.proposals_only) {
     whereOptions.root_id = { [Op.notLike]: 'discussion%' };
   }
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: whereOptions,
     include: [ models.Address, models.OffchainAttachment ],
     order: [['created_at', 'DESC']],

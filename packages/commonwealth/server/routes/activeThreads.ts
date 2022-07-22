@@ -39,7 +39,7 @@ const activeThreads = async (
     ];
 
     await Promise.all(communityTopics.map(async (topic) => {
-      const recentTopicThreads = await models.OffchainThread.findAll({
+      const recentTopicThreads = await models.Thread.findAll({
         where: {
           topic_id: topic.id
         },
@@ -51,7 +51,7 @@ const activeThreads = async (
       // In absence of X threads with recent activity (comments),
       // commentless threads are fetched and included as active
       // if (!recentTopicThreads || recentTopicThreads.length < threads_per_topic) {
-      //   const commentlessTopicThreads = await models.OffchainThread.findAll({
+      //   const commentlessTopicThreads = await models.Thread.findAll({
       //     where: {
       //       topic_id: topic.id,
       //       last_commented_on: {
