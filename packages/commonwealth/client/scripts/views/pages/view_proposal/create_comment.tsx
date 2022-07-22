@@ -6,7 +6,7 @@ import { Callout } from 'construct-ui';
 import 'pages/view_proposal/create_comment.scss';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { Thread, Comment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
@@ -27,9 +27,9 @@ type CreateCommmentAttrs = {
   callback: CallableFunction;
   cancellable?: boolean;
   getSetGlobalEditingStatus: CallableFunction;
-  parentComment?: OffchainComment<any>;
+  parentComment?: Comment<any>;
   proposalPageState: IProposalPageState;
-  rootProposal: AnyProposal | OffchainThread;
+  rootProposal: AnyProposal | Thread;
   tabindex?: number;
 };
 
@@ -146,7 +146,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     };
 
     const activeTopicName =
-      rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+      rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
 
     const isAdmin =
       app.user.isSiteAdmin ||
@@ -216,7 +216,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
             </h3>
           </div>
           {m(User, { user: author, popover: true, hideAvatar: true })}
-          {rootProposal instanceof OffchainThread && rootProposal.readOnly ? (
+          {rootProposal instanceof Thread && rootProposal.readOnly ? (
             <Callout
               intent="primary"
               content="Commenting is disabled because this post has been locked."
