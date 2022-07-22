@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
-    "build": "if [ $TBC_ENV ]; then echo no postbuild script needed for TBC; else yarn --cwd packages/commonwealth heroku-postbuild; fi",
+    "build": "if [ $TBC_ENV ]; then yarn --cwd packages/token-balance-cache build; else yarn --cwd packages/commonwealth heroku-postbuild; fi",
     "psql": "yarn --cwd packages/commonwealth psql"
   },
   "engines": {

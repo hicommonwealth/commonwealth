@@ -11,10 +11,13 @@
   },
   "keywords": [],
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "build": "tsc",
+    "start-dev": "ts-node src/index.ts",
+    "start": "TS_NODE_BASEURL=./build node -r tsconfig-paths/register build/token-balance-cache/src/index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "tsconfig-paths": "^4.0.0"
   }
 }
