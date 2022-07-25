@@ -1,8 +1,7 @@
 @import 'shared';
 
 .ProgressBar {
-  border-radius: 3px;
-
+  border-radius: $border-radius-corners;
   &.ongoing {
     background-color: $neutral-800;
   }
@@ -23,7 +22,7 @@
 .progress-background {
   background-color: $neutral-200;
   width: 100%;
-  border-radius: 3px;
+  border-radius: $border-radius-corners;
 }
 
 .progress-label {
@@ -32,18 +31,11 @@
   align-items: flex-end;
   justify-content: space-between;
   margin-bottom: 2px;
+
   .progress-title {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
     color: $neutral-800;
   }
   .progress-percentage {
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 16px;
     color: $neutral-500;
   }
 }

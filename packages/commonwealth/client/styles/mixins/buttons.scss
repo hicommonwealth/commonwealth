@@ -7,6 +7,12 @@
   .Text.button-text {
     color: $color;
   }
+
+  .Text.button-mini-text {
+    font-weight: 500;
+    font-size: 12px;
+    color: $color;
+  }
 }
 
 @mixin disabled {
@@ -281,12 +287,6 @@
 
   &.disabled {
     background: $neutral-200;
-  }
-
-  .Text {
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
   }
 
   @include iconAndText(white);

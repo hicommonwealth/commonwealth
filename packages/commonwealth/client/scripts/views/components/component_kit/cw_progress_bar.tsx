@@ -1,15 +1,13 @@
 /* @jsx m */
 import m from 'mithril';
-import { getClasses } from './helpers';
-import { ComponentType } from './types';
+
 import 'components/component_kit/cw_progress_bar.scss';
 
-export const enum CWProgressBarStatus {
-  ongoing = 'ongoing',
-  passed = 'passed',
-  failed = 'failed',
-  neutral = 'neutral',
-}
+import { getClasses } from './helpers';
+import { ComponentType } from './types';
+import { CWText } from './cw_text';
+
+type CWProgressBarStatus = 'failed' | 'neutral' | 'ongoing' | 'passed';
 
 type CWProgressBarAttrs = {
   progress: number; // Percentage of progress.
@@ -35,24 +33,19 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
     return (
       <>
         {label && (
-          <div className="progress-label">
-            <div>
-              <div className="progress-title">{label}</div>
-              {token && token.length > 0 && (
-                <div className="progress-percentage">{`${
-                  Math.floor(count * 1000) / 1000
-                } ${token}`}</div>
-              )}
-            </div>
-            <div className="progress-percentage">{`${
+          <div class="progress-label">
+            <CWText className="progress-title">{label}</CWText>
+            {token && token.length > 0 && (
+              <CWText className="progress-percentage" type="caption">
+                {`${Math.floor(count * 1000) / 1000} ${token}`}
+              </CWText>
+            )}
+            <CWText className="progress-percentage" type="caption">{`${
               Math.floor(progress * 1000) / 1000
-            }%`}</div>
+            }%`}</CWText>
           </div>
         )}
-        <div
-          className="progress-background"
-          style={`height: ${progressHeight}px;`}
-        >
+        <div class="progress-background" style={`height: ${progressHeight}px;`}>
           <div
             class={getClasses<CWProgressBarAttrs>(
               {

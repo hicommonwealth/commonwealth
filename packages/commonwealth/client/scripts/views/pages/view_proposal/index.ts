@@ -127,7 +127,7 @@ import {
   handleProposalPollVote,
   jumpHighlightComment,
 } from './helpers';
-import { PollCard, PollType } from '../../components/component_kit/polls';
+import { PollCard } from '../../components/component_kit/poll_card';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1423,7 +1423,7 @@ const ViewProposalPage: m.Component<
               ].map((poll) => {
                 return m('.poll-card-wrapper', {}, [
                   m(PollCard, {
-                    pollType: PollType.Offchain,
+                    pollType: 'Offchain',
                     multiSelect: false,
                     pollEnded:
                       poll.endsAt && poll.endsAt?.isBefore(moment().utc()),

@@ -1,22 +1,20 @@
 /* @jsx m */
 
 import m from 'mithril';
-import moment from 'moment';
 import _ from 'lodash';
+
 import 'components/poll_card.scss';
-import { CWCard } from '../cw_card';
-import { CWRadioGroup } from '../cw_radio_group';
-import { CWButton } from '../cw_button';
-import { CWProgressBar, CWProgressBarStatus } from '../cw_progress_bar';
-import { CWIcon } from '../cw_icons/cw_icon';
-import { CWCheckbox } from '../cw_checkbox';
-import { CWRadioButton } from '../cw_radio_button';
+
+import { CWCard } from './cw_card';
+import { CWButton } from './cw_button';
+import { CWProgressBar } from './cw_progress_bar';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWCheckbox } from './cw_checkbox';
+import { CWRadioButton } from './cw_radio_button';
+import { CWText } from './cw_text';
 
 // Extend as use cases expand.
-export const enum PollType {
-  Offchain = 'Offchain',
-  Snapshot = 'Snapshot',
-}
+type PollType = 'Offchain' | 'Snapshot';
 
 export const enum PollOptionResult {}
 
@@ -77,23 +75,23 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
     } = vnode.attrs;
 
     let resultString;
-    if (pollType === PollType.Offchain) {
+    if (pollType === 'Offchain' || pollType === 'Snapshot') {
       resultString = 'Results'; // TODO: handle this and other poll types.
     }
 
     return (
       <CWCard elevation="elevation-1" className="poll-card">
-        <div className="PollCard">
-          <div className="poll-title-section">
-            <div className="title">{proposalTitle}</div>
-          </div>
+        <div class="poll-card-content">
+          <CWText type="b2" className="poll-title-section">
+            {proposalTitle}
+          </CWText>
           {!pollEnded && (
-            <div className="poll-voting-section">
+            <div class="poll-voting-section">
               {!this.hasVoted ? (
-                <div>
-                  <div className="vote-options">
+                <>
+                  <div class="vote-options">
                     {multiSelect ? (
-                      <div className="multi-select-votes">
+                      <div class="multi-select-votes">
                         {voteInformation.map((option) => (
                           <CWCheckbox
                             checked={false}
@@ -107,7 +105,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                         ))}
                       </div>
                     ) : (
-                      <div className="single-select-votes">
+                      <div class="single-select-votes">
                         {voteInformation.map((option) => (
                           <CWRadioButton
                             checked={
@@ -125,7 +123,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                       </div>
                     )}
                   </div>
-                  <div className="cast-vote-section">
+                  <div class="cast-vote-section">
                     <CWButton
                       label="Vote"
                       buttonType="mini"
@@ -139,7 +137,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                           // TODO: Build this out when multiple vote options are introduced.
                           return;
                         }
-                        if (pollType === PollType.Offchain) {
+                        if (pollType === 'Offchain') {
                           await onVoteCast(
                             this.selectedOptions[0],
                             this.selectedOptions.length === 0,
@@ -154,7 +152,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                               this.hasVoted = true;
                             }
                           );
-                        } else if (pollType === PollType.Snapshot) {
+                        } else if (pollType === 'Snapshot') {
                           try {
                             await onVoteCast(this.selectedOptions[0], () => {
                               if (!votedFor) {
@@ -173,34 +171,38 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                         m.redraw();
                       }}
                     />
-                    <div className="time-remaining-text">
+                    <CWText className="time-remaining-text" type="caption">
                       {timeRemainingString}
-                    </div>
+                    </CWText>
                   </div>
-                </div>
+                </>
               ) : (
-                <div className="voted-display">
-                  <div className="vote-direction">
+                <div class="voted-display">
+                  <div class="vote-direction">
                     <CWIcon iconName="check" iconSize="small" />
-                    <div className="vote-direction-text">
+                    <CWText type="caption" className="vote-direction-string">
                       {this.voteDirectionString}
-                    </div>
+                    </CWText>
                   </div>
-                  <div className="time-remaining-text">
+                  <CWText className="time-remaining-text" type="caption">
                     {timeRemainingString}
-                  </div>
+                  </CWText>
                 </div>
               )}
             </div>
           )}
-          <div className="poll-results-section">
-            <div className="results-header">
-              <div className="results">{resultString}</div>
-              <div className="total-count">{`${
-                Math.floor(this.totalVoteCount * 100) / 100
-              } ${tokenSymbol ?? 'votes'}`}</div>
+          <div class="poll-results-section">
+            <div class="results-header">
+              <CWText type="b1" fontWeight="bold">
+                {resultString}
+              </CWText>
+              <CWText type="caption" className="results">
+                {`${Math.floor(this.totalVoteCount * 100) / 100} ${
+                  tokenSymbol ?? 'votes'
+                }`}
+              </CWText>
             </div>
-            <div className="results-content">
+            <div class="results-content">
               {voteInformation
                 .sort((option1, option2) => {
                   if (pollEnded) {
@@ -211,9 +213,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                 })
                 .map((option, index) => {
                   return (
-                    <div className="progress-bar-wrapper">
+                    <div class="progress-bar-wrapper">
                       <CWProgressBar
-                        className="results-progress-bar"
                         progress={
                           option.voteCount
                             ? (option.voteCount / this.totalVoteCount) * 100
@@ -221,10 +222,10 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                         }
                         progressStatus={
                           !pollEnded
-                            ? CWProgressBarStatus.ongoing
+                            ? 'ongoing'
                             : index === 0
-                            ? CWProgressBarStatus.passed
-                            : CWProgressBarStatus.neutral
+                            ? 'passed'
+                            : 'neutral'
                         }
                         progressHeight={4}
                         label={option.label}

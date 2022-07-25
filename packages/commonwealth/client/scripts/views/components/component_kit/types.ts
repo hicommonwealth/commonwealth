@@ -19,6 +19,7 @@ export enum ComponentType {
   Label = 'Label',
   Modal = 'Modal',
   Popover = 'Popover',
+  ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Tab = 'Tab',
@@ -28,7 +29,6 @@ export enum ComponentType {
   TextInput = 'TextInput',
   WalletOptionRow = 'WalletOptionRow',
   ValidationText = 'ValidationText',
-  ProgressBar = 'ProgressBar',
 }
 
 export type StyleAttrs = {

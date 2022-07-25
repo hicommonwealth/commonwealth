@@ -1,10 +1,8 @@
 /* @jsx m */
-
 import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -17,7 +15,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { NewLoginModal } from '../../modals/login_modal';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_tooltip';
 import { CWPopover } from './cw_popover/cw_popover';
@@ -25,8 +22,7 @@ import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
-import { isWindowMediumSmallInclusive } from './helpers';
-import { CWProgressBar, CWProgressBarStatus } from './cw_progress_bar';
+import { CWProgressBar } from './cw_progress_bar';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -106,26 +102,26 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWProgressBar
             progress={75}
             label="Progress Bar (Success)"
-            progressStatus={CWProgressBarStatus.passed}
+            progressStatus="passed"
             count={50}
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Failed)"
-            progressStatus={CWProgressBarStatus.failed}
+            progressStatus="failed"
             count={50}
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Neutral) With Token"
-            progressStatus={CWProgressBarStatus.neutral}
+            progressStatus="neutral"
             count={50}
             token="CMN"
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Ongoing) With Token"
-            progressStatus={CWProgressBarStatus.ongoing}
+            progressStatus="ongoing"
             count={50}
             token="CMN"
           />
