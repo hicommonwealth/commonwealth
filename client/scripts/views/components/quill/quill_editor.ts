@@ -29,7 +29,8 @@ export class QuillEditor extends QuillEditorInternal {
     this._alteredText = bool;
   }
 
-  // Returns editor contents as Delta. Ideal for RichText.
+  // Returns editor contents as Delta. Ideal for handling RichText.
+  // Use `text` getter for Markdown formattting.
   public get contents(): QuillDelta {
     return this._quill._editor.getContents() as QuillDelta;
   }
@@ -39,9 +40,9 @@ export class QuillEditor extends QuillEditorInternal {
     this._quill._editor.setSelection(this.endIndex);
   }
 
-  // Final indexed, used to set cursor and clear formatting
+  // Index location of , used to set cursor and clear formatting
   public get endIndex(): number {
-    return this._quill.editor.getText().length - 1;
+    return this._quill.getLength() ? this._quill.getLength() - 1 : 0;
   }
 
   public get innerEditor(): Editor {
@@ -57,6 +58,7 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   // Returns editor contents as string. Ideal for Markdown.
+  // Use `contents` getter for Markdown formattting.
   public get text(): string {
     return this._quill._editor.getText();
   }

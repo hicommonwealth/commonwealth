@@ -25,12 +25,7 @@ import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'types';
-import {
-  ITXModalData,
-  ProposalModule,
-  ThreadKind,
-  OffchainThreadStage,
-} from 'models';
+import { ITXModalData, ProposalModule, OffchainThreadStage } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -60,6 +55,7 @@ import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
+import { ThreadKind } from '../../components/new_thread_form/types';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -232,7 +228,7 @@ const NewProposalForm = {
         app.threads
           .create(
             author.address,
-            ThreadKind.Forum,
+            ThreadKind.Discussion,
             OffchainThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,
