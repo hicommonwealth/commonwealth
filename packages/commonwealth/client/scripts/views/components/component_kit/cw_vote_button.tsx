@@ -9,8 +9,6 @@ import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
 import { getClasses } from './helpers';
 
-export type PreviousVote = 'hasUpvoted' | 'hasDownvoted';
-
 type VoteButtonAttrs = {
   updateVoteCount: (newCount: number) => void;
   voteCount: number;
