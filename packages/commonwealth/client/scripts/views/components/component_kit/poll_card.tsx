@@ -165,7 +165,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
               )}
             </div>
           )}
-          <div class="poll-results-section" onclick={() => onResultsClick()}>
+          <div class="poll-results-section" onclick={(e) => onResultsClick(e)}>
             <div class="results-header">
               <CWText type="b1" fontWeight="bold">
                 {resultString}

@@ -3,77 +3,82 @@
 $default-card-width: 260px;
 
 .poll-card.Card {
-  padding: 0;
-  display: flex;
   align-items: center;
-  width: auto;
+  display: flex;
   max-width: 336px;
+  padding: 0;
+  width: auto;
 
   .poll-card-content {
     display: flex;
-    width: 100%;
     flex-direction: column;
+    width: 100%;
 
     .poll-title-section {
-      display: flex;
-      padding-left: 10px;
       align-items: center;
-      min-height: 56px;
-      width: 100%;
       border-bottom: 1px solid #e6e5e7;
+      display: flex;
+      min-height: 56px;
+      padding-left: 10px;
+      width: 100%;
     }
 
     .poll-voting-section {
-      padding: 16px 2px 16px 2px;
+      align-items: flex-start;
       border-bottom: 1px solid #e6e5e7;
-      margin: 0px 8px 0px 8px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      margin: 0px 8px 0px 8px;
+      padding: 16px 2px 16px 2px;
+
       .cast-vote-section {
-        margin-top: 20px;
+        align-items: center;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
-        align-items: center;
+        margin-top: 20px;
 
         .time-remaining-text {
-          margin-left: 15px;
           color: $neutral-500;
+          margin-left: 15px;
         }
       }
 
       .voted-display {
-        display: flex;
-        justify-content: center;
         align-items: center;
+        display: flex;
         flex-direction: column;
+        justify-content: center;
         width: 100%;
+
         .vote-direction {
           display: flex;
+
           .vote-direction-string {
             margin-left: 5px;
           }
         }
+
         .time-remaining-text {
-          margin-top: 3px;
           color: $neutral-500;
+          margin-top: 3px;
         }
       }
     }
 
     .poll-results-section {
       display: flex;
-      padding: 16px 8px 16px 8px;
       flex-direction: column;
+      padding: 16px 8px 16px 8px;
       cursor: pointer;
 
       .results-header {
+        align-items: center;
         display: flex;
         flex-direction: row;
-        width: 100%;
-        align-items: center;
         justify-content: space-between;
+        width: 100%;
+
         .results {
           color: $neutral-500;
         }

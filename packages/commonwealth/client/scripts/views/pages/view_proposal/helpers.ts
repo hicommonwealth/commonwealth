@@ -82,7 +82,10 @@ export const getProposalPollTimestamp = (
   poll: OffchainPoll,
   pollingEnded: boolean
 ) => {
+  if (!poll.endsAt.isValid()) {
+    return 'No end date';
+  }
   return pollingEnded
     ? `Ended ${poll.endsAt?.format('lll')}`
-    : `Ends ${moment().from(poll.endsAt).replace(' ago', '')} left`;
+    : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
 };

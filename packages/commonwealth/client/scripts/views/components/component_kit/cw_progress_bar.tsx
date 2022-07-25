@@ -34,15 +34,19 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
       <>
         {label && (
           <div class="progress-label">
-            <CWText className="progress-title">{label}</CWText>
-            {token && token.length > 0 && (
-              <CWText className="progress-percentage" type="caption">
-                {`${Math.floor(count * 1000) / 1000} ${token}`}
-              </CWText>
-            )}
-            <CWText className="progress-percentage" type="caption">{`${
+            <div class="progress-text-wrapper">
+              <CWText className="progress-title">{label}</CWText>
+              {token && token.length > 0 && (
+                <CWText className="progress-percentage" type="caption">
+                  {`${Math.min(100, Math.floor(count * 1000) / 1000)} ${token}`}
+                </CWText>
+              )}
+            </div>
+
+            <CWText className="progress-percentage" type="caption">{`${Math.min(
+              100,
               Math.floor(progress * 1000) / 1000
-            }%`}</CWText>
+            )}%`}</CWText>
           </div>
         )}
         <div class="progress-background" style={`height: ${progressHeight}px;`}>
@@ -55,7 +59,10 @@ export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
               },
               ComponentType.ProgressBar
             )}
-            style={`height: ${progressHeight}px; width: ${progress}%;`}
+            style={`height: ${progressHeight}px; width: ${Math.min(
+              100,
+              progress
+            )}%;`}
           />
         </div>
       </>

@@ -105,14 +105,6 @@ export class SnapshotPollCard
                       buttonType="mini"
                       disabled={disableVoteButton}
                       onclick={async () => {
-                        if (
-                          multiSelect ||
-                          this.selectedOptions[0] === votedFor ||
-                          this.selectedOptions.length === 0
-                        ) {
-                          // TODO: Build this out when multiple vote options are introduced.
-                          return;
-                        }
                         try {
                           await onVoteCast(this.selectedOptions[0], () => {
                             if (!votedFor) {

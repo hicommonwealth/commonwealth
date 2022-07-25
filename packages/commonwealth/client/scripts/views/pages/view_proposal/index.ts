@@ -128,6 +128,7 @@ import {
   jumpHighlightComment,
 } from './helpers';
 import { PollCard } from '../../components/component_kit/poll_card';
+import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1458,7 +1459,13 @@ const ViewProposalPage: m.Component<
                         isSelected,
                         callback
                       ),
-                    onResultsClick: () => console.log('placeholder'),
+                    onResultsClick: (e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: OffchainVotingModal,
+                        data: { votes: poll.votes },
+                      });
+                    },
                   }),
                 ]);
               }),
