@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import _ from 'lodash';
 
 import 'components/poll_card.scss';
 
@@ -9,11 +8,8 @@ import { CWCard } from './cw_card';
 import { CWButton } from './cw_button';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWCheckbox } from './cw_checkbox';
 import { CWRadioButton } from './cw_radio_button';
 import { CWText } from './cw_text';
-
-export const enum PollOptionResult {}
 
 export type VoteInformation = {
   label: string;
@@ -22,29 +18,30 @@ export type VoteInformation = {
 };
 
 export type SnapshotPollCardAttrs = {
-  pollEnded: boolean;
+  disableVoteButton: boolean;
   hasVoted: boolean;
-  votedFor: string;
+  incrementalVoteCast: number;
+  onVoteCast: () => any;
+  pollEnded: boolean;
   proposalTitle: string;
   timeRemainingString: string;
-  totalVoteCount: number;
-  voteInformation: VoteInformation[];
-  onVoteCast: () => any;
-  disableVoteButton: boolean;
-  incrementalVoteCast: number;
   tokenSymbol: string;
+  totalVoteCount: number;
+  votedFor: string;
+  voteInformation: Array<VoteInformation>;
 };
 
 export function buildVoteDirectionString(voteOption: string) {
   return `You voted "${voteOption}"`;
 }
+
 export class SnapshotPollCard
   implements m.ClassComponent<SnapshotPollCardAttrs>
 {
   hasVoted: boolean; // keep
-  voteDirectionString: string; // keep
+  selectedOptions: Array<string>;
   totalVoteCount: number; // keep
-  selectedOptions: string[];
+  voteDirectionString: string; // keep
 
   oninit(vnode) {
     // Initialize state which can change during the lifecycle of the component.
@@ -58,15 +55,15 @@ export class SnapshotPollCard
 
   view(vnode) {
     const {
+      disableVoteButton = false,
+      incrementalVoteCast,
+      onVoteCast,
       pollEnded,
       proposalTitle,
-      votedFor,
       timeRemainingString,
-      voteInformation,
-      onVoteCast,
-      disableVoteButton = false,
       tokenSymbol,
-      incrementalVoteCast,
+      votedFor,
+      voteInformation,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -130,7 +127,7 @@ export class SnapshotPollCard
                 <div class="voted-display">
                   <div class="vote-direction">
                     <CWIcon iconName="check" iconSize="small" />
-                    <CWText type="caption" className="vote-direction-string">
+                    <CWText type="caption" className="vote-direction-text">
                       {this.voteDirectionString}
                     </CWText>
                   </div>
@@ -146,7 +143,7 @@ export class SnapshotPollCard
               <CWText type="b1" fontWeight="bold">
                 {resultString}
               </CWText>
-              <CWText type="caption" className="results">
+              <CWText type="caption" className="results-text">
                 {`${Math.floor(this.totalVoteCount * 100) / 100} ${
                   tokenSymbol ?? 'votes'
                 }`}
@@ -163,26 +160,24 @@ export class SnapshotPollCard
                 })
                 .map((option, index) => {
                   return (
-                    <div class="progress-bar-wrapper">
-                      <CWProgressBar
-                        progress={
-                          option.voteCount
-                            ? (option.voteCount / this.totalVoteCount) * 100
-                            : 0
-                        }
-                        progressStatus={
-                          !pollEnded
-                            ? 'ongoing'
-                            : index === 0
-                            ? 'passed'
-                            : 'neutral'
-                        }
-                        progressHeight={4}
-                        label={option.label}
-                        count={option.voteCount}
-                        token={tokenSymbol ?? ''}
-                      />
-                    </div>
+                    <CWProgressBar
+                      progress={
+                        option.voteCount
+                          ? (option.voteCount / this.totalVoteCount) * 100
+                          : 0
+                      }
+                      progressStatus={
+                        !pollEnded
+                          ? 'ongoing'
+                          : index === 0
+                          ? 'passed'
+                          : 'neutral'
+                      }
+                      progressHeight={4}
+                      label={option.label}
+                      count={option.voteCount}
+                      token={tokenSymbol ?? ''}
+                    />
                   );
                 })}
             </div>

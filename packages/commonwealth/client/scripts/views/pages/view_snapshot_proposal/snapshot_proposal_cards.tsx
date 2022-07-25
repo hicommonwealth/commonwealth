@@ -13,7 +13,6 @@ import {
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { SnapshotInformationCard } from './snapshot_information_card';
-import { PollCard } from '../../components/component_kit/poll_card';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from '../../components/component_kit/snapshot_poll_card';
 
@@ -40,14 +39,11 @@ export class SnapshotProposalCards
   implements m.ClassComponent<SnapshotProposalCardsAttrs>
 {
   view(vnode) {
-    const author = app.user.activeAccount;
-
     const {
       identifier,
       proposal,
       scores,
       space,
-      symbol,
       threads,
       totals,
       votes,

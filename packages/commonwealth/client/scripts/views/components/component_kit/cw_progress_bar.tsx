@@ -7,62 +7,44 @@ import { getClasses } from './helpers';
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
 
-type CWProgressBarStatus = 'failed' | 'neutral' | 'ongoing' | 'passed';
+type ProgressBarStatus = 'failed' | 'neutral' | 'ongoing' | 'passed';
 
-type CWProgressBarAttrs = {
-  progress: number; // Percentage of progress.
-  progressStatus: CWProgressBarStatus;
-  progressHeight?: number;
-  className?: string;
-  label?: string;
+type ProgressBarAttrs = {
   count?: number;
+  label?: string;
+  progress: number; // Percentage of progress.
+  progressStatus: ProgressBarStatus;
   token?: string;
 };
 
-export class CWProgressBar implements m.ClassComponent<CWProgressBarAttrs> {
+export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
   view(vnode) {
-    const {
-      className,
-      progress,
-      progressStatus,
-      progressHeight = 4,
-      label,
-      count,
-      token,
-    } = vnode.attrs;
+    const { count, label, progress, progressStatus, token } = vnode.attrs;
     return (
       <>
         {label && (
           <div class="progress-label">
-            <div class="progress-text-wrapper">
-              <CWText className="progress-title">{label}</CWText>
-              {token && token.length > 0 && (
-                <CWText className="progress-percentage" type="caption">
-                  {`${Math.min(100, Math.floor(count * 1000) / 1000)} ${token}`}
-                </CWText>
-              )}
-            </div>
-
-            <CWText className="progress-percentage" type="caption">{`${Math.min(
-              100,
-              Math.floor(progress * 1000) / 1000
-            )}%`}</CWText>
+            <CWText>{label}</CWText>
+            {token && token.length > 0 && (
+              <CWText className="progress-percentage-text" type="caption">
+                {`${Math.min(100, Math.floor(count * 1000) / 1000)} ${token}`}
+              </CWText>
+            )}
+            <CWText className="progress-percentage-text" type="caption">
+              {`${Math.min(100, Math.floor(progress * 1000) / 1000)}%`}
+            </CWText>
           </div>
         )}
-        <div class="progress-background" style={`height: ${progressHeight}px;`}>
+        <div class="progress-background">
           <div
-            class={getClasses<CWProgressBarAttrs>(
+            class={getClasses<ProgressBarAttrs>(
               {
-                className,
                 progress,
                 progressStatus,
               },
               ComponentType.ProgressBar
             )}
-            style={`height: ${progressHeight}px; width: ${Math.min(
-              100,
-              progress
-            )}%;`}
+            style={`height: 4px; width: ${Math.min(100, progress)}%;`}
           />
         </div>
       </>

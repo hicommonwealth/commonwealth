@@ -16,19 +16,18 @@ $default-card-width: 260px;
 
     .poll-title-section {
       align-items: center;
-      border-bottom: 1px solid #e6e5e7;
+      border-bottom: 1px solid $neutral-200;
       display: flex;
-      min-height: 56px;
-      padding-left: 10px;
+      min-height: 32px;
+      padding: 8px 16px;
       width: 100%;
     }
 
     .poll-voting-section {
       align-items: flex-start;
-      border-bottom: 1px solid #e6e5e7;
+      border-bottom: 1px solid $neutral-200;
       display: flex;
       flex-direction: column;
-      margin: 0px 8px 0px 8px;
       padding: 16px 2px 16px 2px;
 
       .cast-vote-section {
@@ -38,9 +37,9 @@ $default-card-width: 260px;
         justify-content: flex-start;
         margin-top: 20px;
 
-        .time-remaining-text {
+        .time-remaining-text.Text {
           color: $neutral-500;
-          margin-left: 15px;
+          margin-left: 16px;
         }
       }
 
@@ -54,14 +53,14 @@ $default-card-width: 260px;
         .vote-direction {
           display: flex;
 
-          .vote-direction-string {
-            margin-left: 5px;
+          .vote-direction-text.Text {
+            margin-left: 8px;
           }
         }
 
-        .time-remaining-text {
+        .time-remaining-text.Text {
           color: $neutral-500;
-          margin-top: 3px;
+          margin-top: 4px;
         }
       }
     }
@@ -69,7 +68,7 @@ $default-card-width: 260px;
     .poll-results-section {
       display: flex;
       flex-direction: column;
-      padding: 16px 8px 16px 8px;
+      padding: 16px;
       cursor: pointer;
 
       .results-header {
@@ -77,15 +76,18 @@ $default-card-width: 260px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        margin-bottom: 16px;
         width: 100%;
 
-        .results {
+        .results-text.Text {
           color: $neutral-500;
         }
       }
 
-      .progress-bar-wrapper {
-        margin-top: 8px;
+      .results-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
       }
     }
   }

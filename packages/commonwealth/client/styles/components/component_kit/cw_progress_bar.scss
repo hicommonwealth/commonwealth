@@ -23,21 +23,17 @@
 .progress-background {
   background-color: $neutral-200;
   border-radius: $border-radius-corners;
+  height: 4px;
   width: 100%;
 }
 
 .progress-label {
-  align-items: flex-end;
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2px;
   width: 100%;
 
-  .progress-title {
-    color: $neutral-800;
-  }
-
-  .progress-percentage {
+  .progress-percentage-text.Text {
     color: $neutral-500;
   }
 }

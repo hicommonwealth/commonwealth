@@ -14,8 +14,9 @@ $width: 360px;
   .progress-gallery {
     display: flex;
     flex-direction: column;
+    gap: 16px;
     margin-bottom: $margin-bottom;
-    width: 50%;
+    width: 400px;
   }
 
   .basic-gallery {
