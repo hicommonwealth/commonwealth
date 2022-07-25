@@ -12,8 +12,8 @@
   "keywords": [],
   "scripts": {
     "build": "tsc",
-    "start-dev": "ts-node src/index.ts",
-    "start": "TS_NODE_BASEURL=./build node -r tsconfig-paths/register build/token-balance-cache/src/index.js"
+    "start": "ts-node src/index.ts",
+    "start-prod": "TS_NODE_BASEURL=./build node -r tsconfig-paths/register build/token-balance-cache/src/index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",

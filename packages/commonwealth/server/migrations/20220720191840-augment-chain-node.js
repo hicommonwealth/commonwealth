@@ -34,7 +34,7 @@ module.exports = {
       );
       // special case for axie
       await queryInterface.sequelize.query(
-        `UPDATE "ChainNodes" SET balance_type='terra' WHERE id = (SELECT chain_node_id FROM "Chains" WHERE "Chains".id = 'axie-infinity');`,
+        `UPDATE "ChainNodes" SET balance_type='axie-infinity' WHERE id = (SELECT chain_node_id FROM "Chains" WHERE "Chains".id = 'axie-infinity');`,
         { transaction: t  }
       );
       // special case for terra
