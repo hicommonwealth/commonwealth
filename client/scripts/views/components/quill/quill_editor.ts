@@ -1,6 +1,10 @@
-import { Quill, Editor } from 'quill';
 import QuillEditorInternal from './quill_editor_internal';
-import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
+import {
+  DeltaOps,
+  QuillActiveMode,
+  QuillDelta,
+  QuillTextContents,
+} from './types';
 
 // DOCUMENTATION
 // Standard usage flow:
@@ -89,7 +93,7 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   public clearUnsavedChanges(): void {
-    this._clearUnsavedChanges();
+    this._clearLocalStorage();
   }
 
   public disable(document?: Document): void {
@@ -136,10 +140,10 @@ export class QuillEditor extends QuillEditorInternal {
   }
 
   // Clears editor and resets state
-  public resetEditor(): void {
+  public resetEditor(doc: QuillDelta = { ops: [{ insert: '\n' }] }): void {
     this.enable();
-    this._quill.setContents([{ insert: '\n' }]);
-    this._clearUnsavedChanges();
     this._alteredText = false;
+    this._quill.setContents(doc);
+    this._clearLocalStorage();
   }
 }

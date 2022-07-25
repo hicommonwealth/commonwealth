@@ -2,7 +2,7 @@ import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
-import Quill from 'quill';
+import Quill from 'quill-2.0-dev/quill';
 import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
 import { MarkdownShortcuts } from 'lib/markdownShortcuts';
@@ -14,7 +14,12 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
+import {
+  DeltaOps,
+  QuillActiveMode,
+  QuillDelta,
+  QuillTextContents,
+} from './types';
 
 const Delta = Quill.import('delta');
 const Clipboard = Quill.import('modules/clipboard') as any;
@@ -147,6 +152,7 @@ export default class QuillEditorInternal {
     this._addChangesListener();
 
     // Restore defaultContent
+    console.log({ defaultContents });
     if (defaultContents) this._restoreSavedContents(defaultContents);
 
     // TODO: What is the purpose of this??
@@ -155,12 +161,6 @@ export default class QuillEditorInternal {
         if (this._quill.isEnabled()) {
           // Save the entire updated text to localStorage
           const data = JSON.stringify(this._quill.getContents());
-          console.log(data);
-          console.log(
-            localStorage.getItem(
-              `${app.activeChainId()}-${this._editorNamespace}-storedText`
-            )
-          );
           localStorage.setItem(
             `${app.activeChainId()}-${this._editorNamespace}-storedText`,
             data
@@ -187,7 +187,7 @@ export default class QuillEditorInternal {
     });
   }
 
-  protected _clearUnsavedChanges() {
+  protected _clearLocalStorage() {
     Object.keys(localStorage)
       .filter((key) => key.includes(this._editorNamespace))
       .forEach((key) => {
@@ -195,11 +195,13 @@ export default class QuillEditorInternal {
       });
   }
 
-  protected _restoreSavedContents(contents) {
+  // TODO: Ensure is working
+  protected _restoreSavedContents(contents: string | QuillDelta | DeltaOps) {
     if (typeof contents === 'string') {
       this._quill.setText(contents);
       this._quill.activeMode = 'markdown';
     } else if (typeof contents === 'object') {
+      // TODO: Delta vs DeltaOps format—do both work?
       this._quill.setContents(contents);
       this._quill.activeMode = 'richText';
     }
@@ -710,9 +712,9 @@ export default class QuillEditorInternal {
     // Register a patch to prevent pasting into long documents causing the editor to jump
     class CustomClipboard extends Clipboard {
       onCapturePaste(e) {
-        if (e.defaultPrevented || !this._quill.isEnabled()) return;
+        if (e.defaultPrevented || !this.quill.isEnabled()) return;
         e.preventDefault();
-        const range = this._quill.getSelection(true);
+        const range = this.quill.getSelection(true);
         if (range == null) return;
         const html = e.clipboardData.getData('text/html');
         const text = e.clipboardData.getData('text/plain');

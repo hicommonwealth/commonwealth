@@ -12,12 +12,7 @@ import { QuillEditor } from './quill_editor';
 import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import {
-  QuillTextContents,
-  QuillActiveMode,
-  QuillMode,
-  QuillDelta,
-} from './types';
+import { QuillTextContents, QuillActiveMode, QuillMode } from './types';
 
 // Rich text and Markdown editor.
 //
@@ -34,6 +29,7 @@ type QuillEditorComponentAttrs = {
   contentsDoc?;
   editorNamespace: string;
   imageUploader?;
+  mode?: QuillMode; // Use in order to limit editor to only MD or RT support
   oncreateBind;
   onkeyboardSubmit?;
   placeholder?: string;
@@ -154,17 +150,16 @@ export class QuillEditorComponent
   }
 
   view(vnode) {
-    console.log('editor loaded');
-    const theme = vnode.attrs.theme || 'snow';
-
     const {
       className,
       contentsDoc,
       editorNamespace,
       imageUploader,
       onkeyboardSubmit,
+      mode = 'hybrid',
       placeholder,
       tabIndex,
+      theme = 'snow',
       oncreateBind,
     } = vnode.attrs;
 
@@ -175,7 +170,7 @@ export class QuillEditorComponent
     );
 
     if (!this._loaded) {
-      this._loadSavedState(contentsDoc, editorNamespace);
+      this._loadSavedState(contentsDoc, editorNamespace, mode);
       this._loaded = true;
     }
 

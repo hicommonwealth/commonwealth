@@ -64,13 +64,22 @@ const CreateComment: m.Component<
       vnode.state.uploadsInProgress = 0;
     }
 
-    const submitComment = async (e?) => {
+    const submitComment = async (e?: Event) => {
+      debugger;
       vnode.state.error = null;
       vnode.state.sendingComment = true;
 
       if (!vnode.state.quillEditorState) {
         if (e) e.preventDefault();
-        vnode.state.error = 'Editor not initialized, please try again';
+        vnode.state.error =
+          'Editor not initialized, please try refreshing the page';
+        vnode.state.sendingComment = false;
+        return;
+      }
+
+      if (vnode.state.quillEditorState.isBlank()) {
+        if (e) e.preventDefault();
+        vnode.state.error = 'Comment cannot be blank';
         vnode.state.sendingComment = false;
         return;
       }
@@ -78,14 +87,6 @@ const CreateComment: m.Component<
       const bodyText = vnode.state.quillEditorState.textContentsAsString;
       console.log(bodyText);
       vnode.state.quillEditorState.disable();
-
-      if (vnode.state.quillEditorState.isBlank()) {
-        if (e) e.preventDefault();
-        vnode.state.error = 'Comment cannot be blank';
-        vnode.state.sendingComment = false;
-        vnode.state.quillEditorState.enable();
-        return;
-      }
 
       try {
         const res = await app.comments.create(
