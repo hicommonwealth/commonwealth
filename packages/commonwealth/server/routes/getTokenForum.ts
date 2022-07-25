@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { DB } from '../database';
-import { ChainBase, ChainNetwork, ChainType } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (

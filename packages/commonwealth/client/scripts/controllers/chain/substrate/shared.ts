@@ -19,7 +19,7 @@ import { Compact } from '@polkadot/types/codec';
 import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import {
   NodeInfo,
   ChainInfo,
@@ -29,7 +29,7 @@ import {
   ITXData,
 } from 'models';
 
-import { SubstrateEvents } from '@commonwealth/chain-events';
+import { SubstrateEvents } from 'chain-events/src';
 import { EventEmitter } from 'events';
 
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';

@@ -1,4 +1,4 @@
-import { SubstrateTypes, CWEvent } from '@commonwealth/chain-events';
+import { SubstrateTypes, CWEvent } from 'chain-events/src';
 import * as WebSocket from 'ws';
 import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
@@ -9,8 +9,8 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
-import { ChainBase } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { ChainBase } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import models from '../database';
 

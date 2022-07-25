@@ -4,8 +4,9 @@ import {
   SENDGRID_API_KEY, LOGIN_RATE_LIMIT_MINS, LOGIN_RATE_LIMIT_TRIES, MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN
 } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
-import { DynamicTemplate, WalletId } from '../../shared/types';
+import { DynamicTemplate } from '../../shared/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { WalletId } from 'common-common/src/types';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 const sgMail = require('@sendgrid/mail');

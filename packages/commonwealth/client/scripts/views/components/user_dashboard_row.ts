@@ -7,11 +7,11 @@ import {
   CWEvent,
   Label as ChainEventLabel,
   // CompoundEvents
-} from '@commonwealth/chain-events';
+} from 'chain-events/src';
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationCategories } from 'types';
+import { NotificationCategories } from 'common-common/src/types';
 import {
   AddressInfo,
   DashboardActivityNotification,
@@ -19,7 +19,7 @@ import {
 } from 'models';
 
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 

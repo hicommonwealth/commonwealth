@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { NotificationCategories } from '../../shared/types';
-import { factory, formatFilename } from '../../shared/logging';
+import { NotificationCategories } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { getStatsDInstance } from '../util/metrics';
 import { DB } from '../database';
 import { mixpanelTrack } from '../util/mixpanelUtil';

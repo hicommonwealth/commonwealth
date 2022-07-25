@@ -4,18 +4,18 @@ import { Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from '@commonwealth/chain-events';
+import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
+import { IPostNotificationData } from 'types';
 import {
   NotificationCategories,
-  IPostNotificationData,
   ProposalType,
-} from 'types';
+} from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';

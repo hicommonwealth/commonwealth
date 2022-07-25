@@ -1,4 +1,4 @@
-import { ChainBase } from '../shared/types';
+import { ChainBase } from 'common-common/src/types';
 
 /* eslint-disable indent,prefer-template,operator-linebreak */
 require('dotenv').config();

@@ -1,6 +1,6 @@
 declare let window: any;
 
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {

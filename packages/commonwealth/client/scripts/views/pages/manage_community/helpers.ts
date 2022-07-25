@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 
 import { RolePermission } from 'models';
-import { ChainCategoryType } from 'types';
+import { ChainCategoryType } from 'common-common/src/types';
 import { buildChainToCategoriesMap } from '../community_cards';
 
 export const sortAdminsAndModsFirst = (a, b) => {

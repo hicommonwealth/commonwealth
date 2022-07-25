@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { factory, formatFilename } from '../../shared/logging';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));

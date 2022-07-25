@@ -1,8 +1,8 @@
 import cheerio from 'cheerio';
 import { DB } from '../database';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
-import { factory, formatFilename } from '../../shared/logging';
-import { ChainBase, ChainNetwork, ProposalType } from '../../shared/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import { ChainInstance } from '../models/chain';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';

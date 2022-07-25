@@ -4,7 +4,7 @@ declare let window: any;
 
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { ChainBase, WalletId } from 'types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';

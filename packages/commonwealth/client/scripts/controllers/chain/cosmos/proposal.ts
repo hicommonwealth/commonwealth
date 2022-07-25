@@ -20,7 +20,7 @@ import {
   ICosmosProposal, CosmosToken, CosmosVoteChoice, CosmosProposalState
 } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain, { CosmosApiType } from './chain';

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Coin } from 'adapters/currency';
 import { IIdentifiable } from 'adapters/shared';
-import { ProposalType } from 'types';
+import { ProposalType } from 'common-common/src/types';
 import { IVote, IUniqueId, ITXModalData } from './interfaces';
 import { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
 import Account from './Account';

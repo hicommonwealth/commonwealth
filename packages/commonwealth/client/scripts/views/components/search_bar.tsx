@@ -23,7 +23,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { ContentType } from 'controllers/server/search';
-import MarkdownFormattedText from './markdown_formatted_text';
+import { MarkdownFormattedText } from './markdown_formatted_text';
 import QuillFormattedText from './quill_formatted_text';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
@@ -93,10 +93,9 @@ const getCommunityPreview = (
   const onSelect = () => {
     if (params.community) {
       m.route.set(
-        params.community.address ? `/${params.community.address}` : '/'
+        params.community.address ? `/${params.community.address}`
+          : params.community.id ? `/${params.community.id}` : '/'
       );
-    } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
     }
     closeResultsFn();
   };

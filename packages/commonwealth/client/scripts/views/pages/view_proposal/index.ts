@@ -14,7 +14,7 @@ import 'pages/view_proposal/tips.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
-import { ProposalType, ChainBase } from 'types';
+import { ProposalType, ChainBase } from 'common-common/src/types';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
@@ -96,10 +96,10 @@ import {
   EditPermissionsButton,
   ProposalEditorPermissions,
 } from './body';
-import CreateComment from './create_comment';
+import { CreateComment } from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
 import User from '../../components/widgets/user';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -1155,6 +1155,7 @@ const ViewProposalPage: m.Component<
 
     const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
       if (call === GlobalStatus.Get) return vnode.state.editing;
+
       if (call === GlobalStatus.Set && status !== undefined) {
         vnode.state.editing = status;
         if (status === false) {

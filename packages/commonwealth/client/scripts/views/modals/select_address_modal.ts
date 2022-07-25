@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
-import { ChainBase, ChainNetwork, WalletId } from 'types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, RoleInfo } from 'models';
 import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';

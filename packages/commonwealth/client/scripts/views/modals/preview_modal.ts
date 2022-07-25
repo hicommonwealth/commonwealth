@@ -2,7 +2,7 @@ import 'modals/preview_modal.scss';
 
 import m from 'mithril';
 import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 const PreviewModal: m.Component<{ title: string; doc: string }> = {
