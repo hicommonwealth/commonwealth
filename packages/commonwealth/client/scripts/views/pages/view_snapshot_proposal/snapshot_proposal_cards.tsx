@@ -125,6 +125,7 @@ export class SnapshotProposalCards
           disableVoteButton={fetchedPower && voteErrorText !== ''}
           proposalTitle={proposal.title}
           timeRemainingString={voteErrorText}
+          tokenSymbol={space.symbol}
           totalVoteCount={totals.sumOfResultsBalance}
           voteInformation={buildVoteInformation(proposal?.choices, votes)}
           onVoteCast={(choice: string, callback: () => any) => {

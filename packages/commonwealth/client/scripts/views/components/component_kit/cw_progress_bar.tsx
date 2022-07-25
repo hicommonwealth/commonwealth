@@ -21,15 +21,17 @@ export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
   view(vnode) {
     const { count, label, progress, progressStatus, token } = vnode.attrs;
     return (
-      <>
+      <div class="ProgressBar">
         {label && (
           <div class="progress-label">
-            <CWText>{label}</CWText>
-            {token && token.length > 0 && (
-              <CWText className="progress-percentage-text" type="caption">
-                {`${Math.min(100, Math.floor(count * 1000) / 1000)} ${token}`}
-              </CWText>
-            )}
+            <div class="label-wrapper">
+              <CWText>{label}</CWText>
+              {token && token.length > 0 && (
+                <CWText className="progress-percentage-text" type="caption">
+                  {`${Math.min(100, Math.floor(count * 1000) / 1000)} ${token}`}
+                </CWText>
+              )}
+            </div>
             <CWText className="progress-percentage-text" type="caption">
               {`${Math.min(100, Math.floor(progress * 1000) / 1000)}%`}
             </CWText>
@@ -47,7 +49,7 @@ export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
             style={`height: 4px; width: ${Math.min(100, progress)}%;`}
           />
         </div>
-      </>
+      </div>
     );
   }
 }

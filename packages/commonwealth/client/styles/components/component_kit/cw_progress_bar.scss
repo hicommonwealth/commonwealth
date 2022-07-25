@@ -33,6 +33,10 @@
   justify-content: space-between;
   width: 100%;
 
+  .label-wrapper {
+    margin-bottom: 4px;
+  }
+
   .progress-percentage-text.Text {
     color: $neutral-500;
   }
