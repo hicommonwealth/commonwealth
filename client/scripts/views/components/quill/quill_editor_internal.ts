@@ -914,6 +914,7 @@ export default class QuillEditorInternal {
 
   private _listAutofillHandler(range, context) {
     if (this._activeMode === 'markdown') return true;
+    debugger;
     const length = context.prefix.length;
     const [line, offset] = this._quill.getLine(range.index);
 

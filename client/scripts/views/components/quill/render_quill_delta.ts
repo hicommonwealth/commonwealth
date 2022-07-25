@@ -314,7 +314,7 @@ export const renderQuillDelta = (
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   m(
-                    getGroupTag(group),
+                    getGroupTag(_group),
                     temp.pop().map((data) => {
                       return m(data.tag, data.content);
                     })
@@ -330,7 +330,7 @@ export const renderQuillDelta = (
             const outdentBuffer = temp[temp.length - 2];
             outdentBuffer[outdentBuffer.length - 1].content.push(
               m(
-                getGroupTag(group),
+                getGroupTag(_group),
                 temp.pop().map(({ tag, content }) => {
                   return m(tag, content);
                 })
@@ -338,7 +338,7 @@ export const renderQuillDelta = (
             );
           }
           return m(
-            getGroupTag(group),
+            getGroupTag(_group),
             temp[0].map(({ tag, content }) => {
               return m(tag, content);
             })
