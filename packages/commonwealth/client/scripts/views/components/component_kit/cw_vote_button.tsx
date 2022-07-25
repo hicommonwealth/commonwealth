@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_vote_button.scss';
 
+import { formatNumberShort } from 'adapters/currency';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -65,8 +66,13 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
             this.isHoveringUpvote = false;
           }}
         />
-        <CWText type="caption" fontWeight="medium" className="vote-count">
-          {voteCount}
+        <CWText
+          type="caption"
+          fontWeight="medium"
+          className="vote-count"
+          title={voteCount}
+        >
+          {formatNumberShort(voteCount)}
         </CWText>
         <CWIcon
           iconName="downvote"
