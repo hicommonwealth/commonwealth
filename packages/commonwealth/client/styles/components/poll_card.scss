@@ -66,6 +66,8 @@ $default-card-width: 260px;
       display: flex;
       padding: 16px 8px 16px 8px;
       flex-direction: column;
+      cursor: pointer;
+
       .results-header {
         display: flex;
         flex-direction: row;

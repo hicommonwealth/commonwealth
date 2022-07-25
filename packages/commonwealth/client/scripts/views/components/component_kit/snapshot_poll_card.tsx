@@ -21,8 +21,7 @@ export type VoteInformation = {
   voteCount: number;
 };
 
-export type PollCardAttrs = {
-  multiSelect: boolean;
+export type SnapshotPollCardAttrs = {
   pollEnded: boolean;
   hasVoted: boolean;
   votedFor: string;
@@ -31,15 +30,17 @@ export type PollCardAttrs = {
   totalVoteCount: number;
   voteInformation: VoteInformation[];
   onVoteCast: () => any;
-  onResultsClick: () => any;
   disableVoteButton: boolean;
   incrementalVoteCast: number;
+  tokenSymbol: string;
 };
 
 export function buildVoteDirectionString(voteOption: string) {
   return `You voted "${voteOption}"`;
 }
-export class PollCard implements m.ClassComponent<PollCardAttrs> {
+export class SnapshotPollCard
+  implements m.ClassComponent<SnapshotPollCardAttrs>
+{
   hasVoted: boolean; // keep
   voteDirectionString: string; // keep
   totalVoteCount: number; // keep
@@ -57,15 +58,14 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
 
   view(vnode) {
     const {
-      multiSelect,
       pollEnded,
       proposalTitle,
       votedFor,
       timeRemainingString,
-      onResultsClick,
       voteInformation,
       onVoteCast,
       disableVoteButton = false,
+      tokenSymbol,
       incrementalVoteCast,
     } = vnode.attrs;
 
@@ -82,38 +82,22 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
               {!this.hasVoted ? (
                 <>
                   <div class="vote-options">
-                    {multiSelect ? (
-                      <div class="multi-select-votes">
-                        {voteInformation.map((option) => (
-                          <CWCheckbox
-                            checked={false}
-                            label={option.label}
-                            onchange={() => {
-                              // TODO: Build this out when multiple vote options are introduced.
-                              // Something like: this.selectedOptions.push(option.value);
-                              console.log('A vote for multiple options');
-                            }}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div class="single-select-votes">
-                        {voteInformation.map((option) => (
-                          <CWRadioButton
-                            checked={
-                              this.selectedOptions.length > 0 &&
-                              option.value === this.selectedOptions[0]
-                            }
-                            groupName="votes"
-                            onchange={() => {
-                              this.selectedOptions[0] = option.value;
-                            }}
-                            label={option.label}
-                            value={option.value}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    <div class="single-select-votes">
+                      {voteInformation.map((option) => (
+                        <CWRadioButton
+                          checked={
+                            this.selectedOptions.length > 0 &&
+                            option.value === this.selectedOptions[0]
+                          }
+                          groupName="votes"
+                          onchange={() => {
+                            this.selectedOptions[0] = option.value;
+                          }}
+                          label={option.label}
+                          value={option.value}
+                        />
+                      ))}
+                    </div>
                   </div>
                   <div class="cast-vote-section">
                     <CWButton
@@ -129,10 +113,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                           // TODO: Build this out when multiple vote options are introduced.
                           return;
                         }
-                        await onVoteCast(
-                          this.selectedOptions[0],
-                          this.selectedOptions.length === 0,
-                          () => {
+                        try {
+                          await onVoteCast(this.selectedOptions[0], () => {
                             if (!votedFor) {
                               this.totalVoteCount += incrementalVoteCast;
                             }
@@ -140,8 +122,10 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                               this.selectedOptions[0]
                             );
                             this.hasVoted = true;
-                          }
-                        );
+                          });
+                        } catch (e) {
+                          console.log(e);
+                        }
                         m.redraw();
                       }}
                     />
@@ -165,13 +149,15 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
               )}
             </div>
           )}
-          <div class="poll-results-section" onclick={() => onResultsClick()}>
+          <div class="poll-results-section">
             <div class="results-header">
               <CWText type="b1" fontWeight="bold">
                 {resultString}
               </CWText>
               <CWText type="caption" className="results">
-                {`${Math.floor(this.totalVoteCount * 100) / 100} votes`}
+                {`${Math.floor(this.totalVoteCount * 100) / 100} ${
+                  tokenSymbol ?? 'votes'
+                }`}
               </CWText>
             </div>
             <div class="results-content">
@@ -202,7 +188,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                         progressHeight={4}
                         label={option.label}
                         count={option.voteCount}
-                        token=""
+                        token={tokenSymbol ?? ''}
                       />
                     </div>
                   );

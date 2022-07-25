@@ -1423,7 +1423,6 @@ const ViewProposalPage: m.Component<
               ].map((poll) => {
                 return m('.poll-card-wrapper', {}, [
                   m(PollCard, {
-                    pollType: 'Offchain',
                     multiSelect: false,
                     pollEnded:
                       poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
@@ -1459,6 +1458,7 @@ const ViewProposalPage: m.Component<
                         isSelected,
                         callback
                       ),
+                    onResultsClick: () => console.log('placeholder'),
                   }),
                 ]);
               }),
