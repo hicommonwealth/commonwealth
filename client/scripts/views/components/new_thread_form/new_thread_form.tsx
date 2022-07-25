@@ -81,6 +81,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   ) {
     if (!this) throw new Error('no this');
     const bodyText = quillEditorState.textContentsAsString;
+    console.log({ bodyText });
     quillEditorState.disable();
     checkNewThreadErrors(form, bodyText);
 

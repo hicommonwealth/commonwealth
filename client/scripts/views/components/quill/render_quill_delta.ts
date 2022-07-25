@@ -286,9 +286,9 @@ export const renderQuillDelta = (
               : parent.attributes && parent.attributes.list === 'ordered'
               ? 'li'
               : parent.attributes && parent.attributes.list === 'checked'
-              ? 'li.checked'
+              ? `li.checked`
               : parent.attributes && parent.attributes.list === 'unchecked'
-              ? 'li.unchecked'
+              ? `li.unchecked`
               : 'div',
             parent.children.map(renderChild)
           );
@@ -299,6 +299,11 @@ export const renderQuillDelta = (
           _group.parents.forEach((parent) => {
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
+            if (tag === 'li.checked') {
+              content.unshift(m(`input[type='checkbox'][disabled][checked]`));
+            } else if (tag === 'li.unchecked') {
+              content.unshift(m(`input[type='checkbox'][disabled]`));
+            }
             const indent = parent.attributes.indent || 0;
 
             if (indent >= temp.length) {

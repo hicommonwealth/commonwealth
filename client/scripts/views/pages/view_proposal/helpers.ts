@@ -1,4 +1,5 @@
 import m from 'mithril';
+import $ from 'jquery';
 import moment from 'moment';
 
 import app from 'state';

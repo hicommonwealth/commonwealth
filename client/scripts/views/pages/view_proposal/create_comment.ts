@@ -1,9 +1,9 @@
 import 'pages/view_proposal/create_comment.scss';
 
 import m from 'mithril';
-import { Button, Callout } from 'construct-ui';
-
 import app from 'state';
+
+import { Button, Callout } from 'construct-ui';
 
 import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'types';
@@ -52,6 +52,7 @@ const CreateComment: m.Component<
     let disabled =
       getSetGlobalEditingStatus(GlobalStatus.Get) ||
       vnode.state.quillEditorState?.isBlank();
+    if (disabled) console.log(vnode.state.quillEditorState);
 
     const author = app.user.activeAccount;
     const parentType =
@@ -67,21 +68,22 @@ const CreateComment: m.Component<
       vnode.state.error = null;
       vnode.state.sendingComment = true;
 
-      const { quillEditorState } = vnode.state;
-      if (!quillEditorState) {
+      if (!vnode.state.quillEditorState) {
         if (e) e.preventDefault();
         vnode.state.error = 'Editor not initialized, please try again';
         vnode.state.sendingComment = false;
         return;
       }
 
-      quillEditorState.disable();
+      const bodyText = vnode.state.quillEditorState.textContentsAsString;
+      console.log(bodyText);
+      vnode.state.quillEditorState.disable();
 
-      if (quillEditorState.isBlank()) {
+      if (vnode.state.quillEditorState.isBlank()) {
         if (e) e.preventDefault();
         vnode.state.error = 'Comment cannot be blank';
         vnode.state.sendingComment = false;
-        quillEditorState.enable();
+        vnode.state.quillEditorState.enable();
         return;
       }
 
@@ -90,7 +92,7 @@ const CreateComment: m.Component<
           author.address,
           rootProposal.uniqueIdentifier,
           app.activeChainId(),
-          quillEditorState.textContentsAsString,
+          bodyText,
           proposalPageState.parentCommentId
         );
         callback();
@@ -221,6 +223,7 @@ const CreateComment: m.Component<
                 m(QuillEditorComponent, {
                   contentsDoc: '',
                   oncreateBind: (state: QuillEditor) => {
+                    console.log({ state });
                     vnode.state.quillEditorState = state;
                   },
                   editorNamespace: `${document.location.pathname}-commenting`,
