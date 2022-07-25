@@ -101,6 +101,7 @@ export default (
       indexes: [
         { fields: ['subscriber_id'] },
         { fields: ['category_id', 'object_id', 'is_active'] },
+        { fields: ['offchain_thread_id'] },
       ],
     }
   );

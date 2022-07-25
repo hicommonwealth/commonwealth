@@ -13,6 +13,7 @@ module.exports = {
       await queryInterface.renameTable('OffchainComments', 'Comments', { transaction });
       await queryInterface.renameTable('OffchainThreads', 'Threads', { transaction });
       await queryInterface.renameColumn('Collaborations', 'offchain_thread_id', 'thread_id', { transaction });
+      await queryInterface.addIndex('Subscriptions', { fields: ['offchain_thread_id'] }, { transaction });
     });
   },
 
@@ -28,7 +29,7 @@ module.exports = {
       await queryInterface.renameTable('Comments', 'OffchainComments', { transaction });
       await queryInterface.renameTable('Threads', 'OffchainThreads', { transaction });
       await queryInterface.renameColumn('Collaborations', 'thread_id', 'offchain_thread_id', { transaction });
-
+      await queryInterface.removeIndex('Subscriptions', { fields: ['offchain_thread_id'] }, { transaction });
     });
   }
 };
