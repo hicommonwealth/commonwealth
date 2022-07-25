@@ -3,7 +3,7 @@
 import 'components/new_thread_form.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
+import { capitalize } from 'lodash';
 import $ from 'jquery';
 import {
   Callout,
@@ -359,7 +359,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
               },
               [
                 m(TabItem, {
-                  label: ThreadKind.Discussion,
+                  label: capitalize(ThreadKind.Discussion),
                   onclick: (e) => {
                     this._saveToLocalStorage();
                     this.form.kind = ThreadKind.Discussion;
@@ -372,7 +372,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                   active: this.threadKind === ThreadKind.Discussion,
                 }),
                 m(TabItem, {
-                  label: ThreadKind.Link,
+                  label: capitalize(ThreadKind.Link),
                   onclick: (e) => {
                     this._saveToLocalStorage();
                     this.form.kind = ThreadKind.Link;

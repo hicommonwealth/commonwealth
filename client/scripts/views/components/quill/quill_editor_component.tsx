@@ -224,7 +224,6 @@ export class QuillEditorComponent
             R
           </CWText>
         )}
-        ,
         {this._activeMode === 'richText' && (
           <CWText
             type="h5"
