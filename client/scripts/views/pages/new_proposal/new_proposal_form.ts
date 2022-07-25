@@ -53,7 +53,7 @@ import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
-import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind } from '../../components/new_thread_form/types';
 

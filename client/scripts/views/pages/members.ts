@@ -12,7 +12,7 @@ import { navigateToSubpage } from 'app';
 import { PageLoading } from 'views/pages/loading';
 import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
-import { Profile } from 'client/scripts/models';
+import { Profile } from 'models';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;

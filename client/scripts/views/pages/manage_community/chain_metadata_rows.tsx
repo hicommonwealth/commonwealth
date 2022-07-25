@@ -10,7 +10,7 @@ import { ChainBase, ChainCategoryType, ChainNetwork } from 'types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {

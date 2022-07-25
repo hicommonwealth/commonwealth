@@ -3,7 +3,7 @@ import 'pages/user_dashboard.scss';
 import m from 'mithril';
 import { Col, Tag } from 'construct-ui';
 import app from 'state';
-import { ChainInfo, NodeInfo } from 'client/scripts/models';
+import { ChainInfo, NodeInfo } from 'models';
 import { pluralize } from 'helpers';
 import { ChainIcon } from './chain_icon';
 import { CWCard } from './component_kit/cw_card';
@@ -28,8 +28,9 @@ const ChainCard: m.Component<{ chain: ChainInfo }> = {
     const { unseenPosts } = app.user;
     const visitedChain = !!unseenPosts[chain.id];
     const updatedThreads = unseenPosts[chain.id]?.activePosts || 0;
-    const monthlyThreadCount =
-      app.recentActivity.getCommunityThreadCount(chain.id);
+    const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
+      chain.id
+    );
 
     return m(
       CWCard,
@@ -43,10 +44,7 @@ const ChainCard: m.Component<{ chain: ChainInfo }> = {
         },
       },
       [
-        m('.card-top', [
-          m(ChainIcon, { chain }),
-          m('h3', chain.name),
-        ]),
+        m('.card-top', [m(ChainIcon, { chain }), m('h3', chain.name)]),
         m('.card-bottom', [
           m('p.card-description', chain.description),
           // if no recently active threads, hide this module altogether
@@ -79,13 +77,16 @@ const ChainCard: m.Component<{ chain: ChainInfo }> = {
 
 const DashboardExplorePreview: m.Component = {
   view: (vnode) => {
-    const sortedChains = app.config.chains.getAll().sort((a, b) => {
-      const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-      const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-      return threadCountB - threadCountA;
-    }).map((chain) => {
-      return m(ChainCard, { chain });
-    });
+    const sortedChains = app.config.chains
+      .getAll()
+      .sort((a, b) => {
+        const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+        const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
+        return threadCountB - threadCountA;
+      })
+      .map((chain) => {
+        return m(ChainCard, { chain });
+      });
 
     return m(Col, { span: { md: 3 }, class: 'expore-communities-col' }, [
       m(
@@ -99,9 +100,7 @@ const DashboardExplorePreview: m.Component = {
         'Explore Communities'
       ),
       m('.communities-list', [
-        sortedChains.length > 3
-          ? sortedChains.slice(0, 3)
-          : sortedChains,
+        sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains,
         m('.clear'),
       ]),
       m(

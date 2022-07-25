@@ -1,4 +1,4 @@
-import { CommunityType } from 'client/scripts/views/pages/create_community';
+import { CommunityType } from 'views/pages/create_community';
 import { ChainBase } from 'shared/types';
 
 // Base Payload - Required for All Events

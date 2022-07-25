@@ -1,5 +1,5 @@
-import topics from 'client/scripts/controllers/server/topics';
-import { IChainAdapter, OffchainTopic } from 'client/scripts/models';
+import topics from 'controllers/server/topics';
+import { IChainAdapter, OffchainTopic } from 'models';
 import { INewThreadForm, NewThreadErrors, ThreadKind } from './types';
 
 export const checkNewThreadErrors = (

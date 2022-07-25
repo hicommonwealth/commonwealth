@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import { OffchainThread } from 'client/scripts/models';
+import { OffchainThread } from 'models';
 import { DiscussionRow } from 'views/pages/discussions/discussion_row';
 import { orderDiscussionsbyLastComment } from './helpers';
 

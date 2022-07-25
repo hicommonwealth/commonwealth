@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { OffchainThread } from 'client/scripts/models';
+import { OffchainThread } from 'models';
 
 export const getLastUpdated = (proposal) => {
   const { lastCommentedOn } = proposal;

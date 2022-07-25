@@ -9,7 +9,7 @@ import app from 'state';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { OffchainThread } from 'models';
-import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
+import { LinkedThreadRelation } from 'models/OffchainThread';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 

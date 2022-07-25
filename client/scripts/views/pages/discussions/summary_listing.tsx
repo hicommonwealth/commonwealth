@@ -4,7 +4,7 @@ import 'pages/discussions/summary_listing.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { OffchainTopic } from 'client/scripts/models';
+import { OffchainTopic } from 'models';
 import { LoadingRow } from '../../components/loading_row';
 import SummaryRow from './summary_row';
 import { isWindowSmallInclusive } from '../../components/component_kit/helpers';

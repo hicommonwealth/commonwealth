@@ -32,7 +32,7 @@ import {
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
-import { DraftParams } from 'client/scripts/controllers/server/drafts';
+import { DraftParams } from 'controllers/server/drafts';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { TopicSelector } from '../topic_selector';
