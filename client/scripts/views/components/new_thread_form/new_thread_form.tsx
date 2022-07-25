@@ -104,9 +104,11 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     }
   }
 
+  // TODO: This isn't working
   private async _loadDraft(draft: DiscussionDraft) {
     if (!this) throw new Error('no this');
     this.quillEditorState.loadDocument(draft.body);
+    debugger;
     this.form.title = draft.title;
     this.form.topicName = draft.topic;
     this.activeTopic = draft.topic;
@@ -334,7 +336,14 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       topicMissing ||
       linkContentMissing ||
       discussionContentMissing;
-
+    if (disableSubmission) {
+      console.log({
+        disableSave,
+        topicMissing,
+        linkContentMissing,
+        discussionContentMissing,
+      });
+    }
     console.log(this.threadKind);
     return m(
       '.NewThreadForm',
@@ -512,6 +521,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                 }),
               ]),
               m(FormGroup, { order: 5 }, [
+                // TODO: Why disabled?
                 m(Button, {
                   intent: 'primary',
                   label: 'Create thread',
@@ -776,8 +786,10 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     allowOnContentClick: true,
                     selected: fromDraft === draft.id,
                     onclick: async () => {
-                      const { alteredText, isBlank } = this.quillEditorState;
-                      if (isBlank() || alteredText) {
+                      if (
+                        this.quillEditorState.isBlank() ||
+                        this.quillEditorState.alteredText
+                      ) {
                         const confirmed = await confirmationModalWithText(
                           'Load draft? Your current work will not be saved.'
                         )();

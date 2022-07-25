@@ -4,7 +4,11 @@ import moment from 'moment';
 import { parseUserMentions } from '../util/parseUserMentions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import {
+  getProposalUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { NotificationCategories, ProposalType } from '../../shared/types';
 import { factory, formatFilename } from '../../shared/logging';
 import { DB } from '../database';
@@ -16,17 +20,27 @@ export const Errors = {
   NoThreadId: 'Must provide thread_id',
   NoBodyOrAttachment: 'Must provide body or attachment',
   IncorrectOwner: 'Not owned by this user',
-  InvalidLink: 'Invalid thread URL'
+  InvalidLink: 'Invalid thread URL',
 };
 
-const editThread = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
-  const { body, title, kind, stage, thread_id, version_history, url } = req.body;
+const editThread = async (
+  models: DB,
+  banCache: BanCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { body, title, kind, stage, thread_id, version_history, url } =
+    req.body;
   if (!thread_id) {
     return next(new Error(Errors.NoThreadId));
   }
 
-  if (kind === 'forum') {
-    if ((!body || !body.trim()) && (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)) {
+  if (kind === 'discussion') {
+    if (
+      (!body || !body.trim()) &&
+      (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
+    ) {
       return next(new Error(Errors.NoBodyOrAttachment));
     }
   }
@@ -36,7 +50,10 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
   if (authorError) return next(new Error(authorError));
 
   const attachFiles = async () => {
-    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+    if (
+      req.body['attachments[]'] &&
+      typeof req.body['attachments[]'] === 'string'
+    ) {
       await models.OffchainAttachment.create({
         attachable: 'thread',
         attachment_id: thread_id,
@@ -44,32 +61,37 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]']
-        .map((url_) => models.OffchainAttachment.create({
-          attachable: 'thread',
-          attachment_id: thread_id,
-          url: url_,
-          description: 'image',
-        })));
+      await Promise.all(
+        req.body['attachments[]'].map((url_) =>
+          models.OffchainAttachment.create({
+            attachable: 'thread',
+            attachment_id: thread_id,
+            url: url_,
+            description: 'image',
+          })
+        )
+      );
     }
   };
 
   let thread;
   const userOwnedAddresses = await req.user.getAddresses();
-  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
+  const userOwnedAddressIds = userOwnedAddresses
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
   const collaboration = await models.Collaboration.findOne({
     where: {
       offchain_thread_id: thread_id,
-      address_id: { [Op.in]: userOwnedAddressIds }
-    }
+      address_id: { [Op.in]: userOwnedAddressIds },
+    },
   });
 
   const admin = await models.Role.findOne({
     where: {
       chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
-      permission: 'admin'
-    }
+      permission: 'admin',
+    },
   });
 
   // check if banned
@@ -86,8 +108,8 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
   if (collaboration || admin) {
     thread = await models.OffchainThread.findOne({
       where: {
-        id: thread_id
-      }
+        id: thread_id,
+      },
     });
   } else {
     thread = await models.OffchainThread.findOne({
@@ -108,12 +130,12 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     }
     // If new comment body text has been submitted, create another version history entry
     if (decodeURIComponent(req.body.body) !== latestVersion) {
-      const recentEdit : any = {
+      const recentEdit: any = {
         timestamp: moment(),
         author: req.body.author,
-        body: decodeURIComponent(req.body.body)
+        body: decodeURIComponent(req.body.body),
       };
-      const versionHistory : string = JSON.stringify(recentEdit);
+      const versionHistory: string = JSON.stringify(recentEdit);
       const arr = thread.version_history;
       arr.unshift(versionHistory);
       thread.version_history = arr;
@@ -148,7 +170,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
         {
           model: models.Address,
           // through: models.Collaboration,
-          as: 'collaborators'
+          as: 'collaborators',
         },
         models.OffchainAttachment,
         { model: models.OffchainTopic, as: 'topic' },
@@ -172,7 +194,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
       // don't send webhook notifications for edits
       null,
       req.wss,
-      [ userOwnedAddresses[0].address ],
+      [userOwnedAddresses[0].address]
     );
 
     let mentions;
@@ -182,7 +204,10 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
       mentions = currentDraftMentions.filter((addrArray) => {
         let alreadyExists = false;
         previousDraftMentions.forEach((addrArray_) => {
-          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+          if (
+            addrArray[0] === addrArray_[0] &&
+            addrArray[1] === addrArray_[1]
+          ) {
             alreadyExists = true;
           }
         });
@@ -195,20 +220,22 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        try {
-          const user = await models.Address.findOne({
-            where: {
-              chain: mention[0],
-              address: mention[1],
-            },
-            include: [ models.User, models.Role ]
-          });
-          return user;
-        } catch (err) {
-          return null;
-        }
-      }));
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          try {
+            const user = await models.Address.findOne({
+              where: {
+                chain: mention[0],
+                address: mention[1],
+              },
+              include: [models.User, models.Role],
+            });
+            return user;
+          } catch (err) {
+            return null;
+          }
+        })
+      );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -241,7 +268,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
             body: finalThread.body,
           },
           req.wss,
-          [ finalThread.Address.address ],
+          [finalThread.Address.address]
         );
       });
     }

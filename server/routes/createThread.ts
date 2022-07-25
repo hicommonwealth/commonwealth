@@ -27,12 +27,10 @@ import BanCache from '../util/banCheckCache';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  ForumMissingTitle: 'Forum posts must include a title',
-  QuestionMissingTitle: 'Questions must include a title',
-  RequestMissingTitle: 'Requests must include a title',
-  NoBodyOrAttachments: 'Forum posts must include body or attachment',
+  DiscussionMissingTitle: 'Discussion posts must include a title',
+  NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
-  UnsupportedKind: 'Only forum threads, questions, and requests supported',
+  UnsupportedKind: 'Only discussion and link posts supported',
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
@@ -218,9 +216,9 @@ const createThread = async (
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
 
-  if (kind === 'forum') {
+  if (kind === 'discussion') {
     if (!title || !title.trim()) {
-      return next(new Error(Errors.ForumMissingTitle));
+      return next(new Error(Errors.DiscussionMissingTitle));
     }
     if (
       (!body || !body.trim()) &&
@@ -239,14 +237,6 @@ const createThread = async (
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
-    }
-  } else if (kind === 'question') {
-    if (!title || !title.trim()) {
-      return next(new Error(Errors.QuestionMissingTitle));
-    }
-  } else if (kind === 'request') {
-    if (!title || !title.trim()) {
-      return next(new Error(Errors.RequestMissingTitle));
     }
   } else if (kind === 'link') {
     if (!title || !title.trim() || !url) {
@@ -347,12 +337,18 @@ const createThread = async (
 
     const topic = await models.OffchainTopic.findOne({
       where: {
-        id: topic_id
+        id: topic_id,
       },
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address, transaction);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address,
+        transaction
+      );
       if (!passesRules) {
         return next(new Error(Errors.RuleCheckFailed));
       }
@@ -382,14 +378,14 @@ const createThread = async (
           { transaction }
         );
       } else if (req.body['attachments[]']) {
-        const data = []
+        const data = [];
         req.body['attachments[]'].map((u) => {
           data.push({
             attachable: 'thread',
             attachment_id: thread.id,
             url: u,
             description: 'image',
-          })
+          });
         });
 
         await models.OffchainAttachment.bulkCreate(data, { transaction });

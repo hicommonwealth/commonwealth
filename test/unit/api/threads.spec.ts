@@ -32,7 +32,7 @@ describe('Thread Tests', () => {
   const bodyWithMentions = 'test body [@Tagged Member](/edgeware/npRis4Nb)';
   const topicName = 'test topic';
   const topicId = undefined;
-  const kind = 'forum';
+  const kind = 'discussion';
   const stage = 'discussion';
 
   const markdownThread = require('../../util/fixtures/markdownThread');

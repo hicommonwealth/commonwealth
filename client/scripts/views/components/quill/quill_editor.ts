@@ -32,12 +32,12 @@ export class QuillEditor extends QuillEditorInternal {
   // Returns editor contents as Delta. Ideal for handling RichText.
   // Use `text` getter for Markdown formattting.
   public get contents(): QuillDelta {
-    return this._quill._editor.getContents() as QuillDelta;
+    return this._quill.getContents() as QuillDelta;
   }
 
   public set contents(contents: QuillDelta) {
-    this._quill._editor.setContents(contents);
-    this._quill._editor.setSelection(this.endIndex);
+    this._quill.setContents(contents);
+    this._quill.setSelection(this.endIndex);
   }
 
   // Index location of , used to set cursor and clear formatting
@@ -45,27 +45,19 @@ export class QuillEditor extends QuillEditorInternal {
     return this._quill.getLength() ? this._quill.getLength() - 1 : 0;
   }
 
-  public get innerEditor(): Editor {
-    return this._quill.editor;
-  }
-
   public get markdownMode(): boolean {
     return this._activeMode === 'markdown';
-  }
-
-  public get outerEditor(): Quill {
-    return this._quill;
   }
 
   // Returns editor contents as string. Ideal for Markdown.
   // Use `contents` getter for Markdown formattting.
   public get text(): string {
-    return this._quill._editor.getText();
+    return this._quill.getText();
   }
 
   public set text(contents: string) {
-    this._quill._editor.setText(contents);
-    this._quill._editor.setSelection(this.endIndex);
+    this._quill.setText(contents);
+    this._quill.setSelection(this.endIndex);
   }
 
   // TODO: Check on this vs inner editor
@@ -118,23 +110,16 @@ export class QuillEditor extends QuillEditorInternal {
     this._quill.enable(true);
   }
 
-  // TODO: Check on this vs outer editor
   public isBlank(): boolean {
     if (this._quill.editor.isBlank()) return true;
-    if (
-      this._quill.editor.getText() === '' &&
-      this._quill.editor.getDelta()?.ops.length === 1 &&
-      this._quill.editor.getDelta()?.ops[0]?.insert === '\n'
-    ) {
-      return true;
-    }
+    if (this._quill.getText() === '\n') return true;
     return false;
   }
 
   // Load a template or draft and overwrite activeMode
   public loadDocument(document: string) {
     try {
-      const documentDelta = JSON.parse(document)?.ops;
+      const documentDelta = JSON.parse(document);
       if (!documentDelta.ops) throw new Error();
       this.activeMode = 'richText';
       this.contents = documentDelta;
@@ -142,11 +127,12 @@ export class QuillEditor extends QuillEditorInternal {
       this.activeMode = 'markdown';
       this.text = document;
     }
+    console.log({ this: this });
   }
 
   // Strips all formatting, e.g. when switching from RichText to Markdown
   public removeFormat(startIndex: number, endIndex: number) {
-    return this._quill.innerEditor.removeFormat(startIndex, endIndex);
+    return this._quill.removeFormat(startIndex, endIndex);
   }
 
   // Clears editor and resets state
