@@ -2,42 +2,68 @@
 
 .ProgressBar {
   border-radius: $border-radius-corners;
-
-  &.ongoing {
-    background-color: $neutral-800;
-  }
-
-  &.passed {
-    background-color: $green-500;
-  }
-
-  &.failed {
-    background-color: $rorange-500;
-  }
-
-  &.neutral {
-    background-color: $neutral-500;
-  }
-}
-
-.progress-background {
-  background-color: $neutral-200;
-  border-radius: $border-radius-corners;
-  height: 4px;
-  width: 100%;
-}
-
-.progress-label {
-  align-items: center;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   width: 100%;
 
-  .label-wrapper {
-    margin-bottom: 4px;
+  .progress-label {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .label-wrapper {
+      display: flex;
+      flex-direction: column;
+
+      .subtext-text.Text {
+        color: $neutral-500;
+        margin-bottom: 4px;
+      }
+    }
+
+    .progress-percentage-text.Text {
+      color: $neutral-500;
+      margin-bottom: 4px;
+    }
   }
 
-  .progress-percentage-text.Text {
-    color: $neutral-500;
+  .progress {
+    width: 100%;
+
+    &::-webkit-progress-bar {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+      height: 4px;
+      width: 100%;
+    }
+
+    &::-webkit-progress-value {
+      border-radius: $border-radius-corners;
+    }
+
+    &.ongoing {
+      &::-webkit-progress-value {
+        background-color: $neutral-800;
+      }
+    }
+
+    &.passed {
+      &::-webkit-progress-value {
+        background-color: $green-500;
+      }
+    }
+
+    &.failed {
+      &::-webkit-progress-value {
+        background-color: $rorange-500;
+      }
+    }
+
+    &.neutral {
+      &::-webkit-progress-value {
+        background-color: $neutral-500;
+      }
+    }
   }
 }

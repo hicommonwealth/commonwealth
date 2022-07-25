@@ -196,10 +196,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                           ? 'passed'
                           : 'neutral'
                       }
-                      progressHeight={4}
                       label={option.label}
                       count={option.voteCount}
-                      token=""
                     />
                   );
                 })}

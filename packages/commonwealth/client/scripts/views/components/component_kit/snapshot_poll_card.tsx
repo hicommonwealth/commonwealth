@@ -173,10 +173,12 @@ export class SnapshotPollCard
                           ? 'passed'
                           : 'neutral'
                       }
-                      progressHeight={4}
                       label={option.label}
                       count={option.voteCount}
-                      token={tokenSymbol ?? ''}
+                      subtext={`${Math.min(
+                        100,
+                        Math.floor(option.voteCount * 1000) / 1000
+                      )} ${tokenSymbol}`}
                     />
                   );
                 })}

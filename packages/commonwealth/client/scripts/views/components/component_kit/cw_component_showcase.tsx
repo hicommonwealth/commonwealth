@@ -116,14 +116,14 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Progress Bar (Neutral) With Token"
             progressStatus="neutral"
             count={50}
-            token="CMN"
+            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
           />
           <CWProgressBar
             progress={75}
             label="Progress Bar (Ongoing) With Token"
             progressStatus="ongoing"
             count={50}
-            token="CMN"
+            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
           />
         </div>
         <div class="card-gallery">
