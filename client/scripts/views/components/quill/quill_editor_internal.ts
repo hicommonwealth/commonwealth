@@ -383,21 +383,22 @@ export default class QuillEditorInternal {
         key: 'Enter',
         shortKey: false,
         shiftKey: null,
-        handler: this._newLineHandler,
+        handler: (range, context) => this._newLineHandler(range, context),
       },
       // Check for mentions on return
       'add-mention': {
         key: 'Enter',
         shortKey: false,
         shiftKey: null,
-        handler: this._mentionHandler,
+        handler: (range, context) => this._mentionHandler(range, context),
       },
       // Submit on enter if an onkeyboardSubmit function is passed
       submit: {
         key: 'Enter',
         shortKey: false,
         // TODO: Gate with Meta key, universalize submission
-        handler: this._onkeyboardSubmitHandler,
+        handler: (range, context) =>
+          this._onkeyboardSubmitHandler(range, context),
       },
       // Close headers, code blocks, and blockquotes when backspacing the start of a line
       'header backspace': {
@@ -435,7 +436,7 @@ export default class QuillEditorInternal {
         collapsed: true,
         format: { list: false },
         prefix: /^\s*(1{1,1}\.|\*|-)$/,
-        handler: this._listAutofillHandler,
+        handler: (range, context) => this._listAutofillHandler(range, context),
       },
       // Don't boldface, italicize, or underline text when hotkeys are pressed in Markdown mode
       bold: {
@@ -460,13 +461,13 @@ export default class QuillEditorInternal {
         collapsed: true,
         key: ' ',
         prefix: REGEXP_WITH_PRECEDING_WS,
-        handler: this._handleAutolinks,
+        handler: (range, context) => this._handleAutolinks(range, context),
       },
       autolinks2: {
         collapsed: true,
         key: 'Enter',
         prefix: REGEXP_WITH_PRECEDING_WS,
-        handler: this._handleAutolinks,
+        handler: (range, context) => this._handleAutolinks(range, context),
       },
     };
   }
@@ -950,6 +951,7 @@ export default class QuillEditorInternal {
   }
 
   private _newLineHandler(range, context) {
+    console.log({ this: this, _quill: this._quill });
     if (this._activeMode === 'markdown') return true;
     const [line, offset] = this._quill.getLine(range.index);
     const { textContent } = line.domNode;

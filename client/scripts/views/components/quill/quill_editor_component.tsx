@@ -154,6 +154,7 @@ export class QuillEditorComponent
   }
 
   view(vnode) {
+    console.log('editor loaded');
     const theme = vnode.attrs.theme || 'snow';
 
     const {
