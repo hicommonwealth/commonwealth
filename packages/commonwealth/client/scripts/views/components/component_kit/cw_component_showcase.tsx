@@ -61,10 +61,6 @@ export class ComponentShowcase implements m.ClassComponent {
   }
 
   view() {
-    const handleVoteChange = (newCount: number) => {
-      this.voteCount = newCount;
-    };
-
     return (
       <div class="ComponentShowcase">
         {/* <CWButton
@@ -83,7 +79,9 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWVoteButton
-            updateVoteCount={handleVoteChange}
+            updateVoteCount={(newCount: number) => {
+              this.voteCount = newCount;
+            }}
             voteCount={this.voteCount}
           />
         </div>

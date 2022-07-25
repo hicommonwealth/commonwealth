@@ -72,6 +72,18 @@
         color: $green-200;
       }
     }
+
+    &.isHoveringDownvote {
+      border-color: $rorange-200;
+
+      .vote-count.Text {
+        color: $rorange-200;
+      }
+
+      .downvote-button.Icon {
+        color: $rorange-200;
+      }
+    }
   }
 
   &.hasDownvoted {
@@ -88,6 +100,18 @@
 
     .downvote-button.Icon {
       color: $rorange-300;
+    }
+
+    &.isHoveringUpvote {
+      border-color: $green-400;
+
+      .upvote-button.Icon {
+        color: $green-200;
+      }
+
+      .vote-count.Text {
+        color: $green-200;
+      }
     }
 
     &.isHoveringDownvote {
