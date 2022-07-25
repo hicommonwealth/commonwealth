@@ -24,7 +24,7 @@ import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
-import { CWVoteButton, PreviousVote } from './cw_vote_button';
+import { CWVoteButton } from './cw_vote_button';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -53,7 +53,6 @@ export class ComponentShowcase implements m.ClassComponent {
   private selectedIconButton: number;
   private selectedTab: number;
   private voteCount: number;
-  private previousVote: PreviousVote;
 
   oninit() {
     this.radioGroupSelection = radioGroupOptions[2].value;
@@ -62,6 +61,10 @@ export class ComponentShowcase implements m.ClassComponent {
   }
 
   view() {
+    const handleVoteChange = (newCount: number) => {
+      this.voteCount = newCount;
+    };
+
     return (
       <div class="ComponentShowcase">
         {/* <CWButton
@@ -80,16 +83,8 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWVoteButton
-            onUpvote={() => {
-              this.voteCount += 1;
-              this.previousVote = 'previousUpvote';
-            }}
-            onDownvote={() => {
-              this.voteCount -= 1;
-              this.previousVote = 'previousDownvote';
-            }}
+            updateVoteCount={handleVoteChange}
             voteCount={this.voteCount}
-            previousVote={this.previousVote}
           />
         </div>
         <div class="basic-gallery">

@@ -9,33 +9,44 @@ import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
 import { getClasses } from './helpers';
 
-export type PreviousVote = 'previousUpvote' | 'previousDownvote';
+export type PreviousVote = 'hasUpvoted' | 'hasDownvoted';
 
 type VoteButtonAttrs = {
-  onDownvote: () => void;
-  onUpvote: () => void;
-  previousVote: PreviousVote;
+  updateVoteCount: (newCount: number) => void;
   voteCount: number;
 };
 
 export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
   private isHoveringUpvote: boolean;
   private isHoveringDownvote: boolean;
+  private voteArray: Array<number>;
+
+  oninit(vnode) {
+    const { voteCount } = vnode.attrs;
+
+    this.voteArray = [voteCount - 1, voteCount, voteCount + 1];
+  }
 
   view(vnode) {
-    const { onDownvote, onUpvote, previousVote, voteCount } = vnode.attrs;
+    const { updateVoteCount, voteCount } = vnode.attrs;
+
+    const handleVoteChange = (newCount: number) => {
+      updateVoteCount(newCount);
+    };
 
     return (
       <div
         class={getClasses<{
           isHoveringUpvote: boolean;
           isHoveringDownvote: boolean;
-          previousVote: PreviousVote;
+          hasUpvoted: boolean;
+          hasDownvoted: boolean;
         }>(
           {
             isHoveringUpvote: this.isHoveringUpvote,
             isHoveringDownvote: this.isHoveringDownvote,
-            previousVote,
+            hasUpvoted: voteCount === this.voteArray[2],
+            hasDownvoted: voteCount === this.voteArray[0],
           },
           ComponentType.VoteButton
         )}
@@ -43,11 +54,12 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
         <CWIcon
           iconName="upvote"
           iconSize="small"
-          onclick={previousVote === 'previousUpvote' ? undefined : onUpvote}
-          className={getClasses<{ previousUpvote: boolean }>(
-            { previousUpvote: previousVote === 'previousUpvote' },
-            'upvote-button'
-          )}
+          onclick={() => {
+            voteCount === this.voteArray[2]
+              ? handleVoteChange(this.voteArray[1])
+              : handleVoteChange(voteCount + 1);
+          }}
+          className="upvote-button"
           onmouseenter={() => {
             this.isHoveringUpvote = true;
           }}
@@ -61,17 +73,18 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
         <CWIcon
           iconName="downvote"
           iconSize="small"
-          onclick={previousVote === 'previousDownvote' ? undefined : onDownvote}
+          onclick={() => {
+            voteCount === this.voteArray[0]
+              ? handleVoteChange(this.voteArray[1])
+              : handleVoteChange(voteCount - 1);
+          }}
           onmouseenter={() => {
             this.isHoveringDownvote = true;
           }}
           onmouseleave={() => {
             this.isHoveringDownvote = false;
           }}
-          className={getClasses<{ previousDownvote: boolean }>(
-            { previousDownvote: previousVote === 'previousDownvote' },
-            'downvote-button'
-          )}
+          className="downvote-button"
         />
       </div>
     );

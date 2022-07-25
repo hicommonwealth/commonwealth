@@ -15,10 +15,6 @@
 
   .upvote-button.Icon {
     color: $neutral-300;
-
-    &.previousUpvote {
-      cursor: auto;
-    }
   }
 
   .vote-count.Text {
@@ -27,10 +23,6 @@
 
   .downvote-button.Icon {
     color: $neutral-300;
-
-    &.previousDownvote {
-      cursor: auto;
-    }
   }
 
   &.isHoveringUpvote {
@@ -57,7 +49,7 @@
     }
   }
 
-  &.previousUpvote {
+  &.hasUpvoted {
     background-color: $green-50;
     border-color: $green-500;
 
@@ -72,9 +64,17 @@
     .downvote-button.Icon {
       color: $white;
     }
+
+    &.isHoveringUpvote {
+      border-color: $green-400;
+
+      .upvote-button.Icon {
+        color: $green-200;
+      }
+    }
   }
 
-  &.previousDownvote {
+  &.hasDownvoted {
     background-color: $rorange-50;
     border-color: $rorange-300;
 
@@ -88,6 +88,14 @@
 
     .downvote-button.Icon {
       color: $rorange-300;
+    }
+
+    &.isHoveringDownvote {
+      border-color: $rorange-200;
+
+      .downvote-button.Icon {
+        color: $rorange-200;
+      }
     }
   }
 }
