@@ -10,7 +10,8 @@ const log = factory.getLogger(formatFilename(__filename));
 
 enum DeleteThreadErrors {
   NoUser = 'Not logged in',
-  NoThread = 'Must provide thread_id',
+  NoThreadId = 'Must provide thread_id',
+  NoThread = 'The thread id does not exists',
   NoPermission = 'Not owned by this user',
 }
 
@@ -26,7 +27,7 @@ const deleteThread = async (
     throw new AppError(DeleteThreadErrors.NoUser);
   }
   if (!thread_id) {
-    throw new AppError(DeleteThreadErrors.NoThread);
+    throw new AppError(DeleteThreadErrors.NoThreadId);
   }
 
   try {
@@ -74,7 +75,8 @@ const deleteThread = async (
       });
 
       if (!thread) {
-        throw new ServerError(DeleteThreadErrors.NoThread);
+        // TODO: this should be an AppError since admin tried to delete non-existent thread, no?
+        throw new AppError(DeleteThreadErrors.NoThread);
       }
     }
 
@@ -88,7 +90,9 @@ const deleteThread = async (
     await thread.destroy();
     return res.json({ status: 'Success' });
   } catch (e) {
-    throw new ServerError(e);
+    // we catch a few app errors here that should not be reported as ServerErrors
+    if (e instanceof AppError) throw new AppError(e.message);
+    else throw new ServerError(e.message);
   }
 };
 

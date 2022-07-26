@@ -10,6 +10,7 @@ import {
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
+import { AppError } from "../util/errors";
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -26,16 +27,16 @@ const updateProfile = async (
   models: DB, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
 ) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
-    return next(new Error(Errors.MissingParams));
+    return next(new AppError(Errors.MissingParams));
   }
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   let unpackedData;
   try {
     unpackedData = JSON.parse(req.body.data);
   } catch (e) {
-    return next(new Error(Errors.NotBlob));
+    return next(new AppError(Errors.NotBlob));
   }
   const address = await models.Address.findOne({
     where: {
@@ -45,26 +46,26 @@ const updateProfile = async (
   });
 
   if (!address || !address.id) {
-    return next(new Error(Errors.InvalidProfile));
+    return next(new AppError(Errors.InvalidProfile));
   }
   if (address.user_id !== req.user.id) {
-    return next(new Error(Errors.InvalidProfile));
+    return next(new AppError(Errors.InvalidProfile));
   }
 
   // enforce required fields
   if (!unpackedData.name) {
-    return next(new Error(Errors.NoName));
+    return next(new AppError(Errors.NoName));
   } else if (unpackedData.name.length < PROFILE_NAME_MIN_CHARS) {
-    return next(new Error(Errors.NameTooShort));
+    return next(new AppError(Errors.NameTooShort));
   }
 
   // enforce max chars
   if (unpackedData.name && unpackedData.name.length > PROFILE_NAME_MAX_CHARS) {
-    return next(new Error(Errors.NameTooLong));
+    return next(new AppError(Errors.NameTooLong));
   } else if (unpackedData.headline && unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS) {
-    return next(new Error(Errors.HeadlineTooLong));
+    return next(new AppError(Errors.HeadlineTooLong));
   } else if (unpackedData.bio && unpackedData.bio.length > PROFILE_BIO_MAX_CHARS) {
-    return next(new Error(Errors.BioTooLong));
+    return next(new AppError(Errors.BioTooLong));
   }
 
   // try to find existing profile

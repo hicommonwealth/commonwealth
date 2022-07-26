@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError } from "../util/errors";
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -19,18 +20,20 @@ const searchComments = async (
 ) => {
   let bind = {};
 
+  // TODO: using 'return next(new AppError())' causes AppErros to be logged as an 'Error' rather than 'Debug' in Rollbar
+  // TODO: this is unlike deleteThread.ts where if you do 'return new AppError()' the error is correctly logged as 'Debug' in Rollbar
   if (!req.query.search) {
-    return next(new Error(Errors.QueryMissing));
+    return next(new AppError(Errors.QueryMissing));
   }
   if (req.query.search.length < 4) {
-    return next(new Error(Errors.QueryTooShort));
+    return next(new AppError(Errors.QueryTooShort));
   }
 
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
 
     // set up query parameters
     communityOptions = `AND "OffchainComments".chain = $chain `;
