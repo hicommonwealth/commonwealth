@@ -16,6 +16,7 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -67,7 +68,7 @@ const createChain = async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new AppError('Not logged in'));
   }
   // require Admin privilege for creating Chain/DAO
   if (
@@ -75,36 +76,36 @@ const createChain = async (
     req.body.type !== ChainType.Offchain
   ) {
     if (!req.user.isAdmin) {
-      return next(new Error(Errors.NotAdmin));
+      return next(new AppError(Errors.NotAdmin));
     }
   }
   if (!req.body.id || !req.body.id.trim()) {
-    return next(new Error(Errors.NoId));
+    return next(new AppError(Errors.NoId));
   }
   if (!req.body.name || !req.body.name.trim()) {
-    return next(new Error(Errors.NoName));
+    return next(new AppError(Errors.NoName));
   }
   if (req.body.name.length > 255) {
-    return next(new Error(Errors.InvalidNameLength));
+    return next(new AppError(Errors.InvalidNameLength));
   }
   if (!req.body.symbol || !req.body.symbol.trim()) {
-    return next(new Error(Errors.NoSymbol));
+    return next(new AppError(Errors.NoSymbol));
   }
   if (req.body.symbol.length > 9) {
-    return next(new Error(Errors.InvalidSymbolLength));
+    return next(new AppError(Errors.InvalidSymbolLength));
   }
   if (!req.body.type || !req.body.type.trim()) {
-    return next(new Error(Errors.NoType));
+    return next(new AppError(Errors.NoType));
   }
   if (!req.body.base || !req.body.base.trim()) {
-    return next(new Error(Errors.NoBase));
+    return next(new AppError(Errors.NoBase));
   }
 
   const existingBaseChain = await models.Chain.findOne({
     where: { base: req.body.base },
   });
   if (!existingBaseChain) {
-    return next(new Error(Errors.InvalidBase));
+    return next(new AppError(Errors.InvalidBase));
   }
 
   // TODO: refactor this to use existing nodes rather than always creating one
@@ -118,7 +119,7 @@ const createChain = async (
   // always generate a chain id
   if (req.body.base === ChainBase.Ethereum) {
     if (!req.body.eth_chain_id || !+req.body.eth_chain_id) {
-      return next(new Error(Errors.InvalidChainId));
+      return next(new AppError(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
   }
@@ -129,7 +130,7 @@ const createChain = async (
     req.body.type !== ChainType.Offchain
   ) {
     if (!Web3.utils.isAddress(req.body.address)) {
-      return next(new Error(Errors.InvalidAddress));
+      return next(new AppError(Errors.InvalidAddress));
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
@@ -138,11 +139,11 @@ const createChain = async (
     }});
     if (!node && !req.user.isAdmin) {
       // if creating a new ETH node, must be admin -- users cannot submit custom URLs
-      return next(new Error(Errors.NotAdmin));
+      return next(new AppError(Errors.NotAdmin));
     }
     if (!node && !url) {
       // must provide at least url to create a new node
-      return next(new Error(Errors.InvalidChainIdOrUrl));
+      return next(new AppError(Errors.InvalidChainIdOrUrl));
     }
     if (node) {
       url = node.url;
@@ -154,7 +155,7 @@ const createChain = async (
       where: { address: req.body.address, chain_node_id: node.id }
     });
     if (existingChain) {
-      return next(new Error(Errors.ChainAddressExists));
+      return next(new AppError(Errors.ChainAddressExists));
     }
 
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
@@ -162,7 +163,7 @@ const createChain = async (
     const code = await web3.eth.getCode(req.body.address);
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
-      return next(new Error(Errors.InvalidAddress));
+      return next(new AppError(Errors.InvalidAddress));
     }
 
     // TODO: test altWalletUrl if available
@@ -174,7 +175,7 @@ const createChain = async (
     try {
       pubKey = new solw3.PublicKey(req.body.address);
     } catch (e) {
-      return next(new Error(Errors.InvalidAddress));
+      return next(new AppError(Errors.InvalidAddress));
     }
     try {
       const clusterUrl = solw3.clusterApiUrl(url as Cluster);
@@ -183,10 +184,10 @@ const createChain = async (
       const { decimals, amount } = supply.value;
       req.body.decimals = decimals;
       if (new BN(amount, 10).isZero()) {
-        throw new Error('Invalid supply amount');
+        throw new AppError('Invalid supply amount');
       }
     } catch (e) {
-      return next(new Error(Errors.InvalidNodeUrl));
+      return next(new AppError(Errors.InvalidNodeUrl));
     }
   } else if (
     req.body.base === ChainBase.CosmosSDK &&
@@ -194,13 +195,13 @@ const createChain = async (
   ) {
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
-      return next(new Error(Errors.InvalidNodeUrl));
+      return next(new AppError(Errors.InvalidNodeUrl));
     }
     try {
       const tmClient = await Tendermint34Client.connect(url);
       const { block } = await tmClient.block();
     } catch (err) {
-      return next(new Error(Errors.InvalidNode));
+      return next(new ServerError(Errors.InvalidNode));
     }
 
     // TODO: test altWalletUrl if available
@@ -210,16 +211,16 @@ const createChain = async (
       try {
         sanitizedSpec = await testSubstrateSpec(spec, req.body.node_url);
       } catch (e) {
-        return next(new Error(Errors.InvalidNode));
+        return next(new ServerError(Errors.InvalidNode));
       }
     }
 
   } else {
     if (!url || !url.trim()) {
-      return next(new Error(Errors.InvalidNodeUrl));
+      return next(new AppError(Errors.InvalidNodeUrl));
     }
     if (!urlHasValidHTTPPrefix(url) && !url.match(/wss?:\/\//)) {
-      return next(new Error(Errors.InvalidNodeUrl));
+      return next(new AppError(Errors.InvalidNodeUrl));
     }
   }
 
@@ -243,27 +244,27 @@ const createChain = async (
     token_name,
   } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
-    return next(new Error(Errors.InvalidWebsite));
+    return next(new AppError(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
-    return next(new Error(Errors.InvalidDiscord));
+    return next(new AppError(Errors.InvalidDiscord));
   } else if (element && !urlHasValidHTTPPrefix(element)) {
-    return next(new Error(Errors.InvalidElement));
+    return next(new AppError(Errors.InvalidElement));
   } else if (telegram && !telegram.startsWith('https://t.me/')) {
-    return next(new Error(Errors.InvalidTelegram));
+    return next(new AppError(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
-    return next(new Error(Errors.InvalidGithub));
+    return next(new AppError(Errors.InvalidGithub));
   } else if (icon_url && !urlHasValidHTTPPrefix(icon_url)) {
-    return next(new Error(Errors.InvalidIconUrl));
+    return next(new AppError(Errors.InvalidIconUrl));
   }
 
   const oldChain = await models.Chain.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
-    return next(new Error(Errors.ChainIDExists));
+    return next(new AppError(Errors.ChainIDExists));
   }
   if (oldChain && oldChain.name === req.body.name) {
-    return next(new Error(Errors.ChainNameExists));
+    return next(new AppError(Errors.ChainNameExists));
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({

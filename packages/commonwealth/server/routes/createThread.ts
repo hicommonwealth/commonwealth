@@ -15,7 +15,7 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
 import { OffchainThreadInstance } from '../models/offchain_thread';
-import { ServerError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -212,22 +212,22 @@ const createThread = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
 
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'forum') {
     if (!title || !title.trim()) {
-      return next(new Error(Errors.ForumMissingTitle));
+      return next(new AppError(Errors.ForumMissingTitle));
     }
     if (
       (!body || !body.trim()) &&
       (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
     ) {
-      return next(new Error(Errors.NoBodyOrAttachments));
+      return next(new AppError(Errors.NoBodyOrAttachments));
     }
     try {
       const quillDoc = JSON.parse(decodeURIComponent(body));
@@ -236,25 +236,25 @@ const createThread = async (
         quillDoc.ops[0].insert.trim() === '' &&
         (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
       ) {
-        return next(new Error(Errors.NoBodyOrAttachments));
+        return next(new AppError(Errors.NoBodyOrAttachments));
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
     }
   } else if (kind === 'question') {
     if (!title || !title.trim()) {
-      return next(new Error(Errors.QuestionMissingTitle));
+      return next(new AppError(Errors.QuestionMissingTitle));
     }
   } else if (kind === 'request') {
     if (!title || !title.trim()) {
-      return next(new Error(Errors.RequestMissingTitle));
+      return next(new AppError(Errors.RequestMissingTitle));
     }
   } else if (kind === 'link') {
     if (!title || !title.trim() || !url) {
-      return next(new Error(Errors.LinkMissingTitleOrUrl));
+      return next(new AppError(Errors.LinkMissingTitleOrUrl));
     }
   } else {
-    return next(new Error(Errors.UnsupportedKind));
+    return next(new AppError(Errors.UnsupportedKind));
   }
 
   // check if banned
@@ -263,7 +263,7 @@ const createThread = async (
     address: author.address,
   });
   if (!canInteract) {
-    return next(new Error(banError));
+    return next(new AppError(banError));
   }
 
   // Render a copy of the thread to plaintext for the search indexer
@@ -343,7 +343,7 @@ const createThread = async (
           req.body.address
         );
         if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
+          return next(new AppError(Errors.BalanceCheckFailed));
         }
       }
     }
@@ -357,7 +357,7 @@ const createThread = async (
     if (topic?.rule_id) {
       const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address, transaction);
       if (!passesRules) {
-        return next(new Error(Errors.RuleCheckFailed));
+        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
 
@@ -367,7 +367,7 @@ const createThread = async (
         transaction,
       });
     } catch (err) {
-      return next(new Error(err));
+      return next(new ServerError(err));
     }
     // TODO: attachments can likely be handled like topics & mentions (see lines 11-14)
     try {
