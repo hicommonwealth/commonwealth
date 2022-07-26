@@ -34,7 +34,6 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
-  MissingRootId: 'Must provide valid root_id',
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
@@ -61,10 +60,11 @@ const createComment = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { parent_id, root_id, text } = req.body;
+  const { parent_id, thread_id, text } = req.body;
 
-  if (!root_id || root_id.indexOf('_') === -1) {
-    return next(new Error(Errors.MissingRootId));
+  if (!thread_id ) {
+    //this is failing when proposal doesn't create new thread and pass properly
+    return next(new Error(Errors.ThreadNotFound));
   }
   if (
     (!text || !text.trim()) &&
@@ -108,7 +108,6 @@ const createComment = async (
     }
   }
 
-  const thread_id = root_id.substring(root_id.indexOf('_') + 1);
   const thread = await models.OffchainThread.findOne({
     where: { id: thread_id },
   });
@@ -187,7 +186,7 @@ const createComment = async (
   };
   const version_history: string[] = [JSON.stringify(firstVersion)];
   const commentContent = {
-    root_id,
+    thread_id,
     text,
     plaintext,
     version_history,
@@ -242,58 +241,14 @@ const createComment = async (
   // get parent entity if the comment is on an offchain thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
-  const [prefix, id] = finalComment.root_id.split('_') as [
-    ProposalType,
-    string
-  ];
-  if (prefix === ProposalType.OffchainThread) {
-    proposal = await models.OffchainThread.findOne({
-      where: { id },
-    });
-  } else if (
-    prefix.includes('proposal') ||
-    prefix.includes('referendum') ||
-    prefix.includes('motion')
-  ) {
-    // TODO: better check for on-chain proposal types
-    const chainEntity = await proposalIdToEntity(
-      models,
-      chain.id,
-      finalComment.root_id
-    );
-    if (!chainEntity) {
-      // send a notification email if commenting on an invalid ChainEntity
-      const msg = {
-        to: 'founders@commonwealth.im',
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        subject: 'Missing ChainEntity',
-        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
-      };
-      sgMail
-        .send(msg)
-        .then((result) => {
-          log.error(
-            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        })
-        .catch((e) => {
-          log.error(
-            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        });
-      // await finalComment.destroy();
-      // return next(new Error(Errors.ChainEntityNotFound));
-    }
-    proposal = id;
-  } else {
-    log.error(
-      `No matching proposal of thread for root_id ${finalComment.root_id}`
-    );
-  }
+
+  proposal = await models.ChainEntity.findOne({
+    where: { thread_id: thread.id },
+  });
+
 
   if (!proposal) {
-    await finalComment.destroy();
-    return next(new Error(Errors.ThreadNotFound));
+    proposal = thread;
   }
   if (typeof proposal !== 'string' && proposal.read_only) {
     await finalComment.destroy();
@@ -301,6 +256,7 @@ const createComment = async (
   }
 
   // craft commonwealth url
+  //TODO: fix using chainEntities
   const cwUrl =
     typeof proposal === 'string'
       ? getProposalUrlWithoutObject(
