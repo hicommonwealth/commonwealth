@@ -66,10 +66,12 @@ $discussion-title-font-size: 1.45rem;
     padding: 24px 0 24px 24px;
     width: 736px;
 
-    @include small {
+    @include smallInclusive {
+      padding: 24px;
       width: 100%;
     }
   }
+
   .ProposalHeader {
     margin-bottom: 24px;
 
@@ -77,6 +79,7 @@ $discussion-title-font-size: 1.45rem;
       position: relative;
     }
   }
+
   .ProposalHeader,
   .ProposalComment {
     @include supports-jump-highlight();

@@ -7,6 +7,10 @@
   padding: 0;
   width: 248px;
 
+  @include extraSmall {
+    width: 100%;
+  }
+
   .poll-title-text.Text {
     border-bottom: 1px solid $neutral-200;
     min-height: 32px;

@@ -18,6 +18,8 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWText } from '../../components/component_kit/cw_text';
 
 class ProposalSidebarLinkedChainEntity
   implements
@@ -111,16 +113,18 @@ export class LinkedProposalsCard
     const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
 
     return (
-      <div class="LinkedProposalsCard">
+      <CWCard className="LinkedProposalsCard">
         {proposal.chainEntities.length > 0 ||
         proposal.snapshotProposal?.length > 0 ? (
-          <h4>Proposals for Thread</h4>
+          <CWText type="h5" className="header-text">
+            Proposals for Thread
+          </CWText>
         ) : (
-          <h4>
+          <CWText type="h5">
             {app.chain
               ? 'Connect an on-chain proposal?'
               : 'Track the progress of this thread?'}
-          </h4>
+          </CWText>
         )}
         <div class="links-container">
           {proposal.chainEntities.length > 0 && (
@@ -136,9 +140,7 @@ export class LinkedProposalsCard
             </div>
           )}
           {proposal.snapshotProposal?.length > 0 && (
-            <div class="snapshot-container">
-              <ProposalSidebarLinkedSnapshot proposal={proposal} />
-            </div>
+            <ProposalSidebarLinkedSnapshot proposal={proposal} />
           )}
         </div>
         {showAddProposalButton && (
@@ -153,7 +155,7 @@ export class LinkedProposalsCard
             }}
           />
         )}
-      </div>
+      </CWCard>
     );
   }
 }
