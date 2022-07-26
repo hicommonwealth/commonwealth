@@ -1,5 +1,69 @@
 @import 'shared';
 
+.PollOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.CastVoteSection {
+  align-items: center;
+  display: flex;
+
+  .time-remaining-text.Text {
+    color: $neutral-500;
+    margin-left: 16px;
+  }
+}
+
+.VoteDisplay {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+
+  .vote-direction {
+    display: flex;
+
+    .vote-check-icon.Icon {
+      color: $green-500;
+      margin-right: 8px;
+    }
+  }
+
+  .time-remaining-text.Text {
+    color: $neutral-500;
+  }
+}
+
+.ResultsSection {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  width: 100%;
+  cursor: pointer;
+
+  .results-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    width: 100%;
+
+    .results-text.Text {
+      color: $neutral-500;
+    }
+  }
+
+  .results-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
 .PollCard.Card {
   align-items: center;
   display: flex;
@@ -25,69 +89,5 @@
     gap: 24px;
     padding: 16px;
     width: 100%;
-
-    .vote-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cast-vote-section {
-      align-items: center;
-      display: flex;
-
-      .time-remaining-text.Text {
-        color: $neutral-500;
-        margin-left: 16px;
-      }
-    }
-
-    .voted-display {
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      justify-content: center;
-      width: 100%;
-
-      .vote-direction {
-        display: flex;
-
-        .vote-check-icon.Icon {
-          color: $green-500;
-          margin-right: 8px;
-        }
-      }
-
-      .time-remaining-text.Text {
-        color: $neutral-500;
-      }
-    }
-  }
-
-  .poll-results-section {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    width: 100%;
-    cursor: pointer;
-
-    .results-header {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      width: 100%;
-
-      .results-text.Text {
-        color: $neutral-500;
-      }
-    }
-
-    .results-content {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
   }
 }

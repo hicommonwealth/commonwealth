@@ -12,7 +12,7 @@ import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 
-type VoteInformation = {
+export type VoteInformation = {
   label: string;
   value: string;
   voteCount: number;
@@ -22,16 +22,17 @@ export function buildVoteDirectionString(voteOption: string) {
   return `You voted "${voteOption}"`;
 }
 
-type PollOptionAttrs = {
+export type PollOptionAttrs = {
   multiSelect: boolean;
   voteInformation: Array<VoteInformation>;
   selectedOptions: Array<string>;
 };
-class PollOptions implements m.ClassComponent<PollOptionAttrs> {
+
+export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
   view(vnode) {
     const { multiSelect, voteInformation, selectedOptions } = vnode.attrs;
     return (
-      <div class="vote-options">
+      <div class="PollOptions">
         {multiSelect
           ? voteInformation.map((option) => (
               <CWCheckbox
@@ -63,17 +64,17 @@ class PollOptions implements m.ClassComponent<PollOptionAttrs> {
   }
 }
 
-type CastVoteAttrs = {
+export type CastVoteAttrs = {
   disableVoteButton: boolean;
   timeRemainingString: string;
   onVoteCast: () => any;
 };
 
-class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
+export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
   view(vnode) {
     const { disableVoteButton, timeRemainingString, onVoteCast } = vnode.attrs;
     return (
-      <div class="cast-vote-section">
+      <div class="CastVoteSection">
         <CWButton
           label="Vote"
           buttonType="mini"
@@ -88,13 +89,16 @@ class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
   }
 }
 
-class VoteDisplay
-  implements m.ClassComponent<{ timeRemainingString; voteDirectionString }>
-{
+export type VoteDisplayAttrs = {
+  timeRemainingString: string;
+  voteDirectionString: string;
+};
+
+export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
   view(vnode) {
     const { voteDirectionString, timeRemainingString } = vnode.attrs;
     return (
-      <div class="voted-display">
+      <div class="VoteDisplay">
         <div class="vote-direction">
           <CWIcon
             iconName="check"
@@ -111,23 +115,7 @@ class VoteDisplay
   }
 }
 
-export type SharedPollCardAttrs = {
-  disableVoteButton: boolean;
-  hasVoted: boolean;
-  incrementalVoteCast: number;
-  onVoteCast: () => any;
-  pollEnded: boolean;
-  proposalTitle: string;
-  timeRemainingString: string;
-  totalVoteCount: number;
-  votedFor: string;
-  voteInformation: Array<VoteInformation>;
-  multiSelect?: boolean;
-  onResultsClick?: () => any;
-  tokenSymbol?: string;
-};
-
-type ResultsSectionAttrs = {
+export type ResultsSectionAttrs = {
   resultString: string;
   onResultsClick: () => any;
   tokenSymbol: string;
@@ -136,7 +124,7 @@ type ResultsSectionAttrs = {
   pollEnded: boolean;
 };
 
-class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
+export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
   view(vnode) {
     const {
       resultString,
@@ -147,7 +135,12 @@ class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       pollEnded,
     } = vnode.attrs;
     return (
-      <div class="poll-results-section" onclick={(e) => onResultsClick(e)}>
+      <div
+        class="ResultsSection"
+        onclick={(e) => {
+          if (onResultsClick) onResultsClick(e);
+        }}
+      >
         <div class="results-header">
           <CWText type="b1" fontWeight="bold">
             {resultString}
@@ -189,7 +182,11 @@ class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
   }
 }
 
-export class PollCard implements m.ClassComponent<SharedPollCardAttrs> {
+export type PollCardAttrs = PollOptionAttrs &
+  CastVoteAttrs &
+  ResultsSectionAttrs;
+
+export class PollCard implements m.ClassComponent<PollCardAttrs> {
   private hasVoted: boolean;
   private selectedOptions: Array<string>;
   private totalVoteCount: number;
@@ -231,6 +228,7 @@ export class PollCard implements m.ClassComponent<SharedPollCardAttrs> {
         // TODO: Build this out when multiple vote options are introduced.
         return;
       }
+
       await onVoteCast(
         this.selectedOptions[0],
         this.selectedOptions.length === 0,
@@ -262,7 +260,9 @@ export class PollCard implements m.ClassComponent<SharedPollCardAttrs> {
                   selectedOptions={this.selectedOptions}
                 />
                 <CastVoteSection
-                  disableVoteButton={disableVoteButton}
+                  disableVoteButton={
+                    disableVoteButton || this.selectedOptions.length === 0
+                  }
                   timeRemainingString={timeRemainingString}
                   onVoteCast={castVote}
                 />
