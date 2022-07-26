@@ -380,14 +380,12 @@ $discussion-title-font-size: 1.45rem;
   .right-content-container {
     display: flex;
     flex-direction: column;
+    gap: 16px;
     padding: 24px 24px 24px 0;
     width: 296px;
 
     @include smallInclusive {
       display: none;
-    }
-    .poll-card-wrapper {
-      margin-bottom: 24px;
     }
   }
 

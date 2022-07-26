@@ -28,14 +28,13 @@
     }
   }
 
-  .progress {
+  progress {
+    height: 4px;
     width: 100%;
 
     &::-webkit-progress-bar {
       background-color: $neutral-200;
       border-radius: $border-radius-corners;
-      height: 4px;
-      width: 100%;
     }
 
     &::-webkit-progress-value {

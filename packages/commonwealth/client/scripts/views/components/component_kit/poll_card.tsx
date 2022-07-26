@@ -70,138 +70,130 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
     const resultString = 'Results';
 
     return (
-      <CWCard elevation="elevation-1" className="poll-card">
-        <div class="poll-card-content">
-          <CWText type="b2" className="poll-title-section">
-            {proposalTitle}
-          </CWText>
-          {!pollEnded && (
-            <div class="poll-voting-section">
-              {!this.hasVoted ? (
-                <>
-                  <div class="vote-options">
-                    {multiSelect ? (
-                      <div class="multi-select-votes">
-                        {voteInformation.map((option) => (
-                          <CWCheckbox
-                            checked={false}
-                            label={option.label}
-                            onchange={() => {
-                              // TODO: Build this out when multiple vote options are introduced.
-                              // Something like: this.selectedOptions.push(option.value);
-                              console.log('A vote for multiple options');
-                            }}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div class="single-select-votes">
-                        {voteInformation.map((option) => (
-                          <CWRadioButton
-                            checked={
-                              this.selectedOptions.length > 0 &&
-                              option.value === this.selectedOptions[0]
-                            }
-                            groupName="votes"
-                            onchange={() => {
-                              this.selectedOptions[0] = option.value;
-                            }}
-                            label={option.label}
-                            value={option.value}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div class="cast-vote-section">
-                    <CWButton
-                      label="Vote"
-                      buttonType="mini"
-                      disabled={disableVoteButton}
-                      onclick={async () => {
-                        if (
-                          multiSelect ||
-                          this.selectedOptions[0] === votedFor ||
-                          this.selectedOptions.length === 0
-                        ) {
-                          // TODO: Build this out when multiple vote options are introduced.
-                          return;
-                        }
-                        await onVoteCast(
-                          this.selectedOptions[0],
-                          this.selectedOptions.length === 0,
-                          () => {
-                            if (!votedFor) {
-                              this.totalVoteCount += incrementalVoteCast;
-                            }
-                            this.voteDirectionString = buildVoteDirectionString(
-                              this.selectedOptions[0]
-                            );
-                            this.hasVoted = true;
+      <CWCard className="PollCard">
+        <CWText type="b2" className="poll-title-text">
+          {proposalTitle}
+        </CWText>
+        {!pollEnded && (
+          <div class="poll-voting-section">
+            {!this.hasVoted ? (
+              <>
+                <div class="vote-options">
+                  {multiSelect
+                    ? voteInformation.map((option) => (
+                        <CWCheckbox
+                          checked={false}
+                          label={option.label}
+                          onchange={() => {
+                            // TODO: Build this out when multiple vote options are introduced.
+                            // Something like: this.selectedOptions.push(option.value);
+                            console.log('A vote for multiple options');
+                          }}
+                        />
+                      ))
+                    : voteInformation.map((option) => (
+                        <CWRadioButton
+                          checked={
+                            this.selectedOptions.length > 0 &&
+                            option.value === this.selectedOptions[0]
                           }
-                        );
-                        m.redraw();
-                      }}
-                    />
-                    <CWText className="time-remaining-text" type="caption">
-                      {timeRemainingString}
-                    </CWText>
-                  </div>
-                </>
-              ) : (
-                <div class="voted-display">
-                  <div class="vote-direction">
-                    <CWIcon iconName="check" iconSize="small" />
-                    <CWText type="caption" className="vote-direction-text">
-                      {this.voteDirectionString}
-                    </CWText>
-                  </div>
+                          groupName="votes"
+                          onchange={() => {
+                            this.selectedOptions[0] = option.value;
+                          }}
+                          label={option.label}
+                          value={option.value}
+                        />
+                      ))}
+                </div>
+                <div class="cast-vote-section">
+                  <CWButton
+                    label="Vote"
+                    buttonType="mini"
+                    disabled={disableVoteButton}
+                    onclick={async () => {
+                      if (
+                        multiSelect ||
+                        this.selectedOptions[0] === votedFor ||
+                        this.selectedOptions.length === 0
+                      ) {
+                        // TODO: Build this out when multiple vote options are introduced.
+                        return;
+                      }
+                      await onVoteCast(
+                        this.selectedOptions[0],
+                        this.selectedOptions.length === 0,
+                        () => {
+                          if (!votedFor) {
+                            this.totalVoteCount += incrementalVoteCast;
+                          }
+                          this.voteDirectionString = buildVoteDirectionString(
+                            this.selectedOptions[0]
+                          );
+                          this.hasVoted = true;
+                        }
+                      );
+                      m.redraw();
+                    }}
+                  />
                   <CWText className="time-remaining-text" type="caption">
                     {timeRemainingString}
                   </CWText>
                 </div>
-              )}
-            </div>
-          )}
-          <div class="poll-results-section" onclick={(e) => onResultsClick(e)}>
-            <div class="results-header">
-              <CWText type="b1" fontWeight="bold">
-                {resultString}
-              </CWText>
-              <CWText type="caption" className="results-text">
-                {`${Math.floor(this.totalVoteCount * 100) / 100} votes`}
-              </CWText>
-            </div>
-            <div class="results-content">
-              {voteInformation
-                .sort((option1, option2) => {
-                  if (pollEnded) {
-                    return option2.voteCount - option1.voteCount;
-                  } else {
-                    return 0;
-                  }
-                })
-                .map((option, index) => {
-                  return (
-                    <CWProgressBar
-                      progress={
-                        option.voteCount
-                          ? (option.voteCount / this.totalVoteCount) * 100
-                          : 0
-                      }
-                      progressStatus={
-                        !pollEnded
-                          ? 'ongoing'
-                          : index === 0
-                          ? 'passed'
-                          : 'neutral'
-                      }
-                      label={option.label}
-                      count={option.voteCount}
-                    />
-                  );
-                })}
-            </div>
+              </>
+            ) : (
+              <div class="voted-display">
+                <div class="vote-direction">
+                  <CWIcon iconName="check" iconSize="small" />
+                  <CWText type="caption" className="vote-direction-text">
+                    {this.voteDirectionString}
+                  </CWText>
+                </div>
+                <CWText className="time-remaining-text" type="caption">
+                  {timeRemainingString}
+                </CWText>
+              </div>
+            )}
+          </div>
+        )}
+        <div class="poll-results-section" onclick={(e) => onResultsClick(e)}>
+          <div class="results-header">
+            <CWText type="b1" fontWeight="bold">
+              {resultString}
+            </CWText>
+            <CWText type="caption" className="results-text">
+              {`${Math.floor(this.totalVoteCount * 100) / 100} votes`}
+            </CWText>
+          </div>
+          <div class="results-content">
+            {voteInformation
+              .sort((option1, option2) => {
+                if (pollEnded) {
+                  return option2.voteCount - option1.voteCount;
+                } else {
+                  return 0;
+                }
+              })
+              .map((option, index) => {
+                return (
+                  <CWProgressBar
+                    progress={
+                      option.voteCount
+                        ? (option.voteCount / this.totalVoteCount) * 100
+                        : 0
+                    }
+                    progressStatus={
+                      !pollEnded
+                        ? 'ongoing'
+                        : index === 0
+                        ? 'passed'
+                        : 'neutral'
+                    }
+                    label={option.label}
+                    count={option.voteCount}
+                  />
+                );
+              })}
           </div>
         </div>
       </CWCard>

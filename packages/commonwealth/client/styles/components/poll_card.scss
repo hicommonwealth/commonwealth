@@ -1,94 +1,87 @@
 @import 'shared';
 
-$default-card-width: 260px;
-
-.poll-card.Card {
+.PollCard.Card {
   align-items: center;
   display: flex;
-  max-width: 336px;
+  flex-direction: column;
   padding: 0;
-  width: auto;
+  width: 248px;
 
-  .poll-card-content {
+  .poll-title-text.Text {
+    border-bottom: 1px solid $neutral-200;
+    min-height: 32px;
+    padding: 16px;
+  }
+
+  .poll-voting-section {
+    border-bottom: 1px solid $neutral-200;
     display: flex;
     flex-direction: column;
+    gap: 24px;
+    padding: 16px;
     width: 100%;
 
-    .poll-title-section {
+    .vote-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cast-vote-section {
       align-items: center;
-      border-bottom: 1px solid $neutral-200;
       display: flex;
-      min-height: 32px;
-      padding: 8px 16px;
+
+      .time-remaining-text.Text {
+        color: $neutral-500;
+        margin-left: 16px;
+      }
+    }
+
+    .voted-display {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       width: 100%;
-    }
 
-    .poll-voting-section {
-      align-items: flex-start;
-      border-bottom: 1px solid $neutral-200;
-      display: flex;
-      flex-direction: column;
-      padding: 16px 2px 16px 2px;
-
-      .cast-vote-section {
-        align-items: center;
+      .vote-direction {
         display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        margin-top: 20px;
 
-        .time-remaining-text.Text {
-          color: $neutral-500;
-          margin-left: 16px;
+        .vote-direction-text.Text {
+          margin-left: 8px;
         }
       }
 
-      .voted-display {
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        width: 100%;
+      .time-remaining-text.Text {
+        color: $neutral-500;
+        margin-top: 4px;
+      }
+    }
+  }
 
-        .vote-direction {
-          display: flex;
+  .poll-results-section {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    width: 100%;
+    cursor: pointer;
 
-          .vote-direction-text.Text {
-            margin-left: 8px;
-          }
-        }
+    .results-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      width: 100%;
 
-        .time-remaining-text.Text {
-          color: $neutral-500;
-          margin-top: 4px;
-        }
+      .results-text.Text {
+        color: $neutral-500;
       }
     }
 
-    .poll-results-section {
+    .results-content {
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      cursor: pointer;
-
-      .results-header {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        margin-bottom: 16px;
-        width: 100%;
-
-        .results-text.Text {
-          color: $neutral-500;
-        }
-      }
-
-      .results-content {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-      }
+      gap: 24px;
     }
   }
 }

@@ -1422,52 +1422,45 @@ const ViewProposalPage: m.Component<
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m('.poll-card-wrapper', {}, [
-                  m(PollCard, {
-                    multiSelect: false,
-                    pollEnded:
-                      poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
-                    hasVoted:
-                      app.user.activeAccount &&
-                      poll.getUserVote(
-                        app.user.activeAccount?.chain?.id,
-                        app.user.activeAccount?.address
-                      ),
-                    votedFor: poll.getUserVote(
+                return m(PollCard, {
+                  multiSelect: false,
+                  pollEnded:
+                    poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                  hasVoted:
+                    app.user.activeAccount &&
+                    poll.getUserVote(
                       app.user.activeAccount?.chain?.id,
                       app.user.activeAccount?.address
-                    )?.option,
-                    proposalTitle: poll.prompt,
-                    timeRemainingString: getProposalPollTimestamp(
-                      poll,
-                      poll.endsAt && poll.endsAt?.isBefore(moment().utc())
                     ),
-                    totalVoteCount: poll.votes?.length,
-                    voteInformation: poll.options.map((option) => {
-                      return {
-                        label: option,
-                        value: option,
-                        voteCount: poll.votes.filter((v) => v.option === option)
-                          .length,
-                      };
-                    }),
-                    incrementalVoteCast: 1,
-                    onVoteCast: (option, isSelected, callback) =>
-                      handleProposalPollVote(
-                        poll,
-                        option,
-                        isSelected,
-                        callback
-                      ),
-                    onResultsClick: (e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: OffchainVotingModal,
-                        data: { votes: poll.votes },
-                      });
-                    },
+                  votedFor: poll.getUserVote(
+                    app.user.activeAccount?.chain?.id,
+                    app.user.activeAccount?.address
+                  )?.option,
+                  proposalTitle: poll.prompt,
+                  timeRemainingString: getProposalPollTimestamp(
+                    poll,
+                    poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                  ),
+                  totalVoteCount: poll.votes?.length,
+                  voteInformation: poll.options.map((option) => {
+                    return {
+                      label: option,
+                      value: option,
+                      voteCount: poll.votes.filter((v) => v.option === option)
+                        .length,
+                    };
                   }),
-                ]);
+                  incrementalVoteCast: 1,
+                  onVoteCast: (option, isSelected, callback) =>
+                    handleProposalPollVote(poll, option, isSelected, callback),
+                  onResultsClick: (e) => {
+                    e.preventDefault();
+                    app.modals.create({
+                      modal: OffchainVotingModal,
+                      data: { votes: poll.votes },
+                    });
+                  },
+                });
               }),
           ],
         ]),

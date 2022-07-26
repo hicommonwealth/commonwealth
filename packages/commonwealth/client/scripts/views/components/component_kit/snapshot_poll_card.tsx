@@ -69,7 +69,7 @@ export class SnapshotPollCard
     const resultString = 'Results';
 
     return (
-      <CWCard elevation="elevation-1" className="poll-card">
+      <CWCard className="poll-card">
         <div class="poll-card-content">
           <CWText type="b2" className="poll-title-section">
             {proposalTitle}

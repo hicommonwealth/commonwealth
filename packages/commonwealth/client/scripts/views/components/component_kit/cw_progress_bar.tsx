@@ -37,12 +37,9 @@ export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
           </CWText>
         </div>
         <progress
-          class={getClasses<{ progressStatus: ProgressBarStatus }>(
-            {
-              progressStatus,
-            },
-            'progress'
-          )}
+          class={getClasses<{ progressStatus: ProgressBarStatus }>({
+            progressStatus,
+          })}
           max="100"
           value={Math.min(100, progress)}
         />
