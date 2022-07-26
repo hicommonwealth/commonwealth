@@ -46,7 +46,7 @@ const ConfirmModal = {
             label={primaryButton}
           />
           <CWButton
-            buttonType="secondary"
+            buttonType="secondary-blue"
             onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
