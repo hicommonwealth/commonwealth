@@ -9,6 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError } from "../util/errors";
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
@@ -32,9 +33,9 @@ const startEmailLogin = async (models: DB, req: Request, res: Response, next: Ne
   const email = req.body.email;
   const validEmailRegex = /\S+@\S+\.\S+/;
   if (!email) {
-    return next(new Error(Errors.NoEmail));
+    return next(new AppError(Errors.NoEmail));
   } else if (!validEmailRegex.test(email)) {
-    return next(new Error(Errors.InvalidEmail));
+    return next(new AppError(Errors.InvalidEmail));
   }
 
   const previousUser = await models.User.scope('withPrivateData').findOne({
