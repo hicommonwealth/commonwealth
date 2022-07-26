@@ -46,20 +46,21 @@
       align-items: center;
       display: flex;
       flex-direction: column;
+      gap: 4px;
       justify-content: center;
       width: 100%;
 
       .vote-direction {
         display: flex;
 
-        .vote-direction-text.Text {
-          margin-left: 8px;
+        .vote-check-icon.Icon {
+          color: $green-500;
+          margin-right: 8px;
         }
       }
 
       .time-remaining-text.Text {
         color: $neutral-500;
-        margin-top: 4px;
       }
     }
   }

@@ -146,10 +146,12 @@ export class PollCard implements m.ClassComponent<SharedPollCardAttrs> {
             ) : (
               <div class="voted-display">
                 <div class="vote-direction">
-                  <CWIcon iconName="check" iconSize="small" />
-                  <CWText type="caption" className="vote-direction-text">
-                    {this.voteDirectionString}
-                  </CWText>
+                  <CWIcon
+                    iconName="check"
+                    iconSize="small"
+                    className="vote-check-icon"
+                  />
+                  <CWText type="caption">{this.voteDirectionString}</CWText>
                 </div>
                 <CWText className="time-remaining-text" type="caption">
                   {timeRemainingString}
