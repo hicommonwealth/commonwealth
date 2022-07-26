@@ -18,12 +18,10 @@ type VoteButtonAttrs = {
 export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
   private isHoveringUpvote: boolean;
   private isHoveringDownvote: boolean;
-  private voteArray: Array<number>;
+  private initialVoteCount: number;
 
   oninit(vnode) {
-    const { voteCount } = vnode.attrs;
-
-    this.voteArray = [voteCount - 1, voteCount, voteCount + 1];
+    this.initialVoteCount = vnode.attrs.voteCount;
   }
 
   view(vnode) {
@@ -44,8 +42,8 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
           {
             isHoveringUpvote: this.isHoveringUpvote,
             isHoveringDownvote: this.isHoveringDownvote,
-            hasUpvoted: voteCount === this.voteArray[2],
-            hasDownvoted: voteCount === this.voteArray[0],
+            hasUpvoted: voteCount === this.initialVoteCount + 1,
+            hasDownvoted: voteCount === this.initialVoteCount - 1,
           },
           ComponentType.VoteButton
         )}
@@ -54,9 +52,9 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
           iconName="upvote"
           iconSize="small"
           onclick={() => {
-            voteCount === this.voteArray[2]
-              ? handleVoteChange(this.voteArray[1])
-              : handleVoteChange(voteCount + 1);
+            voteCount === this.initialVoteCount + 1
+              ? handleVoteChange(this.initialVoteCount)
+              : handleVoteChange(this.initialVoteCount + 1);
           }}
           className="upvote-button"
           onmouseenter={() => {
@@ -78,9 +76,9 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
           iconName="downvote"
           iconSize="small"
           onclick={() => {
-            voteCount === this.voteArray[0]
-              ? handleVoteChange(this.voteArray[1])
-              : handleVoteChange(voteCount - 1);
+            voteCount === this.initialVoteCount - 1
+              ? handleVoteChange(this.initialVoteCount)
+              : handleVoteChange(this.initialVoteCount - 1);
           }}
           onmouseenter={() => {
             this.isHoveringDownvote = true;
