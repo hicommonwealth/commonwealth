@@ -281,7 +281,7 @@
     background: $neutral-700;
   }
 
-  &.selected {
+  &:active {
     background: $neutral-400;
   }
 

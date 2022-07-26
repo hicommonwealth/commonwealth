@@ -4,13 +4,13 @@ import m from 'mithril';
 
 import 'components/poll_card.scss';
 
-import { CWCard } from './cw_card';
-import { CWButton } from './cw_button';
-import { CWProgressBar } from './cw_progress_bar';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWCheckbox } from './cw_checkbox';
-import { CWRadioButton } from './cw_radio_button';
-import { CWText } from './cw_text';
+import { CWCard } from './component_kit/cw_card';
+import { CWButton } from './component_kit/cw_button';
+import { CWProgressBar } from './component_kit/cw_progress_bar';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWCheckbox } from './component_kit/cw_checkbox';
+import { CWRadioButton } from './component_kit/cw_radio_button';
+import { CWText } from './component_kit/cw_text';
 
 type VoteInformation = {
   label: string;
@@ -18,12 +18,10 @@ type VoteInformation = {
   voteCount: number;
 };
 
-type PollCardAttrs = {
+export type SharedPollCardAttrs = {
   disableVoteButton: boolean;
   hasVoted: boolean;
   incrementalVoteCast: number;
-  multiSelect: boolean;
-  onResultsClick: () => any;
   onVoteCast: () => any;
   pollEnded: boolean;
   proposalTitle: string;
@@ -31,17 +29,20 @@ type PollCardAttrs = {
   totalVoteCount: number;
   votedFor: string;
   voteInformation: Array<VoteInformation>;
+  multiSelect?: boolean;
+  onResultsClick?: () => any;
+  tokenSymbol?: string;
 };
 
 export function buildVoteDirectionString(voteOption: string) {
   return `You voted "${voteOption}"`;
 }
 
-export class PollCard implements m.ClassComponent<PollCardAttrs> {
-  hasVoted: boolean;
-  selectedOptions: Array<string>;
-  totalVoteCount: number;
-  voteDirectionString: string;
+export class PollCard implements m.ClassComponent<SharedPollCardAttrs> {
+  private hasVoted: boolean;
+  private selectedOptions: Array<string>;
+  private totalVoteCount: number;
+  private voteDirectionString: string;
 
   oninit(vnode) {
     // Initialize state which can change during the lifecycle of the component.
@@ -63,6 +64,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       pollEnded,
       proposalTitle,
       timeRemainingString,
+      tokenSymbol,
       votedFor,
       voteInformation,
     } = vnode.attrs;
@@ -162,7 +164,9 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
               {resultString}
             </CWText>
             <CWText type="caption" className="results-text">
-              {`${Math.floor(this.totalVoteCount * 100) / 100} votes`}
+              {`${Math.floor(this.totalVoteCount * 100) / 100} ${
+                tokenSymbol ?? 'votes'
+              }`}
             </CWText>
           </div>
           <div class="results-content">

@@ -127,7 +127,7 @@ import {
   handleProposalPollVote,
   jumpHighlightComment,
 } from './helpers';
-import { PollCard } from '../../components/component_kit/poll_card';
+import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 
 const MAX_THREAD_LEVEL = 2;

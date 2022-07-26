@@ -14,7 +14,7 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
-import { SnapshotPollCard } from '../../components/component_kit/snapshot_poll_card';
+import { PollCard } from '../../components/poll_card';
 
 type SnapshotProposalCardsAttrs = {
   identifier: string;
@@ -117,7 +117,7 @@ export class SnapshotProposalCards
     return (
       <div class="SnapshotProposalCards">
         <SnapshotInformationCard proposal={proposal} threads={threads} />
-        <SnapshotPollCard
+        <PollCard
           multiSelect={false}
           pollEnded={!isActive}
           hasVoted={hasVoted}
