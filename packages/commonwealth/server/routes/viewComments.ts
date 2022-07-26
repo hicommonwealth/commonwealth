@@ -7,7 +7,7 @@ import { getLastEdited } from '../util/getLastEdited';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NoRootId: 'Must provide root_id',
+  NoThreadId: 'Must provide thread_id',
 };
 
 const viewComments = async (
@@ -19,12 +19,12 @@ const viewComments = async (
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new Error(error));
 
-  if (!req.query.root_id) {
-    return next(new Error(Errors.NoRootId));
+  if (!req.query.thread_id) {
+    return next(new Error(Errors.NoThreadId));
   }
 
   const comments = await models.OffchainComment.findAll({
-    where: { chain: chain.id, root_id: req.query.root_id },
+    where: { chain: chain.id, thread_id: req.query.thread_id },
     include: [
       models.Address,
       models.OffchainAttachment,

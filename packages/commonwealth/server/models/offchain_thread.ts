@@ -58,7 +58,7 @@ export default (
     'OffchainThread',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      address_id: { type: dataTypes.INTEGER, allowNull: false },
+      address_id: { type: dataTypes.INTEGER, allowNull: true },
       title: { type: dataTypes.TEXT, allowNull: false },
       body: { type: dataTypes.TEXT, allowNull: true },
       plaintext: { type: dataTypes.TEXT, allowNull: true },

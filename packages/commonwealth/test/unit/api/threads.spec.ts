@@ -197,7 +197,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        root_id: `discussion_${tRes.result.id}`,
+        thread_id: tRes.result.id,
       });
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
@@ -354,12 +354,12 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        root_id: `discussion_${thread.id}`,
+        thread_id: `discussion_${thread.id}`,
       });
 
       expect(cRes.status).to.equal('Success');
       expect(cRes.result).to.not.be.null;
-      expect(cRes.result.root_id).to.equal(`discussion_${thread.id}`);
+      expect(cRes.result.thread_id).to.equal(`discussion_${thread.id}`);
       expect(cRes.result.text).to.equal(markdownComment.text);
       expect(cRes.result.Address).to.not.be.null;
       expect(cRes.result.Address.address).to.equal(userAddress);
@@ -371,12 +371,12 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: bodyWithMentions,
-        root_id: `discussion_${thread.id}`,
+        thread_id: `discussion_${thread.id}`,
       });
 
       expect(cRes.status).to.equal('Success');
       expect(cRes.result).to.not.be.null;
-      expect(cRes.result.root_id).to.equal(`discussion_${thread.id}`);
+      expect(cRes.result.thread_id).to.equal(`discussion_${thread.id}`);
       expect(cRes.result.text).to.equal(bodyWithMentions);
       expect(cRes.result.Address).to.not.be.null;
       expect(cRes.result.Address.address).to.equal(userAddress);
@@ -388,7 +388,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        root_id: `discussion_${thread.id}`,
+        thread_id: `discussion_${thread.id}`,
       });
       const parentId = cRes.result.id;
       cRes = await modelUtils.createComment({
@@ -396,19 +396,19 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        root_id: `discussion_${thread.id}`,
+        thread_id: `discussion_${thread.id}`,
         parentCommentId: `${parentId}`,
       });
 
       expect(cRes.status).to.equal('Success');
       expect(cRes.result).to.not.be.null;
-      expect(cRes.result.root_id).to.equal(`discussion_${thread.id}`);
+      expect(cRes.result.thread_id).to.equal(`discussion_${thread.id}`);
       expect(cRes.result.parent_id).to.equal(`${parentId}`);
       expect(cRes.result.text).to.equal(markdownComment.text);
       expect(cRes.result.Address).to.not.be.null;
       expect(cRes.result.Address.address).to.equal(userAddress);
     });
-
+/* --deprecating; should replace with thread_id check, but presently permits NULLs until old values cleaned up
     it('should fail to create a comment without a root_id', async () => {
       const cRes = await modelUtils.createComment({
         chain,
@@ -421,14 +421,14 @@ describe('Thread Tests', () => {
       expect(cRes.error).to.not.be.null;
       expect(cRes.error).to.be.equal(CreateCommentErrors.MissingRootId);
     });
-
+*/
     it('should fail to create a comment without text', async () => {
       const cRes = await modelUtils.createComment({
         chain,
         address: userAddress,
         jwt: userJWT,
         text: null,
-        root_id: `discussion_${thread.id}`,
+        thread_id: `discussion_${thread.id}`,
       });
 
       expect(cRes.error).to.not.be.null;
@@ -443,11 +443,11 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: 'test',
-        root_id: 'fake-thread-id',
+        thread_id: 'fake-thread-id',
       });
 
       expect(cRes.error).to.not.be.null;
-      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingRootId);
+      expect(cRes.error).to.be.equal(CreateCommentErrors.MissingThreadId);
     });
   });
 
@@ -647,7 +647,7 @@ describe('Thread Tests', () => {
         address: res.address,
         jwt: newUserJWT,
         text: 'hello world',
-        root_id: `discussion_${tempThread.id}`,
+        thread_id: ${tempThread.id},
       });
       expect(cRes.result).to.be.undefined;
       expect(cRes.error).to.be.equal(CreateCommentErrors.CantCommentOnReadOnly);
@@ -747,7 +747,7 @@ describe('Thread Tests', () => {
         address: userAddress,
         jwt: userJWT,
         text: markdownComment.text,
-        root_id: `discussion_${tRes.result.id}`,
+        thread_id: tRes.result.id,
       });
       const eRes = await modelUtils.editComment({
         text,
@@ -760,7 +760,7 @@ describe('Thread Tests', () => {
       expect(eRes.status).to.be.equal('Success');
       expect(eRes.result).not.to.be.null;
       expect(eRes.result.chain).to.be.equal(chain);
-      expect(eRes.result.root_id).to.be.equal(`discussion_${tRes.result.id}`);
+      expect(eRes.result.thread_id).to.be.equal(tRes.result.id);
     });
   });
 
