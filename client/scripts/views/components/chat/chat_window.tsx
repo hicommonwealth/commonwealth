@@ -42,23 +42,26 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   scrollToBottom: () => void;
   shouldScroll: boolean;
   shouldScrollToHighlight: boolean;
-  private _quillEditorState: QuillEditor;
-  private _channel;
+  quillEditorState: QuillEditor;
+  channel;
 
   private _handleSubmitMessage = () => {
-    if (this._quillEditorState.isBlank()) {
+    console.log(this);
+    if (this.quillEditorState.isBlank()) {
       notifyError('Cannot send a blank message');
       return;
     }
 
-    const { _quillEditorState } = this;
+    const bodyText = this.quillEditorState.textContentsAsString;
+    this.quillEditorState.disable();
 
     const message = {
-      message: _quillEditorState.textContentsAsString,
-      chat_channel_id: this._channel.id,
+      message: bodyText,
+      chatchannel_id: this.channel.id,
       address: app.user.activeAccount.address,
     };
     app.socket.chatNs.sendMessage(message);
+    this.quillEditorState.enable();
 
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.NEW_CHAT_SENT,
@@ -82,8 +85,8 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
-      const { chat_channel_id } = msg;
-      if (chat_channel_id === vnode.attrs.channel_id) {
+      const { chatchannel_id } = msg;
+      if (chatchannel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
       }
       m.redraw();
@@ -105,9 +108,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   view(vnode) {
     const { channel_id } = vnode.attrs;
     app.socket.chatNs.readMessages(channel_id);
-    this._channel = app.socket.chatNs.channels[channel_id];
+    this.channel = app.socket.chatNs.channels[channel_id];
     // group messages; break up groups when the sender changes, or there is a delay of MESSAGE_GROUPING_DELAY
-    const groupedMessages = this._channel.ChatMessages.reduce((acc, msg) => {
+    const groupedMessages = this.channel.ChatMessages.reduce((acc, msg) => {
       if (
         acc.length > 0 &&
         acc[acc.length - 1].address === msg.address &&
@@ -159,7 +162,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                   name={Icons.LINK}
                   onclick={async () => {
                     const route = app.socket.chatNs.getRouteToMessage(
-                      grp.messages[0].chat_channel_id,
+                      grp.messages[0].chatchannel_id,
                       grp.messages[0].id,
                       app.chain.id
                     );

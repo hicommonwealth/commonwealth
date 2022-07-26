@@ -13,10 +13,6 @@ import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
-import { CWBanner } from './components/component_kit/cw_banner';
-import { ITokenAdapter } from '../models';
-import { isNonEmptyString } from '../helpers/typeGuards';
-import { CWText } from './components/component_kit/cw_text';
 import { SublayoutBanners } from './sublayout_banners';
 
 type SublayoutAttrs = {

@@ -65,10 +65,10 @@ const CreateComment: m.Component<
     }
 
     const submitComment = async (e?: Event) => {
-      debugger;
       vnode.state.error = null;
       vnode.state.sendingComment = true;
 
+      // TODO Graham 7-26-22: Is this check necessary? It should be everywhere or nowhere.
       if (!vnode.state.quillEditorState) {
         if (e) e.preventDefault();
         vnode.state.error =
@@ -85,7 +85,6 @@ const CreateComment: m.Component<
       }
 
       const bodyText = vnode.state.quillEditorState.textContentsAsString;
-      console.log(bodyText);
       vnode.state.quillEditorState.disable();
 
       try {
@@ -105,7 +104,6 @@ const CreateComment: m.Component<
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
-        m.redraw();
         jumpHighlightComment(res.id);
       } catch (err) {
         console.log(err);
@@ -113,12 +111,12 @@ const CreateComment: m.Component<
         vnode.state.quillEditorState.enable();
         vnode.state.error = err.message;
         vnode.state.sendingComment = false;
-        m.redraw();
       }
-      vnode.state.saving = false;
 
+      vnode.state.saving = false;
       proposalPageState.replying = false;
       proposalPageState.parentCommentId = null;
+      m.redraw();
     };
 
     const activeTopicName =

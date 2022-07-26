@@ -39,7 +39,7 @@ type EditTopicModalForm = {
 export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
   private error: string;
   private form: EditTopicModalForm;
-  private quillEditorState: QuillEditor; // do we have a type for this?
+  private quillEditorState: QuillEditor;
   private saving: boolean;
   private _contentsDoc: QuillTextContents;
 

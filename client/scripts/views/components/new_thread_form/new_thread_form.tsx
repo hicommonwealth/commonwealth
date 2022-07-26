@@ -55,7 +55,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   autoTitleOverride: boolean;
   form: INewThreadForm;
   fromDraft?: number;
-  threadKind: string;
   quillEditorState: QuillEditor;
   overwriteConfirmationModal: boolean;
   recentlyDeletedDrafts: number[];
@@ -81,7 +80,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   ) {
     if (!this) throw new Error('no this');
     const bodyText = quillEditorState.textContentsAsString;
-    console.log({ bodyText });
     quillEditorState.disable();
     checkNewThreadErrors(form, bodyText);
 
@@ -109,7 +107,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   private async _loadDraft(draft: DiscussionDraft) {
     if (!this) throw new Error('no this');
     this.quillEditorState.loadDocument(draft.body);
-    debugger;
     this.form.title = draft.title;
     this.form.topicName = draft.topic;
     this.activeTopic = draft.topic;
@@ -123,6 +120,8 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     if (this.quillEditorState.alteredText) {
       this.quillEditorState.alteredText = false;
     }
+
+    m.redraw();
   }
 
   private async _saveDraft(
@@ -130,7 +129,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     quillEditorState: QuillEditor,
     existingDraftId?: number
   ) {
-    if (!this) throw new Error('no this');
     if (!quillEditorState || quillEditorState.isBlank()) {
       throw new Error(NewDraftErrors.InsufficientData);
     }
@@ -143,8 +141,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     };
 
     const action = existingDraftId ? 'edit' : 'create';
-    if (existingDraftId) draftParams['id'] = existingDraftId;
-
+    if (existingDraftId) draftParams['existingDraftId'] = existingDraftId;
     try {
       await app.user.discussionDrafts[action](draftParams);
     } catch (err) {
@@ -153,37 +150,13 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  private _clearLocalStorage() {
-    if (!this) throw new Error('no this');
-    if (this.form.kind === ThreadKind.Discussion) {
-      localStorage.removeItem(
-        `${app.activeChainId()}-new-discussion-storedText`
-      );
-      localStorage.removeItem(
-        `${app.activeChainId()}-new-discussion-storedTitle`
-      );
-    } else if (
-      localStorage.getItem(`${app.activeChainId()}-post-type`) ===
-      ThreadKind.Link
-    ) {
-      localStorage.removeItem(`${app.activeChainId()}-new-link-storedText`);
-      localStorage.removeItem(`${app.activeChainId()}-new-link-storedTitle`);
-      localStorage.removeItem(`${app.activeChainId()}-new-link-storedLink`);
-    }
-    localStorage.removeItem(`${app.activeChainId()}-active-topic`);
-    localStorage.removeItem(
-      `${app.activeChainId()}-active-topic-default-template`
-    );
-    localStorage.removeItem(`${app.activeChainId()}-post-type`);
-  }
-
   private _populateFromLocalStorage() {
     if (!this) throw new Error('no this');
     if (this.form.kind === ThreadKind.Discussion) {
       this.form.title = localStorage.getItem(
         `${app.activeChainId()}-new-discussion-storedTitle`
       );
-    } else {
+    } else if (this.form.kind === ThreadKind.Link) {
       this.form.url = localStorage.getItem(
         `${app.activeChainId()}-new-link-storedLink`
       );
@@ -194,7 +167,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   }
 
   private _saveToLocalStorage() {
-    if (!this) throw new Error('no this');
     if (this.form.kind === ThreadKind.Discussion) {
       if (this.form.title) {
         localStorage.setItem(
@@ -202,7 +174,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
           this.form.title
         );
       }
-    } else {
+    } else if (this.form.kind === ThreadKind.Link) {
       if (this.form.url) {
         localStorage.setItem(
           `${app.activeChainId()}-new-link-storedLink`,
@@ -253,12 +225,12 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       );
       localStorage.removeItem(`${app.activeChainId()}-from-draft`);
     }
-    if (this.threadKind === undefined) {
-      this.threadKind =
+    if (this.form.kind === undefined) {
+      this.form.kind =
         localStorage.getItem(`${app.activeChainId()}-post-type`) ||
         ThreadKind.Discussion;
     }
-    if (this.threadKind === ThreadKind.Discussion) {
+    if (this.form.kind === ThreadKind.Discussion) {
       this.form.title = localStorage.getItem(
         `${app.activeChainId()}-new-discussion-storedTitle`
       );
@@ -281,7 +253,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       overwriteConfirmationModal,
     } = this;
     if (
-      this.threadKind === ThreadKind.Discussion &&
+      this.form.kind === ThreadKind.Discussion &&
       !overwriteConfirmationModal
     ) {
       if (quillEditorState?.alteredText) {
@@ -327,9 +299,9 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
 
     const topicMissing = hasTopics && !this.form?.topicName;
     const linkContentMissing =
-      this.threadKind === ThreadKind.Link && !this.form.url;
+      this.form.kind === ThreadKind.Link && !this.form.url;
     const discussionContentMissing =
-      this.threadKind === ThreadKind.Discussion &&
+      this.form.kind === ThreadKind.Discussion &&
       (this.quillEditorState?.isBlank() || !this.form?.title);
     const disableSave = !author || saving || this.uploadsInProgress > 0;
     const disableSubmission =
@@ -337,15 +309,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       topicMissing ||
       linkContentMissing ||
       discussionContentMissing;
-    if (disableSubmission) {
-      console.log({
-        disableSave,
-        topicMissing,
-        linkContentMissing,
-        discussionContentMissing,
-      });
-    }
-    console.log(this.threadKind);
+
     return m(
       '.NewThreadForm',
       {
@@ -379,7 +343,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     );
                     this._populateFromLocalStorage();
                   },
-                  active: this.threadKind === ThreadKind.Discussion,
+                  active: this.form.kind === ThreadKind.Discussion,
                 }),
                 m(TabItem, {
                   label: capitalize(ThreadKind.Link),
@@ -392,7 +356,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     );
                     this._populateFromLocalStorage();
                   },
-                  active: this.threadKind === ThreadKind.Link,
+                  active: this.form.kind === ThreadKind.Link,
                 }),
                 m('.tab-spacer', { style: 'flex: 1' }),
                 isModal &&
@@ -444,7 +408,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                 ),
               ],
             }),
-          this.threadKind === ThreadKind.Link &&
+          this.form.kind === ThreadKind.Link &&
             m(Form, [
               hasTopics
                 ? m(FormGroup, { span: { xs: 12, sm: 5 }, order: 1 }, [
@@ -552,10 +516,10 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                         $(e.target).trigger('modalcomplete');
                         setTimeout(() => {
                           $(e.target).trigger('modalexit');
-                          this._clearLocalStorage();
+                          this.quillEditorState.clearLocalStorage();
                         }, 0);
                       } else {
-                        this._clearLocalStorage();
+                        this.quillEditorState.clearLocalStorage();
                       }
                     } catch (err) {
                       this.saving = false;
@@ -566,26 +530,25 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
               ]),
             ]),
           //
-          this.threadKind === ThreadKind.Discussion &&
+          this.form.kind === ThreadKind.Discussion &&
             m(Form, [
-              fromDraft
-                ? m(
-                    FormGroup,
-                    {
-                      span: 2,
-                      order: { xs: 1, sm: 1 },
-                      class: 'hidden-xs draft-badge-wrap',
-                    },
-                    [
-                      m(Tag, {
-                        class: 'draft-badge',
-                        size: 'xs',
-                        rounded: true,
-                        label: 'Draft',
-                      }),
-                    ]
-                  )
-                : null,
+              !!fromDraft &&
+                m(
+                  FormGroup,
+                  {
+                    span: 2,
+                    order: { xs: 1, sm: 1 },
+                    class: 'hidden-xs draft-badge-wrap',
+                  },
+                  [
+                    m(Tag, {
+                      class: 'draft-badge',
+                      size: 'xs',
+                      rounded: true,
+                      label: 'Draft',
+                    }),
+                  ]
+                ),
               hasTopics
                 ? m(
                     FormGroup,
@@ -686,10 +649,10 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       if (isModal) {
                         setTimeout(() => {
                           $(e.target).trigger('modalexit');
-                          this._clearLocalStorage();
+                          this.quillEditorState.clearLocalStorage();
                         }, 0);
                       } else {
-                        this._clearLocalStorage();
+                        this.quillEditorState.clearLocalStorage();
                       }
                     } catch (err) {
                       this.saving = false;
@@ -717,28 +680,21 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     if (!this.form.title) {
                       this.form.title = title.val() as string;
                     }
-                    const fromDraft_ = this.recentlyDeletedDrafts.includes(
+                    const existingDraftId = this.recentlyDeletedDrafts.includes(
                       this.fromDraft
                     )
                       ? undefined
                       : this.fromDraft;
                     try {
-                      await this._saveDraft(form, quillEditorState, fromDraft_);
+                      await this._saveDraft(
+                        form,
+                        quillEditorState,
+                        existingDraftId
+                      );
                       this.saving = false;
                       if (isModal) {
                         notifySuccess('Draft saved');
                       }
-                      this._clearLocalStorage();
-                      quillEditorState.resetEditor();
-                      title.val('');
-                      this.activeTopic = false;
-                      delete this.fromDraft;
-                      this.form = {
-                        topicName: null,
-                        topicId: null,
-                        title: null,
-                        kind: ThreadKind.Discussion,
-                      };
                       m.redraw();
                     } catch (err) {
                       this.saving = false;
@@ -753,7 +709,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
             ]),
         ]),
         !!discussionDrafts.length &&
-          this.threadKind === ThreadKind.Discussion &&
+          this.form.kind === ThreadKind.Discussion &&
           m('.new-thread-form-sidebar', [
             m(
               List,
@@ -788,7 +744,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     selected: fromDraft === draft.id,
                     onclick: async () => {
                       if (
-                        this.quillEditorState.isBlank() ||
+                        !this.quillEditorState.isBlank() ||
                         this.quillEditorState.alteredText
                       ) {
                         const confirmed = await confirmationModalWithText(

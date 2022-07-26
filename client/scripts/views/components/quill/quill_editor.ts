@@ -1,10 +1,6 @@
+import m from 'mithril';
 import QuillEditorInternal from './quill_editor_internal';
-import {
-  DeltaOps,
-  QuillActiveMode,
-  QuillDelta,
-  QuillTextContents,
-} from './types';
+import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
 // DOCUMENTATION
 // Standard usage flow:
@@ -92,7 +88,7 @@ export class QuillEditor extends QuillEditorInternal {
     );
   }
 
-  public clearUnsavedChanges(): void {
+  public clearLocalStorage(): void {
     this._clearLocalStorage();
   }
 
@@ -131,7 +127,6 @@ export class QuillEditor extends QuillEditorInternal {
       this.activeMode = 'markdown';
       this.text = document;
     }
-    console.log({ this: this });
   }
 
   // Strips all formatting, e.g. when switching from RichText to Markdown
@@ -145,5 +140,6 @@ export class QuillEditor extends QuillEditorInternal {
     this._alteredText = false;
     this._quill.setContents(doc);
     this._clearLocalStorage();
+    m.redraw();
   }
 }

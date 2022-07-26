@@ -140,8 +140,6 @@ export default class QuillEditorInternal {
     // Set tab index
     if (tabIndex) {
       // TODO: Are both of these necessary?
-      console.log(this._quill.container);
-      this._quill.container.tabIndex = tabIndex;
       this._$editor
         .closest('.QuillEditor')
         .find('.ql-editor')
@@ -167,6 +165,7 @@ export default class QuillEditorInternal {
           );
           this._unsavedChanges = new Delta();
         }
+        m.redraw();
       }
     }, 2500);
 
@@ -193,6 +192,19 @@ export default class QuillEditorInternal {
       .forEach((key) => {
         localStorage.removeItem(key);
       });
+
+    if (
+      this._editorNamespace.includes('new-thread') ||
+      this._editorNamespace.includes('new-link')
+    ) {
+      Object.keys(localStorage)
+        .filter(
+          (key) => key.includes('active-topic') || key.includes('post-type')
+        )
+        .forEach((key) => {
+          localStorage.removeItem(key);
+        });
+    }
   }
 
   // TODO: Ensure is working
@@ -899,7 +911,6 @@ export default class QuillEditorInternal {
       })
       .catch((err) => {
         notifyError('Failed to upload image. Was it a valid JPG, PNG, or GIF?');
-        console.log(err);
         this._quill.enable(true);
       });
   }
@@ -954,7 +965,6 @@ export default class QuillEditorInternal {
   }
 
   private _newLineHandler(range, context) {
-    console.log({ this: this, _quill: this._quill });
     if (this._activeMode === 'markdown') return true;
     const [line, offset] = this._quill.getLine(range.index);
     const { textContent } = line.domNode;
