@@ -54,7 +54,7 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
           onclick={() => {
             voteCount === this.initialVoteCount + 1
               ? handleVoteChange(this.initialVoteCount)
-              : handleVoteChange(this.initialVoteCount + 1);
+              : handleVoteChange(voteCount + 1);
           }}
           className="upvote-button"
           onmouseenter={() => {
@@ -78,7 +78,7 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
           onclick={() => {
             voteCount === this.initialVoteCount - 1
               ? handleVoteChange(this.initialVoteCount)
-              : handleVoteChange(this.initialVoteCount - 1);
+              : handleVoteChange(voteCount - 1);
           }}
           onmouseenter={() => {
             this.isHoveringDownvote = true;
