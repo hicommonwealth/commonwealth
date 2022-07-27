@@ -53,7 +53,10 @@
 
     .results-text.Text {
       color: $primary-300;
-      cursor: pointer;
+
+      &.clickable {
+        cursor: pointer;
+      }
     }
   }
 

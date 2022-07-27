@@ -51,6 +51,7 @@ export class SnapshotPollCard
       timeRemainingString,
       tokenSymbol,
       votedFor,
+      tooltipErrorMessage,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -100,6 +101,7 @@ export class SnapshotPollCard
                     disableVoteButton || this.selectedOptions.length === 0
                   }
                   timeRemainingString={timeRemainingString}
+                  tooltipErrorMessage={tooltipErrorMessage}
                   onVoteCast={castVote}
                 />
               </>

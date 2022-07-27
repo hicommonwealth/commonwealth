@@ -11,6 +11,7 @@ import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
+import { CWTooltip } from './component_kit/cw_tooltip';
 
 export type VoteInformation = {
   label: string;
@@ -74,20 +75,43 @@ export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
 export type CastVoteAttrs = {
   disableVoteButton: boolean;
   timeRemainingString: string;
+  tooltipErrorMessage: string;
   onVoteCast: () => any;
 };
 
 export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
   view(vnode) {
-    const { disableVoteButton, timeRemainingString, onVoteCast } = vnode.attrs;
+    const {
+      disableVoteButton,
+      timeRemainingString,
+      onVoteCast,
+      tooltipErrorMessage,
+    } = vnode.attrs;
     return (
       <div class="CastVoteSection">
-        <CWButton
-          label="Vote"
-          buttonType="mini"
-          disabled={disableVoteButton}
-          onclick={onVoteCast}
-        />
+        {disableVoteButton ? (
+          <CWTooltip
+            interactionType="hover"
+            tooltipContents={tooltipErrorMessage}
+            tooltipType="solidNoArrow"
+            hoverCloseDelay={200}
+            trigger={
+              <CWButton
+                label="Vote"
+                buttonType="mini"
+                disabled={disableVoteButton}
+                onclick={onVoteCast}
+              />
+            }
+          />
+        ) : (
+          <CWButton
+            label="Vote"
+            buttonType="mini"
+            disabled={disableVoteButton}
+            onclick={onVoteCast}
+          />
+        )}
         <CWText className="time-remaining-text" type="caption">
           {timeRemainingString}
         </CWText>
@@ -153,7 +177,10 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
               if (onResultsClick) onResultsClick(e);
             }}
           >
-            <CWText type="caption" className="results-text">
+            <CWText
+              type="caption"
+              className={`results-text${onResultsClick ? ' clickable' : ''}`}
+            >
               {`${Math.floor(totalVoteCount * 100) / 100} ${
                 tokenSymbol ?? 'votes'
               }`}
@@ -224,6 +251,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       tokenSymbol,
       votedFor,
       voteInformation,
+      tooltipErrorMessage,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -274,6 +302,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                     disableVoteButton || this.selectedOptions.length === 0
                   }
                   timeRemainingString={timeRemainingString}
+                  tooltipErrorMessage={tooltipErrorMessage}
                   onVoteCast={castVote}
                 />
               </>

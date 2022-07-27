@@ -132,6 +132,7 @@ export class SnapshotProposalCards
             m.redraw();
           }}
           incrementalVoteCast={totalScore}
+          tooltipErrorMessage={voteErrorText}
         />
       </div>
     );
