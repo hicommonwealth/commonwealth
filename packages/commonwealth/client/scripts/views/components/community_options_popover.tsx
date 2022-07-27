@@ -7,7 +7,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { link } from 'helpers';
 import { ITokenAdapter } from 'models';
-import NewTopicModal from 'views/modals/new_topic_modal';
+import { NewTopicModal } from 'views/modals/new_topic_modal';
 import { EditTopicThresholdsModal } from 'views/modals/edit_topic_thresholds_modal';
 import CreateInviteModal from 'views/modals/create_invite_modal';
 import OrderTopicsModal from '../modals/order_topics_modal';
@@ -55,9 +55,8 @@ export class CommunityOptionsPopover implements m.ClassComponent {
             />
           ),
           isAdmin &&
-            app.chain.meta.topics.filter(
-              (topic) => topic.featuredInSidebar
-            ).length > 0 && (
+            app.chain.meta.topics.filter((topic) => topic.featuredInSidebar)
+              .length > 0 && (
               <MenuItem
                 label="Order sidebar topics"
                 onclick={(e) => {

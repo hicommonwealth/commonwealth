@@ -6,6 +6,7 @@ import { Switch, Input } from 'construct-ui';
 import 'components/token_decimal_input.scss';
 
 import { weiToTokens, tokensToWei } from 'helpers';
+import { CWText } from './component_kit/cw_text';
 
 export class TokenDecimalInput
   implements
@@ -83,7 +84,7 @@ export class TokenDecimalInput
                 }
               }}
             />
-            <div class="switch-caption">{this.switchCaption}</div>
+            <CWText>{this.switchCaption}</CWText>
           </div>
         )}
       </div>

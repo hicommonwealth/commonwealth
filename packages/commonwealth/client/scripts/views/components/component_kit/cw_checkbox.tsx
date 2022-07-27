@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_checkbox.scss';
 
-import { ComponentType } from './types';
+import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
@@ -12,9 +12,8 @@ type Checkbox = { label?: string; value: string };
 
 type CheckboxStyleAttrs = {
   checked: boolean;
-  disabled?: boolean;
   indeterminate?: boolean;
-};
+} & StyleAttrs;
 
 type CheckboxAttrs = {
   groupName: string;
@@ -25,6 +24,7 @@ type CheckboxAttrs = {
 export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
   view(vnode) {
     const {
+      className,
       disabled = false,
       groupName,
       indeterminate = false,
@@ -50,6 +50,7 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
             checked,
             disabled,
             indeterminate,
+            className,
           },
           ComponentType.Checkbox
         )}

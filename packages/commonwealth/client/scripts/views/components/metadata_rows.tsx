@@ -1,14 +1,16 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Select, Switch, TextArea } from 'construct-ui';
+import { Select, Switch } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
+import { CWTextArea } from './component_kit/cw_text_area';
 
 type InputRowAttrs = {
   defaultValue: string;
   disabled?: boolean;
+  maxlength?: number;
   onChangeHandler: (e) => void;
   placeholder?: string;
   textarea?: boolean;
@@ -21,24 +23,22 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
     const {
       defaultValue,
       disabled,
+      maxlength,
       onChangeHandler,
       placeholder,
       textarea,
       title,
-      value,
     } = vnode.attrs;
 
     return (
       <div class="InputRow">
         {textarea && <CWLabel label={title} />}
         {textarea ? (
-          <TextArea
+          <CWTextArea
             defaultValue={defaultValue}
-            value={value}
             placeholder={placeholder}
-            fluid={true}
             disabled={disabled || false}
-            style={{ height: '296px', marginBottom: '20px' }}
+            maxlength={maxlength}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
@@ -48,6 +48,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             label={title}
             defaultValue={defaultValue}
             placeholder={placeholder}
+            maxlength={maxlength}
             disabled={disabled || false}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
