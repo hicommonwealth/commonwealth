@@ -4,7 +4,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../database';
-import { ChainAttributes } from '../models/chain';
+import { ChainAttributes } from 'common-common/src/models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 

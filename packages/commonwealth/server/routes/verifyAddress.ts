@@ -25,9 +25,9 @@ import {
 
 import nacl from 'tweetnacl';
 
-import { ChainInstance } from '../models/chain';
-import { ProfileAttributes } from '../models/profile';
-import { AddressInstance } from '../models/address';
+import { ChainInstance } from 'common-common/src/models/chain';
+import { ProfileAttributes } from 'common-common/src/models/profile';
+import { AddressInstance } from 'common-common/src/models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { factory, formatFilename } from 'common-common/src/logging';

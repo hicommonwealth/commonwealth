@@ -16,7 +16,7 @@ import {
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import { ChainInstance } from '../models/chain';
+import { ChainInstance } from 'common-common/src/models/chain';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';

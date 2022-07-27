@@ -10,7 +10,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { AddressAttributes } from '../models/address';
+import { AddressAttributes } from 'common-common/src/models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 const log = factory.getLogger(formatFilename(__filename));

@@ -2,7 +2,7 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import { DB } from '../database';
-import { ChainInstance } from '../models/chain';
+import { ChainInstance } from 'common-common/src/models/chain';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',

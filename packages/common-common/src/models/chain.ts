@@ -12,7 +12,7 @@ import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '../types';
 
 export type ChainAttributes = {
   name: string;

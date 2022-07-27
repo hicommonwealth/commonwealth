@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserInstance } from './models/user';
+import { UserInstance } from "common-common/src/models/user";
 
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>

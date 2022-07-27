@@ -3,7 +3,7 @@ import { DB } from '../database';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import { ChainInstance } from '../models/chain';
+import { ChainInstance } from 'common-common/src/models/chain';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';

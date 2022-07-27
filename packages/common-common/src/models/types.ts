@@ -1,5 +1,5 @@
 import { BuildOptions, Model } from 'sequelize';
-import { DB } from '../database';
+import { DB } from 'commonwealth/server/database';
 
 export type ModelInstance<Attrs extends Record<string, unknown>> = Model<Attrs> & Attrs;
 

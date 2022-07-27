@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
-import { OffchainReactionInstance } from '../models/offchain_reaction';
+import { OffchainReactionInstance } from 'common-common/src/models/offchain_reaction';
 
 const log = factory.getLogger(formatFilename(__filename));
 

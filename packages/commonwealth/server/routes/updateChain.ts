@@ -4,7 +4,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
 import { ChainBase } from 'common-common/src/types';
-import { ChainAttributes } from '../models/chain';
+import { ChainAttributes } from 'common-common/src/models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
 

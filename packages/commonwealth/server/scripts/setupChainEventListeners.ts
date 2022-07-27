@@ -12,7 +12,7 @@ import {
   AaveEvents,
 } from 'chain-events/src';
 
-import { ChainAttributes, ChainInstance } from '../models/chain';
+import { ChainAttributes, ChainInstance } from 'common-common/src/models/chain';
 import EventStorageHandler, {
   StorageFilterConfig,
 } from '../eventHandlers/storage';
@@ -25,7 +25,7 @@ import { default as models, sequelize } from '../database';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainNodeInstance } from '../models/chain_node';
+import { ChainNodeInstance } from 'common-common/src/models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance

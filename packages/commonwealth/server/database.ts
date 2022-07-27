@@ -6,105 +6,105 @@ import { DATABASE_URI } from './config';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import AddressFactory, { AddressModelStatic } from './models/address';
-import BanFactory, { BanModelStatic } from './models/ban';
-import ChainFactory, { ChainModelStatic } from './models/chain';
+import AddressFactory, { AddressModelStatic } from 'common-common/src/models/address';
+import BanFactory, { BanModelStatic } from 'common-common/src/models/ban';
+import ChainFactory, { ChainModelStatic } from 'common-common/src/models/chain';
 import ChainCategoryFactory, {
   ChainCategoryModelStatic,
-} from './models/chain_category';
+} from 'common-common/src/models/chain_category';
 import ChainCategoryTypeFactory, {
   ChainCategoryTypeModelStatic,
-} from './models/chain_category_type';
+} from 'common-common/src/models/chain_category_type';
 import ChainEntityFactory, {
   ChainEntityModelStatic,
-} from './models/chain_entity';
-import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
+} from 'common-common/src/models/chain_entity';
+import ChainEventFactory, { ChainEventModelStatic } from 'common-common/src/models/chain_event';
 import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
-} from './models/chain_event_type';
-import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
-import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
+} from 'common-common/src/models/chain_event_type';
+import ChainNodeFactory, { ChainNodeModelStatic } from 'common-common/src/models/chain_node';
+import ChatChannelFactory, { ChatChannelModelStatic } from 'common-common/src/models/chat_channel';
 import ChatMessageFactory, {
   ChatMessageModelStatic,
-} from './models/chat_message';
-import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/community_banner';
+} from 'common-common/src/models/chat_message';
+import CommunityBannerFactory, { CommunityBannerModelStatic } from 'common-common/src/models/community_banner';
 import CollaborationFactory, {
   CollaborationModelStatic,
-} from './models/collaboration';
+} from 'common-common/src/models/collaboration';
 import ContractCategoryFactory, {
   ContractCategoryModelStatic,
-} from './models/contract_category';
+} from 'common-common/src/models/contract_category';
 import ContractItemFactory, {
   ContractItemModelStatic,
-} from './models/contract_item';
+} from 'common-common/src/models/contract_item';
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
-} from './models/discussion_draft';
+} from 'common-common/src/models/discussion_draft';
 import IdentityCacheFactory, {
   IdentityCacheStatic,
-} from './models/identity_cache';
-import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
-import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
+} from 'common-common/src/models/identity_cache';
+import InviteCodeFactory, { InviteCodeModelStatic } from 'common-common/src/models/invite_code';
+import LinkedThread, { LinkedThreadModelStatic } from 'common-common/src/models/linked_thread';
+import LoginTokenFactory, { LoginTokenModelStatic } from 'common-common/src/models/login_token';
 import NotificationFactory, {
   NotificationModelStatic,
-} from './models/notification';
+} from 'common-common/src/models/notification';
 import NotificationCategoryFactory, {
   NotificationCategoryModelStatic,
-} from './models/notification_category';
+} from 'common-common/src/models/notification_category';
 import OffchainAttachmentFactory, {
   OffchainAttachmentModelStatic,
-} from './models/offchain_attachment';
+} from 'common-common/src/models/offchain_attachment';
 import OffchainCommentFactory, {
   OffchainCommentModelStatic,
-} from './models/offchain_comment';
+} from 'common-common/src/models/offchain_comment';
 import OffchainProfileFactory, {
   OffchainProfileModelStatic,
-} from './models/offchain_profile';
+} from 'common-common/src/models/offchain_profile';
 import OffchainReactionFactory, {
   OffchainReactionModelStatic,
-} from './models/offchain_reaction';
+} from 'common-common/src/models/offchain_reaction';
 import OffchainThreadFactory, {
   OffchainThreadModelStatic,
-} from './models/offchain_thread';
+} from 'common-common/src/models/offchain_thread';
 import OffchainTopicFactory, {
   OffchainTopicModelStatic,
-} from './models/offchain_topic';
+} from 'common-common/src/models/offchain_topic';
 import OffchainViewCountFactory, {
   OffchainViewCountModelStatic,
-} from './models/offchain_viewcount';
+} from 'common-common/src/models/offchain_viewcount';
 import OffchainVoteFactory, {
   OffchainVoteModelStatic,
-} from './models/offchain_vote';
+} from 'common-common/src/models/offchain_vote';
 import OffchainPollFactory, {
   OffchainPollModelStatic,
-} from './models/offchain_poll';
-import ProfileFactory, { ProfileModelStatic } from './models/profile';
-import RoleFactory, { RoleModelStatic } from './models/role';
-import RuleFactory, { RuleModelStatic } from './models/rule';
+} from 'common-common/src/models/offchain_poll';
+import ProfileFactory, { ProfileModelStatic } from 'common-common/src/models/profile';
+import RoleFactory, { RoleModelStatic } from 'common-common/src/models/role';
+import RuleFactory, { RuleModelStatic } from 'common-common/src/models/rule';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
-} from './models/social_account';
-import SsoTokenFactory, { SsoTokenModelStatic } from './models/sso_token';
+} from 'common-common/src/models/social_account';
+import SsoTokenFactory, { SsoTokenModelStatic } from 'common-common/src/models/sso_token';
 import StarredCommunityFactory, {
   StarredCommunityModelStatic,
-} from './models/starred_community';
+} from 'common-common/src/models/starred_community';
 import SubscriptionFactory, {
   SubscriptionModelStatic,
-} from './models/subscription';
-import TokenFactory, { TokenModelStatic } from './models/token';
+} from 'common-common/src/models/subscription';
+import TokenFactory, { TokenModelStatic } from 'common-common/src/models/token';
 import TaggedThreadFactory, {
   TaggedThreadModelStatic,
-} from './models/tagged_threads';
-import UserModelFactory, { UserModelStatic } from './models/user';
+} from 'common-common/src/models/tagged_threads';
+import UserModelFactory, { UserModelStatic } from 'common-common/src/models/user';
 import WaitlistRegistrationFactory, {
   WaitlistRegistrationModelStatic,
-} from './models/waitlist_registration';
-import WebhookFactory, { WebhookModelStatic } from './models/webhook';
+} from 'common-common/src/models/waitlist_registration';
+import WebhookFactory, { WebhookModelStatic } from 'common-common/src/models/webhook';
 import NotificationsReadFactory, {
   NotificationsReadModelStatic,
-} from './models/notifications_read';
-import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
+} from 'common-common/src/models/notifications_read';
+import IpfsPinsFactory, { IpfsPinsModelStatic } from 'common-common/src/models/ipfs_pins';
 
 export type Models = {
   Address: AddressModelStatic;

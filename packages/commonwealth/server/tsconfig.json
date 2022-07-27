@@ -17,11 +17,11 @@
     "scripts/dbNode.ts",
   ],
   "include": [
-    "models/*",
-    "models/",
+    "../../common-common/src/models/*",
+    "../../common-common/src/models/",
     "socket/*",
     "scripts",
-    "eventHandlers",
+    "eventHandlers"
   ],
   "exclude": [
     "./node_modules",

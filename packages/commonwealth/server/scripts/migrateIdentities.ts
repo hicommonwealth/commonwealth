@@ -7,7 +7,7 @@
 
 import _ from 'underscore';
 import { SubstrateEvents } from 'chain-events/src';
-import { OffchainProfileInstance } from '../models/offchain_profile';
+import { OffchainProfileInstance } from 'common-common/src/models/offchain_profile';
 import IdentityEventHandler from '../eventHandlers/identity';
 import { ChainBase } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';

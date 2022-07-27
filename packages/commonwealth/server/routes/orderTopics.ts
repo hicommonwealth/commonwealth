@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import { OffchainTopicInstance } from 'server/models/offchain_topic';
+import { OffchainTopicInstance } from 'common-common/src/models/offchain_topic';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../database';

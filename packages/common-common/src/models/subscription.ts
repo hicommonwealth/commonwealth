@@ -1,11 +1,11 @@
 import WebSocket from 'ws';
 import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import send, { WebhookContent } from '../webhookNotifier';
-import { SERVER_URL } from '../config';
+import { ChainBase, ChainType } from '../types';
+import { factory, formatFilename } from '../logging';
+import send, { WebhookContent } from '../../../commonwealth/server/webhookNotifier';
+import { SERVER_URL } from 'commonwealth/server/config';
 import { UserAttributes } from './user';
-import { DB } from '../database';
+import { DB } from 'commonwealth/server/database';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
@@ -13,11 +13,11 @@ import {
   ICommunityNotificationData,
   IChainEventNotificationData,
   IChatNotification,
-} from '../../shared/types';
+} from 'commonwealth/shared/types';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
-} from '../scripts/emails';
+} from 'commonwealth/server/scripts/emails';
 import { ChainAttributes } from './chain';
 import { OffchainThreadAttributes } from './offchain_thread';
 import { OffchainCommentAttributes } from './offchain_comment';
@@ -28,7 +28,7 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import notificationCategory from "../../client/scripts/models/NotificationCategory";
+import notificationCategory from "commonwealth/client/scripts/models/NotificationCategory";
 
 const log = factory.getLogger(formatFilename(__filename));
 

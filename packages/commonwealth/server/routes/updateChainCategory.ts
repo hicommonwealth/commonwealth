@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { ChainCategoryInstance } from 'server/models/chain_category';
+import { ChainCategoryInstance } from 'common-common/src/models/chain_category';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
 

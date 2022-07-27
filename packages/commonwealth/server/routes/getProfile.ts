@@ -1,6 +1,6 @@
-import { AddressAttributes } from '../models/address';
-import { OffchainCommentAttributes } from '../models/offchain_comment';
-import { OffchainThreadAttributes } from '../models/offchain_thread';
+import { AddressAttributes } from 'common-common/src/models/address';
+import { OffchainCommentAttributes } from 'common-common/src/models/offchain_comment';
+import { OffchainThreadAttributes } from 'common-common/src/models/offchain_thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';

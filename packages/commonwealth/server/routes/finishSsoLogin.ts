@@ -4,7 +4,7 @@ import { isAddress, toChecksumAddress } from 'web3-utils';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
-import { ProfileAttributes } from '../models/profile';
+import { ProfileAttributes } from 'common-common/src/models/profile';
 import { DynamicTemplate } from '../../shared/types';
 import {
   NotificationCategories,
@@ -12,8 +12,8 @@ import {
 } from 'common-common/src/types';
 
 import { AppError, ServerError } from '../util/errors';
-import { UserAttributes } from '../models/user';
-import { AddressAttributes } from '../models/address';
+import { UserAttributes } from 'common-common/src/models/user';
+import { AddressAttributes } from 'common-common/src/models/address';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import {

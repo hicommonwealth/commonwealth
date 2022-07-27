@@ -11,10 +11,10 @@ import { sequelize, DB } from '../database';
 import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
-import { ProfileAttributes } from '../models/profile';
+import { ProfileAttributes } from "common-common/src/models/profile";
 
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AddressInstance } from '../models/address';
+import { AddressInstance } from "common-common/src/models/address";
 const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {
@@ -55,7 +55,7 @@ export function useMagicAuth(models: DB) {
       if (!existingUser && registrationChain?.base && !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)) {
         // unsupported chain -- client should send through old email flow
         return cb(new Error('Unsupported magic chain.'));
-      } 
+      }
 
       // if on root URL, no chain base, we allow users to sign up and generate a Substrate + Ethereum Address
       if (!existingUser && !registrationChain?.base) {
@@ -160,7 +160,7 @@ export function useMagicAuth(models: DB) {
         /* This just uses the ETH Address to encode a Substrate Address, which I'm not sure is the right approach.
            We may want to derive / generate various Magic Chain Addresses on the front end then create / store them via the `createAddress` route
            We will have to:
-            1. validate the signature + pass the address back + 
+            1. validate the signature + pass the address back +
             2. have some specific logic for generating / loading various Magic Extensions as necessary
         */
 

@@ -9,12 +9,12 @@ import { Response, NextFunction, Request } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
-import { OffchainTopicInstance } from '../models/offchain_topic';
-import { RoleInstance } from '../models/role';
-import { OffchainThreadInstance } from '../models/offchain_thread';
-import { ChatChannelInstance } from '../models/chat_channel';
-import { RuleInstance } from '../models/rule';
-import { CommunityBannerInstance } from '../models/community_banner';
+import { OffchainTopicInstance } from 'common-common/src/models/offchain_topic';
+import { RoleInstance } from 'common-common/src/models/role';
+import { OffchainThreadInstance } from 'common-common/src/models/offchain_thread';
+import { ChatChannelInstance } from 'common-common/src/models/chat_channel';
+import { RuleInstance } from 'common-common/src/models/rule';
+import { CommunityBannerInstance } from 'common-common/src/models/community_banner';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};

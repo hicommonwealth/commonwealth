@@ -15,7 +15,7 @@ import { DB } from '../database';
 import {
   ChainEventAttributes,
   ChainEventInstance,
-} from '../models/chain_event';
+} from 'common-common/src/models/chain_event';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));

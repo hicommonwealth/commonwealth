@@ -11,7 +11,7 @@ import { SENDGRID_API_KEY, } from '../config';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import { IPostNotificationData, DynamicTemplate } from '../../shared/types';
 import { DB } from '../database';
-import { UserAttributes } from '../models/user';
+import { UserAttributes } from 'common-common/src/models/user';
 
 const log = factory.getLogger(formatFilename(__filename));
 

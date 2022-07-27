@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
-import { BalanceType } from 'common-common/src/types';
+import { BalanceType } from '../types';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainNodeAttributes = {

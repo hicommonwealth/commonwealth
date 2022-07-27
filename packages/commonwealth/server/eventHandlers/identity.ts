@@ -5,7 +5,7 @@ import {
   IChainEventData,
   SubstrateTypes,
 } from 'chain-events/src';
-import { OffchainProfileInstance } from '../models/offchain_profile';
+import { OffchainProfileInstance } from 'common-common/src/models/offchain_profile';
 import { addPrefix, factory } from 'common-common/src/logging';
 
 export default class extends IEventHandler {

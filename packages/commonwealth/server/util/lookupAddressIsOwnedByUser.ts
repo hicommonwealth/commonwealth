@@ -2,8 +2,8 @@
 // and check that it's owned by the current user. Only for POST requests.
 
 import { DB } from '../database';
-import { AddressInstance } from '../models/address';
-import { UserInstance } from '../models/user';
+import { AddressInstance } from 'common-common/src/models/address';
+import { UserInstance } from 'common-common/src/models/user';
 
 type AddressChainReq = { body?: { author_chain: string, address: string }, user?: UserInstance };
 

@@ -14,7 +14,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { OffchainThreadInstance } from 'common-common/src/models/offchain_thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {

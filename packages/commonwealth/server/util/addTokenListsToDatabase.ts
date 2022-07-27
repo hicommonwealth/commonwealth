@@ -4,7 +4,7 @@ import { slugify } from '../../shared/utils';
 import { DB } from '../database';
 import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenAttributes } from '../models/token';
+import { TokenAttributes } from 'common-common/src/models/token';
 const log = factory.getLogger(formatFilename(__filename));
 
 async function addTokenListsToDatabase(models: DB): Promise<void> {

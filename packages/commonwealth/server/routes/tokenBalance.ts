@@ -4,10 +4,10 @@ import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
-import { ChainInstance } from '../models/chain';
+import { ChainInstance } from 'common-common/src/models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AddressInstance } from '../models/address';
-import { ChainNetwork } from '../../../common-common/src/types';
+import { AddressInstance } from 'common-common/src/models/address';
+import { ChainNetwork } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

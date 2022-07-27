@@ -23,7 +23,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { LinkedThreadAttributes } from 'server/models/linked_thread';
+import { LinkedThreadAttributes } from "common-common/src/models/linked_thread";
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;

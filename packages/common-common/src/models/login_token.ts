@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import crypto from 'crypto';
-import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
+import { LOGIN_TOKEN_EXPIRES_IN } from 'commonwealth/server/config';
 import { SocialAccountAttributes } from './social_account';
 import { ModelStatic, ModelInstance } from './types';
 

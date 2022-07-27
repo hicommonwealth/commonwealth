@@ -4,7 +4,7 @@ import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
-import { OffchainTopicAttributes } from '../models/offchain_topic';
+import { OffchainTopicAttributes } from 'common-common/src/models/offchain_topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -10,7 +10,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import {
   OffchainVoteAttributes,
   OffchainVoteInstance,
-} from '../models/offchain_vote';
+} from 'common-common/src/models/offchain_vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 

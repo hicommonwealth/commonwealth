@@ -1,7 +1,7 @@
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { OffchainVoteAttributes } from '../models/offchain_vote';
+import { OffchainVoteAttributes } from 'common-common/src/models/offchain_vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 
 export const Errors = {

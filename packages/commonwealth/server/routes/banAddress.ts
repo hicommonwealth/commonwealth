@@ -3,7 +3,7 @@ import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { BanAttributes, BanInstance } from '../models/ban';
+import { BanAttributes, BanInstance } from 'common-common/src/models/ban';
 
 enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',
