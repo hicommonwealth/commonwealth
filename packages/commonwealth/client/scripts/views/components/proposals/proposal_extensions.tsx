@@ -45,7 +45,7 @@ export class ProposalExtensions
         <div class="ProposalExtensions">
           <CWText>
             The winning side's coins will be timelocked according to the weight
-            of their vote:
+            of their vote.
           </CWText>
           <ConvictionsChooser callback={setDemocracyVoteConviction} />
           <CWTextInput
