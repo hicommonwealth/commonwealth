@@ -11,6 +11,7 @@ import { TXSigningWebWalletOption } from './tx_signing_web_wallet_option';
 import { NextFn, TxDataState } from './types';
 import { CWButton } from '../component_kit/cw_button';
 import { TXSigningTransactionBox } from './tx_signing_transaction_box';
+import { CWText } from '../component_kit/cw_text';
 
 export class TxSigningModalIntroStage
   implements m.ClassComponent<ITXModalData & NextFn & IWebWallet<any>>
@@ -104,11 +105,11 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
   view() {
     return (
       <>
-        <div class="TXSigningBodyText">
+        <CWText>
           Waiting for your transaction to be confirmed by the network...
-        </div>
+        </CWText>
         <Spinner active />
-        <div>`Waiting ${this.timer || 0}s...</div>
+        <CWText>`Waiting ${this.timer || 0}s...</CWText>
       </>
     );
   }

@@ -14,6 +14,7 @@ import Substrate from 'controllers/chain/substrate/main';
 import { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
 
 type TXSigningWebWalletOptionAttrs = {
   next: NextFn;
@@ -64,13 +65,16 @@ export class TXSigningWebWalletOption
 
     return (
       <div class="TXSigningWebWalletOption">
-        <div>
-          Use a{' '}
-          {link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', {
-            target: '_blank',
-          })}{' '}
-          compatible wallet to sign the transaction:
-        </div>
+        <CWText>
+          {/* extra div is for the link to flow with the text */}
+          <div>
+            Use a{' '}
+            <a href="https://polkadot.js.org/extension" target="_blank">
+              polkadot-js
+            </a>{' '}
+            compatible wallet to sign the transaction:
+          </div>
+        </CWText>
         <CWButton
           disabled={
             !webWallet || (webWallet?.enabled && !foundAuthorInWebWallet)

@@ -1,22 +1,28 @@
 @import 'shared';
 
 .CodeBlock {
-  background: $neutral-800;
-  border-radius: 4px;
-  color: $white;
-  font-family: $monospace-fonts;
-  font-size: 13px;
-  margin-bottom: 20px;
-  padding: 12px 16px 11px;
-  white-space: pre-wrap;
-  word-break: break-word;
+  pre {
+    background: $neutral-800;
+    border-radius: $border-radius-corners;
+    color: $white;
+    font-family: $monospace-fonts;
+    font-size: 13px;
+    padding: 16px;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    span .no-select {
+      opacity: 0.8;
+      user-select: none;
+    }
+  }
 
   &.clickToSelect {
     cursor: pointer;
-  }
 
-  &.clickToSelect:active {
-    opacity: 0.9;
+    &:active {
+      opacity: 0.9;
+    }
   }
 
   &::selection {

@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'components/tx_signing/tx_signing_transaction_box.scss';
 
 import { getClasses } from '../component_kit/helpers';
+import { CWText } from '../component_kit/cw_text';
 
 type TXSigningTransactionBoxAttrs = {
   blockHash: string;
@@ -18,23 +19,25 @@ export class TXSigningTransactionBox
   implements m.ClassComponent<TXSigningTransactionBoxAttrs>
 {
   view(vnode) {
+    const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
+
     return (
       <div class="TXSigningTransactionBox">
-        <div class="txbox-header">Status</div>
-        <div
-          class={getClasses<{ success?: boolean }>(
-            { success: vnode.attrs.success },
-            'txbox-content'
+        <CWText fontWeight="medium">Status</CWText>
+        <CWText
+          className={getClasses<{ success?: boolean }>(
+            { success },
+            'status-text'
           )}
         >
-          {vnode.attrs.status}
-        </div>
-        <div class="txbox-header">Block Hash</div>
-        <div class="txbox-content">{vnode.attrs.blockHash}</div>
-        <div class="txbox-header">Block Number</div>
-        <div class="txbox-content">{vnode.attrs.blockNum}</div>
-        <div class="txbox-header">Timestamp</div>
-        <div class="txbox-content">{vnode.attrs.timestamp}</div>
+          {status}
+        </CWText>
+        <CWText fontWeight="medium">Block Hash</CWText>
+        <CWText>{blockHash}</CWText>
+        <CWText fontWeight="medium">Block Number</CWText>
+        <CWText>{blockNum}</CWText>
+        <CWText fontWeight="medium">Timestamp</CWText>
+        <CWText>{timestamp}</CWText>
       </div>
     );
   }
