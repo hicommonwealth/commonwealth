@@ -37,7 +37,7 @@ export default class TokenBalanceProvider {
     } else if (balanceType === BalanceType.Cosmos) {
       return this._getCosmosTokenBalance(url, address);
     } else {
-      throw new Error(`Unsupported chain`);
+      throw new Error(`Could not fetch balance`);
     }
   }
 
@@ -79,8 +79,6 @@ export default class TokenBalanceProvider {
     return new BN(amount, 10);
   }
 
-  // TODO: this is causing a lot of errors because the url and the userAddress don't go together i.e. the url is for chihuahua and the userAddress is for osmosis (OSMO bech32 prefix)
-  // This causes the following errors: Failed to query token balance: no balance found: Query failed with (18): rpc error: code = InvalidArgument desc = invalid address: invalid Bech32 prefix; expected chihuahua, got osmo: invalid request
   private async _getCosmosTokenBalance(url: string, userAddress: string): Promise<BN> {
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
     const tmClient = await Tendermint34Client.connect(url);
