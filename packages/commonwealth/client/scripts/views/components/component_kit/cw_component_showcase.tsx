@@ -80,6 +80,7 @@ export class ComponentShowcase implements m.ClassComponent {
           <h1>Vote Button</h1>
           <CWThreadVoteButton
             updateVoteCount={(newCount: number) => {
+              // TODO Gabe 7/27/22 - Add real db update
               this.voteCount = newCount;
             }}
             voteCount={this.voteCount}
