@@ -29,6 +29,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
       disabled,
       inputValidationFn,
       label,
+      maxlength,
       name,
       oninput,
       placeholder,
@@ -48,6 +49,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
           })}
           disabled={disabled}
           tabindex={tabindex}
+          maxlength={maxlength}
           name={name}
           placeholder={placeholder}
           oninput={(e) => {
