@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Input } from 'construct-ui';
 
 import 'components/proposals/proposal_extensions.scss';
 
@@ -17,6 +16,8 @@ import Cosmos from 'controllers/chain/cosmos/main';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
 import { BalanceInfo } from 'views/components/proposals/balance_info';
+import { CWTextInput } from '../component_kit/cw_text_input';
+import { CWText } from '../component_kit/cw_text';
 
 export class ProposalExtensions
   implements
@@ -42,15 +43,12 @@ export class ProposalExtensions
 
       return (
         <div class="ProposalExtensions">
-          <div style="font-size: 90%; line-height: 1.2;">
+          <CWText>
             The winning side's coins will be timelocked according to the weight
             of their vote:
-          </div>
-          <div style="margin: 16px 0 12px;">
-            <ConvictionsChooser callback={setDemocracyVoteConviction} />
-          </div>
-          <Input
-            fluid
+          </CWText>
+          <ConvictionsChooser callback={setDemocracyVoteConviction} />
+          <CWTextInput
             placeholder={`Amount to vote (${app.chain?.chain?.denom})`}
             oncreate={() => {
               setDemocracyVoteAmount(0);
@@ -65,25 +63,16 @@ export class ProposalExtensions
         </div>
       );
     } else if (proposal instanceof SubstrateDemocracyProposal) {
-      return (
-        <div class="ProposalExtensions">
-          <div class="proposal-second">
-            Cost to second: {proposal.deposit.format()}
-          </div>
-        </div>
-      );
+      return <CWText>Cost to second: {proposal.deposit.format()}</CWText>;
     } else if (proposal instanceof SubstratePhragmenElection) {
       const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
 
       return (
-        <div class="ProposalExtensions">
+        <CWText>
           Voting on councillor candidacies requires a voting bond of{' '}
           <strong>{votingBond ? votingBond.format() : '--'}</strong> which is
           returned when the election is completed.
-          {/* TODO XXX: check whether user has deposited a voting bond
-        m('.proposal-bond', 'You have not deposited a voting bond for the current election.'),
-        m('.proposal-bond', 'You have already deposited a voting bond for the current election.'), */}
-        </div>
+        </CWText>
       );
     } else if (
       proposal instanceof CosmosProposal &&
@@ -93,13 +82,11 @@ export class ProposalExtensions
 
       return (
         <div class="ProposalExtensions">
-          <div class="proposal-second">
+          <CWText>
             Must deposit at least:{' '}
             {(app.chain as Cosmos).governance.minDeposit.format()}
-          </div>
-          <Input
-            fluid
-            // TODO: support multiple denom
+          </CWText>
+          <CWTextInput
             placeholder={`Amount to deposit (${app.chain?.chain?.denom})`}
             oncreate={() => {
               setCosmosDepositAmount(0);
@@ -108,7 +95,6 @@ export class ProposalExtensions
               setCosmosDepositAmount(parseInt(e.target.value, 10));
             }}
           />
-          {/* TODO: balance display */}
         </div>
       );
     }

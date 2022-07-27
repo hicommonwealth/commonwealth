@@ -65,14 +65,11 @@ export class TXSigningWebWalletOption
     return (
       <div class="TXSigningWebWalletOption">
         <div>
-          {`Use a ${link(
-            'a',
-            'https://polkadot.js.org/extension/',
-            'polkadot-js',
-            {
-              target: '_blank',
-            }
-          )} compatible wallet to sign the transaction:`}
+          Use a{' '}
+          {link('a', 'https://polkadot.js.org/extension/', 'polkadot-js', {
+            target: '_blank',
+          })}{' '}
+          compatible wallet to sign the transaction:
         </div>
         <CWButton
           disabled={
