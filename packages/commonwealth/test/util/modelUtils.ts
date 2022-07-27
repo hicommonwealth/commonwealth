@@ -11,8 +11,8 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import TokenBalanceProvider from 'token-balance-cache/src/provider';
 import app from '../../server-test';
 import models from '../../server/database';
-import { Permission } from "common-common/src/models/role";
-import { constructTypedMessage } from "adapters/chain/ethereum/keys";
+import { Permission } from 'common-common/src/models/role';
+import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
