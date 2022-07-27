@@ -24,7 +24,7 @@ import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
-import { CWVoteButton } from './cw_vote_button';
+import { CWThreadVoteButton } from './cw_thread_vote_button';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -78,7 +78,7 @@ export class ComponentShowcase implements m.ClassComponent {
         /> */}
         <div class="basic-gallery">
           <h1>Vote Button</h1>
-          <CWVoteButton
+          <CWThreadVoteButton
             updateVoteCount={(newCount: number) => {
               this.voteCount = newCount;
             }}

@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_vote_button.scss';
+import 'components/component_kit/cw_thread_vote_button.scss';
 
 import { formatNumberShort } from 'adapters/currency';
 import { CWText } from './cw_text';
@@ -10,12 +10,14 @@ import { ComponentType } from './types';
 import { CWIcon } from './cw_icons/cw_icon';
 import { getClasses } from './helpers';
 
-type VoteButtonAttrs = {
+type ThreadVoteButtonAttrs = {
   updateVoteCount: (newCount: number) => void;
   voteCount: number;
 };
 
-export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
+export class CWThreadVoteButton
+  implements m.ClassComponent<ThreadVoteButtonAttrs>
+{
   private isHoveringUpvote: boolean;
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
@@ -45,7 +47,7 @@ export class CWVoteButton implements m.ClassComponent<VoteButtonAttrs> {
             hasUpvoted: voteCount === this.initialVoteCount + 1,
             hasDownvoted: voteCount === this.initialVoteCount - 1,
           },
-          ComponentType.VoteButton
+          ComponentType.ThreadVoteButton
         )}
       >
         <CWIcon
