@@ -3,25 +3,38 @@
 import m from 'mithril';
 
 import app from 'state';
-import { CWBanner } from './components/component_kit/cw_banner';
+import {
+  CWBanner,
+  CWMessageBanner,
+} from './components/component_kit/cw_banner';
 import { ChainInfo, ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
-import { CWText } from './components/component_kit/cw_text';
+import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersAttrs = {
   banner?: string;
   chain: ChainInfo;
   terms?: string;
   tosStatus?: string;
+  bannerStatus?: string;
 };
 
 export class SublayoutBanners
   implements m.ClassComponent<SublayoutBannersAttrs>
 {
   view(vnode) {
-    const { banner, chain, terms, tosStatus } = vnode.attrs;
+    const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
+
     return (
       <>
+        {banner && bannerStatus !== 'off' && (
+          <CWMessageBanner
+            bannerContent={banner}
+            onClose={() =>
+              localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
+            }
+          />
+        )}
         {app.isLoggedIn() &&
           ITokenAdapter.instanceOf(app.chain) &&
           !app.user.activeAccount && (
@@ -30,21 +43,8 @@ export class SublayoutBanners
             />
           )}
         {isNonEmptyString(terms) && tosStatus !== 'off' && (
-          <CWBanner
-            bannerContent={
-              <CWText type="caption">
-                <a href={terms}>
-                  Please read the terms and conditions before interacting with
-                  this community.
-                </a>
-              </CWText>
-            }
-            onClose={() =>
-              localStorage.setItem(`${app.activeChainId()}-tos`, 'off')
-            }
-          />
+          <TermsBanner terms={terms} />
         )}
-        {banner && <CWBanner bannerContent={banner} />}
       </>
     );
   }

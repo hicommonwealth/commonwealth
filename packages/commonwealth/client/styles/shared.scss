@@ -16,9 +16,6 @@
 
 $sidebar-width: 232px;
 $quick-switcher-width: 56px;
-$layout-max-width: 1280px;
-$layout-padding: 36px;
-$layout-padding-xs: 20px;
 $header-height: 88px;
 
 // base fonts
@@ -33,11 +30,6 @@ $font-family-silka: Silka, sans-serif;
 
 $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-
-//
-// mobile specs
-
-$text-size-mobile-header: 22px;
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {

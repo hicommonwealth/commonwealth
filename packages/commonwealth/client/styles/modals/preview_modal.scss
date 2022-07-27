@@ -1,18 +1,24 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .PreviewModal {
-  .QuillFormattedText {
-    width: 640px;
-    max-height: 64vh;
-    overflow-y: auto;
-    margin: 25px 0;
-    @include extraSmall {
-      width: initial;
+  .compact-modal-body {
+    .QuillFormattedText {
+      margin: 25px 0;
+      max-height: 64vh;
+      overflow-y: auto;
+      width: 640px;
     }
-  }
-  .empty-preview {
-    text-align: center;
-    color: $neutral-500;
-    padding: 65px 25px;
+
+    .empty-state-container {
+      align-items: center;
+      display: flex;
+      height: 400px;
+      justify-content: center;
+      width: 400px;
+
+      .empty-text.Text {
+        color: $neutral-500;
+      }
+    }
   }
 }
