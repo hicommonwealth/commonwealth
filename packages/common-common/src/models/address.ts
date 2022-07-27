@@ -6,7 +6,7 @@ import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
-import { SsoTokenInstance } from './sso_token';
+import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import { WalletId } from '../types';
 
 export type AddressAttributes = {
@@ -32,6 +32,7 @@ export type AddressAttributes = {
 	User?: UserAttributes;
 	OffchainProfile?: OffchainProfileAttributes;
 	Roles?: RoleAttributes[];
+	SsoToken?: SsoTokenAttributes;
 }
 
 // eslint-disable-next-line no-use-before-define

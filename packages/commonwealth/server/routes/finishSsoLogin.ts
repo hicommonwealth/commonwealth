@@ -1,30 +1,24 @@
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
+import {
+  NotificationCategories,
+  WalletId,
+} from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
 import { ProfileAttributes } from 'common-common/src/models/profile';
 import { DynamicTemplate } from '../../shared/types';
-import {
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
 
 import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from 'common-common/src/models/user';
 import { AddressAttributes } from 'common-common/src/models/address';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  redirectWithLoginError,
-  redirectWithLoginSuccess,
-} from './finishEmailLogin';
+import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -140,12 +134,15 @@ const finishSsoLogin = async (
   const reqUser = req.user;
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { address: checksumAddress },
+      where: {
+        address: checksumAddress,
+        chain: 'axie-infinity',
+      },
       include: [
         {
           model: models.SsoToken,
           where: { issuer: jwtPayload.iss },
-          required: true,
+          required: false,
         },
       ],
     }
@@ -171,18 +168,30 @@ const finishSsoLogin = async (
     // check login token, if the user has already logged in before with SSO
     const token = await existingAddress.getSsoToken();
 
-    // perform login on existing account
-    if (jwtPayload.iat <= token.issued_at) {
-      log.error('Replay attack detected.');
-      throw new AppError(Errors.ReplayAttack);
-    }
-    token.issued_at = jwtPayload.iat;
-    token.state_id = emptyTokenInstance.state_id;
-    await token.save();
+    if (token) {
+      // perform login on existing account
+      if (jwtPayload.iat <= token.issued_at) {
+        log.error('Replay attack detected.');
+        throw new AppError(Errors.ReplayAttack);
+      }
+      token.issued_at = jwtPayload.iat;
+      token.state_id = emptyTokenInstance.state_id;
+      await token.save();
 
-    // delete the empty token that was initialized on /auth/sso, because it is superceded
-    // by the existing token for this user
-    await emptyTokenInstance.destroy();
+      // delete the empty token that was initialized on /auth/sso, because it is superceded
+      // by the existing token for this user
+      await emptyTokenInstance.destroy();
+    } else {
+      // XXX: some tokens got dis-associated from accounts due to checksum migration.
+      //   To fix this, we attach new (current) tokens to them here.
+      //   The only possible vulnerability here would be a delayed replay attack using a token
+      //   issued before the migration, which will not work because those tokens would be
+      //   marked expired.
+      emptyTokenInstance.issuer = jwtPayload.iss;
+      emptyTokenInstance.issued_at = jwtPayload.iat;
+      emptyTokenInstance.address_id = existingAddress.id;
+      await emptyTokenInstance.save();
+    }
 
     if (reqUser) {
       // perform address transfer
