@@ -27,8 +27,9 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
-  WalletOptionRow = 'WalletOptionRow',
+  ThreadVoteButton = 'ThreadVoteButton',
   ValidationText = 'ValidationText',
+  WalletOptionRow = 'WalletOptionRow',
 }
 
 export type StyleAttrs = {
