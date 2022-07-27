@@ -2,9 +2,9 @@
 
 .VoteButton {
   align-items: center;
-  background-color: $neutral-25;
+  background-color: $neutral-50;
   border-radius: $border-radius-corners;
-  border: 2px solid $neutral-300;
+  border: 2px solid $neutral-500;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -14,37 +14,46 @@
   width: 40px;
 
   .upvote-button.Icon {
-    color: $neutral-300;
+    color: $neutral-500;
   }
 
   .vote-count.Text {
-    color: $neutral-300;
+    color: $neutral-500;
   }
 
   .downvote-button.Icon {
-    color: $neutral-300;
+    color: $neutral-500;
   }
 
   &.isHoveringUpvote {
-    border-color: $green-200;
+    background-color: $neutral-25;
+    border-color: $green-300;
 
     .upvote-button.Icon {
-      color: $green-200;
+      color: $green-300;
     }
 
     .vote-count.Text {
-      color: $green-200;
+      color: $green-300;
+    }
+
+    .downvote-button.Icon {
+      color: $neutral-200;
     }
   }
 
   &.isHoveringDownvote {
     border-color: $rorange-200;
 
-    .downvote-button.Icon {
-      color: $rorange-200;
+    .upvote-button.Icon {
+      color: $neutral-200;
     }
 
     .vote-count.Text {
+      color: $rorange-200;
+    }
+
+    .downvote-button.Icon {
       color: $rorange-200;
     }
   }
