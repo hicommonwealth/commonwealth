@@ -10,7 +10,10 @@ const bulkMembers = async (models: DB, req: Request, res: Response, next: NextFu
 
   const members = await models.Role.findAll({
     where: { chain_id: chain.id },
-    include: [ models.Address ],
+    include: [{
+      model: models.Address,
+      required: true,
+    }],
     order: [['created_at', 'DESC']],
   });
 

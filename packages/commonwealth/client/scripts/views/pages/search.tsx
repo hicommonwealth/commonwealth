@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { ListItem, Select, Spinner, TabItem, Tabs, Tag } from 'construct-ui';
+import { ListItem, Select, Spinner } from 'construct-ui';
 
 import 'pages/search.scss';
 
@@ -11,8 +11,6 @@ import { pluralize } from 'helpers';
 import app from 'state';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
@@ -21,6 +19,11 @@ import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CommunityLabel } from '../components/community_label';
+import { renderQuillTextBody } from '../components/quill/helpers';
+import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CWText } from '../components/component_kit/cw_text';
+import ErrorPage from './error';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -109,16 +112,17 @@ const getDiscussionResult = (thread, searchTerm) => {
       }}
       label={
         <a class="search-results-item">
-          <div class="search-results-thread-header disabled">
+          <CWText
+            fontStyle="uppercase"
+            type="caption"
+            className="thread-header"
+          >
             {`discussion - ${thread.chain}`}
-          </div>
-          <div class="search-results-thread-title">
+          </CWText>
+          <CWText fontWeight="medium">
             {decodeURIComponent(thread.title)}
-          </div>
+          </CWText>
           <div class="search-results-thread-subtitle">
-            <span class="created-at">
-              {moment(thread.created_at).fromNow()}
-            </span>
             {m(User, {
               user: new AddressInfo(
                 thread.address_id,
@@ -127,28 +131,16 @@ const getDiscussionResult = (thread, searchTerm) => {
                 null
               ),
             })}
+            <CWText className="created-at">
+              {moment(thread.created_at).fromNow()}
+            </CWText>
           </div>
           <div class="search-results-thread-body">
-            {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(thread.body));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(thread.body);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
-            })()}
+            {renderQuillTextBody(thread.body, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }
@@ -175,7 +167,7 @@ const getCommentResult = (comment, searchTerm) => {
       }}
       label={
         <a class="search-results-item">
-          <div class="search-results-thread-header disabled">
+          <div class="search-results-thread-header">
             {`comment - ${comment.chain || comment.community}`}
           </div>
           <div class="search-results-thread-title">
@@ -195,26 +187,11 @@ const getCommentResult = (comment, searchTerm) => {
             })}
           </div>
           <div class="search-results-comment">
-            {(() => {
-              try {
-                const doc = JSON.parse(decodeURIComponent(comment.text));
-                if (!doc.ops) throw new Error();
-                return m(QuillFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              } catch (e) {
-                const doc = decodeURIComponent(comment.text);
-                return m(MarkdownFormattedText, {
-                  doc,
-                  hideFormatting: true,
-                  collapse: true,
-                  searchTerm,
-                });
-              }
-            })()}
+            {renderQuillTextBody(comment.text, {
+              hideFormatting: true,
+              collapse: true,
+              searchTerm,
+            })}
           </div>
         </a>
       }
@@ -230,6 +207,7 @@ const getListing = (
   searchType?: SearchScope
 ) => {
   if (Object.keys(results).length === 0 || !results[searchType]) return [];
+
   const tabScopedResults = results[searchType]
     .map((res) => {
       return res.searchType === SearchScope.Threads
@@ -243,6 +221,7 @@ const getListing = (
         : null;
     })
     .slice(0, pageCount * 50);
+
   return tabScopedResults;
 };
 
@@ -261,15 +240,9 @@ class SearchPage implements m.Component<SearchPageAttrs> {
   view() {
     const LoadingPage = (
       <PageLoading
-        narrow={true}
-        showNewProposalButton={true}
-        title={`Search ${(
-          <Tag
-            size="xs"
-            label="Beta"
-            style="position: relative; top: -2px; margin-left: 6px"
-          />
-        )}`}
+        narrow
+        showNewProposalButton
+        title={<BreadcrumbsTitleTag title="Search" />}
       />
     );
 
@@ -281,6 +254,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
     if (!app.search.isValidQuery(searchQuery)) {
       this.errorText =
         'Must enter query longer than 3 characters to begin searching';
+
       return (
         <PageNotFound
           title="Search"
@@ -313,9 +287,9 @@ class SearchPage implements m.Component<SearchPageAttrs> {
 
     const getTab = (searchScope: SearchScope) => {
       return (
-        <TabItem
+        <CWTab
           label={searchScope}
-          active={this.activeTab === searchScope}
+          isSelected={this.activeTab === searchScope}
           onclick={() => {
             this.pageCount = 1;
             this.activeTab = searchScope;
@@ -342,24 +316,6 @@ class SearchPage implements m.Component<SearchPageAttrs> {
           ).replace('2 ', '')}`
         : pluralize(tabScopedListing.length, activeTab.toLowerCase());
 
-    const filterBar = (
-      <div class="search-results-filters">
-        <h4>Sort By: </h4>
-        <Select
-          basic={true}
-          options={['Best', 'Newest', 'Oldest']}
-          value={this.searchQuery.sort}
-          onchange={(e) => {
-            searchQuery.sort = SearchSort[e.currentTarget['value']];
-            m.route.set(`/search?${searchQuery.toUrlParams()}`);
-            setTimeout(() => {
-              this.refreshResults = true;
-            }, 0);
-          }}
-        />
-      </div>
-    );
-
     const getCaptionScope = () => {
       if (scope) {
         return `in ${capitalize(scope)}.`;
@@ -373,49 +329,67 @@ class SearchPage implements m.Component<SearchPageAttrs> {
     const getSearchResultsCaption = () => {
       return `${resultCount} matching '${
         this.searchQuery.searchTerm
-      }' ${getCaptionScope()}`;
+      }' ${getCaptionScope()} `;
     };
 
-    return (
+    return this.errorText?.length > 0 ? (
+      <ErrorPage
+        message={this.errorText}
+        title={<BreadcrumbsTitleTag title="Search" />}
+      />
+    ) : (
       <Sublayout
         title={['Search ', capitalize(scope) || 'Commonwealth']}
-        showNewProposalButton={true}
-        alwaysShowTitle={true}
+        showNewProposalButton
+        alwaysShowTitle
       >
         <div class="SearchPage">
-          <Tabs>{tabs}</Tabs>
-          <div class="search-results-wrapper">
+          <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
-              <div class="search-loading">
-                <Spinner active={true} fill={true} size="xl" />,
-              </div>
-            ) : this.errorText ? (
-              <div class="search-error">{this.errorText}</div>
+              <Spinner active fill size="xl" />
             ) : (
               <div class="search-results">
-                <div class="search-results-caption">
-                  {getSearchResultsCaption()}
-                  {scope && !app.isCustomDomain() && (
-                    <a
-                      href="#"
-                      class="search-all-communities"
-                      onclick={() => {
-                        searchQuery.chainScope = undefined;
+                <CWTabBar>{tabs}</CWTabBar>
+                <CWText isCentered className="search-results-caption">
+                  <div>
+                    {getSearchResultsCaption()}
+                    {scope && !app.isCustomDomain() && (
+                      <a
+                        href="#"
+                        class="search-all-communities"
+                        onclick={() => {
+                          searchQuery.chainScope = undefined;
+                          m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                          setTimeout(() => {
+                            this.refreshResults = true;
+                          }, 0);
+                        }}
+                      >
+                        {` Search all communities?`}
+                      </a>
+                    )}
+                  </div>
+                </CWText>
+                {tabScopedListing.length > 0 && (
+                  <div class="search-results-filters">
+                    <CWText type="h5">Sort By:</CWText>
+                    <Select
+                      options={['Best', 'Newest', 'Oldest']}
+                      value={this.searchQuery.sort}
+                      onchange={(e) => {
+                        searchQuery.sort = SearchSort[e.currentTarget['value']];
                         m.route.set(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
                       }}
-                    >
-                      {` Search all communities?`}
-                    </a>
-                  )}
-                </div>
-                {resultCount === '0' ? null : filterBar}
+                    />
+                  </div>
+                )}
                 <div class="search-results-list">{tabScopedListing}</div>
               </div>
             )}
-          </div>
+          </>
         </div>
       </Sublayout>
     );
