@@ -43,7 +43,6 @@
   flex-direction: column;
   padding: 16px;
   width: 100%;
-  cursor: pointer;
 
   .results-header {
     align-items: center;
@@ -53,7 +52,8 @@
     width: 100%;
 
     .results-text.Text {
-      color: $neutral-500;
+      color: $primary-300;
+      cursor: pointer;
     }
   }
 

@@ -26,11 +26,17 @@ export type PollOptionAttrs = {
   multiSelect: boolean;
   voteInformation: Array<VoteInformation>;
   selectedOptions: Array<string>;
+  disableVoteOptions: boolean;
 };
 
 export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
   view(vnode) {
-    const { multiSelect, voteInformation, selectedOptions } = vnode.attrs;
+    const {
+      multiSelect,
+      voteInformation,
+      selectedOptions,
+      disableVoteOptions,
+    } = vnode.attrs;
     return (
       <div class="PollOptions">
         {multiSelect
@@ -57,6 +63,7 @@ export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
                 }}
                 label={option.label}
                 value={option.value}
+                disabled={disableVoteOptions}
               />
             ))}
       </div>
@@ -135,21 +142,23 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       pollEnded,
     } = vnode.attrs;
     return (
-      <div
-        class="ResultsSection"
-        onclick={(e) => {
-          if (onResultsClick) onResultsClick(e);
-        }}
-      >
+      <div class="ResultsSection">
         <div class="results-header">
           <CWText type="b1" fontWeight="bold">
             {resultString}
           </CWText>
-          <CWText type="caption" className="results-text">
-            {`${Math.floor(totalVoteCount * 100) / 100} ${
-              tokenSymbol ?? 'votes'
-            }`}
-          </CWText>
+          <div
+            class="results-text-wrapper"
+            onclick={(e) => {
+              if (onResultsClick) onResultsClick(e);
+            }}
+          >
+            <CWText type="caption" className="results-text">
+              {`${Math.floor(totalVoteCount * 100) / 100} ${
+                tokenSymbol ?? 'votes'
+              }`}
+            </CWText>
+          </div>
         </div>
         <div class="results-content">
           {voteInformation
@@ -258,6 +267,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                   multiSelect={multiSelect}
                   voteInformation={voteInformation}
                   selectedOptions={this.selectedOptions}
+                  disableVoteOptions={disableVoteButton}
                 />
                 <CastVoteSection
                   disableVoteButton={

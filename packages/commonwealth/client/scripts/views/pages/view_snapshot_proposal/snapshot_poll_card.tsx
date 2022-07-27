@@ -93,6 +93,7 @@ export class SnapshotPollCard
                   multiSelect={false}
                   voteInformation={this.localVoteInformation}
                   selectedOptions={this.selectedOptions}
+                  disableVoteOptions={disableVoteButton}
                 />
                 <CastVoteSection
                   disableVoteButton={
