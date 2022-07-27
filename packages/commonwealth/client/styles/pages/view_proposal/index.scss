@@ -37,32 +37,6 @@ $discussion-title-font-size: 1.45rem;
   flex: 1;
   flex-direction: row;
 
-  .show-more-button {
-    align-items: center;
-    color: $primary-500;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    width: 115px;
-    margin-top: 100px;
-
-    .show-more-text {
-      font-weight: 600;
-      margin-top: -1px;
-    }
-  }
-
-  .show-more-button-wrapper {
-    align-items: center;
-    background-image: linear-gradient(to bottom, transparent, white);
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    margin-top: -50px;
-    margin-bottom: 30px;
-    position: relative;
-  }
-
   .view-proposal-page-container {
     display: flex;
     flex-direction: column;

@@ -1,15 +1,14 @@
-/* eslint-disable no-restricted-syntax */
-
-import 'components/quill_formatted_text.scss';
-
 import m from 'mithril';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
 
 import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../shared/utils';
+import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
-const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
+export const renderQuillDelta = (
+  delta,
+  hideFormatting = false,
+  collapse = false,
+  openLinksInNewTab = false
+) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
 
@@ -48,6 +47,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
       return 'ul.checklist';
     return 'div';
   };
+
   const getParentTag = (parent) => {
     if (collapse) return 'span';
     if (parent.attributes?.list === 'bullet') return 'li';
@@ -56,20 +56,22 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
     if (parent.attributes?.list === 'unchecked') return 'li.unchecked';
     return 'div';
   };
+
   // multiple list groups should be consolidated, so numbering is preserved even when ordered lists are broken
-  const consolidateOrderedLists = (groups) => {
+  const consolidateOrderedLists = (_groups) => {
     const result = [];
 
     let run = [];
-    for (let i = 0; i < groups.length; i++) {
-      if (groups[i].listtype) {
-        run.push(groups[i]);
+
+    for (let i = 0; i < _groups.length; i++) {
+      if (_groups[i].listtype) {
+        run.push(_groups[i]);
       } else {
         if (run.length > 0) {
           result.push(run);
           run = [];
         }
-        result.push(groups[i]);
+        result.push(_groups[i]);
       }
     }
     if (run.length > 0) {
@@ -78,6 +80,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
 
     return result;
   };
+
   return hideFormatting || collapse
     ? groups.map((group) => {
         const wrapGroupForHiddenFormatting = (content) => {
@@ -101,7 +104,7 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
                     'a',
                     {
                       href: child.attributes.link,
-                      target: '_blank',
+                      target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
                       noopener: 'noopener',
                       onclick: (e) => {
@@ -122,7 +125,8 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
                     `${child.insert}`
                   );
                 if (child.insert.match(/[A-Za-z0-9]$/)) {
-                  // add a period and space after lines that end on a word or number, like Google does in search previews
+                  // add a period and space after lines that end on a word or
+                  // number, like Google does in search previews
                   return m('span', `${child.insert}. `);
                 } else {
                   return m('span', `${child.insert}`);
@@ -290,9 +294,9 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
           );
         };
         // special handler for lists, which need to be un-flattened and turned into a tree
-        const renderListGroup = (group) => {
+        const renderListGroup = (_group) => {
           const temp = []; // accumulator for potential parent tree nodes; will grow to the maximum depth of the tree
-          group.parents.forEach((parent) => {
+          _group.parents.forEach((parent) => {
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             const indent = parent.attributes.indent || 0;
@@ -311,8 +315,8 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
                 outdentBuffer[outdentBuffer.length - 1].content.push(
                   m(
                     getGroupTag(group),
-                    temp.pop().map(({ tag, content }) => {
-                      return m(tag, content);
+                    temp.pop().map((data) => {
+                      return m(data.tag, data.content);
                     })
                   )
                 );
@@ -344,91 +348,3 @@ const renderQuillDelta = (delta, hideFormatting = false, collapse = false) => {
         else return group.parents.map(renderParent);
       });
 };
-
-const QuillFormattedText: m.Component<
-  {
-    doc;
-    hideFormatting?: boolean;
-    collapse?: boolean;
-    searchTerm?: string;
-    cutoffText?: number;
-  },
-  {
-    cachedDocWithHighlights: string;
-    cachedResultWithHighlights;
-  }
-> = {
-  view: (vnode) => {
-    const { doc, hideFormatting, collapse, searchTerm, cutoffText } =
-      vnode.attrs;
-
-    let truncatedDoc = { ...doc };
-    if (cutoffText) truncatedDoc.ops = [...doc.ops.slice(0, cutoffText)];
-
-    // if we're showing highlighted search terms, render the doc once, and cache the result
-    if (searchTerm) {
-      if (
-        JSON.stringify(truncatedDoc) !== vnode.state.cachedDocWithHighlights
-      ) {
-        const vnodes = renderQuillDelta(truncatedDoc, hideFormatting, true); // collapse = true, to inline blocks
-        const root = document.createElement('div');
-        m.render(root, vnodes);
-        const textToHighlight = root.innerText
-          .replace(/\n/g, ' ')
-          .replace(/\ +/g, ' ');
-        const chunks = findAll({
-          searchWords: [searchTerm.trim()],
-          textToHighlight,
-        });
-        vnode.state.cachedDocWithHighlights = JSON.stringify(truncatedDoc);
-        vnode.state.cachedResultWithHighlights = chunks.map(
-          ({ end, highlight, start }, index) => {
-            const middle = 15;
-            const subString = textToHighlight.substr(start, end - start);
-            let text = smartTruncate(
-              subString,
-              chunks.length <= 1 ? 150 : 40 + searchTerm.trim().length,
-              chunks.length <= 1
-                ? {}
-                : index === 0
-                ? { position: 0 }
-                : index === chunks.length - 1
-                ? {}
-                : { position: middle }
-            );
-            if (subString[subString.length - 1] === ' ') {
-              text += ' ';
-            }
-            if (subString[0] === ' ') {
-              text = ` ${text}`;
-            }
-            return highlight ? m('mark', text) : m('span', text);
-          }
-        );
-      }
-      return m(
-        '.QuillFormattedText',
-        {
-          class: collapse ? 'collapsed' : '',
-        },
-        vnode.state.cachedResultWithHighlights
-      );
-    }
-
-    return m(
-      '.QuillFormattedText',
-      {
-        class: collapse ? 'collapsed' : '',
-        oncreate: (vvnode) => {
-          if (!(<any>window).twttr)
-            loadScript('//platform.twitter.com/widgets.js').then(() => {
-              console.log('Twitter Widgets loaded');
-            });
-        },
-      },
-      renderQuillDelta(truncatedDoc, hideFormatting, collapse)
-    );
-  },
-};
-
-export default QuillFormattedText;
