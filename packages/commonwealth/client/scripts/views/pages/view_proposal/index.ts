@@ -1406,16 +1406,7 @@ const ViewProposalPage: m.Component<
                 proposalId: proposal.id,
                 allowLinking: isAuthor || isAdminOrMod,
               }),
-            proposal instanceof OffchainThread &&
-              isAuthor &&
-              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
-              m(PollEditorCard, {
-                proposal,
-                proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
-              }),
+
             proposal instanceof OffchainThread &&
               [
                 ...new Map(
@@ -1467,6 +1458,16 @@ const ViewProposalPage: m.Component<
                 });
               }),
           ],
+          proposal instanceof OffchainThread &&
+            isAuthor &&
+            (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
+            m(PollEditorCard, {
+              proposal,
+              proposalAlreadyHasPolling: !vnode.state.polls?.length,
+              openPollEditor: () => {
+                vnode.state.pollEditorIsOpen = true;
+              },
+            }),
         ]),
       ])
     );
