@@ -87,7 +87,7 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
       this.timeoutHandle = global.setTimeout(() => {
         clearInterval(this.timeoutHandle);
 
-        vnode.attrs.next('SentTransactionSuccess', {
+        vnode.attrs.next('success', {
           hash: 'Not available',
         });
 
@@ -168,7 +168,7 @@ export class TxSigningModalRejectedStage
         <CWButton
           oncreate={(vvnode) => $(vvnode.dom).focus()}
           onclick={() => {
-            vnode.attrs.next('Intro');
+            vnode.attrs.next('intro');
           }}
           label="Try again"
         />

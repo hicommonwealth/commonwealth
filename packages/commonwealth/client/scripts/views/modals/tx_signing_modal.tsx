@@ -29,7 +29,7 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
   }
 
   view(vnode) {
-    const { author, next, txData, txType } = vnode.attrs;
+    const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);
 
@@ -37,19 +37,14 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
       (w) => w instanceof PolkadotWebWalletController
     );
 
+    const next = (newStage: StageName, newData?: TxDataState) => {
+      this.stageName = newStage;
+      this.data = newData;
+      m.redraw();
+    };
+
     return (
       <div class="TXSigningModal">
-        {/*
-          // pass transaction signing state down to each step's view
-          stageName: this.stageName,
-          stateData: this.data,
-          // handle state transitions
-          next: (newState, newData) => {
-            this.stageName = newState;
-            this.data = newData;
-            m.redraw();
-          },
-        })} */}
         <div class="compact-modal-title">
           <h3>{getModalTitle(this.stageName, txLabel)}</h3>
           <ModalExitButton />
@@ -65,17 +60,21 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
             />
           )}
           {this.stageName === 'waiting' && <TxSigningModalWaitingStage />}
-          {/* {this.stageName === 'success' && (
-            <TxSigningModalSuccessStage blocknum={} hash={} timestamp={} />
+          {this.stageName === 'success' && (
+            <TxSigningModalSuccessStage
+              blocknum={this.data.blocknum}
+              hash={this.data.hash}
+              timestamp={this.data.timestamp}
+            />
           )}
           {this.stageName === 'rejected' && (
             <TxSigningModalRejectedStage
-              blocknum={}
-              error={}
-              hash={}
-              timestamp={}
+              blocknum={this.data.blocknum}
+              hash={this.data.hash}
+              timestamp={this.data.timestamp}
+              error={this.data.error}
             />
-          )} */}
+          )}
         </div>
       </div>
     );

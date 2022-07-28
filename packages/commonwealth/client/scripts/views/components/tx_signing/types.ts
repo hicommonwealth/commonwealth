@@ -8,4 +8,4 @@ export type TxDataState = Partial<ITransactionResult> & {
 
 export type StageName = 'intro' | 'waiting' | 'success' | 'rejected';
 
-export type NextFn = (newState: StageName, newData?: TxDataState) => void;
+export type NextFn = (newStage: StageName, newData?: TxDataState) => void;
