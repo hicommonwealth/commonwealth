@@ -18,7 +18,7 @@ async function main() {
   app.use(bodyParser.json({ limit: '1mb' }));
 
   router.post('/getBalance', async (req: Request, res: Response) => {
-    const { chain_node_id, addresses, contract_address, contract_type } = req.body;
+    const { chain_node_id, addresses } = req.body;
     if (!chain_node_id || !+chain_node_id || !addresses) {
       return res.status(400).json('Request must contain chain_node_id and addresses');
     }
@@ -27,7 +27,7 @@ async function main() {
     const results = {};
 
     for (const address of addressArray) {
-      // edit this
+      // edit this however you need for testing
       if (address == '0x0000000000000000000000000000000000000000')
         results[address] = '1000000000000';
       else if (address == '0x1111111111111111111111111111111111111111')
