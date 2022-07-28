@@ -2,11 +2,15 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Tabs, TabItem } from 'construct-ui';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
+import {
+  MixpanelCommunityCreationEvent,
+  MixpanelPageViewEvent,
+} from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
@@ -18,13 +22,8 @@ import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
-  MixpanelPageViewEvent,
-  MixpanelPageViewPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -88,21 +87,27 @@ class CreateCommunity implements m.ClassComponent {
       const { ethChains, ethChainNames } = this.state;
       switch (this.state.activeForm) {
         case CommunityType.StarterCommunity:
-          return m(StarterCommunityForm);
+          return <StarterCommunityForm />;
         case CommunityType.Erc20Community:
-          return m(ERC20Form, { ethChains, ethChainNames });
+          return (
+            <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          );
         case CommunityType.Erc721Community:
-          return m(ERC721Form, { ethChains, ethChainNames });
+          return (
+            <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          );
         case CommunityType.SputnikDao:
-          return m(SputnikForm);
+          return <SputnikForm />;
         case CommunityType.SubstrateCommunity:
-          return m(SubstrateForm);
+          return <SubstrateForm />;
         case CommunityType.Cosmos:
-          return m(CosmosForm);
+          return <CosmosForm />;
         case CommunityType.EthDao:
-          return m(EthDaoForm, { ethChains, ethChainNames });
+          return (
+            <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
+          );
         case CommunityType.SplToken:
-          return m(SplTokenForm);
+          return <SplTokenForm />;
         default:
           throw new Error(`Invalid community type: ${this.state.activeForm}`);
       }
@@ -113,18 +118,20 @@ class CreateCommunity implements m.ClassComponent {
     ) : (
       <Sublayout title="Create Community">
         <div class="CreateCommunityIndex">
-          <h3>New Commonwealth Community</h3>
+          <CWText type="h3" fontWeight="semiBold">
+            New Commonwealth Community
+          </CWText>
           {!this.state.loadingEthChains && (
-            <Tabs align="center" bordered={false} fluid={true}>
+            <CWTabBar>
               {Object.values(CommunityType)
                 .filter((t) => {
                   return !ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin;
                 })
                 .map((t) => {
                   return (
-                    <TabItem
+                    <CWTab
                       label={t.toString()}
-                      active={this.state.activeForm === t}
+                      isSelected={this.state.activeForm === t}
                       onclick={() => {
                         this.state.activeForm = t;
                         mixpanelBrowserTrack({
@@ -135,11 +142,10 @@ class CreateCommunity implements m.ClassComponent {
                           communityType: t,
                         });
                       }}
-                      style="text-align: center"
                     />
                   );
                 })}
-            </Tabs>
+            </CWTabBar>
           )}
           {!this.state.loadingEthChains && getActiveForm()}
         </div>

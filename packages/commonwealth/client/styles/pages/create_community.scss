@@ -1,25 +1,18 @@
 @import 'shared';
 
 .CreateCommunityIndex {
+  align-items: center;
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: 16px;
   padding: 24px;
   width: 100%;
-
-  h3 {
-    margin-bottom: 16px;
-    text-align: center;
-  }
-
-  .cui-tabs {
-    flex-wrap: wrap;
-  }
 
   .CreateCommunityForm {
     display: flex;
     flex-direction: column;
-    margin: 32px auto auto;
+    margin: auto;
     width: 480px;
 
     @include extraSmall {
