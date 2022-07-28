@@ -31,8 +31,20 @@ type SnapshotProposalCardsAttrs = {
 };
 
 const enum VotingError {
-  NOT_VALIDATED = 'Insufficient Voting Power',
+  NOT_VALIDATED = 'You do not have the voting power to vote on this proposal.',
   ALREADY_VOTED = 'Already Submitted Vote',
+}
+
+function calculateTimeRemaining(proposal: SnapshotProposal) {
+  const now = moment();
+  const endTime = moment(proposal.end * 1000);
+  const duration = moment.duration(endTime.diff(now));
+  const days = duration.days();
+  const hours = duration.hours();
+  const timeRemainingString = `${days} ${days > 1 ? 'days' : 'day'} ${hours}${
+    hours > 1 ? 'hrs' : 'hr'
+  } remaining`;
+  return timeRemainingString;
 }
 
 export class SnapshotProposalCards
@@ -123,7 +135,7 @@ export class SnapshotProposalCards
           votedFor={hasVoted ? userVote : ''}
           disableVoteButton={fetchedPower && voteErrorText !== ''}
           proposalTitle={proposal.title}
-          timeRemainingString={voteErrorText}
+          timeRemainingString={calculateTimeRemaining(proposal)}
           tokenSymbol={space.symbol}
           totalVoteCount={totals.sumOfResultsBalance}
           voteInformation={buildVoteInformation(proposal?.choices, votes)}

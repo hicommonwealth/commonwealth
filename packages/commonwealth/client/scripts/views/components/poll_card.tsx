@@ -92,9 +92,9 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
         {disableVoteButton ? (
           <CWTooltip
             interactionType="hover"
-            tooltipContents={tooltipErrorMessage}
+            tooltipContents={tooltipErrorMessage ?? 'Select an option to vote'}
             tooltipType="solidNoArrow"
-            hoverCloseDelay={200}
+            hoverCloseDelay={300}
             trigger={
               <CWButton
                 label="Vote"
@@ -123,24 +123,48 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
 export type VoteDisplayAttrs = {
   timeRemainingString: string;
   voteDirectionString: string;
+  pollEnded: string;
+  voteInformation: Array<VoteInformation>;
 };
 
 export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
   view(vnode) {
-    const { voteDirectionString, timeRemainingString } = vnode.attrs;
+    const {
+      voteDirectionString,
+      timeRemainingString,
+      pollEnded,
+      voteInformation,
+    } = vnode.attrs;
+
+    const topResponse = voteInformation.sort(
+      (option1, option2) => option2.voteCount - option1.voteCount
+    )[0].label;
+
     return (
       <div class="VoteDisplay">
-        <div class="vote-direction">
-          <CWIcon
-            iconName="check"
-            iconSize="small"
-            className="vote-check-icon"
-          />
-          <CWText type="caption">{voteDirectionString}</CWText>
-        </div>
-        <CWText className="time-remaining-text" type="caption">
-          {timeRemainingString}
-        </CWText>
+        {!pollEnded ? (
+          <>
+            <div class="vote-direction">
+              <CWIcon
+                iconName="check"
+                iconSize="small"
+                className="vote-check-icon"
+              />
+              <CWText type="caption">{voteDirectionString}</CWText>
+            </div>
+            <CWText className="time-remaining-text" type="caption">
+              {timeRemainingString}
+            </CWText>
+          </>
+        ) : (
+          <div class="completed-vote-information">
+            <CWText type="caption">This Poll is Complete</CWText>
+            <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
+            {voteDirectionString !== '' && (
+              <CWText type="caption">{`You voted "${voteDirectionString}"`}</CWText>
+            )}
+          </div>
+        )}
       </div>
     );
   }
@@ -171,21 +195,15 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
           <CWText type="b1" fontWeight="bold">
             {resultString}
           </CWText>
-          <div
-            class="results-text-wrapper"
-            onclick={(e) => {
-              if (onResultsClick) onResultsClick(e);
-            }}
+          <CWText
+            type="caption"
+            className={`results-text${onResultsClick ? ' clickable' : ''}`}
+            onclick={onResultsClick ? (e) => onResultsClick(e) : undefined}
           >
-            <CWText
-              type="caption"
-              className={`results-text${onResultsClick ? ' clickable' : ''}`}
-            >
-              {`${Math.floor(totalVoteCount * 100) / 100} ${
-                tokenSymbol ?? 'votes'
-              }`}
-            </CWText>
-          </div>
+            {`${Math.floor(totalVoteCount * 100) / 100} ${
+              tokenSymbol ?? 'votes'
+            }`}
+          </CWText>
         </div>
         <div class="results-content">
           {voteInformation
@@ -287,33 +305,34 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        {!pollEnded && (
-          <div class="poll-voting-section">
-            {!this.hasVoted ? (
-              <>
-                <PollOptions
-                  multiSelect={multiSelect}
-                  voteInformation={voteInformation}
-                  selectedOptions={this.selectedOptions}
-                  disableVoteOptions={disableVoteButton}
-                />
-                <CastVoteSection
-                  disableVoteButton={
-                    disableVoteButton || this.selectedOptions.length === 0
-                  }
-                  timeRemainingString={timeRemainingString}
-                  tooltipErrorMessage={tooltipErrorMessage}
-                  onVoteCast={castVote}
-                />
-              </>
-            ) : (
-              <VoteDisplay
-                timeRemainingString={timeRemainingString}
-                voteDirectionString={this.voteDirectionString}
+        <div class="poll-voting-section">
+          {!this.hasVoted && !pollEnded && (
+            <>
+              <PollOptions
+                multiSelect={multiSelect}
+                voteInformation={voteInformation}
+                selectedOptions={this.selectedOptions}
+                disableVoteOptions={disableVoteButton}
               />
-            )}
-          </div>
-        )}
+              <CastVoteSection
+                disableVoteButton={
+                  disableVoteButton || this.selectedOptions.length === 0
+                }
+                timeRemainingString={timeRemainingString}
+                tooltipErrorMessage={tooltipErrorMessage}
+                onVoteCast={castVote}
+              />
+            </>
+          )}
+          {(this.hasVoted || pollEnded) && (
+            <VoteDisplay
+              timeRemainingString={timeRemainingString}
+              voteDirectionString={this.voteDirectionString}
+              pollEnded={pollEnded}
+              voteInformation={voteInformation}
+            />
+          )}
+        </div>
         <ResultsSection
           resultString={resultString}
           onResultsClick={onResultsClick}

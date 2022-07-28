@@ -86,33 +86,34 @@ export class SnapshotPollCard
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        {!pollEnded && (
-          <div class="poll-voting-section">
-            {!this.hasVoted ? (
-              <>
-                <PollOptions
-                  multiSelect={false}
-                  voteInformation={this.localVoteInformation}
-                  selectedOptions={this.selectedOptions}
-                  disableVoteOptions={disableVoteButton}
-                />
-                <CastVoteSection
-                  disableVoteButton={
-                    disableVoteButton || this.selectedOptions.length === 0
-                  }
-                  timeRemainingString={timeRemainingString}
-                  tooltipErrorMessage={tooltipErrorMessage}
-                  onVoteCast={castVote}
-                />
-              </>
-            ) : (
-              <VoteDisplay
-                timeRemainingString={timeRemainingString}
-                voteDirectionString={this.voteDirectionString}
+        <div class="poll-voting-section">
+          {!this.hasVoted && !pollEnded && (
+            <>
+              <PollOptions
+                multiSelect={false}
+                voteInformation={this.localVoteInformation}
+                selectedOptions={this.selectedOptions}
+                disableVoteOptions={disableVoteButton}
               />
-            )}
-          </div>
-        )}
+              <CastVoteSection
+                disableVoteButton={
+                  disableVoteButton || this.selectedOptions.length === 0
+                }
+                timeRemainingString={timeRemainingString}
+                tooltipErrorMessage={tooltipErrorMessage}
+                onVoteCast={castVote}
+              />
+            </>
+          )}
+          {(this.hasVoted || pollEnded) && (
+            <VoteDisplay
+              timeRemainingString={timeRemainingString}
+              voteDirectionString={this.voteDirectionString}
+              pollEnded={pollEnded}
+              voteInformation={this.localVoteInformation}
+            />
+          )}
+        </div>
         <ResultsSection
           resultString={resultString}
           onResultsClick={null}
