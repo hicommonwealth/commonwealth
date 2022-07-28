@@ -340,13 +340,14 @@ const ProposalHeader: m.Component<
                             proposal: proposal as OffchainThread,
                           }),
                         ],
-                        inline: true,
-                        trigger: m(CWIcon, {
-                          iconName: 'chevronDown',
-                          iconSize: 'small',
-                        }),
+                        trigger: m('', [
+                          m(CWIcon, {
+                            iconName: 'chevronDown',
+                            iconSize: 'small',
+                          }),
+                        ]),
                       }),
-                    m('.CommentSocialHeader', [m(SocialSharingCarat)]),
+                    m(SocialSharingCarat),
                     vnode.state.editPermissionsIsOpen &&
                       proposal instanceof OffchainThread &&
                       m(ProposalEditorPermissions, {
@@ -604,9 +605,8 @@ const ProposalComment: m.Component<
                 }),
               }),
             ],
-            m('.CommentSocialHeader', [
-              m(SocialSharingCarat, { commentID: comment.id }),
-            ]),
+            m(SocialSharingCarat, { commentID: comment.id }),
+
             // For now, we are limiting threading to 1 level deep
             // Comments whose parents are other comments should not display the reply option
             // !vnode.state.editing

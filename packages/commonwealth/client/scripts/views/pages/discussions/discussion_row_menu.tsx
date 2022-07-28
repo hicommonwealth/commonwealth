@@ -238,7 +238,11 @@ export class DiscussionRowMenu
               <ThreadDeletionMenuItem proposal={proposal} />
             ),
           ]}
-          trigger={<CWIcon iconName="chevronDown" iconSize="small" />}
+          trigger={
+            <div>
+              <CWIcon iconName="chevronDown" iconSize="small" />
+            </div>
+          }
         />
         {this.topicEditorIsOpen && (
           <TopicEditor
