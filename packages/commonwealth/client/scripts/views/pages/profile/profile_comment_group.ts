@@ -3,12 +3,9 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { OffchainThread, OffchainComment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-
-import User from 'views/components/widgets/user';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {
   proposal: OffchainThread | any;
@@ -52,18 +49,9 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
           m('.proposal-comment', [
             m(
               '.comment-text',
-              (() => {
-                try {
-                  const doc = JSON.parse(comment.text);
-                  if (!doc.ops) throw new Error();
-                  return m(QuillFormattedText, { doc, collapse: true });
-                } catch (e) {
-                  return m(MarkdownFormattedText, {
-                    doc: comment.text,
-                    collapse: true,
-                  });
-                }
-              })()
+              renderQuillTextBody(comment.text, {
+                collapse: true,
+              })
             ),
           ])
         ),

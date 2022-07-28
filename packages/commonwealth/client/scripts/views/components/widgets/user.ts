@@ -350,7 +350,7 @@ const User: m.Component<
               },
               label: 'Ban User',
               buttonType: 'primary-red',
-            })
+            }),
           ]),
       ]
     );

@@ -9,15 +9,14 @@ import 'pages/chat.scss';
 import app from 'state';
 import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import QuillEditor from '../quill_editor';
+import { QuillEditor } from '../quill/quill_editor';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import QuillFormattedText from '../quill_formatted_text';
+import { editorIsBlank, renderQuillTextBody } from '../quill/helpers';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -95,7 +94,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     }, []);
 
     const handleSubmitMessage = () => {
-      if (this.quillEditorState.editor.editor.isBlank()) {
+      if (editorIsBlank(this.quillEditorState)) {
         notifyError('Cannot send a blank message');
         return;
       }
@@ -121,18 +120,8 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       });
     };
 
-    const messageToText = (msg: any) => {
-      try {
-        const doc = JSON.parse(msg.message);
-        if (!doc.ops) throw new Error();
-        return m(QuillFormattedText, { doc });
-      } catch {
-        return m(MarkdownFormattedText, {
-          doc: msg.message,
-          openLinksInNewTab: true,
-        });
-      }
-    };
+    const messageToText = (msg: any) =>
+      renderQuillTextBody(msg.message, { openLinksInNewTab: true });
 
     const messageIsHighlighted = (message: any): boolean => {
       return (
@@ -212,16 +201,16 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
-            {m(QuillEditor, {
-              contentsDoc: '',
-              oncreateBind: (state) => {
+            <QuillEditor
+              contentsDoc=""
+              oncreateBind={(state) => {
                 vnode.state.quillEditorState = state;
-              },
-              editorNamespace: `${document.location.pathname}-chatting`,
-              onkeyboardSubmit: () => {
+              }}
+              editorNamespace={`${document.location.pathname}-chatting`}
+              onkeyboardSubmit={() => {
                 handleSubmitMessage();
-              },
-            })}
+              }}
+            />
             <CWIcon iconName="send" onclick={handleSubmitMessage} />
           </div>
         )}
