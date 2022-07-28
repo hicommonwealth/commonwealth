@@ -31,6 +31,7 @@ export class CWJdenticon
 {
   view(vnode) {
     const { address, size } = vnode.attrs;
+    if (!address) return null;
 
     return (
       <svg
