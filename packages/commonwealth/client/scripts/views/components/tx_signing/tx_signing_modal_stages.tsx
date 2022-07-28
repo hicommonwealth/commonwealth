@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import $ from 'jquery';
 import m from 'mithril';
 import { Spinner } from 'construct-ui';
 
@@ -131,7 +132,6 @@ export class TxSigningModalSuccessStage
           timestamp={timestamp ? timestamp.format() : '--'}
         />
         <CWButton
-          oncreate={(vvnode) => $(vvnode.dom).focus()}
           onclick={(e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
@@ -144,10 +144,10 @@ export class TxSigningModalSuccessStage
 }
 
 export class TxSigningModalRejectedStage
-  implements m.ClassComponent<TxDataState>
+  implements m.ClassComponent<TxDataState & NextFn>
 {
   view(vnode) {
-    const { blocknum, error, hash, timestamp } = vnode.attrs;
+    const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (
       <>
@@ -158,20 +158,21 @@ export class TxSigningModalRejectedStage
           blockNum={blocknum || '--'}
           timestamp={timestamp ? timestamp.format() : '--'}
         />
-        <CWButton
-          onclick={(e) => {
-            e.preventDefault();
-            $(vnode.dom).trigger('modalexit');
-          }}
-          label="Done"
-        />
-        <CWButton
-          oncreate={(vvnode) => $(vvnode.dom).focus()}
-          onclick={() => {
-            vnode.attrs.next('intro');
-          }}
-          label="Try again"
-        />
+        <div class="buttons-row">
+          <CWButton
+            onclick={(e) => {
+              e.preventDefault();
+              $(vnode.dom).trigger('modalexit');
+            }}
+            label="Done"
+          />
+          <CWButton
+            onclick={() => {
+              next('intro');
+            }}
+            label="Try again"
+          />
+        </div>
       </>
     );
   }

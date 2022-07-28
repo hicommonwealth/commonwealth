@@ -3,8 +3,6 @@
 import $ from 'jquery';
 import m from 'mithril';
 
-import 'components/tx_signing/tx_signing_web_wallet_option.scss';
-
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
@@ -63,7 +61,7 @@ export class TXSigningWebWalletOption
       });
 
     return (
-      <div class="TXSigningWebWalletOption">
+      <>
         <CWText>
           {/* extra div is for the link to flow with the text */}
           <div>
@@ -83,9 +81,9 @@ export class TXSigningWebWalletOption
               await vnode.attrs.wallet.enable();
               m.redraw();
             }
+
             await transact();
           }}
-          oncreate={(vvnode) => $(vvnode.dom).focus()}
           label={
             !webWallet
               ? 'No extension detected'
@@ -96,7 +94,7 @@ export class TXSigningWebWalletOption
               : 'Sign and send transaction'
           }
         />
-      </div>
+      </>
     );
   }
 }

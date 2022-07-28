@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import $ from 'jquery';
 import m from 'mithril';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
@@ -21,6 +20,7 @@ export class TXSigningCLIOption
   implements m.ClassComponent<TXSigningCLIOptionAttrs>
 {
   private calldata?: ISubstrateTXData;
+  private signedTx: string;
 
   async oncreate(vnode) {
     if (this.calldata === undefined) {
@@ -55,17 +55,19 @@ export class TXSigningCLIOption
               <span class="no-select">secret phrase</span>
               {`"`}
             </CodeBlock>
-            <CWTextArea label="Enter the output here" placeholder="Signed TX" />
+            <CWTextArea
+              label="Enter the output here"
+              placeholder="Signed TX"
+              defaultValue={this.signedTx}
+              oninput={(e) => {
+                this.signedTx = e.target.value;
+              }}
+            />
             <CWButton
               onclick={(e) => {
                 e.preventDefault();
                 try {
-                  const signedTx = $(vnode.dom)
-                    .find('TextArea')
-                    .val()
-                    .toString()
-                    .trim();
-                  transact(signedTx);
+                  transact(this.signedTx.trim());
                 } catch (err) {
                   throw new Error('Failed to execute signed transaction');
                 }

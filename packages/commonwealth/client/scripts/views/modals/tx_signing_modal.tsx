@@ -73,6 +73,7 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
               hash={this.data.hash}
               timestamp={this.data.timestamp}
               error={this.data.error}
+              next={next}
             />
           )}
         </div>
