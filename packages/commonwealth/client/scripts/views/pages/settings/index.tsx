@@ -7,13 +7,11 @@ import 'pages/settings/index.scss';
 
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import EmailWell from './email_well';
+import { EmailWell } from './email_well';
 import LinkedAddressesWell from './linked_addresses_well';
 import SettingsWell from './settings_well';
 
 class SettingsPage implements m.ClassComponent {
-  oncreate() {}
-
   view() {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
       m.route.set('/', {}, { replace: true });
@@ -24,8 +22,7 @@ class SettingsPage implements m.ClassComponent {
     return (
       <Sublayout title="Account Settings">
         <div class="SettingsPage">
-          {m(EmailWell, { github: true })}
-          <br />
+          <EmailWell />
           {m(LinkedAddressesWell)}
           <br />
           {m(SettingsWell)}
