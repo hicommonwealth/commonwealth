@@ -1,7 +1,7 @@
 import { SubstrateTypes, CWEvent } from 'chain-events/src';
 import * as WebSocket from 'ws';
 import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EventStorageHandler from '../eventHandlers/storage';
@@ -11,8 +11,9 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import models from '../database';
+import { RABBITMQ_URI } from "../config";
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -22,7 +23,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   let consumer: RabbitMQController
   try {
-    consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
+    consumer = new RabbitMQController(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI));
     await consumer.init();
   } catch (e) {
     log.error("Rascal consumer setup failed. Please check the Rascal configuration");

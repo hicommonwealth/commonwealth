@@ -17,8 +17,8 @@ import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { DATABASE_URI } from '../config';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import { DATABASE_URI, RABBITMQ_URI } from "../config";
+import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -591,7 +591,7 @@ async function initializer(): Promise<void> {
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI), 'ChainEventsHandlersPublication');
   erc20Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   erc721Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   try {

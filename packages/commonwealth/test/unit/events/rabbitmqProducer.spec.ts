@@ -2,7 +2,7 @@ import { BrokerConfig } from 'rascal';
 import { assert } from 'chai';
 import { CWEvent } from 'chain-events/src';
 import { RabbitMqHandler } from '../../../server/eventHandlers/rabbitMQ';
-import  RabbitMQConfig  from '../../../server/util/rabbitmq/RabbitMQConfig';
+import  RabbitMQConfig  from '../../../../common-common/src/rabbitmq/RabbitMQConfig';
 
 describe.skip('RabbitMQ producer integration tests', () => {
   let controller

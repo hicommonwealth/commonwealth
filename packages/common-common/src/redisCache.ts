@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { REDIS_URL } from '../config';
-import { RedisNamespaces } from '../../shared/types';
+import { factory, formatFilename } from 'packages/common-common/src/logging';
+import { REDIS_URL } from 'commonwealth/server/config';
+import { RedisNamespaces } from 'commonwealth/shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

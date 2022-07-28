@@ -12,18 +12,18 @@ import { createClient } from 'redis';
 import bcrypt from 'bcrypt';
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 import {
   JWT_SECRET,
   REDIS_URL,
   WEBSOCKET_ADMIN_USERNAME,
-  WEBSOCKET_ADMIN_PASSWORD,
-} from '../config';
+  WEBSOCKET_ADMIN_PASSWORD, RABBITMQ_URI
+} from "../config";
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
-import { RedisCache } from '../util/redisCache';
+import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -133,7 +133,7 @@ export async function setupWebSocketServer(
 
   try {
     const rabbitController = new RabbitMQController(
-      <BrokerConfig>RabbitMQConfig
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
     );
 
     await rabbitController.init();

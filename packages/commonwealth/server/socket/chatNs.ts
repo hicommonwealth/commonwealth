@@ -12,7 +12,7 @@ import {
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../database';
-import { RedisCache } from '../util/redisCache';
+import { RedisCache } from '../../../common-common/src/redisCache';
 
 
 const log = factory.getLogger(addPrefix(__filename));

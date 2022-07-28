@@ -9,7 +9,7 @@ import {
 } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import { ChainEventNotification } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 
