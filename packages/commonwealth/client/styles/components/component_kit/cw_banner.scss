@@ -4,7 +4,7 @@
   align-items: flex-start;
   display: flex;
   justify-content: space-between;
-  height: 56px;
+  min-height: 56px;
   padding: 16px 16px 16px 192px;
 
   @include mediumSmall {
