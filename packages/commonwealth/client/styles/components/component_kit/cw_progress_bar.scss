@@ -53,9 +53,9 @@
       }
     }
 
-    &.failed {
+    &.selected {
       &::-webkit-progress-value {
-        background-color: $rorange-500;
+        background-color: $primary-300;
       }
     }
 

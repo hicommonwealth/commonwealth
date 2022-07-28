@@ -12,6 +12,8 @@ import { OffchainThread } from 'models';
 import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
+import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export class LinkedThreadsCard
   implements
@@ -81,11 +83,8 @@ export class LinkedThreadsCard
             </>
           )}
           {allowLinking && (
-            <Button
+            <CWButton
               disabled={this.loading}
-              rounded={true}
-              compact={true}
-              fluid={true}
               label={
                 proposal.linkedThreads?.length
                   ? 'Link another thread'

@@ -48,7 +48,7 @@ export class SnapshotPollCard
       onVoteCast,
       pollEnded,
       proposalTitle,
-      timeRemainingString,
+      timeRemaining,
       tokenSymbol,
       votedFor,
       tooltipErrorMessage,
@@ -99,7 +99,7 @@ export class SnapshotPollCard
                 disableVoteButton={
                   disableVoteButton || this.selectedOptions.length === 0
                 }
-                timeRemainingString={timeRemainingString}
+                timeRemaining={timeRemaining}
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
@@ -107,7 +107,7 @@ export class SnapshotPollCard
           )}
           {(this.hasVoted || pollEnded) && (
             <VoteDisplay
-              timeRemainingString={timeRemainingString}
+              timeRemaining={timeRemaining}
               voteDirectionString={this.voteDirectionString}
               pollEnded={pollEnded}
               voteInformation={this.localVoteInformation}

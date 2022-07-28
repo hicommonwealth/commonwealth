@@ -74,7 +74,7 @@ export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
 
 export type CastVoteAttrs = {
   disableVoteButton: boolean;
-  timeRemainingString: string;
+  timeRemaining: string;
   tooltipErrorMessage: string;
   onVoteCast: () => any;
 };
@@ -83,7 +83,7 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
   view(vnode) {
     const {
       disableVoteButton,
-      timeRemainingString,
+      timeRemaining,
       onVoteCast,
       tooltipErrorMessage,
     } = vnode.attrs;
@@ -92,7 +92,7 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
         {disableVoteButton ? (
           <CWTooltip
             interactionType="hover"
-            tooltipContents={tooltipErrorMessage ?? 'Select an option to vote'}
+            tooltipContents={tooltipErrorMessage ?? 'Select an option to vote.'}
             tooltipType="solidNoArrow"
             hoverCloseDelay={300}
             trigger={
@@ -113,7 +113,7 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
           />
         )}
         <CWText className="time-remaining-text" type="caption">
-          {timeRemainingString}
+          {timeRemaining}
         </CWText>
       </div>
     );
@@ -121,7 +121,7 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
 }
 
 export type VoteDisplayAttrs = {
-  timeRemainingString: string;
+  timeRemaining: string;
   voteDirectionString: string;
   pollEnded: string;
   voteInformation: Array<VoteInformation>;
@@ -129,12 +129,8 @@ export type VoteDisplayAttrs = {
 
 export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
   view(vnode) {
-    const {
-      voteDirectionString,
-      timeRemainingString,
-      pollEnded,
-      voteInformation,
-    } = vnode.attrs;
+    const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
+      vnode.attrs;
 
     const topResponse = voteInformation.sort(
       (option1, option2) => option2.voteCount - option1.voteCount
@@ -153,7 +149,7 @@ export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
               <CWText type="caption">{voteDirectionString}</CWText>
             </div>
             <CWText className="time-remaining-text" type="caption">
-              {timeRemainingString}
+              {timeRemaining}
             </CWText>
           </>
         ) : (
@@ -161,7 +157,13 @@ export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
             <CWText type="caption">This Poll is Complete</CWText>
             <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
             {voteDirectionString !== '' && (
-              <CWText type="caption">{`You voted "${voteDirectionString}"`}</CWText>
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className="direction-text"
+              >
+                {voteDirectionString}
+              </CWText>
             )}
           </div>
         )}
@@ -177,6 +179,7 @@ export type ResultsSectionAttrs = {
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
+  votedFor: string;
 };
 
 export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
@@ -188,7 +191,24 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       tokenSymbol,
       voteInformation,
       pollEnded,
+      votedFor,
     } = vnode.attrs;
+
+    const calculateProgressStatus = (
+      option: VoteInformation,
+      index: number
+    ) => {
+      if (!pollEnded) {
+        return 'ongoing';
+      } else if (index === 0) {
+        return 'passed';
+      } else if (option.label === votedFor) {
+        return 'selected';
+      } else {
+        return 'neutral';
+      }
+    };
+
     return (
       <div class="ResultsSection">
         <div class="results-header">
@@ -222,9 +242,7 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
                       ? (option.voteCount / totalVoteCount) * 100
                       : 0
                   }
-                  progressStatus={
-                    !pollEnded ? 'ongoing' : index === 0 ? 'passed' : 'neutral'
-                  }
+                  progressStatus={calculateProgressStatus(option, index)}
                   label={option.label}
                   count={option.voteCount}
                 />
@@ -265,7 +283,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       onVoteCast,
       pollEnded,
       proposalTitle,
-      timeRemainingString,
+      timeRemaining,
       tokenSymbol,
       votedFor,
       voteInformation,
@@ -318,7 +336,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
                 disableVoteButton={
                   disableVoteButton || this.selectedOptions.length === 0
                 }
-                timeRemainingString={timeRemainingString}
+                timeRemaining={timeRemaining}
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
@@ -326,7 +344,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           )}
           {(this.hasVoted || pollEnded) && (
             <VoteDisplay
-              timeRemainingString={timeRemainingString}
+              timeRemaining={timeRemaining}
               voteDirectionString={this.voteDirectionString}
               pollEnded={pollEnded}
               voteInformation={voteInformation}

@@ -1432,12 +1432,13 @@ const ViewProposalPage: m.Component<
                       app.user.activeAccount?.chain?.id,
                       app.user.activeAccount?.address
                     ),
+                  disableVoteButton: !app.user.activeAccount,
                   votedFor: poll.getUserVote(
                     app.user.activeAccount?.chain?.id,
                     app.user.activeAccount?.address
                   )?.option,
                   proposalTitle: poll.prompt,
-                  timeRemainingString: getProposalPollTimestamp(
+                  timeRemaining: getProposalPollTimestamp(
                     poll,
                     poll.endsAt && poll.endsAt?.isBefore(moment().utc())
                   ),
@@ -1451,6 +1452,9 @@ const ViewProposalPage: m.Component<
                     };
                   }),
                   incrementalVoteCast: 1,
+                  tooltipErrorMessage: app.user.activeAccount
+                    ? null
+                    : 'You must join this community to vote.',
                   onVoteCast: (option, isSelected, callback) =>
                     handleProposalPollVote(poll, option, isSelected, callback),
                   onResultsClick: (e) => {

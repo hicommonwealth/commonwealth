@@ -31,7 +31,7 @@ type SnapshotProposalCardsAttrs = {
 };
 
 const enum VotingError {
-  NOT_VALIDATED = 'You do not have the voting power to vote on this proposal.',
+  NOT_VALIDATED = 'You cannot vote on this poll or are not logged in.',
   ALREADY_VOTED = 'Already Submitted Vote',
 }
 
@@ -69,16 +69,19 @@ export class SnapshotProposalCards
       moment(+proposal.start * 1000) <= moment() &&
       moment(+proposal.end * 1000) > moment();
 
-    const userVote = votes.find((vote) => {
-      return vote.voter === app.user?.activeAccount?.address;
-    })?.choice;
+    const userVote =
+      proposal.choices[
+        votes.find((vote) => {
+          return vote.voter === app.user?.activeAccount?.address;
+        })?.choice - 1
+      ];
     const hasVoted = userVote !== undefined;
 
     const voteErrorText = !validatedAgainstStrategies
       ? VotingError.NOT_VALIDATED
       : hasVoted
       ? VotingError.ALREADY_VOTED
-      : '';
+      : null;
 
     const buildVoteInformation = (
       choices,
@@ -133,9 +136,9 @@ export class SnapshotProposalCards
           pollEnded={!isActive}
           hasVoted={hasVoted}
           votedFor={hasVoted ? userVote : ''}
-          disableVoteButton={fetchedPower && voteErrorText !== ''}
+          disableVoteButton={fetchedPower && voteErrorText}
           proposalTitle={proposal.title}
-          timeRemainingString={calculateTimeRemaining(proposal)}
+          timeRemaining={calculateTimeRemaining(proposal)}
           tokenSymbol={space.symbol}
           totalVoteCount={totals.sumOfResultsBalance}
           voteInformation={buildVoteInformation(proposal?.choices, votes)}

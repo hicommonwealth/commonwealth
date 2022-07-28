@@ -20,6 +20,7 @@ import {
 } from 'helpers/snapshot_utils';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 class ProposalSidebarLinkedChainEntity
   implements
@@ -144,10 +145,7 @@ export class LinkedProposalsCard
           )}
         </div>
         {showAddProposalButton && (
-          <Button
-            rounded={true}
-            compact={true}
-            fluid={true}
+          <CWButton
             label="Connect a proposal"
             onclick={(e) => {
               e.preventDefault();
