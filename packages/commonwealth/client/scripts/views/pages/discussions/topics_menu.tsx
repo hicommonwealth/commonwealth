@@ -13,7 +13,7 @@ import 'pages/discussions/topics_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import EditTopicModal from 'views/modals/edit_topic_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type Topic = {

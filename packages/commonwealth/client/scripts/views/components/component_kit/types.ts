@@ -17,6 +17,7 @@ export enum ComponentType {
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
+  MessageBanner = 'MessageBanner',
   Modal = 'Modal',
   Popover = 'Popover',
   RadioButton = 'RadioButton',
@@ -26,8 +27,9 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
-  WalletOptionRow = 'WalletOptionRow',
+  ThreadVoteButton = 'ThreadVoteButton',
   ValidationText = 'ValidationText',
+  WalletOptionRow = 'WalletOptionRow',
 }
 
 export type StyleAttrs = {

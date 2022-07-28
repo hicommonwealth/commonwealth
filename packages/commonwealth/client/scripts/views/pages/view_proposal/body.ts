@@ -22,9 +22,9 @@ import {
 } from 'models';
 
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import QuillEditor from 'views/components/quill_editor';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
+import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import {
@@ -45,6 +45,11 @@ import { ChainType } from 'common-common/src/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import {
+  countLinesQuill,
+  disableEditor,
+  getQuillTextContents,
+} from '../../components/quill/helpers';
 import { jumpHighlightComment } from './helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
@@ -604,11 +609,9 @@ export const ProposalBodyCancelEdit: m.Component<{
           onclick: async (e) => {
             e.preventDefault();
             let confirmed = true;
-            const threadText = parentState.quillEditorState.markdownMode
-              ? parentState.quillEditorState.editor.getText()
-              : JSON.stringify(
-                  parentState.quillEditorState.editor.getContents()
-                );
+            const threadText = getQuillTextContents(
+              parentState.quillEditorState
+            );
             if (threadText !== parentState.currentText) {
               confirmed = await confirmationModalWithText(
                 'Cancel editing? Changes will not be saved.'
@@ -658,11 +661,9 @@ export const ProposalBodySaveEdit: m.Component<{
               }
             }
             parentState.saving = true;
-            parentState.quillEditorState.editor.enable(false);
             const { quillEditorState } = parentState;
-            const itemText = quillEditorState.markdownMode
-              ? quillEditorState.editor.getText()
-              : JSON.stringify(quillEditorState.editor.getContents());
+            disableEditor(quillEditorState);
+            const itemText = getQuillTextContents(quillEditorState);
             if (item instanceof Thread) {
               app.threads
                 .edit(
@@ -701,16 +702,6 @@ export const ProposalBodySpacer: m.Component<{}> = {
   view: (vnode) => {
     return m('.ProposalBodySpacer', m.trust('&middot;'));
   },
-};
-
-const countLinesQuill = (ops) => {
-  let count = 0;
-  for (const op of ops) {
-    try {
-      count += op.insert.split('\n').length - 1;
-    } catch (e) {}
-  }
-  return count;
 };
 
 const countLinesMarkdown = (text) => {
@@ -781,11 +772,6 @@ export const ProposalBodyText: m.Component<
       ]);
     };
 
-    const toggleDisplay = () => {
-      vnode.state.collapsed = !vnode.state.collapsed;
-      m.redraw();
-    };
-
     return m(
       '.ProposalBodyText',
       (() => {
@@ -801,40 +787,20 @@ export const ProposalBodyText: m.Component<
             return getPlaceholder();
           }
 
-          return m('.show-more-wrap', [
-            m(QuillFormattedText, {
-              doc,
-              cutoffText: vnode.state.collapsed
-                ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
-                : doc.ops.length,
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(QuillFormattedText, {
+            doc,
+            cutoffLines: QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
+            collapse: false,
+            hideFormatting: false,
+          });
         } catch (e) {
           if (body?.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m('.show-more-wrap', [
-            m(MarkdownFormattedText, {
-              doc: body,
-              cutoffText: vnode.state.collapsed
-                ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
-                : countLinesMarkdown(body),
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(MarkdownFormattedText, {
+            doc: body,
+            cutoffLines: MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
+          });
         }
       })()
     );

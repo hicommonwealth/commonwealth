@@ -6,7 +6,11 @@ import m from 'mithril';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainCategoryType,
+  ChainNetwork,
+} from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
@@ -111,7 +115,7 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.description = v;
           }}
-          textarea={true}
+          textarea
         />
         <InputRow
           title="Website"
@@ -226,6 +230,7 @@ export class ChainMetadataRows
           title="Banner"
           name="Banner Text"
           label="Banner"
+          maxlength={512}
           placeholder="Text for across the top of your community"
           defaultValue={this.communityBanner}
           onChangeHandler={(v) => {
@@ -286,6 +291,7 @@ export class ChainMetadataRows
               iconUrl,
               defaultSummaryView,
             } = this;
+
             for (const space of snapshot) {
               if (space !== '') {
                 if (space.slice(space.length - 4) !== '.eth') {
@@ -294,6 +300,7 @@ export class ChainMetadataRows
                 }
               }
             }
+
             // Update ChainCategories
             try {
               for (const category of Object.keys(this.selectedTags)) {
@@ -306,15 +313,22 @@ export class ChainMetadataRows
             } catch (err) {
               console.log(err);
             }
+
             try {
-              // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
                 chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
-              }).then(({ result }) => {
+              }).then(() => {
                 app.chain.meta.setBanner(this.communityBanner);
+
+                if (
+                  localStorage.getItem(`${app.activeChainId()}-banner`) ===
+                  'off'
+                ) {
+                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+                }
               });
             } catch (err) {
               console.log(err);
