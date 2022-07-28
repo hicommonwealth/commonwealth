@@ -20,18 +20,16 @@ import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 
 export const CWCosmosEvmMetamask: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#000"
@@ -44,18 +42,16 @@ export const CWCosmosEvmMetamask: m.Component<CustomIconAttrs> = {
 
 export const CWKeplr: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#207afe"
@@ -77,18 +73,16 @@ export const CWKeplr: m.Component<CustomIconAttrs> = {
 
 export const CWMagic: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#6452F6"
@@ -101,18 +95,16 @@ export const CWMagic: m.Component<CustomIconAttrs> = {
 
 export const CWMetaMask: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#E2761B"
@@ -205,18 +197,16 @@ export const CWMetaMask: m.Component<CustomIconAttrs> = {
 
 export const CWNearWallet: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#000"
@@ -290,18 +280,16 @@ export const CWPhantom: m.Component<CustomIconAttrs> = {
 
 export const CWPolkadot: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#D32D79"
@@ -318,18 +306,16 @@ export const CWPolkadot: m.Component<CustomIconAttrs> = {
 
 export const CWRonin: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#1374E9"
@@ -342,18 +328,16 @@ export const CWRonin: m.Component<CustomIconAttrs> = {
 
 export const CWTerraStation: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#0E3CA5"
@@ -399,18 +383,16 @@ export const CWTerraStation: m.Component<CustomIconAttrs> = {
 
 export const CWWalletConnect: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
-    const { componentType, ...customIconStyleAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
-          { ...customIconStyleAttrs },
-          componentType
-        )}
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill="#3B99FC"

@@ -157,12 +157,15 @@ $discussion-title-font-size: 1.45rem;
       }
 
       .proposal-body-meta {
+        align-items: center;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        gap: 8px;
         margin-bottom: 12px;
 
         svg {
+          color: $neutral-500;
           cursor: pointer;
         }
       }
@@ -313,8 +316,6 @@ $discussion-title-font-size: 1.45rem;
     font-size: $discussion-meta-font-size;
     display: inline-block;
     color: $discussion-meta-color;
-    margin-right: 17px;
-
     > a:link,
     > a:visited,
     a.proposal-collaborators,
@@ -328,7 +329,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .CommentSocialHeader,
   .ProposalSocialHeader {
     font-size: $discussion-meta-font-size;
     display: inline-block;

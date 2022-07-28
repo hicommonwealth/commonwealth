@@ -29,9 +29,7 @@ export class SocialSharingCarat
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `${domain}${m.route.get()}?comment=${
-                    vnode.attrs.commentID
-                  }`
+                  `${domain}${m.route.get()}?comment=${vnode.attrs.commentID}`
                 );
               }
             }}
@@ -56,7 +54,11 @@ export class SocialSharingCarat
             }}
           />,
         ]}
-        trigger={<CWIcon iconName="share2" iconSize="small" />}
+        trigger={
+          <div>
+            <CWIcon iconName="share2" iconSize="small" />
+          </div>
+        }
       />
     );
   }
