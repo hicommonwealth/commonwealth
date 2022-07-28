@@ -29,8 +29,6 @@ export class RabbitMQController {
       Rascal.withDefaultConfig(this._rabbitMQConfig)
     );
 
-
-
     this.broker.on('error', (err, { vhost, connectionUrl }) => {
       log.error(`Broker error on vhost: ${vhost} using url: ${connectionUrl}`, err)
     });
