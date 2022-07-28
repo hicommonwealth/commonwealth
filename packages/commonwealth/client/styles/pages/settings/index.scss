@@ -1,8 +1,16 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SettingsPage {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  gap: 16px;
   padding: 24px;
+  width: 400px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
 
   h2 {
     margin-bottom: 38px;

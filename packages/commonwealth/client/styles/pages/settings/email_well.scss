@@ -3,33 +3,27 @@
 .EmailWell {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 
-  .error {
-    margin: 10px 0;
-    color: $rorange-500;
-    font-weight: 500;
+  .verification-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .verification-icon.Icon {
+      color: $rorange-600;
+
+      &.emailVerified {
+        color: $green-500;
+      }
+    }
+
+    .verification-text.Text {
+      color: $rorange-600;
+
+      &.emailVerified {
+        color: $green-500;
+      }
+    }
   }
-}
-
-.GithubWell {
-  margin-top: 12px;
-
-  input {
-    margin-right: 12px;
-  }
-}
-
-.DiscordWell {
-  margin-top: 12px;
-
-  input {
-    margin-right: 12px;
-  }
-}
-
-.LinkButtonWrapper {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
 }
