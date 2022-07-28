@@ -33,13 +33,14 @@ async function main() {
       else if (address == '0x1111111111111111111111111111111111111111')
         results[address] = "0000000000000";
       else
-        // default value
-        results[address] = '100000'
+        // default random value
+        results[address] = Math.random() * 1000000
     }
     return res.status(200).json(results);
   });
 
   router.post('/getNodes', async (req: Request, res: Response) => {
+    // edit this to change the response
     const nodes = [
       { name: "ethereum", description: "", chain_node_id: 37 },
       { name: "edgeware", description: "", chain_node_id: 45 }
