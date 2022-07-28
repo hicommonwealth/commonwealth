@@ -6,7 +6,6 @@ import m from 'mithril';
 import 'components/tx_signing/tx_signing_web_wallet_option.scss';
 
 import app from 'state';
-import { link } from 'helpers';
 import { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';

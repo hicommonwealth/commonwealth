@@ -50,6 +50,7 @@ export const setupEventListeners = (
     {
       next: NextFn;
     } & ITXModalData,
+    // eslint-disable-next-line @typescript-eslint/ban-types
     { timerHandle?: NodeJS.Timeout } | {}
   >
 ) => {
