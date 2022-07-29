@@ -12,6 +12,7 @@ import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { CWTooltip } from './component_kit/cw_tooltip';
+import { getClasses } from './component_kit/helpers';
 
 export type VoteInformation = {
   label: string;
@@ -220,7 +221,9 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
           </CWText>
           <CWText
             type="caption"
-            className={onResultsClick && hasVotes ? 'clickable' : ''}
+            className={getClasses<{ clickable?: boolean }>({
+              clickable: onResultsClick && hasVotes,
+            })}
             onclick={
               onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
             }
