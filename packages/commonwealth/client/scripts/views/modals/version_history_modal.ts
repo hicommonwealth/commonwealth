@@ -2,7 +2,7 @@ import 'modals/version_history_modal.scss';
 
 import m from 'mithril';
 import app from 'state';
-import Quill from 'quill-2.0-dev/quill';
+import Quill from 'quill';
 import { OffchainThread, OffchainComment } from 'models';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
