@@ -120,9 +120,16 @@ export class ComponentShowcase implements m.ClassComponent {
             count={50}
           />
           <CWProgressBar
+            progress={75}
+            label="Progress Bar (Success) with Check"
+            progressStatus="passed"
+            count={50}
+            iconName="check"
+          />
+          <CWProgressBar
             progress={100}
-            label="Progress Bar (Failed)"
-            progressStatus="failed"
+            label="Progress Bar (Selected)"
+            progressStatus="selected"
             count={50}
           />
           <CWProgressBar

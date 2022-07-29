@@ -1450,10 +1450,12 @@ const ViewProposalPage: m.Component<
                     handleProposalPollVote(poll, option, isSelected, callback),
                   onResultsClick: (e) => {
                     e.preventDefault();
-                    app.modals.create({
-                      modal: OffchainVotingModal,
-                      data: { votes: poll.votes },
-                    });
+                    if (poll.votes.length > 0) {
+                      app.modals.create({
+                        modal: OffchainVotingModal,
+                        data: { votes: poll.votes },
+                      });
+                    }
                   },
                 });
               }),

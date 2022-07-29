@@ -121,6 +121,7 @@ export class SnapshotPollCard
           voteInformation={this.localVoteInformation}
           pollEnded={pollEnded}
           totalVoteCount={this.totalVoteCount}
+          votedFor={votedFor}
         />
       </CWCard>
     );

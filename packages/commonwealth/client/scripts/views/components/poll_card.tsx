@@ -209,6 +209,9 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       }
     };
 
+    const hasVotes =
+      voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+
     return (
       <div class="ResultsSection">
         <div class="results-header">
@@ -217,8 +220,10 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
           </CWText>
           <CWText
             type="caption"
-            className={`results-text${onResultsClick ? ' clickable' : ''}`}
-            onclick={onResultsClick ? (e) => onResultsClick(e) : undefined}
+            className={onResultsClick && hasVotes ? 'clickable' : ''}
+            onclick={
+              onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
+            }
           >
             {`${Math.floor(totalVoteCount * 100) / 100} ${
               tokenSymbol ?? 'votes'
@@ -245,6 +250,7 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
                   progressStatus={calculateProgressStatus(option, index)}
                   label={option.label}
                   count={option.voteCount}
+                  iconName={option.label === votedFor ? 'check' : undefined}
                 />
               );
             })}
@@ -358,6 +364,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           voteInformation={voteInformation}
           pollEnded={pollEnded}
           totalVoteCount={this.totalVoteCount}
+          votedFor={votedFor}
         />
       </CWCard>
     );

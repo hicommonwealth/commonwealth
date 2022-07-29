@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/view_proposal/linked_threads_card.scss';
 

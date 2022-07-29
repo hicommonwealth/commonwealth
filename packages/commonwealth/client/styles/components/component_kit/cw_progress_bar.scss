@@ -16,6 +16,13 @@
       display: flex;
       flex-direction: column;
 
+      .label-display {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+      }
+
       .subtext-text.Text {
         color: $neutral-500;
         margin-bottom: 4px;
