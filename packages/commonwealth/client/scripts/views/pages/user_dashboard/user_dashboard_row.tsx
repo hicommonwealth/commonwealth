@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import { Icons, Button, MenuItem, PopoverMenu } from 'construct-ui';
+import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 import { capitalize } from 'lodash';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
@@ -20,145 +20,135 @@ import { formatTimestamp } from 'helpers/index';
 import { getProposalUrlPath } from 'identifiers';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { subscribeToThread, getCommentPreview } from './helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 
-// Discuss, Share, and Subscribe Buttons
-const ButtonRow: m.Component<{
-  path: string;
-  threadId: string;
-  showDiscussion: boolean;
-  showShare: boolean;
-  showSubscribe: boolean;
-}> = {
-  view: (vnode) => {
-    const { path, threadId, showDiscussion, showShare, showSubscribe } =
-      vnode.attrs;
+class ButtonRow
+  implements
+    m.ClassComponent<{
+      path: string;
+      threadId: string;
+    }>
+{
+  view(vnode) {
+    const { path, threadId } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;
+
     const commentSubscription = app.user.notifications.subscriptions.find(
       (v) =>
         v.objectId === adjustedId &&
         v.category === NotificationCategories.NewComment
     );
+
     const reactionSubscription = app.user.notifications.subscriptions.find(
       (v) =>
         v.objectId === adjustedId &&
         v.category === NotificationCategories.NewReaction
     );
+
     const bothActive =
       commentSubscription?.isActive && reactionSubscription?.isActive;
 
-    return m('.icon-row-left', [
-      showDiscussion &&
-        m(Button, {
-          label: 'Discuss',
-          buttonSize: 'sm',
-          iconLeft: Icons.PLUS,
-          rounded: true,
-          onclick: (e) => {
+    return (
+      <>
+        <CWButton label="Discuss" iconName="plus" buttonType="secondary-blue" />
+        <div
+          onclick={(e) => {
             e.stopPropagation();
-            m.route.set(path);
-          },
-        }),
-      showShare &&
-        m(
-          '.share-button',
-          {
-            onclick: (e) => {
-              e.stopPropagation();
-            },
-          },
-          [
-            m(PopoverMenu, {
-              transitionDuration: 0,
-              closeOnOutsideClick: true,
-              closeOnContentClick: true,
-              menuAttrs: { size: 'default' },
-              content: [
-                m(MenuItem, {
-                  iconLeft: Icons.COPY,
-                  label: 'Copy URL',
-                  onclick: async (e) => {
+          }}
+        >
+          <PopoverMenu
+            transitionDuration={0}
+            closeOnOutsideClick
+            closeOnContentClick
+            menuAttrs={{ size: 'default' }}
+            content={
+              <>
+                <MenuItem
+                  iconLeft={Icons.COPY}
+                  label="Copy URL"
+                  onclick={async () => {
                     await navigator.clipboard.writeText(path);
-                  },
-                }),
-                m(MenuItem, {
-                  iconLeft: Icons.TWITTER,
-                  label: 'Share on Twitter',
-                  onclick: async (e) => {
+                  }}
+                />
+                <MenuItem
+                  iconLeft={Icons.TWITTER}
+                  label="Share on Twitter"
+                  onclick={async () => {
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${path}`,
                       '_blank'
                     );
-                  },
-                }),
-              ],
-              trigger: m(Button, {
-                buttonSize: 'sm',
-                label: 'Share',
-                iconLeft: Icons.SHARE,
-                rounded: true,
-              }),
-            }),
-          ]
-        ),
-      showSubscribe &&
-        m(Button, {
-          buttonSize: 'sm',
-          label: bothActive ? 'Unsubscribe' : 'Subscribe',
-          iconLeft: Icons.BELL,
-          rounded: true,
-          class: bothActive ? 'subscribe-button' : '',
-          onclick: (e) => {
+                  }}
+                />
+              </>
+            }
+            trigger={
+              <CWButton
+                label="Share"
+                iconName="share"
+                buttonType="secondary-blue"
+              />
+            }
+          />
+        </div>
+        <CWButton
+          label={bothActive ? 'Unsubscribe' : 'Subscribe'}
+          iconName="bell"
+          buttonType="secondary-blue"
+          onclick={(e) => {
             e.stopPropagation();
+
             subscribeToThread(
               threadId,
               bothActive,
               commentSubscription,
               reactionSubscription
             );
-          },
-        }),
-    ]);
-  },
-};
+          }}
+        />
+      </>
+    );
+  }
+}
 
-// The Likes, Comments, Views Counters
-const ActivityIcons: m.Component<{
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-}> = {
-  view: (vnode) => {
+class ActivityCounts
+  implements
+    m.ClassComponent<{
+      commentCount: number;
+      likeCount: number;
+      viewCount: number;
+    }>
+{
+  view(vnode) {
     const { viewCount, likeCount, commentCount } = vnode.attrs;
 
-    return m('.icon-row-right', [
-      viewCount &&
-        viewCount > 0 &&
-        m(Button, {
-          iconLeft: Icons.EYE,
-          label: viewCount,
-          compact: true,
-          outlined: false,
-        }),
-      likeCount &&
-        likeCount > 0 &&
-        m(Button, {
-          iconLeft: Icons.HEART,
-          label: likeCount,
-          compact: true,
-          outlined: false,
-        }),
-      commentCount &&
-        commentCount > 0 &&
-        m(Button, {
-          iconLeft: Icons.MESSAGE_SQUARE,
-          label: commentCount,
-          compact: true,
-          outlined: false,
-        }),
-    ]);
-  },
-};
+    return (
+      <div class="icon-row-right">
+        {viewCount && viewCount > 0 && (
+          <>
+            <CWIcon iconName="views" />
+            <CWText>{viewCount}</CWText>
+          </>
+        )}
+        {likeCount && likeCount > 0 && (
+          <>
+            <CWIcon iconName="heartFilled" />
+            <CWText>{likeCount}</CWText>
+          </>
+        )}
+        {commentCount && commentCount > 0 && (
+          <>
+            <CWIcon iconName="feedback" />
+            <CWText>{commentCount}</CWText>
+          </>
+        )}
+      </div>
+    );
+  }
+}
 
 const ActivityContent: m.Component<{
   activityData: any;
@@ -176,7 +166,7 @@ const ActivityContent: m.Component<{
       root_type,
     } = JSON.parse(vnode.attrs.activityData.notificationData);
 
-    const { likeCount, viewCount, commentCount } = vnode.attrs.activityData;
+    const { commentCount } = vnode.attrs.activityData;
 
     const numericalCommentCount = Number(commentCount);
 
@@ -184,6 +174,7 @@ const ActivityContent: m.Component<{
       app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
     let decodedTitle;
+
     try {
       decodedTitle = decodeURIComponent(root_title).trim();
     } catch {
@@ -293,23 +284,20 @@ export class UserDashboardRow
       commentCount,
       categoryId,
       threadId,
-      createdAt,
-      typeId,
-      updatedAt,
       blockNumber,
       eventNetwork,
       chain,
-      iconUrl,
     } = vnode.attrs.notification;
 
-    // ----------- Handle Chain Events ----------- //
     if (categoryId === 'chain-event') {
       const chainEvent: CWEvent = {
         blockNumber,
         network: eventNetwork,
         data: vnode.attrs.notification.eventData,
       };
+
       const label = ChainEventLabel(chain, chainEvent);
+
       const communityName =
         app.config.chains.getById(chain)?.name || 'Unknown chain';
 
@@ -353,17 +341,9 @@ export class UserDashboardRow
       );
     }
 
-    // ----------- Handle Notifications ----------- //
-    const {
-      created_at,
-      chain_id,
-      root_id,
-      root_title,
-      author_chain,
-      author_address,
-      comment_text,
-      root_type,
-    } = JSON.parse(vnode.attrs.notification.notificationData);
+    const { chain_id, root_id, root_type } = JSON.parse(
+      vnode.attrs.notification.notificationData
+    );
 
     const path = getProposalUrlPath(root_type, root_id, false, chain_id);
 
@@ -384,18 +364,12 @@ export class UserDashboardRow
           }),
         ]),
         m('.icon-row', [
-          m(ButtonRow, {
-            path,
-            threadId,
-            showDiscussion: true,
-            showShare: true,
-            showSubscribe: true,
-          }),
-          m(ActivityIcons, {
-            viewCount,
-            commentCount,
-            likeCount,
-          }),
+          <ButtonRow path={path} threadId={threadId} />,
+          <ActivityCounts
+            viewCount={viewCount}
+            commentCount={commentCount}
+            likeCount={likeCount}
+          />,
         ]),
       ]
     );

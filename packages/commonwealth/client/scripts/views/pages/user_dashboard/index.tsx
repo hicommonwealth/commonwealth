@@ -193,7 +193,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
               )}
             </div>
             {!loadingData && (
-              <div class="dashboard-row-wrap">
+              <>
                 {activePage === DashboardViews.ForYou && (
                   <>
                     {fyNotifications && fyNotifications.length > 0 ? (
@@ -269,7 +269,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                     )}
                   </>
                 )}
-              </div>
+              </>
             )}
           </div>
           <DashboardCommunitiesPreview />
