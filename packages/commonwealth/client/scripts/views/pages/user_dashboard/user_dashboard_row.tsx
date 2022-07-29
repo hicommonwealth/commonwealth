@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Icons, Button, MenuItem, PopoverMenu } from 'construct-ui';
 import { capitalize } from 'lodash';
 
-import 'components/user_dashboard_row.scss';
+import 'pages/user_dashboard/user_dashboard_row.scss';
 
 import {
   CWEvent,

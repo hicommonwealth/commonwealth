@@ -1,6 +1,8 @@
 /* @jsx m */
 
 import m from 'mithril';
+import $ from 'jquery';
+
 import app from 'state';
 import { NotificationCategories } from 'common-common/src/types';
 import { NotificationSubscription } from 'models';

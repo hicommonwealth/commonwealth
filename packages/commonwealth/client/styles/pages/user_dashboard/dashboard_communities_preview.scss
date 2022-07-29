@@ -1,0 +1,56 @@
+@import 'shared';
+
+.CommunityPreviewCard.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 320px;
+
+  .card-top {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+
+    .CommunityAvatar {
+      margin-right: 8px;
+    }
+  }
+
+  .card-subtext.Text {
+    color: $neutral-500;
+  }
+}
+
+.DashboardCommunitiesPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include smallInclusive {
+    display: none;
+  }
+
+  .community-preview-cards-collection {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .view-more-communities-link {
+      align-items: center;
+      background-color: $purple-50;
+      border-radius: $border-radius-corners;
+      color: $purple-400;
+      cursor: pointer;
+      display: flex;
+      height: 40px;
+      padding: 4px 16px;
+      width: fit-content;
+
+      &:hover {
+        background-color: $purple-100;
+        text-decoration: none;
+      }
+    }
+  }
+}

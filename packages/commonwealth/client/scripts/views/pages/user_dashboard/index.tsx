@@ -5,17 +5,17 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { Spinner } from 'construct-ui';
 
-import 'pages/user_dashboard.scss';
+import 'pages/user_dashboard/index.scss';
 
 import app, { LoginState } from 'state';
 import { DashboardActivityNotification } from 'models';
 import Sublayout from 'views/sublayout';
 import { notifyInfo } from 'controllers/app/notifications';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
-import { DashboardExplorePreview } from './dashboard_explore_preview';
+import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { UserDashboardRow } from './user_dashboard_row';
-import { fetchActivity } from './helpers';
+import { fetchActivity, notificationsRemaining } from './helpers';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -90,13 +90,16 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
       chainEvents,
       loadingData,
     } = this;
+
     // Load activity
     const loggedIn = app.loginState === LoginState.LoggedIn;
+
     if (!vnode.attrs.type) {
       m.route.set(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
     } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
       m.route.set('/dashboard/global');
     }
+
     const subpage: DashboardViews =
       vnode.attrs.type === 'chain-events'
         ? DashboardViews.Chain
@@ -105,6 +108,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
         : loggedIn
         ? DashboardViews.ForYou
         : DashboardViews.Global;
+
     if (!this.activePage || this.activePage !== subpage) {
       this.activePage = subpage;
       this.handleToggle();
@@ -147,59 +151,47 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     return (
       <Sublayout onscroll={this.onscroll}>
         <div class="UserDashboard">
-          <div class="dashboard-header">
-            <div class="title">
-              Activity
-              <div
-                class="communities-link link"
-                onclick={() => {
-                  m.route.set('/communities');
-                  m.redraw();
-                }}
-              >
-                View more communities
-                <CWIcon iconName="externalLink" iconSize="small" />
-              </div>
-            </div>
-            <CWTabBar>
-              <CWTab
-                label={DashboardViews.ForYou}
-                isSelected={activePage === DashboardViews.ForYou}
-                onclick={() => {
-                  if (!loggedIn) {
-                    notifyInfo(
-                      'Log in or create an account for custom activity feed'
-                    );
-                    return;
-                  }
-                  m.route.set('/dashboard/for-you');
-                  m.redraw();
-                }}
-              />
-              <CWTab
-                label={DashboardViews.Global}
-                isSelected={activePage === DashboardViews.Global}
-                onclick={() => {
-                  m.route.set('/dashboard/global');
-                  m.redraw();
-                }}
-              />
-              <CWTab
-                label={DashboardViews.Chain}
-                isSelected={activePage === DashboardViews.Chain}
-                onclick={() => {
-                  m.route.set('/dashboard/chain-events');
-                  m.redraw();
-                }}
-              />
-            </CWTabBar>
-            {loadingData && (
-              <div class="dashboard-row-wrap">
+          <div class="dashboard-column">
+            <div class="dashboard-header">
+              <CWText type="h3">Activity</CWText>
+              <CWTabBar>
+                <CWTab
+                  label={DashboardViews.ForYou}
+                  isSelected={activePage === DashboardViews.ForYou}
+                  onclick={() => {
+                    if (!loggedIn) {
+                      notifyInfo(
+                        'Log in or create an account for custom activity feed'
+                      );
+                      return;
+                    }
+                    m.route.set('/dashboard/for-you');
+                    m.redraw();
+                  }}
+                />
+                <CWTab
+                  label={DashboardViews.Global}
+                  isSelected={activePage === DashboardViews.Global}
+                  onclick={() => {
+                    m.route.set('/dashboard/global');
+                    m.redraw();
+                  }}
+                />
+                <CWTab
+                  label={DashboardViews.Chain}
+                  isSelected={activePage === DashboardViews.Chain}
+                  onclick={() => {
+                    m.route.set('/dashboard/chain-events');
+                    m.redraw();
+                  }}
+                />
+              </CWTabBar>
+              {loadingData && (
                 <div class="Spinner">
-                  <Spinner active={true} />
+                  <Spinner active />
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             {!loadingData && (
               <div class="dashboard-row-wrap">
                 {activePage === DashboardViews.ForYou && (
@@ -215,17 +207,13 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                           fyNotifications.length,
                           this.fyCount
                         ) ? (
-                          <div class="Spinner">
-                            <Spinner active={true} />
-                          </div>
+                          <Spinner active />
                         ) : (
                           ''
                         )}
                       </>
                     ) : (
-                      <div class="no-notifications">
-                        Join some communities to see Activity!
-                      </div>
+                      <CWText>Join some communities to see Activity!</CWText>
                     )}
                   </>
                 )}
@@ -234,22 +222,20 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                     <>
                       {globalNotifications
                         .slice(0, this.globalCount)
-                        .map((data) => {
-                          <UserDashboardRow notification={data} onListPage />;
-                        })}
+                        .map((data) => (
+                          <UserDashboardRow notification={data} onListPage />
+                        ))}
                       {notificationsRemaining(
                         globalNotifications.length,
                         this.globalCount
                       ) ? (
-                        <div class="Spinner">
-                          <Spinner active={true} />
-                        </div>
+                        <Spinner active />
                       ) : (
                         ''
                       )}
                     </>
                   ) : (
-                    <div class="no-notifications">No Activity</div>
+                    <CWText>No Activity</CWText>
                   ),
                 ]}
                 {activePage === DashboardViews.Chain && (
@@ -270,25 +256,23 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                           chainEvents.length,
                           this.chainEventCount
                         ) ? (
-                          <div class="Spinner">
-                            <Spinner active={true} />
-                          </div>
+                          <Spinner active />
                         ) : (
                           ''
                         )}
                       </>
                     ) : (
-                      <div class="no-notifications">
+                      <CWText>
                         Join some communities that have governance to see Chain
                         Events!
-                      </div>
+                      </CWText>
                     )}
                   </>
                 )}
               </div>
             )}
           </div>
-          <DashboardExplorePreview />
+          <DashboardCommunitiesPreview />
         </div>
       </Sublayout>
     );
