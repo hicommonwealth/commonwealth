@@ -11,6 +11,7 @@ import { pluralize } from 'helpers';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const getNewTag = (labelCount?: number) => {
   const label = labelCount ? 'New' : `${labelCount} new`;
@@ -88,19 +89,17 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
 
     return (
       <div class="DashboardCommunitiesPreview">
-        <CWText type="h3">Explore Communities</CWText>
+        <CWText type="h3">Active Communities</CWText>
         <div class="community-preview-cards-collection">
           {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
-          <a
-            class="view-more-communities-link"
-            onclick={() => {
-              m.route.set('/communities');
-              m.redraw();
-            }}
-          >
-            View more communities
-          </a>
         </div>
+        <CWButton
+          onclick={() => {
+            m.route.set('/communities');
+            m.redraw();
+          }}
+          label="View more communities"
+        />
       </div>
     );
   }

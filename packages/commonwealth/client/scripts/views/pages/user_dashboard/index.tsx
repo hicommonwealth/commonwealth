@@ -153,7 +153,9 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
         <div class="UserDashboard">
           <div class="dashboard-column">
             <div class="dashboard-header">
-              <CWText type="h3">Activity</CWText>
+              <CWText type="h3" fontWeight="semiBold">
+                Activity
+              </CWText>
               <CWTabBar>
                 <CWTab
                   label={DashboardViews.ForYou}

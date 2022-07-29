@@ -17,7 +17,9 @@ export const getCommentPreview = (commentText) => {
 
   try {
     const doc = JSON.parse(decodeURIComponent(commentText));
+
     if (!doc.ops) throw new Error();
+
     decodedCommentText = m(QuillFormattedText, {
       doc,
       hideFormatting: true,
@@ -25,11 +27,15 @@ export const getCommentPreview = (commentText) => {
     });
   } catch (e) {
     let doc = decodeURIComponent(commentText);
+
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
+
     const matches = doc['matchAll'](regexp);
+
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
+
     decodedCommentText = m(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
       hideFormatting: true,
@@ -48,6 +54,7 @@ export const subscribeToThread = async (
   reactionSubscription: NotificationSubscription
 ) => {
   const adjustedId = `discussion_${threadId}`;
+
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([
       commentSubscription,
