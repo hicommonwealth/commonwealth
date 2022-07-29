@@ -1,6 +1,14 @@
-import { Response, NextFunction } from 'express';
-import { TypedRequestBody } from '../types';
+import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
+import { validURL } from '../../shared/utils';
+
+enum UpdateCustomDomainErrors {
+  NoChainID = 'No chain_id provided.',
+  NoChain = 'Chain not found.',
+  Failed = 'Request Failed.',
+  InvalidCustomDomain = 'Invalid custom domain.',
+}
 
 type updateCustomDomainReq = {
   secret: string;
@@ -8,32 +16,43 @@ type updateCustomDomainReq = {
   custom_domain: string;
 };
 
+type updateCustomDomainResp = {
+  result: string;
+};
+
 const updateChainCustomDomain = async (
   models: DB,
   req: TypedRequestBody<updateCustomDomainReq>,
-  res: Response,
-  next: NextFunction
+  res: TypedResponse<updateCustomDomainResp>
 ) => {
-  if (!req.body) {
-    return next(new Error('invalid request body'));
-  }
   // Verify Chain Exists
   const { chain_id, custom_domain, secret } = req.body;
+  if (!chain_id) throw new AppError(UpdateCustomDomainErrors.NoChainID);
+
   const chain = await models.Chain.findOne({
     where: { id: chain_id },
   });
-  if (!chain) return next(new Error('Chain not found.'));
+  if (!chain) throw new ServerError(UpdateCustomDomainErrors.NoChain);
+
+  if (!process.env.CUSTOM_DOMAIN_UPDATE_SECRET) {
+    throw new AppError(UpdateCustomDomainErrors.Failed);
+  }
 
   // Check secret
   if (process.env.CUSTOM_DOMAIN_UPDATE_SECRET !== secret) {
-    return next(new Error('Invalid secret.'));
+    throw new AppError(UpdateCustomDomainErrors.Failed);
+  }
+
+  // Check custom domain
+  if (!validURL(custom_domain)) {
+    throw new AppError(UpdateCustomDomainErrors.InvalidCustomDomain);
   }
 
   // Update Custom Domain
   chain.custom_domain = custom_domain;
   await chain.save();
 
-  return res.json({ status: 'success', result: 'Updated custom domain.' });
+  return success(res, { result: 'Updated custom domain.' });
 };
 
 export default updateChainCustomDomain;
