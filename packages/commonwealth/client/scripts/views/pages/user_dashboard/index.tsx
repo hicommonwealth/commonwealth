@@ -9,36 +9,19 @@ import 'pages/user_dashboard.scss';
 
 import app, { LoginState } from 'state';
 import { DashboardActivityNotification } from 'models';
-import UserDashboardRow from 'views/components/user_dashboard_row';
 import Sublayout from 'views/sublayout';
 import { notifyInfo } from 'controllers/app/notifications';
-import DashboardExplorePreview from '../components/dashboard_explore_preview';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { DashboardExplorePreview } from './dashboard_explore_preview';
+import { UserDashboardRow } from './user_dashboard_row';
+import { fetchActivity } from './helpers';
 
-enum DashboardViews {
+export enum DashboardViews {
   ForYou = 'For You',
   Global = 'Global',
   Chain = 'Chain',
 }
-
-const fetchActivity = async (requestType: DashboardViews) => {
-  let activity;
-  if (requestType === DashboardViews.ForYou) {
-    activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
-      jwt: app.user.jwt,
-    });
-  } else if (requestType === DashboardViews.Chain) {
-    activity = await $.post(`${app.serverUrl()}/viewChainActivity`);
-  } else if (requestType === DashboardViews.Global) {
-    activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
-  }
-  return activity;
-};
-
-const notificationsRemaining = (contentLength, count) => {
-  return contentLength >= 10 && count < contentLength;
-};
 
 class UserDashboard implements m.ClassComponent<{ type: string }> {
   private activePage: DashboardViews;
@@ -224,10 +207,9 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <>
                         {fyNotifications.slice(0, this.fyCount).map((data) => {
-                          return m(UserDashboardRow, {
-                            notification: data,
-                            onListPage: true,
-                          });
+                          return (
+                            <UserDashboardRow notification={data} onListPage />
+                          );
                         })}
                         {notificationsRemaining(
                           fyNotifications.length,
@@ -253,10 +235,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                       {globalNotifications
                         .slice(0, this.globalCount)
                         .map((data) => {
-                          return m(UserDashboardRow, {
-                            notification: data,
-                            onListPage: true,
-                          });
+                          <UserDashboardRow notification={data} onListPage />;
                         })}
                       {notificationsRemaining(
                         globalNotifications.length,
@@ -280,10 +259,12 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {chainEvents
                           .slice(0, this.chainEventCount)
                           .map((data) => {
-                            return m(UserDashboardRow, {
-                              notification: data,
-                              onListPage: true,
-                            });
+                            return (
+                              <UserDashboardRow
+                                notification={data}
+                                onListPage
+                              />
+                            );
                           })}
                         {notificationsRemaining(
                           chainEvents.length,
@@ -307,7 +288,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
               </div>
             )}
           </div>
-          {m(DashboardExplorePreview)}
+          <DashboardExplorePreview />
         </div>
       </Sublayout>
     );

@@ -1,13 +1,16 @@
-import 'pages/user_dashboard.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import { Col, Tag } from 'construct-ui';
+
+import 'pages/user_dashboard.scss';
+
 import app from 'state';
 import { ChainInfo } from 'client/scripts/models';
 import { pluralize } from 'helpers';
-import { CWCard } from './component_kit/cw_card';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 const getNewTag = (labelCount = null) => {
   const label = labelCount === null ? 'New' : `${labelCount} new`;
@@ -78,8 +81,8 @@ const ChainCard: m.Component<{ chain: ChainInfo }> = {
   },
 };
 
-const DashboardExplorePreview: m.Component = {
-  view: (vnode) => {
+export class DashboardExplorePreview implements m.ClassComponent {
+  view() {
     const sortedChains = app.config.chains
       .getAll()
       .sort((a, b) => {
@@ -124,7 +127,5 @@ const DashboardExplorePreview: m.Component = {
         ]
       ),
     ]);
-  },
-};
-
-export default DashboardExplorePreview;
+  }
+}
