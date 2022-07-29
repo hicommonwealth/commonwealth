@@ -99,7 +99,7 @@ import {
 import { CreateComment } from './create_comment';
 import LinkedProposalsEmbed from './linked_proposals_embed';
 import User from '../../components/widgets/user';
-import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
 import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -340,13 +340,14 @@ const ProposalHeader: m.Component<
                             proposal: proposal as OffchainThread,
                           }),
                         ],
-                        inline: true,
-                        trigger: m(CWIcon, {
-                          iconName: 'chevronDown',
-                          iconSize: 'small',
-                        }),
+                        trigger: m('', [
+                          m(CWIcon, {
+                            iconName: 'chevronDown',
+                            iconSize: 'small',
+                          }),
+                        ]),
                       }),
-                    m('.CommentSocialHeader', [m(SocialSharingCarat)]),
+                    m(SocialSharingCarat),
                     vnode.state.editPermissionsIsOpen &&
                       proposal instanceof OffchainThread &&
                       m(ProposalEditorPermissions, {
@@ -604,9 +605,8 @@ const ProposalComment: m.Component<
                 }),
               }),
             ],
-            m('.CommentSocialHeader', [
-              m(SocialSharingCarat, { commentID: comment.id }),
-            ]),
+            m(SocialSharingCarat, { commentID: comment.id }),
+
             // For now, we are limiting threading to 1 level deep
             // Comments whose parents are other comments should not display the reply option
             // !vnode.state.editing
