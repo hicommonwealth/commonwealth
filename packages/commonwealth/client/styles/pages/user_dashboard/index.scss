@@ -1,9 +1,9 @@
 @import 'shared';
 
 .UserDashboard {
-  align-items: flex-start;
   display: flex;
   flex: 1;
+  gap: 56px;
   justify-content: space-between;
   padding: 24px;
 

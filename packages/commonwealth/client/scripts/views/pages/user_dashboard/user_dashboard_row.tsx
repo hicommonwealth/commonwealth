@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 import { capitalize } from 'lodash';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
@@ -13,142 +12,13 @@ import {
   // CompoundEvents
 } from 'chain-events/src';
 import app from 'state';
-import { NotificationCategories } from 'common-common/src/types';
 import { AddressInfo, DashboardActivityNotification } from 'models';
 import User from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 import { getProposalUrlPath } from 'identifiers';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
-import { subscribeToThread, getCommentPreview } from './helpers';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWText } from '../../components/component_kit/cw_text';
-
-class ButtonRow
-  implements
-    m.ClassComponent<{
-      path: string;
-      threadId: string;
-    }>
-{
-  view(vnode) {
-    const { path, threadId } = vnode.attrs;
-
-    const adjustedId = `discussion_${threadId}`;
-
-    const commentSubscription = app.user.notifications.subscriptions.find(
-      (v) =>
-        v.objectId === adjustedId &&
-        v.category === NotificationCategories.NewComment
-    );
-
-    const reactionSubscription = app.user.notifications.subscriptions.find(
-      (v) =>
-        v.objectId === adjustedId &&
-        v.category === NotificationCategories.NewReaction
-    );
-
-    const bothActive =
-      commentSubscription?.isActive && reactionSubscription?.isActive;
-
-    return (
-      <>
-        <CWButton label="Discuss" iconName="plus" buttonType="secondary-blue" />
-        <div
-          onclick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <PopoverMenu
-            transitionDuration={0}
-            closeOnOutsideClick
-            closeOnContentClick
-            menuAttrs={{ size: 'default' }}
-            content={
-              <>
-                <MenuItem
-                  iconLeft={Icons.COPY}
-                  label="Copy URL"
-                  onclick={async () => {
-                    await navigator.clipboard.writeText(path);
-                  }}
-                />
-                <MenuItem
-                  iconLeft={Icons.TWITTER}
-                  label="Share on Twitter"
-                  onclick={async () => {
-                    await window.open(
-                      `https://twitter.com/intent/tweet?text=${path}`,
-                      '_blank'
-                    );
-                  }}
-                />
-              </>
-            }
-            trigger={
-              <CWButton
-                label="Share"
-                iconName="share"
-                buttonType="secondary-blue"
-              />
-            }
-          />
-        </div>
-        <CWButton
-          label={bothActive ? 'Unsubscribe' : 'Subscribe'}
-          iconName="bell"
-          buttonType="secondary-blue"
-          onclick={(e) => {
-            e.stopPropagation();
-
-            subscribeToThread(
-              threadId,
-              bothActive,
-              commentSubscription,
-              reactionSubscription
-            );
-          }}
-        />
-      </>
-    );
-  }
-}
-
-class ActivityCounts
-  implements
-    m.ClassComponent<{
-      commentCount: number;
-      likeCount: number;
-      viewCount: number;
-    }>
-{
-  view(vnode) {
-    const { viewCount, likeCount, commentCount } = vnode.attrs;
-
-    return (
-      <div class="icon-row-right">
-        {viewCount && viewCount > 0 && (
-          <>
-            <CWIcon iconName="views" />
-            <CWText>{viewCount}</CWText>
-          </>
-        )}
-        {likeCount && likeCount > 0 && (
-          <>
-            <CWIcon iconName="heartFilled" />
-            <CWText>{likeCount}</CWText>
-          </>
-        )}
-        {commentCount && commentCount > 0 && (
-          <>
-            <CWIcon iconName="feedback" />
-            <CWText>{commentCount}</CWText>
-          </>
-        )}
-      </div>
-    );
-  }
-}
+import { getCommentPreview } from './helpers';
+import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 
 const ActivityContent: m.Component<{
   activityData: any;
@@ -363,14 +233,13 @@ export class UserDashboardRow
             category: categoryId,
           }),
         ]),
-        m('.icon-row', [
-          <ButtonRow path={path} threadId={threadId} />,
-          <ActivityCounts
-            viewCount={viewCount}
-            commentCount={commentCount}
-            likeCount={likeCount}
-          />,
-        ]),
+        <UserDashboardRowBottom
+          path={path}
+          threadId={threadId}
+          viewCount={viewCount}
+          commentCount={commentCount}
+          likeCount={likeCount}
+        />,
       ]
     );
   }
