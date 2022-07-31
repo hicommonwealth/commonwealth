@@ -1,0 +1,135 @@
+@import 'shared';
+
+.SearchPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 24px;
+  width: 800px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  .TabBar {
+    justify-content: center;
+  }
+
+  .search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .search-results-caption.Text {
+      color: $neutral-500;
+
+      .search-all-communities {
+        margin-left: 8px;
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  .search-results-filters {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .cui-list {
+      max-height: none !important;
+    }
+
+    .cui-list-item {
+      border-top: none;
+      border-bottom: none;
+      padding: 16px;
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+
+      .cui-list-item-content-left {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin-right: 16px;
+      }
+
+      .search-results-item {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        text-decoration: none;
+        width: 100%;
+
+        /* Member results */
+        .user-block-name {
+          opacity: 1;
+          font-weight: 500;
+          margin-bottom: 2px;
+        }
+
+        .user-block-address {
+          font-size: 18px;
+          margin-top: 2px;
+          opacity: 1;
+          color: $neutral-500;
+
+          mark {
+            background-color: $purple-100;
+          }
+        }
+
+        .thread-header.Text {
+          color: $neutral-500;
+        }
+
+        .search-results-thread-subtitle {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          .User {
+            align-items: center;
+            color: $neutral-500;
+            display: flex;
+          }
+
+          .created-at.Text {
+            color: $neutral-500;
+          }
+        }
+
+        .search-results-thread-body {
+          color: $neutral-500;
+        }
+
+        .search-results-comment {
+          color: $neutral-500;
+        }
+
+        .search-results-thread-body,
+        .search-results-comment {
+          mark {
+            background-color: $purple-100;
+          }
+        }
+      }
+
+      .search-results-item:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}

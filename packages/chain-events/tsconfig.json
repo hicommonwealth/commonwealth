@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es6",
+    "lib": [
+      "es2019"
+    ],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "declaration": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "sourceMap": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src",
+  ],
+  "exclude": [
+    "./dist",
+    "./node_modules",
+    "./test",
+    "./scripts"
+  ]
+}

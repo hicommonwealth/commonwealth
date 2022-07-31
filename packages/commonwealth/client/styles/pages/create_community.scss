@@ -1,0 +1,63 @@
+@import 'shared';
+
+.CreateCommunityIndex {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  width: 100%;
+
+  .CreateCommunityForm {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 480px;
+
+    @include extraSmall {
+      width: 100%;
+    }
+
+    .InputRow {
+      display: flex;
+      flex-direction: column;
+
+      textarea {
+        resize: none;
+      }
+    }
+
+    .AvatarUploadRow,
+    .IDRow,
+    .SelectRow,
+    .ToggleRow {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+
+      .toggle-and-label {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+
+    .id {
+      align-items: center;
+      background-color: $yellow-50;
+      border-radius: 4px;
+      display: flex;
+      height: 40px;
+      padding: 8px 16px;
+
+      &.placeholder {
+        color: $neutral-200;
+        font-style: italic;
+      }
+    }
+
+    .button-margin-bottom {
+      margin-bottom: 20px;
+    }
+  }
+}
