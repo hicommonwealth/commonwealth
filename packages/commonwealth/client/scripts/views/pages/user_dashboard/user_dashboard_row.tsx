@@ -47,43 +47,39 @@ export class UserDashboardRow
       const communityName =
         app.config.chains.getById(chain)?.name || 'Unknown chain';
 
-      return m(
-        '.UserDashboardRow',
-        {
-          onclick: () => {
+      return (
+        <div
+          class="UserDashboardRow"
+          onclick={() => {
             if (label.linkUrl) {
               m.route.set(label.linkUrl);
             }
             m.redraw();
-          },
-          style: label.linkUrl ? 'cursor: pointer;' : '',
-        },
-        [
-          m('.activity-content', [
-            m(CWCommunityAvatar, {
-              community: chain,
-            }),
-            m('.new-comment', [
-              m('span.header', [
-                m('span.community-title', [label.heading]),
-                m('span.comment-counts', [' in ']),
-                m(
-                  'span.community-link',
-                  {
-                    onclick: (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      m.route.set(`/${chain}`);
-                    },
-                  },
-                  [communityName]
-                ),
-                m('span.block-number', [` Block ${blockNumber}`]),
-              ]),
-              m('.event-body', [label.label]),
-            ]),
-          ]),
-        ]
+          }}
+          style={label.linkUrl ? 'cursor: pointer;' : ''}
+        >
+          <div class="activity-content">
+            <CWCommunityAvatar community={chain} />
+            <div class="new-comment">
+              <span class="header">
+                <span class="community-title">{label.heading}</span>
+                <span class="comment-counts"> in </span>
+                <span
+                  class="community-link"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    m.route.set(`/${chain}`);
+                  }}
+                >
+                  {communityName}
+                </span>
+                <span class="block-number"> Block {blockNumber}</span>
+              </span>
+              <div class="event-body">{label.label}</div>
+            </div>
+          </div>
+        </div>
       );
     }
 
@@ -93,28 +89,27 @@ export class UserDashboardRow
 
     const path = getProposalUrlPath(root_type, root_id, false, chain_id);
 
-    return m(
-      '.UserDashboardRow',
-      {
-        onclick: () => {
+    return (
+      <div
+        class="UserDashboardRow"
+        onclick={() => {
           m.route.set(path);
           m.redraw();
-        },
-        style: path ? 'cursor: pointer;' : '',
-      },
-      [
+        }}
+        style={path ? 'cursor: pointer;' : ''}
+      >
         <UserDashboardRowTop
           activityData={vnode.attrs.notification}
           category={categoryId}
-        />,
+        />
         <UserDashboardRowBottom
           path={path}
           threadId={threadId}
           viewCount={viewCount}
           commentCount={commentCount}
           likeCount={likeCount}
-        />,
-      ]
+        />
+      </div>
     );
   }
 }
