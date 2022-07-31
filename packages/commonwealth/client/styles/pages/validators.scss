@@ -1,0 +1,22 @@
+@import 'shared';
+
+.ValidatorsPage {
+  flex: 1;
+  padding: 24px;
+
+  .ValidatorCard.Card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .user-and-nominator {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .commission-text.Text {
+      color: $neutral-400;
+    }
+  }
+}

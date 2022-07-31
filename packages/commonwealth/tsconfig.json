@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
+      "token-balance-cache": ["../../packages/token-balance-cache"],
+      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
+      "*": ["./*", "shared/*", "client/scripts/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false
+  },
+  "include": [
+    "./client",
+    "./client/scripts",
+    "./shared/adapters",
+    "./test",
+    "./globals.d.ts"
+  ],
+  "exclude": ["./node_modules"]
+}
