@@ -2,10 +2,10 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 import { RuleAttributes } from './rule';
 
-export type OffchainTopicAttributes = {
+export type TopicAttributes = {
   name: string;
   featured_in_sidebar: boolean;
   featured_in_new_post: boolean;
@@ -23,23 +23,23 @@ export type OffchainTopicAttributes = {
 
   // associations
   chain?: ChainAttributes;
-  threads?: OffchainThreadAttributes[] | OffchainTopicAttributes['id'][];
+  threads?: ThreadAttributes[] | TopicAttributes['id'][];
   Rule?: RuleAttributes;
 }
 
-export type OffchainTopicInstance = ModelInstance<OffchainTopicAttributes> & {
+export type TopicInstance = ModelInstance<TopicAttributes> & {
   // no mixins used
   // TODO: do we need to implement the "as" stuff here?
   getRule: Sequelize.BelongsToGetAssociationMixin<RuleAttributes>;
 }
 
-export type OffchainTopicModelStatic = ModelStatic<OffchainTopicInstance>;
+export type TopicModelStatic = ModelStatic<TopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes,
-): OffchainTopicModelStatic => {
-  const OffchainTopic = <OffchainTopicModelStatic>sequelize.define('OffchainTopic', {
+): TopicModelStatic => {
+  const Topic = <TopicModelStatic>sequelize.define('Topic', {
     id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: dataTypes.STRING, allowNull: false },
     description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
@@ -59,7 +59,7 @@ export default (
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
-    tableName: 'OffchainTopics',
+    tableName: 'Topics',
     underscored: true,
     paranoid: true,
     defaultScope: {
@@ -69,20 +69,20 @@ export default (
     },
   });
 
-  OffchainTopic.associate = (models) => {
-    models.OffchainTopic.belongsTo(models.Chain, {
+  Topic.associate = (models) => {
+    models.Topic.belongsTo(models.Chain, {
       as: 'chain',
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.OffchainTopic.hasMany(models.OffchainThread, {
+    models.Topic.hasMany(models.Thread, {
       as: 'threads',
       foreignKey: 'topic_id',
     });
-    models.OffchainTopic.belongsTo(models.Rule, {
+    models.Topic.belongsTo(models.Rule, {
       foreignKey: 'rule_id',
     })
   };
 
-  return OffchainTopic;
+  return Topic;
 };

@@ -22,7 +22,7 @@ const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res:
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const reaction = await models.OffchainReaction.findOne({
+    const reaction = await models.Reaction.findOne({
       where: {
         id: req.body.reaction_id,
         address_id: { [Op.in]: userOwnedAddressIds },

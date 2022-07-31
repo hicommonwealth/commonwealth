@@ -74,8 +74,8 @@ import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
-import updateOffchainVote from './routes/updateOffchainVote';
-import viewOffchainVotes from './routes/viewOffchainVotes';
+import updateVote from './routes/updateVote';
+import viewVotes from './routes/viewVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
@@ -241,7 +241,7 @@ function setupRouter(
     getSupportedEthChains.bind(this, models)
   );
 
-  // offchain threads
+  // threads
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
@@ -286,11 +286,11 @@ function setupRouter(
   );
 
   router.post(
-    '/updateOffchainVote',
+    '/updateVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
-  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
+  router.get('/viewVotes', viewVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.get(
@@ -331,7 +331,7 @@ function setupRouter(
 
   router.get('/profile', getProfile.bind(this, models));
 
-  // offchain discussion drafts
+  // discussion drafts
   router.post(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
@@ -351,7 +351,7 @@ function setupRouter(
 
   router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
-  // offchain comments
+  // comments
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
@@ -370,7 +370,7 @@ function setupRouter(
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
 
-  // offchain topics
+  // topics
   router.post(
     '/createTopic',
     passport.authenticate('jwt', { session: false }),
@@ -403,7 +403,7 @@ function setupRouter(
     setTopicThreshold.bind(this, models)
   );
 
-  // offchain reactions
+  // reactions
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
@@ -501,7 +501,7 @@ function setupRouter(
     setDefaultRole.bind(this, models)
   );
 
-  // offchain profiles
+  // profiles
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
@@ -522,7 +522,7 @@ function setupRouter(
     deleteSocialAccount.bind(this, models, 'discord')
   );
 
-  // offchain viewCount
+  // viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
 
   // attachments

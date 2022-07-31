@@ -77,7 +77,7 @@ const SubstrateOnlineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubst
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
     }
 
-    // return offchain name while identity is loading
+    // return name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',
@@ -121,7 +121,7 @@ const SubstrateOfflineIdentityWidget: m.Component<ISubstrateIdentityAttrs, ISubs
         : m(`a.user-display-name.username.onchain-username${IdentityQuality.Good ? '.verified' : ''}`, name);
     }
 
-    // return offchain name while identity is loading
+    // return name while identity is loading
     return linkify
       ? link('a.user-display-name.username',
         profile ? `/${app.activeChainId()}/account/${profile.address}?base=${profile.chain}` : 'javascript:',

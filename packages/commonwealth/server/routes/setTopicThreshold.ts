@@ -13,7 +13,7 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
     return next(new Error(Errors.MissingTopicIdOrThreshold));
   }
 
-  const topic = await models.OffchainTopic.findOne({
+  const topic = await models.Topic.findOne({
     where: {
       id: req.body.topic_id,
     }
@@ -25,7 +25,7 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
     return next(new Error(Errors.InvalidThreshold));
   }
 
-  await models.OffchainTopic.update({
+  await models.Topic.update({
     token_threshold
   },
   {

@@ -1,20 +1,20 @@
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { OffchainVoteAttributes } from '../models/offchain_vote';
+import { VoteAttributes } from '../models/vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 
 export const Errors = {
   NoPollSpecified: 'No poll has been specified',
 };
 
-type ViewOffchainVotesReq = { poll_id: string; chain_id: string };
-type ViewOffchainVotesResp = OffchainVoteAttributes[];
+type ViewVotesReq = { poll_id: string; chain_id: string };
+type ViewVotesResp = VoteAttributes[];
 
-const viewOffchainVotes = async (
+const viewVotes = async (
   models: DB,
-  req: TypedRequestQuery<ViewOffchainVotesReq>,
-  res: TypedResponse<ViewOffchainVotesResp>
+  req: TypedRequestQuery<ViewVotesReq>,
+  res: TypedResponse<ViewVotesResp>
 ) => {
   // TODO: runtime validation based on params
   //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
@@ -34,7 +34,7 @@ const viewOffchainVotes = async (
   }
 
   try {
-    const votes = await models.OffchainVote.findAll({
+    const votes = await models.Vote.findAll({
       where: {
         poll_id: req.query.poll_id,
         chain_id: chain.id,
@@ -49,4 +49,4 @@ const viewOffchainVotes = async (
   }
 };
 
-export default viewOffchainVotes;
+export default viewVotes;

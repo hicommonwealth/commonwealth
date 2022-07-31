@@ -8,9 +8,9 @@ import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import {
-  OffchainVoteAttributes,
-  OffchainVoteInstance,
-} from '../models/offchain_vote';
+  VoteAttributes,
+  VoteInstance,
+} from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 
@@ -24,7 +24,7 @@ export const Errors = {
   RuleCheckFailed: 'Rule check failed',
 };
 
-type UpdateOffchainVoteReq = {
+type UpdateVoteReq = {
   poll_id: number;
   chain_id: string;
   address: string;
@@ -32,14 +32,14 @@ type UpdateOffchainVoteReq = {
   option: string;
 };
 
-type UpdateOffchainVoteResp = OffchainVoteAttributes;
+type UpdateVoteResp = VoteAttributes;
 
-const updateOffchainVote = async (
+const updateVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
-  req: TypedRequestBody<UpdateOffchainVoteReq>,
-  res: TypedResponse<UpdateOffchainVoteResp>,
+  req: TypedRequestBody<UpdateVoteReq>,
+  res: TypedResponse<UpdateVoteResp>,
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
@@ -50,7 +50,7 @@ const updateOffchainVote = async (
 
   const { poll_id, address, author_chain, option } = req.body;
 
-  const poll = await models.OffchainPoll.findOne({
+  const poll = await models.Poll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
   if (!poll) return next(new Error(Errors.NoPoll));
@@ -68,7 +68,7 @@ const updateOffchainVote = async (
     return next(new Error(Errors.InvalidOption));
   }
 
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: { id: poll.thread_id },
   });
   if (!thread) return next(new Error(Errors.NoThread));
@@ -84,7 +84,7 @@ const updateOffchainVote = async (
     return next(new Error(Errors.BalanceCheckFailed));
   }
 
-  const topic = await models.OffchainTopic.findOne({
+  const topic = await models.Topic.findOne({
     where: { id: thread.topic_id },
     attributes: ['rule_id'],
   });
@@ -95,10 +95,10 @@ const updateOffchainVote = async (
     }
   }
 
-  let vote: OffchainVoteInstance;
+  let vote: VoteInstance;
   await sequelize.transaction(async (t) => {
     // delete existing votes
-    await models.OffchainVote.destroy({
+    await models.Vote.destroy({
       where: {
         poll_id: poll.id,
         address,
@@ -108,7 +108,7 @@ const updateOffchainVote = async (
       transaction: t,
     });
     // create new vote
-    vote = await models.OffchainVote.create(
+    vote = await models.Vote.create(
       {
         poll_id: poll.id,
         address,
@@ -123,4 +123,4 @@ const updateOffchainVote = async (
   return success(res, vote.toJSON());
 };
 
-export default updateOffchainVote;
+export default updateVote;

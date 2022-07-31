@@ -37,7 +37,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'thread',
         attachment_id: thread_id,
         url: req.body['attachments[]'],
@@ -45,7 +45,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
       });
     } else if (req.body['attachments[]']) {
       await Promise.all(req.body['attachments[]']
-        .map((url_) => models.OffchainAttachment.create({
+        .map((url_) => models.Attachment.create({
           attachable: 'thread',
           attachment_id: thread_id,
           url: url_,
@@ -59,7 +59,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
   const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
   const collaboration = await models.Collaboration.findOne({
     where: {
-      offchain_thread_id: thread_id,
+      thread_id,
       address_id: { [Op.in]: userOwnedAddressIds }
     }
   });
@@ -84,13 +84,13 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
   }
 
   if (collaboration || admin) {
-    thread = await models.OffchainThread.findOne({
+    thread = await models.Thread.findOne({
       where: {
         id: thread_id
       }
     });
   } else {
-    thread = await models.OffchainThread.findOne({
+    thread = await models.Thread.findOne({
       where: {
         id: thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -141,7 +141,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
     await thread.save();
     await attachFiles();
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: { id: thread.id },
       include: [
         { model: models.Address, as: 'Address' },
@@ -150,8 +150,8 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
           // through: models.Collaboration,
           as: 'collaborators'
         },
-        models.OffchainAttachment,
-        { model: models.OffchainTopic, as: 'topic' },
+        models.Attachment,
+        { model: models.Topic, as: 'topic' },
       ],
     });
 
@@ -163,7 +163,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
       {
         created_at: new Date(),
         root_id: +finalThread.id,
-        root_type: ProposalType.OffchainThread,
+        root_type: ProposalType.Thread,
         root_title: finalThread.title,
         chain_id: finalThread.chain,
         author_address: finalThread.Address.address,
@@ -225,7 +225,7 @@ const editThread = async (models: DB, banCache: BanCache, req: Request, res: Res
           {
             created_at: new Date(),
             root_id: +finalThread.id,
-            root_type: ProposalType.OffchainThread,
+            root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
             chain_id: finalThread.chain,
