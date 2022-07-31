@@ -1,0 +1,43 @@
+@import 'shared';
+
+.SpecSettingsPage {
+  height: 100%;
+
+  @include extraSmall {
+    width: initial;
+  }
+}
+
+.SpecSettingsForm {
+  max-width: 85%;
+  margin-bottom: 20px;
+
+  .cui-overlay-inline {
+    display: block;
+  }
+
+  h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  textarea {
+    min-height: 400px;
+  }
+
+  .cui-grid {
+    width: 100%;
+
+    .form-col {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+
+      & > button {
+        margin-top: 10px;
+        padding: 0 10px;
+        display: block;
+      }
+    }
+  }
+}

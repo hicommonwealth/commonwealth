@@ -1,0 +1,90 @@
+@import 'shared';
+
+.SummaryListing {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+
+  .row-header {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 16px;
+
+    h4 {
+      color: $neutral-600;
+      flex: 1;
+      font-weight: 500;
+    }
+  }
+
+  .row-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .SummaryRow {
+    border-top: 1px solid $neutral-100;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 16px 0;
+
+    .topic-header {
+      color: $neutral-600;
+    }
+
+    .topic-cell {
+      flex: 1;
+
+      @include small {
+        margin-bottom: 8px;
+      }
+
+      h3 {
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 15px;
+        padding-right: 16px;
+      }
+    }
+
+    .recent-thread-header {
+      color: $neutral-600;
+    }
+
+    @include small {
+      flex-direction: column;
+    }
+
+    .recent-thread-cell {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+
+      .thread-summary {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 16px;
+
+        .thread-title {
+          display: flex;
+          color: $purple-400;
+          margin-right: 16px;
+        }
+
+        .last-updated {
+          color: $neutral-500;
+          min-width: max-content;
+        }
+
+        @include small {
+          flex-direction: column;
+        }
+      }
+    }
+  }
+}

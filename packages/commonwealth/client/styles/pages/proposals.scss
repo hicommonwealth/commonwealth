@@ -1,0 +1,17 @@
+@import 'shared';
+
+.ProposalsPage {
+  flex: 1;
+  padding: 24px;
+
+  .active-proposals,
+  .inactive-proposals {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .no-proposals {
+    display: flex;
+    flex-direction: row;
+  }
+}

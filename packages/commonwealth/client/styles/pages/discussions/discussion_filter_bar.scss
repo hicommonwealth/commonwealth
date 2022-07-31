@@ -1,0 +1,30 @@
+@import 'shared';
+
+.DiscussionFilterBar {
+  background-color: $white;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+
+  > .cui-button {
+    color: $neutral-800;
+    cursor: pointer;
+    max-width: 192px;
+    padding: 0 8px;
+
+    span {
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &.active {
+      border-color: $neutral-800;
+    }
+  }
+}

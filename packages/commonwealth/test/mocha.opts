@@ -1,0 +1,6 @@
+# mocha.opts
+  --require tsconfig-paths/register
+  --require @babel/register
+  --require source-map-support/register
+  --timeout 10000
+  --exit

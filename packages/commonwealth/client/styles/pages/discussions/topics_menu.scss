@@ -1,0 +1,58 @@
+.cui-menu {
+  padding: 0;
+
+  .topic-items {
+    max-height: 192px;
+    max-width: 296px;
+    overflow-y: auto;
+
+    .cui-menu-divider {
+      margin: 0;
+    }
+
+    .cui-button {
+      font-size: 14px;
+      height: 32px;
+      min-height: 32px;
+      line-height: 32px;
+
+      .cui-button-label {
+        // resets the dumb construct overrides
+        position: unset;
+        top: unset;
+
+        .topic-item {
+          align-items: center;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+
+          .icon-and-item-name-container {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            min-width: 0;
+
+            svg {
+              margin-right: 8px;
+            }
+
+            .topic-item-name {
+              margin-right: 8px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+
+          .edit-button {
+            font-size: 14px;
+            height: 24px;
+            min-height: 24px;
+            line-height: 24px;
+          }
+        }
+      }
+    }
+  }
+}

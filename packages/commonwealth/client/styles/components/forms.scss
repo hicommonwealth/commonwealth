@@ -1,0 +1,69 @@
+@import 'shared';
+
+.FormField {
+  .form-group {
+    margin-bottom: 22px;
+  }
+
+  .form-group .form-title {
+    display: inline-block;
+  }
+
+  .form-group .form-subtitle {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 85%;
+    color: $neutral-500;
+  }
+
+  .form-group .form-field {
+    margin-top: 8px;
+  }
+
+  .form-group .radio-buttons {
+    padding-top: 2px;
+  }
+
+  .form-group .radio-buttons.form-field input[type='radio'] {
+    margin-right: 10px;
+  }
+
+  .form-group .radio-buttons.form-field label {
+    margin-right: 20px;
+    position: relative;
+    top: 1px;
+  }
+}
+
+.MultipleButtonSelectorFormField {
+  .form-group {
+    margin-bottom: 19px;
+  }
+
+  .form-field.buttons button {
+    display: inline-block;
+    margin: 3px;
+  }
+}
+
+.DropdownFormField {
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    .cui-custom-select {
+      @include mediumSmall {
+        width: 50%;
+      }
+
+      .cui-button {
+        max-width: 100%;
+
+        .cui-button-label {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}

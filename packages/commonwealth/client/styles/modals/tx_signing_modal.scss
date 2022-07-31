@@ -1,0 +1,107 @@
+@import 'shared';
+
+.TXSigningModalBody {
+  .compact-modal-body {
+    padding-bottom: 15px;
+  }
+
+  &.Intro .compact-modal-body {
+    padding: 0;
+  }
+
+  .no-select {
+    opacity: 0.8;
+    user-select: none;
+  }
+
+  button {
+    margin-top: 15px;
+  }
+
+  .instructions {
+    margin-bottom: 15px;
+  }
+
+  .CodeBlock {
+    min-height: 175px;
+  }
+
+  .gaiacli-codeblock .CodeBlock {
+    min-height: 130px;
+  }
+
+  // signing option selector
+  .HorizontalTabs {
+    border: none;
+    margin-bottom: 0;
+  }
+
+  .HorizontalTabs .tab-bar {
+    width: 160px;
+  }
+
+  .HorizontalTabs .tab-content {
+    width: 490px;
+    min-height: 450px;
+
+    @include smallInclusive {
+      width: initial;
+    }
+  }
+
+  &.Intro {
+    width: 710px;
+  }
+
+  // reusable components
+  .TXSigningCancelAction {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+
+    a {
+      color: $neutral-500;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .TXSigningBodyText {
+    margin-bottom: 20px;
+  }
+
+  .cui-spinner {
+    margin: 20px 0 26px;
+    width: 100%;
+  }
+
+  .TXSigningTransactionBox {
+    border: 1px solid $primary-300;
+    padding: 24px 28px 12px;
+    border-radius: 4px;
+    text-align: left;
+    width: 360px;
+    margin: 5px 0;
+
+    .txbox-header {
+      font-weight: 500;
+      margin-bottom: 1px;
+    }
+
+    .txbox-content {
+      margin-bottom: 14px;
+      word-break: break-word;
+    }
+
+    .txbox-content.txbox-success {
+      color: $green-500;
+    }
+
+    .txbox-content.txbox-fail {
+      color: $rorange-500;
+    }
+  }
+}

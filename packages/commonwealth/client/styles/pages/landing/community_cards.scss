@@ -1,0 +1,42 @@
+@import 'shared';
+
+.HomepageCommunityCards {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 24px;
+
+  .header-section {
+    align-items: center;
+    background-color: $white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 24px;
+    position: sticky;
+    top: 0;
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
+
+  .communities-count.Text {
+    margin-bottom: 8px;
+  }
+
+  .communities-list {
+    display: grid;
+    grid-gap: 24px;
+    grid-template-columns: repeat(auto-fit, 240px);
+    justify-content: center;
+    padding-bottom: 24px;
+
+    @include smallInclusive {
+      grid-template-columns: repeat(auto-fit, 136px);
+    }
+  }
+}

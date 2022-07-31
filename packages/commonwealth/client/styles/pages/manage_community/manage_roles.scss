@@ -1,0 +1,34 @@
+@import 'client/styles/shared';
+
+.ManageRoles {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  width: 248px;
+
+  .roles-container {
+    border: 2px solid $neutral-200;
+    border-radius: 4px;
+    height: 196px;
+    overflow-y: auto;
+    padding: 0 4px;
+    width: 252px;
+
+    .role-row {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      height: 24px;
+      justify-content: space-between;
+      width: 240px;
+
+      svg {
+        cursor: pointer;
+
+        &:hover {
+          color: $neutral-600;
+        }
+      }
+    }
+  }
+}

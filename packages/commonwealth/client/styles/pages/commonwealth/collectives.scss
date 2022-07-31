@@ -1,0 +1,58 @@
+@import 'client/styles/shared';
+
+.CollectivesPage {
+  .cui-card {
+    padding-top: 28px;
+    margin-top: 24px;
+    max-width: none;
+    @include mediumSmall {
+      max-width: calc(50% - 20px);
+      margin-right: 20px;
+    }
+  }
+  h4 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .collective-description {
+    color: $neutral-500;
+    margin-bottom: 5px;
+  }
+  .collective-metadata {
+    margin-bottom: 10px;
+    .collective-metadata-members,
+    .collective-metadata-beneficiary {
+      display: inline-block;
+    }
+    .collective-metadata-beneficiary {
+      color: $neutral-500;
+      margin-right: 18px;
+    }
+    .collective-metadata-members {
+      color: $neutral-500;
+    }
+  }
+  .collective-metrics {
+    display: flex;
+    margin-bottom: 12px;
+    .collective-metric {
+      flex: 1;
+      padding: 16px 0 10px;
+    }
+    .collective-metric-figure {
+      width: 120px;
+      font-size: 24px;
+    }
+    .collective-metric-title {
+    }
+  }
+  .collective-action {
+    .cui-input {
+      margin-bottom: 12px;
+    }
+    .cui-button {
+      margin-bottom: 8px;
+    }
+  }
+}

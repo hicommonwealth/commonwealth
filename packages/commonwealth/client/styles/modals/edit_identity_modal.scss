@@ -1,0 +1,33 @@
+@import 'client/styles/shared';
+
+.EditIdentityModal {
+  width: 620px;
+  @include small {
+    width: initial;
+  }
+  .form {
+    padding: 30px 32px 32px;
+    .text-input-wrapper {
+      margin: 6px 0 4px 0;
+      label {
+        font-size: 14px;
+      }
+      input,
+      textarea {
+        padding: 11px 16px 10px;
+        margin: 7px 0 14px;
+      }
+    }
+  }
+  .form-bottom {
+    margin-top: 20px;
+    button {
+      margin-right: 12px;
+    }
+  }
+  .error-message {
+    color: $rorange-500;
+    font-weight: 500;
+    margin-top: 16px;
+  }
+}

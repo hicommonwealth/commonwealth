@@ -1,0 +1,415 @@
+@import 'shared';
+
+.LinkNewAddressModal {
+  text-align: center;
+
+  .link-address-step-header {
+    margin: 0 auto;
+    padding: 20px 40px 18px;
+    background: $primary-500;
+    color: $white;
+
+    h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+  }
+
+  .link-address-step-narrow {
+    padding: 28px 40px;
+    width: 460px;
+    min-height: 420px;
+  }
+
+  // for all steps
+  .page-graphic {
+    display: none;
+    height: 175px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    margin: 8px 0 16px;
+  }
+
+  p {
+    margin: 4px 0;
+  }
+
+  code {
+    font-size: 13px;
+    padding: 2px 3px;
+    margin: 0 3px;
+    white-space: nowrap;
+  }
+
+  .CodeBlock {
+    text-align: left;
+
+    .no-select {
+      opacity: 0.8;
+      user-select: none;
+    }
+  }
+
+  .CodeBlock + .CodeBlock {
+    margin-top: -10px;
+  }
+
+  .mobile-error-message {
+    color: $neutral-500;
+    margin: 26px 40px;
+
+    p {
+      margin: 8px 0;
+    }
+  }
+
+  a.back-text {
+    color: $neutral-500;
+    text-decoration: none;
+    margin-top: 20px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // for step 0 - chain selection
+  .select-chain-step {
+    padding: 55px 0 60px;
+
+    .cui-button {
+      margin-top: 15px;
+    }
+  }
+
+  .get-wallet-text {
+    margin-top: 15px;
+    color: $neutral-800;
+  }
+
+  // for step 1
+  .cui-callout {
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .link-address-precopy {
+    display: block;
+    font-size: 15px;
+    color: $neutral-500;
+    margin: 26px auto 4px;
+    max-width: 480px;
+
+    @include extraSmall {
+      margin: 20px auto 10px;
+    }
+  }
+
+  .link-address-combined-warning {
+    display: flex;
+    background: $primary-300;
+    padding: 10px 14px;
+    margin: 0 20px;
+    margin-bottom: 28px;
+    text-align: left;
+    border: 1px solid $neutral-50;
+    font-size: 14px;
+
+    .link-address-combined-warning-icon {
+      margin-right: 6px;
+    }
+
+    @include extraSmall {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+  }
+
+  .link-address-options {
+    text-align: center;
+    padding: 0 20px 10px;
+
+    .link-address-option {
+      display: inline-block;
+      cursor: pointer;
+      text-align: center;
+      margin: 20px 8px;
+      // card style
+      width: 230px;
+      height: 190px;
+      border-radius: 3px;
+      border: 1px solid $neutral-50;
+      background: $white;
+      box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+
+      &.mobile-disabled {
+        opacity: 0.6;
+        pointer-events: none;
+        // disable CLI and substrate wallets for mobile users
+      }
+
+      &.selected {
+        border-color: $primary-500;
+      }
+
+      @include extraSmall {
+        height: initial;
+        margin: 8px 8px;
+      }
+    }
+
+    .link-address-header {
+      text-align: center;
+      background: $primary-400;
+      padding: 15px 0 0;
+      border-radius: 4px 4px 0 0;
+
+      @include extraSmall {
+        padding-top: 12px;
+      }
+    }
+
+    .link-address-title {
+      font-weight: 500;
+    }
+
+    .link-address-icon {
+      height: 36px;
+
+      img {
+        width: 34px;
+      }
+    }
+
+    .link-address-title {
+      padding: 9px 15px;
+      color: $neutral-500;
+    }
+
+    .link-address-description {
+      font-size: 13px;
+      margin: 16px 20px 10px;
+      color: $neutral-500;
+    }
+
+    .link-address-link {
+      font-size: 13px;
+      margin: 10px 20px 16px;
+      color: $neutral-500;
+    }
+
+    .link-address-link a {
+      color: $neutral-500;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  button.link-address-options-continue {
+    margin: 0 0 24px;
+  }
+
+  .link-address-options-back {
+    margin-bottom: 24px;
+  }
+
+  // for step 2 - command line
+  .link-address-cli-verification {
+    margin-bottom: 20px;
+  }
+  .link-address-cli-explainer {
+    margin-bottom: 20px;
+  }
+  .cui-control.cui-checkbox {
+    margin-top: 12px;
+  }
+  .link-address-cli-verification {
+    margin-top: 20px;
+    .cui-control.cui-checkbox {
+      margin-bottom: 20px;
+    }
+  }
+
+  //
+  .accounts-list {
+    margin: 26px auto;
+    border-radius: 5px;
+  }
+  .accounts-list-unavailable {
+    text-align: center;
+    color: $neutral-500;
+    margin: 100px 20px;
+  }
+  .accounts-caption {
+  }
+  .accounts-caption p.small-text {
+    font-size: 15px;
+    color: $neutral-500;
+  }
+  .account-adder,
+  .account-adder-placeholder {
+    margin-top: 150px;
+    .cui-spinner {
+      position: relative;
+      top: -2px;
+      margin-right: 6px;
+      .cui-spinner-icon {
+        border-top-color: $white !important;
+        border-right-color: $white !important;
+      }
+    }
+  }
+  .account-item {
+    cursor: pointer;
+    padding: 16px 18px 9px;
+    border: 1px solid $neutral-50;
+    border-bottom: none;
+    text-align: left;
+    display: flex;
+    .account-item-avatar {
+      width: 56px;
+    }
+    .account-item-address {
+      color: $neutral-500;
+    }
+    .account-item-left {
+      flex: 1;
+    }
+    .account-item-right {
+      text-align: right;
+    }
+    .account-waiting {
+      .cui-spinner {
+        position: relative;
+        top: 10px;
+      }
+    }
+
+    &:hover {
+      background: $neutral-200;
+    }
+    &:first-child {
+      border-top-right-radius: 6px;
+      border-top-left-radius: 6px;
+    }
+    &:last-child {
+      border-bottom: 1px solid $neutral-50;
+      border-bottom-right-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+  }
+  .account-item.account-item-emphasized {
+    background: $primary-300;
+
+    &:hover {
+      background: $neutral-200;
+    }
+  }
+
+  // for step 2 - polkadot-js
+  .NewAddressFromWebWallet {
+    .accounts-caption,
+    .accounts-list {
+      margin-top: 20px;
+    }
+    .account-item {
+      cursor: pointer;
+      padding: 10px 15px;
+      border: 1px solid $neutral-300;
+      border-bottom: none;
+      &:hover {
+        background: $neutral-200;
+      }
+      &:first-child {
+        border-top-right-radius: 6px;
+        border-top-left-radius: 6px;
+      }
+      &:last-child {
+        border-bottom: 1px solid $neutral-300;
+        border-bottom-right-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+    }
+    .account-name {
+      margin: 2px 0;
+    }
+    .account-user {
+      margin: 2px 0 10px;
+    }
+  }
+
+  // for step 3
+  .create-profile-instructions {
+    margin-bottom: 26px;
+    p {
+      margin: 10px auto;
+      max-width: 280px;
+    }
+  }
+  .cui-input {
+    margin: 4px 0;
+  }
+  .new-account-userblock {
+    width: 180px;
+    margin: 0 auto 30px;
+    border: 1px solid $neutral-100;
+    border-radius: 4px;
+    padding: 15px 20px 11px;
+  }
+
+  // for step 3
+  textarea[name='bio'] {
+    min-height: 68px;
+    margin-bottom: 18px;
+    padding-top: 11px;
+  }
+
+  // for step 4
+  .profile-block-preview {
+    display: inline-block;
+    text-align: left;
+    padding: 12px 15px 15px;
+    margin: 24px 0 30px;
+    border: 1px solid $primary-300;
+    border-radius: 4px;
+  }
+  .btn-finished-action {
+    width: 300px;
+    margin: 5px 0;
+  }
+  .avatar-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    .AvatarUpload {
+      width: 92px;
+      height: 92px;
+    }
+  }
+  @include extraSmall {
+    min-width: 0;
+    .link-address-step-narrow {
+      width: 100%;
+      padding: 20px 24px 28px;
+      min-height: initial;
+    }
+    .btn-finished-action {
+      width: 100%;
+    }
+    .link-address-option {
+      .link-address-description,
+      .link-address-link,
+      .link-address-title {
+      }
+      button {
+        margin-top: 5px;
+      }
+    }
+  }
+}

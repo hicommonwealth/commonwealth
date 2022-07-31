@@ -1,0 +1,21 @@
+@import 'client/styles/shared';
+
+.LinkedThreadModal {
+  min-width: 55vw;
+  max-width: 55vw;
+
+  @include small {
+    min-width: 100vw;
+    max-width: 100vw;
+  }
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  button {
+    z-index: 21;
+  }
+}
