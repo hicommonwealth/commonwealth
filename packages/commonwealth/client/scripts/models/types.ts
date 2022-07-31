@@ -9,8 +9,13 @@ import {
 } from './interfaces';
 import Proposal from './Proposal';
 
+export enum ThreadKind {
+  Discussion = 'discussion',
+  Link = 'link',
+}
+
 // TODO: this list should be shared with the server
-export enum OffchainThreadStage {
+export enum ThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',

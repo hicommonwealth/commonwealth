@@ -1,6 +1,6 @@
 import topics from 'controllers/server/topics';
-import { IChainAdapter, OffchainTopic } from 'models';
-import { INewThreadForm, NewThreadErrors, ThreadKind } from './types';
+import { IChainAdapter, ThreadKind, Topic } from 'models';
+import { INewThreadForm, NewThreadErrors } from './types';
 
 export const checkNewThreadErrors = (
   form: INewThreadForm,
@@ -20,7 +20,7 @@ export const checkNewThreadErrors = (
 };
 
 export const updateTopicList = (
-  topic: OffchainTopic,
+  topic: Topic,
   activeEntity: IChainAdapter<any, any>
 ) => {
   try {

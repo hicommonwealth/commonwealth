@@ -2,15 +2,15 @@
 
 import m from 'mithril';
 
-import { OffchainThread } from 'models';
+import { Thread } from 'client/scripts/models';
 import { DiscussionRow } from 'views/pages/discussions/discussion_row';
 import { orderDiscussionsbyLastComment } from './helpers';
 
 type IPinnedListingAttrs = {
-  proposals: OffchainThread[];
+  proposals: Thread[];
 };
 
-export const getLastUpdate = (proposal: OffchainThread) => {
+export const getLastUpdate = (proposal: Thread) => {
   const lastComment = proposal.lastCommentedOn?.unix() || 0;
   const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);

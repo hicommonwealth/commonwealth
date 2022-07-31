@@ -21,7 +21,7 @@ const validateChain = async (
     },
     include: [
       {
-        model: models.OffchainTopic,
+        model: models.Topic,
         as: 'topics',
         required: false,
         attributes: ['id', 'name', 'chain_id'],

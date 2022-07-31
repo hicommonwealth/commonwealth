@@ -30,7 +30,7 @@ abstract class Account<C extends Coin> {
   public app: IApp;
 
   constructor(_app: IApp, chain: ChainInfo, address: string, encoding?: number) {
-    // Check if the account is being initialized from an offchain Community
+    // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
     this.app = _app;
     this.chain = chain;

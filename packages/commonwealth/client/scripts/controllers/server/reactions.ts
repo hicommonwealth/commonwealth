@@ -7,17 +7,17 @@ import app from 'state';
 
 import { ReactionStore } from 'stores';
 import {
-  OffchainReaction,
+  Reaction,
   AnyProposal,
-  OffchainComment,
-  OffchainThread,
+  Comment,
+  Thread,
   Proposal,
   AbridgedThread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reaction) => {
-  return new OffchainReaction(
+  return new Reaction(
     reaction.id,
     reaction.Address.address,
     reaction.chain,
@@ -36,7 +36,7 @@ class ReactionsController {
   }
 
   public getByPost(
-    post: OffchainThread | AbridgedThread | AnyProposal | OffchainComment<any>
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     return this._store.getByPost(post);
   }
@@ -54,14 +54,14 @@ class ReactionsController {
       reaction,
       jwt: app.user.jwt,
     };
-    if (post instanceof OffchainThread) {
-      options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof Thread) {
+      options['thread_id'] = (post as Thread).id;
     } else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-    } else if (post instanceof OffchainComment) {
-      options['comment_id'] = (post as OffchainComment<any>).id;
+    } else if (post instanceof Comment) {
+      options['comment_id'] = (post as Comment<any>).id;
     }
     try {
       // TODO: Change to POST /reaction
@@ -79,14 +79,14 @@ class ReactionsController {
   public async refresh(post: any, chainId: string) {
     const options = { chain: chainId };
     // TODO: ensure identifier vs id use is correct; see also create method
-    if (post instanceof OffchainThread)
-      options['thread_id'] = (post as OffchainThread).id;
+    if (post instanceof Thread)
+      options['thread_id'] = (post as Thread).id;
     else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-    } else if (post instanceof OffchainComment)
-      options['comment_id'] = (post as OffchainComment<any>).id;
+    } else if (post instanceof Comment)
+      options['comment_id'] = (post as Comment<any>).id;
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'

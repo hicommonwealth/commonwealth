@@ -1,7 +1,4 @@
-export enum ThreadKind {
-  Discussion = 'discussion',
-  Link = 'link',
-}
+import { ThreadKind } from 'models';
 
 export interface INewThreadForm {
   topicName: string;

@@ -5,14 +5,13 @@ import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
 import { IChainEntityKind } from 'chain-events/src';
 import { IUniqueId } from './interfaces';
-import { OffchainThreadStage } from './types';
-import OffchainAttachment from './OffchainAttachment';
-import OffchainTopic from './OffchainTopic';
-import OffchainVote from './OffchainVote';
+import { ThreadKind, ThreadStage } from './types';
+import Attachment from './Attachment';
+import Topic from './Topic';
+import Vote from './Vote';
 import { VersionHistory } from '../controllers/server/threads';
 import { ChainEntity } from '.';
-import OffchainPoll from './OffchainPoll';
-import { ThreadKind } from '../views/components/new_thread_form/types';
+import Poll from './Poll';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {
@@ -30,7 +29,7 @@ interface IThreadCollaborator {
   address: string;
   chain: string;
 }
-class OffchainThread implements IUniqueId {
+class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
   public chainEntities?: any[];
@@ -40,8 +39,8 @@ class OffchainThread implements IUniqueId {
   public readonly plaintext: string;
   public readonly pinned: boolean;
   public readonly kind: ThreadKind;
-  public stage: OffchainThreadStage;
-  public readonly attachments: OffchainAttachment[];
+  public stage: ThreadStage;
+  public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
@@ -50,14 +49,14 @@ class OffchainThread implements IUniqueId {
   public readonly id: number;
   public readonly createdAt: moment.Moment;
   public readonly lastCommentedOn: moment.Moment;
-  public topic: OffchainTopic;
-  public readonly slug = ProposalType.OffchainThread;
+  public topic: Topic;
+  public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: VersionHistory[];
   public readonly chain: string;
   public readonly lastEdited: moment.Moment;
   public readonly hasPoll: boolean;
-  public readonly polls: OffchainPoll[];
+  public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
 
@@ -93,13 +92,13 @@ class OffchainThread implements IUniqueId {
   }: {
     author: string;
     title: string;
-    attachments: OffchainAttachment[];
+    attachments: Attachment[];
     id: number;
     createdAt: moment.Moment;
     lastCommentedOn: moment.Moment;
-    topic: OffchainTopic;
+    topic: Topic;
     kind: ThreadKind;
-    stage: OffchainThreadStage;
+    stage: ThreadStage;
     versionHistory: VersionHistory[];
     chain: string;
     readOnly: boolean;
@@ -114,7 +113,7 @@ class OffchainThread implements IUniqueId {
     snapshotProposal: string;
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
-    polls?: OffchainPoll[];
+    polls?: Poll[];
   }) {
     this.author = author;
     this.title = title;
@@ -154,4 +153,4 @@ class OffchainThread implements IUniqueId {
   }
 }
 
-export default OffchainThread;
+export default Thread;

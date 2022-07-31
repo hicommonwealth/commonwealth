@@ -10,7 +10,7 @@ const bulkReactions = async (models: DB, req: Request, res: Response, next: Next
   let reactions = [];
   try {
     if (thread_id || proposal_id || comment_id) {
-      reactions = await models.OffchainReaction.findAll({
+      reactions = await models.Reaction.findAll({
         where: {
           thread_id: thread_id || null,
           proposal_id: proposal_id || null,

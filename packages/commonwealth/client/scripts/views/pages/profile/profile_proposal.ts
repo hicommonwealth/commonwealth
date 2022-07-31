@@ -3,12 +3,12 @@ import lity from 'lity';
 import { slugify } from 'utils';
 
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 
 const ProfileProposal: m.Component<
-  { proposal: OffchainThread },
+  { proposal: Thread },
   { revealThread: boolean }
 > = {
   view: (vnode) => {

@@ -12,7 +12,7 @@ const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, n
   if (!snapshot) return next(new Error(Errors.InvalidSnapshot));
   if (!chain) return next(new Error(Errors.InvalidChain));
 
-  const threads = await models.OffchainThread.findAll({
+  const threads = await models.Thread.findAll({
     where: { 
       chain: chain,
       snapshot_proposal: snapshot,

@@ -23,10 +23,11 @@ import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
 import {
-  OffchainTopic,
+  Topic,
   DiscussionDraft,
   Account,
-  OffchainThreadStage,
+  ThreadStage,
+  ThreadKind,
 } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -42,7 +43,7 @@ import { QuillFormattedText } from '../quill/quill_formatted_text';
 import { MarkdownFormattedText } from '../quill/markdown_formatted_text';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { QuillEditor } from '../quill/quill_editor';
-import { INewThreadForm, NewDraftErrors, ThreadKind } from './types';
+import { INewThreadForm, NewDraftErrors } from './types';
 import { updateTopicList, checkNewThreadErrors } from './helpers';
 
 type NewThreadFormAttrs = {
@@ -51,7 +52,7 @@ type NewThreadFormAttrs = {
 };
 
 export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
-  activeTopic: OffchainTopic | string | boolean;
+  activeTopic: Topic | string | boolean;
   autoTitleOverride: boolean;
   form: INewThreadForm;
   fromDraft?: number;
@@ -76,7 +77,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     form: INewThreadForm,
     quillEditorState: QuillEditor,
     author: Account<any>,
-    stage = OffchainThreadStage.Discussion
+    stage = ThreadStage.Discussion
   ) {
     if (!this) throw new Error('no this');
     const bodyText = quillEditorState.textContentsAsString;

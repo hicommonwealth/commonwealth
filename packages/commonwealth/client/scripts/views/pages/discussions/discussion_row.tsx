@@ -17,20 +17,24 @@ import {
   link,
   externalLink,
   extractDomain,
-  offchainThreadStageToLabel,
+  threadStageToLabel,
 } from 'helpers';
-import { OffchainThread, OffchainThreadStage, AddressInfo } from 'models';
+import {
+  Thread,
+  ThreadStage,
+  AddressInfo,
+  ThreadKind,
+} from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { DiscussionRowMenu } from './discussion_row_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { DiscussionRowReactionButton } from '../../components/reaction_button/discussion_row_reaction_button';
-import { ThreadKind } from '../../components/new_thread_form/types';
 
 type DiscussionRowAttrs = {
   onSelect?: any;
-  proposal: OffchainThread;
+  proposal: Thread;
 };
 
 export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
@@ -113,22 +117,22 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 compact={true}
               />
             )}
-            {proposal.stage !== OffchainThreadStage.Discussion && (
+            {proposal.stage !== ThreadStage.Discussion && (
               <Button
                 intent={
-                  proposal.stage === OffchainThreadStage.ProposalInReview
+                  proposal.stage === ThreadStage.ProposalInReview
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Voting
+                    : proposal.stage === ThreadStage.Voting
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Passed
+                    : proposal.stage === ThreadStage.Passed
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Failed
+                    : proposal.stage === ThreadStage.Failed
                     ? 'negative'
                     : 'positive'
                 }
                 size="xs"
                 compact={true}
-                label={offchainThreadStageToLabel(proposal.stage)}
+                label={threadStageToLabel(proposal.stage)}
               />
             )}
             {proposal.kind === ThreadKind.Link &&
