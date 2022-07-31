@@ -1,10 +1,10 @@
-import OffchainPoll from '../models/OffchainPoll';
+import Poll from '../models/Poll';
 import IdStore from './IdStore';
 
-class PollStore extends IdStore<OffchainPoll> {
-  private _storeThreadId: { [id: number]: OffchainPoll[] } = {};
+class PollStore extends IdStore<Poll> {
+  private _storeThreadId: { [id: number]: Poll[] } = {};
 
-  public add(poll: OffchainPoll) {
+  public add(poll: Poll) {
     super.add(poll);
     if (Array.isArray(this._storeThreadId[poll.threadId])) {
       this._storeThreadId[poll.threadId].push(poll);
@@ -14,7 +14,7 @@ class PollStore extends IdStore<OffchainPoll> {
     return this;
   }
 
-  public remove(poll: OffchainPoll) {
+  public remove(poll: Poll) {
     super.remove(poll);
     if (this._storeThreadId[poll.threadId]) {
       const idx = this._storeThreadId[poll.threadId].indexOf(poll);
@@ -28,7 +28,7 @@ class PollStore extends IdStore<OffchainPoll> {
     this._storeThreadId = {};
   }
 
-  public getByThreadId(threadId: number): OffchainPoll[] {
+  public getByThreadId(threadId: number): Poll[] {
     return this._storeThreadId[threadId] || [];
   }
 }

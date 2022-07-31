@@ -10,7 +10,7 @@ import {
 import Proposal from './Proposal';
 
 // TODO: this is inconsistently used
-export enum OffchainThreadKind {
+export enum ThreadKind {
   Forum = 'forum',
   Link = 'link',
   Question = 'question',
@@ -18,7 +18,7 @@ export enum OffchainThreadKind {
 }
 
 // TODO: this list should be shared with the server
-export enum OffchainThreadStage {
+export enum ThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',

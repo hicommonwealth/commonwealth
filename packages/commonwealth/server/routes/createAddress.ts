@@ -7,7 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import AddressSwapper from '../util/addressSwapper';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
@@ -59,7 +59,7 @@ const createAddress = async (
     where: { id: req.body.chain },
   });
 
-  if (!chain) {
+  if (!chain || chain.network === ChainNetwork.AxieInfinity) {
     return next(new Error(Errors.InvalidChain));
   }
 

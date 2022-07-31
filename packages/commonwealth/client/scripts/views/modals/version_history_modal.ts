@@ -3,9 +3,9 @@ import 'modals/version_history_modal.scss';
 import m from 'mithril';
 import app from 'state';
 import Quill from 'quill';
-import { OffchainThread, OffchainComment } from 'models';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/markdown_formatted_text';
+import { Thread, Comment } from 'models';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';
 import { Spinner } from 'construct-ui';
@@ -13,7 +13,7 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
 }
 
 const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {

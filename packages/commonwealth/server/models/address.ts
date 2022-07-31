@@ -6,7 +6,7 @@ import { UserAttributes, UserInstance } from './user';
 import { OffchainProfileAttributes, OffchainProfileInstance } from './offchain_profile';
 import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
-import { SsoTokenInstance } from './sso_token';
+import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import { WalletId } from 'common-common/src/types';
 
 export type AddressAttributes = {
@@ -32,6 +32,7 @@ export type AddressAttributes = {
 	User?: UserAttributes;
 	OffchainProfile?: OffchainProfileAttributes;
 	Roles?: RoleAttributes[];
+	SsoToken?: SsoTokenAttributes;
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -97,7 +98,7 @@ export default (
 		models.Address.hasOne(models.OffchainProfile);
 		models.Address.hasOne(models.SsoToken);
 		models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
-		models.Address.belongsToMany(models.OffchainThread, {
+		models.Address.belongsToMany(models.Thread, {
 			through: models.Collaboration,
 			as: 'collaboration'
 		});

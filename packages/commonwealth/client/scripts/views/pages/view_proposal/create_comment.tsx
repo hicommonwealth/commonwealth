@@ -6,11 +6,11 @@ import { Callout } from 'construct-ui';
 import 'pages/view_proposal/create_comment.scss';
 
 import app from 'state';
-import { OffchainThread, OffchainComment, AnyProposal, Account } from 'models';
+import { Thread, Comment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import QuillEditor from 'views/components/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
@@ -22,14 +22,19 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from '../../components/quill/helpers';
 
 type CreateCommmentAttrs = {
   callback: CallableFunction;
   cancellable?: boolean;
   getSetGlobalEditingStatus: CallableFunction;
-  parentComment?: OffchainComment<any>;
+  parentComment?: Comment<any>;
   proposalPageState: IProposalPageState;
-  rootProposal: AnyProposal | OffchainThread;
+  rootProposal: AnyProposal | Thread;
   tabindex?: number;
 };
 
@@ -77,17 +82,14 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
         return;
       }
 
-      const { quillEditorState } = this;
+      const { quillEditorState } = vnode.state;
+      if (editorIsBlank(quillEditorState)) {
+        if (e) e.preventDefault();
+        vnode.state.error = 'Comment cannot be blank';
+        return;
+      }
 
-      const mentionsEle = document.getElementsByClassName(
-        'ql-mention-list-container'
-      )[0];
-
-      if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-
-      const commentText = quillEditorState.markdownMode
-        ? quillEditorState.editor.getText()
-        : JSON.stringify(quillEditorState.editor.getContents());
+      const commentText = getQuillTextContents(quillEditorState);
 
       const attachments = [];
 
@@ -95,7 +97,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
       this.sendingComment = true;
 
-      quillEditorState.editor.enable(false);
+      disableEditor(quillEditorState);
 
       const chainId = app.activeChainId();
 
@@ -146,7 +148,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     };
 
     const activeTopicName =
-      rootProposal instanceof OffchainThread ? rootProposal?.topic?.name : null;
+      rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
 
     const isAdmin =
       app.user.isSiteAdmin ||
@@ -216,7 +218,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
             </h3>
           </div>
           {m(User, { user: author, popover: true, hideAvatar: true })}
-          {rootProposal instanceof OffchainThread && rootProposal.readOnly ? (
+          {rootProposal instanceof Thread && rootProposal.readOnly ? (
             <Callout
               intent="primary"
               content="Commenting is disabled because this post has been locked."
@@ -252,15 +254,15 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                     }
                   />
                 )}
-              {m(QuillEditor, {
-                contentsDoc: '',
-                oncreateBind: (state) => {
+              <QuillEditor
+                contentsDoc=""
+                oncreateBind={(state) => {
                   this.quillEditorState = state;
-                },
-                editorNamespace: `${document.location.pathname}-commenting`,
-                imageUploader: true,
-                tabindex: vnode.attrs.tabindex,
-              })}
+                }}
+                editorNamespace={`${document.location.pathname}-commenting`}
+                imageUploader
+                tabindex={vnode.attrs.tabindex}
+              />
               {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
                 <div class="token-requirement">
                   Commenting in {activeTopicName} requires{' '}

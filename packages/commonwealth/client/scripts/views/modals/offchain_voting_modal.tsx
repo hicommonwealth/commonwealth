@@ -4,12 +4,12 @@ import m from 'mithril';
 
 import 'modals/offchain_voting_modal.scss';
 
-import { OffchainVote, AddressInfo } from 'models';
+import { Vote, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 export class OffchainVotingModal
-  implements m.ClassComponent<{ votes: OffchainVote[] }>
+  implements m.ClassComponent<{ votes: Vote[] }>
 {
   view(vnode) {
     const { votes } = vnode.attrs;

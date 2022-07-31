@@ -4,21 +4,21 @@ import $ from 'jquery';
 import m, { VnodeDOM } from 'mithril';
 import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
 import app from 'state';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from './confirm_modal';
 
 const getTopicFromElement = (
   htmlEle: HTMLElement,
-  allTopics: OffchainTopic[]
-): OffchainTopic => {
+  allTopics: Topic[]
+): Topic => {
   const topic = allTopics.find((t) => t.name === htmlEle.innerText);
   return topic;
 };
 
 const storeNewTopicOrder = (
   HTMLContainer: HTMLElement,
-  state: { topics: OffchainTopic[] }
+  state: { topics: Topic[] }
 ) => {
   state.topics = Array.from(HTMLContainer.childNodes).map((node: HTMLElement) =>
     getTopicFromElement(node, state.topics)
@@ -28,8 +28,8 @@ const storeNewTopicOrder = (
   });
 };
 
-const OrderTopicsModal: m.Component<null, { topics: OffchainTopic[] }> = {
-  oninit: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
+const OrderTopicsModal: m.Component<null, { topics: Topic[] }> = {
+  oninit: (vnode: VnodeDOM<null, { topics: Topic[] }>) => {
     vnode.state.topics = app.chain.meta.topics.filter(
       (topic) => topic.featuredInSidebar
     );
@@ -47,7 +47,7 @@ const OrderTopicsModal: m.Component<null, { topics: OffchainTopic[] }> = {
       vnode.state.topics.sort((a, b) => a.order - b.order);
     }
   },
-  oncreate: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
+  oncreate: (vnode: VnodeDOM<null, { topics: Topic[] }>) => {
     dragula([document.querySelector('.featured-topic-list')]).on(
       'drop',
       async (draggedEle, targetDiv, sourceDiv) => {
@@ -55,7 +55,7 @@ const OrderTopicsModal: m.Component<null, { topics: OffchainTopic[] }> = {
       }
     );
   },
-  view: (vnode: VnodeDOM<null, { topics: OffchainTopic[] }>) => {
+  view: (vnode: VnodeDOM<null, { topics: Topic[] }>) => {
     const { topics } = vnode.state;
 
     return m('.OrderTopicsModal', [
