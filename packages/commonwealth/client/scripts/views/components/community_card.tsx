@@ -4,12 +4,8 @@ import m from 'mithril';
 
 import 'components/community_card.scss';
 
-<<<<<<< HEAD:client/scripts/views/components/community_card.tsx
 import { isCommandClick } from 'helpers';
-import { ChainInfo, NodeInfo } from 'models';
-=======
 import { ChainInfo } from 'models';
->>>>>>> master:packages/commonwealth/client/scripts/views/components/community_card.tsx
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWIconButton } from './component_kit/cw_icon_button';
