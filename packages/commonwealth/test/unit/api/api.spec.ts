@@ -15,7 +15,7 @@ describe('API Tests', () => {
     console.log('making chai request');
     const res = await chai
       .request(app)
-      .get('/api/viewOffchainVotes?chain=nonexistentchain')
+      .get('/api/viewVotes?chain=nonexistentchain')
       .set('Accept', 'application/json');
     console.log('received chai request');
 

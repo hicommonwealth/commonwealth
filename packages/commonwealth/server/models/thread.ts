@@ -3,12 +3,12 @@ import { DataTypes, Model } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
-import { OffchainAttachmentAttributes } from './offchain_attachment';
+import { AttachmentAttributes } from './attachment';
 import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
-import { OffchainTopicAttributes } from './offchain_topic';
+import { TopicAttributes } from './topic';
 
-export type OffchainThreadAttributes = {
+export type ThreadAttributes = {
   address_id: number;
   title: string;
   kind: string;
@@ -35,27 +35,27 @@ export type OffchainThreadAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  OffchainAttachments?:
-    | OffchainAttachmentAttributes[]
-    | OffchainAttachmentAttributes['id'][];
+  Attachments?:
+    | AttachmentAttributes[]
+    | AttachmentAttributes['id'][];
   ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
-  topic?: OffchainTopicAttributes;
+  topic?: TopicAttributes;
 };
 
-export type OffchainThreadInstance = ModelInstance<OffchainThreadAttributes> & {
+export type ThreadInstance = ModelInstance<ThreadAttributes> & {
   // no mixins used
 };
 
-export type OffchainThreadModelStatic = ModelStatic<OffchainThreadInstance>;
+export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): OffchainThreadModelStatic => {
-  const OffchainThread = <OffchainThreadModelStatic>sequelize.define(
-    'OffchainThread',
+): ThreadModelStatic => {
+  const Thread = <ThreadModelStatic>sequelize.define(
+    'Thread',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
@@ -101,7 +101,7 @@ export default (
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
       underscored: true,
-      tableName: 'OffchainThreads',
+      tableName: 'Threads',
       paranoid: true,
       indexes: [
         { fields: ['address_id'] },
@@ -114,56 +114,56 @@ export default (
     }
   );
 
-  OffchainThread.associate = (models) => {
-    models.OffchainThread.belongsTo(models.Chain, {
+  Thread.associate = (models) => {
+    models.Thread.belongsTo(models.Chain, {
       foreignKey: 'chain',
       targetKey: 'id',
     });
-    models.OffchainThread.belongsTo(models.Address, {
+    models.Thread.belongsTo(models.Address, {
       as: 'Address',
       foreignKey: 'address_id',
       targetKey: 'id',
     });
-    models.OffchainThread.hasMany(models.OffchainAttachment, {
+    models.Thread.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',
       constraints: false,
       scope: { attachable: 'thread' },
     });
-    models.OffchainThread.belongsTo(models.OffchainTopic, {
+    models.Thread.belongsTo(models.Topic, {
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.OffchainThread.belongsToMany(models.Role, {
+    models.Thread.belongsToMany(models.Role, {
       through: 'read_only_roles_threads',
       as: 'read_only_roles',
       foreignKey: 'thread_id',
       otherKey: 'id',
     });
-    models.OffchainThread.belongsToMany(models.Address, {
+    models.Thread.belongsToMany(models.Address, {
       through: models.Collaboration,
       as: 'collaborators',
     });
-    models.OffchainThread.hasMany(models.OffchainReaction, {
+    models.Thread.hasMany(models.Reaction, {
       foreignKey: 'thread_id',
       as: 'reactions',
     });
-    models.OffchainThread.hasMany(models.Collaboration);
-    models.OffchainThread.hasMany(models.ChainEntity, {
+    models.Thread.hasMany(models.Collaboration);
+    models.Thread.hasMany(models.ChainEntity, {
       foreignKey: 'thread_id',
       constraints: false,
     });
-    models.OffchainThread.hasMany(models.LinkedThread, {
+    models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',
     });
-    models.OffchainThread.hasMany(models.LinkedThread, {
+    models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linking_thread',
       as: 'linked_threads',
     });
-    models.OffchainThread.hasMany(models.OffchainPoll, {
+    models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
   };
 
-  return OffchainThread;
+  return Thread;
 };

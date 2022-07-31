@@ -15,7 +15,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
   if (!thread_id) return next(new Error(Errors.NoThread));
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
@@ -36,7 +36,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
 
     await thread.update({ pinned: !thread.pinned });
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: { id: thread.id, },
       include: [
         {
@@ -48,9 +48,9 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
           // through: models.Collaboration,
           as: 'collaborators'
         },
-        models.OffchainAttachment,
+        models.Attachment,
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic'
         }
       ],

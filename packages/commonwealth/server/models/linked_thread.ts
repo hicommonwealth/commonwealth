@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-import { OffchainThreadInstance } from './offchain_thread';
+import { ThreadInstance } from './thread';
 
 export type LinkedThreadAttributes = {
   id?: number;
@@ -12,10 +12,10 @@ export type LinkedThreadAttributes = {
 }
 
 export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
-  getOffchainThread: Sequelize.BelongsToGetAssociationMixin<OffchainThreadInstance>;
-  setOffchainThread: Sequelize.BelongsToSetAssociationMixin<
-    OffchainThreadInstance,
-    OffchainThreadInstance['id']
+  getThread: Sequelize.BelongsToGetAssociationMixin<ThreadInstance>;
+  setThread: Sequelize.BelongsToSetAssociationMixin<
+    ThreadInstance,
+    ThreadInstance['id']
   >;
 }
 
@@ -51,11 +51,11 @@ export default (
   );
 
   LinkedThread.associate = (models) => {
-    models.LinkedThread.belongsTo(models.OffchainThread, {
+    models.LinkedThread.belongsTo(models.Thread, {
       foreignKey: 'linking_thread',
       targetKey: 'id',
     });
-    models.LinkedThread.belongsTo(models.OffchainThread, {
+    models.LinkedThread.belongsTo(models.Thread, {
       foreignKey: 'linked_thread',
       targetKey: 'id',
     });

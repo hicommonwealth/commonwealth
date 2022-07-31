@@ -2,7 +2,7 @@ import app from 'state';
 
 import { ThreadUniqueAddressesCountStore } from 'stores';
 import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
-import { AddressInfo, OffchainThread } from 'models';
+import { AddressInfo, Thread } from 'models';
 import $ from 'jquery';
 
 export const modelFromServer = (threadUniqueAddressesCount) => {
@@ -56,7 +56,7 @@ class ThreadUniqueAddressesCountController {
     }
   };
 
-  public getUniqueAddressesByRootId(proposal: OffchainThread) {
+  public getUniqueAddressesByRootId(proposal: Thread) {
     const { id, slug } = proposal;
     const rootId = `${slug}_${id}`;
     const { addresses = [] } = this._store.getById(rootId) || {};
