@@ -6,8 +6,8 @@ import { Button, Classes, Dialog, Icons } from 'construct-ui';
 import 'components/stage_editor.scss';
 
 import app from 'state';
-import { offchainThreadStageToLabel, parseCustomStages } from 'helpers';
-import { ChainEntity, OffchainThread, OffchainThreadStage } from 'models';
+import { threadStageToLabel, parseCustomStages } from 'helpers';
+import { ChainEntity, Thread, ThreadStage } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { SnapshotProposalSelector } from './snapshot_proposal_selector';
 import { ChainEntitiesSelector } from './chain_entities_selector';
@@ -16,14 +16,14 @@ type StageEditorAttrs = {
   onChangeHandler: () => void;
   openStateHandler: () => void;
   popoverMenu?: boolean;
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
   private chainEntitiesToSet: ChainEntity[];
   private isOpen: boolean;
   private snapshotProposalsToSet: SnapshotProposal[];
-  private stage: OffchainThreadStage;
+  private stage: ThreadStage;
 
   oninit(vnode) {
     this.isOpen = !!vnode.attrs.popoverMenu;
@@ -43,11 +43,11 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
 
     const stages = !customStages
       ? [
-          OffchainThreadStage.Discussion,
-          OffchainThreadStage.ProposalInReview,
-          OffchainThreadStage.Voting,
-          OffchainThreadStage.Passed,
-          OffchainThreadStage.Failed,
+          ThreadStage.Discussion,
+          ThreadStage.ProposalInReview,
+          ThreadStage.Voting,
+          ThreadStage.Passed,
+          ThreadStage.Failed,
         ]
       : parseCustomStages(customStages);
 
@@ -78,7 +78,7 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
                   iconLeft={this.stage === targetStage ? Icons.CHECK : null}
                   rounded={true}
                   size="sm"
-                  label={offchainThreadStageToLabel(targetStage)}
+                  label={threadStageToLabel(targetStage)}
                   onclick={() => {
                     this.stage = targetStage;
                   }}
@@ -90,10 +90,10 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
                 thread={vnode.attrs.thread}
                 onSelect={(sn) => {
                   if (
-                    this.stage === OffchainThreadStage.Discussion ||
-                    this.stage === OffchainThreadStage.ProposalInReview
+                    this.stage === ThreadStage.Discussion ||
+                    this.stage === ThreadStage.ProposalInReview
                   ) {
-                    this.stage = OffchainThreadStage.Voting;
+                    this.stage = ThreadStage.Voting;
                   }
                   if (sn.id === vnode.attrs.thread.snapshotProposal) {
                     this.snapshotProposalsToSet = [];
@@ -111,10 +111,10 @@ export class StageEditor implements m.ClassComponent<StageEditorAttrs> {
                 thread={vnode.attrs.thread}
                 onSelect={() => {
                   if (
-                    this.stage === OffchainThreadStage.Discussion ||
-                    this.stage === OffchainThreadStage.ProposalInReview
+                    this.stage === ThreadStage.Discussion ||
+                    this.stage === ThreadStage.ProposalInReview
                   ) {
-                    this.stage = OffchainThreadStage.Voting;
+                    this.stage = ThreadStage.Voting;
                   }
                 }}
                 chainEntitiesToSet={this.chainEntitiesToSet}

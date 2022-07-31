@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 import $ from 'jquery';
 import app from 'state';
-import { OffchainPoll } from 'models';
+import { Poll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
@@ -42,7 +42,7 @@ export const jumpHighlightComment = (
 };
 
 export const handleProposalPollVote = async (
-  poll: OffchainPoll,
+  poll: Poll,
   option: string,
   isSelected: boolean,
   callback: () => any
@@ -66,7 +66,7 @@ export const handleProposalPollVote = async (
   if (!confirmed) return;
   // submit vote
   poll
-    .submitOffchainVote(...userInfo, option)
+    .submitVote(...userInfo, option)
     .then(() => {
       callback();
       m.redraw();
@@ -79,7 +79,7 @@ export const handleProposalPollVote = async (
 };
 
 export const getProposalPollTimestamp = (
-  poll: OffchainPoll,
+  poll: Poll,
   pollingEnded: boolean
 ) => {
   if (!poll.endsAt.isValid()) {

@@ -12,7 +12,7 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
@@ -25,7 +25,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 class ProposalSidebarLinkedChainEntity
   implements
     m.ClassComponent<{
-      proposal: OffchainThread;
+      proposal: Thread;
       chainEntity;
     }>
 {
@@ -52,7 +52,7 @@ class ProposalSidebarLinkedChainEntity
 class ProposalSidebarLinkedSnapshot
   implements
     m.ClassComponent<{
-      proposal: OffchainThread;
+      proposal: Thread;
     }>
 {
   private initialized: boolean;
@@ -106,7 +106,7 @@ export class LinkedProposalsCard
   implements
     m.ClassComponent<{
       openStageEditor: () => void;
-      proposal: OffchainThread;
+      proposal: Thread;
       showAddProposalButton: boolean;
     }>
 {

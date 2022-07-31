@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
-import { OffchainThreadAttributes } from './offchain_thread';
+import { ThreadAttributes } from './thread';
 import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 
@@ -18,7 +18,7 @@ export type ChainEntityAttributes = {
   updated_at?: Date;
 
   Chain?: ChainAttributes;
-  OffchainThread?: OffchainThreadAttributes;
+  Thread?: ThreadAttributes;
   ChainEvents?: ChainEventAttributes[];
 }
 
@@ -57,7 +57,7 @@ export default (
 
   ChainEntity.associate = (models) => {
     models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.ChainEntity.belongsTo(models.OffchainThread, { foreignKey: 'thread_id', targetKey: 'id' });
+    models.ChainEntity.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };
 

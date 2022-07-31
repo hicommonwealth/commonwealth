@@ -7,7 +7,7 @@ import 'modals/edit_topic_modal.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { QuillEditor } from 'views/components/quill/quill_editor';
@@ -88,7 +88,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
       };
 
       try {
-        await app.topics.edit(new OffchainTopic(topicInfo));
+        await app.topics.edit(new Topic(topicInfo));
         return true;
       } catch (err) {
         this.error = err.message || err;

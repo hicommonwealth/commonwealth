@@ -15,15 +15,15 @@ import {
 
 import 'components/poll_editor.scss';
 
-import { getNextOffchainPollEndingTime } from 'utils';
+import { getNextPollEndingTime } from 'utils';
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { pluralize } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 type PollEditorAttrs = {
   onChangeHandler: () => void;
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 const getPollDurationCopy = (
@@ -38,9 +38,9 @@ const getPollDurationCopy = (
       .local()
       .format('lll')}.`;
   } else {
-    return `By default, offchain polls run for at least 5 days, ending on the 1st
+    return `By default, polls run for at least 5 days, ending on the 1st
         and 15th of each month. If started now, this poll would stay open until
-        ${getNextOffchainPollEndingTime(moment())
+        ${getNextPollEndingTime(moment())
           .local()
           .format('lll')}. Override?`;
   }

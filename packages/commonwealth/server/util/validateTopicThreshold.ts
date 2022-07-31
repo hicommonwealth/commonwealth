@@ -16,7 +16,7 @@ const validateTopicThreshold = async (
 ): Promise<boolean> => {
   if (!topicId || !userAddress) return true;
   try {
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       where: { id: topicId },
       include: [
         {

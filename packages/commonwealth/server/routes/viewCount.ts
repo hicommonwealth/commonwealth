@@ -9,7 +9,7 @@ export const Errors = {
   NoObjectId: 'Must provide object ID',
   NoChainOrComm: 'Must provide chain or community',
   InvalidChainOrComm: 'Invalid chain or community',
-  InvalidThread: 'Invalid offchain thread',
+  InvalidThread: 'Invalid thread',
 };
 
 const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
@@ -27,7 +27,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
   }
 
   // verify count exists before querying
-  let count = await models.OffchainViewCount.findOne({
+  let count = await models.ViewCount.findOne({
     where: {
       chain: req.body.chain,
       object_id: req.body.object_id,

@@ -26,7 +26,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
 
   const { thread_id } = req.body;
 
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
     },
@@ -56,7 +56,7 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   }
   await thread.save();
 
-  const finalThread = await models.OffchainThread.findOne({
+  const finalThread = await models.Thread.findOne({
     where: { id: thread_id, },
     include: [
       {
@@ -68,9 +68,9 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
         // through: models.Collaboration,
         as: 'collaborators'
       },
-      models.OffchainAttachment,
+      models.Attachment,
       {
-        model: models.OffchainTopic,
+        model: models.Topic,
         as: 'topic'
       }
     ],
