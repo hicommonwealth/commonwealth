@@ -210,9 +210,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                           this.fyCount
                         ) ? (
                           <Spinner active />
-                        ) : (
-                          ''
-                        )}
+                        ) : null}
                       </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
@@ -232,9 +230,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         this.globalCount
                       ) ? (
                         <Spinner active />
-                      ) : (
-                        ''
-                      )}
+                      ) : null}
                     </>
                   ) : (
                     <CWText>No Activity</CWText>
@@ -259,9 +255,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                           this.chainEventCount
                         ) ? (
                           <Spinner active />
-                        ) : (
-                          ''
-                        )}
+                        ) : null}
                       </>
                     ) : (
                       <CWText>

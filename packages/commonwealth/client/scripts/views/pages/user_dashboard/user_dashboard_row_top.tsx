@@ -11,6 +11,7 @@ import { AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 import { getCommentPreview } from './helpers';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type UserDashboardRowTopAttrs = {
   activityData: any;
@@ -74,17 +75,16 @@ export class UserDashboardRowTop
     if (vnode.attrs.category === 'new-comment-creation') {
       return (
         <div class="UserDashboardRowTop">
-          <span class="header">
+          <CWText className="row-top-text">
             {actorName}
-            <span class="comment-counts">
+            <span>
               {numericalCommentCount > 1 &&
-                ` and ${numericalCommentCount - 1} others`}{' '}
-              commented on{' '}
+                `and ${numericalCommentCount - 1} others `}
+              commented on
             </span>
-            <span class="community-title">{titleText}</span>
-            <span class="comment-counts"> in</span>
-            <span
-              class="community-link"
+            <b>{titleText}</b>
+            <span>in</span>
+            <a
               onclick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -92,12 +92,9 @@ export class UserDashboardRowTop
               }}
             >
               {communityName}
-            </span>
-            <span class="comment-counts">
-              {' '}
-              {formatTimestamp(moment(created_at))}
-            </span>
-          </span>
+            </a>
+            <span>({formatTimestamp(moment(created_at))})</span>
+          </CWText>
           <div class="comment-body-concat">
             {getCommentPreview(comment_text)}
           </div>
@@ -106,13 +103,12 @@ export class UserDashboardRowTop
     } else if (vnode.attrs.category === 'new-thread-creation') {
       return (
         <div class="UserDashboardRowTop">
-          <span class="header">
+          <CWText className="row-top-text">
             {actorName}
-            <span class="comment-counts"> created new thread</span>
-            <span class="community-title">{titleText}</span>
-            <span class="comment-counts"> in</span>
-            <div
-              class="span.community-link"
+            <span>created new thread</span>
+            <b>{titleText}</b>
+            <span>in</span>
+            <a
               onclick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -120,12 +116,9 @@ export class UserDashboardRowTop
               }}
             >
               {communityName}
-            </div>
-            <span class="comment-counts">
-              {' '}
-              {formatTimestamp(moment(created_at))}
-            </span>
-          </span>
+            </a>
+            <span>{formatTimestamp(moment(created_at))}</span>
+          </CWText>
         </div>
       );
     }
