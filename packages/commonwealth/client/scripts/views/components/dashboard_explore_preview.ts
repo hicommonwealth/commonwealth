@@ -4,7 +4,7 @@ import m from 'mithril';
 import { Col, Tag } from 'construct-ui';
 import app from 'state';
 import { ChainInfo } from 'client/scripts/models';
-import { pluralize } from 'helpers';
+import { isCommandClick, pluralize } from 'helpers';
 import { CWCard } from './component_kit/cw_card';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
