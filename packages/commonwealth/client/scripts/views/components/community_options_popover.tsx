@@ -34,7 +34,11 @@ export class CommunityOptionsPopover implements m.ClassComponent {
         transitionDuration={0}
         hoverCloseDelay={0}
         closeOnContentClick={true}
-        trigger={<CWIcon iconName="chevronDown" iconSize="small" />}
+        trigger={
+          <div>
+            <CWIcon iconName="chevronDown" iconSize="small" />
+          </div>
+        }
         content={[
           isAdmin && (
             <MenuItem
