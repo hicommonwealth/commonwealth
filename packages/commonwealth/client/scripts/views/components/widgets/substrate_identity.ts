@@ -124,7 +124,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
           );
     }
 
-    // return offchain name while identity is loading
+    // return name while identity is loading
     return linkify
       ? link(
           'a.user-display-name.username',

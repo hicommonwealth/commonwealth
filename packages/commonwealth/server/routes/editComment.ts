@@ -38,14 +38,14 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'comment',
         attachment_id: req.body.id,
         url: req.body['attachments[]'],
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((u) => models.OffchainAttachment.create({
+      await Promise.all(req.body['attachments[]'].map((u) => models.Attachment.create({
         attachable: 'comment',
         attachment_id: req.body.id,
         url: u,
@@ -56,7 +56,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    const comment = await models.OffchainComment.findOne({
+    const comment = await models.Comment.findOne({
       where: {
         id: req.body.id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -88,15 +88,15 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     })();
     await comment.save();
     await attachFiles();
-    const finalComment = await models.OffchainComment.findOne({
+    const finalComment = await models.Comment.findOne({
       where: { id: comment.id },
-      include: [models.Address, models.OffchainAttachment],
+      include: [models.Address, models.Attachment],
     });
     // get thread for crafting commonwealth url
     let proposal;
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
-      proposal = await models.OffchainThread.findOne({
+      proposal = await models.Thread.findOne({
         where: { id }
       });
     } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {

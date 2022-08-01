@@ -5,13 +5,13 @@ import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
 
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import { isNotUndefined } from 'helpers/typeGuards';
 
 type TopicSelectorAttrs = {
-  defaultTopic?: OffchainTopic | string | boolean;
+  defaultTopic?: Topic | string | boolean;
   tabindex?: number;
-  topics: OffchainTopic[];
+  topics: Topic[];
   updateFormData: () => void;
 };
 
@@ -25,7 +25,7 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       selectedTopic = undefined;
     } else if (defaultTopic && typeof defaultTopic === 'string') {
       selectedTopic = topics.find((t) => t.name === defaultTopic);
-    } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
+    } else if (defaultTopic && defaultTopic instanceof Topic) {
       selectedTopic = defaultTopic;
     }
 
@@ -37,12 +37,12 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       return (
         <ListItem
           label={topic.name}
-          selected={(selectedTopic as OffchainTopic)?.name === topic.name}
+          selected={(selectedTopic as Topic)?.name === topic.name}
         />
       );
     };
 
-    const itemPredicate = (query: string, item: OffchainTopic) => {
+    const itemPredicate = (query: string, item: Topic) => {
       return item.name.toLowerCase().includes(query.toLowerCase());
     };
 
@@ -52,12 +52,12 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       }
     };
 
-    const onSelect = (item: OffchainTopic) => {
+    const onSelect = (item: Topic) => {
       selectedTopic = item;
       updateFormData(item.name, item.id);
     };
 
-    const sortTopics = (topics_: OffchainTopic[]) => {
+    const sortTopics = (topics_: Topic[]) => {
       return topics_
         .filter((topic) => featuredTopics.includes(topic))
         .sort((a, b) => (a.name > b.name ? 1 : -1))

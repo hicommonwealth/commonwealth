@@ -98,7 +98,7 @@ export default (
 		models.Address.hasOne(models.OffchainProfile);
 		models.Address.hasOne(models.SsoToken);
 		models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
-		models.Address.belongsToMany(models.OffchainThread, {
+		models.Address.belongsToMany(models.Thread, {
 			through: models.Collaboration,
 			as: 'collaboration'
 		});

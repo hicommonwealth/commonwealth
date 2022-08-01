@@ -1,4 +1,4 @@
-class OffchainAttachment {
+class Attachment {
   public readonly url: string;
   public readonly description: string;
 
@@ -8,4 +8,4 @@ class OffchainAttachment {
   }
 }
 
-export default OffchainAttachment;
+export default Attachment;

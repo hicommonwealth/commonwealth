@@ -42,7 +42,7 @@ export default (
   DiscussionDraft.associate = (models) => {
     models.DiscussionDraft.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.DiscussionDraft.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
-    models.DiscussionDraft.hasMany(models.OffchainAttachment, {
+    models.DiscussionDraft.hasMany(models.Attachment, {
       foreignKey: 'attachment_id',
       constraints: false,
       scope: { attachable: 'thread' },

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import OffchainAttachment from './OffchainAttachment';
+import Attachment from './Attachment';
 
 class DiscussionDraft {
   public readonly id: number;
@@ -7,7 +7,7 @@ class DiscussionDraft {
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
-  public readonly attachments: OffchainAttachment[];
+  public readonly attachments: Attachment[];
   public readonly createdAt: moment.Moment;
   // Draft topics are not created as topic objects yet, so they are just strings
   public readonly topic: string;
@@ -21,7 +21,7 @@ class DiscussionDraft {
     body: string,
     topic: string,
     createdAt: moment.Moment,
-    attachments: OffchainAttachment[],
+    attachments: Attachment[],
     authorChain?: string
   ) {
     this.author = author;
