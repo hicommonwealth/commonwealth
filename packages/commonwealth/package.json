@@ -38,13 +38,13 @@
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.node.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.dev.js --json --profile > webpack-stats.json",
     "psql": "psql -h localhost commonwealth -U commonwealth",
-    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --exclude-table-data=\"public.\\\"OldNotifications\\\"\" --no-privileges --no-owner -f latest.dump",
+    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --exclude-table-data=\"public.\\\"OldNotifications\\\"\" --no-privileges --no-owner -f latest.dump",
     "reset-db": "sh -c \"npx sequelize db:drop && npx sequelize db:create\"",
     "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
     "migrate-db": "npx sequelize db:migrate",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
-    "dump-db-limit": ""
+    "dump-db-limit": "yarn run dump-db-local &&  psql $(heroku config:get DATABASE_URL -a commonwealthstaging) -a -f copytest.sql "
   },
   "engines": {
     "node": "14.x"
