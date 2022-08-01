@@ -28,8 +28,8 @@ import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import {
   ITXModalData,
   ProposalModule,
-  ThreadKind,
   ThreadStage,
+  ThreadKind
 } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
@@ -58,7 +58,7 @@ import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
-import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
 
 enum SupportedSputnikProposalTypes {
@@ -232,7 +232,7 @@ const NewProposalForm = {
         app.threads
           .create(
             author.address,
-            ThreadKind.Forum,
+            ThreadKind.Discussion,
             ThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,

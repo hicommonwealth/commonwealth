@@ -10,6 +10,7 @@ import { Thread, Comment, AnyProposal, Account } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
@@ -22,11 +23,6 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
-import {
-  disableEditor,
-  editorIsBlank,
-  getQuillTextContents,
-} from '../../components/quill/helpers';
 
 type CreateCommmentAttrs = {
   callback: CallableFunction;
@@ -40,7 +36,7 @@ type CreateCommmentAttrs = {
 
 export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
   private error;
-  private quillEditorState: any;
+  private quillEditorState: QuillEditor;
   private saving: boolean;
   private sendingComment;
   private uploadsInProgress;
@@ -69,35 +65,27 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       this.uploadsInProgress = 0;
     }
 
-    const handleSubmitComment = async (e?) => {
-      if (!this.quillEditorState || !this.quillEditorState.editor) {
+    const handleSubmitComment = async (e?: Event) => {
+      if (!this.quillEditorState) {
         if (e) e.preventDefault();
         this.error = 'Editor not initialized, please try again';
         return;
       }
 
-      if (this.quillEditorState.editor.editor.isBlank()) {
+
+      if (this.quillEditorState?.isBlank()) {
         if (e) e.preventDefault();
         this.error = 'Comment cannot be blank';
         return;
       }
 
-      const { quillEditorState } = vnode.state;
-      if (editorIsBlank(quillEditorState)) {
-        if (e) e.preventDefault();
-        vnode.state.error = 'Comment cannot be blank';
-        return;
-      }
-
-      const commentText = getQuillTextContents(quillEditorState);
-
-      const attachments = [];
+      const commentText = this.quillEditorState.textContentsAsString;
 
       this.error = null;
 
       this.sendingComment = true;
 
-      disableEditor(quillEditorState);
+      this.quillEditorState.disable();
 
       const chainId = app.activeChainId();
 
@@ -108,16 +96,13 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           chainId,
           commentText,
           proposalPageState.parentCommentId,
-          attachments
         );
 
         callback();
+        this.quillEditorState.resetEditor();
+        this.error = null;
+        this.sendingComment = false;
 
-        if (this.quillEditorState.editor) {
-          this.quillEditorState.editor.enable();
-          this.quillEditorState.editor.setContents();
-          this.quillEditorState.clearUnsavedChanges();
-        }
 
         this.sendingComment = false;
 
@@ -132,19 +117,16 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       } catch (err) {
         console.log(err);
         notifyError(err.message || 'Comment submission failed.');
-        if (this.quillEditorState.editor) {
-          this.quillEditorState.editor.enable();
-        }
+        this.quillEditorState.enable();
         this.error = err.message;
         this.sendingComment = false;
         m.redraw();
       }
 
       this.saving = false;
-
       proposalPageState.replying = false;
-
       proposalPageState.parentCommentId = null;
+      m.redraw();
     };
 
     const activeTopicName =
@@ -173,7 +155,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     const disabled =
       getSetGlobalEditingStatus(GlobalStatus.Get) ||
-      this.quillEditorState?.editor?.editor?.isBlank() ||
+      this.quillEditorState?.isBlank() ||
       sendingComment ||
       uploadsInProgress ||
       !app.user.activeAccount ||
@@ -254,9 +236,9 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                     }
                   />
                 )}
-              <QuillEditor
+              <QuillEditorComponent
                 contentsDoc=""
-                oncreateBind={(state) => {
+                oncreateBind={(state: QuillEditor) => {
                   this.quillEditorState = state;
                 }}
                 editorNamespace={`${document.location.pathname}-commenting`}

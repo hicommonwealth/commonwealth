@@ -45,7 +45,6 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
-
   view(vnode) {
     const {
       doc,
