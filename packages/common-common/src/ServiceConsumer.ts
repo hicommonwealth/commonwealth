@@ -37,8 +37,6 @@ export class ServiceConsumer {
     this.rabbitMQController = new RabbitMQController(
       getRabbitMQConfig(_rabbitmqUri)
     );
-
-
   }
 
   public async init(): Promise<void> {
