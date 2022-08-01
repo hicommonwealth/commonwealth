@@ -74,7 +74,6 @@ export class CWText implements m.ClassComponent<TextAttrs> {
             fontStyle,
             noWrap,
             onclick: !!onclick,
-            isCentered,
             className,
           },
           ComponentType.Text
