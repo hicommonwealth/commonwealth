@@ -15,13 +15,6 @@ import ChainCategoryFactory, {
 import ChainCategoryTypeFactory, {
   ChainCategoryTypeModelStatic,
 } from './models/chain_category_type';
-import ChainEntityFactory, {
-  ChainEntityModelStatic,
-} from './models/chain_entity';
-import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
-import ChainEventTypeFactory, {
-  ChainEventTypeModelStatic,
-} from './models/chain_event_type';
 import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
 import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
 import ChatMessageFactory, {
@@ -112,9 +105,6 @@ export type Models = {
   Chain: ChainModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
-  ChainEntity: ChainEntityModelStatic;
-  ChainEvent: ChainEventModelStatic;
-  ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
@@ -194,9 +184,6 @@ const models: Models = {
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
-  ChainEntity: ChainEntityFactory(sequelize, DataTypes),
-  ChainEvent: ChainEventFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),

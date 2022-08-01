@@ -19,8 +19,13 @@
       "./node_modules/@types"
     ]
   },
+  "paths": {
+    "common-common": ["../../packages/common-common"],
+    "common-common/*": ["../../packages/common-common/*"],
+  },
   "include": [
     "./src",
+    "./app"
   ],
   "exclude": [
     "./dist",
