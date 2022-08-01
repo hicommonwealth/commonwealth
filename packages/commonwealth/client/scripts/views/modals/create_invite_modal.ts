@@ -335,116 +335,118 @@ const InviteButton: m.Component<IInviteButtonAttrs, { loading: boolean }> = {
   },
 };
 
-const CreateInviteLink: m.Component<
-  {
-    chain?: ChainInfo;
-    onChangeHandler?: Function;
-  },
-  {
-    link: string;
-    inviteUses: string;
-    inviteTime: string;
-  }
-> = {
-  oninit: (vnode) => {
-    vnode.state.link = '';
-    vnode.state.inviteUses = 'none';
-    vnode.state.inviteTime = 'none';
-  },
-  view: (vnode) => {
-    const { chain, onChangeHandler } = vnode.attrs;
-    const chainOrCommunityObj = { chain: chain.id };
-    return m(Form, { class: 'CreateInviteLink' }, [
-      m(FormGroup, { span: 12 }, [
-        m('h2.invite-link-title', 'Generate Invite Link'),
-      ]),
-      m(FormGroup, { span: 4 }, [
-        m(FormLabel, { for: 'uses' }, 'Number of Uses'),
-        m(RadioGroup, {
-          name: 'uses',
-          options: [
-            { value: 'none', label: 'Unlimited uses' },
-            { value: '1', label: 'One time use' },
-          ],
-          value: vnode.state.inviteUses,
-          onchange: (e: Event) => {
-            vnode.state.inviteUses = (e.target as any).value;
-          },
-        }),
-      ]),
-      m(FormGroup, { span: 4 }, [
-        m(FormLabel, { for: 'time' }, 'Expires after'),
-        m(RadioGroup, {
-          name: 'time',
-          options: [
-            { value: 'none', label: 'Never expires' },
-            { value: '24h', label: '24 hours' },
-            { value: '48h', label: '48 hours' },
-            { value: '1w', label: '1 week' },
-            { value: '30d', label: '30 days' },
-          ],
-          value: vnode.state.inviteTime,
-          onchange: (e: Event) => {
-            vnode.state.inviteTime = (e.target as any).value;
-          },
-        }),
-      ]),
-      m(FormGroup, { span: 4 }),
-      m(FormGroup, { span: 4 }, [
-        m(Button, {
-          type: 'submit',
-          intent: 'primary',
-          rounded: true,
-          onclick: (e) => {
-            e.preventDefault();
-            // TODO: Change to POST /inviteLink
-            $.post(`${app.serverUrl()}/createInviteLink`, {
-              ...chainOrCommunityObj,
-              time: vnode.state.inviteTime,
-              uses: vnode.state.inviteUses,
-              jwt: app.user.jwt,
-            }).then((response) => {
-              const linkInfo = response.result;
-              const url = app.isProduction
-                ? 'commonwealth.im'
-                : 'localhost:8080';
-              if (onChangeHandler) onChangeHandler(linkInfo);
-              vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
-                linkInfo.id
-              }`;
-              m.redraw();
-            });
-          },
-          label: 'Get invite link',
-        }),
-      ]),
-      m(FormGroup, { span: 8, class: 'copy-link-line' }, [
-        m(Input, {
-          id: 'invite-link-pastebin',
-          class: 'invite-link-pastebin',
-          fluid: true,
-          readonly: true,
-          placeholder: 'Click to generate a link',
-          value: `${vnode.state.link}`,
-        }),
-        m('img', {
-          src: 'static/img/copy_default.svg',
-          alt: '',
-          class: 'mx-auto',
-          onclick: (e) => {
-            const copyText = document.getElementById(
-              'invite-link-pastebin'
-            ) as HTMLInputElement;
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); /* For mobile devices */
+// Gabe 7/28/22 - Invite link generation doesn't work, currently
 
-            document.execCommand('copy');
-          },
-        }),
-      ]),
-    ]);
-  },
-};
+// const CreateInviteLink: m.Component<
+//   {
+//     chain?: ChainInfo;
+//     onChangeHandler?: Function;
+//   },
+//   {
+//     link: string;
+//     inviteUses: string;
+//     inviteTime: string;
+//   }
+// > = {
+//   oninit: (vnode) => {
+//     vnode.state.link = '';
+//     vnode.state.inviteUses = 'none';
+//     vnode.state.inviteTime = 'none';
+//   },
+//   view: (vnode) => {
+//     const { chain, onChangeHandler } = vnode.attrs;
+//     const chainOrCommunityObj = { chain: chain.id };
+//     return m(Form, { class: 'CreateInviteLink' }, [
+//       m(FormGroup, { span: 12 }, [
+//         m('h2.invite-link-title', 'Generate Invite Link'),
+//       ]),
+//       m(FormGroup, { span: 4 }, [
+//         m(FormLabel, { for: 'uses' }, 'Number of Uses'),
+//         m(RadioGroup, {
+//           name: 'uses',
+//           options: [
+//             { value: 'none', label: 'Unlimited uses' },
+//             { value: '1', label: 'One time use' },
+//           ],
+//           value: vnode.state.inviteUses,
+//           onchange: (e: Event) => {
+//             vnode.state.inviteUses = (e.target as any).value;
+//           },
+//         }),
+//       ]),
+//       m(FormGroup, { span: 4 }, [
+//         m(FormLabel, { for: 'time' }, 'Expires after'),
+//         m(RadioGroup, {
+//           name: 'time',
+//           options: [
+//             { value: 'none', label: 'Never expires' },
+//             { value: '24h', label: '24 hours' },
+//             { value: '48h', label: '48 hours' },
+//             { value: '1w', label: '1 week' },
+//             { value: '30d', label: '30 days' },
+//           ],
+//           value: vnode.state.inviteTime,
+//           onchange: (e: Event) => {
+//             vnode.state.inviteTime = (e.target as any).value;
+//           },
+//         }),
+//       ]),
+//       m(FormGroup, { span: 4 }),
+//       m(FormGroup, { span: 4 }, [
+//         m(Button, {
+//           type: 'submit',
+//           intent: 'primary',
+//           rounded: true,
+//           onclick: (e) => {
+//             e.preventDefault();
+//             // TODO: Change to POST /inviteLink
+//             $.post(`${app.serverUrl()}/createInviteLink`, {
+//               ...chainOrCommunityObj,
+//               time: vnode.state.inviteTime,
+//               uses: vnode.state.inviteUses,
+//               jwt: app.user.jwt,
+//             }).then((response) => {
+//               const linkInfo = response.result;
+//               const url = app.isProduction
+//                 ? 'commonwealth.im'
+//                 : 'localhost:8080';
+//               if (onChangeHandler) onChangeHandler(linkInfo);
+//               vnode.state.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
+//                 linkInfo.id
+//               }`;
+//               m.redraw();
+//             });
+//           },
+//           label: 'Get invite link',
+//         }),
+//       ]),
+//       m(FormGroup, { span: 8, class: 'copy-link-line' }, [
+//         m(Input, {
+//           id: 'invite-link-pastebin',
+//           class: 'invite-link-pastebin',
+//           fluid: true,
+//           readonly: true,
+//           placeholder: 'Click to generate a link',
+//           value: `${vnode.state.link}`,
+//         }),
+//         m('img', {
+//           src: 'static/img/copy_default.svg',
+//           alt: '',
+//           class: 'mx-auto',
+//           onclick: (e) => {
+//             const copyText = document.getElementById(
+//               'invite-link-pastebin'
+//             ) as HTMLInputElement;
+//             copyText.select();
+//             copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+//             document.execCommand('copy');
+//           },
+//         }),
+//       ]),
+//     ]);
+//   },
+// };
 
 const emptySearchPreview: m.Component<{ searchTerm: string }, {}> = {
   view: (vnode) => {
@@ -715,7 +717,7 @@ const CreateInviteModal: m.Component<
           }),
         ]),
         m('div.divider'),
-        m(CreateInviteLink, { ...chainOrCommunityObj }),
+        // m(CreateInviteLink, { ...chainOrCommunityObj }),
         vnode.state.success &&
           m('.success-message', ['Success! Your invite was sent']),
         vnode.state.failure &&

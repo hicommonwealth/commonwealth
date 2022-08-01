@@ -34,7 +34,7 @@ const deleteThread = async (
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
 
-    const myThread = await models.OffchainThread.findOne({
+    const myThread = await models.Thread.findOne({
       where: {
         id: req.body.thread_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -66,7 +66,7 @@ const deleteThread = async (
         throw new AppError(DeleteThreadErrors.NoPermission);
       }
 
-      thread = await models.OffchainThread.findOne({
+      thread = await models.Thread.findOne({
         where: {
           id: req.body.thread_id,
         },

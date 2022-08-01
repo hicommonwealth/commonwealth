@@ -1,14 +1,14 @@
 import IdStore from './IdStore';
-import { OffchainComment } from '../models';
+import { Comment } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 import { IUniqueId } from '../models/interfaces';
 
-class CommentsStore extends IdStore<OffchainComment<any>> {
-  private _storeAuthor: { [address: string]: Array<OffchainComment<any>> } = {};
+class CommentsStore extends IdStore<Comment<any>> {
+  private _storeAuthor: { [address: string]: Array<Comment<any>> } = {};
 
-  private _storeProposal: { [identifier: string]: Array<OffchainComment<any>> } = {};
+  private _storeProposal: { [identifier: string]: Array<Comment<any>> } = {};
 
-  public add(comment: OffchainComment<any>) {
+  public add(comment: Comment<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
     super.add(comment);
     this.getAll().sort(byAscendingCreationDate);
@@ -25,7 +25,7 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
     return this;
   }
 
-  public remove(comment: OffchainComment<any>) {
+  public remove(comment: Comment<any>) {
     super.remove(comment);
 
     const authorIndex = this._storeAuthor[comment.author].indexOf(comment);
@@ -59,15 +59,15 @@ class CommentsStore extends IdStore<OffchainComment<any>> {
     return this;
   }
 
-  public getById(id: number): OffchainComment<any> {
+  public getById(id: number): Comment<any> {
     return this._store.find((c) => c.id === id);
   }
 
-  public getByAuthor(address: string): Array<OffchainComment<any>> {
+  public getByAuthor(address: string): Array<Comment<any>> {
     return this._storeAuthor[address] || [];
   }
 
-  public getByProposal<T extends IUniqueId>(proposal: T): Array<OffchainComment<any>> {
+  public getByProposal<T extends IUniqueId>(proposal: T): Array<Comment<any>> {
     return this._storeProposal[proposal.uniqueIdentifier] || [];
   }
 

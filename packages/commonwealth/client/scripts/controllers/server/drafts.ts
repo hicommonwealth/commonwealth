@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import { DiscussionDraft, OffchainAttachment } from 'models';
+import { DiscussionDraft, Attachment } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
@@ -8,9 +8,9 @@ import moment from 'moment';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
-  const attachments = draft.OffchainAttachments
-    ? draft.OffchainAttachments.map(
-        (a) => new OffchainAttachment(a.url, a.description)
+  const attachments = draft.Attachments
+    ? draft.Attachments.map(
+        (a) => new Attachment(a.url, a.description)
       )
     : [];
   return new DiscussionDraft(
@@ -145,7 +145,7 @@ class DraftsController {
       }
       for (let draft of response.result) {
         if (!draft.Address) {
-          console.error('OffchainThread missing address');
+          console.error('Thread missing address');
         }
         draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);

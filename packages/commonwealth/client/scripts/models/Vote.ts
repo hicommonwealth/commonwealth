@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-class OffchainVote {
+class Vote {
   public readonly id: number;
   public readonly pollId: number;
   public readonly chainId: string;
@@ -28,4 +28,4 @@ class OffchainVote {
   }
 }
 
-export default OffchainVote;
+export default Vote;
