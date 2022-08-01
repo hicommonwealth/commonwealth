@@ -188,11 +188,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                   }}
                 />
               </CWTabBar>
-              {loadingData && (
-                <div class="Spinner">
-                  <Spinner active />
-                </div>
-              )}
+              {loadingData && <Spinner active />}
             </div>
             {!loadingData && (
               <>
@@ -201,16 +197,12 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                     {fyNotifications && fyNotifications.length > 0 ? (
                       <>
                         {fyNotifications.slice(0, this.fyCount).map((data) => {
-                          return (
-                            <UserDashboardRow notification={data} onListPage />
-                          );
+                          return <UserDashboardRow notification={data} />;
                         })}
                         {notificationsRemaining(
                           fyNotifications.length,
                           this.fyCount
-                        ) ? (
-                          <Spinner active />
-                        ) : null}
+                        ) && <Spinner active />}
                       </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
@@ -223,14 +215,12 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                       {globalNotifications
                         .slice(0, this.globalCount)
                         .map((data) => (
-                          <UserDashboardRow notification={data} onListPage />
+                          <UserDashboardRow notification={data} />
                         ))}
                       {notificationsRemaining(
                         globalNotifications.length,
                         this.globalCount
-                      ) ? (
-                        <Spinner active />
-                      ) : null}
+                      ) && <Spinner active />}
                     </>
                   ) : (
                     <CWText>No Activity</CWText>
@@ -243,19 +233,12 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {chainEvents
                           .slice(0, this.chainEventCount)
                           .map((data) => {
-                            return (
-                              <UserDashboardRow
-                                notification={data}
-                                onListPage
-                              />
-                            );
+                            return <UserDashboardRow notification={data} />;
                           })}
                         {notificationsRemaining(
                           chainEvents.length,
                           this.chainEventCount
-                        ) ? (
-                          <Spinner active />
-                        ) : null}
+                        ) && <Spinner active />}
                       </>
                     ) : (
                       <CWText>

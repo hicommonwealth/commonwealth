@@ -1,14 +1,51 @@
 @import 'shared';
 
-.UserDashboardRow {
+@mixin rowTopTextStyles {
+  display: inline-block;
+
+  b {
+    margin-right: 4px;
+  }
+
+  span {
+    color: $neutral-500;
+    margin-right: 4px;
+  }
+
+  a {
+    color: $neutral-800;
+    font-weight: 600;
+    margin-right: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@mixin userDashboardRowStyles {
   border-bottom-width: 2px;
   display: flex;
-  flex-direction: column;
   gap: 16px;
   padding: 16px 24px;
+  width: 768px;
+
+  @include mediumSmallInclusive {
+    width: 100%;
+  }
 
   &:hover {
     background: $neutral-50;
     border-radius: $border-radius-corners;
+  }
+}
+
+.UserDashboardRow {
+  @include userDashboardRowStyles;
+
+  flex-direction: column;
+
+  &.isLink {
+    cursor: pointer;
   }
 }

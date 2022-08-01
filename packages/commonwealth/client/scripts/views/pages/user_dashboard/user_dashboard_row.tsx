@@ -12,15 +12,15 @@ import {
 import app from 'state';
 import { DashboardActivityNotification } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';
+import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
+import { getClasses } from '../../components/component_kit/helpers';
 
 export class UserDashboardRow
   implements
     m.ClassComponent<{
       notification: DashboardActivityNotification;
-      onListPage?: boolean;
     }>
 {
   view(vnode) {
@@ -48,38 +48,12 @@ export class UserDashboardRow
         app.config.chains.getById(chain)?.name || 'Unknown chain';
 
       return (
-        <div
-          class="UserDashboardRow"
-          onclick={() => {
-            if (label.linkUrl) {
-              m.route.set(label.linkUrl);
-            }
-            m.redraw();
-          }}
-          style={label.linkUrl ? 'cursor: pointer;' : ''}
-        >
-          <div class="activity-content">
-            <CWCommunityAvatar community={chain} />
-            <div class="new-comment">
-              <span class="header">
-                <span class="community-title">{label.heading}</span>
-                <span class="comment-counts"> in </span>
-                <span
-                  class="community-link"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    m.route.set(`/${chain}`);
-                  }}
-                >
-                  {communityName}
-                </span>
-                <span class="block-number"> Block {blockNumber}</span>
-              </span>
-              <div class="event-body">{label.label}</div>
-            </div>
-          </div>
-        </div>
+        <UserDashboardChainEventRow
+          blockNumber={blockNumber}
+          chain={chain}
+          communityName={communityName}
+          label={label}
+        />
       );
     }
 
@@ -91,12 +65,14 @@ export class UserDashboardRow
 
     return (
       <div
-        class="UserDashboardRow"
+        class={getClasses<{ isLink?: boolean }>(
+          { isLink: !!path },
+          'UserDashboardRow'
+        )}
         onclick={() => {
           m.route.set(path);
           m.redraw();
         }}
-        style={path ? 'cursor: pointer;' : ''}
       >
         <UserDashboardRowTop
           activityData={vnode.attrs.notification}
