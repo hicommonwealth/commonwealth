@@ -364,7 +364,7 @@ Polkadot/Kusama:
 
 ## Vultr Scripts
 ### Root/Admin ONLY
-**install-docker.sh: This script installs Docker on a remote Vultr server.
+**install-docker.sh**: This script installs Docker on a remote Vultr server.
 - Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP 
   stored in the `VULTR_IP` env var defined in the `.env` file. Also requires the `VULTR_USER` env var to be set so that
   the root user can give the `VULTR_USER` permission to use Docker CLI without using `sudo`. The user of this command
@@ -375,16 +375,18 @@ Polkadot/Kusama:
   IP stored in the `VULTR_IP` env var defined in the `.env` file. The user of this command must have
   the `cmn_docker_root_ssh` private key in `~/.ssh/`.
 
+### Developer Commands
+Before running any of these commands, you will need `VULTR_IP`, `VULTR_USER`, and `VULTR_DOCKER_ADMIN_PASSWORD` in your
+.env file. You will also need the `cmn_docker_admin_ssh` file in your `.ssh` folder. This folder can be found at
+`~./ssh` on linux and `Users/<username>/.ssh/` on Mac.
+
+If using the docker containers for the very first time use `start-docker-setup`.
+
 **start-docker-setup** This script should be run only when setting up the required environment variables for the
 first time.
-- Requires: `VULTR_IP`, `VULTR_USER`, and `VULTR_DOCKER_ADMIN_PASSWORD` to be set before running the script. Also
-requires the `cmn_docker_admin_ssh` private key in `~/.ssh/`.
 
 **start-containers** This scripts starts your existing docker containers. Should be used after `start-docker-setup` has
 been used.
 
 **stop-containers** This scripts stops/shutsdown your docker containers. Should be used to end your session after using
 `start-docker-setup` or `start-containers`.
-
-### Developer Commands
-
