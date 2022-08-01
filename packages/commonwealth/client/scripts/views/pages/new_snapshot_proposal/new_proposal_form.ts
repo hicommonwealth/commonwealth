@@ -106,19 +106,6 @@ const newThread = async (
   form.start = Math.floor(form.start / 1000);
   form.end = Math.floor(form.end / 1000);
 
-  // const version = await getVersion();
-
-  // const msg = {
-  //   address: author.address,
-  //   msg: JSON.stringify({
-  //     version,
-  //     timestamp: (Date.now() / 1e3).toFixed(),
-  //     space: space.id,
-  //     type: 'proposal',
-  //     payload: form,
-  //   }),
-  // };
-
   const proposalPayload = {
     space: space.id,
     type: 'single-choice',

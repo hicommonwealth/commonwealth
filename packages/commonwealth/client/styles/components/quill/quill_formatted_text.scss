@@ -327,17 +327,6 @@
   @include formatted-text();
   @include collapsible();
   @include hidden-formatting();
-
-  .show-more-button-wrapper {
-    // align-items: center;
-    background-image: linear-gradient(to bottom, transparent, white);
-    // display: flex;
-    // height: 50px;
-    // justify-content: center;
-    // margin-top: -50px;
-    // margin-bottom: 30px;
-    // position: relative;
-  }
 }
 
 .show-more-button {
