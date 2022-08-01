@@ -27,7 +27,7 @@ export class MobileHeader implements m.ClassComponent {
           class="mobile-logo"
           src="https://commonwealth.im/static/img/logo.png"
           onclick={() => {
-            m.route.set('/');
+            m.route.set('/communities');
           }}
         />
         <SearchBar />
