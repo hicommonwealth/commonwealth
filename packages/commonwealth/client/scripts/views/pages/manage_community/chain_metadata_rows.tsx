@@ -14,7 +14,7 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -29,6 +29,7 @@ type ChainMetadataRowsAttrs = {
   chain?: ChainInfo;
   mods: any;
   onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onSave: () => void;
 };
 
 export class ChainMetadataRows
@@ -57,6 +58,8 @@ export class ChainMetadataRows
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
+  quillBanner: any;
+  bannerStateUpdated: boolean;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -196,7 +199,7 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.customDomain = v;
           }}
-          disabled={true} // Custom domains should be admin configurable only
+          disabled // Custom domains should be admin configurable only
         />
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
@@ -236,6 +239,8 @@ export class ChainMetadataRows
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
+          tabindex={1}
+          editorNamespace="new-banner"
         />
         <div class="tag-row">
           <CWLabel label="Community Tags" />
@@ -351,10 +356,13 @@ export class ChainMetadataRows
                 iconUrl,
                 defaultSummaryView,
               });
+              vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+
+            m.redraw();
           }}
         />
       </div>

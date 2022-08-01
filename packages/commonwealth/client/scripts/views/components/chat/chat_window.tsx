@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import $ from 'jquery';
-import m from 'mithril';
+import m, { VnodeDOM } from 'mithril';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -14,9 +14,10 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import { QuillEditor } from '../quill/quill_editor';
+import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { editorIsBlank, renderQuillTextBody } from '../quill/helpers';
+import { renderQuillTextBody } from '../quill/helpers';
+import { QuillEditor } from '../quill/quill_editor';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -41,13 +42,45 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
   private shouldScrollToHighlight: boolean;
-  private quillEditorState: any;
+  private quillEditorState: QuillEditor;
+  private channel;
 
-  oninit(vnode) {
+  private _handleSubmitMessage = () => {
+    if (this.quillEditorState.isBlank()) {
+      notifyError('Cannot send a blank message');
+      return;
+    }
+
+    const bodyText = this.quillEditorState.textContentsAsString;
+    this.quillEditorState.disable();
+
+    const message = {
+      message: bodyText,
+      chat_channel_id: this.channel.id,
+      address: app.user.activeAccount.address,
+    };
+    app.socket.chatNs.sendMessage(message);
+    this.quillEditorState.enable();
+
+    mixpanelBrowserTrack({
+      event: MixpanelChatEvents.NEW_CHAT_SENT,
+      community: app.activeChainId(),
+      isCustomDomain: app.isCustomDomain(),
+    });
+  };
+
+  private _messageIsHighlighted = (message: any): boolean => {
+    return (
+      m.route.param('message') &&
+      Number(m.route.param('message')) === message.id
+    );
+  };
+
+  oninit(vnode: VnodeDOM<ChatWindowAttrs, this>) {
     this.shouldScroll = true;
     this.shouldScrollToHighlight = Boolean(m.route.param('message'));
     this.scrollToBottom = () => {
-      const scroller = $((vnode as any).dom).find('.chat-messages')[0];
+      const scroller = $(vnode.dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
     };
     this.onIncomingMessage = (msg) => {
@@ -74,9 +107,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   view(vnode) {
     const { channel_id } = vnode.attrs;
     app.socket.chatNs.readMessages(channel_id);
-    const channel = app.socket.chatNs.channels[channel_id];
+    this.channel = app.socket.chatNs.channels[channel_id];
     // group messages; break up groups when the sender changes, or there is a delay of MESSAGE_GROUPING_DELAY
-    const groupedMessages = channel.ChatMessages.reduce((acc, msg) => {
+    const groupedMessages = this.channel.ChatMessages.reduce((acc, msg) => {
       if (
         acc.length > 0 &&
         acc[acc.length - 1].address === msg.address &&
@@ -93,43 +126,6 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
       return acc;
     }, []);
 
-    const handleSubmitMessage = () => {
-      if (editorIsBlank(this.quillEditorState)) {
-        notifyError('Cannot send a blank message');
-        return;
-      }
-
-      const { quillEditorState } = vnode.state;
-
-      const message = {
-        message: JSON.stringify(quillEditorState.editor.getContents()),
-        chat_channel_id: channel.id,
-        address: app.user.activeAccount.address,
-      };
-      app.socket.chatNs.sendMessage(message);
-      if (quillEditorState.editor) {
-        quillEditorState.editor.enable();
-        quillEditorState.editor.setContents();
-        quillEditorState.clearUnsavedChanges();
-      }
-
-      mixpanelBrowserTrack({
-        event: MixpanelChatEvents.NEW_CHAT_SENT,
-        community: app.activeChainId(),
-        isCustomDomain: app.isCustomDomain(),
-      });
-    };
-
-    const messageToText = (msg: any) =>
-      renderQuillTextBody(msg.message, { openLinksInNewTab: true });
-
-    const messageIsHighlighted = (message: any): boolean => {
-      return (
-        m.route.param('message') &&
-        Number(m.route.param('message')) === message.id
-      );
-    };
-
     return (
       <div class="ChatPage">
         <div class="chat-messages">
@@ -141,7 +137,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
           {groupedMessages.map((grp) => (
             <div
               class="chat-message-group"
-              id={grp.messages.some(messageIsHighlighted) ? 'highlighted' : ''}
+              id={
+                grp.messages.some(this._messageIsHighlighted)
+                  ? 'highlighted'
+                  : ''
+              }
             >
               <div class="user-and-timestamp-container">
                 {m(User, {
@@ -181,7 +181,11 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (
-                <div class="chat-message-text">{messageToText(msg)}</div>
+                <div class="chat-message-text">
+                  {renderQuillTextBody(msg.message, {
+                    openLinksInNewTab: true,
+                  })}
+                </div>
               ))}
             </div>
           ))}
@@ -201,17 +205,18 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
-            <QuillEditor
+            <QuillEditorComponent
+              // TODO Graham 7/20/22: I hate this usage of contentsDoc—can it be improved?
               contentsDoc=""
-              oncreateBind={(state) => {
+              oncreateBind={(state: QuillEditor) => {
                 vnode.state.quillEditorState = state;
               }}
               editorNamespace={`${document.location.pathname}-chatting`}
               onkeyboardSubmit={() => {
-                handleSubmitMessage();
+                this._handleSubmitMessage();
               }}
             />
-            <CWIcon iconName="send" onclick={handleSubmitMessage} />
+            <CWIcon iconName="send" onclick={this._handleSubmitMessage} />
           </div>
         )}
       </div>
