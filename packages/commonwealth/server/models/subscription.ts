@@ -21,14 +21,13 @@ import {
 import { ChainAttributes } from './chain';
 import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
-import { ChainEventTypeAttributes } from './chain_event_type';
-import { ChainEntityAttributes } from './chain_entity';
 import {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import notificationCategory from "../../client/scripts/models/NotificationCategory";
+import { ChainEventTypeAttributes } from "chain-events/app/models/chain_event_type";
+import { ChainEntityAttributes } from "chain-events/app/models/chain_entity";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -281,8 +280,6 @@ export default (
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
   };
 
   return Subscription;
