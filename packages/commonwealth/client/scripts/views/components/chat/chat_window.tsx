@@ -38,15 +38,14 @@ type ChatWindowAttrs = {
 };
 
 export class ChatWindow implements m.Component<ChatWindowAttrs> {
-  onIncomingMessage: (any: any) => void;
-  scrollToBottom: () => void;
-  shouldScroll: boolean;
-  shouldScrollToHighlight: boolean;
-  quillEditorState: QuillEditor;
-  channel;
+  private onIncomingMessage: (any: any) => void;
+  private scrollToBottom: () => void;
+  private shouldScroll: boolean;
+  private shouldScrollToHighlight: boolean;
+  private quillEditorState: QuillEditor;
+  private channel;
 
   private _handleSubmitMessage = () => {
-    console.log(this);
     if (this.quillEditorState.isBlank()) {
       notifyError('Cannot send a blank message');
       return;
@@ -183,7 +182,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               <div class="clear" />
               {grp.messages.map((msg) => (
                 <div class="chat-message-text">
-                  {renderQuillTextBody(msg.message, { openLinksInNewTab: true })}
+                  {renderQuillTextBody(msg.message, {
+                    openLinksInNewTab: true,
+                  })}
                 </div>
               ))}
             </div>

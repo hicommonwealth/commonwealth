@@ -150,7 +150,6 @@ export default class QuillEditorInternal {
     this._addChangesListener();
 
     // Restore defaultContent
-    console.log({ defaultContents });
     if (defaultContents) this._restoreSavedContents(defaultContents);
 
     // TODO: What is the purpose of this??
