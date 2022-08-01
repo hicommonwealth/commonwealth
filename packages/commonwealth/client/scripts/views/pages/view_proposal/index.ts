@@ -129,6 +129,7 @@ import {
 } from './helpers';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -209,7 +210,7 @@ const ProposalHeader: m.Component<
     savedEdit: string;
     editing: boolean;
     saving: boolean;
-    quillEditorState: any;
+    quillEditorState: QuillEditor;
     currentText: any;
     topicEditorIsOpen: boolean;
     editPermissionsIsOpen: boolean;
@@ -542,7 +543,7 @@ const ProposalComment: m.Component<
     editing: boolean;
     saving: boolean;
     replying: boolean;
-    quillEditorState: any;
+    quillEditorState: QuillEditor;
   }
 > = {
   view: (vnode) => {

@@ -129,13 +129,11 @@
     }
 
     li[data-list='checked'] > .ql-ui::before {
-      content: '\f14a';
       color: $neutral-500;
       font-size: 93%;
     }
 
     li[data-list='unchecked'] > .ql-ui::before {
-      content: '\f096';
       color: $neutral-400;
     }
   }

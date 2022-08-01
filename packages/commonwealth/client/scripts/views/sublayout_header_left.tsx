@@ -7,7 +7,7 @@ import 'sublayout_header_left.scss';
 import app from 'state';
 import { link } from 'helpers';
 import { isNotNil, isNotUndefined, isUndefined } from 'helpers/typeGuards';
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import { CommunityOptionsPopover } from './components/community_options_popover';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 
