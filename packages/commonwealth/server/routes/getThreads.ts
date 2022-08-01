@@ -15,7 +15,7 @@ const getThreads = async (
 
   let threads;
   try {
-    threads = await models.OffchainThread.findAll({
+    threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
         chain: chain.id
@@ -31,14 +31,14 @@ const getThreads = async (
           as: 'collaborators',
         },
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
         {
           model: models.ChainEntity,
         },
         {
-          model: models.OffchainReaction,
+          model: models.Reaction,
           as: 'reactions',
           include: [
             {

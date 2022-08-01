@@ -5,7 +5,7 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
 import { ChainInstance } from 'server/models/chain';
-import OffchainTopic from './OffchainTopic';
+import Topic from './Topic';
 import NodeInfo from './NodeInfo';
 
 import {
@@ -37,7 +37,7 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
-  public readonly topics: OffchainTopic[];
+  public readonly topics: Topic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -107,7 +107,7 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
-    this.topics = topics ? topics.map((t) => new OffchainTopic(t)) : [];
+    this.topics = topics ? topics.map((t) => new Topic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;

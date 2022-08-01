@@ -60,7 +60,7 @@ const createTopic = async (
     chain_id: chain.id,
   };
 
-  const newTopic = await models.OffchainTopic.findOrCreate({
+  const newTopic = await models.Topic.findOrCreate({
     where: {
       chain_id: chain.id,
       name: req.body.name,

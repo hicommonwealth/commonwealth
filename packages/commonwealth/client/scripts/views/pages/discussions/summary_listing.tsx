@@ -4,7 +4,7 @@ import 'pages/discussions/summary_listing.scss';
 
 import m from 'mithril';
 import app from 'state';
-import { OffchainTopic } from 'client/scripts/models';
+import { Topic } from 'client/scripts/models';
 import { LoadingRow } from '../../components/loading_row';
 import SummaryRow from './summary_row';
 import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
@@ -29,7 +29,7 @@ export class SummaryListing implements m.ClassComponent {
     const recentThreads = app.threads.summaryStore.getAll();
     const sortedTopics = app.topics
       .getByCommunity(app.activeChainId())
-      .sort((a: OffchainTopic, b: OffchainTopic) => {
+      .sort((a: Topic, b: Topic) => {
         return a.name.localeCompare(b.name);
       });
 
