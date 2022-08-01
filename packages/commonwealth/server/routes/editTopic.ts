@@ -4,7 +4,7 @@ import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
-import { OffchainTopicAttributes } from '../models/offchain_topic';
+import { TopicAttributes } from '../models/topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,7 +34,7 @@ type EditTopicReq = {
   rule_id?: number,
 };
 
-type EditTopicResp = OffchainTopicAttributes;
+type EditTopicResp = TopicAttributes;
 
 const editTopic = async (
   models: DB,
@@ -70,7 +70,7 @@ const editTopic = async (
     rule_id,
   } = req.body;
   try {
-    const topic = await models.OffchainTopic.findOne({ where: { id } });
+    const topic = await models.Topic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';

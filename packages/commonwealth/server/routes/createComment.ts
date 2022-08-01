@@ -85,7 +85,7 @@ const createComment = async (
   let parentComment;
   if (parent_id) {
     // check that parent comment is in the same community
-    parentComment = await models.OffchainComment.findOne({
+    parentComment = await models.Comment.findOne({
       where: {
         id: parent_id,
         chain: chain.id,
@@ -96,7 +96,7 @@ const createComment = async (
     // Backend check to ensure comments are never nested more than three levels deep:
     // top-level, child, and grandchild
     if (parentComment.parent_id) {
-      const grandparentComment = await models.OffchainComment.findOne({
+      const grandparentComment = await models.Comment.findOne({
         where: {
           id: parentComment.parent_id,
           chain: chain.id,
@@ -109,14 +109,14 @@ const createComment = async (
   }
 
   const thread_id = root_id.substring(root_id.indexOf('_') + 1);
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: { id: thread_id },
   });
 
   if (thread?.id) {
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       include: {
-        model: models.OffchainThread,
+        model: models.Thread,
         where: { id: thread.id },
         required: true,
         as: 'threads',
@@ -199,7 +199,7 @@ const createComment = async (
 
   let comment;
   try {
-    comment = await models.OffchainComment.create(commentContent);
+    comment = await models.Comment.create(commentContent);
   } catch (err) {
     return next(err);
   }
@@ -210,7 +210,7 @@ const createComment = async (
       req.body['attachments[]'] &&
       typeof req.body['attachments[]'] === 'string'
     ) {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'comment',
         attachment_id: comment.id,
         url: req.body['attachments[]'],
@@ -219,7 +219,7 @@ const createComment = async (
     } else if (req.body['attachments[]']) {
       await Promise.all(
         req.body['attachments[]'].map((url) =>
-          models.OffchainAttachment.create({
+          models.Attachment.create({
             attachable: 'comment',
             attachment_id: comment.id,
             url,
@@ -234,20 +234,20 @@ const createComment = async (
 
   // fetch attached objects to return to user
   // TODO: we should be able to assemble the object without another query
-  const finalComment = await models.OffchainComment.findOne({
+  const finalComment = await models.Comment.findOne({
     where: { id: comment.id },
-    include: [models.Address, models.OffchainAttachment],
+    include: [models.Address, models.Attachment],
   });
 
-  // get parent entity if the comment is on an offchain thread
+  // get parent entity if the comment is on a thread
   // no parent entity if the comment is on an onchain entity
   let proposal;
   const [prefix, id] = finalComment.root_id.split('_') as [
     ProposalType,
     string
   ];
-  if (prefix === ProposalType.OffchainThread) {
-    proposal = await models.OffchainThread.findOne({
+  if (prefix === ProposalType.Thread) {
+    proposal = await models.Thread.findOne({
       where: { id },
     });
   } else if (
@@ -459,7 +459,7 @@ const createComment = async (
   author.save();
 
   // update proposal updated_at timestamp
-  if (prefix === ProposalType.OffchainThread) {
+  if (prefix === ProposalType.Thread) {
     proposal.last_commented_on = Date.now();
     proposal.save();
   }

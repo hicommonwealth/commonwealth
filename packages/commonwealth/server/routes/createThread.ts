@@ -14,7 +14,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -43,7 +43,7 @@ export const Errors = {
 const dispatchHooks = async (
   models: DB,
   req: Request,
-  finalThread: OffchainThreadInstance
+  finalThread: ThreadInstance
 ) => {
   // auto-subscribe thread creator to comments & reactions
   try {
@@ -147,7 +147,7 @@ const dispatchHooks = async (
     {
       created_at: new Date(),
       root_id: finalThread.id,
-      root_type: ProposalType.OffchainThread,
+      root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
@@ -180,7 +180,7 @@ const dispatchHooks = async (
         {
           created_at: new Date(),
           root_id: finalThread.id,
-          root_type: ProposalType.OffchainThread,
+          root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
@@ -303,17 +303,17 @@ const createThread = async (
     if (topic_id) {
       threadContent['topic_id'] = +topic_id;
     } else if (topic_name) {
-      let offchainTopic;
+      let topic;
       try {
-        [offchainTopic] = await models.OffchainTopic.findOrCreate({
+        [topic] = await models.Topic.findOrCreate({
           where: {
             name: topic_name,
             chain_id: chain?.id || null,
           },
           transaction,
         });
-        threadContent['topic_id'] = offchainTopic.id;
-        topic_id = offchainTopic.id;
+        threadContent['topic_id'] = topic.id;
+        topic_id = topic.id;
       } catch (err) {
         return next(err);
       }
@@ -348,7 +348,7 @@ const createThread = async (
       }
     }
 
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       where: {
         id: topic_id
       },
@@ -361,9 +361,9 @@ const createThread = async (
       }
     }
 
-    let thread: OffchainThreadInstance;
+    let thread: ThreadInstance;
     try {
-      thread = await models.OffchainThread.create(threadContent, {
+      thread = await models.Thread.create(threadContent, {
         transaction,
       });
     } catch (err) {
@@ -375,7 +375,7 @@ const createThread = async (
         req.body['attachments[]'] &&
         typeof req.body['attachments[]'] === 'string'
       ) {
-        await models.OffchainAttachment.create(
+        await models.Attachment.create(
           {
             attachable: 'thread',
             attachment_id: thread.id,
@@ -395,14 +395,14 @@ const createThread = async (
           })
         });
 
-        await models.OffchainAttachment.bulkCreate(data, { transaction });
+        await models.Attachment.bulkCreate(data, { transaction });
       }
     } catch (err) {
       return next(err);
     }
 
     // initialize view count
-    await models.OffchainViewCount.create(
+    await models.ViewCount.create(
       {
         chain: thread.chain,
         object_id: thread.id,
@@ -417,12 +417,12 @@ const createThread = async (
 
     try {
       // re-fetch thread once created
-      return await models.OffchainThread.findOne({
+      return await models.Thread.findOne({
         where: { id: thread.id },
         include: [
           { model: models.Address, as: 'Address' },
-          models.OffchainAttachment,
-          { model: models.OffchainTopic, as: 'topic' },
+          models.Attachment,
+          { model: models.Topic, as: 'topic' },
         ],
         transaction,
       });
