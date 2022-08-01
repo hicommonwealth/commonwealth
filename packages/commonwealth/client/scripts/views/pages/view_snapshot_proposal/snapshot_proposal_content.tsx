@@ -5,7 +5,6 @@ import m from 'mithril';
 import 'pages/snapshot/snapshot_proposal_content.scss';
 
 import { SnapshotProposal, SnapshotProposalVote } from 'helpers/snapshot_utils';
-import { MarkdownFormattedText } from '../../components/markdown_formatted_text';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   ActiveProposalPill,
@@ -13,6 +12,7 @@ import {
 } from '../../components/proposal_pills';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 
 type SnapshotProposalContentAttrs = {
   proposal: SnapshotProposal;

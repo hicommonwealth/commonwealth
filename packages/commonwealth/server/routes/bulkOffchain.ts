@@ -6,12 +6,12 @@
 //
 import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { OffchainTopicInstance } from '../models/offchain_topic';
+import { TopicInstance } from '../models/topic';
 import { RoleInstance } from '../models/role';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { RuleInstance } from '../models/rule';
 import { CommunityBannerInstance } from '../models/community_banner';
@@ -38,11 +38,11 @@ const bulkOffchain = async (
     await (<
       Promise<
         [
-          OffchainTopicInstance[],
+          TopicInstance[],
           unknown,
           RoleInstance[],
           unknown,
-          OffchainThreadInstance[],
+          ThreadInstance[],
           ChatChannelInstance[],
           RuleInstance[],
           CommunityBannerInstance,
@@ -50,14 +50,14 @@ const bulkOffchain = async (
       >
     >Promise.all([
       // topics
-      models.OffchainTopic.findAll({
+      models.Topic.findAll({
         where: { chain_id: chain.id },
       }),
       // threads, comments, reactions
       new Promise(async (resolve, reject) => {
         try {
           const threadParams = Object.assign(replacements, { pinned: true });
-          const rawPinnedThreads = await models.OffchainThread.findAll({
+          const rawPinnedThreads = await models.Thread.findAll({
             where: threadParams,
             include: [
               {
@@ -69,7 +69,7 @@ const bulkOffchain = async (
                 as: 'collaborators',
               },
               {
-                model: models.OffchainTopic,
+                model: models.Topic,
                 as: 'topic',
               },
               {
@@ -80,7 +80,7 @@ const bulkOffchain = async (
                 as: 'linked_threads',
               },
               {
-                model: models.OffchainReaction,
+                model: models.Reaction,
                 as: 'reactions',
                 include: [
                   {
@@ -125,11 +125,11 @@ const bulkOffchain = async (
             chain: chain.id,
           };
 
-          const monthlyComments = await models.OffchainComment.findAll({
+          const monthlyComments = await models.Comment.findAll({
             where,
             include: [models.Address],
           });
-          const monthlyThreads = await models.OffchainThread.findAll({
+          const monthlyThreads = await models.Thread.findAll({
             where,
             attributes: { exclude: ['version_history'] },
             include: [{ model: models.Address, as: 'Address' }],
@@ -155,7 +155,7 @@ const bulkOffchain = async (
       }),
       models.sequelize.query(
         `
-     SELECT id, title, stage FROM "OffchainThreads"
+     SELECT id, title, stage FROM "Threads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
         {
           replacements,

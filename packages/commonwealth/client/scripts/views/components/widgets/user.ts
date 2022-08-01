@@ -167,7 +167,7 @@ const User: m.Component<
           },
           long ? `${friendlyChainName} Validator` : 'V'
         ),
-      // offchain role in commonwealth forum
+      // role in commonwealth forum
       showRole &&
         role &&
         m(Tag, {
@@ -350,7 +350,7 @@ const User: m.Component<
               },
               label: 'Ban User',
               buttonType: 'primary-red',
-            })
+            }),
           ]),
       ]
     );

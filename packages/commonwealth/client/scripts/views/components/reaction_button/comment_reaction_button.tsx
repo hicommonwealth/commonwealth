@@ -7,7 +7,7 @@ import 'components/reaction_button/comment_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainComment, ChainInfo } from 'models';
+import { Comment, ChainInfo } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,
@@ -16,7 +16,7 @@ import {
 } from './helpers';
 
 type CommentReactionButtonAttrs = {
-  comment: OffchainComment<any>;
+  comment: Comment<any>;
 };
 
 export class CommentReactionButton

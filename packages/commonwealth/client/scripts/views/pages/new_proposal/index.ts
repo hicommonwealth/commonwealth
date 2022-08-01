@@ -22,7 +22,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     vnode.state.titlePre = 'New';
 
     // auto-redirect to the new thread page if sent here accidentally
-    if (vnode.state.typeEnum === ProposalType.OffchainThread) {
+    if (vnode.state.typeEnum === ProposalType.Thread) {
       navigateToSubpage('/new/discussion');
     }
 

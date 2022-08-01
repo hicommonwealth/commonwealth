@@ -22,19 +22,24 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 
 import { detectURL } from 'helpers/threads';
-import { OffchainTopic, OffchainThreadKind, OffchainThreadStage } from 'models';
+import { Topic, ThreadKind, ThreadStage } from 'models';
 
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import QuillEditor from 'views/components/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { TopicSelector } from 'views/components/topic_selector';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 
-import QuillFormattedText from './quill_formatted_text';
-import { MarkdownFormattedText } from './markdown_formatted_text';
+import { QuillFormattedText } from './quill/quill_formatted_text';
+import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import {
+  disableEditor,
+  editorIsBlank,
+  getQuillTextContents,
+} from './quill/helpers';
 
 interface IThreadForm {
   topicName?: string;
@@ -61,11 +66,7 @@ enum NewDraftErrors {
 }
 
 const saveDraft = async (form, quillEditorState, author, existingDraft?) => {
-  const bodyText = !quillEditorState
-    ? ''
-    : quillEditorState.markdownMode
-    ? quillEditorState.editor.getText()
-    : JSON.stringify(quillEditorState.editor.getContents());
+  const bodyText = getQuillTextContents(quillEditorState);
   const { threadTitle, topicName } = form;
   if (quillEditorState.editor.getText().length <= 1 && !threadTitle) {
     throw new Error(NewDraftErrors.InsufficientData);
@@ -104,18 +105,18 @@ const newThread = async (
   form,
   quillEditorState,
   author,
-  kind = OffchainThreadKind.Forum,
-  stage = OffchainThreadStage.Discussion,
+  kind = ThreadKind.Forum,
+  stage = ThreadStage.Discussion,
   readOnly?: boolean
 ) => {
   const topics = app.chain.meta.topics;
 
-  if (kind === OffchainThreadKind.Forum) {
+  if (kind === ThreadKind.Forum) {
     if (!form.threadTitle) {
       throw new Error(NewThreadErrors.NoTitle);
     }
   }
-  if (kind === OffchainThreadKind.Link) {
+  if (kind === ThreadKind.Link) {
     if (!form.linkTitle) {
       throw new Error(NewThreadErrors.NoTitle);
     }
@@ -126,24 +127,13 @@ const newThread = async (
   if (!form.topicName && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
-  if (
-    kind === OffchainThreadKind.Forum &&
-    quillEditorState.editor.editor.isBlank()
-  ) {
+  if (kind === ThreadKind.Forum && editorIsBlank(quillEditorState)) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  quillEditorState.editor.enable(false);
+  disableEditor(quillEditorState, document);
 
-  const mentionsEle = document.getElementsByClassName(
-    'ql-mention-list-container'
-  )[0];
-  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-  const bodyText = !quillEditorState
-    ? ''
-    : quillEditorState.markdownMode
-    ? quillEditorState.editor.getText()
-    : JSON.stringify(quillEditorState.editor.getContents());
+  const bodyText = getQuillTextContents(quillEditorState);
 
   const { topicName, topicId, threadTitle, linkTitle, url } = form;
   const title = threadTitle || linkTitle;
@@ -193,7 +183,7 @@ const newLink = async (
   form,
   quillEditorState,
   author,
-  kind = OffchainThreadKind.Link
+  kind = ThreadKind.Link
 ) => {
   const errors = await newThread(form, quillEditorState, author, kind);
   return errors;
@@ -359,7 +349,7 @@ export const NewThreadForm: m.Component<
     hasTopics: boolean;
   },
   {
-    activeTopic: OffchainTopic | string | boolean;
+    activeTopic: Topic | string | boolean;
     autoTitleOverride;
     form: IThreadForm;
     fromDraft?: number;
