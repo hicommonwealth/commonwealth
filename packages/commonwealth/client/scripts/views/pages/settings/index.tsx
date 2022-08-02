@@ -7,9 +7,9 @@ import 'pages/settings/index.scss';
 
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { EmailWell } from './email_well';
-import LinkedAddressesWell from './linked_addresses_well';
-import SettingsWell from './settings_well';
+import { EmailSection } from './email_section';
+import { LinkedAddressesSection } from './linked_addresses_section';
+import { ComposerSection } from './composer_section';
 
 class SettingsPage implements m.ClassComponent {
   view() {
@@ -22,10 +22,9 @@ class SettingsPage implements m.ClassComponent {
     return (
       <Sublayout title="Account Settings">
         <div class="SettingsPage">
-          <EmailWell />
-          {m(LinkedAddressesWell)}
-          <br />
-          {m(SettingsWell)}
+          <EmailSection />
+          <LinkedAddressesSection />
+          <ComposerSection />
         </div>
       </Sublayout>
     );

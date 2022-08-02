@@ -4,35 +4,11 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: 16px;
+  gap: 32px;
   padding: 24px;
   width: 400px;
 
-  @include smallInclusive {
+  @include extraSmall {
     width: 100%;
-  }
-
-  h2 {
-    margin-bottom: 38px;
-  }
-
-  .account-selector {
-    margin-top: 30px;
-    margin-right: 10px;
-  }
-
-  .send-tokens {
-    margin-top: 30px;
-    margin-right: 10px;
-  }
-
-  .send-tokens-from {
-    color: $neutral-500;
-    margin-left: 15px;
-  }
-
-  .LinkedAddressesWell,
-  .SettingsWell {
-    margin-top: 30px;
   }
 }
