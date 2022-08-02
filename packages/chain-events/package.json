@@ -21,7 +21,7 @@
     "ganache": "ganache-cli -m \"Alice\" -p 9545 -l 800000000 --allowUnlimitedContractSize",
     "batch-poll": "ts-node -T ./scripts/batchPoller.ts",
     "preyalcpublish": "yarn build",
-    "start": ""
+    "start": "ts-node ./app/Server.ts"
   },
   "engines": {
     "node": ">=14"
@@ -50,6 +50,8 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
     "pg": "^8.6.0",
     "pg-format": "^1.0.4",
     "sequelize": "^6.21.3",
