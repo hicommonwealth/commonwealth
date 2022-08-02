@@ -44,14 +44,12 @@ export class UserDashboardRow
 
       const label = ChainEventLabel(chain, chainEvent);
 
-      const communityName =
-        app.config.chains.getById(chain)?.name || 'Unknown chain';
+      const chainInfo = app.config.chains.getById(chain);
 
       return (
         <UserDashboardChainEventRow
           blockNumber={blockNumber}
-          chain={chain}
-          communityName={communityName}
+          chain={chainInfo}
           label={label}
         />
       );
