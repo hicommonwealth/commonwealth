@@ -28,8 +28,8 @@ import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import {
   ITXModalData,
   ProposalModule,
-  OffchainThreadKind,
-  OffchainThreadStage,
+  ThreadStage,
+  ThreadKind
 } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
@@ -58,7 +58,7 @@ import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
-import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
 
 enum SupportedSputnikProposalTypes {
@@ -165,7 +165,7 @@ const NewProposalForm = {
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
       if (hasExternalProposalSelector)
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
-    } else if (proposalTypeEnum === ProposalType.OffchainThread) {
+    } else if (proposalTypeEnum === ProposalType.Thread) {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
@@ -228,12 +228,12 @@ const NewProposalForm = {
         ).createTx(...a);
       };
       let args = [];
-      if (proposalTypeEnum === ProposalType.OffchainThread) {
+      if (proposalTypeEnum === ProposalType.Thread) {
         app.threads
           .create(
             author.address,
-            OffchainThreadKind.Forum,
-            OffchainThreadStage.Discussion,
+            ThreadKind.Discussion,
+            ThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,
             vnode.state.form.topicName,
@@ -1268,7 +1268,7 @@ const NewProposalForm = {
                   )
                 ),
               ]),
-              // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+              // TODO: display copy re AIPs and ARCs from https://docs.aave.com/governance/
               m('.tab-selector', [
                 m(
                   Tabs,
@@ -1651,7 +1651,7 @@ const NewProposalForm = {
               intent: 'primary',
               rounded: true,
               label:
-                proposalTypeEnum === ProposalType.OffchainThread
+                proposalTypeEnum === ProposalType.Thread
                   ? 'Create thread'
                   : 'Send transaction',
               onclick: (e) => {

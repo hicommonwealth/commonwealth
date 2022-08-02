@@ -1,6 +1,6 @@
 import { IUniqueId } from './interfaces';
 
-class OffchainReaction<T extends IUniqueId> {
+class Reaction<T extends IUniqueId> {
   public readonly id: number;
   public readonly author: string;
   public readonly chain: string;
@@ -32,4 +32,4 @@ class OffchainReaction<T extends IUniqueId> {
   }
 }
 
-export default OffchainReaction;
+export default Reaction;

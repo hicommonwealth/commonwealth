@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-class OffchainTopic {
+class Topic {
   public readonly name: string;
   public readonly id: number;
   public readonly description: string;
@@ -57,4 +57,4 @@ class OffchainTopic {
   }
 }
 
-export default OffchainTopic;
+export default Topic;

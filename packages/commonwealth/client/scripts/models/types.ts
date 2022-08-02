@@ -5,20 +5,17 @@ import {
   IThresholdEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
-  IUnavailableEndTime
+  IUnavailableEndTime,
 } from './interfaces';
 import Proposal from './Proposal';
 
-// TODO: this is inconsistently used
-export enum OffchainThreadKind {
-  Forum = 'forum',
+export enum ThreadKind {
+  Discussion = 'discussion',
   Link = 'link',
-  Question = 'question',
-  Request = 'request',
 }
 
 // TODO: this list should be shared with the server
-export enum OffchainThreadStage {
+export enum ThreadStage {
   Discussion = 'discussion',
   ProposalInReview = 'proposal_in_review',
   Voting = 'voting',

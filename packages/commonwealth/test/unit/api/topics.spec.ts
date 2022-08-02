@@ -24,7 +24,7 @@ describe('Topic Tests', () => {
   const body = 'test body';
   const topicName = 'test topic';
   const topicId = undefined;
-  const kind = 'forum';
+  const kind = 'discussion';
   const stage = 'discussion';
 
   before('reset database', async () => {

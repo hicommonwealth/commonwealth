@@ -7,19 +7,17 @@ import 'modals/edit_topic_modal.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
-import {
-  disableEditor,
-  getQuillTextContents,
-} from '../components/quill/helpers';
+import { QuillEditor } from '../components/quill/quill_editor';
+import { QuillTextContents } from '../components/quill/types';
 
 type EditTopicModalAttrs = {
   defaultOffchainTemplate: string;
@@ -41,8 +39,9 @@ type EditTopicModalForm = {
 export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
   private error: string;
   private form: EditTopicModalForm;
-  private quillEditorState; // do we have a type for this?
+  private quillEditorState: QuillEditor;
   private saving: boolean;
+  private _contentsDoc: QuillTextContents;
 
   view(vnode) {
     const {
@@ -53,6 +52,14 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
       id,
       name,
     } = vnode.attrs;
+
+    if (defaultOffchainTemplate) {
+      try {
+        this._contentsDoc = JSON.parse(defaultOffchainTemplate);
+      } catch (e) {
+        this._contentsDoc = defaultOffchainTemplate;
+      }
+    }
 
     if (!this.form) {
       this.form = {
@@ -66,15 +73,12 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
 
     const updateTopic = async (form) => {
       const { quillEditorState } = this;
+      quillEditorState.disable();
 
-      if (form.featuredInNewPost && quillEditorState.editor.editor.isBlank()) {
+      if (form.featuredInNewPost && quillEditorState.isBlank()) {
         this.error = 'Must provide template.';
         return false;
       }
-
-      disableEditor(quillEditorState);
-
-      const bodyText = getQuillTextContents(quillEditorState);
 
       const topicInfo = {
         id,
@@ -84,11 +88,13 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
         telegram: null,
         featured_in_sidebar: form.featuredInSidebar,
         featured_in_new_post: form.featuredInNewPost,
-        default_offchain_template: bodyText,
+        default_offchain_template: form.featuredInNewPost
+          ? quillEditorState.textContentsAsString
+          : null,
       };
 
       try {
-        await app.topics.edit(new OffchainTopic(topicInfo));
+        await app.topics.edit(new Topic(topicInfo));
         return true;
       } catch (err) {
         this.error = err.message || err;
@@ -138,108 +144,71 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
               this.form.description = (e.target as HTMLInputElement).value;
             }}
           />
-          <div class="checkboxes-container">
-            <CWCheckbox
-              label="Featured in Sidebar"
-              checked={this.form.featuredInSidebar}
-              onchange={() => {
-                this.form.featuredInSidebar = !this.form.featuredInSidebar;
-              }}
-            />
-            <CWCheckbox
-              label="Featured in New Post"
-              checked={this.form.featuredInNewPost}
-              onchange={() => {
-                this.form.featuredInNewPost = !this.form.featuredInNewPost;
-              }}
-            />
-          </div>
+          <CWCheckbox
+            label="Featured in Sidebar"
+            checked={this.form.featuredInSidebar}
+            onchange={() => {
+              this.form.featuredInSidebar = !this.form.featuredInSidebar;
+            }}
+          />
+          <CWCheckbox
+            label="Featured in New Post"
+            checked={this.form.featuredInNewPost}
+            onchange={() => {
+              this.form.featuredInNewPost = !this.form.featuredInNewPost;
+            }}
+          />
           {this.form.featuredInNewPost && (
-            <QuillEditor
-              contentsDoc=""
-              oncreateBind={(state) => {
+            <QuillEditorComponent
+              contentsDoc={this._contentsDoc}
+              oncreateBind={(state: QuillEditor) => {
                 this.quillEditorState = state;
-
-                let newDraftMarkdown;
-
-                let newDraftDelta;
-
-                if (defaultOffchainTemplate) {
-                  try {
-                    newDraftDelta = JSON.parse(defaultOffchainTemplate);
-                    if (!newDraftDelta.ops) throw new Error();
-                  } catch (e) {
-                    newDraftMarkdown = defaultOffchainTemplate;
-                  }
-                }
-                // If the text format of the loaded draft differs from the current editor's mode,
-                // we update the current editor's mode accordingly, to preserve formatting
-                if (newDraftDelta && this.quillEditorState.markdownMode) {
-                  this.quillEditorState.markdownMode = false;
-                } else if (
-                  newDraftMarkdown &&
-                  !this.quillEditorState.markdownMode
-                ) {
-                  this.quillEditorState.markdownMode = true;
-                }
-                if (newDraftDelta) {
-                  this.quillEditorState.editor.setContents(newDraftDelta);
-                } else if (newDraftMarkdown) {
-                  this.quillEditorState.editor.setText(newDraftMarkdown);
-                } else {
-                  this.quillEditorState.editor.setContents('');
-                  this.quillEditorState.editor.setText('');
-                }
-                m.redraw();
               }}
               editorNamespace="new-discussion"
-              imageUploader
               tabindex={3}
             />
           )}
-          <div class="buttons-row">
-            <CWButton
-              onclick={async (e) => {
-                e.preventDefault();
-                const { form } = this;
-                updateTopic(form)
-                  .then((closeModal) => {
-                    if (closeModal) {
-                      $(e.target).trigger('modalexit');
-                      navigateToSubpage(
-                        `/discussions/${encodeURI(form.name.toString().trim())}`
-                      );
-                    }
-                  })
-                  .catch(() => {
-                    this.saving = false;
-                    m.redraw();
-                  });
-              }}
-              label="Save changes"
-            />
-            <CWButton
-              buttonType="primary-red"
-              disabled={this.saving}
-              onclick={async (e) => {
-                e.preventDefault();
-                const confirmed = await confirmationModalWithText(
-                  'Delete this topic?'
-                )();
-                if (!confirmed) return;
-                deleteTopic(this.form)
-                  .then(() => {
+          <CWButton
+            onclick={async (e) => {
+              e.preventDefault();
+              const { form } = this;
+              updateTopic(form)
+                .then((closeModal) => {
+                  if (closeModal) {
                     $(e.target).trigger('modalexit');
-                    navigateToSubpage('/');
-                  })
-                  .catch(() => {
-                    this.saving = false;
-                    m.redraw();
-                  });
-              }}
-              label="Delete topic"
-            />
-          </div>
+                    navigateToSubpage(
+                      `/discussions/${encodeURI(form.name.toString().trim())}`
+                    );
+                  }
+                })
+                .catch(() => {
+                  this.saving = false;
+                  m.redraw();
+                });
+            }}
+            label="Save changes"
+          />
+          <CWButton
+            buttonType="primary-red"
+            disabled={this.saving}
+            onclick={async (e) => {
+              e.preventDefault();
+              const confirmed = await confirmationModalWithText(
+                'Delete this topic?'
+              )();
+              if (!confirmed) return;
+              deleteTopic(this.form)
+                .then(() => {
+                  $(e.target).trigger('modalexit');
+                  navigateToSubpage('/');
+                })
+                .catch(() => {
+                  this.saving = false;
+                  m.redraw();
+                });
+            }}
+            label="Delete topic"
+          />
         </div>
         {this.error && (
           <CWValidationText message={this.error} status="failure" />

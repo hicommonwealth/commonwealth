@@ -33,15 +33,15 @@ const searchComments = async (
     if (error) return next(new Error(error));
 
     // set up query parameters
-    communityOptions = `AND "OffchainComments".chain = $chain `;
+    communityOptions = `AND "Comments".chain = $chain `;
     bind = { chain: chain.id };
   }
 
   const sort =
     req.query.sort === 'Newest'
-      ? 'ORDER BY "OffchainComments".created_at DESC'
+      ? 'ORDER BY "Comments".created_at DESC'
       : req.query.sort === 'Oldest'
-      ? 'ORDER BY "OffchainComments".created_at ASC'
+      ? 'ORDER BY "Comments".created_at ASC'
       : 'ORDER BY rank DESC';
 
   bind['searchTerm'] = req.query.search;
@@ -53,22 +53,22 @@ const searchComments = async (
     comments = await models.sequelize.query(
       `
   SELECT
-      "OffchainThreads".title,
-      "OffchainComments".text,
-      "OffchainComments".root_id as proposalId,
+      "Threads".title,
+      "Comments".text,
+      "Comments".root_id as proposalId,
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
       "Addresses".chain as address_chain,
-      "OffchainComments".created_at,
-      "OffchainThreads".chain,
-      ts_rank_cd("OffchainComments"._search, query) as rank
-    FROM "OffchainComments"
-    JOIN "OffchainThreads" ON "OffchainThreads".id =
+      "Comments".created_at,
+      "Threads".chain,
+      ts_rank_cd("Comments"._search, query) as rank
+    FROM "Comments"
+    JOIN "Threads" ON "Threads".id =
         CASE WHEN root_id ~ '^discussion_[0-9\\.]+$' THEN CAST(REPLACE(root_id, 'discussion_', '') AS int) ELSE NULL END
-    JOIN "Addresses" ON "OffchainComments".address_id = "Addresses".id, 
+    JOIN "Addresses" ON "Comments".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query
-    WHERE query @@ "OffchainComments"._search ${communityOptions} AND "OffchainComments".deleted_at IS NULL
+    WHERE query @@ "Comments"._search ${communityOptions} AND "Comments".deleted_at IS NULL
     ${sort} LIMIT $limit
 `,
       {

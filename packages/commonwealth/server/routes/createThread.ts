@@ -14,7 +14,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
 import { ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -28,12 +28,10 @@ import BanCache from '../util/banCheckCache';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  ForumMissingTitle: 'Forum posts must include a title',
-  QuestionMissingTitle: 'Questions must include a title',
-  RequestMissingTitle: 'Requests must include a title',
-  NoBodyOrAttachments: 'Forum posts must include body or attachment',
+  DiscussionMissingTitle: 'Discussion posts must include a title',
+  NoBodyOrAttachments: 'Discussion posts must include body or attachment',
   LinkMissingTitleOrUrl: 'Links must include a title and URL',
-  UnsupportedKind: 'Only forum threads, questions, and requests supported',
+  UnsupportedKind: 'Only discussion and link posts supported',
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to post",
   BalanceCheckFailed: 'Could not verify user token balance',
@@ -43,7 +41,7 @@ export const Errors = {
 const dispatchHooks = async (
   models: DB,
   req: Request,
-  finalThread: OffchainThreadInstance
+  finalThread: ThreadInstance
 ) => {
   // auto-subscribe thread creator to comments & reactions
   try {
@@ -147,7 +145,7 @@ const dispatchHooks = async (
     {
       created_at: new Date(),
       root_id: finalThread.id,
-      root_type: ProposalType.OffchainThread,
+      root_type: ProposalType.Thread,
       root_title: finalThread.title,
       comment_text: finalThread.body,
       chain_id: finalThread.chain,
@@ -180,7 +178,7 @@ const dispatchHooks = async (
         {
           created_at: new Date(),
           root_id: finalThread.id,
-          root_type: ProposalType.OffchainThread,
+          root_type: ProposalType.Thread,
           root_title: finalThread.title,
           comment_text: finalThread.body,
           chain_id: finalThread.chain,
@@ -219,9 +217,9 @@ const createThread = async (
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
 
-  if (kind === 'forum') {
+  if (kind === 'discussion') {
     if (!title || !title.trim()) {
-      return next(new Error(Errors.ForumMissingTitle));
+      return next(new Error(Errors.DiscussionMissingTitle));
     }
     if (
       (!body || !body.trim()) &&
@@ -240,14 +238,6 @@ const createThread = async (
       }
     } catch (e) {
       // check always passes if the body isn't a Quill document
-    }
-  } else if (kind === 'question') {
-    if (!title || !title.trim()) {
-      return next(new Error(Errors.QuestionMissingTitle));
-    }
-  } else if (kind === 'request') {
-    if (!title || !title.trim()) {
-      return next(new Error(Errors.RequestMissingTitle));
     }
   } else if (kind === 'link') {
     if (!title || !title.trim() || !url) {
@@ -303,17 +293,17 @@ const createThread = async (
     if (topic_id) {
       threadContent['topic_id'] = +topic_id;
     } else if (topic_name) {
-      let offchainTopic;
+      let topic;
       try {
-        [offchainTopic] = await models.OffchainTopic.findOrCreate({
+        [topic] = await models.Topic.findOrCreate({
           where: {
             name: topic_name,
             chain_id: chain?.id || null,
           },
           transaction,
         });
-        threadContent['topic_id'] = offchainTopic.id;
-        topic_id = offchainTopic.id;
+        threadContent['topic_id'] = topic.id;
+        topic_id = topic.id;
       } catch (err) {
         return next(err);
       }
@@ -348,22 +338,28 @@ const createThread = async (
       }
     }
 
-    const topic = await models.OffchainTopic.findOne({
+    const topic = await models.Topic.findOne({
       where: {
-        id: topic_id
+        id: topic_id,
       },
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address, transaction);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address,
+        transaction
+      );
       if (!passesRules) {
         return next(new Error(Errors.RuleCheckFailed));
       }
     }
 
-    let thread: OffchainThreadInstance;
+    let thread: ThreadInstance;
     try {
-      thread = await models.OffchainThread.create(threadContent, {
+      thread = await models.Thread.create(threadContent, {
         transaction,
       });
     } catch (err) {
@@ -375,7 +371,7 @@ const createThread = async (
         req.body['attachments[]'] &&
         typeof req.body['attachments[]'] === 'string'
       ) {
-        await models.OffchainAttachment.create(
+        await models.Attachment.create(
           {
             attachable: 'thread',
             attachment_id: thread.id,
@@ -385,24 +381,24 @@ const createThread = async (
           { transaction }
         );
       } else if (req.body['attachments[]']) {
-        const data = []
+        const data = [];
         req.body['attachments[]'].map((u) => {
           data.push({
             attachable: 'thread',
             attachment_id: thread.id,
             url: u,
             description: 'image',
-          })
+          });
         });
 
-        await models.OffchainAttachment.bulkCreate(data, { transaction });
+        await models.Attachment.bulkCreate(data, { transaction });
       }
     } catch (err) {
       return next(err);
     }
 
     // initialize view count
-    await models.OffchainViewCount.create(
+    await models.ViewCount.create(
       {
         chain: thread.chain,
         object_id: thread.id,
@@ -417,12 +413,12 @@ const createThread = async (
 
     try {
       // re-fetch thread once created
-      return await models.OffchainThread.findOne({
+      return await models.Thread.findOne({
         where: { id: thread.id },
         include: [
           { model: models.Address, as: 'Address' },
-          models.OffchainAttachment,
-          { model: models.OffchainTopic, as: 'topic' },
+          models.Attachment,
+          { model: models.Topic, as: 'topic' },
         ],
         transaction,
       });

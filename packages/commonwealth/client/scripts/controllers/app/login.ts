@@ -124,8 +124,8 @@ export async function updateLastVisited(
 }
 
 export async function updateActiveAddresses(chain?: ChainInfo) {
-  // update addresses for a chain (if provided) or for offchain communities (if null)
-  // for offchain communities, addresses on all chains are available by default
+  // update addresses for a chain (if provided) or for communities (if null)
+  // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain === chain.id)
