@@ -14,6 +14,7 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
   const chain = await models.Chain.findOne({
     where: { id: req.query.chain }
   });
+  
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -27,11 +28,11 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
         ],
         include: [ models.ChainEventType ],
       },
-      {
-        model: models.Thread,
-        attributes: ['title'],
-        // required: false,
-      }
+      // {
+      //   model: models.Thread,
+      //   attributes: ['title'],
+      //   // required: false,
+      // }
     ],
     order: [['created_at', 'DESC']],
     where: {

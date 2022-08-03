@@ -1,16 +1,14 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
-import { ThreadAttributes } from './thread';
 import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityAttributes = {
+  id: number;
   chain: string;
   type: string;
   type_id: string;
-  id?: number;
-  thread_id?: number;
   title?: string;
   author?: string;
   completed?: boolean;
@@ -18,7 +16,6 @@ export type ChainEntityAttributes = {
   updated_at?: Date;
 
   Chain?: ChainAttributes;
-  Thread?: ThreadAttributes;
   ChainEvents?: ChainEventAttributes[];
 }
 
@@ -35,7 +32,6 @@ export default (
     chain: { type: dataTypes.STRING, allowNull: false },
     type: { type: dataTypes.STRING, allowNull: false },
     type_id: { type: dataTypes.STRING, allowNull: false },
-    thread_id: { type: dataTypes.INTEGER, allowNull: true },
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     title: { type: dataTypes.STRING, allowNull: true },
     author: { type: dataTypes.STRING, allowNull: true },
@@ -57,7 +53,6 @@ export default (
 
   ChainEntity.associate = (models) => {
     models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-    models.ChainEntity.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };
 
