@@ -102,14 +102,14 @@ export async function setupWebSocketServer(
         : ''
     }`
   );
-  // const redisOptions = origin.includes("localhost") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
-  // const pubClient = createClient(redisOptions);
-  // const subClient = pubClient.duplicate();
+  const redisOptions = origin.includes("localhost") || origin.includes("127.0.0.1") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
+  const pubClient = createClient(redisOptions);
+  const subClient = pubClient.duplicate();
 
   try {
-    // await Promise.all([pubClient.connect(), subClient.connect()]);
+    await Promise.all([pubClient.connect(), subClient.connect()]);
     // provide the redis connection instances to the socket.io adapters
-    // await io.adapter(<any>createAdapter(pubClient, subClient));
+    await io.adapter(<any>createAdapter(pubClient, subClient));
   } catch (e) {
     // local env may not have redis so don't do anything if they don't
     if (!origin.includes('localhost')) {
