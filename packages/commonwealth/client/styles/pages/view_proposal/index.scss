@@ -234,12 +234,16 @@ $discussion-title-font-size: 1.45rem;
       }
     }
     .comment-body-top {
-      font-size: $discussion-meta-font-size;
-      display: flex;
-      flex-direction: row;
       align-items: center;
-      margin-bottom: 8px;
+      display: flex;
       flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      svg {
+        color: $neutral-500;
+        cursor: pointer;
+      }
     }
     .comment-body-bottom {
       padding: 4px 0 2px;
