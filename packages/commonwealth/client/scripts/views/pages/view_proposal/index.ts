@@ -224,9 +224,7 @@ const ProposalHeader: m.Component<
       isAdmin,
     } = vnode.attrs;
     const attachments =
-      proposal instanceof Thread
-        ? (proposal as Thread).attachments
-        : false;
+      proposal instanceof Thread ? (proposal as Thread).attachments : false;
     const proposalLink = getProposalUrlPath(
       proposal.slug,
       `${proposal.identifier}-${slugify(proposal.title)}`
@@ -428,10 +426,12 @@ const ProposalHeader: m.Component<
                           }),
                         ],
                         inline: true,
-                        trigger: m(CWIcon, {
-                          iconName: 'chevronDown',
-                          iconSize: 'small',
-                        }),
+                        trigger: m('', [
+                          m(CWIcon, {
+                            iconName: 'chevronDown',
+                            iconSize: 'small',
+                          }),
+                        ]),
                       }),
                   ]
             ),
@@ -600,10 +600,12 @@ const ProposalComment: m.Component<
                   }),
                 ],
                 transitionDuration: 0,
-                trigger: m(CWIcon, {
-                  iconName: 'chevronDown',
-                  iconSize: 'small',
-                }),
+                trigger: m('', [
+                  m(CWIcon, {
+                    iconName: 'chevronDown',
+                    iconSize: 'small',
+                  }),
+                ]),
               }),
             ],
             m(SocialSharingCarat, { commentID: comment.id }),
@@ -1171,13 +1173,9 @@ const ViewProposalPage: m.Component<
     const { activeAccount } = app.user;
 
     const authorChain =
-      proposal instanceof Thread
-        ? proposal.authorChain
-        : app.activeChainId();
+      proposal instanceof Thread ? proposal.authorChain : app.activeChainId();
     const authorAddress =
-      proposal instanceof Thread
-        ? proposal.author
-        : proposal.author?.address;
+      proposal instanceof Thread ? proposal.author : proposal.author?.address;
     const isAuthor =
       activeAccount?.address === authorAddress &&
       activeAccount?.chain.id === authorChain;
@@ -1359,10 +1357,8 @@ const ViewProposalPage: m.Component<
               m(AaveViewProposalSummary, { proposal }),
               m(AaveViewProposalDetail, { proposal }),
             ],
-            !(proposal instanceof Thread) &&
-              m(VotingResults, { proposal }),
-            !(proposal instanceof Thread) &&
-              m(VotingActions, { proposal }),
+            !(proposal instanceof Thread) && m(VotingResults, { proposal }),
+            !(proposal instanceof Thread) && m(VotingActions, { proposal }),
             m(ProposalComments, {
               proposal,
               comments,
