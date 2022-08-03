@@ -73,8 +73,8 @@ export class SnapshotInformationCard
     );
 
     return (
-      <CWCard elevation="elevation-1" className="SnapshotInformationCard">
-        <CWText type="h3" fontWeight="semiBold">
+      <CWCard className="SnapshotInformationCard">
+        <CWText type="h5" fontWeight="semiBold">
           Information
         </CWText>
         <div class="info-rows-container">

@@ -12,6 +12,7 @@ import {
   SnapshotProposal,
   SnapshotProposalVote,
   getResults,
+  getPower,
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
@@ -35,6 +36,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private threads: Array<{ id: string; title: string }> | null;
   private totals: any;
   private votes: SnapshotProposalVote[];
+  private fetchedPower: boolean;
+  private validatedAgainstStrategies: boolean;
+  private totalScore: number;
 
   oninit(vnode) {
     this.activeTab = 'proposals';
@@ -42,6 +46,8 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     this.scores = [];
     this.proposal = null;
     this.threads = null;
+    this.fetchedPower = false;
+    this.validatedAgainstStrategies = true;
 
     const loadVotes = async () => {
       this.proposal = app.snapshot.proposals.find(
@@ -58,6 +64,17 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       });
 
       m.redraw();
+
+      getPower(
+        this.space,
+        this.proposal,
+        app.user?.activeAccount?.address
+      ).then((vals) => {
+        this.validatedAgainstStrategies = vals.totalScore > 0;
+        this.totalScore = vals.totalScore;
+        this.fetchedPower = true;
+        m.redraw();
+      });
 
       try {
         app.threads
@@ -145,6 +162,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
                   threads={this.threads}
                   totals={this.totals}
                   votes={this.votes}
+                  validatedAgainstStrategies={this.validatedAgainstStrategies}
+                  fetchedPower={this.fetchedPower}
+                  totalScore={this.totalScore}
                 />
               </div>
             )}
@@ -164,6 +184,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
               threads={this.threads}
               totals={this.totals}
               votes={this.votes}
+              validatedAgainstStrategies={this.validatedAgainstStrategies}
+              fetchedPower={this.fetchedPower}
+              totalScore={this.totalScore}
             />
           </div>
         </div>

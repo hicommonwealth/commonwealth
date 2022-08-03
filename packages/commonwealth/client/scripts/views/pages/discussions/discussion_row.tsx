@@ -22,9 +22,9 @@ import {
 } from 'helpers';
 import {
   Thread,
-  ThreadKind,
   ThreadStage,
   AddressInfo,
+  ThreadKind,
 } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
