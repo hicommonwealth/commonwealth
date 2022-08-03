@@ -17,7 +17,7 @@ module.exports = {
       },{ transaction: t });
       await queryInterface.sequelize.query(`
         ALTER TABLE "Threads" 
-        DROP CONSTRAINT Threads_author_id_fkey;
+        DROP CONSTRAINT "OffchainThreads_author_id_fkey";
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.changeColumn('Threads', 'address_id', {
         type: Sequelize.INTEGER,
@@ -30,7 +30,7 @@ module.exports = {
         UPDATE "Threads" 
         SET chain_entity_id =  ce.id
         FROM "ChainEntities" ce
-        WHERE Threads.id = ce.thread_id;
+        WHERE "Threads".id = ce.thread_id;
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.sequelize.query(`
         INSERT INTO "Threads" (title, created_at, updated_at, chain, chain_entity_id)
@@ -60,9 +60,9 @@ module.exports = {
       await queryInterface.sequelize.query(`
       INSERT INTO "Threads" (title, created_at, updated_at, chain, chain_entity_id)
       SELECT DISTINCT '-' as title, 
-        COALESCE(ce.created_at, MIN(r.created_at) OVER (PARTITION BY c.root_id)) as created_at,
-        COALESCE(ce.created_at, MIN(r.created_at) OVER (PARTITION BY c.root_id)) as updated_at,
-        c.chain,
+        COALESCE(ce.created_at, MIN(r.created_at) OVER (PARTITION BY r.proposal_id)) as created_at,
+        COALESCE(ce.created_at, MIN(r.created_at) OVER (PARTITION BY r.proposal_id)) as updated_at,
+        r.chain,
         ce.id
       FROM "Reactions" r
         INNER JOIN "ChainEntities" ce on r.chain = ce."chain"  
@@ -128,9 +128,10 @@ module.exports = {
                 end
       ;
     `, {transaction: t, raw: true, type: 'RAW'});     
-      await queryInterface.removeColumn('Comments','root_id',{ transaction: t });
-      await queryInterface.removeColumn('Reactions','proposal_id',{ transaction: t });
-      await queryInterface.removeColumn('ChainEntities','thread_id',{ transaction: t });
+      //await queryInterface.removeColumn('Comments','root_id',{ transaction: t });
+      //await queryInterface.removeColumn('Reactions','proposal_id',{ transaction: t });
+      //await queryInterface.removeColumn('ChainEntities','thread_id',{ transaction: t });
+
       //TODO: map onchain threads that are valid but don't have ChainEntities ()
       //TODO: delete comments w/no threads-- deleted proposals, too old, councilcandidate, etc
     });
@@ -144,7 +145,7 @@ module.exports = {
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.sequelize.query(`
         ALTER TABLE "Threads" 
-        ADD CONSTRAINT Threads_author_id_fkey FOREIGN KEY (address_id) REFERENCES "Addresses" (id);
+        ADD CONSTRAINT "OffchainThreads_author_id_fkey" FOREIGN KEY (address_id) REFERENCES "Addresses" (id);
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.changeColumn('Threads', 'address_id', {
         type: Sequelize.INTEGER,
@@ -152,15 +153,15 @@ module.exports = {
       },{ transaction: t });
       await queryInterface.removeColumn('Threads','chain_entity_id',{ transaction: t });
       await queryInterface.removeColumn('Comments','thread_id',{ transaction: t });
-      await queryInterface.addColumn('Comments', 'root_id', {
-        type: Sequelize.VARCHAR(255),
-      },{ transaction: t });
-      await queryInterface.addColumn('Reactions', 'proposal_id', {
-        type: Sequelize.VARCHAR(255),
-      },{ transaction: t });
-      await queryInterface.addColumn('ChainEntities', 'thread_id', {
-        type: Sequelize.INTEGER,
-      },{ transaction: t });
+      // await queryInterface.addColumn('Comments', 'root_id', {
+      //   type: Sequelize.VARCHAR(255),
+      // },{ transaction: t });
+      // await queryInterface.addColumn('Reactions', 'proposal_id', {
+      //   type: Sequelize.VARCHAR(255),
+      // },{ transaction: t });
+      // await queryInterface.addColumn('ChainEntities', 'thread_id', {
+      //   type: Sequelize.INTEGER,
+      // },{ transaction: t });
       await queryInterface.sequelize.query(`
         UPDATE "Comments" 
         SET root_id =  "rootIdRefactor_Comments".root_id
