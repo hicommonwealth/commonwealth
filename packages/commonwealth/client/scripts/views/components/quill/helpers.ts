@@ -25,7 +25,12 @@ export const renderQuillTextBody = (textBody: any, params: QuillTextParams) => {
     if (!doc.ops) throw new Error();
     return m(QuillFormattedText, { ...params, doc });
   } catch (e) {
-    const doc = decodeURIComponent(textBody);
+    let doc;
+    try {
+      doc = decodeURIComponent(textBody);
+    } catch (e2) {
+      return m(MarkdownFormattedText, { ...params, textBody });
+    }
     return m(MarkdownFormattedText, { ...params, doc });
   }
 };

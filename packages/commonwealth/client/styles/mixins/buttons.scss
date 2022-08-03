@@ -7,6 +7,12 @@
   .Text.button-text {
     color: $color;
   }
+
+  .Text.button-mini-text {
+    font-weight: 500;
+    font-size: 12px;
+    color: $color;
+  }
 }
 
 @mixin disabled {
@@ -263,4 +269,25 @@
 
     @include iconAndText($neutral-600);
   }
+}
+
+@mixin mini {
+  align-items: center;
+  padding: 4px 12px;
+  background: $neutral-800;
+  border-radius: $border-radius-rounded-corners;
+
+  &:hover {
+    background: $neutral-700;
+  }
+
+  &:active {
+    background: $neutral-400;
+  }
+
+  &.disabled {
+    background: $neutral-200;
+  }
+
+  @include iconAndText(white);
 }
