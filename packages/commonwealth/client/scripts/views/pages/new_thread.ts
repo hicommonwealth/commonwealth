@@ -7,7 +7,7 @@ import { navigateToSubpage } from 'app';
 import { notifyInfo } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { NewThreadForm } from '../components/new_thread_form';
+import { NewThreadForm } from '../components/new_thread_form/new_thread_form';
 
 const NewThreadPage: m.Component<{}> = {
   oncreate: (vnode: VnodeDOM) => {},
