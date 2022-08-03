@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'components/proposals/aave_detail.scss';
 
-import AaveProposal from 'client/scripts/controllers/chain/ethereum/aave/proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import User from '../widgets/user';
 
 export const roundVote = (percentage) => {

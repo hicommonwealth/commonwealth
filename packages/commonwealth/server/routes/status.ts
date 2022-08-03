@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JWT_SECRET } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import '../types';
-import {DB, sequelize} from '../database';
+import { DB, sequelize } from '../database';
 import { ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,7 +34,7 @@ const status = async (
           },
           {
             model: models.ChainNode,
-          }
+          },
         ],
       }),
       models.ChainNode.findAll(),
@@ -162,45 +162,7 @@ const status = async (
     for (let i = 0; i < commsAndChains.length; i++) {
       const name = commsAndChains[i][0];
       let time: any = commsAndChains[i][1];
-      time = new Date(time as string)
-
-      // if time is invalid reset + skip this chain
-      if (Number.isNaN(time.getDate())) {
-        unseenPosts[name] = {};
-        continue;
-      }
-
-      // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-      if (i != 0) query += ' UNION '
-      // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-      replacements.push(name, time.getTime());
-      // append the SELECT query
-      query += `SELECT id, chain FROM "Threads" WHERE (kind IN ('forum', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`
-      if (i == commsAndChains.length - 1) query += ';';
-    }
-
-    // populate the query replacements and execute the query
-    const threadNum: {id: string, chain: string}[] = <any>(await sequelize.query(query, {
-      raw: true, type: QueryTypes.SELECT, replacements
-    }));
-
-    // this section iterates through the retrieved threads counting the number of threads and keeping a set of activePosts
-    // the set of activePosts is used to compare with the comments under threads so that there are no duplicate active threads counted
-    for (const thread of threadNum) {
-      if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {}
-      unseenPosts[thread.chain].activePosts ? unseenPosts[thread.chain].activePosts.add(thread.id) : unseenPosts[thread.chain].activePosts = new Set(thread.id);
-      unseenPosts[thread.chain].threads ? unseenPosts[thread.chain].threads++ : unseenPosts[thread.chain].threads = 1;
-    }
-
-    // reset var
-    query = ``;
-    replacements = []
-
-    // same principal as the loop above but for comments instead of threads
-    for (let i = 0; i < commsAndChains.length; i++) {
-      const name = commsAndChains[i][0];
-      let time: any = commsAndChains[i][1];
-      time = new Date(time as string)
+      time = new Date(time as string);
 
       // if time is invalid reset + skip this chain
       if (Number.isNaN(time.getDate())) {
@@ -211,24 +173,78 @@ const status = async (
       // adds a union between SELECT queries if the number of SELECT queries is greater than 1
       if (i != 0) query += ' UNION ';
       // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-      replacements.push(name, time.getTime())
+      replacements.push(name, time.getTime());
       // append the SELECT query
-      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`
-      if (i == commsAndChains.length - 1) query += ';';
+      query += `SELECT id, chain FROM "Threads" WHERE (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+      if (i === commsAndChains.length - 1) query += ';';
+    }
+
+    // populate the query replacements and execute the query
+    const threadNum: { id: string; chain: string }[] = <any>(
+      await sequelize.query(query, {
+        raw: true,
+        type: QueryTypes.SELECT,
+        replacements,
+      })
+    );
+
+    // this section iterates through the retrieved threads counting the number of threads and keeping a set of activePosts
+    // the set of activePosts is used to compare with the comments under threads so that there are no duplicate active threads counted
+    for (const thread of threadNum) {
+      if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
+      unseenPosts[thread.chain].activePosts
+        ? unseenPosts[thread.chain].activePosts.add(thread.id)
+        : (unseenPosts[thread.chain].activePosts = new Set(thread.id));
+      unseenPosts[thread.chain].threads
+        ? unseenPosts[thread.chain].threads++
+        : (unseenPosts[thread.chain].threads = 1);
+    }
+
+    // reset var
+    query = ``;
+    replacements = [];
+
+    // same principal as the loop above but for comments instead of threads
+    for (let i = 0; i < commsAndChains.length; i++) {
+      const name = commsAndChains[i][0];
+      let time: any = commsAndChains[i][1];
+      time = new Date(time as string);
+
+      // if time is invalid reset + skip this chain
+      if (Number.isNaN(time.getDate())) {
+        unseenPosts[name] = {};
+        continue;
+      }
+
+      // adds a union between SELECT queries if the number of SELECT queries is greater than 1
+      if (i !== 0) query += ' UNION ';
+      // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
+      replacements.push(name, time.getTime());
+      // append the SELECT query
+      query += `SELECT root_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+      if (i === commsAndChains.length - 1) query += ';';
     }
 
     // populate query and execute
-    const commentNum: {root_id: string, chain: string}[] = <any>(await sequelize.query(query, {
-      raw: true, type: QueryTypes.SELECT, replacements
-    }));
+    const commentNum: { root_id: string; chain: string }[] = <any>(
+      await sequelize.query(query, {
+        raw: true,
+        type: QueryTypes.SELECT,
+        replacements,
+      })
+    );
 
     // iterates through the retrieved comments and adds each thread id to the activePosts set
     for (const comment of commentNum) {
-      if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {}
+      if (!unseenPosts[comment.chain]) unseenPosts[comment.chain] = {};
       // extract the thread id from the comments root id
       const id = comment.root_id.split('_')[1];
-      unseenPosts[comment.chain].activePosts ? unseenPosts[comment.chain].activePosts.add(id) : unseenPosts[comment.chain].activePosts = new Set(id);
-      unseenPosts[comment.chain].comments ? unseenPosts[comment.chain].comments++ : unseenPosts[comment.chain].comments = 1;
+      unseenPosts[comment.chain].activePosts
+        ? unseenPosts[comment.chain].activePosts.add(id)
+        : (unseenPosts[comment.chain].activePosts = new Set(id));
+      unseenPosts[comment.chain].comments
+        ? unseenPosts[comment.chain].comments++
+        : (unseenPosts[comment.chain].comments = 1);
     }
 
     // set the activePosts to num in set
@@ -244,8 +260,8 @@ const status = async (
         unseenPosts[name] = {
           activePosts: 0,
           threads: 0,
-          comments: 0
-        }
+          comments: 0,
+        };
       } else {
         // if the chain does have activePosts convert the set of ids to simply the length of the set
         unseenPosts[name].activePosts = unseenPosts[name].activePosts.size;

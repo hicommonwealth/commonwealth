@@ -3,10 +3,9 @@ import lity from 'lity';
 import { slugify } from 'utils';
 
 import app from 'state';
-import { Thread, ThreadKind, AddressInfo } from 'models';
+import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import User from 'views/components/widgets/user';
 
 const ProfileProposal: m.Component<
   { proposal: Thread },
@@ -23,47 +22,40 @@ const ProfileProposal: m.Component<
     return m('.ProfileProposal', [
       m('.summary', [
         m('', [
-          proposal.kind === ThreadKind.Question
-            ? 'Added a question'
-            : proposal.kind === ThreadKind.Request
-            ? 'added a task'
-            : [
-                'Created a new ',
-                link(
-                  'a.link-bold',
-                  `/${chain}${getProposalUrlPath(
-                    slug,
-                    `${identifier}-${slugify(title)}`,
-                    true
-                  )}`,
-                  'thread',
-                  {},
-                  `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
-                ),
-                ' in ',
-                link('a.link-bold', `/${chain}`, `${chain}`),
-              ],
+          'Created a new ',
+          link(
+            'a.link-bold',
+            `/${chain}${getProposalUrlPath(
+              slug,
+              `${identifier}-${slugify(title)}`,
+              true
+            )}`,
+            'thread',
+            {},
+            `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
+          ),
+          ' in ',
+          link('a.link-bold', `/${chain}`, `${chain}`),
         ]),
         createdAt && createdAt.fromNow(),
       ]),
-      m('.activity.proposal', [
-        proposal.kind === ThreadKind.Forum ||
-        proposal.kind === ThreadKind.Link
-          ? link(
-              'a.proposal-title',
-              `/${chain}${getProposalUrlPath(
-                slug,
-                `${identifier}-${slugify(title)}`,
-                true
-              )}`,
-              title,
-              {},
-              `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
-            )
-          : m('a.proposal-title', title),
+      m(
+        '.activity.proposal',
+        [
+          link(
+            'a.proposal-title',
+            `/${chain}${getProposalUrlPath(
+              slug,
+              `${identifier}-${slugify(title)}`,
+              true
+            )}`,
+            title,
+            {},
+            `profile-${author}-${proposal.authorChain}-${proposal.chain}-scrollY`
+          ),
+        ],
         // TODO: show a truncated thread once we have a good formatting stripping helper
-        attachments &&
-          attachments.length > 0 &&
+        !!attachments?.length &&
           m('.proposal-attachments', [
             m('p', `Attachments (${attachments.length})`),
             attachments.map((attachment) =>
@@ -87,8 +79,8 @@ const ProfileProposal: m.Component<
                 ]
               )
             ),
-          ]),
-      ]),
+          ])
+      ),
     ]);
   },
 };
