@@ -136,7 +136,7 @@ export class SnapshotProposalCards
           pollEnded={!isActive}
           hasVoted={hasVoted}
           votedFor={hasVoted ? userVote : ''}
-          disableVoteButton={fetchedPower && voteErrorText !== null}
+          disableVoteButton={!fetchedPower || voteErrorText !== null}
           proposalTitle={proposal.title}
           timeRemaining={calculateTimeRemaining(proposal)}
           tokenSymbol={space.symbol}
