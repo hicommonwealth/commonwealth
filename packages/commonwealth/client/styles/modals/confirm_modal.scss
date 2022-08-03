@@ -1,9 +1,10 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ConfirmModal {
   max-width: 440px;
 
-  button {
-    margin-right: 8px;
+  .compact-modal-actions {
+    display: flex;
+    gap: 8px;
   }
 }

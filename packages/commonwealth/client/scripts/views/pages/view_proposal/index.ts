@@ -38,6 +38,7 @@ import {
   ProposalModule,
   DepositVote,
 } from 'models';
+import moment from 'moment';
 
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
@@ -109,7 +110,6 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalPollCard } from './proposal_poll_card';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
@@ -122,7 +122,13 @@ import {
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
+import {
+  getProposalPollTimestamp,
+  handleProposalPollVote,
+  jumpHighlightComment,
+} from './helpers';
+import { PollCard } from '../../components/poll_card';
+import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { QuillEditor } from '../../components/quill/quill_editor';
 
 const MAX_THREAD_LEVEL = 2;
@@ -1398,24 +1404,68 @@ const ViewProposalPage: m.Component<
                 allowLinking: isAuthor || isAdminOrMod,
               }),
             proposal instanceof Thread &&
-              isAuthor &&
-              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
-              m(PollEditorCard, {
-                proposal,
-                proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
-              }),
-            proposal instanceof Thread &&
               [
                 ...new Map(
                   vnode.state.polls?.map((poll) => [poll.id, poll])
                 ).values(),
               ].map((poll) => {
-                return m(ProposalPollCard, { poll, thread: proposal });
+                return m(PollCard, {
+                  multiSelect: false,
+                  pollEnded:
+                    poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                  hasVoted:
+                    app.user.activeAccount &&
+                    poll.getUserVote(
+                      app.user.activeAccount?.chain?.id,
+                      app.user.activeAccount?.address
+                    ),
+                  disableVoteButton: !app.user.activeAccount,
+                  votedFor: poll.getUserVote(
+                    app.user.activeAccount?.chain?.id,
+                    app.user.activeAccount?.address
+                  )?.option,
+                  proposalTitle: poll.prompt,
+                  timeRemaining: getProposalPollTimestamp(
+                    poll,
+                    poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                  ),
+                  totalVoteCount: poll.votes?.length,
+                  voteInformation: poll.options.map((option) => {
+                    return {
+                      label: option,
+                      value: option,
+                      voteCount: poll.votes.filter((v) => v.option === option)
+                        .length,
+                    };
+                  }),
+                  incrementalVoteCast: 1,
+                  tooltipErrorMessage: app.user.activeAccount
+                    ? null
+                    : 'You must join this community to vote.',
+                  onVoteCast: (option, isSelected, callback) =>
+                    handleProposalPollVote(poll, option, isSelected, callback),
+                  onResultsClick: (e) => {
+                    e.preventDefault();
+                    if (poll.votes.length > 0) {
+                      app.modals.create({
+                        modal: OffchainVotingModal,
+                        data: { votes: poll.votes },
+                      });
+                    }
+                  },
+                });
               }),
           ],
+          proposal instanceof Thread &&
+            isAuthor &&
+            (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
+            m(PollEditorCard, {
+              proposal,
+              proposalAlreadyHasPolling: !vnode.state.polls?.length,
+              openPollEditor: () => {
+                vnode.state.pollEditorIsOpen = true;
+              },
+            }),
         ]),
       ])
     );
