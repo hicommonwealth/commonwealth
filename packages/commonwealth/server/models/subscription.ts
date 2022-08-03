@@ -27,7 +27,6 @@ import {
 } from './notifications_read';
 import { NotificationInstance } from './notification';
 import { ChainEventTypeAttributes } from "chain-events/app/models/chain_event_type";
-import { ChainEntityAttributes } from "chain-events/app/models/chain_entity";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,7 +54,6 @@ export type SubscriptionAttributes = {
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
   ChainEventType?: ChainEventTypeAttributes;
-  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface SubscriptionInstance

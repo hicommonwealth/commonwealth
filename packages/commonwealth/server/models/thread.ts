@@ -4,7 +4,6 @@ import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { AttachmentAttributes } from './attachment';
-import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 import { TopicAttributes } from './topic';
 
@@ -20,6 +19,7 @@ export type ThreadAttributes = {
   topic_id?: number;
   pinned?: boolean;
   chain: string;
+  chain_entity_id?: number
 
   read_only?: boolean;
   version_history?: string[];
@@ -38,7 +38,6 @@ export type ThreadAttributes = {
   Attachments?:
     | AttachmentAttributes[]
     | AttachmentAttributes['id'][];
-  ChainEntity?: ChainEntityAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
   topic?: TopicAttributes;
@@ -76,6 +75,7 @@ export default (
         allowNull: false,
       },
       chain: { type: dataTypes.STRING, allowNull: false },
+      chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -148,10 +148,6 @@ export default (
       as: 'reactions',
     });
     models.Thread.hasMany(models.Collaboration);
-    models.Thread.hasMany(models.ChainEntity, {
-      foreignKey: 'thread_id',
-      constraints: false,
-    });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',
