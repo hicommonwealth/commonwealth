@@ -1,10 +1,8 @@
 /* @jsx m */
-
 import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -24,6 +22,7 @@ import { CWAddressTooltip } from './cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
+import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
@@ -111,6 +110,42 @@ export class ComponentShowcase implements m.ClassComponent {
               isSelected={this.selectedTab === 3}
             />
           </CWTabBar>
+        </div>
+        <div class="progress-gallery">
+          <h1>Progress Bars</h1>
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Success)"
+            progressStatus="passed"
+            count={50}
+          />
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Success) with Check"
+            progressStatus="passed"
+            count={50}
+            iconName="check"
+          />
+          <CWProgressBar
+            progress={100}
+            label="Progress Bar (Selected)"
+            progressStatus="selected"
+            count={50}
+          />
+          <CWProgressBar
+            progress={150}
+            label="Progress Bar (Neutral) With Token"
+            progressStatus="neutral"
+            count={50}
+            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+          />
+          <CWProgressBar
+            progress={75}
+            label="Progress Bar (Ongoing) With Token"
+            progressStatus="ongoing"
+            count={50}
+            subtext={`${Math.min(100, Math.floor(50 * 1000) / 1000)} CMN`}
+          />
         </div>
         <div class="card-gallery">
           <h1>Account Creation Button</h1>
@@ -420,6 +455,19 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             label="Secondary blue dark"
             buttonType="secondary-blue-dark"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            label="Mini"
+            buttonType="mini"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Mini Disabled"
+            buttonType="mini"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />

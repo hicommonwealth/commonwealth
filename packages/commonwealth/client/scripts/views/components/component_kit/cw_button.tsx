@@ -26,7 +26,8 @@ export type ButtonType =
   | 'lg-tertiary-red'
   | 'lg-tertiary-blue'
   | 'primary-blue-dark'
-  | 'secondary-blue-dark';
+  | 'secondary-blue-dark'
+  | 'mini';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
@@ -70,7 +71,7 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
         )}
         <CWText
           type={buttonType.slice(0, 2) === 'lg' ? 'buttonLg' : 'buttonSm'}
-          className="button-text"
+          className={buttonType === 'mini' ? 'button-mini-text' : 'button-text'}
           noWrap
         >
           {label}

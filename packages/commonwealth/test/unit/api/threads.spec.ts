@@ -32,7 +32,7 @@ describe('Thread Tests', () => {
   const bodyWithMentions = 'test body [@Tagged Member](/edgeware/npRis4Nb)';
   const topicName = 'test topic';
   const topicId = undefined;
-  const kind = 'forum';
+  const kind = 'discussion';
   const stage = 'discussion';
 
   const markdownThread = require('../../util/fixtures/markdownThread');
@@ -103,41 +103,7 @@ describe('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.ForumMissingTitle);
-    });
-
-    it('should fail to create a question thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
-        address: userAddress,
-        kind: 'question',
-        stage,
-        chainId: chain,
-        title: '',
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.QuestionMissingTitle);
-    });
-
-    it('should fail to create a request thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
-        address: userAddress,
-        kind: 'request',
-        stage,
-        chainId: chain,
-        title: '',
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.RequestMissingTitle);
+      expect(tRes.error).to.be.equal(ThreadErrors.DiscussionMissingTitle);
     });
 
     it('should fail to create a link thread with an empty title', async () => {

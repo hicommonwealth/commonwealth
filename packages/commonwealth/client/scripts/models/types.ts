@@ -5,16 +5,13 @@ import {
   IThresholdEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
-  IUnavailableEndTime
+  IUnavailableEndTime,
 } from './interfaces';
 import Proposal from './Proposal';
 
-// TODO: this is inconsistently used
 export enum ThreadKind {
-  Forum = 'forum',
+  Discussion = 'discussion',
   Link = 'link',
-  Question = 'question',
-  Request = 'request',
 }
 
 // TODO: this list should be shared with the server
