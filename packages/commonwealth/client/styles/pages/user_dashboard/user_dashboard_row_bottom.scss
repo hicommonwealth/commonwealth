@@ -1,0 +1,34 @@
+@import 'shared';
+
+.UserDashboardRowBottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  width: 100%;
+
+  .buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .interaction-counts {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+
+    .icon-and-count {
+      display: flex;
+      gap: 8px;
+
+      .count-icon.Icon {
+        color: $neutral-500;
+      }
+
+      .count-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
+}
