@@ -10,7 +10,13 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": false
+    "traceResolution": false,
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"]
+    },
   },
   "files": [
     "scripts/chainEventsConsumer.ts",
@@ -22,6 +28,8 @@
     "socket/*",
     "scripts",
     "eventHandlers",
+    "../../common-common/src",
+    "../../chain-events/src"
   ],
   "exclude": [
     "./node_modules",
