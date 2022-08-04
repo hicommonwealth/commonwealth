@@ -199,9 +199,11 @@ ssh "$VULTR_USER"@"$VULTR_IP" UNIQUE_DOCKER_CONTAINER_ID="$UNIQUE_DOCKER_CONTAIN
     printf "NOTE: Please update the following environment variable(s) to your .env file to be able to connect in the future:\n\n"
     if [[ "$OPEN_RMQ_PORT" != "$VULTR_RABBITMQ_CONTAINER_PORT" ]]; then
       echo "VULTR_RABBITMQ_CONTAINER_PORT=$OPEN_RMQ_PORT"
-    elif [[ "$OPEN_RMQ_MNGMT_PORT" != "$VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT" ]]; then
+    fi
+    if [[ "$OPEN_RMQ_MNGMT_PORT" != "$VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT" ]]; then
       echo "VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT=$OPEN_RMQ_MNGMT_PORT"
-    elif [[ "$OPEN_REDIS_PORT" != "$VULTR_REDIS_CONTAINER_PORT" ]]; then
+    fi
+    if [[ "$OPEN_REDIS_PORT" != "$VULTR_REDIS_CONTAINER_PORT" ]]; then
       echo "VULTR_REDIS_CONTAINER_PORT=$OPEN_REDIS_PORT"
     fi
     printf "\n\n*******************************************************\n\n"
