@@ -35,7 +35,7 @@ const activeThreads = async (
       { model: models.Address, as: 'collaborators',},
       { model: models.Topic, as: 'topic', },
       { model: models.LinkedThread, as: 'linked_threads' },
-      { model: models.ChainEntity }
+      { model: models.ChainEntityMeta }
     ];
 
     await Promise.all(communityTopics.map(async (topic) => {
