@@ -1,0 +1,37 @@
+@import 'shared';
+@import 'user_dashboard_row.scss';
+
+.UserDashboardRowTop {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .row-top-text {
+    @include rowTopTextStyles;
+  }
+
+  .comment-body {
+    &-concat {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin: 7px 0 8px 25px;
+
+      .MarkdownFormattedText {
+        white-space: inherit !important;
+      }
+    }
+  }
+
+  .event-body {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin: 7px 0 8px 0px;
+  }
+}
