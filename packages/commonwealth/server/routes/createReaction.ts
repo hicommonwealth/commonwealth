@@ -48,7 +48,7 @@ const createReaction = async (
   if (error) return next(new Error(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new Error(Errors.NoPostId));
@@ -139,8 +139,7 @@ const createReaction = async (
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
-    const chainEntity = await proposalIdToEntity(models, chain.id, proposal_id);
-    if (!chainEntity) return next(new Error(Errors.NoProposalMatch));
+    if (!chain_entity_id) return next(new Error(Errors.NoProposalMatch));
     const [prefix, id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];

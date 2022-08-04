@@ -61,7 +61,7 @@ const createComment = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new Error(authorError));
 
-  const { parent_id, root_id, text } = req.body;
+  const { parent_id, root_id, chain_entity_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
     return next(new Error(Errors.MissingRootId));
@@ -250,18 +250,13 @@ const createComment = async (
     proposal = await models.Thread.findOne({
       where: { id },
     });
+    // TODO: put this part on the front-end and pass in just the chain-entity id so we can check if it exists for the email part --- similar for reaction
   } else if (
     prefix.includes('proposal') ||
     prefix.includes('referendum') ||
     prefix.includes('motion')
   ) {
-    // TODO: better check for on-chain proposal types
-    const chainEntity = await proposalIdToEntity(
-      models,
-      chain.id,
-      finalComment.root_id
-    );
-    if (!chainEntity) {
+    if (!chain_entity_id) {
       // send a notification email if commenting on an invalid ChainEntity
       const msg = {
         to: 'founders@commonwealth.im',

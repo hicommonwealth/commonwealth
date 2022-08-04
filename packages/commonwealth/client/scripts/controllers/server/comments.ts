@@ -10,13 +10,12 @@ import {
   Comment,
   Attachment,
   IUniqueId,
-  AddressInfo,
-  NodeInfo,
-  Thread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
+import { ProposalType } from "common-common/src/types";
+import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 // tslint:disable: object-literal-key-quotes
 
@@ -160,13 +159,29 @@ class CommentsController {
     parentCommentId: any = null,
     attachments?: string[]
   ) {
+    // attempt to find the chain-entity associated with this proposal
+    // TODO: is the below assumptions valid?
+    // this only works if we assume that all chain-entities for the specific
+    // chain are loaded when the comment is created
+    const [prefix, id] = proposalIdentifier.split('_') as [
+      ProposalType,
+      string
+    ];
+    let chainEntity;
+    if (
+      prefix.includes('proposal') ||
+      prefix.includes('referendum') ||
+      prefix.includes('motion')
+    ) {
+      chainEntity = proposalIdToEntity(app, app.activeChainId(), proposalIdentifier);
+    }
     try {
-      // TODO: Change to POST /comment
       const res = await $.post(`${app.serverUrl()}/createComment`, {
         author_chain: app.user.activeAccount.chain.id,
         chain,
         address,
         parent_id: parentCommentId,
+        chain_entity_id: chainEntity?.id,
         root_id: proposalIdentifier,
         'attachments[]': attachments,
         text: encodeURIComponent(unescapedText),
