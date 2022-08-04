@@ -60,12 +60,20 @@ export const DATABASE_URI =
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
 
-export const RABBITMQ_URI =
-  !process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development'
-    ? 'amqp://guest:guest@localhost:5672'
-    : process.env.CLOUDAMQP_URL;
+export const VULTR_IP = process.env.VULTR_IP;
 
-export const REDIS_URL = process.env.REDIS_URL;
+export const RABBITMQ_URI = (() => {
+  if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
+    if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT) {
+      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`
+    } else return 'amqp://guest:guest@localhost:5672'
+  } else return process.env.CLOUDAMQP_URL
+})()
+
+// if REDIS_URL exists use that (production or local redis instance) otherwise if
+// the Vultr server info is given then use that. Undefined otherwise.
+export const REDIS_URL = process.env.REDIS_URL ? process.env.REDIS_URL :
+  process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT ? `${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}` : undefined
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
