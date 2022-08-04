@@ -51,7 +51,7 @@ module.exports = {
                     when 'referendum' then 'democracy-referendum'
                     when 'signalingproposal' then 'signaling-proposal'
                     when 'sputnikproposal' then 'proposal'
-                    when 'treasuryproposal' then 'treasuryproposal'		
+                    when 'treasuryproposal' then 'treasury-proposal'		
                   end
           WHERE c.root_id not like 'discussion%' 
         ;
@@ -76,7 +76,7 @@ module.exports = {
                   when 'referendum' then 'democracy-referendum'
                   when 'signalingproposal' then 'signaling-proposal'
                   when 'sputnikproposal' then 'proposal'
-                  when 'treasuryproposal' then 'treasuryproposal'		
+                  when 'treasuryproposal' then 'treasury-proposal'		
                 end
         WHERE r.proposal_id IS NOT NULL
           AND NOT EXISTS (SELECT 1 FROM "Threads" t WHERE t.chain_entity_id = ce.id)
@@ -104,7 +104,7 @@ module.exports = {
                     when 'referendum' then 'democracy-referendum'
                     when 'signalingproposal' then 'signaling-proposal'
                     when 'sputnikproposal' then 'proposal'
-                    when 'treasuryproposal' then 'treasuryproposal'		
+                    when 'treasuryproposal' then 'treasury-proposal'		
                   end
         ;
       `, {transaction: t, raw: true, type: 'RAW'});
@@ -124,7 +124,7 @@ module.exports = {
                   when 'referendum' then 'democracy-referendum'
                   when 'signalingproposal' then 'signaling-proposal'
                   when 'sputnikproposal' then 'proposal'
-                  when 'treasuryproposal' then 'treasuryproposal'		
+                  when 'treasuryproposal' then 'treasury-proposal'		
                 end
       ;
     `, {transaction: t, raw: true, type: 'RAW'});     
@@ -139,18 +139,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(`
-        DELETE FROM "Threads" 
-        WHERE chain_entity_id IS NOT NULL;
-      `, {transaction: t, raw: true, type: 'RAW'});
-      await queryInterface.sequelize.query(`
-        ALTER TABLE "Threads" 
-        ADD CONSTRAINT "OffchainThreads_author_id_fkey" FOREIGN KEY (address_id) REFERENCES "Addresses" (id);
-      `, {transaction: t, raw: true, type: 'RAW'});
-      await queryInterface.changeColumn('Threads', 'address_id', {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },{ transaction: t });
       await queryInterface.removeColumn('Threads','chain_entity_id',{ transaction: t });
       await queryInterface.removeColumn('Comments','thread_id',{ transaction: t });
       // await queryInterface.addColumn('Comments', 'root_id', {
@@ -170,7 +158,8 @@ module.exports = {
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.sequelize.query(`
         UPDATE "Reactions" 
-        SET proposal_id =  "rootIdRefactor_Reactions".proposal_id
+        SET proposal_id =  "rootIdRefactor_Reactions".proposal_id,
+            thread_id = NULL
         FROM "rootIdRefactor_Reactions"
         WHERE "Reactions".id = "rootIdRefactor_Reactions".id;
       `, {transaction: t, raw: true, type: 'RAW'});
@@ -180,6 +169,18 @@ module.exports = {
         FROM "rootIdRefactor_ChainEntities"
         WHERE "ChainEntities".id = "rootIdRefactor_ChainEntities".id;
       `, {transaction: t, raw: true, type: 'RAW'});
+      await queryInterface.sequelize.query(`
+        DELETE FROM "Threads" 
+        WHERE address_id IS NULL;
+      `, {transaction: t, raw: true, type: 'RAW'});
+      await queryInterface.sequelize.query(`
+        ALTER TABLE "Threads" 
+        ADD CONSTRAINT "OffchainThreads_author_id_fkey" FOREIGN KEY (address_id) REFERENCES "Addresses" (id);
+      `, {transaction: t, raw: true, type: 'RAW'});
+      await queryInterface.changeColumn('Threads', 'address_id', {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },{ transaction: t });
       await queryInterface.dropTable('rootIdRefactor_Comments',{ transaction: t });
       await queryInterface.dropTable('rootIdRefactor_Reactions',{ transaction: t });
       await queryInterface.dropTable('rootIdRefactor_ChainEntities',{ transaction: t });
