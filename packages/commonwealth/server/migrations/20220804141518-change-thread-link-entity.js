@@ -6,7 +6,8 @@ module.exports = {
       await queryInterface.addColumn('Threads', 'chain_entity_id', {
         type: Sequelize.INTEGER,
         allowNull: true,
-        unique: true
+        unique: true,
+        references: { model: 'ChainEntityMeta', key: 'id' }
       }, { transaction: t });
 
       await queryInterface.sequelize.query(
@@ -50,3 +51,4 @@ module.exports = {
     })
   }
 };
+

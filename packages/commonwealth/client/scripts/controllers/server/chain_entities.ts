@@ -17,6 +17,7 @@ import {
   SupportedNetwork,
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
+import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -182,12 +183,13 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
+    const chainEntity = proposalIdToEntity(app, app.activeChainId(), uniqueIdentifier);
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
-        'unique_id': uniqueIdentifier,
+        'chain_entity_id': chainEntity?.id,
         'title': title,
         'chain': app.activeChainId(),
       },

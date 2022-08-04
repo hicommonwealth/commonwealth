@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
@@ -17,9 +16,13 @@ const updateChainEntityTitle = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
-  const { unique_id, title } = req.body;
+  const { title, chain_entity_id } = req.body;
 
-  const entity = await proposalIdToEntity(models, chain.id, unique_id);
+  const entity = await models.ChainEntityTitle.findOne({
+    where: {
+      id: chain_entity_id
+    }
+  })
   if (!entity) return next(new Error(Errors.NoEntity));
   const userOwnedAddressObjects = (await req.user.getAddresses()).filter(
     (addr) => !!addr.verified
@@ -46,18 +49,7 @@ const updateChainEntityTitle = async (
   entity.title = title;
   await entity.save();
 
-  const finalEntity = await models.ChainEntity.findOne({
-    where: { id: entity.id },
-    include: [
-      {
-        model: models.ChainEvent,
-        order: [[models.ChainEvent, 'id', 'asc']],
-        include: [models.ChainEventType],
-      },
-    ],
-  });
-
-  return res.json({ status: 'Success', result: finalEntity.toJSON() });
+  return res.json({ status: 'Success', result: entity.toJSON() });
 };
 
 export default updateChainEntityTitle;

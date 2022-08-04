@@ -6,6 +6,7 @@ import { ChainAttributes } from './chain';
 import { AttachmentAttributes } from './attachment';
 import { LinkedThreadAttributes } from './linked_thread';
 import { TopicAttributes } from './topic';
+import { ChainEntityMetaAttributes } from "./chain_entity_meta";
 
 export type ThreadAttributes = {
   address_id: number;
@@ -34,6 +35,7 @@ export type ThreadAttributes = {
 
   // associations
   Chain?: ChainAttributes;
+  ChainEntityTile: ChainEntityMetaAttributes;
   Address?: AddressAttributes;
   Attachments?:
     | AttachmentAttributes[]
@@ -159,6 +161,9 @@ export default (
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
+    models.Thread.hasOne(models.ChainEntityMeta, {
+      foreignKey: 'id'
+    })
   };
 
   return Thread;
