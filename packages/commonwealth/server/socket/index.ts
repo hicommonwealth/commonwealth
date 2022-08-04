@@ -8,25 +8,27 @@ import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { createClient } from 'redis';
+import {
+  ConnectionTimeoutError,
+  createClient,
+  ReconnectStrategyError,
+} from 'redis';
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import {
-  JWT_SECRET,
-  REDIS_URL, VULTR_IP
-} from "../config";
+import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
-import { RedisCache, redisRetryStrategy } from "../util/redisCache";
+import { RedisCache, redisRetryStrategy } from '../util/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const origin = process.env.SERVER_URL || 'http://localhost:8080';
-const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1')
-const isVultr = origin.includes(VULTR_IP)
+const isLocalhost =
+  REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+const isVultr = REDIS_URL.includes(VULTR_IP);
 
 export const authenticate = (
   socket: Socket,
@@ -96,43 +98,75 @@ export async function setupWebSocketServer(
     }`
   );
 
-  const redisOptions = {}
-
+  const redisOptions = {};
+  let finalRedisUrl;
   if (isLocalhost) {
-    redisOptions['retry_strategy'] = redisRetryStrategy;
+    redisOptions['socket'] = {
+      reconnectStrategy: redisRetryStrategy,
+    };
+    finalRedisUrl = 'redis://localhost:6379';
   } else if (isVultr) {
     redisOptions['url'] = REDIS_URL;
-    redisOptions['retry_strategy'] = redisRetryStrategy;
-  } else {
-    redisOptions['retry_strategy'] = redisRetryStrategy.bind({rollbar: this.rollbar});
     redisOptions['socket'] = {
+      reconnectStrategy: redisRetryStrategy,
+    };
+    finalRedisUrl = REDIS_URL;
+  } else {
+    redisOptions['socket'] = {
+      connectTimeout: 5000,
+      keepAlive: 4000,
       tls: true,
       rejectUnauthorized: false,
+      reconnectStrategy: redisRetryStrategy,
     };
+    finalRedisUrl = REDIS_URL;
   }
 
   const pubClient = createClient(redisOptions);
   const subClient = pubClient.duplicate();
 
-  try {
-    await Promise.all([pubClient.connect(), subClient.connect()]);
-    // provide the redis connection instances to the socket.io adapters
-    await io.adapter(<any>createAdapter(pubClient, subClient));
-  } catch (e) {
-    // local env may not have redis so don't do anything if they don't
-    // if (!isLocalhost) {
-    //   log.error('Failed to connect to Redis!', e);
-    //   rollbar.critical(
-    //     'Socket.io server failed to connect to Redis. Servers will NOT share socket messages ' +
-    //       'between rooms on different servers!',
-    //     e
-    //   );
-    // }
-  }
+  pubClient.on('error', (err) => {
+    if (err instanceof ConnectionTimeoutError) {
+      log.error(
+        `Socket.io Redis pub-client connection to ${finalRedisUrl} timed out!`
+      );
+    } else if (err instanceof ReconnectStrategyError) {
+      log.error(`Socket.io Redis pub-client max connection retries exceeded!`);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis pub-client max connection retries exceeded! Redis pub-client for Socket.io shutting down!'
+        );
+    } else {
+      log.error(`Socket.io Redis pub-client connection error:`, err);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical('Socket.io Redis pub-client unknown connection error!', err);
+    }
+  });
+  subClient.on('error', (err) => {
+    if (err instanceof ConnectionTimeoutError) {
+      log.error(
+        `Socket.io Redis sub-client connection to ${finalRedisUrl} timed out!`
+      );
+    } else if (err instanceof ReconnectStrategyError) {
+      log.error(`Socket.io Redis sub-client max connection retries exceeded!`);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis sub-client max connection retries exceeded! Redis sub-client for Socket.io shutting down!'
+        );
+    } else {
+      log.error(`Socket.io Redis sub-client connection error:`, err);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical('Socket.io Redis sub-client unknown connection error!', err);
+    }
+  });
+
+  await Promise.all([pubClient.connect(), subClient.connect()]);
+  // provide the redis connection instances to the socket.io adapters
+  await io.adapter(<any>createAdapter(pubClient, subClient));
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init();
+  // await redisCache.init();
   console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
