@@ -22,19 +22,8 @@
     "scripts/chainEventsConsumer.ts",
     "scripts/dbNode.ts",
   ],
-  "include": [
-    "models/*",
-    "models/",
-    "eventHandlers",
-    "../../common-common/src",
-    "../../chain-events/src"
-  ],
   "exclude": [
     "./node_modules",
-    "passport.ts",
-    "server/router.ts",
-    "server/webhookNotifier.ts",
-    "server/migrations",
     "node_modules",
     "build",
     "dist"
