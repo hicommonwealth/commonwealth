@@ -2,8 +2,24 @@ import { createClient } from 'redis';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
+import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
+
+export function redisRetryStrategy(numRetries) {
+  if (options.error && options.error.code === 'ECONNREFUSED') {
+    this.rollbar?.critical('Redis server refused the connection');
+    log.error("Redis server refused the connection", options.error);
+    return new Error('Redis server refused the connection');
+  }
+  if (options.total_retry_time > 1000 * 60) {
+    this.rollbar?.critical('Redis connection retry time exhausted')
+    log.error("Redis connection retry time exhausted");
+    return new Error('Redis connection retry time exhausted')
+  }
+
+  return Math.min(options.attempt * 100, 3000);
+}
 
 /**
  * This class facilitates interacting with Redis and constructing a Redis Cache. Note that all keys must use a namespace
@@ -15,6 +31,11 @@ const log = factory.getLogger(formatFilename(__filename));
 export class RedisCache {
   private initialized = false;
   private client;
+  private rollbar?: Rollbar;
+
+  constructor(rollbar_?: Rollbar) {
+    this.rollbar = rollbar_;
+  }
 
   /**
    * Initializes the Redis client. Must be run before any Redis command can be executed.
@@ -29,29 +50,30 @@ export class RedisCache {
     }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
+    const localRedis = REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+    const vultrRedis = REDIS_URL.includes(VULTR_IP);
+
     if (!this.client) {
       const redisOptions = {};
-      // TODO: update this
-      if (
-        REDIS_URL.includes('localhost') ||
-        REDIS_URL.includes('127.0.0.1') ||
-        REDIS_URL.includes(VULTR_IP)
-      ) {
-        redisOptions['url'] = `redis://${REDIS_URL}`;
-      } else {
+
+      if (localRedis) {
+        redisOptions['retry_strategy'] = {
+          reconnectStrategy: redisRetryStrategy
+        };
+      } else if (VULTR_IP) {
         redisOptions['url'] = REDIS_URL;
+        redisOptions['retry_strategy'] = {
+          reconnectStrategy: redisRetryStrategy
+        };
+      } else {
         redisOptions['socket'] = {
+          keepAlive: true,
           tls: true,
           rejectUnauthorized: false,
-          reconnectStrategy(retries: number): number | Error {
-            if (retries <= 5) {
-              return (retries * 10) ** 2;
-            } else {
-              return new Error('Failed to connect to Redis!');
-            }
-          },
+          reconnectStrategy: redisRetryStrategy.bind({rollbar: this.rollbar})
         };
       }
+
       this.client = createClient(redisOptions);
     }
 

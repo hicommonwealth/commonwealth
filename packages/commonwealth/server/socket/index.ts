@@ -9,25 +9,24 @@ import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
-// import bcrypt from 'bcrypt';
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import {
   JWT_SECRET,
-  REDIS_URL,
-  WEBSOCKET_ADMIN_USERNAME,
-  WEBSOCKET_ADMIN_PASSWORD,
-} from '../config';
+  REDIS_URL, VULTR_IP
+} from "../config";
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
-import { RedisCache } from '../util/redisCache';
+import { RedisCache, redisRetryStrategy } from "../util/redisCache";
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const origin = process.env.SERVER_URL || 'http://localhost:8080';
+const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1')
+const isVultr = origin.includes(VULTR_IP)
 
 export const authenticate = (
   socket: Socket,
@@ -67,9 +66,17 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
-    log.trace(`Socket connected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
+    log.trace(
+      `Socket connected: socket_id = ${socket.id}, user_id = ${
+        (<any>socket).user.id
+      }`
+    );
     socket.on('disconnect', () => {
-      log.trace(`Socket disconnected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
+      log.trace(
+        `Socket disconnected: socket_id = ${socket.id}, user_id = ${
+          (<any>socket).user.id
+        }`
+      );
     });
   });
 
@@ -81,20 +88,6 @@ export async function setupWebSocketServer(
     log.error('A WebSocket connection error has occurred', err);
   });
 
-  // enables the admin analytics dashboard (creates /admin namespace)
-  // instrument(io, {
-  //   auth: origin.includes('localhost')
-  //     ? false
-  //     : {
-  //         type: 'basic',
-  //         username: WEBSOCKET_ADMIN_USERNAME,
-  //         password: bcrypt.hashSync(
-  //           WEBSOCKET_ADMIN_PASSWORD,
-  //           WEBSOCKET_ADMIN_PASSWORD.length
-  //         ),
-  //       },
-  // });
-
   log.info(
     `Socket instance connecting to Redis at: ${REDIS_URL}. ${
       !REDIS_URL
@@ -102,7 +95,22 @@ export async function setupWebSocketServer(
         : ''
     }`
   );
-  const redisOptions = origin.includes("localhost") || origin.includes("127.0.0.1") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
+
+  const redisOptions = {}
+
+  if (isLocalhost) {
+    redisOptions['retry_strategy'] = redisRetryStrategy;
+  } else if (isVultr) {
+    redisOptions['url'] = REDIS_URL;
+    redisOptions['retry_strategy'] = redisRetryStrategy;
+  } else {
+    redisOptions['retry_strategy'] = redisRetryStrategy.bind({rollbar: this.rollbar});
+    redisOptions['socket'] = {
+      tls: true,
+      rejectUnauthorized: false,
+    };
+  }
+
   const pubClient = createClient(redisOptions);
   const subClient = pubClient.duplicate();
 
@@ -112,20 +120,20 @@ export async function setupWebSocketServer(
     await io.adapter(<any>createAdapter(pubClient, subClient));
   } catch (e) {
     // local env may not have redis so don't do anything if they don't
-    if (!origin.includes('localhost')) {
-      log.error('Failed to connect to Redis!', e);
-      rollbar.critical(
-        'Socket.io server failed to connect to Redis. Servers will NOT share socket messages' +
-          'between rooms on different servers!',
-        e
-      );
-    }
+    // if (!isLocalhost) {
+    //   log.error('Failed to connect to Redis!', e);
+    //   rollbar.critical(
+    //     'Socket.io server failed to connect to Redis. Servers will NOT share socket messages ' +
+    //       'between rooms on different servers!',
+    //     e
+    //   );
+    // }
   }
 
   const redisCache = new RedisCache();
-  console.log("Initializing Redis Cache for WebSockets...")
+  console.log('Initializing Redis Cache for WebSockets...');
   await redisCache.init();
-  console.log("Redis Cache initialized!");
+  console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
