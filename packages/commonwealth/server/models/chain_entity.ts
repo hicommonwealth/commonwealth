@@ -1,21 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityAttributes = {
   id: number;
-  chain: string;
-  type: string;
-  type_id: string;
-  author?: string;
-  completed?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-
-  Chain?: ChainAttributes;
-  ChainEvents?: ChainEventAttributes[];
+  title?: string;
 }
 
 export type ChainEntityInstance = ModelInstance<ChainEntityAttributes>;
@@ -28,24 +17,14 @@ export default (
 ): ChainEntityModelStatic => {
   const ChainEntity = <ChainEntityModelStatic>sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false },
-    type: { type: dataTypes.STRING, allowNull: false },
-    type_id: { type: dataTypes.STRING, allowNull: false },
-    completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-    author: { type: dataTypes.STRING, allowNull: true },
-    created_at: { type: dataTypes.DATE, allowNull: false },
-    updated_at: { type: dataTypes.DATE, allowNull: false },
+    title: { type: dataTypes.STRING, allowNull: true },
   }, {
-    tableName: 'ChainEntities',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    tableName: 'ChainEntitiesTitles',
+    timestamps: false,
     underscored: true,
     paranoid: false,
     indexes: [
       { fields: ['id'] },
-      { fields: ['thread_id'] },
-      { fields: ['chain', 'type', 'id' ] },
     ],
   });
 
