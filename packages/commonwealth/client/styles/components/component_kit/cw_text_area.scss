@@ -1,0 +1,24 @@
+@import 'shared';
+
+.TextArea {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%;
+
+  textarea {
+    font-size: 16px;
+    height: 152px;
+    letter-spacing: 0.02em;
+    line-height: 24px;
+    padding: 6px 8px;
+    resize: none;
+
+    @include inputStyles;
+  }
+
+  &.success,
+  &.failure {
+    margin-bottom: 0px;
+  }
+}

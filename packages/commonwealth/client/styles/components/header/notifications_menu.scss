@@ -1,0 +1,58 @@
+@import 'client/styles/shared';
+
+@mixin notificationsButton {
+  .cui-button {
+    border-radius: 0;
+    border-right: 1px solid $neutral-300;
+    box-shadow: none;
+    height: 40px;
+    padding: 0 8px;
+    width: 100%;
+
+    .cui-button-label {
+      color: $neutral-900;
+      text-align: center;
+    }
+
+    &:hover {
+      background: $neutral-100;
+    }
+
+    &:active {
+      background: $neutral-200;
+    }
+  }
+}
+
+.NotificationsMenu {
+  width: 296px;
+
+  .cui-popover-content {
+    width: 100%;
+
+    .cui-menu {
+      width: 100%;
+
+      .NotificationsMenuHeader {
+        @include notificationsButton;
+
+        border-bottom: 1px solid $neutral-300;
+        display: flex;
+      }
+
+      .notification-list {
+        align-items: center;
+        display: flex;
+        height: 480px;
+        justify-content: center;
+      }
+
+      .NotificationsMenuFooter {
+        @include notificationsButton;
+
+        border-top: 1px solid $neutral-300;
+        display: flex;
+      }
+    }
+  }
+}

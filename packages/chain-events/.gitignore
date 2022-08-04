@@ -1,0 +1,16 @@
+.DS_Store
+/eth/build
+/eth/artifacts
+/eth/cache
+node_modules/
+.vscode
+yarn-error.log
+.nyc_output/
+coverage/
+
+.env
+*.tgz
+
+.yalc/
+yalc.lock
+/dist/

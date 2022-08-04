@@ -1,0 +1,34 @@
+@mixin hideInput {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+@mixin controlStyles {
+  border: 2px solid $neutral-300;
+  height: 12px;
+  margin: 8px 8px 8px 0px;
+  position: relative;
+  flex-shrink: 0;
+  width: 12px;
+}
+
+@mixin hoverColors {
+  background-color: $primary-50;
+  border-color: $primary-300;
+}
+
+@mixin checkedColors {
+  background-color: $primary-50;
+  border-color: $primary-500;
+}
+
+@mixin checkedHoverColors {
+  background-color: $primary-100;
+  border-color: $primary-600;
+}
+
+@mixin disabledColors {
+  background-color: $neutral-200;
+  border-color: $neutral-300;
+}

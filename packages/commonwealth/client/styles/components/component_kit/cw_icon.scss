@@ -1,0 +1,15 @@
+@import 'shared';
+
+.Icon {
+  @include baseIconStyles;
+
+  &.disabled {
+    color: $neutral-200;
+  }
+}
+
+.CustomIcon {
+  @include baseIconStyles;
+
+  fill: unset; // they will be brand assets should we shouldn't alter their colors
+}

@@ -1,0 +1,50 @@
+@import 'shared';
+
+.MembersPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .members-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .member-row {
+      display: flex;
+      justify-content: space-between;
+
+      a {
+        color: $neutral-800;
+        text-decoration: none;
+
+        .User {
+          align-items: center;
+          display: flex;
+
+          .username {
+            align-items: center;
+            display: flex;
+          }
+        }
+      }
+    }
+  }
+
+  .infinite-scroll-wrapper {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    .infinite-scroll-reached-end-text.Text {
+      color: $neutral-500;
+    }
+  }
+}
