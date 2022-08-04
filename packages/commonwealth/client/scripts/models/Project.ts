@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import moment from 'moment';
-import { CommonwealthTypes } from 'chain-events';
+import { CommonwealthTypes } from 'chain-events/src';
 import ChainEntityT from './ChainEntity';
 
 class Project {

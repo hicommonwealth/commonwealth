@@ -120,7 +120,7 @@ export default class ProjectsController {
       this._factoryAddress
     );
 
-    const projectId = (await contract.numProjects()).toNumber();
+    const projectId = (await contract.numProjects());
     const tx = await contract.createProject(
       title.slice(0, 32),
       ipfsHash,
