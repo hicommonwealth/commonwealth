@@ -14,7 +14,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 
 const getNewTag = (labelCount?: number) => {
-  const label = labelCount ? 'New' : `${labelCount} new`;
+  const label = !labelCount ? 'New' : `${labelCount} new`;
 
   return <Tag label={label} size="xs" rounded intent="primary" />;
 };
