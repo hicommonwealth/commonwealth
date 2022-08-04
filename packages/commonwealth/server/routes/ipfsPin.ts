@@ -1,10 +1,9 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import pinIpfsBlob from '../util/pinIpfsBlob';
 import { AppError } from '../util/errors';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-
-import { factory, formatFilename } from '../../shared/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
