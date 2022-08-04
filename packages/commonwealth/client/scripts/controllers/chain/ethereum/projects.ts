@@ -1,9 +1,9 @@
 import { IdStore } from 'stores';
 import $ from 'jquery';
-import { ICuratedProjectFactory__factory, ICuratedProject__factory } from 'eth/types';
+import { ICuratedProjectFactory__factory, ICuratedProject__factory } from 'common-common/src/eth/types';
 import { NodeInfo, Project } from 'models';
 import { IApp } from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import BN from 'bn.js';
 import { attachSigner } from './contractApi';
 

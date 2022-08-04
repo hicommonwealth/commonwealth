@@ -4,8 +4,8 @@ import {
   CWEvent,
   IChainEventData,
   CommonwealthTypes,
-} from '@commonwealth/chain-events';
-import { addPrefix, factory } from '../../shared/logging';
+} from 'chain-events/src';
+import { addPrefix, factory } from 'common-common/src/logging';
 import { DB } from '../database';
 
 export default class extends IEventHandler {
