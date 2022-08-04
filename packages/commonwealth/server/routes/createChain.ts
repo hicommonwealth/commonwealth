@@ -20,6 +20,8 @@ import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { RoleAttributes } from '../models/role';
 
+import { NotificationCategories } from 'common-common/src/types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 
@@ -66,6 +68,7 @@ type CreateChainResp = {
   chain: ChainAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
+  admin_address: string;
 };
 
 const createChain = async (
@@ -318,6 +321,7 @@ const createChain = async (
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
   let role;
+  let addressToBeAdmin;
   try {
     // Use the chain base to get the right address from the user
     let potentialAdmin:(AddressInstance | null);
@@ -372,7 +376,7 @@ const createChain = async (
       });
     }
 
-    const addressToBeAdmin = potentialAdmin
+    addressToBeAdmin = potentialAdmin
     const solanaRegExp = new RegExp('[1-9A-HJ-NP-Za-km-z]{32,44}');
 
     // Checking the actual address to be admin that is being added to the role
@@ -399,6 +403,16 @@ const createChain = async (
       is_user_default: true,
     });
 
+    const [ subscription ] = await models.Subscription.findOrCreate({
+      where: {
+        subscriber_id: req.user.id,
+        category_id: NotificationCategories.NewThread,
+        chain_id: chain.id,
+        object_id: chain.id,
+        is_active: true,
+      }
+    });
+
   } catch (err) {
     console.log(err);
     // If the issue is an invalid wallet type then log the error and skip making them admin, but still create the chain
@@ -417,7 +431,7 @@ const createChain = async (
     });
   }
 
-  return success(res, { chain: chain.toJSON(), node: nodeJSON, role: role?.toJSON() });
+  return success(res, { chain: chain.toJSON(), node: nodeJSON, role: role?.toJSON(), admin_address: addressToBeAdmin.address});
 };
 
 export default createChain;

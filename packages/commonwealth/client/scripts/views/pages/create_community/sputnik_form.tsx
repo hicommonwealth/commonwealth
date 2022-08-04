@@ -22,6 +22,9 @@ import {
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { CommunityType } from '.';
 
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+
+
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
@@ -137,6 +140,11 @@ export class SputnikForm implements m.ClassComponent {
               const res = await $.post(
                 `${app.serverUrl()}/createChain`,
                 createChainArgs
+              );
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id,
               );
               await initAppState(false);
               m.route.set(`${window.location.origin}/${res.result.chain.id}`);

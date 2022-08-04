@@ -49,7 +49,7 @@ const linkExistingAddressToChain = async (
 
   // check if the original address is verified and is owned by the user
   const originalAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { chain: req.body.originChain, address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
+    where: { address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
   });
 
   if (!originalAddress) {

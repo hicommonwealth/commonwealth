@@ -36,6 +36,8 @@ import {
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
   tokenName: string;
@@ -213,6 +215,11 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.DAO,
                 ...this.state.form,
               });
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id,
+              );
               await initAppState(false);
               // TODO: notify about needing to run event migration
               m.route.set(`/${res.result.chain?.id}`);

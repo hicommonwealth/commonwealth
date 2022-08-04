@@ -19,6 +19,9 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
 import { CommunityType } from '.';
 
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+
+
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
 // and should be located elsewhere.
@@ -157,6 +160,11 @@ export class StarterCommunityForm implements m.ClassComponent {
                 website,
                 ...additionalArgs,
               });
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id,
+              );
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {

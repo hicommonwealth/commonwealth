@@ -30,6 +30,7 @@ import {
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateERC721Form = ChainFormFields & EthFormFields;
 
@@ -209,6 +210,11 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.Token,
                 ...this.state.form,
               });
+              await linkExistingAddressToChainOrCommunity(
+                res.result.admin_address,
+                res.result.role.chain_id,
+                res.result.role.chain_id,
+              );
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
