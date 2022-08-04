@@ -9,7 +9,7 @@ import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
@@ -82,18 +82,18 @@ export async function setupWebSocketServer(
   });
 
   // enables the admin analytics dashboard (creates /admin namespace)
-  instrument(io, {
-    auth: origin.includes('localhost')
-      ? false
-      : {
-          type: 'basic',
-          username: WEBSOCKET_ADMIN_USERNAME,
-          password: bcrypt.hashSync(
-            WEBSOCKET_ADMIN_PASSWORD,
-            WEBSOCKET_ADMIN_PASSWORD.length
-          ),
-        },
-  });
+  // instrument(io, {
+  //   auth: origin.includes('localhost')
+  //     ? false
+  //     : {
+  //         type: 'basic',
+  //         username: WEBSOCKET_ADMIN_USERNAME,
+  //         password: bcrypt.hashSync(
+  //           WEBSOCKET_ADMIN_PASSWORD,
+  //           WEBSOCKET_ADMIN_PASSWORD.length
+  //         ),
+  //       },
+  // });
 
   log.info(
     `Socket instance connecting to Redis at: ${REDIS_URL}. ${
