@@ -16,7 +16,7 @@ module.exports = {
                 FROM "ChainEntities"
                 WHERE thread_id IS NOT NULL) AS C(id, thread_id)
          WHERE T.id = C.thread_id;`,
-        { transaction: t }
+        { transaction: t, type: 'UPDATE', raw: true }
       );
 
       await queryInterface.removeColumn('ChainEntities',
@@ -40,7 +40,7 @@ module.exports = {
                 FROM "Threads"
                 WHERE chain_entity_id IS NOT NULL) AS T(id, chain_entity_id)
         WHERE C.id = T.chain_entity_id;`,
-        { transaction: t }
+        { transaction: t, type: 'UPDATE', raw: true }
       );
 
       await queryInterface.removeColumn('Threads',
