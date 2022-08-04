@@ -17,6 +17,9 @@ import ChainCategoryTypeFactory, {
 } from './models/chain_category_type';
 import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
 import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
+import ChainEntityTitleFactory, {
+  ChainEntityTitleModelStatic
+} from './models/chain_entity_title';
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
@@ -107,6 +110,7 @@ export type Models = {
   ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
+  ChainEntityTitle: ChainEntityTitleModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
@@ -186,6 +190,7 @@ const models: Models = {
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
+  ChainEntityTitle: ChainEntityTitleFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
