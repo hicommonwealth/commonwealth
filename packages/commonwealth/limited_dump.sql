@@ -1,2 +1,4 @@
- \COPY (SELECT * FROM "ChainNodes" LIMIT 200) TO 'ChainNodes.csv' WITH (delimiter ',', format CSV);
- \COPY (SELECT * FROM "ChatChannels" LIMIT 200) TO 'ChatChannels.csv' WITH (delimiter ',', format CSV);
+\COPY (SELECT * FROM "Notifications" n WHERE n.created_at > NOW() - interval '15 days') TO 'Notifications.dat' WITH BINARY;
+\COPY (SELECT s.* FROM "Subscriptions" s where s.id IN(SELECT nr.subscription_id FROM "NotificationsRead" nr INNER JOIN "Notifications" n on nr.notification_id = n.id WHERE n.created_at > NOW() - interval '15 days')) TO 'Subscriptions.dat' WITH BINARY;
+\COPY (SELECT ce.* FROM "ChainEvents" ce WHERE ce.id IN(SELECT n.chain_event_id FROM "Notifications" n WHERE n.created_at > NOW() - interval '15 days')) TO 'ChainEvents.dat' WITH BINARY;
+\COPY (SELECT nr.* FROM "NotificationsRead" nr WHERE nr.notification_id IN (SELECT n.id FROM "Notifications" n WHERE n.created_at > NOW() - interval '15 days')) TO 'NotificationsRead.dat' WITH BINARY;
