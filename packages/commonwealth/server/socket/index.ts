@@ -101,13 +101,12 @@ export async function setupWebSocketServer(
   log.info(`Socket instance connecting to Redis at: ${REDIS_URL}`);
 
   const redisOptions = {};
+  redisOptions['url'] = REDIS_URL;
   if (isLocalhost || isVultr) {
-    redisOptions['url'] = REDIS_URL;
     redisOptions['socket'] = {
       reconnectStrategy: redisRetryStrategy,
     };
   } else {
-    redisOptions['url'] = REDIS_URL;
     redisOptions['socket'] = {
       connectTimeout: 5000,
       keepAlive: 4000,

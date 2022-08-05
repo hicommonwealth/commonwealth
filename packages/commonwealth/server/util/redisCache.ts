@@ -49,14 +49,13 @@ export class RedisCache {
 
     if (!this.client) {
       const redisOptions = {};
+      redisOptions['url'] = REDIS_URL;
 
       if (localRedis || vultrRedis) {
-        redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           reconnectStrategy: redisRetryStrategy
         };
       } else {
-        redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           connectTimeout: 5000,
           keepAlive: 4000,
