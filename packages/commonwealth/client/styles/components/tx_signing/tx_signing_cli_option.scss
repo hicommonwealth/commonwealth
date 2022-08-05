@@ -1,12 +1,11 @@
 @import 'shared';
 
-.PollEditorCard.Card {
+.TXSigningCLIOption {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 248px;
 
-  @include extraSmall {
-    width: 100%;
+  .TextArea {
+    margin: 0;
   }
 }

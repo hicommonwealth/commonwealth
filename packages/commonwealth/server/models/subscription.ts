@@ -28,7 +28,6 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import notificationCategory from "../../client/scripts/models/NotificationCategory";
 
 const log = factory.getLogger(formatFilename(__filename));
 
