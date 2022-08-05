@@ -5,6 +5,7 @@ import m from 'mithril';
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { CWText } from '../component_kit/cw_text';
 
 export class BalanceInfo implements m.ClassComponent {
   private balance: any;
@@ -28,15 +29,13 @@ export class BalanceInfo implements m.ClassComponent {
   view() {
     return (
       <>
-        <div>
-          {`Free: ${this.freeBalance ? formatCoin(this.freeBalance) : '--'}`}
-        </div>
-        <div>
-          {`Locked: ${
-            this.lockedBalance ? formatCoin(this.lockedBalance) : '--'
-          }`}
-        </div>
-        <div>{`Total: ${this.balance ? formatCoin(this.balance) : '--'}`}</div>
+        <CWText>
+          Free: {this.freeBalance ? formatCoin(this.freeBalance) : '--'}
+        </CWText>
+        <CWText>
+          Locked: {this.lockedBalance ? formatCoin(this.lockedBalance) : '--'}
+        </CWText>
+        <CWText>Total: {this.balance ? formatCoin(this.balance) : '--'}</CWText>
       </>
     );
   }

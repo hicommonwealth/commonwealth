@@ -16,13 +16,12 @@ import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
-
+import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import AddressSwapper from 'views/components/addresses/address_swapper';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const CHAINBASE_SHORT = {
@@ -264,11 +263,11 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
         (prev) =>
           activeBase === ChainBase.Substrate &&
           (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
-            ? AddressSwapper({
+            ? addressSwapper({
                 address: prev.address,
                 currentPrefix: 42,
               }) ===
-              AddressSwapper({
+              addressSwapper({
                 address: a.address,
                 currentPrefix: 42,
               })
