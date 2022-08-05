@@ -1,11 +1,11 @@
 @import 'shared';
 
-.ProposalExtensions {
+.TXSigningCLIOption {
   display: flex;
   flex-direction: column;
   gap: 16px;
 
-  .TextInput {
+  .TextArea {
     margin: 0;
   }
 }
