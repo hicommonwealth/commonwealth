@@ -2,27 +2,18 @@
 
 .OrderTopicsModal {
   .featured-topic-list {
-    .cui-list-item {
-      cursor: default;
-      pointer-events: none;
+    // .cui-list-item {
+    //   cursor: default;
+    //   pointer-events: none;
 
-      &:hover {
-        cursor: default;
-        background-color: $white;
-      }
+    //   &:hover {
+    //     cursor: default;
+    //     background-color: $white;
+    //   }
 
-      &.gu-transit {
-        background-color: $neutral-100;
-      }
-
-      .cui-icon {
-        padding: 2px;
-        cursor: pointer;
-        pointer-events: all;
-      }
-    }
-  }
-  d .cui-button {
-    margin-top: 15px;
+    //   &.gu-transit {
+    //     background-color: $neutral-100;
+    //   }
+    // }
   }
 }
