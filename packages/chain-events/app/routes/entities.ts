@@ -6,7 +6,7 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const bulkEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const entities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.chain) {
     return next(new Error(Errors.NeedChain));
   }
@@ -14,7 +14,7 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
   const chain = await models.Chain.findOne({
     where: { id: req.query.chain }
   });
-  
+
   if (!chain) {
     return next(new Error(Errors.InvalidChain));
   }
@@ -55,4 +55,4 @@ const bulkEntities = async (models: DB, req: Request, res: Response, next: NextF
   return res.json({ status: 'Success', result: entities.map((e) => e.toJSON()) });
 };
 
-export default bulkEntities;
+export default entities;

@@ -46,6 +46,15 @@ class ChainEntityStore extends Store<ChainEntity> {
       return [];
     }
   }
+
+  public getById(id: number) {
+    for (const entityDict of Object.values(this._storeType)) {
+      for (const entity of Object.values(entityDict)) {
+        if (id === entity.id) return entity;
+      }
+    }
+    return null;
+  }
 }
 
 export default ChainEntityStore;

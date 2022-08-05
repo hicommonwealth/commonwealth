@@ -7,6 +7,7 @@ export type ChainEntityMetaAttributes = {
   title?: string;
   chain: string;
   author?: string;
+  thread_id?: number;
 }
 
 export type ChainEntityMetaInstance = ModelInstance<ChainEntityMetaAttributes>;
@@ -21,7 +22,8 @@ export default (
     id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
     title: { type: dataTypes.STRING, allowNull: true },
     chain: { type: dataTypes.STRING, allowNull: false },
-    author: { type: dataTypes.STRING, allowNull: true }
+    author: { type: dataTypes.STRING, allowNull: true },
+    thread_id: { type: dataTypes.INTEGER, allowNull: true }
   }, {
     tableName: 'ChainEntityMeta',
     timestamps: false,
@@ -32,7 +34,10 @@ export default (
     ],
   });
 
-  ChainEntityMeta.associate = (models) => {};
+  ChainEntityMeta.associate = (models) => {
+    models.ChainEntityMeta.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    models.ChainEntityMeta.belongsTo(models.Thread, { foreignKey: 'thread_id', targetKey: 'id' });
+  };
 
   return ChainEntityMeta;
 };

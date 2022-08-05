@@ -43,7 +43,6 @@ import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
 import viewNotifications, {NotificationCategories} from './routes/viewNotifications';
 import viewUserActivity from './routes/viewUserActivity';
-import viewChainActivity from './routes/viewChainActivity';
 import viewGlobalActivity from './routes/viewGlobalActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
@@ -126,7 +125,7 @@ import updateChainCategory from './routes/updateChainCategory';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
-import bulkEntities from './routes/bulkEntities';
+import getEntityMeta from './routes/getEntityMeta';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import tokenBalance from './routes/tokenBalance';
@@ -573,7 +572,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
-  router.post('/viewChainActivity', viewChainActivity.bind(this, models));
   router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
   router.post(
     '/markNotificationsRead',
@@ -746,8 +744,7 @@ function setupRouter(
   // logout
   router.get('/logout', logout.bind(this, models));
 
-  // TODO: Change to GET /entities
-  router.get('/bulkEntities', bulkEntities.bind(this, models));
+  router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));

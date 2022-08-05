@@ -39,7 +39,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     : req.body['chain_entity_id[]'] ? req.body['chain_entity_id[]'].map((id) => +id) : [];
 
   // remove any chain entities no longer linked to this thread
-  const existingChainEntities = await models.ChainEntity.findAll({
+  const existingChainEntities = await models.ChainEntityMeta.findAll({
     where: { thread_id }
   });
   const entitiesToClear = existingChainEntities.filter((ce) => chain_entity_ids.indexOf(ce.id) === -1);
@@ -51,7 +51,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
   // add any chain entities newly linked to this thread
   const existingEntityIds = existingChainEntities.map((ce) => ce.id);
   const entityIdsToSet = chain_entity_ids.filter((id) => existingEntityIds.indexOf(id) === -1);
-  const entitiesToSet = await models.ChainEntity.findAll({
+  const entitiesToSet = await models.ChainEntityMeta.findAll({
     where: {
       id: { [Op.in]: entityIdsToSet }
     }

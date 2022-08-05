@@ -77,19 +77,32 @@ class ChainEntityController {
     }
   }
 
-  public refresh(chain: string, refreshOption: EntityRefreshOption) {
+  public async refresh(chain: string, refreshOption: EntityRefreshOption) {
     if (refreshOption === EntityRefreshOption.Nothing) return;
+
     const options: any = { chain };
     if (refreshOption === EntityRefreshOption.CompletedEntities) {
       options.completed = true;
     }
-    // TODO: Change to GET /entities
-    return get('/bulkEntities', options, (result) => {
+
+    get('/entities', options, (result) => {
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);
       }
+
+      get('/entityMeta', {}, (result) => {
+        for (const entityMetaJSON of result) {
+          const entity = this._store.getById(entityMetaJSON.id);
+          if (entity) {
+            entity.title = entityMetaJSON.title;
+            entity.threadId = entityMetaJSON.thread_id;
+          }
+        }
+      });
     });
+
+
   }
 
   public deinit() {

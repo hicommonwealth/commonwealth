@@ -8,12 +8,13 @@ class ChainEntity {
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
-  public readonly title?: string;
   public readonly author: string;
 
-  public readonly threadId?: number;
   public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
+
+  public title: string;
+  public threadId?: number;
 
   private _updatedAt?: moment.Moment;
   public get updatedAt() { return this._updatedAt; }

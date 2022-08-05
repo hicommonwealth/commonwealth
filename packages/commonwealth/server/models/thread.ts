@@ -40,6 +40,7 @@ export type ThreadAttributes = {
   Attachments?:
     | AttachmentAttributes[]
     | AttachmentAttributes['id'][];
+  ChainEntityMeta?: ChainEntityMetaAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
   topic?: TopicAttributes;
@@ -150,6 +151,10 @@ export default (
       as: 'reactions',
     });
     models.Thread.hasMany(models.Collaboration);
+    models.Thread.hasMany(models.ChainEntityMeta, {
+      foreignKey: 'thread_id',
+      constraints: false,
+    });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
       as: 'linking_threads',

@@ -159,6 +159,7 @@ export default (
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
+    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' })
   };
 
   return Chain;

@@ -3,13 +3,15 @@ import { factory, formatFilename } from 'common-common/src/logging'
 import bodyParser from 'body-parser'
 import passport from "passport";
 import setupPassport from "./passport";
+import setupRouter from "./router";
+import { DB } from "./database";
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const port = process.env.PORT || 4002;
 
 const app = express();
-const router = express.Router();
 
 setupPassport();
 
@@ -18,10 +20,7 @@ async function main() {
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
 
-  router.get('/test', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
-    return res.status(200).json({success: true})
-  });
-
+  const router = setupRouter(DB);
   app.use('/', router);
   app.set('port', port);
 
