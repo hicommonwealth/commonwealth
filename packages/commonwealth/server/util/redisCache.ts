@@ -44,25 +44,19 @@ export class RedisCache {
     }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
-    const localRedis = REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
-    const vultrRedis = REDIS_URL.includes(VULTR_IP);
+    const localRedis = REDIS_URL?.includes('localhost') || REDIS_URL?.includes('127.0.0.1');
+    const vultrRedis = REDIS_URL?.includes(VULTR_IP);
 
-    let finalRedisUrl;
     if (!this.client) {
       const redisOptions = {};
 
-      if (localRedis) {
-        redisOptions['socket'] = {
-          reconnectStrategy: redisRetryStrategy
-        };
-        finalRedisUrl = "redis://localhost:6379"
-      } else if (vultrRedis) {
+      if (localRedis || vultrRedis) {
         redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           reconnectStrategy: redisRetryStrategy
         };
-        finalRedisUrl = REDIS_URL;
       } else {
+        redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           connectTimeout: 5000,
           keepAlive: 4000,
@@ -70,7 +64,6 @@ export class RedisCache {
           rejectUnauthorized: false,
           reconnectStrategy: redisRetryStrategy
         };
-        finalRedisUrl = REDIS_URL;
       }
 
       this.client = createClient(redisOptions);
@@ -79,7 +72,7 @@ export class RedisCache {
     this.client.on('error', (err) => {
       if (err instanceof ConnectionTimeoutError) {
         log.error(
-          `RedisCache connection to ${finalRedisUrl} timed out!`
+          `RedisCache connection to ${REDIS_URL} timed out!`
         );
       } else if (err instanceof ReconnectStrategyError) {
         log.error(`RedisCache max connection retries exceeded!`);

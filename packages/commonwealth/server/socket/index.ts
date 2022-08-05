@@ -26,9 +26,6 @@ import { RedisCache, redisRetryStrategy } from '../util/redisCache';
 const log = factory.getLogger(formatFilename(__filename));
 
 const origin = process.env.SERVER_URL || 'http://localhost:8080';
-const isLocalhost =
-  REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
-const isVultr = REDIS_URL.includes(VULTR_IP);
 
 export const authenticate = (
   socket: Socket,
@@ -90,28 +87,27 @@ export async function setupWebSocketServer(
     log.error('A WebSocket connection error has occurred', err);
   });
 
-  log.info(
-    `Socket instance connecting to Redis at: ${REDIS_URL}. ${
-      !REDIS_URL
-        ? 'The Redis url is undefined so the socket instance will not work cross server'
-        : ''
-    }`
-  );
+  if (!REDIS_URL) {
+    log.warn(
+      'Redis Url is undefined. Some services (e.g. WebSockets) may not be available.'
+    );
+    return;
+  }
+
+  const isLocalhost =
+    REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+  const isVultr = REDIS_URL.includes(VULTR_IP);
+
+  log.info(`Socket instance connecting to Redis at: ${REDIS_URL}`);
 
   const redisOptions = {};
-  let finalRedisUrl;
-  if (isLocalhost) {
-    redisOptions['socket'] = {
-      reconnectStrategy: redisRetryStrategy,
-    };
-    finalRedisUrl = 'redis://localhost:6379';
-  } else if (isVultr) {
+  if (isLocalhost || isVultr) {
     redisOptions['url'] = REDIS_URL;
     redisOptions['socket'] = {
       reconnectStrategy: redisRetryStrategy,
     };
-    finalRedisUrl = REDIS_URL;
   } else {
+    redisOptions['url'] = REDIS_URL;
     redisOptions['socket'] = {
       connectTimeout: 5000,
       keepAlive: 4000,
@@ -119,7 +115,6 @@ export async function setupWebSocketServer(
       rejectUnauthorized: false,
       reconnectStrategy: redisRetryStrategy,
     };
-    finalRedisUrl = REDIS_URL;
   }
 
   const pubClient = createClient(redisOptions);
@@ -128,7 +123,7 @@ export async function setupWebSocketServer(
   pubClient.on('error', (err) => {
     if (err instanceof ConnectionTimeoutError) {
       log.error(
-        `Socket.io Redis pub-client connection to ${finalRedisUrl} timed out!`
+        `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
       );
     } else if (err instanceof ReconnectStrategyError) {
       log.error(`Socket.io Redis pub-client max connection retries exceeded!`);
@@ -139,13 +134,16 @@ export async function setupWebSocketServer(
     } else {
       log.error(`Socket.io Redis pub-client connection error:`, err);
       if (!isLocalhost && !isVultr)
-        rollbar.critical('Socket.io Redis pub-client unknown connection error!', err);
+        rollbar.critical(
+          'Socket.io Redis pub-client unknown connection error!',
+          err
+        );
     }
   });
   subClient.on('error', (err) => {
     if (err instanceof ConnectionTimeoutError) {
       log.error(
-        `Socket.io Redis sub-client connection to ${finalRedisUrl} timed out!`
+        `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
       );
     } else if (err instanceof ReconnectStrategyError) {
       log.error(`Socket.io Redis sub-client max connection retries exceeded!`);
@@ -156,7 +154,10 @@ export async function setupWebSocketServer(
     } else {
       log.error(`Socket.io Redis sub-client connection error:`, err);
       if (!isLocalhost && !isVultr)
-        rollbar.critical('Socket.io Redis sub-client unknown connection error!', err);
+        rollbar.critical(
+          'Socket.io Redis sub-client unknown connection error!',
+          err
+        );
     }
   });
 
@@ -166,7 +167,7 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  // await redisCache.init();
+  await redisCache.init();
   console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
