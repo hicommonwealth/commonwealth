@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .NewThreadForm {
   display: flex;
@@ -8,6 +8,7 @@
     max-width: 680px;
     padding: 0 0 16px 0;
   }
+
   &.is-modal.has-drafts {
     max-width: 810px;
   }
@@ -18,26 +19,33 @@
 
   .ql-editor {
     min-height: calc(100vh - 360px);
+
     @include extraSmall {
       min-height: calc(100vh - 440px);
     }
   }
+
   &.is-modal .ql-editor {
     min-height: 170px;
   }
+
   &.is-modal.link-post .ql-editor {
     min-height: 115px;
   }
+
   @include extraSmall {
     .ql-editor {
       max-height: calc(100vh - 310px) !important;
     }
+
     .hidden-xs {
       display: none;
     }
+
     .cui-form-group > button {
       width: 100%;
     }
+
     .cui-form-group > button + button {
       margin-top: 10px;
     }
@@ -45,22 +53,27 @@
 
   .new-thread-form-body {
     max-width: 100%;
+
     .new-snapshot-proposal-form {
       display: flex;
+
       .add-vote-choice {
         color: $primary-400;
         font-weight: 500;
         margin: 10px 0 20px;
         display: flex;
         justify-content: flex-end;
+
         span {
           padding-top: 1px;
         }
+
         .cui-icon {
           color: $primary-400;
           margin-left: 12px;
         }
       }
+
       form:last-child {
         display: block;
       }
@@ -69,118 +82,146 @@
 
   &.has-drafts .new-thread-form-body {
     max-width: calc(100% - 205px);
+
     @include extraSmall {
       max-width: 100%;
       padding: 16px;
     }
   }
+
   .new-thread-form-body {
     flex: 9;
+
     .cui-tabs {
       margin-bottom: 8px;
       padding-right: 28px;
       border-bottom: 1px solid $neutral-50;
+
       .cui-tabs-item {
         padding: 11px 0 7px !important;
         margin-left: 1px !important;
         margin-right: 24px !important;
         font-size: 17px;
       }
+
       .cui-tabs-item.tab-right {
         margin-right: 1px !important;
         margin-left: 24px !important;
       }
+
       // center tabs on mobile
       @include extraSmall {
         justify-content: center;
         padding-right: 0;
+
         .cui-tabs-item {
           margin-right: 10px;
           margin-left: 10px;
         }
+
         .tab-spacer {
           display: none;
         }
       }
     }
+
     .no-profile-callout {
       margin-bottom: 16px;
       width: calc(100% - 28px);
+
       a {
         font-weight: 500;
       }
+
       @include extraSmall {
         width: 100%;
       }
     }
+
     .cui-form {
       margin: 0;
       margin-right: 28px;
+
       @include extraSmall {
         margin-right: 0;
       }
+
       // space between title and topic
       .topic-selection-drop-menu {
         padding: 18.8px 15.6px;
         margin-right: 12px;
         width: calc(100% - 12px);
+
         @include extraSmall {
           margin-right: 0;
           width: 100%;
         }
       }
     }
+
     button[name='submit'],
     button[name='submission'] {
       margin-right: 12px;
       // no margin-bottom here because it breaks button alignment
     }
   }
+
   &.is-modal .new-thread-form-body {
     .cui-tabs {
       padding-left: 28px;
     }
+
     .no-profile-callout {
       margin-left: 28px;
       width: calc(100% - 56px);
     }
+
     .cui-form {
       margin-left: 28px;
     }
+
     @include extraSmall {
       .cui-tabs {
         padding: 0;
       }
+
       .no-profile-callout {
         margin-left: 20px;
         width: calc(100% - 40px);
       }
+
       .cui-form {
         margin: 0 20px;
       }
     }
   }
+
   .new-thread-form-sidebar {
     display: flex;
     flex-direction: column;
     flex: 3;
     border-left: 1px solid $neutral-50;
     padding-bottom: 10px;
+
     .cui-list {
       max-height: none;
+
       .cui-list-item {
         display: block;
         padding: 21px 0 12px !important;
         border-bottom-color: $neutral-50;
         max-height: 140px;
         overflow: hidden;
+
         .discussion-draft-title-wrap {
           display: flex;
+
           svg {
             color: $rorange-500;
             margin: 0 8px 8px 0;
           }
         }
+
         .discussion-draft-title {
           font-weight: 400;
           margin-bottom: 8px;
@@ -189,21 +230,27 @@
           -webkit-line-clamp: 2;
           overflow: hidden;
         }
+
         .discussion-draft-body {
           font-weight: 400 !important;
+
           .QuillFormattedText {
             opacity: 0.4;
           }
+
           max-width: 150px;
         }
+
         .discussion-draft-actions {
           margin-top: 7px;
+
           a {
             font-size: 12px;
             font-weight: 500;
             text-transform: uppercase;
             opacity: 0.4;
             text-decoration: none;
+
             &:hover {
               opacity: 1;
               color: $rorange-500;
@@ -213,6 +260,7 @@
       }
     }
   }
+
   .draft-badge-wrap {
     display: flex;
     justify-content: center;

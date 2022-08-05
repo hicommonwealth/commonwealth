@@ -1,10 +1,11 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .NewThreadModal {
-    .modal-header {
-        padding: 0 24px;
-        h3 {
-            margin: 16px 0 6px;
-        }
+  .modal-header {
+    padding: 0 24px;
+
+    h3 {
+      margin: 16px 0 6px;
     }
+  }
 }

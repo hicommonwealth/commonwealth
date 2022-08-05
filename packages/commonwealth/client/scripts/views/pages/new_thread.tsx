@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* @jsx m */
 
-import m, { VnodeDOM } from 'mithril';
-import _ from 'lodash';
+import m from 'mithril';
+
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -9,9 +9,8 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { NewThreadForm } from '../components/new_thread_form/new_thread_form';
 
-const NewThreadPage: m.Component<{}> = {
-  oncreate: (vnode: VnodeDOM) => {},
-  view: (vnode: VnodeDOM) => {
+class NewThreadPage implements m.ClassComponent {
+  view() {
     if (!app.isLoggedIn()) {
       notifyInfo('You need to log in first');
       navigateToSubpage('/login');
@@ -19,26 +18,19 @@ const NewThreadPage: m.Component<{}> = {
     }
 
     const activeEntity = app.chain;
+
     if (!activeEntity) return m(PageLoading);
 
     const hasTopics = !!app.chain?.meta.topics.length;
 
-    return m(
-      Sublayout,
-      {
-        class: 'NewThreadPage',
-        title: 'New Thread',
-      },
-      [
-        m('.forum-container', [
-          m(NewThreadForm, {
-            isModal: false,
-            hasTopics,
-          }),
-        ]),
-      ]
+    return (
+      <Sublayout title="New Thread">
+        <div class="forum-container">
+          <NewThreadForm isModal={false} hasTopics={hasTopics} />
+        </div>
+      </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default NewThreadPage;
