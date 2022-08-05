@@ -22,10 +22,6 @@ import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 
-export enum SerivceUrls {
-  chainEvents = ''
-}
-
 export enum ApiStatus {
   Disconnected = 'disconnected',
   Connecting = 'connecting',

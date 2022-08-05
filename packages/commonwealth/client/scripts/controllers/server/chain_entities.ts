@@ -1,23 +1,23 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-import _ from 'lodash';
+import $ from "jquery";
 
-import { ChainEntityStore } from 'stores';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
-import app from 'state';
+import { ChainEntityStore } from "stores";
+import { ChainBase, ChainNetwork } from "common-common/src/types";
+import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from "models";
+import app from "state";
 import {
   CWEvent,
-  eventToEntity,
   entityToFieldName,
+  eventToEntity,
+  IChainEntityKind,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
-  IChainEntityKind,
-  SupportedNetwork,
-} from 'chain-events/src';
-import { notifyError } from '../app/notifications';
+  SupportedNetwork
+} from "chain-events/src";
+import { notifyError } from "../app/notifications";
 import proposalIdToEntity from "helpers/proposalIdToEntity";
+import { getBaseUrl, ServiceUrls } from "helpers/getUrl";
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -44,6 +44,26 @@ const get = (route, args, callback) => {
     }
   }).catch((e) => console.error(e));
 };
+
+async function getFetch(url: string, queryParams?: {[key: string]: any}) {
+  let queryUrl;
+  if (queryParams) queryUrl = url + new URLSearchParams(queryParams);
+  try {
+    const response = await fetch(queryUrl || url, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      referrerPolicy: 'strict-origin-when-cross-origin',
+    })
+    if (response.ok) return response.json();
+    else console.error(response)
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -85,24 +105,27 @@ class ChainEntityController {
       options.completed = true;
     }
 
-    get('/entities', options, (result) => {
-      for (const entityJSON of result) {
+    // load the chain-entity objects
+    const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents), options);
+    if (entities) {
+      for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);
       }
+    }
 
-      get('/entityMeta', {}, (result) => {
-        for (const entityMetaJSON of result) {
-          const entity = this._store.getById(entityMetaJSON.id);
-          if (entity) {
-            entity.title = entityMetaJSON.title;
-            entity.threadId = entityMetaJSON.thread_id;
-          }
+    // load the commonwealth chain-entity metadata and populate the existing
+    // entities in the store with it
+    const entityMetas = await getFetch(getBaseUrl());
+    if (entityMetas) {
+      for (const entityMetaJSON of entityMetas) {
+        const entity = this._store.getById(entityMetaJSON.id);
+        if (entity) {
+          entity.title = entityMetaJSON.title;
+          entity.threadId = entityMetaJSON.thread_id;
         }
-      });
-    });
-
-
+      }
+    }
   }
 
   public deinit() {
