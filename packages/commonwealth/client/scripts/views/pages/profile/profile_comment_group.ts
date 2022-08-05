@@ -3,13 +3,13 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThread, OffchainComment, Account } from 'models';
+import { Thread, Comment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {
-  proposal: OffchainThread | any;
-  comments: Array<OffchainComment<any>>;
+  proposal: Thread | any;
+  comments: Array<Comment<any>>;
   account: Account<any>;
 }
 
@@ -32,7 +32,7 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
             link(
               'a.link-bold',
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
-              proposal instanceof OffchainThread ? 'thread' : 'proposal',
+              proposal instanceof Thread ? 'thread' : 'proposal',
               {},
               `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
             ),

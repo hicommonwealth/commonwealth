@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { CustomSelect } from 'construct-ui';
+import { Select } from 'construct-ui';
 
 import 'components/proposals/convictions_chooser.scss';
 
@@ -11,14 +11,12 @@ import {
   convictions,
 } from 'controllers/chain/substrate/democracy_referendum';
 
-type ConvictionsChooserAttrs = { callback: (number) => void };
-
 export class ConvictionsChooser
-  implements m.ClassComponent<ConvictionsChooserAttrs>
+  implements m.ClassComponent<{ callback: (number) => void }>
 {
   view(vnode) {
     return (
-      <CustomSelect
+      <Select
         class="ConvictionsChooser"
         name="convictions"
         oncreate={() => {

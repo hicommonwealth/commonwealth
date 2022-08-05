@@ -12,17 +12,20 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 class ProposalSidebarLinkedChainEntity
   implements
     m.ClassComponent<{
-      proposal: OffchainThread;
+      proposal: Thread;
       chainEntity;
     }>
 {
@@ -49,7 +52,7 @@ class ProposalSidebarLinkedChainEntity
 class ProposalSidebarLinkedSnapshot
   implements
     m.ClassComponent<{
-      proposal: OffchainThread;
+      proposal: Thread;
     }>
 {
   private initialized: boolean;
@@ -103,7 +106,7 @@ export class LinkedProposalsCard
   implements
     m.ClassComponent<{
       openStageEditor: () => void;
-      proposal: OffchainThread;
+      proposal: Thread;
       showAddProposalButton: boolean;
     }>
 {
@@ -111,16 +114,18 @@ export class LinkedProposalsCard
     const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
 
     return (
-      <div class="LinkedProposalsCard">
+      <CWCard className="LinkedProposalsCard">
         {proposal.chainEntities.length > 0 ||
         proposal.snapshotProposal?.length > 0 ? (
-          <h4>Proposals for Thread</h4>
+          <CWText type="h5" className="header-text">
+            Proposals for Thread
+          </CWText>
         ) : (
-          <h4>
+          <CWText type="h5">
             {app.chain
               ? 'Connect an on-chain proposal?'
               : 'Track the progress of this thread?'}
-          </h4>
+          </CWText>
         )}
         <div class="links-container">
           {proposal.chainEntities.length > 0 && (
@@ -136,16 +141,11 @@ export class LinkedProposalsCard
             </div>
           )}
           {proposal.snapshotProposal?.length > 0 && (
-            <div class="snapshot-container">
-              <ProposalSidebarLinkedSnapshot proposal={proposal} />
-            </div>
+            <ProposalSidebarLinkedSnapshot proposal={proposal} />
           )}
         </div>
         {showAddProposalButton && (
-          <Button
-            rounded={true}
-            compact={true}
-            fluid={true}
+          <CWButton
             label="Connect a proposal"
             onclick={(e) => {
               e.preventDefault();
@@ -153,7 +153,7 @@ export class LinkedProposalsCard
             }}
           />
         )}
-      </div>
+      </CWCard>
     );
   }
 }

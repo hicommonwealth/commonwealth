@@ -56,7 +56,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
             label={<CWIcon iconName="home" iconSize="small" />}
             onclick={(e) => {
               e.preventDefault();
-              m.route.set('/');
+              m.route.set(app.isLoggedIn() ? '/dashboard/for-you' : '/');
             }}
           />
           <CommunitySelector />

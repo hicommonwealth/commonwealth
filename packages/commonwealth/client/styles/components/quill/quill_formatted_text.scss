@@ -201,16 +201,6 @@
     li.checked span {
       text-decoration: line-through;
     }
-
-    li.checked:before {
-      content: '\f14a';
-      color: $neutral-500;
-    }
-
-    li.unchecked:before {
-      content: '\f096';
-      color: $neutral-400;
-    }
   }
 
   ul.checklist + ul.checklist {

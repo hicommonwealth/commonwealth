@@ -1,17 +1,18 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/view_proposal/linked_threads_card.scss';
 
 import app from 'state';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import { OffchainThread } from 'models';
-import { LinkedThreadRelation } from 'client/scripts/models/OffchainThread';
+import { Thread } from 'models';
+import { LinkedThreadRelation } from 'client/scripts/models/Thread';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export class LinkedThreadsCard
   implements
@@ -21,7 +22,7 @@ export class LinkedThreadsCard
     }>
 {
   private fetchLinkedThreads: boolean;
-  private linkedThreads: OffchainThread[];
+  private linkedThreads: Thread[];
   private loading: boolean;
 
   oninit() {
@@ -66,6 +67,7 @@ export class LinkedThreadsCard
     if (allowLinking || proposal.linkedThreads.length) {
       return (
         <div class="LinkedThreadsCard">
+          <CWText type="h5">Link to an existing thread?</CWText>
           {proposal.linkedThreads.length > 0 && (
             <>
               <h4>Linked Threads</h4>
@@ -81,11 +83,8 @@ export class LinkedThreadsCard
             </>
           )}
           {allowLinking && (
-            <Button
+            <CWButton
               disabled={this.loading}
-              rounded={true}
-              compact={true}
-              fluid={true}
               label={
                 proposal.linkedThreads?.length
                   ? 'Link another thread'

@@ -1,6 +1,13 @@
+import { isU8a, isHex } from '@polkadot/util';
+import {
+  checkAddress,
+  decodeAddress,
+  encodeAddress,
+} from '@polkadot/util-crypto';
+
 import { ProposalType } from 'common-common/src/types';
 
-export const getNextOffchainPollEndingTime = (now) => {
+export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
   // and should always be open for at least 5 days.
   //
@@ -17,7 +24,7 @@ export const getNextOffchainPollEndingTime = (now) => {
   return t3;
 };
 
-export const getNextOffchainPollEndingTimeIsDangerouslyClose = (
+export const getNextPollEndingTimeIsDangerouslyClose = (
   now,
   endingTime
 ) => {
@@ -75,7 +82,7 @@ export const getProposalUrl = (type, proposal, comment?) => {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/proposal/${type}/${tId}${tTitle.toLowerCase()}${cId}`;
-  } else if (type === ProposalType.OffchainThread) {
+  } else if (type === ProposalType.Thread) {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
       : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
@@ -100,7 +107,7 @@ export const getProposalUrlWithoutObject = (
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/proposal/${type}/${tId}${cId}`
       : `http://localhost:8080/${aId}/proposal/${type}/${tId}${cId}`;
-  } else if (type === ProposalType.OffchainThread) {
+  } else if (type === ProposalType.Thread) {
     return process.env.NODE_ENV === 'production'
       ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
       : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
@@ -248,3 +255,41 @@ export function formatAddressShort(
     }`;
   }
 }
+
+export const addressSwapper = (options: {
+  address: string;
+  currentPrefix: number;
+}): string => {
+  if (!options.address) throw new Error('No address provided to swap');
+
+  if (!options.currentPrefix) return options.address;
+
+  if (isU8a(options.address) || isHex(options.address)) {
+    throw new Error('address not in SS58 format');
+  }
+
+  // check if it is valid as an address
+  let decodedAddress: Uint8Array;
+
+  try {
+    decodedAddress = decodeAddress(options.address);
+  } catch (e) {
+    throw new Error('failed to decode address');
+  }
+
+  // check if it is valid with the current prefix & reencode if needed
+  const [valid, errorMsg] = checkAddress(
+    options.address,
+    options.currentPrefix
+  );
+
+  if (!valid) {
+    try {
+      return encodeAddress(decodedAddress, options.currentPrefix);
+    } catch (e) {
+      throw new Error('failed to reencode address');
+    }
+  } else {
+    return options.address;
+  }
+};

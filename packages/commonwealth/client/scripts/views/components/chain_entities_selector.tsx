@@ -7,14 +7,14 @@ import { QueryList, ListItem } from 'construct-ui';
 import 'components/chain_entities_selector.scss';
 
 import app from 'state';
-import { ChainEntity, OffchainThread } from 'models';
+import { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: ChainEntity[];
   onSelect: () => void;
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 export class ChainEntitiesSelector

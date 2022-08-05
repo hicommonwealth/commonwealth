@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && tsc --project server/tsconfig.json",
+    "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && tsc --project server/tsconfig.json && tsc-alias --project server/tsconfig.json",
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
-    "build-scripts": "tsc --project server/tsconfig.json",
+    "build-scripts": "tsc --project server/tsconfig.json && tsc-alias --project server/tsconfig.json",
     "build:css": "NODE_ENV=production build client/styles/shared.scss",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit && tsc --project server/tsconfig.json --noEmit",
@@ -45,7 +45,10 @@
     "migrate-db": "npx sequelize db:migrate",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get DATABASE_URL -a commonwealthapp) -a -f limited_dump.sql",
-    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql" 
+    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql" ,
+    "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
+    "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
+    "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh"
   },
   "engines": {
     "node": "14.x"
@@ -162,7 +165,7 @@
     "ignore-loader": "^0.1.2",
     "jdenticon": "^2.1.1",
     "jquery": "^3.3.1",
-    "jsdom": "^15.0.0",
+    "jsdom": "^16.5.0",
     "jsdom-global": "^3.0.2",
     "jsonwebtoken": "^8.5.1",
     "lity": "^2.3.1",
@@ -196,7 +199,7 @@
     "prerender": "^5.6.0",
     "prerender-node": "^3.2.5",
     "prettier": "2.4.1",
-    "quill-2.0-dev": "^2.0.0-dev.3",
+    "quill": "^2.0.0-dev.4",
     "quill-image-drop-and-paste": "^1.0.4",
     "quill-image-uploader": "^1.0.2",
     "quill-mention": "^2.2.7",
@@ -219,6 +222,7 @@
     "throttled-queue": "^1.0.7",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
+    "tsc-alias": "^1.7.0",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.13.0",
     "tweetnacl": "^1.0.1",

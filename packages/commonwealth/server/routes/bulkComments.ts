@@ -7,7 +7,7 @@ import { DB } from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  MutuallyExclusive: 'Cannot select mutually exclusive offchain threads and proposals only options',
+  MutuallyExclusive: 'Cannot select mutually exclusive threads and proposals only options',
 };
 
 const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -24,9 +24,9 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   } else if (req.query.proposals_only) {
     whereOptions.root_id = { [Op.notLike]: 'discussion%' };
   }
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: whereOptions,
-    include: [ models.Address, models.OffchainAttachment ],
+    include: [ models.Address, models.Attachment ],
     order: [['created_at', 'DESC']],
   });
 

@@ -10,25 +10,20 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "traceResolution": false
+    "traceResolution": false,
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"]
+    },
   },
   "files": [
     "scripts/chainEventsConsumer.ts",
     "scripts/dbNode.ts",
   ],
-  "include": [
-    "models/*",
-    "models/",
-    "socket/*",
-    "scripts",
-    "eventHandlers",
-  ],
   "exclude": [
     "./node_modules",
-    "passport.ts",
-    "server/router.ts",
-    "server/webhookNotifier.ts",
-    "server/migrations",
     "node_modules",
     "build",
     "dist"

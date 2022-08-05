@@ -5,14 +5,14 @@ import 'pages/discussions/recent_listing.scss';
 import m from 'mithril';
 
 import app from 'state';
-import { OffchainThread } from 'models';
+import { Thread } from 'models';
 import { LoadingRow } from '../../components/loading_row';
 import { DiscussionRow } from './discussion_row';
 import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholder';
 import { ListingScroll } from './listing_scroll';
 
 export class DiscussionListing
-  implements m.ClassComponent<{ threads: OffchainThread[] }>
+  implements m.ClassComponent<{ threads: Thread[] }>
 {
   view(vnode) {
     return vnode.attrs.threads.map((t) => {

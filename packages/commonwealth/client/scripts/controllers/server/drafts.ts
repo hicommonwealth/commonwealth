@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
-import { DiscussionDraft, OffchainAttachment } from 'models';
+import { DiscussionDraft, Attachment } from 'models';
 
 import $ from 'jquery';
 import app from 'state';
@@ -8,9 +8,9 @@ import moment from 'moment';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
-  const attachments = draft.OffchainAttachments
-    ? draft.OffchainAttachments.map(
-        (a) => new OffchainAttachment(a.url, a.description)
+  const attachments = draft.Attachments
+    ? draft.Attachments.map(
+        (a) => new Attachment(a.url, a.description)
       )
     : [];
   return new DiscussionDraft(
@@ -23,6 +23,14 @@ const modelFromServer = (draft) => {
     moment(draft.created_at),
     attachments
   );
+};
+
+export type DraftParams = {
+  existingDraftId?: number;
+  title: string;
+  body: string;
+  topicName: string;
+  attachments?: string[];
 };
 
 class DraftsController {
@@ -38,19 +46,15 @@ class DraftsController {
     return this._initialized;
   }
 
-  public async create(
-    title: string,
-    body: string,
-    topicName: string,
-    attachments?: string[]
-  ) {
+  public async create(params: DraftParams) {
+    const { title, body, topicName, attachments } = params;
     try {
       const response = await $.post(`${app.serverUrl()}/drafts`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
         chain: app.activeChainId(),
-        title: title,
-        body: body,
+        title,
+        body,
         topic: topicName,
         'attachments[]': attachments,
         jwt: app.user.jwt,
@@ -67,14 +71,12 @@ class DraftsController {
     }
   }
 
-  public async edit(
-    id: number,
-    title: string,
-    body: string,
-    topicName: string,
-    attachments?: string[]
-  ) {
-    // Todo: handle attachments
+  // TODO: Handle attachments
+  public async edit(params: DraftParams) {
+    const { existingDraftId, title, body, topicName, attachments } = params;
+    if (!existingDraftId) {
+      throw new Error('Must include id of draft being edited.');
+    }
     try {
       const response = await $.ajax(`${app.serverUrl()}/drafts`, {
         type: 'PATCH',
@@ -82,9 +84,9 @@ class DraftsController {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
           chain: app.activeChainId(),
-          id: id,
-          title: title,
-          body: body,
+          id: existingDraftId,
+          title,
+          body,
           topic: topicName,
           'attachments[]': attachments,
           jwt: app.user.jwt,
@@ -113,7 +115,7 @@ class DraftsController {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
           chain: app.activeChainId(),
-          id: id,
+          id,
           jwt: app.user.jwt,
         },
       });
@@ -145,7 +147,7 @@ class DraftsController {
       }
       for (let draft of response.result) {
         if (!draft.Address) {
-          console.error('OffchainThread missing address');
+          console.error('Thread missing address');
         }
         draft = modelFromServer(draft);
         const existing = this._store.getById(draft.id);

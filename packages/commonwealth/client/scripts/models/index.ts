@@ -15,13 +15,13 @@ export { default as Notification } from './Notification';
 export { default as DashboardActivityNotification } from './DashboardActivityNotification';
 export { default as NotificationCategory } from './NotificationCategory';
 export { default as NotificationSubscription } from './NotificationSubscription';
-export { default as OffchainAttachment } from './OffchainAttachment';
-export { default as OffchainComment } from './OffchainComment';
-export { default as OffchainReaction } from './OffchainReaction';
-export { default as OffchainTopic } from './OffchainTopic';
-export { default as OffchainThread } from './OffchainThread';
-export { default as OffchainPoll } from './OffchainPoll';
-export { default as OffchainVote } from './OffchainVote';
+export { default as Attachment } from './Attachment';
+export { default as Comment } from './Comment';
+export { default as Reaction } from './Reaction';
+export { default as Topic } from './Topic';
+export { default as Thread } from './Thread';
+export { default as Poll } from './Poll';
+export { default as Vote } from './Vote';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
@@ -40,8 +40,8 @@ export { default as Webhook } from './Webhook';
 export { DepositVote, BinaryVote } from './votes';
 
 export {
-  OffchainThreadKind,
-  OffchainThreadStage,
+  ThreadStage,
+  ThreadKind,
   TransactionStatus,
   ProposalStatus,
   VotingType,
