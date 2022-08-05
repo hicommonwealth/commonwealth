@@ -134,6 +134,13 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string
   ): Promise<string> {
+    if (!this.initialized) {
+      log.error(
+        'Redis client is not initialized. Run RedisCache.init() first!'
+      );
+      return;
+    }
+
     const finalKey = namespace + '_' + key;
     return await this.client.get(finalKey);
   }
