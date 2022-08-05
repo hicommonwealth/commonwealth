@@ -14,7 +14,7 @@ import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elect
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import CouncilVotingModal from 'views/modals/council_voting_modal';
+import { CouncilVotingModal } from 'views/modals/council_voting_modal';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
