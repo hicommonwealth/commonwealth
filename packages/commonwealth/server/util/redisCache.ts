@@ -44,8 +44,8 @@ export class RedisCache {
     }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
-    const localRedis = REDIS_URL?.includes('localhost') || REDIS_URL?.includes('127.0.0.1');
-    const vultrRedis = REDIS_URL?.includes(VULTR_IP);
+    const localRedis = REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+    const vultrRedis = REDIS_URL.includes(VULTR_IP);
 
     if (!this.client) {
       const redisOptions = {};
