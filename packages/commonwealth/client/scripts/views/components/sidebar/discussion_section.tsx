@@ -6,6 +6,7 @@ import 'components/sidebar/index.scss';
 
 import { navigateToSubpage } from 'app';
 import app from 'state';
+import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -145,8 +146,17 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          navigateToSubpage('/');
+          handleRedirectClicks(
+            e,
+            `/`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(
+                `children.All.toggledState`,
+                toggle
+              );
+            }
+          );
         },
         displayData: null,
       },
@@ -161,8 +171,14 @@ export class DiscussionSection
           (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
-          navigateToSubpage('/sputnik-daos');
+          handleRedirectClicks(
+            e,
+            `/sputnik-daos`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
+            }
+          );
         },
         displayData: null,
       },
@@ -177,13 +193,20 @@ export class DiscussionSection
           isVisible: true,
           isUpdated: true,
           isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
+          // eslint-disable-next-line no-loop-func
           onclick: (e, toggle: boolean) => {
             e.preventDefault();
-            setDiscussionsToggleTree(
-              `children.${topic.name}.toggledState`,
-              toggle
+            handleRedirectClicks(
+              e,
+              `/discussions/${encodeURI(topic.name)}`,
+              app.activeChainId(),
+              () => {
+                setDiscussionsToggleTree(
+                  `children.${topic.name}.toggledState`,
+                  toggle
+                );
+              }
             );
-            navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
           },
           displayData: null,
         };

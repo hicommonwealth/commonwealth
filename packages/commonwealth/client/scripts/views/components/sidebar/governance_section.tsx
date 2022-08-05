@@ -4,9 +4,9 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
-import { navigateToSubpage } from 'app';
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -260,9 +260,9 @@ export class GovernanceSection
         onMembersPage(m.route.get()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
-        e.preventDefault();
-        setGovernanceToggleTree('children.Members.toggledState', toggle);
-        navigateToSubpage('/members');
+        handleRedirectClicks(e, '/members', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Members.toggledState', toggle);
+        });
       },
       displayData: null,
     };
@@ -283,16 +283,29 @@ export class GovernanceSection
         // Check if we have multiple snapshots for conditional redirect
         const snapshotSpaces = app.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
-          navigateToSubpage('/multiple-snapshots', { action: 'select-space' });
+          handleRedirectClicks(
+            e,
+            '/multiple-snapshots?action=select-space',
+            app.activeChainId(),
+            null
+          );
         } else {
           if (snapshotSpaces[0].lastIndexOf('/') > -1) {
-            navigateToSubpage(
+            handleRedirectClicks(
+              e,
               `/snapshot/${snapshotSpaces[0]
                 .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
-                .trim()}`
+                .trim()}`,
+              app.activeChainId(),
+              null
             );
           } else {
-            navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+            handleRedirectClicks(
+              e,
+              `/snapshot/${snapshotSpaces}`,
+              app.activeChainId(),
+              null
+            );
           }
         }
       },
@@ -308,8 +321,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/proposals');
-        setGovernanceToggleTree('children.Proposals.toggledState', toggle);
+        handleRedirectClicks(e, '/proposals', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Proposals.toggledState', toggle);
+        });
       },
       isVisible: showProposals,
       isUpdated: true,
@@ -326,8 +340,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/treasury');
-        setGovernanceToggleTree('children.Treasury.toggledState', toggle);
+        handleRedirectClicks(e, '/treasury', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Treasury.toggledState', toggle);
+        });
       },
       isVisible: showTreasury,
       isUpdated: true,
@@ -343,8 +358,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/bounties');
-        setGovernanceToggleTree('children.Bounties.toggledState', toggle);
+        handleRedirectClicks(e, '/bounties', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Bounties.toggledState', toggle);
+        });
       },
       isVisible: showBounties,
       isUpdated: true,
@@ -360,8 +376,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/referenda');
-        setGovernanceToggleTree('children.Referenda.toggledState', toggle);
+        handleRedirectClicks(e, '/referenda', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Referenda.toggledState', toggle);
+        });
       },
       isVisible: showReferenda,
       isUpdated: true,
@@ -377,8 +394,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/tips');
-        setGovernanceToggleTree('children.Tips.toggledState', toggle);
+        handleRedirectClicks(e, '/tips', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Tips.toggledState', toggle);
+        });
       },
       isVisible: showTips,
       isUpdated: true,
@@ -394,8 +412,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/council');
-        setGovernanceToggleTree('children.Councillors.toggledState', toggle);
+        handleRedirectClicks(e, '/council', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Councillors.toggledState', toggle);
+        });
       },
       isVisible: showCouncillors,
       isUpdated: true,
@@ -411,8 +430,9 @@ export class GovernanceSection
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        navigateToSubpage('/validators');
-        setGovernanceToggleTree('children.Validators.toggledState', toggle);
+        handleRedirectClicks(e, '/validators', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Validators.toggledState', toggle);
+        });
       },
       isVisible: showValidators,
       isUpdated: true,
@@ -432,8 +452,9 @@ export class GovernanceSection
       isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        setGovernanceToggleTree('children.Delegate.toggledState', toggle);
-        navigateToSubpage('/delegate');
+        handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Delegate.toggledState', toggle);
+        });
       },
       displayData: null,
     };
