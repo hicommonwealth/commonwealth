@@ -86,6 +86,11 @@ export class EmailSection implements m.ClassComponent {
                 if (!confirmed) return;
 
                 try {
+                  await $.post(`${app.serverUrl()}/updateEmail`, {
+                    email: this.email,
+                    jwt: app.user.jwt,
+                  });
+
                   this.emailVerified = false;
 
                   this.verificationSent = true;
