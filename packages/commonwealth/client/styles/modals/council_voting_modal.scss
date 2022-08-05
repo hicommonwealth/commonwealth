@@ -3,23 +3,23 @@
 .CouncilVotingModal {
   max-width: 640px;
 
-  .chooser {
-    p {
-      margin: 10px 0;
-    }
+  // .chooser {
+  //   p {
+  //     margin: 10px 0;
+  //   }
 
-    .MultipleButtonSelectorFormField button {
-      width: 100%;
-      margin: 3px 0 !important;
-    }
-  }
+  //   .MultipleButtonSelectorFormField button {
+  //     width: 100%;
+  //     margin: 3px 0 !important;
+  //   }
+  // }
 
-  input[type='text'].phragmen-vote-amount {
-    margin-top: 24px;
-  }
+  // input[type='text'].phragmen-vote-amount {
+  //   margin-top: 24px;
+  // }
 
-  .no-candidates {
-    margin: 20px 0;
-    font-weight: 500;
-  }
+  // .no-candidates {
+  //   margin: 20px 0;
+  //   font-weight: 500;
+  // }
 }
