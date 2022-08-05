@@ -5,7 +5,7 @@ import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
 
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import HeaderLandingPage from './landing_page_header';
 import JoinCommonWealthSection from './landing_page_pre_footer';
 import TokensCommunityComponent from './tokens_community_hero';
@@ -64,21 +64,28 @@ const LandingPage: m.Component<{}, IState> = {
     vnode.state.inputTokenValue = '';
     vnode.state.chains = [];
 
-    const sortedChains = app.config.chains.getAll().sort((a, b) => {
-      const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-      const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-      return threadCountB - threadCountA;
-    }).map((chain) => {
-      return {
-        img: chain.iconUrl,
-        id: chain.id,
-        chainInfo: chain,
-        name: chain.name,
-      };
-    });
+    const sortedChains = app.config.chains
+      .getAll()
+      .sort((a, b) => {
+        const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+        const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
+        return threadCountB - threadCountA;
+      })
+      .map((chain) => {
+        return {
+          img: chain.iconUrl,
+          id: chain.id,
+          chainInfo: chain,
+          name: chain.name,
+        };
+      });
 
-    const sortedChainsAndCommunities = sortedChains.filter((c) => !c.chainInfo.collapsedOnHomepage)
-    const betaChainsAndCommunities = sortedChains.filter((c) => c.chainInfo.collapsedOnHomepage)
+    const sortedChainsAndCommunities = sortedChains.filter(
+      (c) => !c.chainInfo.collapsedOnHomepage
+    );
+    const betaChainsAndCommunities = sortedChains.filter(
+      (c) => c.chainInfo.collapsedOnHomepage
+    );
 
     vnode.state.chains = [
       ...sortedChainsAndCommunities,

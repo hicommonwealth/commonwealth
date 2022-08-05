@@ -27,6 +27,7 @@ type ConfirmSnapshotVoteModalAttrs = {
   snapshot: any;
   space: SnapshotSpace;
   totalScore: number;
+  successCallback: () => any;
 };
 
 export class ConfirmSnapshotVoteModal
@@ -37,7 +38,8 @@ export class ConfirmSnapshotVoteModal
   view(vnode) {
     const author = app.user.activeAccount;
 
-    const { proposal, space, id, selectedChoice, totalScore } = vnode.attrs;
+    const { proposal, space, id, selectedChoice, totalScore, successCallback } =
+      vnode.attrs;
 
     return (
       <div class="ConfirmSnapshotVoteModal">
@@ -58,8 +60,9 @@ export class ConfirmSnapshotVoteModal
             <div class="vote-info-row">
               <CWText>Your voting power</CWText>
               <CWText>
-                `${formatNumberShort(totalScore)} $
-                {space.symbol.slice(0, 6).trim()}...`
+                {`${formatNumberShort(totalScore)} ${space.symbol
+                  .slice(0, 6)
+                  .trim()}...`}
               </CWText>
             </div>
           </div>
@@ -92,6 +95,7 @@ export class ConfirmSnapshotVoteModal
                 try {
                   castVote(author.address, votePayload).then(() => {
                     $(e.target).trigger('modalexit');
+                    successCallback();
                     m.redraw();
                   });
                   mixpanelBrowserTrack({

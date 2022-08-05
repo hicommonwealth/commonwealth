@@ -3,11 +3,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
 
 import 'modals/confirm_modal.scss';
 
 import app from 'state';
+import { CWButton } from '../components/component_kit/cw_button';
 
 const ConfirmModal = {
   confirmExit: async () => true,
@@ -32,9 +32,7 @@ const ConfirmModal = {
           <h3>{confirmText}</h3>
         </div>
         <div class="compact-modal-actions">
-          <Button
-            intent="primary"
-            rounded={true}
+          <CWButton
             onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
@@ -47,9 +45,8 @@ const ConfirmModal = {
             }}
             label={primaryButton}
           />
-          <Button
-            intent="none"
-            rounded={true}
+          <CWButton
+            buttonType="secondary-blue"
             onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');

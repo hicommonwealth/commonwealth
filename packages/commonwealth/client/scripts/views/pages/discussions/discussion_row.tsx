@@ -18,12 +18,13 @@ import {
   externalLink,
   extractDomain,
   threadStageToLabel,
+  isCommandClick,
 } from 'helpers';
 import {
   Thread,
-  ThreadKind,
   ThreadStage,
   AddressInfo,
+  ThreadKind,
 } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
@@ -53,7 +54,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             return vnode.attrs.onSelect();
           }
           if ($(e.target).hasClass('cui-tag')) return;
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          if (isCommandClick(e)) {
             window.open(discussionLink, '_blank');
             return;
           }

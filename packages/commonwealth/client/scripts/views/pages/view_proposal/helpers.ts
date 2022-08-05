@@ -1,6 +1,6 @@
 import m from 'mithril';
-import moment from 'moment';
 import $ from 'jquery';
+import moment from 'moment';
 import app from 'state';
 import { Poll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
@@ -44,7 +44,8 @@ export const jumpHighlightComment = (
 export const handleProposalPollVote = async (
   poll: Poll,
   option: string,
-  isSelected: boolean
+  isSelected: boolean,
+  callback: () => any
 ) => {
   const { activeAccount } = app.user;
 
@@ -66,7 +67,10 @@ export const handleProposalPollVote = async (
   // submit vote
   poll
     .submitVote(...userInfo, option)
-    .then(() => m.redraw())
+    .then(() => {
+      callback();
+      m.redraw();
+    })
     .catch(async () => {
       await alertModalWithText(
         'Error submitting vote. Maybe the poll has already ended?'
@@ -78,7 +82,10 @@ export const getProposalPollTimestamp = (
   poll: Poll,
   pollingEnded: boolean
 ) => {
+  if (!poll.endsAt.isValid()) {
+    return 'No end date';
+  }
   return pollingEnded
     ? `Ended ${poll.endsAt?.format('lll')}`
-    : `Ends ${moment().from(poll.endsAt).replace(' ago', '')} left`;
+    : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
 };

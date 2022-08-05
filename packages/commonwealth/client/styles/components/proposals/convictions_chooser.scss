@@ -1,14 +1,5 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ConvictionsChooser {
   width: 100%;
-
-  button {
-    width: 100%;
-  }
-
-  .cui-button-label {
-    width: calc(100% - 20px);
-    text-align: left;
-  }
 }

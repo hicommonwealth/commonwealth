@@ -26,7 +26,6 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import { ChainEventTypeAttributes } from "chain-events/app/models/chain_event_type";
 
 const log = factory.getLogger(formatFilename(__filename));
 

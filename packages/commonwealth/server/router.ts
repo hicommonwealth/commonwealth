@@ -41,7 +41,9 @@ import enableSubscriptions from './routes/subscription/enableSubscriptions';
 import disableSubscriptions from './routes/subscription/disableSubscriptions';
 import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
-import viewNotifications, {NotificationCategories} from './routes/viewNotifications';
+import viewNotifications, {
+  NotificationCategories,
+} from './routes/viewNotifications';
 import viewUserActivity from './routes/viewUserActivity';
 import viewGlobalActivity from './routes/viewGlobalActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
@@ -122,6 +124,7 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
+import updateChainCustomDomain from './routes/updateChainCustomDomain';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -149,7 +152,7 @@ function setupRouter(
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
-  banCache: BanCache, // TODO: where is this needed?
+  banCache: BanCache // TODO: where is this needed?
 ) {
   const router = express.Router();
 
@@ -556,15 +559,15 @@ function setupRouter(
   );
 
   router.post(
-      '/viewDiscussionNotifications',
-      passport.authenticate('jwt', { session: false }),
-      viewNotifications.bind(this, models, NotificationCategories.Discussion)
+    '/viewDiscussionNotifications',
+    passport.authenticate('jwt', { session: false }),
+    viewNotifications.bind(this, models, NotificationCategories.Discussion)
   );
 
   router.post(
-      '/viewChainEventNotifications',
-      passport.authenticate('jwt', { session: false }),
-      viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
+    '/viewChainEventNotifications',
+    passport.authenticate('jwt', { session: false }),
+    viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
   );
 
   router.post(
@@ -665,10 +668,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
   );
-  router.get(
-    '/getRuleTypes',
-    getRuleTypes.bind(this, models)
-  );
+  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 
   // settings
   router.post(
@@ -693,6 +693,12 @@ function setupRouter(
     getBannedAddresses.bind(this, models)
   );
 
+  // Custom domain update route
+  router.post(
+    '/updateChainCustomDomain',
+    updateChainCustomDomain.bind(this, models)
+  );
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -712,19 +718,33 @@ function setupRouter(
   // NOTE: if a successfulRedirect url is used in the options then there is no way to access that data.
 
   router.get('/auth/github', (req, res, next) => {
-    passport.authenticate('github', <any>{state: {hostname: req.hostname}})(req, res, next);
-  })
-  router.get('/auth/github/callback', passport.authenticate('github', {
-    failureRedirect: '/',
-  }), startOAuthLogin.bind(this, models, 'github'))
+    passport.authenticate('github', <any>{ state: { hostname: req.hostname } })(
+      req,
+      res,
+      next
+    );
+  });
+  router.get(
+    '/auth/github/callback',
+    passport.authenticate('github', {
+      failureRedirect: '/',
+    }),
+    startOAuthLogin.bind(this, models, 'github')
+  );
 
   router.get('/auth/discord', (req, res, next) => {
-    passport.authenticate('discord', <any>{state: {hostname: req.hostname}})(req, res, next);
+    passport.authenticate('discord', <any>{
+      state: { hostname: req.hostname },
+    })(req, res, next);
   });
 
-  router.get('/auth/discord/callback', passport.authenticate('discord', {
-    failureRedirect: '/',
-  }), startOAuthLogin.bind(this, models, 'discord'));
+  router.get(
+    '/auth/discord/callback',
+    passport.authenticate('discord', {
+      failureRedirect: '/',
+    }),
+    startOAuthLogin.bind(this, models, 'discord')
+  );
 
   router.post(
     '/auth/magic',
