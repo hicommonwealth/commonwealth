@@ -73,7 +73,7 @@ export const RABBITMQ_URI = (() => {
 // if REDIS_URL exists use that (production or local redis instance) otherwise if
 // the Vultr server info is given then use that. Undefined otherwise.
 export const REDIS_URL = process.env.REDIS_URL ? process.env.REDIS_URL :
-  process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT ? `${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}` : undefined
+  process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}` : undefined
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
