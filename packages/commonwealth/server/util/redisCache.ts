@@ -7,10 +7,10 @@ import Rollbar from 'rollbar';
 const log = factory.getLogger(formatFilename(__filename));
 
 export function redisRetryStrategy(retries: number) {
-  if (retries > 10) {
+  if (retries > 5) {
     return new Error('Redis max connection retries exceeded');
   }
-  // timetable: 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
+  // timetable: 0, 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
   // from 1 sec to 16.67 minutes
   return (retries * 10) ** 3
 }
