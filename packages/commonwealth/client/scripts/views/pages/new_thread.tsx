@@ -17,9 +17,7 @@ class NewThreadPage implements m.ClassComponent {
       return;
     }
 
-    const activeEntity = app.chain;
-
-    if (!activeEntity) return m(PageLoading);
+    if (!app.chain) return <PageLoading />;
 
     const hasTopics = !!app.chain?.meta.topics.length;
 

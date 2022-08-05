@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 
 import 'modals/new_thread_modal.scss';
