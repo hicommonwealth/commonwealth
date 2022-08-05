@@ -146,8 +146,17 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          navigateToSubpage('/');
+          handleRedirectClicks(
+            e,
+            `/`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(
+                `children.All.toggledState`,
+                toggle
+              );
+            }
+          );
         },
         displayData: null,
       },
@@ -162,8 +171,14 @@ export class DiscussionSection
           (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
-          navigateToSubpage('/sputnik-daos');
+          handleRedirectClicks(
+            e,
+            `/sputnik-daos`,
+            app.activeChainId(),
+            () => {
+              setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
+            }
+          );
         },
         displayData: null,
       },

@@ -369,6 +369,7 @@ export const isCommandClick = (e: MouseEvent) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
 
+// Handle command click and normal clicks
 export const handleRedirectClicks = (
   e: MouseEvent,
   redirectLink: string,
