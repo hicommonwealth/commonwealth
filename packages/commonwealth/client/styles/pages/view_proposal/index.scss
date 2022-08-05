@@ -32,22 +32,49 @@ $discussion-title-font-size: 1.45rem;
   }
 }
 
+.view-proposal-content-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 768px;
+  width: 100%;
+}
+
+.view-sidebar-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .ViewProposalPage {
   display: flex;
   flex: 1;
-  flex-direction: row;
+  flex-direction: column;
+  padding: 24px;
 
-  .view-proposal-page-container {
+  .view-proposal-body-with-tabs {
+    .TabBar {
+      margin-bottom: 8px;
+    }
+
+    @include medium {
+      display: none;
+    }
+
+    @include large {
+      display: none;
+    }
+  }
+
+  .view-proposal-body {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-right: 32px;
-    padding: 24px 0 24px 24px;
-    width: 736px;
+    gap: 56px;
+    justify-content: space-between;
+    width: 100%;
 
-    @include smallInclusive {
-      padding: 24px;
-      width: 100%;
+    &.hasSidebar {
+      @include mediumSmallInclusive {
+        display: none;
+      }
     }
   }
 
