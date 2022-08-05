@@ -30,7 +30,7 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
 
     const candidates = vnode.attrs.candidates || [];
 
-    if (!author) return m('div', 'Must be logged in');
+    if (!author) return <CWText>Must be logged in</CWText>;
 
     if (!(author instanceof SubstrateAccount))
       return <CWText>Council voting only supported on Substrate.</CWText>;
