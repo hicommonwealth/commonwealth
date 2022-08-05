@@ -10,6 +10,7 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
+import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -140,7 +141,9 @@ export class ChatSection
   }
 
   onbeforeupdate(vnode, old) {
-    if (!_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)) {
+    if (
+      !_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)
+    ) {
       Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
         this.channels[metadata.category]
@@ -362,10 +365,16 @@ export class ChatSection
         isVisible: true,
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
-        onclick: () => {
-          navigateToSubpage(`/chat/${channel.id}`);
-          this.activeChannel = channel.id;
-          app.socket.chatNs.activeChannel = String(channel.id);
+        onclick: (e) => {
+          handleRedirectClicks(
+            e,
+            `/chat/${channel.id}`,
+            app.activeChainId(),
+            () => {
+              this.activeChannel = channel.id;
+              app.socket.chatNs.activeChannel = String(channel.id);
+            }
+          );
         },
         rightIcon: isAdmin && channelRightIcon(channel),
       };
