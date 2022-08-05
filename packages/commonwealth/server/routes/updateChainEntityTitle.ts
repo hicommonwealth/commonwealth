@@ -18,7 +18,7 @@ const updateChainEntityTitle = async (
   if (error) return next(new Error(error));
   const { title, chain_entity_id } = req.body;
 
-  const entity = await models.ChainEntityTitle.findOne({
+  const entity = await models.ChainEntityMeta.findOne({
     where: {
       id: chain_entity_id
     }
