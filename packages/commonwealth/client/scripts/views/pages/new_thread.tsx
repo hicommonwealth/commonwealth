@@ -23,9 +23,7 @@ class NewThreadPage implements m.ClassComponent {
 
     return (
       <Sublayout title="New Thread">
-        <div class="forum-container">
-          <NewThreadForm isModal={false} hasTopics={hasTopics} />
-        </div>
+        <NewThreadForm isModal={false} hasTopics={hasTopics} />
       </Sublayout>
     );
   }

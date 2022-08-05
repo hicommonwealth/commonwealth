@@ -3,7 +3,7 @@
 import m from 'mithril';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
-import { Callout, List, ListItem, Tag } from 'construct-ui';
+import { List, ListItem } from 'construct-ui';
 
 import 'components/new_thread_form.scss';
 
@@ -34,6 +34,7 @@ import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { getClasses } from '../component_kit/helpers';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
@@ -50,17 +51,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   recentlyDeletedDrafts: number[];
   saving: boolean;
   uploadsInProgress: number;
-
-  private _getClass(isModal, draftCount) {
-    if (!this) throw new Error('no this');
-    return (
-      `${this.form.kind === ThreadKind.Link ? 'link-post' : ''} ` +
-      `${
-        this.form.kind !== ThreadKind.Link && draftCount > 0 ? 'has-drafts' : ''
-      } ` +
-      `${isModal ? 'is-modal' : ''}`
-    );
-  }
 
   private async _newThread(
     form: NewThreadFormType,
@@ -298,9 +288,20 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       linkContentMissing ||
       discussionContentMissing;
 
+    // private _getClass(isModal, draftCount) {
+    //   if (!this) throw new Error('no this');
+    //   return (
+    //     `${this.form.kind === ThreadKind.Link ? 'link-post' : ''} ` +
+    //     `${
+    //       this.form.kind !== ThreadKind.Link && draftCount > 0 ? 'has-drafts' : ''
+    //     } ` +
+    //     `${isModal ? 'is-modal' : ''}`
+    //   );
+    // }
+
     return (
       <div
-        class="NewThreadForm"
+        class={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
         // class={this._getClass(isModal, discussionDrafts.length)}
         oncreate={(vvnode) => {
           $(vvnode.dom)
@@ -309,7 +310,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
             .focus();
         }}
       >
-        <div class="new-thread-form-body">
+        <div class="new-thread-header">
           <CWTabBar>
             <CWTab
               label={capitalize(ThreadKind.Discussion)}
@@ -334,56 +335,191 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
               }}
               isSelected={this.form.kind === ThreadKind.Link}
             />
-            {isModal && m.route.get() !== `${chainId}/new/discussion` && (
-              <CWButton
-                label="Full editor"
-                iconName="expand"
-                onclick={(e) => {
-                  this.overwriteConfirmationModal = true;
-                  localStorage.setItem(`${chainId}-from-draft`, `${fromDraft}`);
-                  navigateToSubpage('/new/discussion');
-                  $(e.target).trigger('modalexit');
-                }}
-              />
-            )}
           </CWTabBar>
-          {author?.profile && !author.profile.name && (
-            <Callout
-              class="no-profile-callout"
-              intent="primary"
-              content={[
-                "You haven't set a display name yet. ",
-                m(
-                  'a',
-                  {
-                    href: `/${chainId}/account/${author.address}?base=${author.chain}`,
-                    onclick: (e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: EditProfileModal,
-                        data: {
-                          account: author,
-                          refreshCallback: () => m.redraw(),
-                        },
-                      });
-                    },
-                  },
-                  'Set a display name'
-                ),
-              ]}
+          {isModal && m.route.get() !== `${chainId}/new/discussion` && (
+            <CWButton
+              label="Full editor"
+              iconName="expand"
+              buttonType="tertiary-blue"
+              onclick={(e) => {
+                this.overwriteConfirmationModal = true;
+                localStorage.setItem(`${chainId}-from-draft`, `${fromDraft}`);
+                navigateToSubpage('/new/discussion');
+                $(e.target).trigger('modalexit');
+              }}
             />
+          )}
+        </div>
+        <div class="new-thread-form-body">
+          {author?.profile && !author.profile.name && (
+            <div class="set-display-name-callout">
+              <CWText>You haven't set a display name yet.</CWText>
+              <a
+                href={`/${chainId}/account/${author.address}?base=${author.chain}`}
+                onclick={(e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditProfileModal,
+                    data: {
+                      account: author,
+                      refreshCallback: () => m.redraw(),
+                    },
+                  });
+                }}
+              >
+                Set a display name
+              </a>
+            </div>
           )}
           {this.form.kind === ThreadKind.Discussion && (
             <>
-              {!!fromDraft && (
-                <Tag class="draft-badge" size="xs" rounded label="Draft" />
-              )}
-              {hasTopics && (
+              {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
+              <div class="topics-and-title-row">
+                {hasTopics && (
+                  <TopicSelector
+                    defaultTopic={
+                      this.activeTopic === false || this.activeTopic
+                        ? this.activeTopic
+                        : localStorage.getItem(`${chainId}-active-topic`)
+                    }
+                    topics={
+                      app.topics &&
+                      app.topics.getByCommunity(chainId).filter((t) => {
+                        return (
+                          isAdmin ||
+                          t.tokenThreshold.isZero() ||
+                          !TopicGateCheck.isGatedTopic(t.name)
+                        );
+                      })
+                    }
+                    updateFormData={this._updateTopicState.bind(this)}
+                    tabindex={1}
+                  />
+                )}
+                <CWTextInput
+                  name="new-thread-title"
+                  placeholder="Title"
+                  oninput={(e) => {
+                    e.redraw = false; // do not redraw on input
+                    const { value } = (e as any).target;
+                    if (
+                      this.quillEditorState &&
+                      !this.quillEditorState.alteredText
+                    ) {
+                      this.quillEditorState.alteredText = true;
+                    }
+                    this.form.title = value;
+                    localStorage.setItem(
+                      `${chainId}-new-discussion-storedTitle`,
+                      this.form.title
+                    );
+                  }}
+                  defaultValue={this.form.title}
+                  tabindex={2}
+                />
+              </div>
+              <QuillEditorComponent
+                contentsDoc=""
+                oncreateBind={(state: QuillEditor) => {
+                  this.quillEditorState = state;
+                  if (defaultTemplate) {
+                    state.loadDocument(defaultTemplate);
+                  }
+                }}
+                editorNamespace="new-discussion"
+                imageUploader
+                tabindex={3}
+              />
+              <div class="buttons-row">
+                <CWButton
+                  disabled={disableSubmission}
+                  onclick={async (e) => {
+                    this.saving = true;
+                    const { quillEditorState } = this;
+                    if (!form.title) {
+                      this.form.title = $(e.target)
+                        .closest('.NewThreadForm')
+                        .find("input[name='new-thread-title'")
+                        .val() as string;
+                    }
+                    try {
+                      await this._newThread(form, quillEditorState, author);
+                      this.overwriteConfirmationModal = true;
+                      this.saving = false;
+                      if (
+                        this.fromDraft &&
+                        !this.recentlyDeletedDrafts.includes(fromDraft)
+                      ) {
+                        await app.user.discussionDrafts.delete(fromDraft);
+                      }
+                      if (isModal) {
+                        setTimeout(() => {
+                          $(e.target).trigger('modalexit');
+                          this.quillEditorState.clearLocalStorage();
+                        }, 0);
+                      } else {
+                        this.quillEditorState.clearLocalStorage();
+                      }
+                    } catch (err) {
+                      this.saving = false;
+                      notifyError(err.message);
+                    }
+                  }}
+                  label={
+                    this.uploadsInProgress > 0
+                      ? 'Uploading...'
+                      : 'Create thread'
+                  }
+                  name="submission"
+                  tabindex={4}
+                />
+                <CWButton
+                  disabled={disableSubmission}
+                  onclick={async (e) => {
+                    // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
+                    const { quillEditorState } = this;
+                    this.saving = true;
+                    const title = $(e.target)
+                      .closest('.NewThreadForm')
+                      .find("input[name='new-thread-title']");
+                    if (!this.form.title) {
+                      this.form.title = title.val() as string;
+                    }
+                    const existingDraftId = this.recentlyDeletedDrafts.includes(
+                      this.fromDraft
+                    )
+                      ? undefined
+                      : this.fromDraft;
+                    try {
+                      await this._saveDraft(
+                        form,
+                        quillEditorState,
+                        existingDraftId
+                      );
+                      this.saving = false;
+                      if (isModal) {
+                        notifySuccess('Draft saved');
+                      }
+                      m.redraw();
+                    } catch (err) {
+                      this.saving = false;
+                      notifyError(err.message);
+                    }
+                  }}
+                  label={fromDraft ? 'Update saved draft' : 'Save draft'}
+                  name="save"
+                  tabindex={5}
+                />
+              </div>
+            </>
+          )}
+          {this.form.kind === ThreadKind.Link && hasTopics && (
+            <>
+              <div class="topics-and-title-row">
                 <TopicSelector
                   defaultTopic={
-                    this.activeTopic === false || this.activeTopic
-                      ? this.activeTopic
-                      : localStorage.getItem(`${chainId}-active-topic`)
+                    this.activeTopic ||
+                    localStorage.getItem(`${chainId}-active-topic`)
                   }
                   topics={
                     app.topics &&
@@ -398,139 +534,23 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                   updateFormData={this._updateTopicState.bind(this)}
                   tabindex={1}
                 />
-              )}
-              <CWTextInput
-                name="new-thread-title"
-                placeholder="Title"
-                oninput={(e) => {
-                  e.redraw = false; // do not redraw on input
-                  const { value } = (e as any).target;
-                  if (
-                    this.quillEditorState &&
-                    !this.quillEditorState.alteredText
-                  ) {
-                    this.quillEditorState.alteredText = true;
-                  }
-                  this.form.title = value;
-                  localStorage.setItem(
-                    `${chainId}-new-discussion-storedTitle`,
-                    this.form.title
-                  );
-                }}
-                defaultValue={this.form.title}
-                tabindex={2}
-              />
-              <QuillEditorComponent
-                contentsDoc=""
-                oncreateBind={(state: QuillEditor) => {
-                  this.quillEditorState = state;
-                  if (defaultTemplate) {
-                    state.loadDocument(defaultTemplate);
-                  }
-                }}
-                editorNamespace="new-discussion"
-                imageUploader
-                tabindex={3}
-              />
-              <CWButton
-                disabled={disableSubmission}
-                onclick={async (e) => {
-                  this.saving = true;
-                  const { quillEditorState } = this;
-                  if (!form.title) {
-                    this.form.title = $(e.target)
-                      .closest('.NewThreadForm')
-                      .find("input[name='new-thread-title'")
-                      .val() as string;
-                  }
-                  try {
-                    await this._newThread(form, quillEditorState, author);
-                    this.overwriteConfirmationModal = true;
-                    this.saving = false;
-                    if (
-                      this.fromDraft &&
-                      !this.recentlyDeletedDrafts.includes(fromDraft)
-                    ) {
-                      await app.user.discussionDrafts.delete(fromDraft);
-                    }
-                    if (isModal) {
-                      setTimeout(() => {
-                        $(e.target).trigger('modalexit');
-                        this.quillEditorState.clearLocalStorage();
-                      }, 0);
-                    } else {
-                      this.quillEditorState.clearLocalStorage();
-                    }
-                  } catch (err) {
-                    this.saving = false;
-                    notifyError(err.message);
-                  }
-                }}
-                label={
-                  this.uploadsInProgress > 0 ? 'Uploading...' : 'Create thread'
-                }
-                name="submission"
-                tabindex={4}
-              />
-              <CWButton
-                disabled={disableSubmission}
-                onclick={async (e) => {
-                  // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
-                  const { quillEditorState } = this;
-                  this.saving = true;
-                  const title = $(e.target)
-                    .closest('.NewThreadForm')
-                    .find("input[name='new-thread-title']");
-                  if (!this.form.title) {
-                    this.form.title = title.val() as string;
-                  }
-                  const existingDraftId = this.recentlyDeletedDrafts.includes(
-                    this.fromDraft
-                  )
-                    ? undefined
-                    : this.fromDraft;
-                  try {
-                    await this._saveDraft(
-                      form,
-                      quillEditorState,
-                      existingDraftId
+                <CWTextInput
+                  placeholder="Title"
+                  name="new-link-title"
+                  oninput={(e) => {
+                    e.redraw = false; // do not redraw on input
+                    const { value } = e.target as any;
+                    this.autoTitleOverride = true;
+                    this.form.title = value;
+                    localStorage.setItem(
+                      `${chainId}-new-link-storedTitle`,
+                      this.form.title
                     );
-                    this.saving = false;
-                    if (isModal) {
-                      notifySuccess('Draft saved');
-                    }
-                    m.redraw();
-                  } catch (err) {
-                    this.saving = false;
-                    notifyError(err.message);
-                  }
-                }}
-                label={fromDraft ? 'Update saved draft' : 'Save draft'}
-                name="save"
-                tabindex={5}
-              />
-            </>
-          )}
-          {this.form.kind === ThreadKind.Link && hasTopics && (
-            <>
-              <TopicSelector
-                defaultTopic={
-                  this.activeTopic ||
-                  localStorage.getItem(`${chainId}-active-topic`)
-                }
-                topics={
-                  app.topics &&
-                  app.topics.getByCommunity(chainId).filter((t) => {
-                    return (
-                      isAdmin ||
-                      t.tokenThreshold.isZero() ||
-                      !TopicGateCheck.isGatedTopic(t.name)
-                    );
-                  })
-                }
-                updateFormData={this._updateTopicState.bind(this)}
-                tabindex={1}
-              />
+                  }}
+                  defaultValue={this.form.title}
+                  tabindex={3}
+                />
+              </div>
               <CWTextInput
                 placeholder="https://"
                 oninput={(e) => {
@@ -544,22 +564,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                 }}
                 defaultValue={this.form.url}
                 tabindex={2}
-              />
-              <CWTextInput
-                placeholder="Title"
-                name="new-link-title"
-                oninput={(e) => {
-                  e.redraw = false; // do not redraw on input
-                  const { value } = e.target as any;
-                  this.autoTitleOverride = true;
-                  this.form.title = value;
-                  localStorage.setItem(
-                    `${chainId}-new-link-storedTitle`,
-                    this.form.title
-                  );
-                }}
-                defaultValue={this.form.title}
-                tabindex={3}
               />
               <QuillEditorComponent
                 contentsDoc="" // Prevent the editor from being filled in with previous content

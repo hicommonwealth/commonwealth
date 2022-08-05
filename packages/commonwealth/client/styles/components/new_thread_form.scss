@@ -2,7 +2,71 @@
 
 .NewThreadForm {
   display: flex;
-  padding: 16px;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+  width: 768px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  &.isModal {
+    padding: 16px;
+  }
+
+  .new-thread-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .new-thread-form-body {
+    display: flex;
+    flex-direction: column;
+    // gap: 16px;
+
+    .set-display-name-callout {
+      background-color: $purple-50;
+      border-radius: $border-radius-corners;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .draft-text.Text {
+      background-color: $rorange-50;
+      border-radius: $border-radius-rounded-corners;
+      color: $rorange-500;
+      margin-bottom: 16px;
+      padding: 4px 16px;
+      width: fit-content;
+    }
+
+    .topics-and-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .topic-selection-drop-menu {
+        height: 40px;
+      }
+
+      .TextInput {
+        max-width: 400px;
+      }
+    }
+
+    .QuillEditor {
+      margin-bottom: 16px;
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
 
   // &.is-modal {
   //   max-width: 680px;
@@ -224,13 +288,5 @@
     //     }
     //   }
     // }
-  }
-
-  .draft-badge {
-    display: inline-block;
-    color: $rorange-500;
-    border: 1px solid $rorange-500;
-    border-radius: 9999px;
-    text-align: center;
   }
 }

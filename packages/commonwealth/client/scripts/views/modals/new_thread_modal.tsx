@@ -19,7 +19,7 @@ class NewThreadModal implements m.ClassComponent {
           <ModalExitButton />
         </div>
         <div class="compact-modal-body-max">
-          <NewThreadForm isModal hasTopics={hasTopics} />,
+          <NewThreadForm isModal hasTopics={hasTopics} />
         </div>
       </div>
     );
