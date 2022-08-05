@@ -1,8 +1,30 @@
 import Rascal from "rascal";
 
+/**
+ * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.
+ * @param rabbitmq_uri The uri of the RabbitMQ instance to connect to.
+ */
 function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
-  const vhost = rabbitmq_uri.includes('localhost') ? '/' : rabbitmq_uri.split('/')[rabbitmq_uri.split('/').length - 1]
-  const purge: boolean = rabbitmq_uri.includes('localhost')
+  let vhost, purge;
+
+  if (rabbitmq_uri.includes('localhost') || rabbitmq_uri.includes('127.0.0.1')) {
+    vhost = '/';
+    purge = true;
+  } else {
+    const count = (rabbitmq_uri.match(/\//g) || []).length;
+    if (count == 3) {
+      // this matches for a production URL
+      const res = rabbitmq_uri.split('/');
+      vhost = res[res.length - 1];
+      purge = false;
+    } else if (count == 2) {
+      // this matches for a Vultr URL
+      vhost = '/'
+      purge = true;
+    } else {
+      throw new Error("Can't create Rascal RabbitMQ Config with an invalid URI!")
+    }
+  }
 
   const config = {
     'vhosts': {
