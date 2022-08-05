@@ -3,7 +3,6 @@
 import m from 'mithril';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
-import { List, ListItem } from 'construct-ui';
 
 import 'components/new_thread_form.scss';
 
@@ -288,21 +287,9 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       linkContentMissing ||
       discussionContentMissing;
 
-    // private _getClass(isModal, draftCount) {
-    //   if (!this) throw new Error('no this');
-    //   return (
-    //     `${this.form.kind === ThreadKind.Link ? 'link-post' : ''} ` +
-    //     `${
-    //       this.form.kind !== ThreadKind.Link && draftCount > 0 ? 'has-drafts' : ''
-    //     } ` +
-    //     `${isModal ? 'is-modal' : ''}`
-    //   );
-    // }
-
     return (
       <div
         class={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
-        // class={this._getClass(isModal, discussionDrafts.length)}
         oncreate={(vvnode) => {
           $(vvnode.dom)
             .find('.cui-input input')
@@ -350,37 +337,177 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
             />
           )}
         </div>
-        <div class="new-thread-form-body">
-          {author?.profile && !author.profile.name && (
-            <div class="set-display-name-callout">
-              <CWText>You haven't set a display name yet.</CWText>
-              <a
-                href={`/${chainId}/account/${author.address}?base=${author.chain}`}
-                onclick={(e) => {
-                  e.preventDefault();
-                  app.modals.create({
-                    modal: EditProfileModal,
-                    data: {
-                      account: author,
-                      refreshCallback: () => m.redraw(),
-                    },
-                  });
-                }}
-              >
-                Set a display name
-              </a>
-            </div>
-          )}
-          {this.form.kind === ThreadKind.Discussion && (
-            <>
-              {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
-              <div class="topics-and-title-row">
-                {hasTopics && (
+        <div class="new-thread-body">
+          <div class="new-thread-form-inputs">
+            {author?.profile && !author.profile.name && (
+              <div class="set-display-name-callout">
+                <CWText>You haven't set a display name yet.</CWText>
+                <a
+                  href={`/${chainId}/account/${author.address}?base=${author.chain}`}
+                  onclick={(e) => {
+                    e.preventDefault();
+                    app.modals.create({
+                      modal: EditProfileModal,
+                      data: {
+                        account: author,
+                        refreshCallback: () => m.redraw(),
+                      },
+                    });
+                  }}
+                >
+                  Set a display name
+                </a>
+              </div>
+            )}
+            {this.form.kind === ThreadKind.Discussion && (
+              <>
+                {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
+                <div class="topics-and-title-row">
+                  {hasTopics && (
+                    <TopicSelector
+                      defaultTopic={
+                        this.activeTopic === false || this.activeTopic
+                          ? this.activeTopic
+                          : localStorage.getItem(`${chainId}-active-topic`)
+                      }
+                      topics={
+                        app.topics &&
+                        app.topics.getByCommunity(chainId).filter((t) => {
+                          return (
+                            isAdmin ||
+                            t.tokenThreshold.isZero() ||
+                            !TopicGateCheck.isGatedTopic(t.name)
+                          );
+                        })
+                      }
+                      updateFormData={this._updateTopicState.bind(this)}
+                      tabindex={1}
+                    />
+                  )}
+                  <CWTextInput
+                    name="new-thread-title"
+                    placeholder="Title"
+                    oninput={(e) => {
+                      e.redraw = false; // do not redraw on input
+                      const { value } = (e as any).target;
+                      if (
+                        this.quillEditorState &&
+                        !this.quillEditorState.alteredText
+                      ) {
+                        this.quillEditorState.alteredText = true;
+                      }
+                      this.form.title = value;
+                      localStorage.setItem(
+                        `${chainId}-new-discussion-storedTitle`,
+                        this.form.title
+                      );
+                    }}
+                    defaultValue={this.form.title}
+                    tabindex={2}
+                  />
+                </div>
+                <QuillEditorComponent
+                  contentsDoc=""
+                  oncreateBind={(state: QuillEditor) => {
+                    this.quillEditorState = state;
+                    if (defaultTemplate) {
+                      state.loadDocument(defaultTemplate);
+                    }
+                  }}
+                  editorNamespace="new-discussion"
+                  imageUploader
+                  tabindex={3}
+                />
+                <div class="buttons-row">
+                  <CWButton
+                    disabled={disableSubmission}
+                    onclick={async (e) => {
+                      this.saving = true;
+                      const { quillEditorState } = this;
+                      if (!form.title) {
+                        this.form.title = $(e.target)
+                          .closest('.NewThreadForm')
+                          .find("input[name='new-thread-title'")
+                          .val() as string;
+                      }
+                      try {
+                        await this._newThread(form, quillEditorState, author);
+                        this.overwriteConfirmationModal = true;
+                        this.saving = false;
+                        if (
+                          this.fromDraft &&
+                          !this.recentlyDeletedDrafts.includes(fromDraft)
+                        ) {
+                          await app.user.discussionDrafts.delete(fromDraft);
+                        }
+                        if (isModal) {
+                          setTimeout(() => {
+                            $(e.target).trigger('modalexit');
+                            this.quillEditorState.clearLocalStorage();
+                          }, 0);
+                        } else {
+                          this.quillEditorState.clearLocalStorage();
+                        }
+                      } catch (err) {
+                        this.saving = false;
+                        notifyError(err.message);
+                      }
+                    }}
+                    label={
+                      this.uploadsInProgress > 0
+                        ? 'Uploading...'
+                        : 'Create thread'
+                    }
+                    name="submission"
+                    tabindex={4}
+                  />
+                  <CWButton
+                    disabled={disableSubmission}
+                    buttonType="tertiary-blue"
+                    onclick={async (e) => {
+                      // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
+                      const { quillEditorState } = this;
+                      this.saving = true;
+                      const title = $(e.target)
+                        .closest('.NewThreadForm')
+                        .find("input[name='new-thread-title']");
+                      if (!this.form.title) {
+                        this.form.title = title.val() as string;
+                      }
+                      const existingDraftId =
+                        this.recentlyDeletedDrafts.includes(this.fromDraft)
+                          ? undefined
+                          : this.fromDraft;
+                      try {
+                        await this._saveDraft(
+                          form,
+                          quillEditorState,
+                          existingDraftId
+                        );
+                        this.saving = false;
+                        if (isModal) {
+                          notifySuccess('Draft saved');
+                        }
+                        m.redraw();
+                      } catch (err) {
+                        this.saving = false;
+                        notifyError(err.message);
+                      }
+                    }}
+                    label={fromDraft ? 'Update saved draft' : 'Save draft'}
+                    name="save"
+                    tabindex={5}
+                  />
+                </div>
+              </>
+            )}
+            {this.form.kind === ThreadKind.Link && hasTopics && (
+              <>
+                <div class="topics-and-title-row">
                   <TopicSelector
                     defaultTopic={
-                      this.activeTopic === false || this.activeTopic
-                        ? this.activeTopic
-                        : localStorage.getItem(`${chainId}-active-topic`)
+                      this.activeTopic ||
+                      localStorage.getItem(`${chainId}-active-topic`)
                     }
                     topics={
                       app.topics &&
@@ -395,64 +522,75 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     updateFormData={this._updateTopicState.bind(this)}
                     tabindex={1}
                   />
-                )}
+                  <CWTextInput
+                    placeholder="Title"
+                    name="new-link-title"
+                    oninput={(e) => {
+                      e.redraw = false; // do not redraw on input
+                      const { value } = e.target as any;
+                      this.autoTitleOverride = true;
+                      this.form.title = value;
+                      localStorage.setItem(
+                        `${chainId}-new-link-storedTitle`,
+                        this.form.title
+                      );
+                    }}
+                    defaultValue={this.form.title}
+                    tabindex={3}
+                  />
+                </div>
                 <CWTextInput
-                  name="new-thread-title"
-                  placeholder="Title"
+                  placeholder="https://"
                   oninput={(e) => {
                     e.redraw = false; // do not redraw on input
-                    const { value } = (e as any).target;
-                    if (
-                      this.quillEditorState &&
-                      !this.quillEditorState.alteredText
-                    ) {
-                      this.quillEditorState.alteredText = true;
-                    }
-                    this.form.title = value;
+                    const { value } = e.target as any;
+                    this.form.url = value;
                     localStorage.setItem(
-                      `${chainId}-new-discussion-storedTitle`,
-                      this.form.title
+                      `${chainId}-new-link-storedLink`,
+                      this.form.url
                     );
                   }}
-                  defaultValue={this.form.title}
+                  defaultValue={this.form.url}
                   tabindex={2}
                 />
-              </div>
-              <QuillEditorComponent
-                contentsDoc=""
-                oncreateBind={(state: QuillEditor) => {
-                  this.quillEditorState = state;
-                  if (defaultTemplate) {
-                    state.loadDocument(defaultTemplate);
-                  }
-                }}
-                editorNamespace="new-discussion"
-                imageUploader
-                tabindex={3}
-              />
-              <div class="buttons-row">
+                <QuillEditorComponent
+                  contentsDoc="" // Prevent the editor from being filled in with previous content
+                  oncreateBind={(state: QuillEditor) => {
+                    this.quillEditorState = state;
+                    if (defaultTemplate) {
+                      state.loadDocument(defaultTemplate);
+                    }
+                  }}
+                  placeholder="Comment (optional)"
+                  editorNamespace="new-link"
+                  imageUploader
+                  tabindex={4}
+                />
                 <CWButton
+                  label="Create thread"
+                  name="submit"
                   disabled={disableSubmission}
                   onclick={async (e) => {
+                    if (!detectURL(this.form.url)) {
+                      notifyError('Must provide a valid URL.');
+                      return;
+                    }
                     this.saving = true;
-                    const { quillEditorState } = this;
-                    if (!form.title) {
+                    if (!this.form.title) {
                       this.form.title = $(e.target)
                         .closest('.NewThreadForm')
-                        .find("input[name='new-thread-title'")
+                        .find("input[name='new-link-title'")
                         .val() as string;
                     }
                     try {
-                      await this._newThread(form, quillEditorState, author);
-                      this.overwriteConfirmationModal = true;
+                      await this._newThread(
+                        this.form,
+                        this.quillEditorState,
+                        author
+                      );
                       this.saving = false;
-                      if (
-                        this.fromDraft &&
-                        !this.recentlyDeletedDrafts.includes(fromDraft)
-                      ) {
-                        await app.user.discussionDrafts.delete(fromDraft);
-                      }
                       if (isModal) {
+                        $(e.target).trigger('modalcomplete');
                         setTimeout(() => {
                           $(e.target).trigger('modalexit');
                           this.quillEditorState.clearLocalStorage();
@@ -465,260 +603,117 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       notifyError(err.message);
                     }
                   }}
-                  label={
-                    this.uploadsInProgress > 0
-                      ? 'Uploading...'
-                      : 'Create thread'
-                  }
-                  name="submission"
-                  tabindex={4}
                 />
-                <CWButton
-                  disabled={disableSubmission}
-                  onclick={async (e) => {
-                    // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
-                    const { quillEditorState } = this;
-                    this.saving = true;
-                    const title = $(e.target)
-                      .closest('.NewThreadForm')
-                      .find("input[name='new-thread-title']");
-                    if (!this.form.title) {
-                      this.form.title = title.val() as string;
-                    }
-                    const existingDraftId = this.recentlyDeletedDrafts.includes(
-                      this.fromDraft
-                    )
-                      ? undefined
-                      : this.fromDraft;
-                    try {
-                      await this._saveDraft(
-                        form,
-                        quillEditorState,
-                        existingDraftId
-                      );
-                      this.saving = false;
-                      if (isModal) {
-                        notifySuccess('Draft saved');
-                      }
-                      m.redraw();
-                    } catch (err) {
-                      this.saving = false;
-                      notifyError(err.message);
-                    }
-                  }}
-                  label={fromDraft ? 'Update saved draft' : 'Save draft'}
-                  name="save"
-                  tabindex={5}
-                />
-              </div>
-            </>
-          )}
-          {this.form.kind === ThreadKind.Link && hasTopics && (
-            <>
-              <div class="topics-and-title-row">
-                <TopicSelector
-                  defaultTopic={
-                    this.activeTopic ||
-                    localStorage.getItem(`${chainId}-active-topic`)
-                  }
-                  topics={
-                    app.topics &&
-                    app.topics.getByCommunity(chainId).filter((t) => {
-                      return (
-                        isAdmin ||
-                        t.tokenThreshold.isZero() ||
-                        !TopicGateCheck.isGatedTopic(t.name)
-                      );
-                    })
-                  }
-                  updateFormData={this._updateTopicState.bind(this)}
-                  tabindex={1}
-                />
-                <CWTextInput
-                  placeholder="Title"
-                  name="new-link-title"
-                  oninput={(e) => {
-                    e.redraw = false; // do not redraw on input
-                    const { value } = e.target as any;
-                    this.autoTitleOverride = true;
-                    this.form.title = value;
-                    localStorage.setItem(
-                      `${chainId}-new-link-storedTitle`,
-                      this.form.title
-                    );
-                  }}
-                  defaultValue={this.form.title}
-                  tabindex={3}
-                />
-              </div>
-              <CWTextInput
-                placeholder="https://"
-                oninput={(e) => {
-                  e.redraw = false; // do not redraw on input
-                  const { value } = e.target as any;
-                  this.form.url = value;
-                  localStorage.setItem(
-                    `${chainId}-new-link-storedLink`,
-                    this.form.url
-                  );
-                }}
-                defaultValue={this.form.url}
-                tabindex={2}
-              />
-              <QuillEditorComponent
-                contentsDoc="" // Prevent the editor from being filled in with previous content
-                oncreateBind={(state: QuillEditor) => {
-                  this.quillEditorState = state;
-                  if (defaultTemplate) {
-                    state.loadDocument(defaultTemplate);
-                  }
-                }}
-                placeholder="Comment (optional)"
-                editorNamespace="new-link"
-                imageUploader
-                tabindex={4}
-              />
-              <CWButton
-                label="Create thread"
-                name="submit"
-                disabled={disableSubmission}
-                onclick={async (e) => {
-                  if (!detectURL(this.form.url)) {
-                    notifyError('Must provide a valid URL.');
-                    return;
-                  }
-                  this.saving = true;
-                  if (!this.form.title) {
-                    this.form.title = $(e.target)
-                      .closest('.NewThreadForm')
-                      .find("input[name='new-link-title'")
-                      .val() as string;
-                  }
-                  try {
-                    await this._newThread(
-                      this.form,
-                      this.quillEditorState,
-                      author
-                    );
-                    this.saving = false;
-                    if (isModal) {
-                      $(e.target).trigger('modalcomplete');
-                      setTimeout(() => {
-                        $(e.target).trigger('modalexit');
-                        this.quillEditorState.clearLocalStorage();
-                      }, 0);
-                    } else {
-                      this.quillEditorState.clearLocalStorage();
-                    }
-                  } catch (err) {
-                    this.saving = false;
-                    notifyError(err.message);
-                  }
-                }}
-              />
-            </>
-          )}
-        </div>
-        {!!discussionDrafts.length && this.form.kind === ThreadKind.Discussion && (
-          <div class="new-thread-form-sidebar">
-            <List interactive>
-              {discussionDrafts
-                .sort((a, b) => a.createdAt.unix() - b.createdAt.unix())
-                .map((draft) => {
-                  const { body } = draft;
+              </>
+            )}
+          </div>
+          {!!discussionDrafts.length &&
+            this.form.kind === ThreadKind.Discussion && (
+              <div class="drafts-list-container">
+                <CWText
+                  type="h5"
+                  fontWeight="semiBold"
+                  className="drafts-list-title-text"
+                >
+                  Drafts
+                </CWText>
+                <div class="drafts-list">
+                  {discussionDrafts
+                    .sort((a, b) => a.createdAt.unix() - b.createdAt.unix())
+                    .map((draft) => {
+                      const { body } = draft;
 
-                  let bodyComponent;
+                      let bodyComponent;
 
-                  if (body) {
-                    try {
-                      const doc = JSON.parse(body);
-                      if (!doc.ops) throw new Error();
-                      doc.ops = doc.ops.slice(0, 3);
-                      bodyComponent = (
-                        <QuillFormattedText doc={doc} collapse hideFormatting />
-                      );
-                    } catch (e) {
-                      bodyComponent = (
-                        <MarkdownFormattedText
-                          doc={body}
-                          collapse
-                          hideFormatting
-                        />
-                      );
-                    }
-                  }
-
-                  return (
-                    <ListItem
-                      allowOnContentClick
-                      selected={fromDraft === draft.id}
-                      onclick={async () => {
-                        if (
-                          !this.quillEditorState.isBlank() ||
-                          this.quillEditorState.alteredText
-                        ) {
-                          const confirmed = await confirmationModalWithText(
-                            'Load draft? Your current work will not be saved.'
-                          )();
-                          if (!confirmed) return;
+                      if (body) {
+                        try {
+                          const doc = JSON.parse(body);
+                          if (!doc.ops) throw new Error();
+                          doc.ops = doc.ops.slice(0, 3);
+                          bodyComponent = (
+                            <QuillFormattedText
+                              doc={doc}
+                              collapse
+                              hideFormatting
+                            />
+                          );
+                        } catch (e) {
+                          bodyComponent = (
+                            <MarkdownFormattedText
+                              doc={body}
+                              collapse
+                              hideFormatting
+                            />
+                          );
                         }
-                        this._loadDraft(draft);
-                      }}
-                      contentRight={
-                        <>
+                      }
+
+                      return (
+                        <div
+                          class={getClasses<{ isSelected: boolean }>(
+                            { isSelected: fromDraft === draft.id },
+                            'draft-item'
+                          )}
+                          onclick={async () => {
+                            if (
+                              !this.quillEditorState.isBlank() ||
+                              this.quillEditorState.alteredText
+                            ) {
+                              const confirmed = await confirmationModalWithText(
+                                'Load draft? Your current work will not be saved.'
+                              )();
+                              if (!confirmed) return;
+                            }
+                            this._loadDraft(draft);
+                          }}
+                        >
                           {fromDraft === draft.id ? (
-                            <div class="discussion-draft-title-wrap">
-                              <CWIcon iconName="edit" />
-                              <div class="discussion-draft-title">
+                            <div class="draft-title">
+                              <CWIcon iconName="edit" iconSize="small" />
+                              <CWText fontWeight="semiBold">
                                 {draft.title || 'Untitled'}
-                              </div>
+                              </CWText>
                             </div>
                           ) : (
-                            <div class="discussion-draft-title">
+                            <CWText fontWeight="semiBold">
                               {draft.title || 'Untitled'}
-                            </div>
+                            </CWText>
                           )}
-                          <div class="discussion-draft-body">
-                            {draft.body.length ? bodyComponent : ''}
-                          </div>
-                          <div class="discussion-draft-actions">
-                            <a
-                              href="#"
-                              onclick={async (e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const confirmed =
-                                  await confirmationModalWithText(
-                                    'Are you sure you want to delete this draft?'
-                                  )();
-                                if (confirmed) {
-                                  try {
-                                    await app.user.discussionDrafts.delete(
-                                      draft.id
-                                    );
-                                    this.recentlyDeletedDrafts.push(draft.id);
-                                    if (this.fromDraft === draft.id) {
-                                      delete this.fromDraft;
-                                      m.redraw();
-                                    }
-                                  } catch (err) {
-                                    notifyError(err.message);
+                          {draft.body.length > 0 && bodyComponent}
+                          <CWText
+                            className="draft-delete-text"
+                            onclick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const confirmed = await confirmationModalWithText(
+                                'Are you sure you want to delete this draft?'
+                              )();
+                              if (confirmed) {
+                                try {
+                                  await app.user.discussionDrafts.delete(
+                                    draft.id
+                                  );
+                                  this.recentlyDeletedDrafts.push(draft.id);
+                                  if (this.fromDraft === draft.id) {
+                                    delete this.fromDraft;
+                                    m.redraw();
                                   }
-                                  m.redraw();
+                                } catch (err) {
+                                  notifyError(err.message);
                                 }
-                              }}
-                            >
-                              Delete
-                            </a>
-                          </div>
-                        </>
-                      }
-                    />
-                  );
-                })}
-            </List>
-          </div>
-        )}
+                                m.redraw();
+                              }
+                            }}
+                          >
+                            Delete
+                          </CWText>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+        </div>
       </div>
     );
   }

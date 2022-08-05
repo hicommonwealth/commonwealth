@@ -5,14 +5,19 @@
   flex: 1;
   flex-direction: column;
   padding: 24px;
-  width: 768px;
-
-  @include smallInclusive {
-    width: 100%;
-  }
+  width: 100%;
 
   &.isModal {
     padding: 16px;
+  }
+
+  @include smallInclusive {
+    height: 400px;
+    overflow-y: auto;
+  }
+
+  @include mediumSmallInclusive {
+    width: 100%;
   }
 
   .new-thread-header {
@@ -21,272 +26,107 @@
     margin-bottom: 8px;
   }
 
-  .new-thread-form-body {
+  .new-thread-body {
     display: flex;
-    flex-direction: column;
-    // gap: 16px;
+    gap: 16px;
+    justify-content: space-between;
+    width: 100%;
 
-    .set-display-name-callout {
-      background-color: $purple-50;
-      border-radius: $border-radius-corners;
+    @include smallInclusive {
+      flex-direction: column;
+    }
+
+    .new-thread-form-inputs {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding: 16px;
-    }
+      width: 768px;
 
-    .draft-text.Text {
-      background-color: $rorange-50;
-      border-radius: $border-radius-rounded-corners;
-      color: $rorange-500;
-      margin-bottom: 16px;
-      padding: 4px 16px;
-      width: fit-content;
-    }
-
-    .topics-and-title-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-
-      .topic-selection-drop-menu {
-        height: 40px;
+      @include mediumInclusive {
+        width: 100%;
       }
 
-      .TextInput {
-        max-width: 400px;
+      .set-display-name-callout {
+        background-color: $purple-50;
+        border-radius: $border-radius-corners;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
       }
-    }
 
-    .QuillEditor {
-      margin-bottom: 16px;
-    }
+      .draft-text.Text {
+        background-color: $rorange-50;
+        border-radius: $border-radius-rounded-corners;
+        color: $rorange-500;
+        margin-bottom: 16px;
+        padding: 4px 16px;
+        width: fit-content;
+      }
 
-    .buttons-row {
-      display: flex;
-      gap: 8px;
+      .topics-and-title-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .topic-selection-drop-menu {
+          height: 40px;
+        }
+
+        .TextInput {
+          max-width: 400px;
+        }
+      }
+
+      .QuillEditor {
+        height: 400px;
+        margin-bottom: 16px;
+      }
+
+      .buttons-row {
+        display: flex;
+        gap: 8px;
+      }
     }
   }
 
-  // &.is-modal {
-  //   max-width: 680px;
-  //   padding: 0 0 16px 0;
-  // }
-
-  // &.is-modal.has-drafts {
-  //   max-width: 810px;
-  // }
-
-  // .cui-form-group {
-  //   margin-bottom: 15px;
-  // }
-
-  // .ql-editor {
-  //   min-height: calc(100vh - 360px);
-
-  //   @include extraSmall {
-  //     min-height: calc(100vh - 440px);
-  //   }
-  // }
-
-  // &.is-modal .ql-editor {
-  //   min-height: 170px;
-  // }
-
-  // &.is-modal.link-post .ql-editor {
-  //   min-height: 115px;
-  // }
-
-  // @include extraSmall {
-  //   .ql-editor {
-  //     max-height: calc(100vh - 310px) !important;
-  //   }
-
-  //   .hidden-xs {
-  //     display: none;
-  //   }
-
-  //   .cui-form-group > button {
-  //     width: 100%;
-  //   }
-
-  //   .cui-form-group > button + button {
-  //     margin-top: 10px;
-  //   }
-  // }
-
-  // .new-thread-form-body {
-  //   max-width: 100%;
-
-  //   .new-snapshot-proposal-form {
-  //     display: flex;
-
-  //     .add-vote-choice {
-  //       color: $primary-400;
-  //       font-weight: 500;
-  //       margin: 10px 0 20px;
-  //       display: flex;
-  //       justify-content: flex-end;
-
-  //       span {
-  //         padding-top: 1px;
-  //       }
-
-  //       .cui-icon {
-  //         color: $primary-400;
-  //         margin-left: 12px;
-  //       }
-  //     }
-
-  //     form:last-child {
-  //       display: block;
-  //     }
-  //   }
-  // }
-
-  // &.has-drafts .new-thread-form-body {
-  //   max-width: calc(100% - 205px);
-
-  //   @include extraSmall {
-  //     max-width: 100%;
-  //     padding: 16px;
-  //   }
-  // }
-
-  // .new-thread-form-body {
-  //   flex: 9;
-
-  //   .no-profile-callout {
-  //     margin-bottom: 16px;
-  //     width: calc(100% - 28px);
-
-  //     a {
-  //       font-weight: 500;
-  //     }
-
-  //     @include extraSmall {
-  //       width: 100%;
-  //     }
-  //   }
-
-  //   .cui-form {
-  //     margin: 0;
-  //     margin-right: 28px;
-
-  //     @include extraSmall {
-  //       margin-right: 0;
-  //     }
-
-  //     // space between title and topic
-  //     .topic-selection-drop-menu {
-  //       padding: 18.8px 15.6px;
-  //       margin-right: 12px;
-  //       width: calc(100% - 12px);
-
-  //       @include extraSmall {
-  //         margin-right: 0;
-  //         width: 100%;
-  //       }
-  //     }
-  //   }
-
-  //   button[name='submit'],
-  //   button[name='submission'] {
-  //     margin-right: 12px;
-  //     // no margin-bottom here because it breaks button alignment
-  //   }
-  // }
-
-  // &.is-modal .new-thread-form-body {
-  //   .cui-tabs {
-  //     padding-left: 28px;
-  //   }
-
-  //   .no-profile-callout {
-  //     margin-left: 28px;
-  //     width: calc(100% - 56px);
-  //   }
-
-  //   .cui-form {
-  //     margin-left: 28px;
-  //   }
-
-  //   @include extraSmall {
-  //     .cui-tabs {
-  //       padding: 0;
-  //     }
-
-  //     .no-profile-callout {
-  //       margin-left: 20px;
-  //       width: calc(100% - 40px);
-  //     }
-
-  //     .cui-form {
-  //       margin: 0 20px;
-  //     }
-  //   }
-  // }
-
-  .new-thread-form-sidebar {
+  .drafts-list-container {
     display: flex;
     flex-direction: column;
-    border-left: 1px solid $neutral-50;
 
-    // .cui-list {
-    //   max-height: none;
+    .drafts-list-title-text.Text {
+      border-bottom: 2px solid $primary-500;
+      margin: 0 0 8px 16px;
+      width: fit-content;
+    }
 
-    //   .cui-list-item {
-    //     display: block;
-    //     padding: 21px 0 12px !important;
-    //     border-bottom-color: $neutral-50;
-    //     max-height: 140px;
-    //     overflow: hidden;
+    .drafts-list {
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+      overflow-y: auto;
+      width: 200px;
 
-    //     .discussion-draft-title-wrap {
-    //       display: flex;
+      .draft-item {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px 16px;
 
-    //       svg {
-    //         color: $rorange-500;
-    //         margin: 0 8px 8px 0;
-    //       }
-    //     }
+        &:hover {
+          background-color: $neutral-50;
+        }
 
-    //     .discussion-draft-title {
-    //       font-weight: 400;
-    //       margin-bottom: 8px;
-    //       display: -webkit-box;
-    //       -webkit-box-orient: vertical;
-    //       -webkit-line-clamp: 2;
-    //       overflow: hidden;
-    //     }
+        .draft-title {
+          align-items: center;
+          display: flex;
+          gap: 4px;
+        }
 
-    //     .discussion-draft-body {
-    //       font-weight: 400 !important;
-
-    //       .QuillFormattedText {
-    //         opacity: 0.4;
-    //       }
-
-    //       max-width: 150px;
-    //     }
-
-    //     .discussion-draft-actions {
-    //       margin-top: 7px;
-
-    //       a {
-    //         font-size: 12px;
-    //         font-weight: 500;
-    //         text-transform: uppercase;
-    //         opacity: 0.4;
-    //         text-decoration: none;
-
-    //         &:hover {
-    //           opacity: 1;
-    //           color: $rorange-500;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+        .draft-delete-text {
+          color: $rorange-500;
+        }
+      }
+    }
   }
 }
