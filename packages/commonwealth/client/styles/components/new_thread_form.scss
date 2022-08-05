@@ -106,6 +106,8 @@
       overflow-y: auto;
       width: 200px;
 
+      @include visibleScrollbar(light);
+
       .draft-item {
         cursor: pointer;
         display: flex;

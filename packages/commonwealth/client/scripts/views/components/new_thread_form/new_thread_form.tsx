@@ -654,7 +654,8 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                             { isSelected: fromDraft === draft.id },
                             'draft-item'
                           )}
-                          onclick={async () => {
+                          onclick={async (e) => {
+                            e.preventDefault();
                             if (
                               !this.quillEditorState.isBlank() ||
                               this.quillEditorState.alteredText
