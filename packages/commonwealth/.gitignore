@@ -25,6 +25,7 @@ out.dump
 out.dump.*
 redacted.dump
 redacted.dump.*
+*.dat
 
 # Bundle analyzer
 out.png
