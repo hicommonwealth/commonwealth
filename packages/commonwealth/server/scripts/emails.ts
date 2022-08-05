@@ -81,81 +81,81 @@ export const createImmediateNotificationEmailObject = async (notification_data, 
 };
 
 const createNotificationDigestEmailObject = async (user, notifications, models: DB) => {
-  const emailObjArray = await Promise.all(notifications.map(async (n) => {
-    const s = await n.getSubscription();
-    const { category_id } = s;
+  // const emailObjArray = await Promise.all(notifications.map(async (n) => {
+  //   const s = await n.getSubscription();
+  //   const { category_id } = s;
+  //
+  //   if (n.chain_event_id) {
+  //     const chainEvent = await models.ChainEvent.findOne({
+  //       where: { id: n.chain_event_id },
+  //       include: [{
+  //         model: models.ChainEventType,
+  //         required: true,
+  //         as: 'ChainEventType',
+  //       }]
+  //     });
+  //     if (!chainEvent) return {};
+  //
+  //     // construct compatible CW event from DB by inserting network from type
+  //     const evt: CWEvent = {
+  //       blockNumber: chainEvent.block_number,
+  //       data: chainEvent.event_data as IChainEventData,
+  //       network: chainEvent.ChainEventType.event_network as SupportedNetwork,
+  //     };
+  //
+  //     let label: IEventLabel;
+  //     try {
+  //       label = ChainEventLabel(s.chain_id, evt);
+  //     } catch (e) {
+  //       return {};
+  //     }
+  //
+  //     const path = `https://commonwealth.im/${s.chain_id}/notifications`;
+  //     let createdAt = moment(n.created_at).fromNow();
+  //     if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
+  //     return {
+  //       chainId: s.chain_id,
+  //       blockNumber: chainEvent.block_number,
+  //       label: label.heading,
+  //       path: `https://commonwealth.im${label.linkUrl}`,
+  //       createdAt,
+  //     };
+  //   } else {
+  //     const notification_data = JSON.parse(n.notification_data);
+  //     const [
+  //       emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
+  //     ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
+  //
+  //     if (actionCopy === null) return; // don't return notification object if object no-longer exists
+  //
+  //     let createdAt = moment(n.created_at).fromNow();
+  //     if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
+  //     return {
+  //       author: subjectCopy,
+  //       action: actionCopy,
+  //       rootObject: objectCopy,
+  //       community: communityCopy,
+  //       excerpt,
+  //       proposalPath,
+  //       authorPath,
+  //       createdAt,
+  //     };
+  //   }
+  // }));
 
-    if (n.chain_event_id) {
-      const chainEvent = await models.ChainEvent.findOne({
-        where: { id: n.chain_event_id },
-        include: [{
-          model: models.ChainEventType,
-          required: true,
-          as: 'ChainEventType',
-        }]
-      });
-      if (!chainEvent) return {};
-
-      // construct compatible CW event from DB by inserting network from type
-      const evt: CWEvent = {
-        blockNumber: chainEvent.block_number,
-        data: chainEvent.event_data as IChainEventData,
-        network: chainEvent.ChainEventType.event_network as SupportedNetwork,
-      };
-
-      let label: IEventLabel;
-      try {
-        label = ChainEventLabel(s.chain_id, evt);
-      } catch (e) {
-        return {};
-      }
-
-      const path = `https://commonwealth.im/${s.chain_id}/notifications`;
-      let createdAt = moment(n.created_at).fromNow();
-      if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
-      return {
-        chainId: s.chain_id,
-        blockNumber: chainEvent.block_number,
-        label: label.heading,
-        path: `https://commonwealth.im${label.linkUrl}`,
-        createdAt,
-      };
-    } else {
-      const notification_data = JSON.parse(n.notification_data);
-      const [
-        emailSubjectLine, subjectCopy, actionCopy, objectCopy, communityCopy, excerpt, proposalPath, authorPath
-      ] = await getForumNotificationCopy(models, notification_data as IPostNotificationData, category_id);
-
-      if (actionCopy === null) return; // don't return notification object if object no-longer exists
-
-      let createdAt = moment(n.created_at).fromNow();
-      if (createdAt === 'a day ago') createdAt = `${moment(Date.now()).diff(n.created_at, 'hours')} hours ago`;
-      return {
-        author: subjectCopy,
-        action: actionCopy,
-        rootObject: objectCopy,
-        community: communityCopy,
-        excerpt,
-        proposalPath,
-        authorPath,
-        createdAt,
-      };
-    }
-  }));
-
-  // construct email
-  return {
-    from: 'Commonwealth <no-reply@commonwealth.im>',
-    to: null,
-    bcc: null,
-    templateId: DynamicTemplate.BatchNotifications,
-    dynamic_template_data: {
-      notifications: emailObjArray,
-      subject: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
-      }${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
-      user: user.email,
-    },
-  };
+  // // construct email
+  // return {
+  //   from: 'Commonwealth <no-reply@commonwealth.im>',
+  //   to: null,
+  //   bcc: null,
+  //   templateId: DynamicTemplate.BatchNotifications,
+  //   dynamic_template_data: {
+  //     notifications: emailObjArray,
+  //     subject: `${process.env.NODE_ENV !== 'production' ? '[dev] ' : ''
+  //     }${notifications.length} new notification${notifications.length === 1 ? '' : 's'}`,
+  //     user: user.email,
+  //   },
+  // };
 };
 
 export const sendImmediateNotificationEmail = async (
@@ -211,12 +211,12 @@ export const sendBatchedNotificationEmails = async (models): Promise<number> => 
       // send notification email
       try {
         console.log(`producing digest for ${user.email}`);
-        const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
-        emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
-        emailObject.bcc = 'raymond+bcc@commonwealth.im';
+        // const emailObject = await createNotificationDigestEmailObject(user, notifications, models);
+        // emailObject.to = process.env.NODE_ENV === 'development' ? 'raymond@commonwealth.im' : user.email;
+        // emailObject.bcc = 'raymond+bcc@commonwealth.im';
 
-        console.log(`sending batch notification email to ${user.email}`);
-        await sgMail.send(emailObject);
+        // console.log(`sending batch notification email to ${user.email}`);
+        // await sgMail.send(emailObject);
       } catch (e) {
         console.log('Failed to send batch notification email', e);
       }

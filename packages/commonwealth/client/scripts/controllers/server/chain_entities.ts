@@ -119,7 +119,7 @@ class ChainEntityController {
     const entityMetas = await getFetch(getBaseUrl());
     if (entityMetas) {
       for (const entityMetaJSON of entityMetas) {
-        const entity = this._store.getById(entityMetaJSON.id);
+        const entity = this._store.getById(entityMetaJSON.ce_id);
         if (entity) {
           entity.title = entityMetaJSON.title;
           entity.threadId = entityMetaJSON.thread_id;
@@ -149,10 +149,10 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
+  public async _fetchTitle(chain_entity_id: number): Promise<any> {
     try {
       return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-        unique_id, chain
+        chain_entity_id
       });
     } catch (e) {
       return { status: 'Failed' };

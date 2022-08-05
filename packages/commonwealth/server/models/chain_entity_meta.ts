@@ -3,7 +3,8 @@ import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityMetaAttributes = {
-  id: number;
+  id: number; // sequelize auto-generated primary key id --- NEVER USE DIRECTLY
+  ce_id: number; // this is the primary key id from the chain-events service (used to match chain-entity-meta with chain-entities from chain-events)
   title?: string;
   chain: string;
   author?: string;
@@ -19,7 +20,8 @@ export default (
   dataTypes: typeof DataTypes,
 ): ChainEntityMetaModelStatic => {
   const ChainEntityMeta = <ChainEntityMetaModelStatic>sequelize.define<ChainEntityMetaInstance, ChainEntityMetaAttributes>('ChainEntity', {
-    id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
+    id: { type: dataTypes.INTEGER, primaryKey:true },
+    ce_id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
     title: { type: dataTypes.STRING, allowNull: true },
     chain: { type: dataTypes.STRING, allowNull: false },
     author: { type: dataTypes.STRING, allowNull: true },

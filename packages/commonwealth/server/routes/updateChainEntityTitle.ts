@@ -20,7 +20,7 @@ const updateChainEntityTitle = async (
 
   const entity = await models.ChainEntityMeta.findOne({
     where: {
-      id: chain_entity_id
+      ce_id: chain_entity_id
     }
   })
   if (!entity) return next(new Error(Errors.NoEntity));

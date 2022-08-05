@@ -18,7 +18,6 @@ import {
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
