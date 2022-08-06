@@ -109,7 +109,7 @@ export async function setupWebSocketServer(
   } else {
     redisOptions['socket'] = {
       connectTimeout: 5000,
-      keepAlive: 4000,
+      keepAlive: true,
       tls: true,
       rejectUnauthorized: false,
       reconnectStrategy: redisRetryStrategy,
@@ -139,6 +139,15 @@ export async function setupWebSocketServer(
         );
     }
   });
+  pubClient.on('ready', () => {
+    log.info("Redis pub-client ready");
+  })
+  pubClient.on('reconnect', () => {
+    log.info("Redis pub-client reconnecting");
+  })
+  pubClient.on('end', () => {
+    log.info('Redis pub-client disconnected');
+  })
   subClient.on('error', (err) => {
     if (err instanceof ConnectionTimeoutError) {
       log.error(
@@ -159,6 +168,15 @@ export async function setupWebSocketServer(
         );
     }
   });
+  subClient.on('ready', () => {
+    log.info("Redis sub-client ready");
+  })
+  subClient.on('reconnect', () => {
+    log.info("Redis sub-client reconnecting");
+  })
+  subClient.on('end', () => {
+    log.info('Redis sub-client disconnected');
+  })
 
   await Promise.all([pubClient.connect(), subClient.connect()]);
   // provide the redis connection instances to the socket.io adapters
