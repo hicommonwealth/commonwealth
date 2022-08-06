@@ -105,7 +105,7 @@ const updateLinkedThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
         },
         {
           model: models.Reaction,

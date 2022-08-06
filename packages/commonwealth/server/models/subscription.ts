@@ -52,7 +52,6 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
-  ChainEventType?: ChainEventTypeAttributes;
 }
 
 export interface SubscriptionInstance

@@ -172,7 +172,7 @@ const bulkThreads = async (
               as: 'topic',
             },
             {
-              model: models.ChainEntity,
+              model: models.ChainEntityMeta,
             },
             {
               model: models.LinkedThread,

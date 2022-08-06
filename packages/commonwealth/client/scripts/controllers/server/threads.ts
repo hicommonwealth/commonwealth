@@ -652,11 +652,13 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
 
+    // TODO: figure out optimal strategy to get ChainEntity data i.e. Is ChainEntityMeta enough or do we need to query the server or store for the others
     const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }
     const { threads } = response.result;
+    // TODO: edit this process to include ChainEntityMeta data + match it with the actual entity
     const modeledThreads: Thread[] = threads.map((t) => {
       return modelFromServer(t);
     });
