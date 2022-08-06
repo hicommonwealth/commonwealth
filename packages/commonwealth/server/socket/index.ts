@@ -11,8 +11,8 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import {
   ConnectionTimeoutError,
   createClient,
-  ReconnectStrategyError,
-} from 'redis';
+  ReconnectStrategyError, SocketClosedUnexpectedlyError
+} from "redis";
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
@@ -130,6 +130,8 @@ export async function setupWebSocketServer(
         rollbar.critical(
           'Socket.io Redis pub-client max connection retries exceeded! Redis pub-client for Socket.io shutting down!'
         );
+    } else if (err instanceof SocketClosedUnexpectedlyError) {
+      log.error(`Socket.io Redis pub-client socket closed unexpectedly`);
     } else {
       log.error(`Socket.io Redis pub-client connection error:`, err);
       if (!isLocalhost && !isVultr)
@@ -142,7 +144,7 @@ export async function setupWebSocketServer(
   pubClient.on('ready', () => {
     log.info("Redis pub-client ready");
   })
-  pubClient.on('reconnect', () => {
+  pubClient.on('reconnecting', () => {
     log.info("Redis pub-client reconnecting");
   })
   pubClient.on('end', () => {
@@ -159,6 +161,8 @@ export async function setupWebSocketServer(
         rollbar.critical(
           'Socket.io Redis sub-client max connection retries exceeded! Redis sub-client for Socket.io shutting down!'
         );
+    } else if (err instanceof SocketClosedUnexpectedlyError) {
+      log.error(`Socket.io Redis sub-client socket closed unexpectedly`);
     } else {
       log.error(`Socket.io Redis sub-client connection error:`, err);
       if (!isLocalhost && !isVultr)
@@ -171,7 +175,7 @@ export async function setupWebSocketServer(
   subClient.on('ready', () => {
     log.info("Redis sub-client ready");
   })
-  subClient.on('reconnect', () => {
+  subClient.on('reconnecting', () => {
     log.info("Redis sub-client reconnecting");
   })
   subClient.on('end', () => {

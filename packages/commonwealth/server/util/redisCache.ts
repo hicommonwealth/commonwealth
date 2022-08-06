@@ -1,4 +1,4 @@
-import { ConnectionTimeoutError, createClient, ReconnectStrategyError } from "redis";
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
 import { factory, formatFilename } from 'common-common/src/logging';
 import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
@@ -79,6 +79,8 @@ export class RedisCache {
           this.rollbar.critical(
             'RedisCache max connection retries exceeded! RedisCache client shutting down!'
           );
+      } else if (err instanceof SocketClosedUnexpectedlyError) {
+        log.error(`RedisCache socket closed unexpectedly`);
       } else {
         log.error(`RedisCache connection error:`, err);
         if (!localRedis && !vultrRedis)
@@ -89,7 +91,7 @@ export class RedisCache {
     this.client.on('ready', () => {
       log.info("Redis RedisCache ready");
     })
-    this.client.on('reconnect', () => {
+    this.client.on('reconnecting', () => {
       log.info("Redis RedisCache reconnecting");
     })
     this.client.on('end', () => {
