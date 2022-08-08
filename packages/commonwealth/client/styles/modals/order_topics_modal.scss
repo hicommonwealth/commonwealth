@@ -1,19 +1,26 @@
 @import 'shared';
 
 .OrderTopicsModal {
+  width: 360px;
+
   .featured-topic-list {
-    // .cui-list-item {
-    //   cursor: default;
-    //   pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
 
-    //   &:hover {
-    //     cursor: default;
-    //     background-color: $white;
-    //   }
+    .topic-row {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
 
-    //   &.gu-transit {
-    //     background-color: $neutral-100;
-    //   }
-    // }
+      &:hover {
+        background-color: $neutral-50;
+      }
+
+      &.gu-transit {
+        background-color: $neutral-100;
+      }
+    }
   }
 }

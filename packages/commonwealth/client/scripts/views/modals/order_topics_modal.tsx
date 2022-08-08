@@ -67,12 +67,12 @@ export class OrderTopicsModal implements m.ClassComponent {
 
     return (
       <div class="OrderTopicsModal">
-        <h3 class="compact-modal-title">Reorder Topics</h3>,
+        <h3 class="compact-modal-title">Reorder Topics</h3>
         <div class="compact-modal-body">
           <div class="featured-topic-list">
             {topics.map((t) => (
-              <div>
-                <CWText>{t.name}</CWText>,
+              <div class="topic-row">
+                <CWText>{t.name}</CWText>
                 <CWIcon iconName="hamburger" />
               </div>
             ))}
