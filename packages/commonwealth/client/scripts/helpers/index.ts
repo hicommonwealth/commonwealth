@@ -386,5 +386,7 @@ export const handleRedirectClicks = (
   }
 
   navigateToSubpage(redirectLink);
-  callback();
+  if (callback) {
+    callback();
+  }
 };
