@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'components/community_card.scss';
 
+import { isCommandClick } from 'helpers';
 import { ChainInfo } from 'models';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
@@ -19,6 +20,10 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
 
     const redirectFunction = (e) => {
       e.preventDefault();
+      if (isCommandClick(e)) {
+        window.open(`/${chain.id}`, '_blank');
+        return;
+      }
       localStorage['home-scrollY'] = window.scrollY;
       m.route.set(`/${chain.id}`);
     };

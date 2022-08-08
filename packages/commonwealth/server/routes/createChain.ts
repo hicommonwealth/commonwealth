@@ -5,6 +5,8 @@ import { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
@@ -12,10 +14,11 @@ import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { AddressInstance } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { RoleAttributes, RoleInstance } from '../models/role';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -58,6 +61,8 @@ type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAt
 type CreateChainResp = {
   chain: ChainAttributes;
   node: ChainNodeAttributes;
+  role: RoleAttributes;
+  admin_address: string;
 };
 
 const createChain = async (
@@ -112,7 +117,7 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
-  let privateUrl;
+  let privateUrl: string | undefined;
   let sanitizedSpec;
 
   // always generate a chain id
@@ -307,6 +312,75 @@ const createChain = async (
     category: 'General',
   });
 
+  // try to make admin one of the user's addresses
+  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
+  let role: RoleInstance | undefined;
+  let addressToBeAdmin: AddressInstance | undefined;
+
+  if (chain.base === ChainBase.Ethereum) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          [Op.startsWith]: '0x'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  } else if (chain.base === ChainBase.NEAR) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          [Op.endsWith]: '.near'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  } else if (chain.base === ChainBase.Solana) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          // This is the regex formatting for solana addresses per their website
+          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  }
+
+  if (addressToBeAdmin) {
+    role = await models.Role.create({
+      address_id: addressToBeAdmin.id,
+      chain_id: chain.id,
+      permission: 'admin',
+      is_user_default: true,
+    });
+
+    const [ subscription ] = await models.Subscription.findOrCreate({
+      where: {
+        subscriber_id: req.user.id,
+        category_id: NotificationCategories.NewThread,
+        chain_id: chain.id,
+        object_id: chain.id,
+        is_active: true,
+      }
+    });
+  }
+
   if (process.env.NODE_ENV !== 'test') {
     mixpanelTrack({
       chainBase: req.body.base,
@@ -316,7 +390,12 @@ const createChain = async (
     });
   }
 
-  return success(res, { chain: chain.toJSON(), node: node.toJSON() });
+  return success(res, {
+    chain: chain.toJSON(),
+    node: nodeJSON,
+    role: role?.toJSON(),
+    admin_address: addressToBeAdmin?.address,
+  });
 };
 
 export default createChain;
