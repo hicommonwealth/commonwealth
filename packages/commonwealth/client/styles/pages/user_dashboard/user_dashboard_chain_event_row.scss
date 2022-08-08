@@ -14,7 +14,7 @@
     gap: 16px;
     word-break: break-word;
 
-    .row-top-text {
+    .row-top-text.Text {
       @include rowTopTextStyles;
 
       .block-number {
