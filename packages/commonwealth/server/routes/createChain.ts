@@ -7,6 +7,7 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
+import TokenBalanceCache from 'token-balance-cache/src/index';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
@@ -67,6 +68,7 @@ type CreateChainResp = {
 
 const createChain = async (
   models: DB,
+  tokenBalanceCache: TokenBalanceCache,
   req: TypedRequestBody<CreateChainReq>,
   res: TypedResponse<CreateChainResp>,
   next: NextFunction
@@ -271,14 +273,20 @@ const createChain = async (
     return next(new Error(Errors.ChainNameExists));
   }
 
-  const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
+  const [node, wasCreated] = await models.ChainNode.scope('withPrivateData').findOrCreate({
     where: { url },
     defaults: {
+      url,
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
     }
   });
+
+  // ensure new cosmos communities or new eth chains are immediately added to TBC
+  if (wasCreated && typeof node.id === 'number') {
+    tokenBalanceCache.addNode(node);
+  }
 
   const chain = await models.Chain.create({
     id,
