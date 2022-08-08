@@ -54,6 +54,7 @@ const Errors = {
   NoSharedSecret: 'Missing shared secret',
   MissingToken: 'Must provide token',
   InvalidToken: 'Invalid token',
+  InvalidUser: 'Invalid user',
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
@@ -232,28 +233,58 @@ const finishSsoLogin = async (
       });
       return success(res, { address: newAddress });
     } else {
-      // user is not logged in, so we log them in
-      const user = await models.User.findOne({
-        where: {
-          id: existingAddress.user_id,
-        },
-        include: [models.Address],
-      });
-      // TODO: should we req.login here, or not?
-      req.login(user, (err) => {
-        if (err)
-          return redirectWithLoginError(
-            res,
-            `Could not log in with ronin wallet`
-          );
-        if (process.env.NODE_ENV !== 'test') {
-          mixpanelTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
+      if (existingAddress.user_id) {
+        // user exists but is not logged in, so we log them in
+        const existingUser = await models.User.findOne({
+          where: {
+            id: existingAddress.user_id,
+          },
+          include: [models.Address],
+        });
+
+        if (!existingUser) {
+          // if the address has a user id but we don't have a user object,
+          // the db has gotten into a bad state -- throw a server error
+          throw new ServerError(Errors.InvalidUser);
         }
-      });
-      return success(res, { user });
+
+        req.login(existingUser, (err) => {
+          if (err)
+            return redirectWithLoginError(
+              res,
+              `Could not log in with ronin wallet`
+            );
+          if (process.env.NODE_ENV !== 'test') {
+            mixpanelTrack({
+              event: MixpanelLoginEvent.LOGIN,
+              isCustomDomain: null,
+            });
+          }
+        });
+        return success(res, { user: existingUser });
+      } else {
+        // create new user if no user exists but address exists
+        const newUser = await models.User.createWithProfile(
+          models,
+          { email: null },
+        );
+        existingAddress.user_id = newUser.id;
+        await existingAddress.save();
+        req.login(newUser, (err) => {
+          if (err)
+            return redirectWithLoginError(
+              res,
+              `Could not log in with ronin wallet`
+            );
+          if (process.env.NODE_ENV !== 'test') {
+            mixpanelTrack({
+              event: MixpanelLoginEvent.LOGIN,
+              isCustomDomain: null,
+            });
+          }
+        });
+        return success(res, { user: newUser });
+      }
     }
   }
 
