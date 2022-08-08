@@ -200,6 +200,7 @@ class CouncilPage implements m.ClassComponent {
             ]}
             statAction={
               app.user.activeAccount &&
+              app.user.activeAccount instanceof SubstrateAccount &&
               app.chain.networkStatus === ApiStatus.Connected && (
                 <>
                   <CWButton

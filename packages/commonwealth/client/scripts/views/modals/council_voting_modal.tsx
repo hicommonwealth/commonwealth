@@ -59,12 +59,6 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
   view(vnode) {
     const { candidates } = vnode.attrs;
 
-    const author = app.user.activeAccount;
-
-    if (!(author instanceof SubstrateAccount)) {
-      return <CWText>Council voting only supported on Substrate.</CWText>;
-    }
-
     const submitVote = (e) => {
       this.error = '';
 
@@ -143,41 +137,40 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
               }}
             />
             <div class="candidates-container">
-              {candidates.map((candidateTuple) => {
-                const candidate = candidateTuple[0];
-                const address = candidateTuple[0].address;
+              {candidates.length > 0 ? (
+                candidates.map((candidateTuple) => {
+                  const candidate = candidateTuple[0];
+                  const address = candidateTuple[0].address;
 
-                const onclick = (e) => {
-                  e.preventDefault();
+                  const onclick = (e) => {
+                    e.preventDefault();
 
-                  const index = this.votes.indexOf(address);
+                    const index = this.votes.indexOf(address);
 
-                  if (index === -1) {
-                    this.votes.push(address);
-                  } else {
-                    this.votes.splice(index, 1);
-                  }
-                };
+                    if (index === -1) {
+                      this.votes.push(address);
+                    } else {
+                      this.votes.splice(index, 1);
+                    }
+                  };
 
-                return (
-                  <div class="candidate-row" onclick={onclick}>
-                    <CWCheckbox
-                      checked={this.votes.indexOf(address) !== -1}
-                      onchange={onclick}
-                      label=""
-                    />
-                    {m(User, { user: candidate })}
-                  </div>
-                );
-              })}
-            </div>
-            {candidates.length === 0 && (
-              <>
+                  return (
+                    <div class="candidate-row" onclick={onclick}>
+                      <CWCheckbox
+                        checked={this.votes.indexOf(address) !== -1}
+                        onchange={onclick}
+                        label=""
+                      />
+                      {m(User, { user: candidate })}
+                    </div>
+                  );
+                })
+              ) : (
                 <CWText>No candidates to vote for</CWText>
-                {this.error && (
-                  <CWValidationText message={this.error} status="failure" />
-                )}
-              </>
+              )}
+            </div>
+            {this.error && (
+              <CWValidationText message={this.error} status="failure" />
             )}
           </div>
         </div>

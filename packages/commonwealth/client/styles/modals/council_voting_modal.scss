@@ -3,6 +3,10 @@
 .CouncilVotingModal {
   width: 400px;
 
+  @include extraSmall {
+    width: 100%;
+  }
+
   .chooser {
     display: flex;
     flex-direction: column;
@@ -13,7 +17,7 @@
     }
 
     .candidates-container {
-      height: 320px;
+      height: 256px;
       overflow-y: auto;
 
       @include visibleScrollbar(light);
@@ -40,6 +44,7 @@
 
   .compact-modal-actions {
     display: flex;
+    gap: 8px;
     justify-content: flex-end;
     padding: 0 16px 16px;
   }
