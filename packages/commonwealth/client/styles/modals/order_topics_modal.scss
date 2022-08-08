@@ -6,7 +6,11 @@
   .featured-topic-list {
     display: flex;
     flex-direction: column;
+    height: 320px;
     margin-bottom: 16px;
+    overflow-y: auto;
+
+    @include visibleScrollbar(light);
 
     .topic-row {
       align-items: center;
