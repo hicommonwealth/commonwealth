@@ -87,13 +87,13 @@ export class RedisCache {
     });
 
     this.client.on('ready', () => {
-      log.info("Redis RedisCache ready");
+      log.info("RedisCache connection ready");
     })
     this.client.on('reconnecting', () => {
-      log.info("Redis RedisCache reconnecting");
+      log.info("RedisCache reconnecting");
     })
     this.client.on('end', () => {
-      log.info('Redis RedisCache disconnected');
+      log.info('RedisCache disconnected');
     })
 
     if (!this.client.isOpen) {
