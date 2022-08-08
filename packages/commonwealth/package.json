@@ -45,7 +45,7 @@
     "migrate-db": "npx sequelize db:migrate",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get DATABASE_URL -a commonwealthapp) -a -f limited_dump.sql",
-    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql" ,
+    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
     "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh"
@@ -204,7 +204,7 @@
     "quill-image-uploader": "^1.0.2",
     "quill-mention": "^2.2.7",
     "rascal": "^13.1.0",
-    "redis": "^4.0.4",
+    "redis": "4.2.0",
     "rollbar": "^2.6.1",
     "rxjs": "^7.3.0",
     "sass-loader": "^10.1.1",

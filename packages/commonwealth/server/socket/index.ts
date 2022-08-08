@@ -108,9 +108,8 @@ export async function setupWebSocketServer(
     };
   } else {
     redisOptions['socket'] = {
-      connectTimeout: 5000,
-      keepAlive: true,
       tls: true,
+      keepAlive: 120,
       rejectUnauthorized: false,
       reconnectStrategy: redisRetryStrategy,
     };
@@ -183,6 +182,16 @@ export async function setupWebSocketServer(
   })
 
   await Promise.all([pubClient.connect(), subClient.connect()]);
+
+  // setInterval(async () => {
+  //   try {
+  //     await pubClient.ping();
+  //     await subClient.ping();
+  //   } catch (e) {
+  //     log.error("Pub or Sub client could not ping Redis", e);
+  //   }
+  // }, 5000);
+
   // provide the redis connection instances to the socket.io adapters
   await io.adapter(<any>createAdapter(pubClient, subClient));
 

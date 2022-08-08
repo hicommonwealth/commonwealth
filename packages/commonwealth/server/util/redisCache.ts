@@ -58,7 +58,7 @@ export class RedisCache {
       } else {
         redisOptions['socket'] = {
           connectTimeout: 5000,
-          keepAlive: 4000,
+          keepAlive: 120,
           tls: true,
           rejectUnauthorized: false,
           reconnectStrategy: redisRetryStrategy
@@ -100,6 +100,15 @@ export class RedisCache {
 
     if (!this.client.isOpen) {
       await this.client.connect();
+
+      // setInterval(async () => {
+      //   try {
+      //     await this.client.ping();
+      //     await this.client.ping();
+      //   } catch (e) {
+      //     log.error("RedisCache client could not ping Redis", e);
+      //   }
+      // }, 5000);
     }
 
     this.initialized = !!this.client.isOpen;
