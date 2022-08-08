@@ -6,7 +6,7 @@ import { Tag } from 'construct-ui';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
 import app from 'state';
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import { pluralize } from 'helpers';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';

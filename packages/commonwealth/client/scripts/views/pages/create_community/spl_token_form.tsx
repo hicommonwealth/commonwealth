@@ -17,6 +17,9 @@ import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+
+
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
   decimals: number;
@@ -160,11 +163,18 @@ export class SplTokenForm implements m.ClassComponent {
                 type: ChainType.Token,
                 ...this.state.form,
               });
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error || 'Creating new SPL community failed'
               );
             } finally {
               this.state.saving = false;
