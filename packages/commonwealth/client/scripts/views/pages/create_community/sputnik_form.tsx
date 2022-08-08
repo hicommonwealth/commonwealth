@@ -143,6 +143,13 @@ export class SputnikForm implements m.ClassComponent {
                 `${app.serverUrl()}/createChain`,
                 createChainArgs
               );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {
