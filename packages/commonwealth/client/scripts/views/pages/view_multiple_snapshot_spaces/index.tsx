@@ -11,7 +11,7 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
-import { Thread } from 'client/scripts/models';
+import { Thread } from 'models';
 import { SnapshotSpaceCard } from './snapshot_space_card';
 import { PageLoading } from '../loading';
 import { CardsCollection } from '../../components/cards_collection';

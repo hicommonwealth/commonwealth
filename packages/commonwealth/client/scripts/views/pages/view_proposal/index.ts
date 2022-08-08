@@ -62,7 +62,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
-import Poll from 'client/scripts/models/Poll';
+import Poll from 'models/Poll';
 import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,

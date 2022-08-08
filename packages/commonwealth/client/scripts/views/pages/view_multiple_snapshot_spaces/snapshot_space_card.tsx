@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 
-import { Thread } from 'client/scripts/models';
+import { Thread } from 'models';
 import app from 'state';
 import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
