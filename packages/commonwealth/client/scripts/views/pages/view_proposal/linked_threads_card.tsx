@@ -8,7 +8,7 @@ import app from 'state';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models';
-import { LinkedThreadRelation } from 'client/scripts/models/Thread';
+import { LinkedThreadRelation } from 'models/Thread';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';

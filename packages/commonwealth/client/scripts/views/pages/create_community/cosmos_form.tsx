@@ -11,7 +11,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'common-common/src/types';
-import { linkExistingAddressToChainOrCommunity } from 'client/scripts/controllers/app/login';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState, EthFormFields } from './types';
 import { IdRow, InputRow } from '../../components/metadata_rows';
