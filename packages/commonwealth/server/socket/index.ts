@@ -109,7 +109,6 @@ export async function setupWebSocketServer(
   } else {
     redisOptions['socket'] = {
       tls: true,
-      keepAlive: 5000,
       rejectUnauthorized: false,
       reconnectStrategy: redisRetryStrategy,
     };
