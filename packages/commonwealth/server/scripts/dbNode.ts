@@ -15,8 +15,8 @@ import {
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
