@@ -23,8 +23,6 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { TopicSelector } from '../topic_selector';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
-import { QuillFormattedText } from '../quill/quill_formatted_text';
-import { MarkdownFormattedText } from '../quill/markdown_formatted_text';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { QuillEditor } from '../quill/quill_editor';
 import { NewThreadFormType, NewDraftErrors } from './types';
@@ -34,6 +32,7 @@ import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getClasses } from '../component_kit/helpers';
+import { renderQuillTextBody } from '../quill/helpers';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
@@ -290,12 +289,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     return (
       <div
         class={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
-        oncreate={(vvnode) => {
-          $(vvnode.dom)
-            .find('.cui-input input')
-            .prop('autocomplete', 'off')
-            .focus();
-        }}
       >
         <div class="new-thread-header">
           <CWTabBar>
@@ -385,18 +378,23 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     />
                   )}
                   <CWTextInput
+                    autofocus
                     name="new-thread-title"
                     placeholder="Title"
                     oninput={(e) => {
                       e.redraw = false; // do not redraw on input
+
                       const { value } = (e as any).target;
+
                       if (
                         this.quillEditorState &&
                         !this.quillEditorState.alteredText
                       ) {
                         this.quillEditorState.alteredText = true;
                       }
+
                       this.form.title = value;
+
                       localStorage.setItem(
                         `${chainId}-new-discussion-storedTitle`,
                         this.form.title
@@ -423,13 +421,9 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     disabled={disableSubmission}
                     onclick={async (e) => {
                       this.saving = true;
+
                       const { quillEditorState } = this;
-                      if (!form.title) {
-                        this.form.title = $(e.target)
-                          .closest('.NewThreadForm')
-                          .find("input[name='new-thread-title'")
-                          .val() as string;
-                      }
+
                       try {
                         await this._newThread(form, quillEditorState, author);
                         this.overwriteConfirmationModal = true;
@@ -468,16 +462,12 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
                       const { quillEditorState } = this;
                       this.saving = true;
-                      const title = $(e.target)
-                        .closest('.NewThreadForm')
-                        .find("input[name='new-thread-title']");
-                      if (!this.form.title) {
-                        this.form.title = title.val() as string;
-                      }
+
                       const existingDraftId =
                         this.recentlyDeletedDrafts.includes(this.fromDraft)
                           ? undefined
                           : this.fromDraft;
+
                       try {
                         await this._saveDraft(
                           form,
@@ -575,20 +565,18 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       notifyError('Must provide a valid URL.');
                       return;
                     }
+
                     this.saving = true;
-                    if (!this.form.title) {
-                      this.form.title = $(e.target)
-                        .closest('.NewThreadForm')
-                        .find("input[name='new-link-title'")
-                        .val() as string;
-                    }
+
                     try {
                       await this._newThread(
                         this.form,
                         this.quillEditorState,
                         author
                       );
+
                       this.saving = false;
+
                       if (isModal) {
                         $(e.target).trigger('modalcomplete');
                         setTimeout(() => {
@@ -621,32 +609,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                   {discussionDrafts
                     .sort((a, b) => a.createdAt.unix() - b.createdAt.unix())
                     .map((draft) => {
-                      const { body } = draft;
-
-                      let bodyComponent;
-
-                      if (body) {
-                        try {
-                          const doc = JSON.parse(body);
-                          if (!doc.ops) throw new Error();
-                          doc.ops = doc.ops.slice(0, 3);
-                          bodyComponent = (
-                            <QuillFormattedText
-                              doc={doc}
-                              collapse
-                              hideFormatting
-                            />
-                          );
-                        } catch (e) {
-                          bodyComponent = (
-                            <MarkdownFormattedText
-                              doc={body}
-                              collapse
-                              hideFormatting
-                            />
-                          );
-                        }
-                      }
+                      const title = draft.title || 'Untitled';
 
                       return (
                         <div
@@ -668,19 +631,33 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                             this._loadDraft(draft);
                           }}
                         >
-                          {fromDraft === draft.id ? (
-                            <div class="draft-title">
-                              <CWIcon iconName="edit" iconSize="small" />
-                              <CWText fontWeight="semiBold">
-                                {draft.title || 'Untitled'}
+                          <div class="draft-title">
+                            {fromDraft === draft.id ? (
+                              <>
+                                <CWIcon iconName="edit" iconSize="small" />
+                                <CWText
+                                  fontWeight="semiBold"
+                                  noWrap
+                                  title={title}
+                                >
+                                  {title}
+                                </CWText>
+                              </>
+                            ) : (
+                              <CWText
+                                fontWeight="semiBold"
+                                noWrap
+                                title={title}
+                              >
+                                {title}
                               </CWText>
-                            </div>
-                          ) : (
-                            <CWText fontWeight="semiBold">
-                              {draft.title || 'Untitled'}
-                            </CWText>
-                          )}
-                          {draft.body.length > 0 && bodyComponent}
+                            )}
+                          </div>
+                          {draft.body.length > 0 &&
+                            renderQuillTextBody(draft.body, {
+                              hideFormatting: true,
+                              collapse: true,
+                            })}
                           <CWText
                             className="draft-delete-text"
                             onclick={async (e) => {

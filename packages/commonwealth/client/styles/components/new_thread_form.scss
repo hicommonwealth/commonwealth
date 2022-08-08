@@ -11,11 +11,6 @@
     padding: 16px;
   }
 
-  @include smallInclusive {
-    height: 400px;
-    overflow-y: auto;
-  }
-
   @include mediumSmallInclusive {
     width: 100%;
   }
