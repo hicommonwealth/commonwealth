@@ -98,7 +98,7 @@ import {
   ProposalEditorPermissions,
 } from './body';
 import { CreateComment } from './create_comment';
-import LinkedProposalsEmbed from './linked_proposals_embed';
+import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import User from '../../components/widgets/user';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
