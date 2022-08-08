@@ -30,6 +30,7 @@ import {
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -213,6 +214,13 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.Token,
                 ...this.state.form,
               });
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
