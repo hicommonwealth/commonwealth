@@ -100,15 +100,6 @@ export class RedisCache {
 
     if (!this.client.isOpen) {
       await this.client.connect();
-
-      // setInterval(async () => {
-      //   try {
-      //     await this.client.ping();
-      //     await this.client.ping();
-      //   } catch (e) {
-      //     log.error("RedisCache client could not ping Redis", e);
-      //   }
-      // }, 5000);
     }
 
     this.initialized = !!this.client.isOpen;
