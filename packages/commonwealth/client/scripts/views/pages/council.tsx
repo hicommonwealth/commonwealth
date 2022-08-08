@@ -41,7 +41,7 @@ class Councillor implements m.ClassComponent<{ account }> {
       .filter((v) => v.votes.includes(account.address));
 
     return (
-      <CWCard elevation="elevation-1" className="CouncillorCard">
+      <CWCard className="CouncillorCard">
         {m(User, { user: account, popover: true, hideIdentityIcon: true })}
         <CWText className="councillor-status-text">
           {election.isMember(account)

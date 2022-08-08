@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import $ from 'jquery';
 import m from 'mithril';
+import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
 
@@ -11,7 +11,6 @@ import { formatCoin } from 'adapters/currency';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/main';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
-import { MultipleButtonSelectorFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -19,43 +18,51 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 
 export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
-  private error;
-  private phragmenStakeAmount;
-  private votes;
+  private currentApprovals: Array<string>;
+  private currentStake: number;
+  private error: string;
+  private phragmenStakeAmount: SubstrateCoin;
+  private votes: Array<string>;
 
-  view(vnode) {
-    const author = app.user.activeAccount;
-
+  oninit(vnode) {
     const candidates = vnode.attrs.candidates || [];
-
-    if (!author) return <CWText>Must be logged in</CWText>;
-
-    if (!(author instanceof SubstrateAccount))
-      return <CWText>Council voting only supported on Substrate.</CWText>;
-
     // get currently set approvals
     const currentVote = (
       app.chain as Substrate
-    ).phragmenElections.activeElection.getVotes(author);
+    ).phragmenElections.activeElection.getVotes(app.user.activeAccount);
 
     const currentStake = currentVote[0] ? currentVote[0].stake.inDollars : 0;
+
+    this.currentStake = currentStake;
+
+    this.phragmenStakeAmount = app.chain.chain.coins(
+      parseFloat(String(currentStake)),
+      true
+    );
 
     const currentApprovals =
       (currentVote && currentVote.length > 0 && currentVote[0].votes) || [];
 
-    const hasApprovals = currentApprovals.length > 0;
+    this.currentApprovals = currentApprovals;
 
-    const defaultSelection = candidates
+    this.votes = candidates
       .filter(
         ([candidate]) =>
           currentApprovals && currentApprovals.includes(candidate.address)
       )
       .map(([candidate]) => candidate.address);
+  }
 
-    if (this.votes === undefined) {
-      this.votes = defaultSelection;
+  view(vnode) {
+    const { candidates } = vnode.attrs;
+
+    const author = app.user.activeAccount;
+
+    if (!(author instanceof SubstrateAccount)) {
+      return <CWText>Council voting only supported on Substrate.</CWText>;
     }
 
     const submitVote = (e) => {
@@ -101,6 +108,8 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
       );
     };
 
+    const hasApprovals = this.currentApprovals.length > 0;
+
     const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
 
     return (
@@ -111,27 +120,21 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
         </div>
         <div class="compact-modal-body">
           <div class="chooser">
-            <CWText>
+            <CWText fontWeight="semiBold">
               Lock any amount of{' '}
               {(app.chain && app.chain.chain && app.chain.chain.denom) ||
                 'balance'}{' '}
               to vote. You may unlock at any time.
             </CWText>
-            <CWText>
+            <CWText type="caption">
               A {formatCoin(votingBond)} bond will be reserved in case your vote
               becomes inactive (everyone you are voting for withdraws their
               candidacies). Once inactive, anyone can evict your voter record
               and claim your bond.
             </CWText>
             <CWTextInput
-              defaultValue={String(currentStake)}
+              defaultValue={String(this.currentStake)}
               placeholder="Amount to lock"
-              // oncreate={() => {
-              //   this.phragmenStakeAmount = app.chain.chain.coins(
-              //     parseFloat(String(currentStake)),
-              //     true
-              //   );
-              // }}
               oninput={(e) => {
                 this.phragmenStakeAmount = app.chain.chain.coins(
                   parseFloat(e.target.value),
@@ -139,18 +142,35 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
                 );
               }}
             />
-            {m(MultipleButtonSelectorFormField, {
-              name: 'candidate',
-              choices: candidates.map(([candidate, slot]) => ({
-                value: candidate.address,
-                label: m(User, { user: candidate }),
-              })),
-              callback: (result) => {
-                // votes array has type string[]
-                this.votes = result;
-              },
-              defaultSelection,
-            })}
+            <div class="candidates-container">
+              {candidates.map((candidateTuple) => {
+                const candidate = candidateTuple[0];
+                const address = candidateTuple[0].address;
+
+                const onclick = (e) => {
+                  e.preventDefault();
+
+                  const index = this.votes.indexOf(address);
+
+                  if (index === -1) {
+                    this.votes.push(address);
+                  } else {
+                    this.votes.splice(index, 1);
+                  }
+                };
+
+                return (
+                  <div class="candidate-row" onclick={onclick}>
+                    <CWCheckbox
+                      checked={this.votes.indexOf(address) !== -1}
+                      onchange={onclick}
+                      label=""
+                    />
+                    {m(User, { user: candidate })}
+                  </div>
+                );
+              })}
+            </div>
             {candidates.length === 0 && (
               <>
                 <CWText>No candidates to vote for</CWText>

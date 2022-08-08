@@ -1,25 +1,46 @@
 @import 'shared';
 
 .CouncilVotingModal {
-  max-width: 640px;
+  width: 400px;
 
-  // .chooser {
-  //   p {
-  //     margin: 10px 0;
-  //   }
+  .chooser {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-  //   .MultipleButtonSelectorFormField button {
-  //     width: 100%;
-  //     margin: 3px 0 !important;
-  //   }
-  // }
+    .TextInput {
+      margin: 0;
+    }
 
-  // input[type='text'].phragmen-vote-amount {
-  //   margin-top: 24px;
-  // }
+    .candidates-container {
+      height: 320px;
+      overflow-y: auto;
 
-  // .no-candidates {
-  //   margin: 20px 0;
-  //   font-weight: 500;
-  // }
+      @include visibleScrollbar(light);
+
+      .candidate-row {
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        height: 32px;
+        padding-left: 8px;
+
+        &:hover {
+          background-color: $neutral-50;
+        }
+
+        .User {
+          align-items: center;
+          display: flex;
+          margin-left: 4px;
+        }
+      }
+    }
+  }
+
+  .compact-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 16px 16px;
+  }
 }

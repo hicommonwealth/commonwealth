@@ -26,7 +26,7 @@ class Validator implements m.ClassComponent<{ info }> {
     const { info } = vnode.attrs;
 
     return (
-      <CWCard elevation="elevation-1" className="ValidatorCard">
+      <CWCard className="ValidatorCard">
         <div class="user-and-nominator">
           {m(User, {
             user: new AddressInfo(null, info.stash, info.chain, null),
