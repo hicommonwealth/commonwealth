@@ -18,7 +18,7 @@ import {
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { linkExistingAddressToChainOrCommunity } from 'client/scripts/controllers/app/login';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';

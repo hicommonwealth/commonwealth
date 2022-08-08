@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Thread } from 'client/scripts/models';
+import { Thread } from 'models';
 
 export const getLastUpdated = (proposal) => {
   const { lastCommentedOn } = proposal;
