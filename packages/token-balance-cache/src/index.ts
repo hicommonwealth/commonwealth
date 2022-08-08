@@ -80,6 +80,13 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
     return this.start();
   }
 
+  public addNode(node: Omit<ChainNodeT, 'id'> & { id?: number }) {
+    const id = node.id;
+    if (id && !this._nodes[id]) {
+      this._nodes[id] = node as ChainNodeT;
+    }
+  }
+
   // query a user's balance on a given token contract and save in cache
   public async getBalance(
     nodeId: number,
