@@ -58,7 +58,6 @@ export class RedisCache {
       } else {
         redisOptions['socket'] = {
           connectTimeout: 5000,
-          keepAlive: 120,
           tls: true,
           rejectUnauthorized: false,
           reconnectStrategy: redisRetryStrategy
