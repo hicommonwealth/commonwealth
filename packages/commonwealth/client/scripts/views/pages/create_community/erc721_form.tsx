@@ -210,11 +210,13 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.Token,
                 ...this.state.form,
               });
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
-              );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {

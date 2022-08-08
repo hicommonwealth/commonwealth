@@ -160,11 +160,13 @@ export class StarterCommunityForm implements m.ClassComponent {
                 website,
                 ...additionalArgs,
               });
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
-              );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {

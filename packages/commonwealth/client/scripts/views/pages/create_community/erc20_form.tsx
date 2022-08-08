@@ -17,7 +17,6 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { IERC20Metadata__factory } from 'common-common/src/eth/types';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import { RoleInfo } from 'models';
 import {
   initChainForm,
   defaultChainRows,
@@ -31,7 +30,7 @@ import {
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { linkExistingAddressToChainOrCommunity, setActiveAccount } from '../../../controllers/app/login';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -214,14 +213,15 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
                 node_url: nodeUrl,
                 type: ChainType.Token,
                 ...this.state.form,
-              }); 
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
-              );
+              });
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
-              app.user.addRole(new RoleInfo(res.result.role.id,res.result.role.address_id, res.result.admin_address, res.result.role.address_chain, res.result.role.chain_id, res.result.role.permission, res.result.role.is_user_default))
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(

@@ -12,14 +12,16 @@ import { initAppState } from 'app';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
+
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+
+import { initChainForm, defaultChainRows } from './chain_input_rows';
+import { ChainFormFields, ChainFormState } from './types';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
@@ -140,11 +142,6 @@ export class SputnikForm implements m.ClassComponent {
               const res = await $.post(
                 `${app.serverUrl()}/createChain`,
                 createChainArgs
-              );
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
               );
               await initAppState(false);
               m.route.set(`${window.location.origin}/${res.result.chain.id}`);

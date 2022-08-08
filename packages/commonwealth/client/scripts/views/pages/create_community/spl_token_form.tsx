@@ -163,16 +163,18 @@ export class SplTokenForm implements m.ClassComponent {
                 type: ChainType.Token,
                 ...this.state.form,
               });
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
-              );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error || 'Creating new SPL community failed'
               );
             } finally {
               this.state.saving = false;

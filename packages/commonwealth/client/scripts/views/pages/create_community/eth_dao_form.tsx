@@ -215,11 +215,13 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.DAO,
                 ...this.state.form,
               });
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id,
-              );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id,
+                );
+              }
               await initAppState(false);
               // TODO: notify about needing to run event migration
               m.route.set(`/${res.result.chain?.id}`);

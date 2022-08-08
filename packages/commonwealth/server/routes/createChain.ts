@@ -1,13 +1,12 @@
 import { NextFunction } from 'express';
 import Web3 from 'web3';
-import crypto from 'crypto';
 import * as solw3 from '@solana/web3.js';
 import { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
@@ -18,12 +17,9 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AddressInstance } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
-import { RoleAttributes } from '../models/role';
-
-import { NotificationCategories } from 'common-common/src/types';
+import { RoleAttributes, RoleInstance } from '../models/role';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -54,8 +50,6 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  FailedToAssignAdmin: 'Failed to assign admin',
-  InvalidWalletType: 'Wallet type does not match chain'
 };
 
 type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
@@ -123,7 +117,7 @@ const createChain = async (
   let eth_chain_id: number = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
-  let privateUrl;
+  let privateUrl: string | undefined;
   let sanitizedSpec;
 
   // always generate a chain id
@@ -320,82 +314,55 @@ const createChain = async (
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role;
-  let addressToBeAdmin;
-  try {
-    // Use the chain base to get the right address from the user
-    let potentialAdmin:(AddressInstance | null);
+  let role: RoleInstance | undefined;
+  let addressToBeAdmin: AddressInstance | undefined;
 
-    // Will get one of the users Ethereum addresses or null
-    if (chain.base === ChainBase.Ethereum) {
-      potentialAdmin = await models.Address.findOne({
-        where: {
-          user_id: req.user.id,
-          address: {
-            [Op.startsWith]: '0x'
-          }
-        },
-        include: [{
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        }]
-      });
-    }
-    // Will get one of the users Near addresses or null
-    else if (chain.base === ChainBase.NEAR) {
-      potentialAdmin = await models.Address.findOne({
-        where: {
-          user_id: req.user.id,
-          address: {
-            [Op.endsWith]: '.near'
-          }
-        },
-        include: [{
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        }]
-      });
-    }
-    // Will get one of the users Solana addresses or null
-    else if (chain.base === ChainBase.Solana) {
-      potentialAdmin = await models.Address.findOne({
-        where: {
-          user_id: req.user.id,
-          address: {
-            // This is the regex formatting for solana addresses per their website
-            [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}'
-          }
-        },
-        include: [{
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        }]
-      });
-    }
+  if (chain.base === ChainBase.Ethereum) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          [Op.startsWith]: '0x'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  } else if (chain.base === ChainBase.NEAR) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          [Op.endsWith]: '.near'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  } else if (chain.base === ChainBase.Solana) {
+    addressToBeAdmin = await models.Address.findOne({
+      where: {
+        user_id: req.user.id,
+        address: {
+          // This is the regex formatting for solana addresses per their website
+          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}'
+        }
+      },
+      include: [{
+        model: models.Chain,
+        where: { base: chain.base },
+        required: true,
+      }]
+    });
+  }
 
-    addressToBeAdmin = potentialAdmin
-    const solanaRegExp = new RegExp('[1-9A-HJ-NP-Za-km-z]{32,44}');
-
-    // Checking the actual address to be admin that is being added to the role
-    // probably redundant now but better safe than sorry
-    if (!addressToBeAdmin ||
-      [ChainBase.Substrate, ChainBase.CosmosSDK].includes(chain.base)) throw Error(Errors.FailedToAssignAdmin);
-
-    // All Ethererum addresses start with 0x
-    if (chain.base === ChainBase.Ethereum &&
-      !addressToBeAdmin.address.startsWith('0x')) throw Error(Errors.InvalidWalletType);
-
-    // All Near addresses end with .near
-    if (chain.base === ChainBase.NEAR &&
-      !addressToBeAdmin.address.endsWith('.near')) throw Error(Errors.InvalidWalletType);
-
-    // All Solana addresses follow their regex formatting
-    if (chain.base === ChainBase.Solana &&
-      solanaRegExp.test(addressToBeAdmin.address)) throw Error(Errors.InvalidWalletType);
-
+  if (addressToBeAdmin) {
     role = await models.Role.create({
       address_id: addressToBeAdmin.id,
       chain_id: chain.id,
@@ -412,14 +379,6 @@ const createChain = async (
         is_active: true,
       }
     });
-
-  } catch (err) {
-    console.log(err);
-    // If the issue is an invalid wallet type then log the error and skip making them admin, but still create the chain
-    if (err !== (Errors.InvalidWalletType || Errors.FailedToAssignAdmin)) {
-      console.log(err);
-      throw Error(Errors.FailedToAssignAdmin);
-    }
   }
 
   if (process.env.NODE_ENV !== 'test') {
@@ -431,7 +390,12 @@ const createChain = async (
     });
   }
 
-  return success(res, { chain: chain.toJSON(), node: nodeJSON, role: role?.toJSON(), admin_address: addressToBeAdmin.address});
+  return success(res, {
+    chain: chain.toJSON(),
+    node: nodeJSON,
+    role: role?.toJSON(),
+    admin_address: addressToBeAdmin?.address,
+  });
 };
 
 export default createChain;
