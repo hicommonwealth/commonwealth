@@ -30,7 +30,8 @@ type FontType =
   | 'b2'
   | 'caption'
   | 'buttonSm'
-  | 'buttonLg';
+  | 'buttonLg'
+  | 'buttonMini';
 
 type TextStyleAttrs = {
   className?: string;
@@ -47,8 +48,15 @@ type TextAttrs = {
   title?: string;
 } & TextStyleAttrs;
 
-const getFontWeight = (type: FontType) =>
-  type === 'buttonSm' || type === 'buttonLg' ? 'semiBold' : 'regular';
+const getFontWeight = (type: FontType) => {
+  if (type === 'buttonSm' || type === 'buttonLg') {
+    return 'semiBold';
+  } else if (type === 'buttonMini') {
+    return 'medium';
+  } else {
+    return 'regular';
+  }
+};
 
 export class CWText implements m.ClassComponent<TextAttrs> {
   view(vnode) {
@@ -74,6 +82,7 @@ export class CWText implements m.ClassComponent<TextAttrs> {
             fontStyle,
             noWrap,
             onclick: !!onclick,
+            isCentered,
             className,
           },
           ComponentType.Text
