@@ -2,8 +2,8 @@
 
 .DelegatePage {
   .DelegateForm {
-    width: 380px;
-    max-width: 85%;
+    flex: 1;
+    padding: 24px;
 
     textarea {
       min-height: 200px;

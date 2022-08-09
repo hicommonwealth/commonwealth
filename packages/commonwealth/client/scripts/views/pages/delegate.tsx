@@ -1,14 +1,6 @@
-import 'pages/delegate.scss';
+/* @jsx m */
 
 import m from 'mithril';
-import app from 'state';
-import { ChainNetwork } from 'common-common/src/types';
-
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import {
   Grid,
   Col,
@@ -18,6 +10,16 @@ import {
   Input,
   Button,
 } from 'construct-ui';
+
+import 'pages/delegate.scss';
+
+import app from 'state';
+import { ChainNetwork } from 'common-common/src/types';
+import Sublayout from 'views/sublayout';
+import { PageLoading } from 'views/pages/loading';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { PageNotFound } from './404';
 
 const DelegateStats: m.Component<{ currentDelegate: string }> = {
@@ -47,40 +49,30 @@ const DelegateStats: m.Component<{ currentDelegate: string }> = {
               : '--',
           ]),
         ]),
-        // m(Col, { span: { xs: 6, md: 3 } }, [
-        //   m('.stats-tile', [
-        //     m('.stats-heading', 'Your address:'),
-        //     app.user.activeAccount.address
-        //       ? m('.stats-tile-figure-minor', app.user.activeAccount.address)
-        //       : '--',
-        //   ]),
-        // ]),
       ]
     );
   },
 };
 
-interface IDelegateForm {
+type DelegateFormType = {
   address: string;
   amount: number;
-}
+};
 
-interface IDelegateFormState {
-  form: IDelegateForm;
-  loading: boolean;
+type DelegateFormState = {
   currentDelegate: string;
-}
+  form: DelegateFormType;
+  loading: boolean;
+};
 
 const getDelegate = async (
-  vnode: m.Vnode<Record<string, never>, IDelegateFormState>
+  vnode: m.Vnode<Record<string, never>, DelegateFormState>
 ) => {
   if (app.chain.network === ChainNetwork.Compound) {
-    vnode.state.currentDelegate = await (
-      app.chain as Compound
-    ).chain.getDelegate();
+    this.currentDelegate = await (app.chain as Compound).chain.getDelegate();
   } else if (app.chain.network === ChainNetwork.Aave) {
     // TODO: switch on delegation type
-    vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(
+    this.currentDelegate = await (app.chain as Aave).chain.getDelegate(
       app.user.activeAccount.address,
       'voting'
     );
@@ -90,25 +82,23 @@ const getDelegate = async (
 
 // TODO: remove popup modal for delegation as we auto-delegate all tokens now
 const setDelegate = async (
-  vnode: m.Vnode<Record<string, never>, IDelegateFormState>
+  vnode: m.Vnode<Record<string, never>, DelegateFormState>
 ) => {
   if (app.chain.apiInitialized) {
     let delegationPromise: Promise<void>;
     if (app.chain.network === ChainNetwork.Compound) {
       delegationPromise = (app.chain as Compound).chain.setDelegate(
-        vnode.state.form.address
+        this.form.address
       );
     } else if (app.chain.network === ChainNetwork.Aave) {
       delegationPromise = (app.chain as Aave).chain.setDelegate(
-        vnode.state.form.address
+        this.form.address
       );
     }
     if (delegationPromise) {
       try {
         await delegationPromise;
-        notifySuccess(
-          `Sent transaction to delegate to ${vnode.state.form.address}`
-        );
+        notifySuccess(`Sent transaction to delegate to ${this.form.address}`);
         getDelegate(vnode);
       } catch (err) {
         notifyError(`${err.message}`);
@@ -117,21 +107,30 @@ const setDelegate = async (
   }
 };
 
-const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
-  oninit: (vnode) => {
-    vnode.state.form = {
+class DelegateForm implements m.ClassComponent {
+  private currentDelegate: string;
+  private form: DelegateFormType;
+  private loading: boolean;
+
+  oninit(vnode) {
+    this.form = {
       address: '',
       amount: null,
     };
-    vnode.state.loading = false;
+
+    this.loading = false;
+
     getDelegate(vnode);
-  },
-  view: (vnode) => {
-    const { form, loading } = vnode.state;
+  }
+
+  view(vnode) {
+    const { form, loading } = this;
+
     const hasValue = app.chain.network === ChainNetwork.Compound;
+
     return [
       m(DelegateStats, {
-        currentDelegate: vnode.state.currentDelegate,
+        currentDelegate: this.currentDelegate,
       }),
       m(Form, { class: 'DelegateForm' }, [
         m(Grid, [
@@ -144,7 +143,7 @@ const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
                 placeholder: 'Paste address you want to delegate to',
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.address = result;
+                  this.form.address = result;
                   m.redraw();
                 },
               }),
@@ -156,7 +155,7 @@ const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
                   defaultValue: '',
                   oninput: (e) => {
                     const result = (e.target as any).value;
-                    vnode.state.form.amount = result;
+                    this.form.amount = result;
                     m.redraw();
                   },
                 }),
@@ -169,9 +168,9 @@ const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
                 label: 'Delegate!',
                 onclick: async (e) => {
                   e.preventDefault();
-                  vnode.state.loading = true;
+                  this.loading = true;
                   await setDelegate(vnode);
-                  vnode.state.loading = false;
+                  this.loading = false;
                   m.redraw();
                 },
                 type: 'submit',
@@ -181,19 +180,22 @@ const DelegateForm: m.Component<Record<string, never>, IDelegateFormState> = {
         ]),
       ]),
     ];
-  },
-};
+  }
+}
 
-const DelegatePage: m.Component = {
-  view: () => {
+class DelegatePage implements m.ClassComponent {
+  view() {
     if (!app.chain || !app.chain.loaded) {
       // chain load failed
       if (app.chain && app.chain.failed) {
-        return m(PageNotFound, {
-          title: 'Wrong Ethereum Provider Network!',
-          message: 'Change Metamask to point to Ethereum Mainnet',
-        });
+        return (
+          <PageNotFound
+            title="Wrong Ethereum Provider Network!"
+            message="Change Metamask to point to Ethereum Mainnet"
+          />
+        );
       }
+
       // wrong chain loaded
       if (
         app.chain &&
@@ -201,27 +203,24 @@ const DelegatePage: m.Component = {
         app.chain.network !== ChainNetwork.Compound &&
         app.chain.network !== ChainNetwork.Aave
       ) {
-        return m(PageNotFound, {
-          title: 'Delegate Page',
-          message: 'Delegate page for Marlin and Aave users only!',
-        });
+        return (
+          <PageNotFound
+            title="Delegate Page"
+            message="Delegate page for Marlin and Aave users only!"
+          />
+        );
       }
+
       // chain loading
-      return m(PageLoading, {
-        message: 'Connecting to chain',
-        title: 'Delegate',
-      });
+      return <PageLoading message="Connecting to chain" title="Delegate" />;
     }
 
-    return m(
-      Sublayout,
-      {
-        class: 'DelegatePage',
-        title: 'Delegate',
-      },
-      [m('.forum-container', [m(DelegateForm, {})])]
+    return (
+      <Sublayout title="Delegate">
+        <DelegateForm />
+      </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default DelegatePage;
