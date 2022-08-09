@@ -1,31 +1,16 @@
 import BN from 'bn.js';
 import moment from 'moment';
-<<<<<<< HEAD:client/scripts/models/Project.ts
-import { CommonwealthTypes } from '@commonwealth/chain-events';
+import { CommonwealthTypes } from 'chain-events/src';
 import ChainEntityT from './ChainEntity';
 import { CWParticipant } from '../controllers/chain/ethereum/commonwealth/participants';
 import AddressInfo from './AddressInfo';
-
 class Project {
-  // Helper getters
-=======
-import { CommonwealthTypes } from 'chain-events/src';
-import ChainEntityT from './ChainEntity';
-
-class Project {
-  public get createdEvent(): CommonwealthTypes.IProjectCreated {
-    return this.entity.chainEvents.find(
-      ({ type }) => type.eventName === CommonwealthTypes.EventKind.ProjectCreated
-    ).data as CommonwealthTypes.IProjectCreated;
-  }
 
   // address of Project contract
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
   public get address(): string {
     return this.createdEvent.id;
   }
 
-<<<<<<< HEAD:client/scripts/models/Project.ts
   public get completionPercent(): number {
     return this.threshold.div(this.fundingAmount).toNumber();
   }
@@ -44,23 +29,6 @@ class Project {
   }
 
   public get backEvents(): CommonwealthTypes.IProjectBacked[] {
-    return this.entity.chainEvents
-      .filter(
-        ({ type }) =>
-          type.eventName === CommonwealthTypes.EventKind.ProjectBacked
-      )
-      .map(({ data }) => data as CommonwealthTypes.IProjectBacked);
-  }
-
-  public get curateEvents(): CommonwealthTypes.IProjectCurated[] {
-    return this.entity.chainEvents
-      .filter(
-        ({ type }) =>
-          type.eventName === CommonwealthTypes.EventKind.ProjectCurated
-      )
-      .map(({ data }) => data as CommonwealthTypes.IProjectCurated);
-=======
-  public get backEvents(): CommonwealthTypes.IProjectBacked[] {
     return this.entity.chainEvents.filter(
       ({ type }) => type.eventName === CommonwealthTypes.EventKind.ProjectBacked
     ).map(({ data }) => data as CommonwealthTypes.IProjectBacked);
@@ -70,17 +38,11 @@ class Project {
     return this.entity.chainEvents.filter(
       ({ type }) => type.eventName === CommonwealthTypes.EventKind.ProjectCurated
     ).map(({ data }) => data as CommonwealthTypes.IProjectCurated);
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
   }
 
   public get succeededEvent(): CommonwealthTypes.IProjectSucceeded | null {
     const evt = this.entity.chainEvents.find(
-<<<<<<< HEAD:client/scripts/models/Project.ts
-      ({ type }) =>
-        type.eventName === CommonwealthTypes.EventKind.ProjectSucceeded
-=======
       ({ type }) => type.eventName === CommonwealthTypes.EventKind.ProjectSucceeded
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
     );
     if (evt) {
       return evt.data as CommonwealthTypes.IProjectSucceeded;
@@ -99,7 +61,6 @@ class Project {
   }
 
   public get withdrawEvents(): CommonwealthTypes.IProjectWithdraw[] {
-<<<<<<< HEAD:client/scripts/models/Project.ts
     return this.entity.chainEvents
       .filter(
         ({ type }) =>
@@ -204,32 +165,11 @@ class Project {
     public readonly entity: ChainEntityT,
     public readonly chainId?: string
   ) {}
-=======
-    return this.entity.chainEvents.filter(
-      ({ type }) => type.eventName === CommonwealthTypes.EventKind.ProjectWithdraw
-    ).map(({ data }) => data as CommonwealthTypes.IProjectWithdraw);
-  }
-
-  constructor(
-    public readonly id: number,
-    public readonly creator: string,
-    public readonly beneficiary: string,
-    public readonly token: string,
-    public readonly curatorFee: BN,
-    public readonly threshold: BN,
-    public readonly deadline: moment.Moment,
-    public fundingAmount: BN,
-    public readonly entity: ChainEntityT,
-    public readonly chainId?: string,
-  ) {
-  }
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
 
   public static fromJSON({
     id,
     chain_id,
     creator,
-<<<<<<< HEAD:client/scripts/models/Project.ts
     creator_address_id,
     beneficiary,
     token,
@@ -260,31 +200,10 @@ class Project {
     created_at: number;
     funding_amount: string;
     ChainEntity: ChainEntityT;
-=======
-    beneficiary,
-    token,
-    curator_fee,
-    threshold,
-    deadline,
-    funding_amount,
-    ChainEntity,
-  }: {
-    id: number,
-    chain_id?: string,
-    creator: string,
-    beneficiary: string,
-    token: string,
-    curator_fee: string,
-    threshold: string,
-    deadline: number,
-    funding_amount: string,
-    ChainEntity: ChainEntityT,
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
   }) {
     return new Project(
       id,
       creator,
-<<<<<<< HEAD:client/scripts/models/Project.ts
       creator_address_id,
       beneficiary,
       token,
@@ -299,16 +218,6 @@ class Project {
       new BN(funding_amount),
       ChainEntity,
       chain_id
-=======
-      beneficiary,
-      token,
-      new BN(curator_fee),
-      new BN(threshold),
-      moment.unix(deadline),
-      new BN(funding_amount),
-      ChainEntity,
-      chain_id,
->>>>>>> master:packages/commonwealth/client/scripts/models/Project.ts
     );
   }
 }
