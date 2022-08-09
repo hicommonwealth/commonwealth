@@ -35,7 +35,8 @@ $discussion-title-font-size: 1.45rem;
 .view-proposal-content-container {
   display: flex;
   flex-direction: column;
-  max-width: 768px;
+  gap: 16px;
+  max-width: 704px;
   width: 100%;
 }
 
@@ -75,6 +76,10 @@ $discussion-title-font-size: 1.45rem;
       @include mediumSmallInclusive {
         display: none;
       }
+    }
+
+    @include mediumSmallInclusive {
+      gap: 0;
     }
   }
 
@@ -160,7 +165,6 @@ $discussion-title-font-size: 1.45rem;
 
     .proposal-top {
       display: flex;
-      padding-bottom: 16px;
       border-bottom: 1px solid $neutral-200;
     }
 
@@ -228,7 +232,6 @@ $discussion-title-font-size: 1.45rem;
 
     .proposal-content {
       display: flex;
-      padding-top: 24px;
     }
 
     .proposal-content-right {
