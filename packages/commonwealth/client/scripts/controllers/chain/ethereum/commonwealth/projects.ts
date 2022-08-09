@@ -3,10 +3,10 @@ import $ from 'jquery';
 import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
-} from 'eth/types';
+} from 'common-common/src/eth/types';
 import { ChainInfo, NodeInfo, Project } from 'models';
 import { IApp } from 'state';
-import { ChainNetwork } from 'types';
+import { ChainNetwork } from 'common-common/src/types';
 import { BigNumberish, ContractReceipt } from 'ethers';
 import { attachSigner } from './contractApi';
 
@@ -149,7 +149,7 @@ export default class ProjectsController {
       this._factoryInfo.address
     );
 
-    const projectId = (await contract.numProjects()).toNumber();
+    const projectId = (await contract.numProjects());
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
     const tx = await contract.createProject(
