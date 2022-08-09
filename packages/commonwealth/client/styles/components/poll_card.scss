@@ -76,12 +76,12 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    
-    .more-options.Text {
-      color: $neutral-500;
-      justify-content: flex-end;
-      margin-top: -16px;
-    }
+  }
+
+  .more-options.Text {
+    color: $neutral-500;
+    justify-content: flex-end;
+    margin-top: 8px;
   }
 
   .button-icon.Icon {

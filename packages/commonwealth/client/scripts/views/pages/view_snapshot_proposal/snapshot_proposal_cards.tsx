@@ -148,7 +148,7 @@ export class SnapshotProposalCards
           }}
           incrementalVoteCast={totalScore}
           tooltipErrorMessage={voteErrorText}
-          isPreview={true}
+          isPreview={false}
         />
       </div>
     );

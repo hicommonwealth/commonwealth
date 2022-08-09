@@ -52,7 +52,7 @@ export class SnapshotPollCard
       tokenSymbol,
       votedFor,
       tooltipErrorMessage,
-      isPreview
+      isPreview,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -106,7 +106,7 @@ export class SnapshotPollCard
               />
             </>
           )}
-          {(this.hasVoted || pollEnded) && (
+          {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay
               timeRemaining={timeRemaining}
               voteDirectionString={this.voteDirectionString}
