@@ -89,9 +89,9 @@ export interface ICreateProjectForm {
   token: string;
   creator: string;
   beneficiary: string;
-  threshold: string;
-  fundraiseLength: string;
-  curatorFee: string;
+  threshold: number;
+  fundraiseLength: number;
+  curatorFee: number;
 }
 
 export class InformationSlide
