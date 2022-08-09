@@ -10,7 +10,7 @@ import { ProjectCompletionBar, ProjectRole } from './project_card';
 import Sublayout from '../../../sublayout';
 import { AnonymousUser } from '../../../components/widgets/user';
 import { PageNotFound } from '../../404';
-import MarkdownFormattedText from '../../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../../components/quill/markdown_formatted_text';
 import { CWTable } from '../../../components/component_kit/cw_table';
 import { createNewDummyProject } from './dummy_project';
 import SupportCard from './support_card';

@@ -4,7 +4,7 @@ import 'pages/projects/create_project_form.scss';
 import m from 'mithril';
 
 import app from 'state';
-import QuillEditor from 'views/components/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
@@ -12,7 +12,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import CoverImageUpload from './cover_image_upload';
 
