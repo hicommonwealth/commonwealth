@@ -46,7 +46,9 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        margin-bottom: 16px;
         padding: 16px;
+        width: fit-content;
       }
 
       .draft-text.Text {
@@ -73,7 +75,7 @@
       }
 
       .QuillEditor {
-        height: 400px;
+        height: 280px;
         margin-bottom: 16px;
       }
 
@@ -97,7 +99,7 @@
     .drafts-list {
       display: flex;
       flex-direction: column;
-      height: 480px;
+      height: 360px;
       overflow-y: auto;
       width: 200px;
 
