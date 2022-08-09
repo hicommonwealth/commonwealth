@@ -1,15 +1,18 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .CreateInviteModal {
   form {
     margin: 0;
     max-width: 560px;
+
     .chain-select-group {
       max-width: calc(33.3% - 5px);
+
       .chain-select-label {
         display: block;
       }
     }
+
     .address-input-group {
       max-width: calc(66.7% - 5px);
 
@@ -18,44 +21,54 @@
         padding: 4px 8px;
       }
     }
+
     h4 {
       margin-top: 0;
       margin-bottom: 16px;
     }
   }
+
   .add-address-form {
     column-gap: 10px;
+
     .cui-form-group {
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
     }
   }
+
   .invite-email-form {
     .cui-input input {
       height: 40px;
       padding: 4px 8px;
     }
   }
+
   form + form {
     margin-top: 40px;
   }
+
   .valid input {
     border: solid 1px green;
   }
+
   .invalid input {
     border: solid 1px red;
   }
+
   .error-message {
     margin: 10px 0;
     font-weight: 500;
     color: $rorange-500;
   }
+
   .success-message {
     margin: 10px 0;
     font-weight: 500;
     color: $green-500;
   }
+
   .copy-link-line {
     display: flex;
     align-items: center;
@@ -83,14 +96,17 @@
 
   .CreateInviteLink {
     margin-top: 30px;
+
     .cui-input input {
       height: 40px;
       padding: 4px 8px;
     }
+
     .invite-link-title {
       font-size: 24px;
       font-weight: 500;
     }
+
     .cui-form-label {
       font-size: 18px;
       font-weight: 500;
@@ -117,16 +133,20 @@
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
     overflow-y: visible;
     max-height: none !important;
+
     &.search-results-loading {
       display: flex;
       justify-content: center;
     }
+
     .cui-list-item {
       border-bottom: none;
       padding: 5px 20px !important;
+
       &:focus {
         outline: $purple-100 auto 2px;
       }
+
       .search-results-item {
         color: $neutral-800;
         text-decoration: none;
@@ -138,16 +158,20 @@
           font-weight: 500;
           margin-bottom: 4px;
         }
+
         .search-results-thread-subtitle {
           margin-bottom: 2px;
+
           .User {
             margin-left: 5px;
           }
         }
+
         mark {
           background-color: $purple-100;
         }
       }
+
       &.disabled,
       &.no-results {
         font-weight: 500;
@@ -158,28 +182,35 @@
         color: $neutral-400;
         margin-top: 18px;
         top: 2px;
+
         &:first-child {
           margin-top: 0px;
         }
+
         &:hover {
           background: $white;
         }
       }
+
       &.disabled {
         margin-top: 5px;
+
         &:hover {
           cursor: default;
         }
       }
+
       &.no-results {
         display: flex;
         justify-content: space-between;
+
         b {
           width: 50%;
           text-overflow: ellipsis;
           overflow: hidden;
           white-space: nowrap;
         }
+
         span {
           width: 50%;
           color: $primary-500;
@@ -187,11 +218,13 @@
         }
       }
     }
+
     .UserBlock {
       .user-block-left {
         display: flex;
         align-items: center;
       }
+
       .user-block-right {
         display: none;
       }
