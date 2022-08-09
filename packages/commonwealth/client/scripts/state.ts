@@ -21,6 +21,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import ProjectsController from './controllers/chain/ethereum/projects';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -71,6 +72,7 @@ export interface IApp {
   // Web3
   wallets: WebWalletController;
   snapshot: SnapshotController;
+  projects: ProjectsController;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -140,6 +142,7 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
+  projects: new ProjectsController(),
 
   // User
   user: new UserController(),

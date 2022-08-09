@@ -13,8 +13,6 @@ import {
   Grid,
   Col,
   Spinner,
-  Tabs,
-  TabItem,
   PopoverMenu,
   Icons,
   MenuItem,
@@ -25,12 +23,7 @@ import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import {
-  ITXModalData,
-  ProposalModule,
-  ThreadStage,
-  ThreadKind
-} from 'models';
+import { ITXModalData, ProposalModule, ThreadStage, ThreadKind } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -60,6 +53,7 @@ import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -1104,25 +1098,17 @@ const NewProposalForm = {
                 }),
               ]),
               m('.tab-selector', [
-                m(
-                  Tabs,
-                  {
-                    align: 'left',
-                    class: 'tabs',
-                  },
-                  [
-                    aaveProposalState.map((_, index) =>
-                      m(TabItem, {
-                        key: index,
-                        label: `Call ${index + 1}`,
-                        active: activeAaveTabIndex === index,
-                        onclick: () => {
-                          vnode.state.activeAaveTabIndex = index;
-                        },
-                      })
-                    ),
-                  ]
-                ),
+                m(CWTabBar, [
+                  aaveProposalState.map((_, index) =>
+                    m(CWTab, {
+                      label: `Call ${index + 1}`,
+                      isSelected: activeAaveTabIndex === index,
+                      onclick: () => {
+                        vnode.state.activeAaveTabIndex = index;
+                      },
+                    })
+                  ),
+                ]),
                 m(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
@@ -1270,25 +1256,17 @@ const NewProposalForm = {
               ]),
               // TODO: display copy re AIPs and ARCs from https://docs.aave.com/governance/
               m('.tab-selector', [
-                m(
-                  Tabs,
-                  {
-                    align: 'left',
-                    class: 'tabs',
-                  },
-                  [
-                    aaveProposalState.map((_, index) =>
-                      m(TabItem, {
-                        key: index,
-                        label: `Call ${index + 1}`,
-                        active: activeAaveTabIndex === index,
-                        onclick: () => {
-                          vnode.state.activeAaveTabIndex = index;
-                        },
-                      })
-                    ),
-                  ]
-                ),
+                m(CWTabBar, [
+                  aaveProposalState.map((_, index) =>
+                    m(CWTab, {
+                      label: `Call ${index + 1}`,
+                      isSelected: activeAaveTabIndex === index,
+                      onclick: () => {
+                        vnode.state.activeAaveTabIndex = index;
+                      },
+                    })
+                  ),
+                ]),
                 m(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
