@@ -85,6 +85,10 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   private async _loadDraft(draft: DiscussionDraft) {
     if (!this) throw new Error('no this');
     this.quillEditorState.loadDocument(draft.body);
+    const titleEle = document.querySelector(
+      'input[name="new-thread-title"]'
+    ) as HTMLInputElement;
+    titleEle.value = draft.title;
     this.form.title = draft.title;
     this.form.topicName = draft.topic;
     this.activeTopic = draft.topic;
