@@ -45,7 +45,7 @@
     "migrate-db": "npx sequelize db:migrate",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get DATABASE_URL -a commonwealthapp) -a -f limited_dump.sql",
-    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql" 
+    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -a -f limited_load.sql" 
   },
   "engines": {
     "node": "14.x"
