@@ -21,21 +21,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "sender",
         type: "address",
       },
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "token",
         type: "address",
@@ -54,21 +46,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "sender",
         type: "address",
       },
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "token",
         type: "address",
@@ -94,8 +78,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-=======
         internalType: "bytes32",
         name: "name",
         type: "bytes32",
@@ -121,7 +103,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
@@ -140,21 +121,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "sender",
         type: "address",
       },
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        indexed: false,
-=======
         indexed: true,
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
         internalType: "address",
         name: "token",
         type: "address",
@@ -177,22 +150,6 @@ const _abi = [
   },
   {
     inputs: [],
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    name: "acceptedToken",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
     name: "bToken",
     outputs: [
       {
@@ -238,22 +195,6 @@ const _abi = [
   },
   {
     inputs: [],
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    name: "beneficiary",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
     name: "beneficiaryWithdraw",
     outputs: [
       {
@@ -302,15 +243,9 @@ const _abi = [
     name: "curatorFee",
     outputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        internalType: "address",
-        name: "",
-        type: "address",
-=======
         internalType: "uint256",
         name: "",
         type: "uint256",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
       },
     ],
     stateMutability: "view",
@@ -331,22 +266,6 @@ const _abi = [
   },
   {
     inputs: [],
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    name: "deadline",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
     name: "funded",
     outputs: [
       {
@@ -379,11 +298,7 @@ const _abi = [
           },
           {
             internalType: "bytes32",
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-            name: "cwUrl",
-=======
             name: "url",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
             type: "bytes32",
           },
           {
@@ -409,11 +324,7 @@ const _abi = [
             type: "uint256",
           },
           {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-            internalType: "address payable",
-=======
             internalType: "address",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
             name: "beneficiary",
             type: "address",
           },
@@ -435,11 +346,7 @@ const _abi = [
             type: "uint8",
           },
           {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-            internalType: "address payable",
-=======
             internalType: "address",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
             name: "feeTo",
             type: "address",
           },
@@ -511,11 +418,7 @@ const _abi = [
           },
           {
             internalType: "bytes32",
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-            name: "cwUrl",
-=======
             name: "url",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
             type: "bytes32",
           },
           {
@@ -534,14 +437,6 @@ const _abi = [
   },
   {
     inputs: [],
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    name: "protocolFee",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-=======
     name: "projectData",
     outputs: [
       {
@@ -570,7 +465,6 @@ const _abi = [
         internalType: "struct DataTypes.ProjectData",
         name: "",
         type: "tuple",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
       },
     ],
     stateMutability: "view",
@@ -578,14 +472,6 @@ const _abi = [
   },
   {
     inputs: [],
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    name: "protocolFeeTo",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-=======
     name: "protocolData",
     outputs: [
       {
@@ -604,7 +490,6 @@ const _abi = [
         internalType: "struct DataTypes.ProtocolData",
         name: "",
         type: "tuple",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
       },
     ],
     stateMutability: "view",
@@ -637,18 +522,6 @@ const _abi = [
     type: "function",
   },
   {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-    inputs: [],
-    name: "threshold",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-=======
     inputs: [
       {
         internalType: "bytes32",
@@ -659,7 +532,6 @@ const _abi = [
     name: "setUrl",
     outputs: [],
     stateMutability: "nonpayable",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
     type: "function",
   },
   {
@@ -667,15 +539,9 @@ const _abi = [
     name: "totalCuratorFunding",
     outputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-        internalType: "address",
-        name: "",
-        type: "address",
-=======
         internalType: "uint256",
         name: "",
         type: "uint256",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
       },
     ],
     stateMutability: "view",
@@ -694,8 +560,6 @@ const _abi = [
     stateMutability: "view",
     type: "function",
   },
-<<<<<<< HEAD:shared/eth/types/factories/ICuratedProject__factory.ts
-=======
   {
     inputs: [],
     name: "withdrawRemaining",
@@ -709,5 +573,4 @@ const _abi = [
     stateMutability: "view",
     type: "function",
   },
->>>>>>> master:packages/chain-events/src/contractTypes/factories/ICuratedProject__factory.ts
 ];

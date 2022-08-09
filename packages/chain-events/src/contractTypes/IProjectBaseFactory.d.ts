@@ -30,11 +30,7 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
     "protocolData()": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
     "setProjectImpl(address)": FunctionFragment;
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    "setProtocolFee(uint256)": FunctionFragment;
-=======
     "setProtocolFee(uint8)": FunctionFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
   };
 
   encodeFunctionData(
@@ -103,11 +99,6 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
 
   events: {
     "ProjectCreated(uint256,address)": EventFragment;
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-  };
-
-  getEvent(nameOrSignatureOrTopic: "ProjectCreated"): EventFragment;
-=======
     "ProjectImplChange(address,address)": EventFragment;
     "ProtocolFeeChange(uint8,uint8)": EventFragment;
     "ProtocolFeeToChange(address,address)": EventFragment;
@@ -119,7 +110,6 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ProtocolFeeChange"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProtocolFeeToChange"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProtocolTokenImplChange"): EventFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
 }
 
 export class IProjectBaseFactory extends Contract {
@@ -186,15 +176,9 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    numProjects(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "numProjects()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-=======
     numProjects(overrides?: CallOverrides): Promise<[number]>;
 
     "numProjects()"(overrides?: CallOverrides): Promise<[number]>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -247,11 +231,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    "setProtocolFee(uint256)"(
-=======
     "setProtocolFee(uint8)"(
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -274,15 +254,9 @@ export class IProjectBaseFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-  numProjects(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
   numProjects(overrides?: CallOverrides): Promise<number>;
 
   "numProjects()"(overrides?: CallOverrides): Promise<number>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -335,11 +309,7 @@ export class IProjectBaseFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-  "setProtocolFee(uint256)"(
-=======
   "setProtocolFee(uint8)"(
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
     _protocolFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -362,15 +332,9 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    numProjects(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     numProjects(overrides?: CallOverrides): Promise<number>;
 
     "numProjects()"(overrides?: CallOverrides): Promise<number>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -420,11 +384,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    "setProtocolFee(uint256)"(
-=======
     "setProtocolFee(uint8)"(
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
       _protocolFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -433,13 +393,6 @@ export class IProjectBaseFactory extends Contract {
   filters: {
     ProjectCreated(
       projectIndex: null,
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-      newProject: null
-    ): TypedEventFilter<
-      [BigNumber, string],
-      { projectIndex: BigNumber; newProject: string }
-    >;
-=======
       projectAddress: null
     ): TypedEventFilter<
       [BigNumber, string],
@@ -465,7 +418,6 @@ export class IProjectBaseFactory extends Contract {
       oldAddr: null,
       newAddr: null
     ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
   };
 
   estimateGas: {
@@ -540,11 +492,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    "setProtocolFee(uint256)"(
-=======
     "setProtocolFee(uint8)"(
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -622,11 +570,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBaseFactory.d.ts
-    "setProtocolFee(uint256)"(
-=======
     "setProtocolFee(uint8)"(
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBaseFactory.d.ts
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

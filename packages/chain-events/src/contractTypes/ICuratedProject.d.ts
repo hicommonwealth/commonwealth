@@ -21,45 +21,18 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ICuratedProjectInterface extends ethers.utils.Interface {
   functions: {
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    "acceptedToken()": FunctionFragment;
     "bToken()": FunctionFragment;
     "back(uint256)": FunctionFragment;
     "backersWithdraw()": FunctionFragment;
-    "beneficiary()": FunctionFragment;
-=======
-    "bToken()": FunctionFragment;
-    "back(uint256)": FunctionFragment;
-    "backersWithdraw()": FunctionFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     "beneficiaryWithdraw()": FunctionFragment;
     "cToken()": FunctionFragment;
     "curate(uint256)": FunctionFragment;
     "curatorFee()": FunctionFragment;
     "curatorsWithdraw()": FunctionFragment;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    "deadline()": FunctionFragment;
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     "funded()": FunctionFragment;
     "initialize(tuple,tuple,tuple,uint256,address,address)": FunctionFragment;
     "lockedWithdraw()": FunctionFragment;
     "metaData()": FunctionFragment;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    "protocolFee()": FunctionFragment;
-    "protocolFeeTo()": FunctionFragment;
-    "setIpfsHash(bytes32)": FunctionFragment;
-    "setName(bytes32)": FunctionFragment;
-    "threshold()": FunctionFragment;
-    "totalCuratorFunding()": FunctionFragment;
-    "totalFunding()": FunctionFragment;
-  };
-
-  encodeFunctionData(
-    functionFragment: "acceptedToken",
-    values?: undefined
-  ): string;
-=======
     "projectData()": FunctionFragment;
     "protocolData()": FunctionFragment;
     "setIpfsHash(bytes32)": FunctionFragment;
@@ -70,7 +43,6 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     "withdrawRemaining()": FunctionFragment;
   };
 
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   encodeFunctionData(functionFragment: "bToken", values?: undefined): string;
   encodeFunctionData(functionFragment: "back", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -78,13 +50,6 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    functionFragment: "beneficiary",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     functionFragment: "beneficiaryWithdraw",
     values?: undefined
   ): string;
@@ -101,10 +66,6 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     functionFragment: "curatorsWithdraw",
     values?: undefined
   ): string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
@@ -113,11 +74,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       {
@@ -138,19 +95,11 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "metaData", values?: undefined): string;
   encodeFunctionData(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    functionFragment: "protocolFee",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "protocolFeeTo",
-=======
     functionFragment: "projectData",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "protocolData",
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -158,11 +107,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "setName", values: [BytesLike]): string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  encodeFunctionData(functionFragment: "threshold", values?: undefined): string;
-=======
   encodeFunctionData(functionFragment: "setUrl", values: [BytesLike]): string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   encodeFunctionData(
     functionFragment: "totalCuratorFunding",
     values?: undefined
@@ -171,19 +116,11 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     functionFragment: "totalFunding",
     values?: undefined
   ): string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-
-  decodeFunctionResult(
-    functionFragment: "acceptedToken",
-    data: BytesLike
-  ): Result;
-=======
   encodeFunctionData(
     functionFragment: "withdrawRemaining",
     values?: undefined
   ): string;
 
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   decodeFunctionResult(functionFragment: "bToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "back", data: BytesLike): Result;
   decodeFunctionResult(
@@ -191,13 +128,6 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    functionFragment: "beneficiary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     functionFragment: "beneficiaryWithdraw",
     data: BytesLike
   ): Result;
@@ -208,10 +138,6 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     functionFragment: "curatorsWithdraw",
     data: BytesLike
   ): Result;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  decodeFunctionResult(functionFragment: "deadline", data: BytesLike): Result;
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   decodeFunctionResult(functionFragment: "funded", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
@@ -220,19 +146,11 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "metaData", data: BytesLike): Result;
   decodeFunctionResult(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    functionFragment: "protocolFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "protocolFeeTo",
-=======
     functionFragment: "projectData",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "protocolData",
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -240,11 +158,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  decodeFunctionResult(functionFragment: "threshold", data: BytesLike): Result;
-=======
   decodeFunctionResult(functionFragment: "setUrl", data: BytesLike): Result;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   decodeFunctionResult(
     functionFragment: "totalCuratorFunding",
     data: BytesLike
@@ -253,22 +167,16 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     functionFragment: "totalFunding",
     data: BytesLike
   ): Result;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
   decodeFunctionResult(
     functionFragment: "withdrawRemaining",
     data: BytesLike
   ): Result;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
   events: {
     "Back(address,address,uint256)": EventFragment;
     "Curate(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
     "ProjectDataChange(bytes32,bytes32,bytes32)": EventFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     "Succeeded(uint256,uint256)": EventFragment;
     "Withdraw(address,address,uint256,bytes32)": EventFragment;
   };
@@ -276,10 +184,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Curate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Failed"): EventFragment;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
   getEvent(nameOrSignatureOrTopic: "ProjectDataChange"): EventFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   getEvent(nameOrSignatureOrTopic: "Succeeded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
@@ -328,13 +233,6 @@ export class ICuratedProject extends Contract {
   interface: ICuratedProjectInterface;
 
   functions: {
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<[string]>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<[string]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     bToken(overrides?: CallOverrides): Promise<[string]>;
 
     "bToken()"(overrides?: CallOverrides): Promise<[string]>;
@@ -357,13 +255,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<[string]>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<[string]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -386,15 +277,9 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    curatorFee(overrides?: CallOverrides): Promise<[string]>;
-
-    "curatorFee()"(overrides?: CallOverrides): Promise<[string]>;
-=======
     curatorFee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "curatorFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     curatorsWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -404,13 +289,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    deadline(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     funded(overrides?: CallOverrides): Promise<[boolean]>;
 
     "funded()"(overrides?: CallOverrides): Promise<[boolean]>;
@@ -420,11 +298,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -445,11 +319,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -477,11 +347,7 @@ export class ICuratedProject extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-          cwUrl: string;
-=======
           url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
           creator: string;
         }
       ]
@@ -495,25 +361,12 @@ export class ICuratedProject extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-          cwUrl: string;
-=======
           url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
           creator: string;
         }
       ]
     >;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<[string]>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<[string]>;
-=======
     projectData(
       overrides?: CallOverrides
     ): Promise<
@@ -547,7 +400,6 @@ export class ICuratedProject extends Contract {
     "protocolData()"(
       overrides?: CallOverrides
     ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -569,15 +421,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    threshold(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    totalCuratorFunding(overrides?: CallOverrides): Promise<[string]>;
-
-    "totalCuratorFunding()"(overrides?: CallOverrides): Promise<[string]>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -591,26 +434,16 @@ export class ICuratedProject extends Contract {
     totalCuratorFunding(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalCuratorFunding()"(overrides?: CallOverrides): Promise<[BigNumber]>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  };
-
-  acceptedToken(overrides?: CallOverrides): Promise<string>;
-
-  "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
-
-=======
 
     withdrawRemaining(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "withdrawRemaining()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   bToken(overrides?: CallOverrides): Promise<string>;
 
   "bToken()"(overrides?: CallOverrides): Promise<string>;
@@ -633,13 +466,6 @@ export class ICuratedProject extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  beneficiary(overrides?: CallOverrides): Promise<string>;
-
-  "beneficiary()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   beneficiaryWithdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -662,15 +488,9 @@ export class ICuratedProject extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  curatorFee(overrides?: CallOverrides): Promise<string>;
-
-  "curatorFee()"(overrides?: CallOverrides): Promise<string>;
-=======
   curatorFee(overrides?: CallOverrides): Promise<BigNumber>;
 
   "curatorFee()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
   curatorsWithdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -680,13 +500,6 @@ export class ICuratedProject extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   funded(overrides?: CallOverrides): Promise<boolean>;
 
   "funded()"(overrides?: CallOverrides): Promise<boolean>;
@@ -696,11 +509,7 @@ export class ICuratedProject extends Contract {
       id: BigNumberish;
       name: BytesLike;
       ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      cwUrl: BytesLike;
-=======
       url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       creator: string;
     },
     _projectData: {
@@ -721,11 +530,7 @@ export class ICuratedProject extends Contract {
       id: BigNumberish;
       name: BytesLike;
       ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      cwUrl: BytesLike;
-=======
       url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       creator: string;
     },
     _projectData: {
@@ -752,11 +557,7 @@ export class ICuratedProject extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      cwUrl: string;
-=======
       url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       creator: string;
     }
   >;
@@ -768,24 +569,11 @@ export class ICuratedProject extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      cwUrl: string;
-=======
       url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       creator: string;
     }
   >;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  protocolFeeTo(overrides?: CallOverrides): Promise<string>;
-
-  "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
-=======
   projectData(
     overrides?: CallOverrides
   ): Promise<
@@ -815,7 +603,6 @@ export class ICuratedProject extends Contract {
   "protocolData()"(
     overrides?: CallOverrides
   ): Promise<[number, string] & { fee: number; feeTo: string }>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
   setIpfsHash(
     _ipfsHash: BytesLike,
@@ -837,15 +624,6 @@ export class ICuratedProject extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalCuratorFunding(overrides?: CallOverrides): Promise<string>;
-
-  "totalCuratorFunding()"(overrides?: CallOverrides): Promise<string>;
-=======
   setUrl(
     _url: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -859,25 +637,16 @@ export class ICuratedProject extends Contract {
   totalCuratorFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalCuratorFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
   totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  callStatic: {
-    acceptedToken(overrides?: CallOverrides): Promise<string>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
-
-=======
   withdrawRemaining(overrides?: CallOverrides): Promise<BigNumber>;
 
   "withdrawRemaining()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     bToken(overrides?: CallOverrides): Promise<string>;
 
     "bToken()"(overrides?: CallOverrides): Promise<string>;
@@ -893,13 +662,6 @@ export class ICuratedProject extends Contract {
 
     "backersWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<string>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     beneficiaryWithdraw(overrides?: CallOverrides): Promise<boolean>;
 
     "beneficiaryWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
@@ -915,27 +677,14 @@ export class ICuratedProject extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    curatorFee(overrides?: CallOverrides): Promise<string>;
-
-    "curatorFee()"(overrides?: CallOverrides): Promise<string>;
-=======
     curatorFee(overrides?: CallOverrides): Promise<BigNumber>;
 
     "curatorFee()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     curatorsWithdraw(overrides?: CallOverrides): Promise<boolean>;
 
     "curatorsWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     funded(overrides?: CallOverrides): Promise<boolean>;
 
     "funded()"(overrides?: CallOverrides): Promise<boolean>;
@@ -945,11 +694,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -970,11 +715,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -1001,11 +742,7 @@ export class ICuratedProject extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: string;
-=======
         url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       }
     >;
@@ -1017,24 +754,11 @@ export class ICuratedProject extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: string;
-=======
         url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       }
     >;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<string>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
-=======
     projectData(
       overrides?: CallOverrides
     ): Promise<
@@ -1064,7 +788,6 @@ export class ICuratedProject extends Contract {
     "protocolData()"(
       overrides?: CallOverrides
     ): Promise<[number, string] & { fee: number; feeTo: string }>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -1080,15 +803,6 @@ export class ICuratedProject extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    totalCuratorFunding(overrides?: CallOverrides): Promise<string>;
-
-    "totalCuratorFunding()"(overrides?: CallOverrides): Promise<string>;
-=======
     setUrl(_url: BytesLike, overrides?: CallOverrides): Promise<void>;
 
     "setUrl(bytes32)"(
@@ -1099,29 +813,20 @@ export class ICuratedProject extends Contract {
     totalCuratorFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalCuratorFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
 
     withdrawRemaining(overrides?: CallOverrides): Promise<BigNumber>;
 
     "withdrawRemaining()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   };
 
   filters: {
     Back(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      sender: null,
-      token: null,
-=======
       sender: string | null,
       token: string | null,
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       amount: null
     ): TypedEventFilter<
       [string, string, BigNumber],
@@ -1129,13 +834,8 @@ export class ICuratedProject extends Contract {
     >;
 
     Curate(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      sender: null,
-      token: null,
-=======
       sender: string | null,
       token: string | null,
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       amount: null
     ): TypedEventFilter<
       [string, string, BigNumber],
@@ -1144,8 +844,6 @@ export class ICuratedProject extends Contract {
 
     Failed(): TypedEventFilter<[], {}>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
     ProjectDataChange(
       name: null,
       oldData: null,
@@ -1155,7 +853,6 @@ export class ICuratedProject extends Contract {
       { name: string; oldData: string; newData: string }
     >;
 
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     Succeeded(
       timestamp: null,
       amount: null
@@ -1165,13 +862,8 @@ export class ICuratedProject extends Contract {
     >;
 
     Withdraw(
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-      sender: null,
-      token: null,
-=======
       sender: string | null,
       token: string | null,
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
       amount: null,
       withdrawalType: null
     ): TypedEventFilter<
@@ -1186,13 +878,6 @@ export class ICuratedProject extends Contract {
   };
 
   estimateGas: {
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     bToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     "bToken()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1215,13 +900,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1256,13 +934,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     funded(overrides?: CallOverrides): Promise<BigNumber>;
 
     "funded()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1272,11 +943,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -1297,11 +964,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -1325,15 +988,6 @@ export class ICuratedProject extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     projectData(overrides?: CallOverrides): Promise<BigNumber>;
 
     "projectData()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1341,7 +995,6 @@ export class ICuratedProject extends Contract {
     protocolData(overrides?: CallOverrides): Promise<BigNumber>;
 
     "protocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -1363,11 +1016,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1377,7 +1025,6 @@ export class ICuratedProject extends Contract {
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     totalCuratorFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1386,15 +1033,6 @@ export class ICuratedProject extends Contract {
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-  };
-
-  populateTransaction: {
-    acceptedToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
 
     withdrawRemaining(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1402,7 +1040,6 @@ export class ICuratedProject extends Contract {
   };
 
   populateTransaction: {
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     bToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "bToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1425,13 +1062,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1466,13 +1096,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    deadline(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
     funded(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "funded()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1482,11 +1105,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -1507,11 +1126,7 @@ export class ICuratedProject extends Contract {
         id: BigNumberish;
         name: BytesLike;
         ipfsHash: BytesLike;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-        cwUrl: BytesLike;
-=======
         url: BytesLike;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
         creator: string;
       },
       _projectData: {
@@ -1537,15 +1152,6 @@ export class ICuratedProject extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-=======
     projectData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "projectData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1553,7 +1159,6 @@ export class ICuratedProject extends Contract {
     protocolData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "protocolData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -1575,11 +1180,6 @@ export class ICuratedProject extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-    threshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1589,7 +1189,6 @@ export class ICuratedProject extends Contract {
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
 
     totalCuratorFunding(
       overrides?: CallOverrides
@@ -1602,14 +1201,11 @@ export class ICuratedProject extends Contract {
     totalFunding(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-<<<<<<< HEAD:shared/eth/types/ICuratedProject.d.ts
-=======
 
     withdrawRemaining(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "withdrawRemaining()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/ICuratedProject.d.ts
   };
 }

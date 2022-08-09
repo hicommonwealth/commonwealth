@@ -21,29 +21,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IProjectBaseInterface extends ethers.utils.Interface {
   functions: {
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    "acceptedToken()": FunctionFragment;
-    "back(uint256)": FunctionFragment;
-    "backersWithdraw()": FunctionFragment;
-    "beneficiary()": FunctionFragment;
-    "beneficiaryWithdraw()": FunctionFragment;
-    "deadline()": FunctionFragment;
-    "funded()": FunctionFragment;
-    "lockedWithdraw()": FunctionFragment;
-    "metaData()": FunctionFragment;
-    "protocolFee()": FunctionFragment;
-    "protocolFeeTo()": FunctionFragment;
-    "setIpfsHash(bytes32)": FunctionFragment;
-    "setName(bytes32)": FunctionFragment;
-    "threshold()": FunctionFragment;
-    "totalFunding()": FunctionFragment;
-  };
-
-  encodeFunctionData(
-    functionFragment: "acceptedToken",
-    values?: undefined
-  ): string;
-=======
     "back(uint256)": FunctionFragment;
     "backersWithdraw()": FunctionFragment;
     "beneficiaryWithdraw()": FunctionFragment;
@@ -58,27 +35,15 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     "totalFunding()": FunctionFragment;
   };
 
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   encodeFunctionData(functionFragment: "back", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "backersWithdraw",
     values?: undefined
   ): string;
   encodeFunctionData(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    functionFragment: "beneficiary",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "beneficiaryWithdraw",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
-=======
-    functionFragment: "beneficiaryWithdraw",
-    values?: undefined
-  ): string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lockedWithdraw",
@@ -86,19 +51,11 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "metaData", values?: undefined): string;
   encodeFunctionData(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    functionFragment: "protocolFee",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "protocolFeeTo",
-=======
     functionFragment: "projectData",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "protocolData",
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -106,43 +63,21 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "setName", values: [BytesLike]): string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  encodeFunctionData(functionFragment: "threshold", values?: undefined): string;
-=======
   encodeFunctionData(functionFragment: "setUrl", values: [BytesLike]): string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   encodeFunctionData(
     functionFragment: "totalFunding",
     values?: undefined
   ): string;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  decodeFunctionResult(
-    functionFragment: "acceptedToken",
-    data: BytesLike
-  ): Result;
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   decodeFunctionResult(functionFragment: "back", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "backersWithdraw",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    functionFragment: "beneficiary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "beneficiaryWithdraw",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "deadline", data: BytesLike): Result;
-=======
-    functionFragment: "beneficiaryWithdraw",
-    data: BytesLike
-  ): Result;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   decodeFunctionResult(functionFragment: "funded", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockedWithdraw",
@@ -150,19 +85,11 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "metaData", data: BytesLike): Result;
   decodeFunctionResult(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    functionFragment: "protocolFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "protocolFeeTo",
-=======
     functionFragment: "projectData",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "protocolData",
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -170,11 +97,7 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  decodeFunctionResult(functionFragment: "threshold", data: BytesLike): Result;
-=======
   decodeFunctionResult(functionFragment: "setUrl", data: BytesLike): Result;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   decodeFunctionResult(
     functionFragment: "totalFunding",
     data: BytesLike
@@ -183,20 +106,14 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   events: {
     "Back(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-=======
     "ProjectDataChange(bytes32,bytes32,bytes32)": EventFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     "Succeeded(uint256,uint256)": EventFragment;
     "Withdraw(address,address,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Failed"): EventFragment;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-=======
   getEvent(nameOrSignatureOrTopic: "ProjectDataChange"): EventFragment;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   getEvent(nameOrSignatureOrTopic: "Succeeded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
@@ -245,13 +162,6 @@ export class IProjectBase extends Contract {
   interface: IProjectBaseInterface;
 
   functions: {
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<[string]>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<[string]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -270,13 +180,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<[string]>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<[string]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -285,13 +188,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    deadline(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     funded(overrides?: CallOverrides): Promise<[boolean]>;
 
     "funded()"(overrides?: CallOverrides): Promise<[boolean]>;
@@ -308,11 +204,7 @@ export class IProjectBase extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-          cwUrl: string;
-=======
           url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
           creator: string;
         }
       ]
@@ -326,25 +218,12 @@ export class IProjectBase extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-          cwUrl: string;
-=======
           url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
           creator: string;
         }
       ]
     >;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<[string]>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<[string]>;
-=======
     projectData(
       overrides?: CallOverrides
     ): Promise<
@@ -378,7 +257,6 @@ export class IProjectBase extends Contract {
     "protocolData()"(
       overrides?: CallOverrides
     ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -400,11 +278,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    threshold(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -414,20 +287,12 @@ export class IProjectBase extends Contract {
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  acceptedToken(overrides?: CallOverrides): Promise<string>;
-
-  "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   back(
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -446,13 +311,6 @@ export class IProjectBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  beneficiary(overrides?: CallOverrides): Promise<string>;
-
-  "beneficiary()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   beneficiaryWithdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -461,13 +319,6 @@ export class IProjectBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
   funded(overrides?: CallOverrides): Promise<boolean>;
 
   "funded()"(overrides?: CallOverrides): Promise<boolean>;
@@ -483,11 +334,7 @@ export class IProjectBase extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-      cwUrl: string;
-=======
       url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
       creator: string;
     }
   >;
@@ -499,24 +346,11 @@ export class IProjectBase extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-      cwUrl: string;
-=======
       url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
       creator: string;
     }
   >;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-  protocolFeeTo(overrides?: CallOverrides): Promise<string>;
-
-  "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
-=======
   projectData(
     overrides?: CallOverrides
   ): Promise<
@@ -546,7 +380,6 @@ export class IProjectBase extends Contract {
   "protocolData()"(
     overrides?: CallOverrides
   ): Promise<[number, string] & { fee: number; feeTo: string }>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
   setIpfsHash(
     _ipfsHash: BytesLike,
@@ -568,11 +401,6 @@ export class IProjectBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-  threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-  "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
   setUrl(
     _url: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -582,20 +410,12 @@ export class IProjectBase extends Contract {
     _url: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
   totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<string>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     back(_amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     "back(uint256)"(
@@ -607,24 +427,10 @@ export class IProjectBase extends Contract {
 
     "backersWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<string>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<string>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     beneficiaryWithdraw(overrides?: CallOverrides): Promise<boolean>;
 
     "beneficiaryWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     funded(overrides?: CallOverrides): Promise<boolean>;
 
     "funded()"(overrides?: CallOverrides): Promise<boolean>;
@@ -640,11 +446,7 @@ export class IProjectBase extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-        cwUrl: string;
-=======
         url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
         creator: string;
       }
     >;
@@ -656,24 +458,11 @@ export class IProjectBase extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-        cwUrl: string;
-=======
         url: string;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
         creator: string;
       }
     >;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<string>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
-=======
     projectData(
       overrides?: CallOverrides
     ): Promise<
@@ -703,7 +492,6 @@ export class IProjectBase extends Contract {
     "protocolData()"(
       overrides?: CallOverrides
     ): Promise<[number, string] & { fee: number; feeTo: string }>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -719,18 +507,12 @@ export class IProjectBase extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     setUrl(_url: BytesLike, overrides?: CallOverrides): Promise<void>;
 
     "setUrl(bytes32)"(
       _url: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -739,13 +521,8 @@ export class IProjectBase extends Contract {
 
   filters: {
     Back(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-      sender: null,
-      token: null,
-=======
       sender: string | null,
       token: string | null,
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
       amount: null
     ): TypedEventFilter<
       [string, string, BigNumber],
@@ -754,8 +531,6 @@ export class IProjectBase extends Contract {
 
     Failed(): TypedEventFilter<[], {}>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-=======
     ProjectDataChange(
       name: null,
       oldData: null,
@@ -765,7 +540,6 @@ export class IProjectBase extends Contract {
       { name: string; oldData: string; newData: string }
     >;
 
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     Succeeded(
       timestamp: null,
       amount: null
@@ -775,13 +549,8 @@ export class IProjectBase extends Contract {
     >;
 
     Withdraw(
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-      sender: null,
-      token: null,
-=======
       sender: string | null,
       token: string | null,
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
       amount: null,
       withdrawalType: null
     ): TypedEventFilter<
@@ -796,13 +565,6 @@ export class IProjectBase extends Contract {
   };
 
   estimateGas: {
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -821,13 +583,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -836,13 +591,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    deadline(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     funded(overrides?: CallOverrides): Promise<BigNumber>;
 
     "funded()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -855,15 +603,6 @@ export class IProjectBase extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     projectData(overrides?: CallOverrides): Promise<BigNumber>;
 
     "projectData()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -871,7 +610,6 @@ export class IProjectBase extends Contract {
     protocolData(overrides?: CallOverrides): Promise<BigNumber>;
 
     "protocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -893,11 +631,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    threshold(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -907,7 +640,6 @@ export class IProjectBase extends Contract {
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -915,13 +647,6 @@ export class IProjectBase extends Contract {
   };
 
   populateTransaction: {
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    acceptedToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "acceptedToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -940,13 +665,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "beneficiary()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -955,13 +673,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    deadline(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "deadline()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-=======
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
     funded(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "funded()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -976,15 +687,6 @@ export class IProjectBase extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    protocolFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "protocolFee()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    protocolFeeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "protocolFeeTo()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-=======
     projectData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "projectData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -992,7 +694,6 @@ export class IProjectBase extends Contract {
     protocolData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "protocolData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -1014,11 +715,6 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-<<<<<<< HEAD:shared/eth/types/IProjectBase.d.ts
-    threshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "threshold()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-=======
     setUrl(
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1028,7 +724,6 @@ export class IProjectBase extends Contract {
       _url: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
->>>>>>> master:packages/chain-events/src/contractTypes/IProjectBase.d.ts
 
     totalFunding(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

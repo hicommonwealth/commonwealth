@@ -29,11 +29,7 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-        name: "newProject",
-=======
         name: "projectAddress",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
         type: "address",
       },
     ],
@@ -41,8 +37,6 @@ const _abi = [
     type: "event",
   },
   {
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-=======
     anonymous: false,
     inputs: [
       {
@@ -119,7 +113,6 @@ const _abi = [
     type: "event",
   },
   {
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
     inputs: [
       {
         internalType: "address[]",
@@ -156,15 +149,9 @@ const _abi = [
     name: "numProjects",
     outputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-=======
         internalType: "uint32",
         name: "",
         type: "uint32",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
       },
     ],
     stateMutability: "view",
@@ -227,11 +214,7 @@ const _abi = [
             type: "uint8",
           },
           {
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-            internalType: "address payable",
-=======
             internalType: "address",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
             name: "feeTo",
             type: "address",
           },
@@ -247,11 +230,7 @@ const _abi = [
   {
     inputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-        internalType: "address payable",
-=======
         internalType: "address",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
         name: "_feeTo",
         type: "address",
       },
@@ -277,15 +256,9 @@ const _abi = [
   {
     inputs: [
       {
-<<<<<<< HEAD:shared/eth/types/factories/IProjectBaseFactory__factory.ts
-        internalType: "uint256",
-        name: "_protocolFee",
-        type: "uint256",
-=======
         internalType: "uint8",
         name: "_protocolFee",
         type: "uint8",
->>>>>>> master:packages/chain-events/src/contractTypes/factories/IProjectBaseFactory__factory.ts
       },
     ],
     name: "setProtocolFee",
