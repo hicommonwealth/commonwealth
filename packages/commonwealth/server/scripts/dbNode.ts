@@ -146,11 +146,6 @@ async function mainProcess(
   let myChainData = allChains.filter(
     (chain, index) => index % numWorkers === workerNumber
   );
-<<<<<<< HEAD:server/scripts/dbNode.ts
-
-  console.log(myChainData);
-=======
->>>>>>> master:packages/commonwealth/server/scripts/dbNode.ts
   // passed to listeners that support it
   const discoverReconnectRange = async (chain: string) => {
     let latestBlock;
