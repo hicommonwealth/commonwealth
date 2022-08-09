@@ -1,0 +1,34 @@
+@import 'shared';
+
+.ConfirmSnapshotVoteModal {
+  width: 480px;
+
+  @include extraSmall {
+    width: 100%;
+  }
+
+  .vote-info {
+    border: 2px solid $primary-300;
+    border-radius: $border-radius-corners;
+    display: flex;
+    flex-direction: column;
+    margin: 16px 0;
+    padding: 8px;
+
+    .vote-info-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      .Text {
+        color: $primary-500;
+      }
+    }
+  }
+
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

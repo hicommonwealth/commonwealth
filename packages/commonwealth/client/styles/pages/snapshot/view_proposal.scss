@@ -1,0 +1,325 @@
+@import 'shared.scss';
+
+.topic-loading-spinner-wrap {
+  height: 120px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin padding-x-20 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.SnapshotViewProposalPage {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  .proposal-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+
+    .proposal-content {
+      width: 100%;
+      margin-right: 40px;
+
+      .snapshot-proposal-title {
+        margin-top: 24px;
+        font-size: 32px;
+        font-weight: 500;
+      }
+
+      .snapshot-proposal-hash {
+        font-weight: 600;
+        color: $neutral-600;
+        margin-top: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .ProposalBodyText {
+        margin-top: 32px;
+      }
+
+      .votes-title {
+        margin-top: 64px;
+        display: flex;
+        align-items: baseline;
+
+        .title {
+          font-size: 24px;
+          font-weight: 500;
+          margin-right: 8px;
+        }
+
+        .vote-count {
+          background-color: $neutral-600;
+          color: $white;
+          font-weight: 500;
+          border-radius: 9999px;
+          padding: 4px 8px;
+        }
+      }
+
+      .votes-container {
+        border: 2px solid $neutral-100;
+        border-radius: 10px;
+        background-color: $neutral-50;
+        margin-top: 18px;
+
+        .t-head {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 2px solid $neutral-100;
+          color: $neutral-600;
+          font-weight: 500;
+          padding: 18px 18px 14px;
+        }
+
+        .user-column {
+          width: 30%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .vote-column {
+          width: 40%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .power-column {
+          width: 25%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: right;
+        }
+
+        .vote-row {
+          display: flex;
+          padding: 18px 18px 14px;
+          justify-content: space-between;
+        }
+
+        .view-more-button {
+          text-transform: uppercase;
+          width: 100%;
+          padding: 18px 0 14px 0;
+          color: $purple-400;
+          border-top: 1px solid $neutral-100;
+        }
+      }
+    }
+
+    .proposal-info {
+      .proposal-info-box {
+        width: 336px;
+      }
+
+      .proposal-info-box,
+      .VoteAction {
+        border: 1px solid $neutral-100;
+        border-radius: 8px;
+        padding: 20px 0;
+        margin-top: 24px;
+        box-shadow: 0px 2px 6px 0px #0000001a;
+
+        & > * {
+          @include padding-x-20;
+        }
+
+        button {
+          margin: 0 20px;
+        }
+        .vote-button-group {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          margin-left: -20px;
+          .vote-message {
+            margin-top: 5px;
+            color: $neutral-600;
+          }
+        }
+      }
+
+      .box-title {
+        font-size: 32px;
+        font-weight: 500;
+      }
+
+      .info-block {
+        display: flex;
+        margin: 16px 0 4px;
+
+        .labels {
+          color: $neutral-600;
+          margin-right: 24px;
+          flex-shrink: 0;
+
+          & > * {
+            margin-bottom: 10px;
+          }
+        }
+
+        .values {
+          overflow: hidden;
+
+          svg {
+            margin-left: 4px;
+          }
+
+          .-mt-10 {
+            margin-top: -10px;
+          }
+
+          .snapshot-type {
+            text-transform: capitalize;
+          }
+
+          & > * {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 10px;
+          }
+        }
+      }
+
+      .linked-discussion {
+        border-top: 1px solid $neutral-100;
+        padding-top: 16px;
+      }
+
+      .heading-2 {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      .snapshot-votes {
+        margin-top: 8px;
+
+        .cui-radio {
+          display: block;
+          margin-bottom: 14px;
+        }
+      }
+
+      .result-choice {
+        font-weight: 500;
+        font-size: 24px;
+        margin-top: 24px;
+      }
+
+      .result-choice-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .vote-balance-for-choice {
+        flex-shrink: 1;
+      }
+
+      .font-medium {
+        font-weight: 500;
+      }
+
+      .symbol {
+        color: $neutral-600;
+        margin-left: 4px;
+      }
+
+      .result-progress {
+        width: 100%;
+      }
+
+      .result-progress::-webkit-progress-bar {
+        width: 100%;
+        height: 6px;
+        border-radius: 5px;
+        background-color: $neutral-100;
+      }
+
+      .result-progress::-webkit-progress-value {
+        border-radius: 5px;
+        background-color: $green-400;
+      }
+
+      .snapshot-link {
+        font-weight: 500;
+        color: $purple-400;
+        display: flex;
+      }
+
+      .truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .back-button {
+    color: $neutral-500;
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+
+    .back-icon {
+      margin-right: 14px;
+      transform: rotate(180deg);
+      opacity: 0.5;
+    }
+
+    .back-button-text {
+      text-transform: uppercase;
+    }
+  }
+
+  .snapshot-tabs {
+    margin-top: 24px;
+    margin-left: -15px;
+
+    @include mediumSmall {
+      display: none;
+    }
+  }
+}
+
+.proposal-tab {
+  .proposal-body {
+    .proposal-content {
+      @include small {
+        display: block;
+      }
+    }
+
+    .proposal-info {
+      @include small {
+        display: none;
+      }
+    }
+  }
+}
+
+.info-tab {
+  .proposal-body {
+    .proposal-content {
+      @include small {
+        display: none;
+      }
+    }
+
+    .proposal-info {
+      @include small {
+        display: block;
+      }
+    }
+  }
+}

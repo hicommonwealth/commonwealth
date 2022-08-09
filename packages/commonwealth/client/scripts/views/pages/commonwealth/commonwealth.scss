@@ -1,0 +1,54 @@
+@import 'client/styles/shared';
+
+.WhyCommonWealth {
+  height: 100%;
+  overflow-y: auto;
+}
+
+p.Gradient-purple-text {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+
+  background-size: 100%;
+  background: linear-gradient(
+    221.07deg,
+    #79e0e8 -342.51%,
+    #bf8e60 -240.83%,
+    #d69fcc -128.65%,
+    #6086d1 -14.94%,
+    #b37dba 72.35%
+  );
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+}
+
+div.WhyCommonWealthInitialSection {
+  div.SeeDocsButton {
+    a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
+      color: $neutral-800;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  }
+}
+
+div.SeeDocsButton {
+  a.btn-outline.text-xl.rounded-lg.pb-2.pt-3.px-3 {
+    color: $neutral-800;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+.cwTable {
+  min-width: 800px;
+}

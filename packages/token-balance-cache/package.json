@@ -1,0 +1,17 @@
+{
+  "name": "token-balance-cache",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "14.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicommonwealth/commonwealth.git"
+  },
+  "keywords": [],
+  "scripts": {
+  },
+  "dependencies": {
+  }
+}

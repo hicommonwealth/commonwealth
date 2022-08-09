@@ -1,0 +1,24 @@
+@import 'shared';
+
+.PreviewModal {
+  .compact-modal-body {
+    .QuillFormattedText {
+      margin: 25px 0;
+      max-height: 64vh;
+      overflow-y: auto;
+      width: 640px;
+    }
+
+    .empty-state-container {
+      align-items: center;
+      display: flex;
+      height: 400px;
+      justify-content: center;
+      width: 400px;
+
+      .empty-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+$small-icon: 16px;
+$medium-icon: 24px;
+$large-icon: 32px;
+$xl-icon: 48px;
+$xxl-icon: 60px;
+
+@mixin baseIconStyles {
+  fill: currentColor;
+  flex-shrink: 0;
+  height: 1em;
+  width: 1em;
+
+  &.small {
+    font-size: $small-icon;
+  }
+
+  &.medium {
+    font-size: $medium-icon;
+  }
+
+  &.large {
+    font-size: $large-icon;
+  }
+
+  &.xl {
+    font-size: $xl-icon;
+  }
+
+  &.xxl {
+    font-size: $xxl-icon;
+  }
+}

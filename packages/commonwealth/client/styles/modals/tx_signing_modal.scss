@@ -1,0 +1,25 @@
+@import 'shared';
+
+.TXSigningModal {
+  max-width: 480px;
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .TabBar {
+      margin: 0;
+    }
+
+    .cui-spinner {
+      margin: 24px;
+      width: 100%;
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+@import 'shared';
+
+.ConfirmModal {
+  max-width: 440px;
+
+  .compact-modal-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
