@@ -1,14 +1,20 @@
-import { web3Accounts, web3Enable, web3FromAddress, isWeb3Injected } from '@polkadot/extension-dapp';
+import {
+  web3Accounts,
+  web3Enable,
+  web3FromAddress,
+  isWeb3Injected,
+} from '@polkadot/extension-dapp';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-
 import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import AddressSwapper from 'views/components/addresses/address_swapper';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
-class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta> {
+class PolkadotWebWalletController
+  implements IWebWallet<InjectedAccountWithMeta>
+{
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];
@@ -37,7 +43,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
   public async getSigner(who: string): Promise<Signer> {
     // finds an injector for an address
     // web wallet stores addresses in testnet format for now, so we have to re-encode
-    const reencodedAddress = AddressSwapper({
+    const reencodedAddress = addressSwapper({
       address: who,
       currentPrefix: 42,
     });

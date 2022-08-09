@@ -62,7 +62,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
-import Poll from 'client/scripts/models/Poll';
+import Poll from 'models/Poll';
 import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,
@@ -130,6 +130,8 @@ import {
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -156,6 +158,7 @@ export interface IProposalPageState {
   recentlySubmitted: number; // comment ID for CSS highlight transitions
   replying: boolean;
   stageEditorIsOpen: boolean;
+  tabSelected: 'viewProposal' | 'viewSidebar';
   threadFetched;
   threadFetchFailed;
   tipAmount: number;
@@ -846,6 +849,9 @@ const ViewProposalPage: m.Component<
   },
   IProposalPageState
 > = {
+  oninit: (vnode) => {
+    vnode.state.tabSelected = 'viewProposal';
+  },
   oncreate: (vnode) => {
     // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
 
@@ -1318,15 +1324,33 @@ const ViewProposalPage: m.Component<
         ]
       );
     }
+
     const showLinkedSnapshotOptions =
       (proposal as Thread).snapshotProposal?.length > 0 ||
       (proposal as Thread).chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
+
     const showLinkedThreadOptions =
       (proposal as Thread).linkedThreads?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
+
+    window.onresize = () => {
+      if (
+        isWindowMediumSmallInclusive(window.innerWidth) &&
+        vnode.state.tabSelected !== 'viewProposal'
+      ) {
+        vnode.state.tabSelected = 'viewProposal';
+        m.redraw();
+      }
+    };
+
+    const sidebarCheck =
+      showLinkedSnapshotOptions ||
+      showLinkedThreadOptions ||
+      (proposal instanceof Thread && vnode.state.polls?.length > 0) ||
+      (proposal instanceof Thread && isAuthor);
 
     return m(
       Sublayout,
@@ -1335,8 +1359,164 @@ const ViewProposalPage: m.Component<
         title: headerTitle,
       },
       m('.ViewProposalPage', [
-        m('.view-proposal-page-container', [
-          [
+        sidebarCheck &&
+          m('.view-proposal-body-with-tabs', [
+            m(CWTabBar, [
+              m(CWTab, {
+                label: 'Proposal',
+                onclick: () => {
+                  vnode.state.tabSelected = 'viewProposal';
+                },
+                isSelected: vnode.state.tabSelected === 'viewProposal',
+              }),
+              m(CWTab, {
+                label: 'Info & Results',
+                onclick: () => {
+                  vnode.state.tabSelected = 'viewSidebar';
+                },
+                isSelected: vnode.state.tabSelected === 'viewSidebar',
+              }),
+            ]),
+            vnode.state.tabSelected === 'viewProposal' && [
+              m('.view-proposal-content-container', [
+                m(ProposalHeader, {
+                  proposal,
+                  commentCount,
+                  viewCount,
+                  getSetGlobalEditingStatus,
+                  proposalPageState: vnode.state,
+                  isAuthor,
+                  isEditor,
+                  isAdmin: isAdminOrMod,
+                  stageEditorIsOpen: vnode.state.stageEditorIsOpen,
+                  pollEditorIsOpen: vnode.state.pollEditorIsOpen,
+                  closeStageEditor: () => {
+                    vnode.state.stageEditorIsOpen = false;
+                    m.redraw();
+                  },
+                  closePollEditor: () => {
+                    vnode.state.pollEditorIsOpen = false;
+                    m.redraw();
+                  },
+                }),
+                !(proposal instanceof Thread) &&
+                  m(LinkedProposalsEmbed, { proposal }),
+                proposal instanceof AaveProposal && [
+                  m(AaveViewProposalSummary, { proposal }),
+                  m(AaveViewProposalDetail, { proposal }),
+                ],
+                !(proposal instanceof Thread) && m(VotingResults, { proposal }),
+                !(proposal instanceof Thread) && m(VotingActions, { proposal }),
+                m(ProposalComments, {
+                  proposal,
+                  comments,
+                  createdCommentCallback,
+                  getSetGlobalEditingStatus,
+                  proposalPageState: vnode.state,
+                  recentlySubmitted: vnode.state.recentlySubmitted,
+                  isAdmin: isAdminOrMod,
+                }),
+                !vnode.state.editing &&
+                  !vnode.state.parentCommentId &&
+                  m(CreateComment, {
+                    callback: createdCommentCallback,
+                    cancellable: true,
+                    getSetGlobalEditingStatus,
+                    proposalPageState: vnode.state,
+                    parentComment: null,
+                    rootProposal: proposal,
+                  }),
+              ]),
+            ],
+            vnode.state.tabSelected === 'viewSidebar' &&
+              m('.view-sidebar-content-container', [
+                showLinkedSnapshotOptions &&
+                  proposal instanceof Thread &&
+                  m(LinkedProposalsCard, {
+                    proposal,
+                    openStageEditor: () => {
+                      vnode.state.stageEditorIsOpen = true;
+                    },
+                    showAddProposalButton: isAuthor || isAdminOrMod,
+                  }),
+                showLinkedThreadOptions &&
+                  proposal instanceof Thread &&
+                  m(LinkedThreadsCard, {
+                    proposalId: proposal.id,
+                    allowLinking: isAuthor || isAdminOrMod,
+                  }),
+                proposal instanceof Thread &&
+                  [
+                    ...new Map(
+                      vnode.state.polls?.map((poll) => [poll.id, poll])
+                    ).values(),
+                  ].map((poll) => {
+                    return m(PollCard, {
+                      multiSelect: false,
+                      pollEnded:
+                        poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                      hasVoted:
+                        app.user.activeAccount &&
+                        poll.getUserVote(
+                          app.user.activeAccount?.chain?.id,
+                          app.user.activeAccount?.address
+                        ),
+                      disableVoteButton: !app.user.activeAccount,
+                      votedFor: poll.getUserVote(
+                        app.user.activeAccount?.chain?.id,
+                        app.user.activeAccount?.address
+                      )?.option,
+                      proposalTitle: poll.prompt,
+                      timeRemaining: getProposalPollTimestamp(
+                        poll,
+                        poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                      ),
+                      totalVoteCount: poll.votes?.length,
+                      voteInformation: poll.options.map((option) => {
+                        return {
+                          label: option,
+                          value: option,
+                          voteCount: poll.votes.filter(
+                            (v) => v.option === option
+                          ).length,
+                        };
+                      }),
+                      incrementalVoteCast: 1,
+                      tooltipErrorMessage: app.user.activeAccount
+                        ? null
+                        : 'You must join this community to vote.',
+                      onVoteCast: (option, isSelected, callback) =>
+                        handleProposalPollVote(
+                          poll,
+                          option,
+                          isSelected,
+                          callback
+                        ),
+                      onResultsClick: (e) => {
+                        e.preventDefault();
+                        if (poll.votes.length > 0) {
+                          app.modals.create({
+                            modal: OffchainVotingModal,
+                            data: { votes: poll.votes },
+                          });
+                        }
+                      },
+                    });
+                  }),
+                proposal instanceof Thread &&
+                  isAuthor &&
+                  (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
+                  m(PollEditorCard, {
+                    proposal,
+                    proposalAlreadyHasPolling: !vnode.state.polls?.length,
+                    openPollEditor: () => {
+                      vnode.state.pollEditorIsOpen = true;
+                    },
+                  }),
+              ]),
+          ]),
+        m(`.view-proposal-body ${sidebarCheck && '.hasSidebar'}`, [
+          m('.view-proposal-content-container', [
             m(ProposalHeader, {
               proposal,
               commentCount,
@@ -1384,10 +1564,8 @@ const ViewProposalPage: m.Component<
                 parentComment: null,
                 rootProposal: proposal,
               }),
-          ],
-        ]),
-        m('.right-content-container', [
-          [
+          ]),
+          m('.view-sidebar-content-container', [
             showLinkedSnapshotOptions &&
               proposal instanceof Thread &&
               m(LinkedProposalsCard, {
@@ -1455,17 +1633,17 @@ const ViewProposalPage: m.Component<
                   },
                 });
               }),
-          ],
-          proposal instanceof Thread &&
-            isAuthor &&
-            (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
-            m(PollEditorCard, {
-              proposal,
-              proposalAlreadyHasPolling: !vnode.state.polls?.length,
-              openPollEditor: () => {
-                vnode.state.pollEditorIsOpen = true;
-              },
-            }),
+            proposal instanceof Thread &&
+              isAuthor &&
+              (!app.chain?.meta?.adminOnlyPolling || isAdmin) &&
+              m(PollEditorCard, {
+                proposal,
+                proposalAlreadyHasPolling: !vnode.state.polls?.length,
+                openPollEditor: () => {
+                  vnode.state.pollEditorIsOpen = true;
+                },
+              }),
+          ]),
         ]),
       ])
     );

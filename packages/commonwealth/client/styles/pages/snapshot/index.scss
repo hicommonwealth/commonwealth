@@ -7,10 +7,6 @@
   padding: 24px;
 
   .proposal-body-with-tabs {
-    .TabBar {
-      margin-bottom: 8px;
-    }
-
     @include medium {
       display: none;
     }

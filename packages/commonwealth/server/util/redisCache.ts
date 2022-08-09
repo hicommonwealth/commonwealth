@@ -1,9 +1,19 @@
-import { createClient } from 'redis';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
 import { factory, formatFilename } from 'common-common/src/logging';
 import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
+import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+export function redisRetryStrategy(retries: number) {
+  if (retries > 5) {
+    return new Error('Redis max connection retries exceeded');
+  }
+  // timetable: 0, 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
+  // from 1 sec to 16.67 minutes
+  return (retries * 10) ** 3
+}
 
 /**
  * This class facilitates interacting with Redis and constructing a Redis Cache. Note that all keys must use a namespace
@@ -15,6 +25,11 @@ const log = factory.getLogger(formatFilename(__filename));
 export class RedisCache {
   private initialized = false;
   private client;
+  private rollbar?: Rollbar;
+
+  constructor(rollbar_?: Rollbar) {
+    this.rollbar = rollbar_;
+  }
 
   /**
    * Initializes the Redis client. Must be run before any Redis command can be executed.
@@ -29,33 +44,57 @@ export class RedisCache {
     }
     log.info(`Connecting to Redis at: ${REDIS_URL}`);
 
+    const localRedis = REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+    const vultrRedis = REDIS_URL.includes(VULTR_IP);
+
     if (!this.client) {
       const redisOptions = {};
-      // TODO: update this
-      if (
-        REDIS_URL.includes('localhost') ||
-        REDIS_URL.includes('127.0.0.1') ||
-        REDIS_URL.includes(VULTR_IP)
-      ) {
-        redisOptions['url'] = `redis://${REDIS_URL}`;
+      redisOptions['url'] = REDIS_URL;
+
+      if (localRedis || vultrRedis) {
+        redisOptions['socket'] = {
+          reconnectStrategy: redisRetryStrategy
+        };
       } else {
-        redisOptions['url'] = REDIS_URL;
         redisOptions['socket'] = {
           tls: true,
           rejectUnauthorized: false,
-          reconnectStrategy(retries: number): number | Error {
-            if (retries <= 5) {
-              return (retries * 10) ** 2;
-            } else {
-              return new Error('Failed to connect to Redis!');
-            }
-          },
+          reconnectStrategy: redisRetryStrategy
         };
       }
+
       this.client = createClient(redisOptions);
     }
 
-    this.client.on('error', (err) => log.error('Redis Client Error', err));
+    this.client.on('error', (err) => {
+      if (err instanceof ConnectionTimeoutError) {
+        log.error(
+          `RedisCache connection to ${REDIS_URL} timed out!`
+        );
+      } else if (err instanceof ReconnectStrategyError) {
+        log.error(`RedisCache max connection retries exceeded!`);
+        if (!localRedis && !vultrRedis)
+          this.rollbar.critical(
+            'RedisCache max connection retries exceeded! RedisCache client shutting down!'
+          );
+      } else if (err instanceof SocketClosedUnexpectedlyError) {
+        log.error(`RedisCache socket closed unexpectedly`);
+      } else {
+        log.error(`RedisCache connection error:`, err);
+        if (!localRedis && !vultrRedis)
+          this.rollbar.critical('RedisCache unknown connection error!', err);
+      }
+    });
+
+    this.client.on('ready', () => {
+      log.info("RedisCache connection ready");
+    })
+    this.client.on('reconnecting', () => {
+      log.info("RedisCache reconnecting");
+    })
+    this.client.on('end', () => {
+      log.info('RedisCache disconnected');
+    })
 
     if (!this.client.isOpen) {
       await this.client.connect();
@@ -105,6 +144,13 @@ export class RedisCache {
     namespace: RedisNamespaces,
     key: string
   ): Promise<string> {
+    if (!this.initialized) {
+      log.error(
+        'Redis client is not initialized. Run RedisCache.init() first!'
+      );
+      return;
+    }
+
     const finalKey = namespace + '_' + key;
     return await this.client.get(finalKey);
   }

@@ -8,22 +8,20 @@ import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { createClient } from 'redis';
-// import bcrypt from 'bcrypt';
+import {
+  ConnectionTimeoutError,
+  createClient,
+  ReconnectStrategyError, SocketClosedUnexpectedlyError
+} from "redis";
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import {
-  JWT_SECRET,
-  REDIS_URL,
-  WEBSOCKET_ADMIN_USERNAME,
-  WEBSOCKET_ADMIN_PASSWORD,
-} from '../config';
+import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
-import { RedisCache } from '../util/redisCache';
+import { RedisCache, redisRetryStrategy } from '../util/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -67,9 +65,17 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
-    log.trace(`Socket connected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
+    log.trace(
+      `Socket connected: socket_id = ${socket.id}, user_id = ${
+        (<any>socket).user.id
+      }`
+    );
     socket.on('disconnect', () => {
-      log.trace(`Socket disconnected: socket_id = ${socket.id}, user_id = ${(<any>socket).user.id}`);
+      log.trace(
+        `Socket disconnected: socket_id = ${socket.id}, user_id = ${
+          (<any>socket).user.id
+        }`
+      );
     });
   });
 
@@ -81,51 +87,108 @@ export async function setupWebSocketServer(
     log.error('A WebSocket connection error has occurred', err);
   });
 
-  // enables the admin analytics dashboard (creates /admin namespace)
-  // instrument(io, {
-  //   auth: origin.includes('localhost')
-  //     ? false
-  //     : {
-  //         type: 'basic',
-  //         username: WEBSOCKET_ADMIN_USERNAME,
-  //         password: bcrypt.hashSync(
-  //           WEBSOCKET_ADMIN_PASSWORD,
-  //           WEBSOCKET_ADMIN_PASSWORD.length
-  //         ),
-  //       },
-  // });
+  if (!REDIS_URL) {
+    log.warn(
+      'Redis Url is undefined. Some services (e.g. WebSockets) may not be available.'
+    );
+    return;
+  }
 
-  log.info(
-    `Socket instance connecting to Redis at: ${REDIS_URL}. ${
-      !REDIS_URL
-        ? 'The Redis url is undefined so the socket instance will not work cross server'
-        : ''
-    }`
-  );
-  const redisOptions = origin.includes("localhost") || origin.includes("127.0.0.1") ? {} : { url: REDIS_URL, socket: {tls: true, rejectUnauthorized: false} }
+  const isLocalhost =
+    REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
+  const isVultr = REDIS_URL.includes(VULTR_IP);
+
+  log.info(`Socket instance connecting to Redis at: ${REDIS_URL}`);
+
+  const redisOptions = {};
+  redisOptions['url'] = REDIS_URL;
+  if (isLocalhost || isVultr) {
+    redisOptions['socket'] = {
+      reconnectStrategy: redisRetryStrategy,
+    };
+  } else {
+    redisOptions['socket'] = {
+      tls: true,
+      rejectUnauthorized: false,
+      reconnectStrategy: redisRetryStrategy,
+    };
+  }
+
   const pubClient = createClient(redisOptions);
   const subClient = pubClient.duplicate();
 
-  try {
-    await Promise.all([pubClient.connect(), subClient.connect()]);
-    // provide the redis connection instances to the socket.io adapters
-    await io.adapter(<any>createAdapter(pubClient, subClient));
-  } catch (e) {
-    // local env may not have redis so don't do anything if they don't
-    if (!origin.includes('localhost')) {
-      log.error('Failed to connect to Redis!', e);
-      rollbar.critical(
-        'Socket.io server failed to connect to Redis. Servers will NOT share socket messages' +
-          'between rooms on different servers!',
-        e
+  pubClient.on('error', (err) => {
+    if (err instanceof ConnectionTimeoutError) {
+      log.error(
+        `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
       );
+    } else if (err instanceof ReconnectStrategyError) {
+      log.error(`Socket.io Redis pub-client max connection retries exceeded!`);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis pub-client max connection retries exceeded! Redis pub-client for Socket.io shutting down!'
+        );
+    } else if (err instanceof SocketClosedUnexpectedlyError) {
+      log.error(`Socket.io Redis pub-client socket closed unexpectedly`);
+    } else {
+      log.error(`Socket.io Redis pub-client connection error:`, err);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis pub-client unknown connection error!',
+          err
+        );
     }
-  }
+  });
+  pubClient.on('ready', () => {
+    log.info("Redis pub-client ready");
+  })
+  pubClient.on('reconnecting', () => {
+    log.info("Redis pub-client reconnecting");
+  })
+  pubClient.on('end', () => {
+    log.info('Redis pub-client disconnected');
+  })
+  subClient.on('error', (err) => {
+    if (err instanceof ConnectionTimeoutError) {
+      log.error(
+        `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
+      );
+    } else if (err instanceof ReconnectStrategyError) {
+      log.error(`Socket.io Redis sub-client max connection retries exceeded!`);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis sub-client max connection retries exceeded! Redis sub-client for Socket.io shutting down!'
+        );
+    } else if (err instanceof SocketClosedUnexpectedlyError) {
+      log.error(`Socket.io Redis sub-client socket closed unexpectedly`);
+    } else {
+      log.error(`Socket.io Redis sub-client connection error:`, err);
+      if (!isLocalhost && !isVultr)
+        rollbar.critical(
+          'Socket.io Redis sub-client unknown connection error!',
+          err
+        );
+    }
+  });
+  subClient.on('ready', () => {
+    log.info("Redis sub-client ready");
+  })
+  subClient.on('reconnecting', () => {
+    log.info("Redis sub-client reconnecting");
+  })
+  subClient.on('end', () => {
+    log.info('Redis sub-client disconnected');
+  })
+
+  await Promise.all([pubClient.connect(), subClient.connect()]);
+
+  // provide the redis connection instances to the socket.io adapters
+  await io.adapter(<any>createAdapter(pubClient, subClient));
 
   const redisCache = new RedisCache();
-  console.log("Initializing Redis Cache for WebSockets...")
+  console.log('Initializing Redis Cache for WebSockets...');
   await redisCache.init();
-  console.log("Redis Cache initialized!");
+  console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
   const ceNamespace = createCeNamespace(io);
