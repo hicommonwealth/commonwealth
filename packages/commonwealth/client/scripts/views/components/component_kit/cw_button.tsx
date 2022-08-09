@@ -39,6 +39,16 @@ export type ButtonAttrs = {
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 
+const getTextType = (buttonType: ButtonType) => {
+  if (buttonType.slice(0, 2) === 'lg') {
+    return 'buttonLg';
+  } else if (buttonType === 'mini') {
+    return 'buttonMini';
+  } else {
+    return 'buttonSm';
+  }
+};
+
 export class CWButton implements m.ClassComponent<ButtonAttrs> {
   view(vnode) {
     const {
@@ -69,11 +79,7 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
             className="button-icon"
           />
         )}
-        <CWText
-          type={buttonType.slice(0, 2) === 'lg' ? 'buttonLg' : 'buttonSm'}
-          className={buttonType === 'mini' ? 'button-mini-text' : 'button-text'}
-          noWrap
-        >
+        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
           {label}
         </CWText>
       </button>
