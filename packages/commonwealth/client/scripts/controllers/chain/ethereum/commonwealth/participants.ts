@@ -1,4 +1,4 @@
-import { CommonwealthTypes } from '@commonwealth/chain-events';
+import { CommonwealthTypes } from 'chain-events/src';
 import BN from 'bn.js';
 import { Project, AddressInfo } from 'models';
 
