@@ -103,12 +103,12 @@ export enum ChainNetwork {
   HydraDX = 'hydradx',
   Crust = 'crust',
   Sputnik = 'sputnik',
-  Commonwealth = 'commonwealth',
   SolanaDevnet = 'solana-devnet',
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
+  CommonProtocol = 'common-protocol', // dummy chain used for event handling
   Evmos = 'evmos',
 }
 
