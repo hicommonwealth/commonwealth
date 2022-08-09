@@ -26,6 +26,9 @@ module.exports = {
       await queryInterface.addColumn('Threads', 'chain_entity_id', {
         type: Sequelize.INTEGER,
       },{ transaction: t });
+      await queryInterface.addColumn('Threads', 'onchain_identification', {
+        type: Sequelize.STRING,
+      },{ transaction: t });
       await queryInterface.sequelize.query(`
         UPDATE "Threads" 
         SET chain_entity_id =  ce.id
@@ -40,19 +43,19 @@ module.exports = {
           c.chain,
           ce.id
         FROM "Comments" c
-          INNER JOIN "ChainEntities" ce on c.chain = ce."chain"  
-          and SPLIT_PART(c.root_id,'_',2) = ce."type_id"
-          and ce."type" = case SPLIT_PART(c.root_id,'_',1)  
-                    when 'compoundproposal' then 'proposal'
-                    when 'cosmosproposal' then 'proposal'
-                    when 'councilmotion' then 'collective-proposal'
-                    when 'democracyproposal' then 'democracy-proposal'
-                    when 'onchainproposal' then 'proposal'
-                    when 'referendum' then 'democracy-referendum'
-                    when 'signalingproposal' then 'signaling-proposal'
-                    when 'sputnikproposal' then 'proposal'
-                    when 'treasuryproposal' then 'treasury-proposal'		
-                  end
+          INNER JOIN "ChainEntities" ce ON c.chain = ce."chain"  
+          AND SPLIT_PART(c.root_id,'_',2) = ce."type_id"
+          AND ce."type" = case SPLIT_PART(c.root_id,'_',1)  
+                    WHEN 'compoundproposal' then 'proposal'
+                    WHEN 'cosmosproposal' then 'proposal'
+                    WHEN 'councilmotion' then 'collective-proposal'
+                    WHEN 'democracyproposal' then 'democracy-proposal'
+                    WHEN 'onchainproposal' then 'proposal'
+                    WHEN 'referendum' then 'democracy-referendum'
+                    WHEN 'signalingproposal' then 'signaling-proposal'
+                    WHEN 'sputnikproposal' then 'proposal'
+                    WHEN 'treasuryproposal' then 'treasury-proposal'		
+                  END
           WHERE c.root_id not like 'discussion%' 
         ;
       `, {transaction: t, raw: true, type: 'RAW'});
@@ -65,23 +68,48 @@ module.exports = {
         r.chain,
         ce.id
       FROM "Reactions" r
-        INNER JOIN "ChainEntities" ce on r.chain = ce."chain"  
-        and SPLIT_PART(r.proposal_id,'_',2) = ce."type_id"
-        and ce."type" = case SPLIT_PART(r.proposal_id,'_',1)  
-                  when 'compoundproposal' then 'proposal'
-                  when 'cosmosproposal' then 'proposal'
-                  when 'councilmotion' then 'collective-proposal'
-                  when 'democracyproposal' then 'democracy-proposal'
-                  when 'onchainproposal' then 'proposal'
-                  when 'referendum' then 'democracy-referendum'
-                  when 'signalingproposal' then 'signaling-proposal'
-                  when 'sputnikproposal' then 'proposal'
-                  when 'treasuryproposal' then 'treasury-proposal'		
-                end
+        INNER JOIN "ChainEntities" ce ON r.chain = ce."chain"  
+        AND SPLIT_PART(r.proposal_id,'_',2) = ce."type_id"
+        AND ce."type" = case SPLIT_PART(r.proposal_id,'_',1)  
+                  WHEN 'compoundproposal' then 'proposal'
+                  WHEN 'cosmosproposal' then 'proposal'
+                  WHEN 'councilmotion' then 'collective-proposal'
+                  WHEN 'democracyproposal' then 'democracy-proposal'
+                  WHEN 'onchainproposal' then 'proposal'
+                  WHEN 'referendum' then 'democracy-referendum'
+                  WHEN 'signalingproposal' then 'signaling-proposal'
+                  WHEN 'sputnikproposal' then 'proposal'
+                  WHEN 'treasuryproposal' then 'treasury-proposal'		
+                END
         WHERE r.proposal_id IS NOT NULL
           AND NOT EXISTS (SELECT 1 FROM "Threads" t WHERE t.chain_entity_id = ce.id)
       ;
-    `, {transaction: t, raw: true, type: 'RAW'});     
+    `, {transaction: t, raw: true, type: 'RAW'});  
+    await queryInterface.sequelize.query(`
+      INSERT INTO "Threads" (title, created_at, updated_at, chain, onchain_identification)
+      SELECT DISTINCT '-' as title, 
+        MIN(c.created_at) OVER (PARTITION BY c.root_id) as created_at,
+        MIN(c.created_at) OVER (PARTITION BY c.root_id) as updated_at,
+        c.chain,
+        c.root_id
+      FROM "Comments" c
+        LEFT JOIN "ChainEntities" ce ON c.chain = ce."chain"  
+        AND SPLIT_PART(c.root_id,'_',2) = ce."type_id"
+        AND ce."type" = case SPLIT_PART(c.root_id,'_',1)  
+                  WHEN 'compoundproposal' then 'proposal'
+                  WHEN 'cosmosproposal' then 'proposal'
+                  WHEN 'councilmotion' then 'collective-proposal'
+                  WHEN 'democracyproposal' then 'democracy-proposal'
+                  WHEN 'onchainproposal' then 'proposal'
+                  WHEN 'referendum' then 'democracy-referendum'
+                  WHEN 'signalingproposal' then 'signaling-proposal'
+                  WHEN 'sputnikproposal' then 'proposal'
+                  WHEN 'treasuryproposal' then 'treasury-proposal'		
+                END
+        WHERE c.root_id NOT LIKE 'discussion%' 
+          AND ce.id IS NULL
+      ;       
+    `, {transaction: t, raw: true, type: 'RAW'});  
       await queryInterface.sequelize.query(`
         UPDATE "Comments" 
         SET thread_id =  SPLIT_PART(root_id,'_',2)::INTEGER
@@ -96,16 +124,16 @@ module.exports = {
           AND "Comments".chain = ce."chain"  
           AND SPLIT_PART("Comments".root_id,'_',2) = ce."type_id"
           AND ce."type" = case SPLIT_PART("Comments".root_id,'_',1)  
-                    when 'compoundproposal' then 'proposal'
-                    when 'cosmosproposal' then 'proposal'
-                    when 'councilmotion' then 'collective-proposal'
-                    when 'democracyproposal' then 'democracy-proposal'
-                    when 'onchainproposal' then 'proposal'
-                    when 'referendum' then 'democracy-referendum'
-                    when 'signalingproposal' then 'signaling-proposal'
-                    when 'sputnikproposal' then 'proposal'
-                    when 'treasuryproposal' then 'treasury-proposal'		
-                  end
+                    WHEN 'compoundproposal' then 'proposal'
+                    WHEN 'cosmosproposal' then 'proposal'
+                    WHEN 'councilmotion' then 'collective-proposal'
+                    WHEN 'democracyproposal' then 'democracy-proposal'
+                    WHEN 'onchainproposal' then 'proposal'
+                    WHEN 'referendum' then 'democracy-referendum'
+                    WHEN 'signalingproposal' then 'signaling-proposal'
+                    WHEN 'sputnikproposal' then 'proposal'
+                    WHEN 'treasuryproposal' then 'treasury-proposal'		
+                  END
         ;
       `, {transaction: t, raw: true, type: 'RAW'});
       await queryInterface.sequelize.query(`
@@ -116,24 +144,23 @@ module.exports = {
       WHERE "Reactions".chain = ce."chain"  
         AND SPLIT_PART("Reactions".proposal_id,'_',2) = ce."type_id"
         AND ce."type" = case SPLIT_PART("Reactions".proposal_id,'_',1)  
-                  when 'compoundproposal' then 'proposal'
-                  when 'cosmosproposal' then 'proposal'
-                  when 'councilmotion' then 'collective-proposal'
-                  when 'democracyproposal' then 'democracy-proposal'
-                  when 'onchainproposal' then 'proposal'
-                  when 'referendum' then 'democracy-referendum'
-                  when 'signalingproposal' then 'signaling-proposal'
-                  when 'sputnikproposal' then 'proposal'
-                  when 'treasuryproposal' then 'treasury-proposal'		
-                end
+                  WHEN 'compoundproposal' then 'proposal'
+                  WHEN 'cosmosproposal' then 'proposal'
+                  WHEN 'councilmotion' then 'collective-proposal'
+                  WHEN 'democracyproposal' then 'democracy-proposal'
+                  WHEN 'onchainproposal' then 'proposal'
+                  WHEN 'referendum' then 'democracy-referendum'
+                  WHEN 'signalingproposal' then 'signaling-proposal'
+                  WHEN 'sputnikproposal' then 'proposal'
+                  WHEN 'treasuryproposal' then 'treasury-proposal'		
+                END
       ;
     `, {transaction: t, raw: true, type: 'RAW'});     
+    //*******commented only for testing, so new objects can be compared to old state in situ
       //await queryInterface.removeColumn('Comments','root_id',{ transaction: t });
       //await queryInterface.removeColumn('Reactions','proposal_id',{ transaction: t });
       //await queryInterface.removeColumn('ChainEntities','thread_id',{ transaction: t });
 
-      //TODO: map onchain threads that are valid but don't have ChainEntities ()
-      //TODO: delete comments w/no threads-- deleted proposals, too old, councilcandidate, etc
     });
   },
 
@@ -141,6 +168,7 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn('Threads','chain_entity_id',{ transaction: t });
       await queryInterface.removeColumn('Comments','thread_id',{ transaction: t });
+    //*******commented only for testing, so new objects can be compared to old state in situ
       // await queryInterface.addColumn('Comments', 'root_id', {
       //   type: Sequelize.VARCHAR(255),
       // },{ transaction: t });
