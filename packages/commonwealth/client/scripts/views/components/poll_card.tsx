@@ -14,6 +14,10 @@ import { CWText } from './component_kit/cw_text';
 import { CWTooltip } from './component_kit/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
+const MAX_POLL_RESULTS_IN_LIVE_PREVIEW = 3;
+const MAX_POLL_RESULTS_IN_ENDED_PREVIEW = 1;
+
+
 export type VoteInformation = {
   label: string;
   value: string;
@@ -181,6 +185,7 @@ export type ResultsSectionAttrs = {
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
   votedFor: string;
+  isPreview: boolean;
 };
 
 export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
@@ -193,6 +198,7 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       voteInformation,
       pollEnded,
       votedFor,
+      isPreview
     } = vnode.attrs;
 
     const calculateProgressStatus = (
@@ -212,10 +218,17 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
 
     const hasVotes =
       voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+      
+    let numOptionsBeyondPreview;
+    if (!pollEnded) {
+      numOptionsBeyondPreview = voteInformation.length - MAX_POLL_RESULTS_IN_LIVE_PREVIEW;
+    } else {
+      numOptionsBeyondPreview = voteInformation.length - MAX_POLL_RESULTS_IN_ENDED_PREVIEW;
+    }
 
     return (
       <div class="ResultsSection">
-        <div class="results-header">
+        {!isPreview && <div class="results-header">
           <CWText type="b1" fontWeight="bold">
             {resultString}
           </CWText>
@@ -232,7 +245,7 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
               tokenSymbol ?? 'votes'
             }`}
           </CWText>
-        </div>
+        </div>}
         <div class="results-content">
           {voteInformation
             .sort((option1, option2) => {
@@ -243,6 +256,9 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
               }
             })
             .map((option, index) => {
+              if (isPreview && (pollEnded ? index >= MAX_POLL_RESULTS_IN_ENDED_PREVIEW : index >= MAX_POLL_RESULTS_IN_LIVE_PREVIEW)) {
+                return;
+              }
               return (
                 <CWProgressBar
                   progress={
@@ -256,7 +272,8 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
                   iconName={option.label === votedFor ? 'check' : undefined}
                 />
               );
-            })}
+          })}
+          {isPreview && numOptionsBeyondPreview > 0 && <CWText type="caption" className="more-options">{`+ ${numOptionsBeyondPreview} more option${numOptionsBeyondPreview === 1 ? '' : 's'}`}</CWText>}
         </div>
       </div>
     );
@@ -297,6 +314,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       votedFor,
       voteInformation,
       tooltipErrorMessage,
+      isPreview
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -333,7 +351,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           {proposalTitle}
         </CWText>
         <div class="poll-voting-section">
-          {!this.hasVoted && !pollEnded && (
+          {!this.hasVoted && !pollEnded && !isPreview && (
             <>
               <PollOptions
                 multiSelect={multiSelect}
@@ -368,6 +386,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           pollEnded={pollEnded}
           totalVoteCount={this.totalVoteCount}
           votedFor={votedFor}
+          isPreview={isPreview}
         />
       </CWCard>
     );
