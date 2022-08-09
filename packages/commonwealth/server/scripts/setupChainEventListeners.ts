@@ -11,12 +11,9 @@ import {
   CompoundEvents,
   AaveEvents,
   CommonwealthEvents,
-<<<<<<< HEAD:server/scripts/setupChainEventListeners.ts
-} from '@commonwealth/chain-events';
-=======
 } from 'chain-events/src';
->>>>>>> master:packages/commonwealth/server/scripts/setupChainEventListeners.ts
-
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainAttributes, ChainInstance } from '../models/chain';
 import EventStorageHandler, {
   StorageFilterConfig,
@@ -28,14 +25,8 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import ProjectHandler from '../eventHandlers/project';
 import { default as models, sequelize } from '../database';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
-<<<<<<< HEAD:server/scripts/setupChainEventListeners.ts
-import { factory, formatFilename } from '../../shared/logging';
-=======
-import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNodeInstance } from '../models/chain_node';
->>>>>>> master:packages/commonwealth/server/scripts/setupChainEventListeners.ts
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
@@ -238,14 +229,7 @@ const setupChainEventListeners = async (
             verbose: true,
           });
         } else if (node.network === ChainNetwork.CommonProtocol) {
-<<<<<<< HEAD:server/scripts/setupChainEventListeners.ts
-          const api = await CommonwealthEvents.createApi(
-            node.ChainNode.url,
-            node.address
-          );
-=======
           const api = await CommonwealthEvents.createApi(node.ChainNode.url, node.address);
->>>>>>> master:packages/commonwealth/server/scripts/setupChainEventListeners.ts
           const handlers = generateHandlers(node, wss);
           subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.id,
