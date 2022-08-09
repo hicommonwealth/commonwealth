@@ -34,9 +34,7 @@ import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(
-  /* webpackPrefetch: true */ 'views/pages/commonwealth/whycommonwealth/index'
-);
+import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
