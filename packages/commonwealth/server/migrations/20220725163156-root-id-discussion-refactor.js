@@ -167,6 +167,7 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeColumn('Threads','chain_entity_id',{ transaction: t });
+      await queryInterface.removeColumn('Threads','onchain_identification',{ transaction: t });
       await queryInterface.removeColumn('Comments','thread_id',{ transaction: t });
     //*******commented only for testing, so new objects can be compared to old state in situ
       // await queryInterface.addColumn('Comments', 'root_id', {
