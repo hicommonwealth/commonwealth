@@ -1,11 +1,6 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/NftAdapter.ts
-import { ERC721, ERC721__factory } from 'eth/types';
-import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
-=======
 import { ERC721, ERC721__factory } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
->>>>>>> master:packages/commonwealth/client/scripts/controllers/chain/ethereum/NftAdapter.ts
 import Ethereum from 'controllers/chain/ethereum/main';
 
 import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';

@@ -6,15 +6,9 @@ import {
   GovernanceStrategy,
   GovernanceStrategy__factory,
   AaveTokenV2,
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/aave/api.ts
-  AaveTokenV2__factory,
-} from 'eth/types';
-import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
-=======
   AaveTokenV2__factory
 } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
->>>>>>> master:packages/commonwealth/client/scripts/controllers/chain/ethereum/aave/api.ts
 
 export interface AaveExecutor {
   contract: Executor;

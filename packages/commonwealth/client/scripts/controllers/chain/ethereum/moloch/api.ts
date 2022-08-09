@@ -1,10 +1,5 @@
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/moloch/api.ts
-import { Moloch1, ERC20, ERC20__factory } from 'eth/types';
-import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
-=======
 import { Moloch1, ERC20, ERC20__factory } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
->>>>>>> master:packages/commonwealth/client/scripts/controllers/chain/ethereum/moloch/api.ts
 
 export default class MolochAPI extends ContractApi<Moloch1> {
   private _token: ERC20;

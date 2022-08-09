@@ -1,18 +1,10 @@
 import { ProposalModule, ITXModalData } from 'models';
 import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/aave/governance.ts
-import { AaveEvents, AaveTypes } from '@commonwealth/chain-events';
-import { Executor } from 'eth/types';
-import {
-  chainToEventNetwork,
-  EntityRefreshOption,
-} from 'controllers/server/chain_entities';
-=======
+
 import { AaveEvents, AaveTypes } from 'chain-events/src';
 import { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
->>>>>>> master:packages/commonwealth/client/scripts/controllers/chain/ethereum/aave/governance.ts
 
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveProposal from './proposal';

@@ -28,6 +28,6 @@
     "./shared/adapters",
     "./test",
     "./globals.d.ts"
-  ],
+, "../../client/scripts/views/pages/commonwealth/backers"  ],
   "exclude": ["./node_modules"]
 }

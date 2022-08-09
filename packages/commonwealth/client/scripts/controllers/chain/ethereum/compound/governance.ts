@@ -8,12 +8,8 @@ import {
   EntityRefreshOption,
 } from 'controllers/server/chain_entities';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-<<<<<<< HEAD:client/scripts/controllers/chain/ethereum/compound/governance.ts
-import { GovernorCompatibilityBravo } from 'eth/types';
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
-=======
 import { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
->>>>>>> master:packages/commonwealth/client/scripts/controllers/chain/ethereum/compound/governance.ts
 import CompoundAPI, { GovernorType } from './api';
 import CompoundProposal from './proposal';
 import CompoundChain from './chain';
