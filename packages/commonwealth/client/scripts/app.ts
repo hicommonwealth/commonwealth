@@ -95,13 +95,13 @@ export async function initAppState(
         updateActiveUser(data.user);
         app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-        if (app.loginState == LoginState.LoggedIn) {
+        if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
         } else if (
-          app.loginState == LoginState.LoggedOut &&
+          app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
