@@ -77,9 +77,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                 </CWText>
                 {app.activeChainId() && (
                   <CWButton
-                    href={`/${app.activeChainId()}/proposal/${
-                      ProposalType.SubstrateDemocracyReferendum
-                    }/${proposal.getReferendum().identifier}`}
+                    buttonType="tertiary-blue"
                     onclick={(e) => {
                       e.preventDefault();
                       navigateToSubpage(
@@ -103,11 +101,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                 </CWText>
                 {app.activeChainId() && (
                   <CWButton
-                    href={`/${app.activeChainId()}/proposal/${
-                      proposal.getProposalOrMotion(proposal.preimage).slug
-                    }/${
-                      proposal.getProposalOrMotion(proposal.preimage).identifier
-                    }`}
+                    buttonType="tertiary-blue"
                     onclick={(e) => {
                       e.preventDefault();
                       navigateToSubpage(
@@ -180,9 +174,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
               </CWText>
               {app.activeChainId() && (
                 <CWButton
-                  href={`/${app.activeChainId()}/proposal/${
-                    ProposalType.SubstrateDemocracyProposal
-                  }/${p.identifier}`}
+                  buttonType="tertiary-blue"
                   onclick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
@@ -205,9 +197,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
               </CWText>
               {app.activeChainId() && (
                 <CWButton
-                  href={`/${app.activeChainId()}/proposal/${
-                    ProposalType.SubstrateDemocracyReferendum
-                  }/${r.identifier}`}
+                  buttonType="tertiary-blue"
                   onclick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
@@ -232,9 +222,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
               </CWText>
               {app.activeChainId() && (
                 <CWButton
-                  href={`/${app.activeChainId()}/proposal/${
-                    ProposalType.SubstrateCollectiveProposal
-                  }/${mo.identifier}`}
+                  buttonType="tertiary-blue"
                   onclick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
