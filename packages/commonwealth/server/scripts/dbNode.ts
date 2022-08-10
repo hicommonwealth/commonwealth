@@ -15,8 +15,8 @@ import {
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
+import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 
@@ -146,6 +146,7 @@ async function mainProcess(
   let myChainData = allChains.filter(
     (chain, index) => index % numWorkers === workerNumber
   );
+
   // passed to listeners that support it
   const discoverReconnectRange = async (chain: string) => {
     let latestBlock;
@@ -341,8 +342,7 @@ async function mainProcess(
         network = SupportedNetwork.Aave;
       else if (chain.network === ChainNetwork.Moloch)
         network = SupportedNetwork.Moloch;
-      else if (chain.network === ChainNetwork.CommonProtocol)
-        network = SupportedNetwork.Commonwealth;
+
       try {
         listeners[chain.id] = await createListener(chain.id, network, {
           address: chain.address,
