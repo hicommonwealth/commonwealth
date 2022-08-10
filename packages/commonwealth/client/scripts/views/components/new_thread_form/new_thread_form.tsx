@@ -405,7 +405,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                         this.form.title
                       );
                     }}
-                    defaultValue={this.form.title}
+                    value={this.form.title}
                     tabindex={2}
                   />
                 </div>
@@ -530,7 +530,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                         this.form.title
                       );
                     }}
-                    defaultValue={this.form.title}
+                    value={this.form.title}
                     tabindex={3}
                   />
                 </div>
@@ -545,7 +545,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       this.form.url
                     );
                   }}
-                  defaultValue={this.form.url}
+                  value={this.form.url}
                   tabindex={2}
                 />
                 <QuillEditorComponent

@@ -308,7 +308,7 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Text field"
             label="Disabled"
             disabled
-            defaultValue="Some disabled text"
+            value="Some disabled text"
           />
           <CWTextInput
             name="Text field dark mode"

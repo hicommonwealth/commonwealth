@@ -24,7 +24,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
     const {
       autocomplete,
       autofocus,
-      defaultValue,
+      value,
       disabled,
       inputValidationFn,
       label,
@@ -95,7 +95,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
               }
             }
           }}
-          defaultValue={defaultValue}
+          value={value}
         />
       </div>
     );
