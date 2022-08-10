@@ -153,7 +153,6 @@ export default class QuillEditorInternal {
     // Restore defaultContent
     if (defaultContents) this._restoreSavedContents(defaultContents);
 
-    // TODO: What is the purpose of this??
     setInterval(() => {
       if (this._unsavedChanges.length() > 0) {
         if (this._quill.isEnabled()) {
