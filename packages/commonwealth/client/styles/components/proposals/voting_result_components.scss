@@ -24,8 +24,7 @@
 .VotingResult {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 16px;
 
   .results-column-yes {
     @include resultsColumnStyles;
