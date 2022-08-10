@@ -10,19 +10,19 @@ import {
   IEventHandler,
   CWEvent,
   LoggingHandler,
-  SupportedNetwork,
-} from 'chain-events/src';
+  SupportedNetwork, IAnyListener
+} from "chain-events/src";
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { DATABASE_URI, RABBITMQ_URI } from "../config";
+import { DATABASE_URI, RABBITMQ_URI } from "./config";
 import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
+import { manageErcListeners, getListenerNames, queryDb } from "./util";
+import { IListenerInstances } from "./types";
 
 const log = factory.getLogger(formatFilename(__filename));
-
-// TODO: RollBar error reporting
 
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
@@ -36,7 +36,7 @@ let chainErrors: { [chain: string]: number } = {};
 let runCount = 0;
 
 // stores all the listeners a dbNode has active
-const listeners: { [key: string]: any } = {};
+const listenerInstances: IListenerInstances = {};
 
 const generalLogger = new LoggingHandler();
 
@@ -102,50 +102,31 @@ async function mainProcess(
   workerNumber: number,
   numWorkers: number
 ) {
-  // reset the chainError counts at the end of every day
-  if (runCount > 1440 / REPEAT_TIME) {
-    runCount = 1;
-    chainErrors = {};
+  // TODO: post this data somewhere?
+  log.info("Starting scheduled process...")
+  const activeListeners = getListenerNames(listenerInstances);
+  if (activeListeners.length > 0) {
+    log.info(`Active listeners: ${JSON.stringify(activeListeners)}`);
   } else {
-    ++runCount;
+    log.info("No active listeners");
   }
 
-  const activeChains: string[] = Object.keys(listeners).map((listenerName): string => {
-    if (!listenerName.startsWith(ChainNetwork.ERC20) &&
-      !listenerName.startsWith(ChainNetwork.ERC721)) return listenerName;
-    else {
-      return listeners[listenerName].options.tokenNames;
-    }
-  });
-  if (activeChains.length > 0)
-    log.info(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
-    );
-
+  // selects the chain data needed to create the listeners for the current chainSubscriber
   let query =`
-    SELECT
-      "Chains"."id",
-      "Chains"."substrate_spec",
-      "url",
-      "private_url",
-      "Chains"."address",
-      "Chains"."base",
-      "Chains"."type",
-      "Chains"."network",
-      "Chains"."ce_verbose"
-    FROM "Chains"
-    JOIN "ChainNodes"
-    ON "Chains".chain_node_id = "ChainNodes".id
-    WHERE "Chains"."has_chain_events_listener" = true;
+      WITH allListeners AS (
+          SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Listeners" WHERE active = True
+      ) SELECT allListeners.id,
+               allListeners.spec,
+               allListeners.contract_address,
+               allListeners.network,
+               allListeners.base,
+               allListeners.verbose_logging,
+               "ChainEndpoints".url
+      FROM allListeners
+               JOIN "ChainEndpoints" ON allListeners.url_id = "ChainEndpoints".id
+      WHERE MOD(allListeners.index, ?) = ?;
   `;
-  const allChains = (await pool.query(query)).rows;
-
-  // gets the chains specific to this node
-  let myChainData = allChains.filter(
-    (chain, index) => index % numWorkers === workerNumber
-  );
+  const allListeners = await queryDb(pool, query, numWorkers, workerNumber);
 
   // passed to listeners that support it
   const discoverReconnectRange = async (chain: string) => {
@@ -194,135 +175,27 @@ async function mainProcess(
     }
   };
 
-  // group erc20 and erc721 tokens together by URL in order to minimize number of listeners
-  const erc20Tokens = myChainData.filter(
-    (chain) =>
-      chain.network === ChainNetwork.ERC20 && chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  ).map((chain) => {
-    // replace url with private_url if available
-    chain.url = chain.private_url || chain.url;
-    return chain;
-  });
-
-  const erc721Tokens = myChainData.filter(
-    (chain) =>
-      chain.network === ChainNetwork.ERC721 && chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  ).map((chain) => {
-    // replace url with private_url if available
-    chain.url = chain.private_url || chain.url;
-    return chain;
-  });
-
-  const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
-  const erc721ByUrl = _.groupBy(erc721Tokens, 'url');
-
-  async function createErcListener(network: ChainNetwork,
-    groupedTokens: _.Dictionary<any[]>, logger: ErcLoggingHandler) {
-
-    for (const [url, tokens] of Object.entries(groupedTokens)) {
-      const tokenKey = `${network}_${url}`;
-      const ercTokenAddresses = tokens.map((chain) => chain.address);
-      const ercTokenNames = tokens.map((chain) => chain.id);
-
-      let supportedNetwork: SupportedNetwork;
-      switch(network) {
-        case ChainNetwork.ERC20:
-          supportedNetwork = SupportedNetwork.ERC20;
-          break;
-        case ChainNetwork.ERC721:
-          supportedNetwork = SupportedNetwork.ERC721;
-          break;
-        default:
-          break;
-      }
-
-      // update the names of the tokens whose events should be logged by the ercLoggers
-      logger.tokenNames = tokens
-        .filter((chain) => chain.ce_verbose)
-        .map((chain) => chain.id);
-
-      // don't start a new erc20 listener if it is causing errors
-      if (!chainErrors[tokenKey] || chainErrors[tokenKey] < 4) {
-        // start a listener if: it doesn't exist yet OR it exists but the tokens have changed
-        if (
-          tokens.length > 0 &&
-          (!listeners[tokenKey] ||
-            (listeners[tokenKey] &&
-              !_.isEqual(
-                ercTokenAddresses,
-                listeners[tokenKey].options.tokenAddresses
-              )))
-        ) {
-          // clear the listener if it already exists and the tokens have changed
-          if (listeners[tokenKey]) {
-            listeners[tokenKey].unsubscribe();
-            delete listeners[tokenKey];
-          }
-
-          // start a listener
-          log.info(`Starting listener for ${ercTokenNames}...`);
-          try {
-            listeners[tokenKey] = await createListener(
-              network,
-              supportedNetwork,
-              {
-                url,
-                tokenAddresses: ercTokenAddresses,
-                tokenNames: ercTokenNames,
-                verbose: false,
-              }
-            );
-
-            // add the rabbitmq handler for this chain
-            listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
-            listeners[tokenKey].eventHandlers['logger'] = { handler: logger };
-          } catch (error) {
-            delete listeners[tokenKey];
-            await handleFatalError(error, pool, tokenKey, 'listener-startup');
-          }
-
-          // if listener has started at this point then subscribe
-          if (listeners[tokenKey]) {
-            try {
-              // subscribe to the chain to begin listening for events
-              await listeners[tokenKey].subscribe();
-            } catch (error) {
-              await handleFatalError(error, pool, tokenKey, 'listener-subscribe');
-            }
-          }
-        } else if (listeners[tokenKey] && tokens.length === 0) {
-          // delete the listener if there are no tokens to listen to
-          log.info(`[${tokenKey}]: Deleting ${network} listener...`);
-          listeners[tokenKey].unsubscribe();
-          delete listeners[tokenKey];
-        }
-      } else {
-        log.fatal(
-          `[${tokenKey}]: There are outstanding errors that need to be resolved
-            before creating a new ${network} listener!`
-        );
-      }
+  const erc20Tokens = [];
+  const erc721Tokens = [];
+  const regularListeners = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
+  for (const listener of allListeners) {
+    if (listener.network === ChainNetwork.ERC20 && listener.base === ChainBase.Ethereum) {
+      erc20Tokens.push(listener);
+    } else if (listener.network === ChainNetwork.ERC721 && listener.base === ChainBase.Ethereum) {
+      erc721Tokens.push(listener);
+    } else {
+      regularListeners.push(listener);
     }
   }
 
-  createErcListener(ChainNetwork.ERC20, erc20ByUrl, erc20Logger);
-  createErcListener(ChainNetwork.ERC721, erc721ByUrl, erc721Logger);
+  // group the erc20s and erc721s by url so that we only create 1 listener/subscriber for each endpoint
+  const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
+  const erc721ByUrl = _.groupBy(erc721Tokens, 'url');
 
-  // remove erc tokens from myChainData
-  myChainData = myChainData.filter(
-    (chain) =>
-      chain.type !== ChainType.Token || chain.base !== ChainBase.Ethereum
-  );
+  // this creates/updates/deletes a single listener in listenerInstances called 'erc20' or 'erc721' respectively
+  await manageErcListeners(ChainNetwork.ERC20, erc20ByUrl, listenerInstances);
+  await manageErcListeners(ChainNetwork.ERC721, erc721ByUrl, listenerInstances);
 
-  // delete listeners for chains that are no longer assigned to this node (skip erc20 and erc721)
-  const myChains = myChainData.map((row) => row.id);
-  Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && !chain.startsWith(ChainNetwork.ERC20) && !chain.startsWith(ChainNetwork.ERC721)) {
-      log.info(`[${chain}]: Deleting chain...`);
-      if (listeners[chain]) listeners[chain].unsubscribe();
-      delete listeners[chain];
-    }
-  });
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {

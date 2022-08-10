@@ -1,5 +1,3 @@
-import * as net from 'net';
-
 import {
   IEventHandler,
   IChainEventKind,

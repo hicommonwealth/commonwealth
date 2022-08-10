@@ -9,6 +9,15 @@ import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
+import { ApiPromise as SubstrateApi } from '@polkadot/api';
+import { Api as MolochApi } from './chains/moloch/types';
+import { IErc721Contracts as ERC721Api } from "./chains/erc721/types";
+import { IErc20Contracts as ERC20Api } from "./chains/erc20/types";
+import { Api as CompoundApi } from './chains/compound/types';
+import { Api as CommonwealthApi } from './chains/commonwealth/types';
+import { Api as AaveApi } from './chains/aave/types';
+import { StorageFetcher } from "./chains/aave";
+import { Listener } from "./Listener";
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -33,6 +42,17 @@ export type IChainEventKind =
   | Erc20Types.EventKind
   | Erc721Types.EventKind
   | CommonwealthTypes.EventKind;
+export type IAPIs =
+  | SubstrateApi
+  | MolochApi
+  | ERC721Api
+  | ERC20Api
+  | CompoundApi
+  | CommonwealthApi
+  | AaveApi;
+export type IAnyListener = Listener<IAPIs, IStorageFetcher<IAPIs>, IEventProcessor<IAPIs, any>, IEventSubscriber<IAPIs, any>, IChainEventKind>
+
+
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
