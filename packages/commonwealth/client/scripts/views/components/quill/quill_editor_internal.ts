@@ -88,7 +88,7 @@ export default class QuillEditorInternal {
           mentionDenotationChars: ['@'],
           dataAttributes: ['name', 'link', 'component'],
           renderItem: (item) => item.component,
-          onSelect: this._selectMention,
+          onSelect: (item: QuillMention) => this._selectMention(item),
           source: _.debounce(this._queryMentions, 300, {
             leading: true,
             trailing: true,
@@ -926,7 +926,6 @@ export default class QuillEditorInternal {
 
   private _listAutofillHandler(range, context) {
     if (this._activeMode === 'markdown') return true;
-    debugger;
     const length = context.prefix.length;
     const [line, offset] = this._quill.getLine(range.index);
 
