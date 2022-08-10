@@ -453,13 +453,19 @@ export class ComponentShowcase implements m.ClassComponent {
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Secondary blue dark"
+            label="Secondary blue dark disabled"
             buttonType="secondary-blue-dark"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />
         </div>
         <div class="button-gallery">
+          <CWButton
+            iconName="person"
+            buttonType="mini"
+            label="Mini with icon"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
           <CWButton
             label="Mini"
             buttonType="mini"
@@ -558,6 +564,7 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWText type="caption" fontWeight="uppercase">
             Caption uppercase
           </CWText>
+          <CWText type="buttonMini">Button mini</CWText>
           <CWText type="buttonSm">Button small</CWText>
           <CWText type="buttonLg">Button large</CWText>
           <div class="text-row">

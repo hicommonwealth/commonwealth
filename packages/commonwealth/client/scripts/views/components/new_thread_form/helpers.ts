@@ -1,9 +1,9 @@
 import topics from 'controllers/server/topics';
 import { IChainAdapter, ThreadKind, Topic } from 'models';
-import { INewThreadForm, NewThreadErrors } from './types';
+import { NewThreadFormType, NewThreadErrors } from './types';
 
 export const checkNewThreadErrors = (
-  form: INewThreadForm,
+  form: NewThreadFormType,
   bodyText?: string
 ) => {
   if (!form.title) {
