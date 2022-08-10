@@ -1,26 +1,6 @@
 @import 'shared';
 
-.DelegatePage {
-  .DelegateForm {
-    flex: 1;
-    padding: 24px;
-
-    textarea {
-      min-height: 200px;
-    }
-
-    .council-motion-description {
-      margin-top: -12px;
-      margin-bottom: 22px;
-      color: $neutral-500;
-    }
-
-    .cui-form-label {
-      margin-bottom: 10px;
-    }
-
-    .cui-input {
-      margin-bottom: 10px;
-    }
-  }
+.DelegateForm {
+  flex: 1;
+  padding: 24px;
 }
