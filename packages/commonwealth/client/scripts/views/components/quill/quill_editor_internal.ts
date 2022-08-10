@@ -167,7 +167,7 @@ export default class QuillEditorInternal {
         }
         m.redraw();
       }
-    }, 2500);
+    }, 250);
 
     return this._quill;
   }

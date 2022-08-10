@@ -112,7 +112,12 @@ export class QuillEditor extends QuillEditorInternal {
 
   public isBlank(): boolean {
     if (this._quill.editor.isBlank()) return true;
-    if (this._quill.getText() === '\n') return true;
+    const newLinesOnly = /^\s+$/.test(this.text);
+    if (this.markdownMode) {
+      if (newLinesOnly) return true;
+    } else {
+      if (this.contents.ops.length === 1 && newLinesOnly) return true;
+    }
     return false;
   }
 
