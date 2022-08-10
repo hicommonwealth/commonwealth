@@ -54,6 +54,7 @@
     "passport-jwt": "^4.0.0",
     "pg": "^8.6.0",
     "pg-format": "^1.0.4",
+    "rollbar": "^2.25.1",
     "sequelize": "^6.21.3",
     "sleep-promise": "^8.0.1",
     "typescript-logging": "^0.6.4",

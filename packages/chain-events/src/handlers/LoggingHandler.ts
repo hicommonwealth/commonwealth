@@ -10,3 +10,4 @@ export class LoggingHandler extends IEventHandler {
     return null;
   }
 }
+

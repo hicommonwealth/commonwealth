@@ -14,3 +14,12 @@ export const RABBITMQ_URI = (() => {
     } else return 'amqp://guest:guest@localhost:5672'
   } else return process.env.CLOUDAMQP_URL
 })()
+
+export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
+
+// ----------------- ChainSubscriber specific var ------------------------
+export const WORKER_NUMBER = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+export const NUM_WORKERS = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
+
+// The number of minutes to wait between each run -- rounded to the nearest whole number
+export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;

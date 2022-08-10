@@ -49,8 +49,8 @@
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
-    "transfer_ce_db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" | psql $(heroku config:get DATABASE_URL -a chain-events-staging)",
-    "transfer_ce_db_local": "pg_dump -U commonwealth -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" | psql $(heroku config:get DATABASE_URL -a chain-events-staging)"
+    "transfer_ce_db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) -t \"public.\\\"ChainNodes\\\"\" -t \"public.\\\"Chains\\\"\" -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" | psql $(heroku config:get DATABASE_URL -a chain-events-staging)",
+    "transfer_ce_db_local": "pg_dump -U commonwealth -t \"public.\\\"ChainNodes\\\"\" -t \"public.\\\"Chains\\\"\" -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" | psql $(heroku config:get DATABASE_URL -a chain-events-staging)"
   },
   "engines": {
     "node": "14.x"
