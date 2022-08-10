@@ -66,7 +66,6 @@ export class CWAvatarUsernameInput
             darkMode={darkMode}
             size="small"
             iconRight="edit"
-            containerClassName="username-input-container"
             defaultValue={defaultValue}
             oninput={(e) => {
               onUsernameChangeHandler((e.target as any).value);
