@@ -240,7 +240,7 @@ const createThread = async (
       // check always passes if the body isn't a Quill document
     }
   } else if (kind === 'link') {
-    if (!title || !title.trim() || !url) {
+    if (!title?.trim() || !url?.trim()) {
       return next(new Error(Errors.LinkMissingTitleOrUrl));
     }
   } else {
