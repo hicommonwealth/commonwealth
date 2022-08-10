@@ -1,15 +1,11 @@
 @import 'shared';
 
 .ProposalExtensions {
-  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
-  .cui-overlay {
-    width: 100%;
-    position: relative;
-    top: -14px;
-  }
-
-  .cui-custom-select .cui-popover-content {
-    min-width: 200px;
+  .TextInput {
+    margin: 0;
   }
 }

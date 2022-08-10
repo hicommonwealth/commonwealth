@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js';
 import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
+import { navigateToSubpage } from '../app';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -362,4 +363,30 @@ export const weiToTokens = (input: string, decimals: number) => {
   const exp = new BigNumber(10).pow(decimals);
   const valueTokens = value.div(exp);
   return valueTokens.toFixed();
+};
+
+export const isCommandClick = (e: MouseEvent) => {
+  return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
+};
+
+// Handle command click and normal clicks
+export const handleRedirectClicks = (
+  e: MouseEvent,
+  redirectLink: string,
+  activeChainId: string | null,
+  callback: () => any
+) => {
+  if (isCommandClick(e)) {
+    if (activeChainId) {
+      window.open(`/${activeChainId}`.concat(redirectLink), '_blank');
+    } else {
+      window.open(redirectLink, '_blank');
+    }
+    return;
+  }
+
+  navigateToSubpage(redirectLink);
+  if (callback) {
+    callback();
+  }
 };

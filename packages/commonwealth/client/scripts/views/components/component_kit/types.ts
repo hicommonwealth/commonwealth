@@ -20,6 +20,7 @@ export enum ComponentType {
   MessageBanner = 'MessageBanner',
   Modal = 'Modal',
   Popover = 'Popover',
+  ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   Tab = 'Tab',

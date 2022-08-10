@@ -3,8 +3,7 @@ import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-
-import AddressSwapper from '../util/addressSwapper';
+import { addressSwapper } from '../../shared/utils';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -67,7 +66,7 @@ const createAddress = async (
   let encodedAddress = (req.body.address as string).trim();
   try {
     if (chain.base === ChainBase.Substrate) {
-      encodedAddress = AddressSwapper({
+      encodedAddress = addressSwapper({
         address: req.body.address,
         currentPrefix: chain.ss58_prefix,
       });

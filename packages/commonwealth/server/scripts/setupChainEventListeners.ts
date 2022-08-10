@@ -10,6 +10,7 @@ import {
   MolochEvents,
   CompoundEvents,
   AaveEvents,
+  CommonwealthEvents,
 } from 'chain-events/src';
 
 import { ChainAttributes, ChainInstance } from '../models/chain';
@@ -21,6 +22,7 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
+import ProjectHandler from '../eventHandlers/project';
 import { default as models, sequelize } from '../database';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
@@ -59,7 +61,7 @@ const discoverReconnectRange = async (
 export const generateHandlers = (
   chain: ChainInstance,
   wss?: WebSocket.Server,
-  storageConfig: StorageFilterConfig = {}
+  storageConfig: StorageFilterConfig = {},
 ) => {
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(models, chain.id, storageConfig);
@@ -98,6 +100,12 @@ export const generateHandlers = (
     const userFlagsHandler = new UserFlagsHandler(models, chain.id);
 
     handlers.push(identityHandler, userFlagsHandler);
+  }
+
+  // only handle CWP events on Common Protocol
+  if (chain.network === ChainNetwork.CommonProtocol) {
+    const projectHandler = new ProjectHandler(models);
+    handlers.push(projectHandler);
   }
 
   return handlers;
@@ -202,6 +210,17 @@ const setupChainEventListeners = async (
           const api = await AaveEvents.createApi(node.ChainNode.url, node.address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
+            chain: node.id,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.id),
+            api,
+            verbose: true,
+          });
+        } else if (node.network === ChainNetwork.CommonProtocol) {
+          const api = await CommonwealthEvents.createApi(node.ChainNode.url, node.address);
+          const handlers = generateHandlers(node, wss);
+          subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.id,
             handlers,
             skipCatchup,

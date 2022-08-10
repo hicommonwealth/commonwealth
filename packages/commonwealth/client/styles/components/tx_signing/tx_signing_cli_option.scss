@@ -1,0 +1,11 @@
+@import 'shared';
+
+.TXSigningCLIOption {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .TextArea {
+    margin: 0;
+  }
+}

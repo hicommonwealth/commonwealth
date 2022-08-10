@@ -26,7 +26,8 @@ export type ButtonType =
   | 'lg-tertiary-red'
   | 'lg-tertiary-blue'
   | 'primary-blue-dark'
-  | 'secondary-blue-dark';
+  | 'secondary-blue-dark'
+  | 'mini';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
@@ -37,6 +38,16 @@ export type ButtonAttrs = {
   label: string | Vnode<any>;
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
+
+const getTextType = (buttonType: ButtonType) => {
+  if (buttonType.slice(0, 2) === 'lg') {
+    return 'buttonLg';
+  } else if (buttonType === 'mini') {
+    return 'buttonMini';
+  } else {
+    return 'buttonSm';
+  }
+};
 
 export class CWButton implements m.ClassComponent<ButtonAttrs> {
   view(vnode) {
@@ -68,11 +79,7 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
             className="button-icon"
           />
         )}
-        <CWText
-          type={buttonType.slice(0, 2) === 'lg' ? 'buttonLg' : 'buttonSm'}
-          className="button-text"
-          noWrap
-        >
+        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
           {label}
         </CWText>
       </button>

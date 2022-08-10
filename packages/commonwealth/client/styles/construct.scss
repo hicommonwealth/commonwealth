@@ -77,11 +77,6 @@ $cui-base-height: floor($cui-base-size * 2.8);
   font-weight: $cui-font-weight-bold; // fix weight
 }
 
-.cui-tabs .cui-tabs-item {
-  font-weight: $cui-font-weight-bold; // fix weight
-  padding: 8px;
-}
-
 .cui-card h4 {
   font-weight: $cui-font-weight-bold; // fix weight
 }
@@ -123,19 +118,6 @@ button,
   a:hover {
     text-decoration: inherit;
   }
-}
-
-.cui-tabs-item {
-  color: $neutral-400;
-}
-
-.cui-tabs-item.cui-active {
-  color: $neutral-500;
-  border-color: $neutral-500;
-}
-
-.cui-tabs-item:hover {
-  color: $neutral-600;
 }
 
 // button color fixes
@@ -326,28 +308,6 @@ button,
         min-height: $icon-size;
         min-width: $icon-size;
       }
-    }
-  }
-}
-
-// reduce tab padding
-.cui-tabs {
-  .cui-tabs-item {
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  @each $size in $cui-sizes {
-    &.cui-#{$size} {
-      @include cui-tabs-size(
-        map-get($cui-padding-map, $size),
-        map-get($cui-font-size-map, $size)
-      );
     }
   }
 }
