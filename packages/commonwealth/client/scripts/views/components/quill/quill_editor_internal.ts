@@ -72,7 +72,8 @@ export default class QuillEditorInternal {
           [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
         ]),
         imageDropAndPaste: {
-          handler: this._imageHandler,
+          handler: (imageDataUrl, type) =>
+            this._imageHandler(imageDataUrl, type),
         },
         // TODO: Currently works, but throws Parchment error. Smooth functionality
         // requires troubleshooting
