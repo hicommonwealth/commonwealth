@@ -1,12 +1,12 @@
 import { ThreadKind } from 'models';
 
-export interface INewThreadForm {
-  topicName: string;
-  topicId: number;
-  title: string;
-  url?: string;
+export type NewThreadFormType = {
   kind: ThreadKind;
-}
+  title: string;
+  topicId: number;
+  topicName: string;
+  url?: string;
+};
 
 export enum NewThreadErrors {
   NoBody = 'Thread body cannot be blank',
