@@ -1,9 +1,35 @@
 @import 'shared';
 
+.MessageRow {
+  display: flex;
+
+  &.hasFeedback {
+    align-items: flex-end;
+    gap: 8px;
+    justify-content: space-between;
+
+    > * {
+      flex: 1;
+    }
+  }
+
+  .feedback-message-text.Text {
+    justify-content: flex-end;
+    margin-bottom: 4px;
+
+    &.success {
+      color: $green-600;
+    }
+
+    &.failure {
+      color: $rorange-500;
+    }
+  }
+}
+
 .TextInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
   width: 100%;
 
   .input-and-icon-container {
@@ -46,10 +72,5 @@
       top: 50%;
       transform: translateY(-50%);
     }
-  }
-
-  &.success,
-  &.failure {
-    margin-bottom: 0px;
   }
 }
