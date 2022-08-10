@@ -14,6 +14,7 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import Substrate from 'controllers/chain/substrate/main';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
   view(vnode) {
@@ -70,8 +71,10 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
           {(proposal instanceof SubstrateDemocracyProposal ||
             proposal instanceof SubstrateCollectiveProposal) &&
             proposal.getReferendum() && (
-              <div class="treasury-embed-section">
-                <p>Became referendum {proposal.getReferendum().identifier}</p>
+              <>
+                <CWText>
+                  Became referendum {proposal.getReferendum().identifier}
+                </CWText>
                 {app.activeChainId() && (
                   <CWButton
                     href={`/${app.activeChainId()}/proposal/${
@@ -88,16 +91,16 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                     label="Go to referendum"
                   />
                 )}
-              </div>
+              </>
             )}
           {proposal instanceof SubstrateDemocracyReferendum &&
             proposal.preimage &&
             proposal.getProposalOrMotion(proposal.preimage) && (
-              <div class="treasury-embed-section">
-                <p>
+              <>
+                <CWText>
                   Via {proposal.getProposalOrMotion(proposal.preimage).slug}{' '}
                   {proposal.getProposalOrMotion(proposal.preimage).identifier}
-                </p>
+                </CWText>
                 {app.activeChainId() && (
                   <CWButton
                     href={`/${app.activeChainId()}/proposal/${
@@ -119,7 +122,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                     label="Go to proposal"
                   />
                 )}
-              </div>
+              </>
             )}
         </div>
       );
@@ -165,14 +168,16 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
       return (
         <div class="LinkedProposalsEmbed">
           {democracyProposals.map((p) => (
-            <div class="treasury-embed-section">
-              <strong>Democracy Proposal ${p.shortIdentifier}</strong>
-              <p>
+            <>
+              <CWText fontWeight="semiBold">
+                Democracy Proposal ${p.shortIdentifier}
+              </CWText>
+              <CWText>
                 {p.preimage?.method === 'approveProposal' &&
                   'Approves this proposal'}
                 {p.preimage?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
-              </p>
+              </CWText>
               {app.activeChainId() && (
                 <CWButton
                   href={`/${app.activeChainId()}/proposal/${
@@ -187,17 +192,17 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                   label="Go to democracy proposal"
                 />
               )}
-            </div>
+            </>
           ))}
           {referenda.map((r) => (
-            <div class="treasury-embed-section">
-              <strong>Referendum {r.identifier}</strong>
-              <p>
+            <>
+              <CWText fontWeight="semiBold">Referendum {r.identifier}</CWText>
+              <CWText>
                 {r.preimage?.method === 'approveProposal' &&
                   'Approves this proposal'}
                 {r.preimage?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
-              </p>
+              </CWText>
               {app.activeChainId() && (
                 <CWButton
                   href={`/${app.activeChainId()}/proposal/${
@@ -212,17 +217,19 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                   label="Go to referendum"
                 />
               )}
-            </div>
+            </>
           ))}
           {councilMotions.map((mo) => (
-            <div class="treasury-embed-section">
-              <strong>Council Motion {mo.shortIdentifier}</strong>
-              <p>
+            <>
+              <CWText fontWeight="semiBold">
+                Council Motion {mo.shortIdentifier}
+              </CWText>
+              <CWText>
                 {mo.call?.method === 'approveProposal' &&
                   'Approves this proposal'}
                 {mo.call?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
-              </p>
+              </CWText>
               {app.activeChainId() && (
                 <CWButton
                   href={`/${app.activeChainId()}/proposal/${
@@ -237,7 +244,7 @@ export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
                   label="Go to motion"
                 />
               )}
-            </div>
+            </>
           ))}
         </div>
       );

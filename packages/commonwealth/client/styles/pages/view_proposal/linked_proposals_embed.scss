@@ -7,14 +7,4 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-
-  .treasury-embed-section {
-    p {
-      margin-bottom: 16px;
-    }
-  }
-
-  .treasury-embed-section + .treasury-embed-section {
-    margin-top: 24;
-  }
 }
