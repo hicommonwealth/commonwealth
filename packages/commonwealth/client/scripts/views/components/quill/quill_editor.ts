@@ -112,8 +112,12 @@ export class QuillEditor extends QuillEditorInternal {
 
   public isBlank(): boolean {
     if (this._quill.editor.isBlank()) return true;
-    if (this._quill.getText() === '\n') return true;
-    return false;
+    const newLinesOnly = /^\s+$/.test(this.text);
+    if (this.markdownMode) {
+      return newLinesOnly;
+    } else {
+      return this.contents.ops.length === 1 && newLinesOnly;
+    }
   }
 
   // Load a template or draft and overwrite activeMode

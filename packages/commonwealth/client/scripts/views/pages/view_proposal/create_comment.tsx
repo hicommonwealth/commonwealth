@@ -72,7 +72,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
         return;
       }
 
-
       if (this.quillEditorState?.isBlank()) {
         if (e) e.preventDefault();
         this.error = 'Comment cannot be blank';
@@ -95,14 +94,13 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           rootProposal.uniqueIdentifier,
           chainId,
           commentText,
-          proposalPageState.parentCommentId,
+          proposalPageState.parentCommentId
         );
 
         callback();
         this.quillEditorState.resetEditor();
         this.error = null;
         this.sendingComment = false;
-
 
         this.sendingComment = false;
 
