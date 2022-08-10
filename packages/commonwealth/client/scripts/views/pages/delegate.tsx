@@ -27,7 +27,7 @@ class DelegateForm implements m.ClassComponent {
   private form: DelegateFormType;
   private loading: boolean;
 
-  oninit(vnode) {
+  oninit() {
     this.form = {
       address: '',
       amount: null,
@@ -35,17 +35,15 @@ class DelegateForm implements m.ClassComponent {
 
     this.loading = false;
 
-    this.getDelegate(vnode);
+    this.getDelegate();
   }
 
-  async getDelegate(vnode) {
+  async getDelegate() {
     if (app.chain.network === ChainNetwork.Compound) {
-      vnode.state.currentDelegate = await (
-        app.chain as Compound
-      ).chain.getDelegate();
+      this.currentDelegate = await (app.chain as Compound).chain.getDelegate();
     } else if (app.chain.network === ChainNetwork.Aave) {
       // TODO: switch on delegation type
-      vnode.state.currentDelegate = await (app.chain as Aave).chain.getDelegate(
+      this.currentDelegate = await (app.chain as Aave).chain.getDelegate(
         app.user.activeAccount.address,
         'voting'
       );
@@ -54,9 +52,7 @@ class DelegateForm implements m.ClassComponent {
     m.redraw();
   }
 
-  async setDelegate(vnode) {
-    const { address } = vnode.attrs;
-
+  async setDelegate(address: string) {
     if (app.chain.apiInitialized) {
       let delegationPromise: Promise<void>;
 
@@ -70,7 +66,7 @@ class DelegateForm implements m.ClassComponent {
         try {
           await delegationPromise;
           notifySuccess(`Sent transaction to delegate to ${address}`);
-          this.getDelegate(vnode);
+          this.getDelegate();
         } catch (err) {
           notifyError(`${err.message}`);
         }
@@ -78,7 +74,7 @@ class DelegateForm implements m.ClassComponent {
     }
   }
 
-  view(vnode) {
+  view() {
     const { form, loading } = this;
 
     const hasValue = app.chain.network === ChainNetwork.Compound;
@@ -99,9 +95,8 @@ class DelegateForm implements m.ClassComponent {
             },
           ]}
         />
-        <CWText type="h4">Set up your delegation</CWText>,
+        <CWText type="h4">Set up your delegation</CWText>
         <CWTextInput
-          // name: 'address',
           label="Your delegate"
           placeholder="Paste address you want to delegate to"
           oninput={(e) => {
@@ -112,7 +107,6 @@ class DelegateForm implements m.ClassComponent {
         />
         {hasValue && (
           <CWTextInput
-            // name: 'amount',
             label="Amount to delegate"
             placeholder="10000"
             defaultValue=""
@@ -129,7 +123,7 @@ class DelegateForm implements m.ClassComponent {
           onclick={async (e) => {
             e.preventDefault();
             this.loading = true;
-            await this.setDelegate(vnode);
+            await this.setDelegate(form.address);
             this.loading = false;
             m.redraw();
           }}
