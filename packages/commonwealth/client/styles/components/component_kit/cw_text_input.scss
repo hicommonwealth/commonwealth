@@ -16,6 +16,7 @@
   .feedback-message-text.Text {
     justify-content: flex-end;
     margin-bottom: 4px;
+    text-align: right;
 
     &.success {
       color: $green-600;

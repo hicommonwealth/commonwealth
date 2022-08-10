@@ -167,10 +167,12 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             await updateDAO();
           }}
         />
-        <CWValidationText
-          message={this.state.message}
-          status={this.state.status}
-        />
+        {this.state.message && (
+          <CWValidationText
+            message={this.state.message}
+            status={this.state.status}
+          />
+        )}
         <InputRow
           title="Name"
           value={this.state.form.name}
