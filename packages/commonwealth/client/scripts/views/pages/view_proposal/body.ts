@@ -46,7 +46,10 @@ import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { jumpHighlightComment } from './helpers';
-import { countLinesQuill } from '../../components/quill/helpers';
+import {
+  countLinesMarkdown,
+  countLinesQuill,
+} from '../../components/quill/helpers';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
@@ -697,10 +700,6 @@ export const ProposalBodySpacer: m.Component<{}> = {
   view: (vnode) => {
     return m('.ProposalBodySpacer', m.trust('&middot;'));
   },
-};
-
-const countLinesMarkdown = (text) => {
-  return text.split('\n').length - 1;
 };
 
 const formatBody = (vnode, updateCollapse) => {

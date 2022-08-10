@@ -2,19 +2,26 @@ import m from 'mithril';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';
+import { DeltaOps } from './types';
 
-export const countLinesQuill = (ops) => {
+export const countLinesQuill = (ops: DeltaOps[]) => {
   let count = 0;
 
   for (const op of ops) {
-    try {
-      count += op.insert.split('\n').length - 1;
-    } catch (e) {
-      console.log(e);
+    if (typeof op.insert === 'string') {
+      try {
+        count += op.insert.split('\n').length - 1;
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
   return count;
+};
+
+export const countLinesMarkdown = (text: string) => {
+  return text.split('\n').length - 1;
 };
 
 // TODO Graham 22-6-5: Add option to trim doc to param length
