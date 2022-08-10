@@ -80,9 +80,9 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     stage = ThreadStage.Discussion
   ) {
     if (!this) throw new Error('no this');
-    const bodyText = quillEditorState.textContentsAsString;
+    const body = quillEditorState.textContentsAsString;
     quillEditorState.disable();
-    checkNewThreadErrors(form, bodyText);
+    checkNewThreadErrors(form, body);
 
     try {
       const result = await app.threads.create(
@@ -93,7 +93,8 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
         form.title,
         form.topicName,
         form.topicId,
-        bodyText
+        body,
+        form.url
       );
 
       navigateToSubpage(`/discussion/${result.id}`);
@@ -244,12 +245,8 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   }
 
   async onremove() {
-    const {
-      fromDraft,
-      form,
-      quillEditorState,
-      overwriteConfirmationModal,
-    } = this;
+    const { fromDraft, form, quillEditorState, overwriteConfirmationModal } =
+      this;
     if (
       this.form.kind === ThreadKind.Discussion &&
       !overwriteConfirmationModal
