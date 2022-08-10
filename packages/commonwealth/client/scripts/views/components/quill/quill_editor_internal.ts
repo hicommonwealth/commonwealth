@@ -72,7 +72,8 @@ export default class QuillEditorInternal {
           [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
         ]),
         imageDropAndPaste: {
-          handler: this._imageHandler,
+          handler: (imageDataUrl, type) =>
+            this._imageHandler(imageDataUrl, type),
         },
         // TODO: Currently works, but throws Parchment error. Smooth functionality
         // requires troubleshooting
@@ -88,7 +89,7 @@ export default class QuillEditorInternal {
           mentionDenotationChars: ['@'],
           dataAttributes: ['name', 'link', 'component'],
           renderItem: (item) => item.component,
-          onSelect: this._selectMention,
+          onSelect: () => this._selectMention,
           source: _.debounce(this._queryMentions, 300, {
             leading: true,
             trailing: true,
