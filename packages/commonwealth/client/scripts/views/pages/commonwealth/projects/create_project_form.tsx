@@ -14,6 +14,7 @@ import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
+import { QuillEditorComponent } from 'client/scripts/views/components/quill/quill_editor_component';
 import CoverImageUpload from './cover_image_upload';
 
 const weekInSeconds = 604800;
@@ -268,15 +269,14 @@ export class DescriptionSlide
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
-        {m(QuillEditor, {
-          oncreateBind: (state) => {
-            vnode.attrs.form.description = state.editor;
-          },
-          editorNamespace: 'project-description',
-          disableRichText: true,
-          placeholder:
-            'Write a full-length description of your project proposal,',
-        })}
+        <QuillEditorComponent
+          oncreateBind={(state: QuillEditor) => {
+            vnode.attrs.form.description = state;
+          }}
+          editorNamespace="project-description"
+          disableRichText={true}
+          placeholder="Write a full-length description of your project proposal"
+        />
       </div>
     );
   }
