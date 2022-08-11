@@ -100,7 +100,6 @@ export interface IProposalPageState {
   editing: boolean;
   highlightedComment: boolean;
   parentCommentId: number; // if null or undefined, reply is thread-scoped
-  pollEditorIsOpen: boolean;
   prefetch: IPrefetch;
   proposal: AnyProposal | Thread;
   recentlyEdited: boolean;
@@ -1001,13 +1000,8 @@ const ViewProposalPage: m.Component<
                   isEditor,
                   isAdmin: isAdminOrMod,
                   stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-                  pollEditorIsOpen: vnode.state.pollEditorIsOpen,
                   closeStageEditor: () => {
                     vnode.state.stageEditorIsOpen = false;
-                    m.redraw();
-                  },
-                  closePollEditor: () => {
-                    vnode.state.pollEditorIsOpen = false;
                     m.redraw();
                   },
                 }),
@@ -1136,13 +1130,8 @@ const ViewProposalPage: m.Component<
               isEditor,
               isAdmin: isAdminOrMod,
               stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-              pollEditorIsOpen: vnode.state.pollEditorIsOpen,
               closeStageEditor: () => {
                 vnode.state.stageEditorIsOpen = false;
-                m.redraw();
-              },
-              closePollEditor: () => {
-                vnode.state.pollEditorIsOpen = false;
                 m.redraw();
               },
             }),
@@ -1248,9 +1237,6 @@ const ViewProposalPage: m.Component<
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
               }),
           ]),
         ]),
