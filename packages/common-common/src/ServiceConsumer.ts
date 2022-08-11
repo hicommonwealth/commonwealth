@@ -7,21 +7,22 @@ import { RascalSubscriptions } from "./rabbitmq/types";
 
 let log;
 
-type subscription = {
+export type RabbitMQSubscription = {
   messageProcessor: (data: any) => Promise<any>;
   subscriptionName: RascalSubscriptions;
+  msgProcessorContext?: { [key: string]: any };
 };
 
 export class ServiceConsumer {
   public readonly serviceName: string;
   public readonly serviceId: string;
   public readonly rabbitMQController: RabbitMQController;
-  public readonly subscriptions: subscription[];
+  public readonly subscriptions: RabbitMQSubscription[];
 
   constructor(
     _serviceName: string,
-    _rabbitmqUri: string,
-    _subscriptions: subscription[]
+    _rabbitmqController: RabbitMQController,
+    _subscriptions: RabbitMQSubscription[]
   ) {
     this.serviceName = _serviceName;
     // TODO: make this deterministic somehow
@@ -32,23 +33,26 @@ export class ServiceConsumer {
     log = factory.getLogger(
       addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId])
     );
-
-    // create RabbitMQController instance
-    this.rabbitMQController = new RabbitMQController(
-      getRabbitMQConfig(_rabbitmqUri)
-    );
   }
 
   public async init(): Promise<void> {
     log.info(`Starting the ${this.serviceName}-${this.serviceId} consumer`);
 
+    if (!this.rabbitMQController.initialized) {
+      try {
+        await this.rabbitMQController.init();
+      } catch (e) {
+        log.error("Failed to initialize the RabbitMQ Controller", e);
+      }
+    }
+
     try {
-      // initialize RabbitMQ and start all the subscriptions for this consumer
-      await this.rabbitMQController.init();
+      // start all the subscriptions for this consumer
       for (const sub of this.subscriptions) {
         await this.rabbitMQController.startSubscription(
           sub.messageProcessor,
-          RascalSubscriptions[sub.subscriptionName]
+          RascalSubscriptions[sub.subscriptionName],
+          sub.msgProcessorContext
         );
       }
     } catch (e) {

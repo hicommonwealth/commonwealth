@@ -5,3 +5,7 @@ export enum RabbitMQQueues {
 export enum RascalSubscriptions {
   ChainEvents
 }
+
+export enum RascalPublications {
+  ChainEvents = "ijij",
+}

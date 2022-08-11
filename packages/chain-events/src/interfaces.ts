@@ -95,6 +95,8 @@ export interface CWEvent<IEventData = IChainEventData> {
 
 // handles individual events by sending them off to storage/notifying
 export abstract class IEventHandler<DBEventType = IChainEventData> {
+  name?: any;
+
   // throws on error, returns a db event, or void
   public abstract handle(
     event: CWEvent,

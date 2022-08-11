@@ -1,5 +1,6 @@
 import Rascal from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { RascalSubscriptions } from "./types";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -8,6 +9,7 @@ export class RabbitMQController {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   private readonly _rawVhost: any;
+  private _initialized: boolean = false;
 
   constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     // sets the first vhost config to _rawVhost
@@ -47,16 +49,21 @@ export class RabbitMQController {
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`
       );
     });
+
+    this._initialized = true;
   }
 
   /**
    * This function subscribes to a subscription defined in the RabbitMQ/Rascal config
    * @param messageProcessor The function to run for every message
    * @param subscriptionName The name of the subscription from the RabbitMQ/Rascal config file to start
+   * @param msgProcessorContext An object containing the context that should be
+   * used when calling the messageProcessor function
    */
   public async startSubscription(
-    messageProcessor: (data: any) => Promise<void>,
-    subscriptionName: string
+    messageProcessor: (data: any, ...args: any) => Promise<void>,
+    subscriptionName: string,
+    msgProcessorContext?: {[key: string]: any}
   ): Promise<any> {
     let subscription: Rascal.SubscriberSessionAsPromised;
     log.info(`Subscribing to ${subscriptionName}`);
@@ -66,7 +73,8 @@ export class RabbitMQController {
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
         try {
-          messageProcessor(content);
+          if (msgProcessorContext) messageProcessor.apply({...this, ...msgProcessorContext}, content);
+          else messageProcessor(content);
           ackOrNack();
         } catch (e) {
           ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}])
@@ -88,7 +96,7 @@ export class RabbitMQController {
     return subscription;
   }
 
-  public async publish(data: any, publisherName: string): Promise<any> {
+  public async publish(data: any, publisherName: any): Promise<any> {
     if (!this.publishers.includes(publisherName))
       throw new Error('Publisher is not defined');
 
@@ -100,5 +108,9 @@ export class RabbitMQController {
     } catch (err) {
       throw new Error(`Rascal config error: ${err.message}`);
     }
+  }
+
+  public get initialized(): boolean {
+    return this._initialized;
   }
 }

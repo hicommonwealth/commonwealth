@@ -1,157 +1,77 @@
-import { SubstrateTypes, CWEvent } from 'chain-events/src';
-import * as WebSocket from 'ws';
-import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
-import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
-
-import EventNotificationHandler from '../eventHandlers/notifications';
-import EventStorageHandler from '../eventHandlers/storage';
-import EntityArchivalHandler from '../eventHandlers/entityArchival';
-import IdentityHandler from '../eventHandlers/identity';
-import UserFlagsHandler from '../eventHandlers/userFlags';
-import ProfileCreationHandler from '../eventHandlers/profileCreation';
-import { ChainBase } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import models from '../database';
+import { BrokerConfig, SubscriberSessionAsPromised } from "rascal";
+import getRabbitMQConfig from "common-common/src/rabbitmq/RabbitMQConfig";
+import { RabbitMQSubscription, ServiceConsumer } from "common-common/src/ServiceConsumer";
+import EventStorageHandler from "./ChainEventHandlers/storage";
+import EntityArchivalHandler from "./ChainEventHandlers/entityArchival";
+import { ChainBase } from "common-common/src/types";
+import { factory, formatFilename } from "common-common/src/logging";
+import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
+import models from "../database";
 import { RABBITMQ_URI } from "../config";
+import { processChainEvents, Ithis as CeProcessorContextType } from "./MessageProcessors/ChainEventsQueue";
 
+
+// TODO: move userFlags, profileCreation, and notificationHandler to main service
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupChainEventListeners = async (wss: WebSocket.Server):
-  Promise<{ eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised}> => {
+async function setupChainEventConsumers() {
 
-  let consumer: RabbitMQController
+  let rmqController: RabbitMQController
   try {
-    consumer = new RabbitMQController(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI));
-    await consumer.init();
+    rmqController = new RabbitMQController(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI));
+    await rmqController.init();
   } catch (e) {
     log.error("Rascal consumer setup failed. Please check the Rascal configuration");
     throw e
   }
 
-  // writes events into the db as ChainEvents rows
-  const storageHandler = new EventStorageHandler(models, null);
-
+  // TODO: move this
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
-  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
-  const notificationHandler = new EventNotificationHandler(
-    models,
-    wss,
-    excludedNotificationEvents,
-    consumer
-  );
+  // const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
+  // const notificationHandler = new EventNotificationHandler(
+  //   models,
+  //   wss,
+  //   excludedNotificationEvents,
+  //   consumer
+  // );
+
+  // writes events into the db as ChainEvents rows
+  const storageHandler = new EventStorageHandler(models);
 
   // creates and updates ChainEntity rows corresponding with entity-related events
-  const entityArchivalHandler = new EntityArchivalHandler(models, null, wss);
-
-  // creates empty Address and OffchainProfile models for users who perform certain
-  // actions, like voting on proposals or registering an identity
-  const profileCreationHandler = new ProfileCreationHandler(models, null);
+  const entityArchivalHandler = new EntityArchivalHandler(models, null, rmqController);
 
   const allChainEventHandlers = [
     storageHandler,
-    notificationHandler,
     entityArchivalHandler,
-    profileCreationHandler,
   ];
 
-  // populates identity information in OffchainProfiles when received (Substrate only)
-  const identityHandler = new IdentityHandler(models, null);
-
-  // populates is_validator and is_councillor flags on Addresses when validator and
-  // councillor sets are updated (Substrate only)
-  const userFlagsHandler = new UserFlagsHandler(models, null);
-
-  const substrateEventHandlers = [identityHandler, userFlagsHandler];
-
-  const substrateChains = (
-    await models.Chain.findAll({
-      attributes: ['id'],
-      where: {
-        base: ChainBase.Substrate,
-      },
-    })
-  ).map((o) => o.id);
-
-  // feed the events into their respective handlers
-  async function processClassicEvents(event: CWEvent): Promise<void> {
-    let prevResult = null;
-    for (const handler of allChainEventHandlers) {
-      try {
-        prevResult = await handler.handle(event, prevResult);
-      } catch (err) {
-        log.error(
-          `${handler.name} handler failed to process the following event: ${JSON.stringify(
-            event,
-            null,
-            2
-          )}`,
-          err
-        );
-        break;
-      }
-    }
-    if (substrateChains.includes(event.chain)) {
-      for (const handler of substrateEventHandlers) {
-        try {
-          prevResult = await handler.handle(event, prevResult);
-        } catch (err) {
-          log.error(
-            `${handler.name} handler failed to process the following event: ${JSON.stringify(
-              event,
-              null,
-              2
-            )}`,
-            err
-          );
-          break;
-        }
-      }
-    }
+  // build the context the queue processor needs
+  const ceProcessorContext: CeProcessorContextType = {
+    allChainEventHandlers,
+    log
+  }
+  // build the RabbitMQ subscription
+  const ceProcessorRmqSub: RabbitMQSubscription = {
+    messageProcessor: processChainEvents,
+    subscriptionName: RascalSubscriptions.ChainEvents,
+    msgProcessorContext: ceProcessorContext
   }
 
-  async function processIdentityEvents(event: CWEvent): Promise<void> {
-    log.debug(`Received event: ${JSON.stringify(event, null, 2)}`);
-    try {
-      await identityHandler.handle(event, null);
-    } catch (err) {
-      log.error(`Identity event handle failure: ${err.message}`);
-    }
-  }
+  let subscriptions: RabbitMQSubscription[] = [ceProcessorRmqSub];
 
-  let eventsSubscriber: SubscriberSessionAsPromised, identitySubscriber: SubscriberSessionAsPromised;
-
-  try {
-    eventsSubscriber = await consumer.startSubscription(
-      processClassicEvents,
-      'ChainEventsHandlersSubscription'
-    );
-  } catch (e) {
-    log.info('Failure in ChainEventsHandlersSubscription');
-    throw e;
-  }
-
-  try {
-    identitySubscriber = await consumer.startSubscription(
-      processIdentityEvents,
-      'SubstrateIdentityEventsSubscription'
-    );
-  } catch (e) {
-    log.info('Failure in SubstrateIdentityEventsSubscription');
-    throw e;
-  }
-
+  const serviceConsumer = new ServiceConsumer("ChainEventsConsumer", rmqController, subscriptions);
+  await serviceConsumer.init();
 
   log.info('Consumer started');
-  return { eventsSubscriber, identitySubscriber };
-};
+}
 
 async function main() {
   try {
     log.info('Starting consumer...');
-    await setupChainEventListeners(null);
+    await setupChainEventConsumers();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }

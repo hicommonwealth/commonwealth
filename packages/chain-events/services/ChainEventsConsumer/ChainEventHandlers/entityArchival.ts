@@ -1,7 +1,6 @@
 /**
  * Determines which chain entities each event affects and updates state accordingly.
  */
-import WebSocket from 'ws';
 import {
   IEventHandler,
   CWEvent,
@@ -14,6 +13,7 @@ import {
 } from 'chain-events/src';
 
 import { factory, addPrefix } from 'common-common/src/logging';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -21,31 +21,10 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain?: string,
-    private readonly _wss?: WebSocket.Server
+    private readonly _rmqController?: RabbitMQController
   ) {
     super();
   }
-
-  // private async _wssSend(dbEntity, dbEvent) {
-  //   if (!this._wss) return;
-  //   const dbEventType = await dbEvent.getChainEventType();
-  //   const payload: IWebsocketsPayload<any> = {
-  //     event: WebsocketMessageNames.ChainEntity,
-  //     data: {
-  //       object_id: dbEntity.id,
-  //       chainEntity: dbEntity.toJSON(),
-  //       chainEvent: dbEvent.toJSON(),
-  //       chainEventType: dbEventType.toJSON(),
-  //     },
-  //   };
-  //   try {
-  //     this._wss.emit(WebsocketMessageNames.ChainEntity, payload);
-  //   } catch (e) {
-  //     log.warn(
-  //       `Failed to emit websocket event for entity ${dbEntity.type}:${dbEntity.type_id}`
-  //     );
-  //   }
-  // }
 
   /**
    * Handles an existing ChainEvent by connecting it with an entity, and creating
