@@ -157,12 +157,13 @@ const createChain = async (
       privateUrl = node.private_url;
     }
 
-    const existingChain = await models.Contract.findOrCreate({
-      where: { address: req.body.address, chain_node_id: node.id }
-    });
-    if (existingChain) {
-      return next(new Error(Errors.ChainAddressExists));
-    }
+    // TODO: Document to BD that multiple communities with the same contract can now exist
+    // const existingChain = await models.Chain.findOrCreate({
+    //   where: { address: req.body.address, chain_node_id: node.id }
+    // });
+    // if (existingChain) {
+    //   return next(new Error(Errors.ChainAddressExists));
+    // }
 
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
@@ -315,6 +316,12 @@ const createChain = async (
         type: chain.network,
       }
     });
+
+    await models.CommunityContract.create({
+      community_id: chain.id,
+      contract_id: contract.id,
+    });
+
     chain.Contract = contract;
   }
 
