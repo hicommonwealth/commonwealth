@@ -72,7 +72,8 @@ export default class QuillEditorInternal {
           [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
         ]),
         imageDropAndPaste: {
-          handler: this._imageHandler,
+          handler: (imageDataUrl, type) =>
+            this._imageHandler(imageDataUrl, type),
         },
         // TODO: Currently works, but throws Parchment error. Smooth functionality
         // requires troubleshooting
@@ -152,7 +153,6 @@ export default class QuillEditorInternal {
     // Restore defaultContent
     if (defaultContents) this._restoreSavedContents(defaultContents);
 
-    // TODO: What is the purpose of this??
     setInterval(() => {
       if (this._unsavedChanges.length() > 0) {
         if (this._quill.isEnabled()) {
@@ -166,7 +166,7 @@ export default class QuillEditorInternal {
         }
         m.redraw();
       }
-    }, 2500);
+    }, 250);
 
     return this._quill;
   }
