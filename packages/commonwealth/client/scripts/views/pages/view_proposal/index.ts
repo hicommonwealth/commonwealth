@@ -1121,9 +1121,6 @@ const ViewProposalPage: m.Component<
                   m(PollEditorCard, {
                     proposal,
                     proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                    openPollEditor: () => {
-                      vnode.state.pollEditorIsOpen = true;
-                    },
                   }),
               ]),
           ]),

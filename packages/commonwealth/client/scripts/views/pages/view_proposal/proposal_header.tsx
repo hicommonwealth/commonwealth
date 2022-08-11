@@ -19,7 +19,6 @@ import {
 } from 'models';
 import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
-import { PollEditor } from 'views/components/poll_editor';
 import {
   TopicEditorMenuItem,
   ThreadSubscriptionMenuItem,
@@ -88,8 +87,6 @@ export class ProposalHeader
       isEditor: boolean;
       isAdmin: boolean;
       stageEditorIsOpen: boolean;
-      pollEditorIsOpen: boolean;
-      closePollEditor: Function;
       closeStageEditor: Function;
     }>
 {
@@ -292,15 +289,6 @@ export class ProposalHeader
                           }}
                         />
                       ),
-                    vnode.attrs.pollEditorIsOpen && proposal instanceof Thread && (
-                      <PollEditor
-                        thread={vnode.attrs.proposal as Thread}
-                        onChangeHandler={() => {
-                          vnode.attrs.closePollEditor();
-                          m.redraw();
-                        }}
-                      />
-                    ),
                   ]
                 : [
                     m(ProposalBodyAuthor, { item: proposal }),
