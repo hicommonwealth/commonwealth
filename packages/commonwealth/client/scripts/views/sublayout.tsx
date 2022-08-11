@@ -76,9 +76,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     return (
       <div class="Sublayout">
-        {!app.isCustomDomain() && !hideQuickSwitcher && (
-          <SidebarQuickSwitcher />
-        )}
         <div class="header-and-body-container">
           <MobileHeader />
           <div class="header-container">
@@ -94,12 +91,12 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            {!hideSidebar && <Sidebar />}
             {!app.isCustomDomain() &&
+              !hideQuickSwitcher &&
               !isWindowMediumSmallInclusive(window.innerWidth) && (
                 <SidebarQuickSwitcher />
               )}
-            <Sidebar />
+            {!hideSidebar && <Sidebar />}
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

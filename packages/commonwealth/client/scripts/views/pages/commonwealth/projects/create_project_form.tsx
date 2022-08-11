@@ -5,6 +5,7 @@ import m from 'mithril';
 
 import app from 'state';
 import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
@@ -14,7 +15,6 @@ import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
-import { QuillEditorComponent } from 'client/scripts/views/components/quill/quill_editor_component';
 import CoverImageUpload from './cover_image_upload';
 
 const weekInSeconds = 604800;
@@ -29,7 +29,7 @@ export const validateProjectForm = (property: string, value: string) => {
   let errorMessage: string;
   switch (property) {
     case 'title':
-      if (value.length < 8 || value.length > 64) {
+      if (value.length < 4 || value.length > 64) {
         errorMessage = `Title must be valid string between 3 and 64 characters. Current count: ${value.length}`;
       }
       break;
@@ -67,7 +67,7 @@ export const validateProjectForm = (property: string, value: string) => {
   }
 
   if (errorMessage) {
-    return ['error', errorMessage];
+    return ['failure', errorMessage];
   } else {
     return ['success', `Valid ${property}`];
   }
@@ -93,6 +93,10 @@ export interface ICreateProjectForm {
   threshold: number;
   fundraiseLength: number;
   curatorFee: number;
+
+  // Construct SelectList data
+  tokenIdx: number;
+  fundraiseLengthIdx: number;
 }
 
 export class InformationSlide
@@ -107,13 +111,16 @@ export class InformationSlide
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
         <CWTextInput
+          defaultValue={vnode.attrs.form.title}
           placeholder="Your Project Name Here"
           label="Name Your Crowdfund"
           name="Name"
           onsuccess={(e) => {
             vnode.attrs.form.title = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(value: string) =>
+            validateProjectForm('title', value)
+          }
         />
         <CWTextInput
           defaultValue={app.user.activeAccount.address}
@@ -122,13 +129,16 @@ export class InformationSlide
           name="Creator Address"
         />
         <CWTextArea
+          defaultValue={vnode.attrs.form.shortDescription}
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
           name="Short Description"
           onsuccess={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(value: string) =>
+            validateProjectForm('shortDescription', value)
+          }
         />
         <CoverImageUpload
           uploadStartedCallback={() => {
@@ -162,6 +172,7 @@ export class FundraisingSlide
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
         <SelectList
+          defaultIndex={vnode.attrs.form.tokenIdx}
           items={[
             {
               name: 'WETH',
@@ -190,9 +201,10 @@ export class FundraisingSlide
           filterable={false}
           label="Raise In"
           name="Raise In"
-          onSelect={(token: TokenOption) => {
+          onSelect={(token: TokenOption, idx: number) => {
             this.tokenName = token.name;
             vnode.attrs.form.token = token.address;
+            vnode.attrs.form.tokenIdx = idx;
           }}
           style="width: 441px;"
           trigger={
@@ -206,9 +218,9 @@ export class FundraisingSlide
           }
         />
         <SelectList
+          defaultIndex={vnode.attrs.form.fundraiseLengthIdx}
           items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
           itemRender={(i: string) => {
-            console.log(i);
             return (
               <div value={i} style="cursor: pointer">
                 <CWText type="body1">{i}</CWText>
@@ -218,9 +230,10 @@ export class FundraisingSlide
           filterable={false}
           label="Fundraising Period"
           name="Fundraising Period"
-          onSelect={(length: string) => {
+          onSelect={(length: string, idx: number) => {
             const lengthInSeconds = +length.split(' ')[0] * weekInSeconds;
             vnode.attrs.form.fundraiseLength = lengthInSeconds;
+            vnode.attrs.form.fundraiseLengthIdx = idx;
           }}
           style="width: 441px;"
           trigger={
@@ -236,22 +249,28 @@ export class FundraisingSlide
           }
         />
         <CWTextInput
+          defaultValue={vnode.attrs.form.beneficiary}
           placeholder="Address"
           label="Beneficiary Address"
           name="Beneficiary Address"
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(value: string) =>
+            validateProjectForm('beneficiary', value)
+          }
           onsuccess={(e) => {
             vnode.attrs.form.beneficiary = e.target.value;
           }}
         />
         <CWTextInput
+          defaultValue={vnode.attrs.form.curatorFee}
           placeholder="Set Quantity"
           label="Curator Fee (%)"
           name="Curator Fee"
           onsuccess={(e) => {
             vnode.attrs.form.curatorFee = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(value: string) =>
+            validateProjectForm('curatorFee', value)
+          }
         />
       </div>
     );
@@ -270,6 +289,7 @@ export class DescriptionSlide
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
         <QuillEditorComponent
+          defaultContents={vnode.attrs.form.description}
           oncreateBind={(state: QuillEditor) => {
             vnode.attrs.form.description = state;
           }}
@@ -287,11 +307,11 @@ export default class CreateProjectForm implements m.ClassComponent {
   private stage: 'information' | 'fundraising' | 'description';
 
   view() {
+    if (!app?.chain) return;
     // Create project form must be scoped to an Ethereum page
     if (
-      !app?.user?.activeAccount ||
-      !app.activeChainId() ||
-      app.user.activeAccount.chainBase !== ChainBase.Ethereum
+      !app.isLoggedIn ||
+      app.user.activeAccount?.chainBase !== ChainBase.Ethereum
     ) {
       m.route.set(`/projects/explore`);
     }
@@ -300,10 +320,12 @@ export default class CreateProjectForm implements m.ClassComponent {
       this.stage = 'information';
     }
     if (!this.form) {
+      console.log('no form');
       this.form = {
         title: '',
         // WETH hard-coded as default raise token, but can be overwritten
         token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+        tokenIdx: null,
         creator: app.user.activeAccount.address,
         beneficiary: '',
         description: '',
@@ -312,9 +334,13 @@ export default class CreateProjectForm implements m.ClassComponent {
         curatorFee: 0,
         threshold: 0,
         fundraiseLength: weekInSeconds,
+        fundraiseLengthIdx: null,
         chainId: app.activeChainId(),
       };
     }
+
+    console.log(this.form);
+
     return (
       <Sublayout
         title="Create project"

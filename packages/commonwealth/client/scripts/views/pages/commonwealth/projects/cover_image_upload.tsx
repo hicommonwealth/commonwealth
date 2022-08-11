@@ -93,7 +93,6 @@ export default class CoverImageUpload
 
   view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
     const logoURL = this.dropzone?.options?.url;
-    console.log(this.dropzone);
     return (
       <div class="CoverImageUpload">
         <div
