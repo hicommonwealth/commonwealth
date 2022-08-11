@@ -20,7 +20,6 @@ const status = async (
     const [
       chains,
       nodes,
-      contractCategories,
       notificationCategories,
       chainCategories,
       chainCategoryTypes,
@@ -38,7 +37,6 @@ const status = async (
         ],
       }),
       models.ChainNode.findAll(),
-      models.ContractCategory.findAll(),
       models.NotificationCategory.findAll(),
       models.ChainCategory.findAll(),
       models.ChainCategoryType.findAll(),
@@ -70,7 +68,6 @@ const status = async (
       return res.json({
         chains,
         nodes,
-        contractCategories,
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
@@ -285,7 +282,6 @@ const status = async (
     return res.json({
       chains,
       nodes,
-      contractCategories,
       notificationCategories,
       chainCategories,
       chainCategoryTypes,

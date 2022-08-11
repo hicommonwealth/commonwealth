@@ -1,8 +1,9 @@
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -16,7 +17,7 @@ export const Errors = {
   QueryFailed: 'Balance query failed',
 };
 
-type TokenBalanceReq = { address: string, author_chain: string, chain: string };
+type TokenBalanceReq = { address: string, author_chain: string, chain: string, contract_address: string };
 type TokenBalanceResp = string;
 
 const tokenBalance = async (
@@ -32,6 +33,7 @@ const tokenBalance = async (
   let chain: ChainInstance;
   let author: AddressInstance;
   let error: string;
+  let contract: ContractInstance;
   try {
     [chain, error] = await validateChain(models, req.body);
     if (error) throw new Error(error);
@@ -46,19 +48,32 @@ const tokenBalance = async (
   }
 
   try {
+    const { contract_address } = req.body;
+    contract = await models.Contract.findOne({
+      where: {
+        address: contract_address,
+      }
+    });
+  } catch (err) {
+    throw new AppError(err);
+  }
+
+
+
+  try {
     const balance = await tokenBalanceCache.getBalance(
       chain.chain_node_id,
       author.address,
-      chain.address,
+      contract.address,
       chain.network === ChainNetwork.ERC20
         ? 'erc20' : chain.network === ChainNetwork.ERC721
           ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined,
+            ? 'spl-token' : undefined, // TODO: @Jake, should we be using Chain.ChainNode.base instead of network?
     );
     return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
-    throw new Error(Errors.QueryFailed);
+    throw new ServerError(Errors.QueryFailed);
   }
 };
 

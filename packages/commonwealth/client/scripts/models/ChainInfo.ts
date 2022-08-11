@@ -18,7 +18,7 @@ class ChainInfo {
   public readonly ChainNode: NodeInfo;
   public readonly address: string;
   public readonly tokenName: string;
-  public readonly symbol: string;
+  public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
   public readonly base: ChainBase;
@@ -56,7 +56,7 @@ class ChainInfo {
   constructor({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     iconUrl,
     description,
@@ -89,7 +89,7 @@ class ChainInfo {
     this.id = id;
     this.network = network;
     this.base = base;
-    this.symbol = symbol;
+    this.default_symbol = default_symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
@@ -124,7 +124,7 @@ class ChainInfo {
   public static fromJSON({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     icon_url,
     description,
@@ -150,7 +150,7 @@ class ChainInfo {
     decimals,
     substrate_spec,
     token_name,
-    address,
+    Contract,
     ChainNode,
     admin_only_polling,
   }) {
@@ -164,7 +164,7 @@ class ChainInfo {
     return new ChainInfo({
       id,
       network,
-      symbol,
+      default_symbol,
       name,
       iconUrl: icon_url,
       description,
@@ -190,7 +190,7 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      address,
+      address: Contract?.address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
