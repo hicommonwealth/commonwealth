@@ -31,95 +31,96 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
       [vhost]: {
         'connection': rabbitmq_uri,
         'exchanges': {
-          'EventsExchange': {
+          'ChainEventsExchange': {
             'assert': true,
-            'type': 'topic'
+            'type': 'fanout',
+            'options': {
+              'durable': true,
+            }
           },
-          'DeadLetterExchange': {
+          'CreateDeleteExchange': {
             'assert': true,
-          }
+            'type': 'topic',
+            'options': {
+              'durable': true
+            }
+          },
         },
         'queues': {
-          'ChainEventsHandlersQueue': {
+          'ChainEventsQueue': {
             'assert': true,
             'purge': purge,
-            'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
-            }
           },
-          'SubstrateIdentityEventsQueue': {
+          'ChainCDChainEventsQueue': {
             'assert': true,
             'purge': purge,
-            'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
-            }
           },
-          'ChainEventsNotificationsQueue': {
+          'ChainEntityCDMainQueue': {
             'assert': true,
             'purge': purge,
-            'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue',
-              "arguments": {
-                "x-message-ttl": 600000
-              }
-            }
           },
-          'DeadLetterQueue': {
+          'ChainEventNotificationsQueue': {
             'assert': true,
-            'purge': purge
-          }
+            'purge': purge,
+          },
         },
         'bindings': {
-          'ChainEventsHandlersBinding': {
-            'source': 'EventsExchange',
-            'destination': 'ChainEventsHandlersQueue',
+          'ChainEventsBinding': {
+            'source': 'ChainEventsExchange',
+            'destination': 'ChainEventsQueue',
             'destinationType': 'queue',
-            'bindingKey': 'eQueue'
+            'bindingKey': 'ChainEvents'
           },
-          'SubstrateIdentityEventsBinding': {
-            'source': 'EventsExchange',
-            'destination': 'SubstrateIdentityEventsQueue',
+          'ChainCDChainEventsBinding': {
+            'source': 'CreateDeleteExchange',
+            'destination': 'ChainCDChainEventsQueue',
             'destinationType': 'queue',
-            'bindingKey': 'iQueue'
+            'bindingKey': 'ChainCD'
           },
-          'ChainEventsNotificationsBinding': {
-            'source': 'EventsExchange',
-            'destination': 'ChainEventsNotificationsQueue',
+          'ChainEntityCDMainBinding': {
+            'source': 'CreateDeleteExchange',
+            'destination': 'ChainEntityCDMainQueue',
             'destinationType': 'queue',
-            'bindingKey': 'nQueue'
+            'bindingKey': 'ChainEntityCD'
           },
-          'DeadLetterBinding': {
-            'source': 'DeadLetterExchange',
-            'destination': 'DeadLetterQueue',
+          'ChainEventNotificationsBinding': {
+            'source': 'ChainEventsExchange',
+            'destination': 'ChainEventNotificationsQueue',
             'destinationType': 'queue',
-            'bindingKey': 'dlQueue'
+            'bindingKey': 'ChainEventNotifications'
           }
         },
         'publications': {
-          'ChainEventsHandlersPublication': {
-            'exchange': 'EventsExchange',
-            'routingKey': 'eQueue',
+          'ChainEventsPublication': {
+            'exchange': 'ChainEventsExchange',
+            'routingKey': 'ChainEvents',
             'confirm': true,
             'timeout': 10000,
             'options': {
               'persistent': true
             }
           },
-          'SubstrateIdentityEventsPublication': {
-            'exchange': 'EventsExchange',
-            'routingKey': 'iQueue',
+          'ChainCDChainEventsPublication': {
+            'exchange': 'CreateDeleteExchange',
+            'routingKey': 'ChainCD',
             'confirm': true,
             'timeout': 10000,
             'options': {
               'persistent': true
             }
           },
-          'ChainEventsNotificationsPublication': {
-            'exchange': 'EventsExchange',
-            'routingKey': 'nQueue',
+          'ChainEntityCDMainPublication': {
+            'exchange': 'CreateDeleteExchange',
+            'routingKey': 'ChainEntityCD',
+            'confirm': true,
+            'timeout': 10000,
+            'options': {
+              'persistent': true
+            },
+          },
+          'ChainEventNotificationsPublication': {
+            'exchange': 'ChainEventsExchange',
+            'routingKey': 'ChainEvents',
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -128,24 +129,32 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           }
         },
         'subscriptions': {
-          'ChainEventsHandlersSubscription': {
-            'queue': 'ChainEventsHandlersQueue',
+          'ChainEventsSubscription': {
+            'queue': 'ChainEventsQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
             },
             'prefetch': 10,
           },
-          'SubstrateIdentityEventsSubscription': {
-            'queue': 'SubstrateIdentityEventsQueue',
+          'ChainCDChainEventsSubscription': {
+            'queue': 'ChainCDChainEventsQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
             },
             'prefetch': 10,
           },
-          'ChainEventsNotificationsSubscription': {
-            'queue': 'ChainEventsNotificationsQueue',
+          'ChainEntityCDMainSubscription': {
+            'queue': 'ChainEntityCDMainQueue',
+            'contentType': 'application/json',
+            'retry': {
+              'delay': 1000
+            },
+            'prefetch': 10,
+          },
+          'ChainEventNotificationsSubscription': {
+            'queue': 'ChainEventNotificationsQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000

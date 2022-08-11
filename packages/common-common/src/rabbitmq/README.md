@@ -1,4 +1,4 @@
-# ce-rabbitmq-plugin
+# General Info
 This package is a plugin that allows chain-events to be used with rabbitmq. This plugin relies heavily on Rascal, a 
 config drive wrapper for amqp.
 
@@ -11,6 +11,10 @@ queues. The producer is the parent class of the RabbitMqHandler.
 ### RabbitMqHandler
 This is a chain-events event handler (IEventHandler) used to publish events to rabbitmq.
 
+
+# Queue Naming Conventions
+- Queues that are bound to the **CreateDelete Exchange** are formatted like so: 
+  - [object being created or deleted]CD[Destination service]Queue
 
 # Setting up RabbitMQ
 ### Installation

@@ -14,6 +14,7 @@ import {
 
 import { factory, addPrefix } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -91,7 +92,6 @@ export default class extends IEventHandler {
         );
       }
 
-      // TODO: create thread?
       return dbEvent;
     };
 
@@ -124,7 +124,6 @@ export default class extends IEventHandler {
         dbEntity.completed = true;
         await dbEntity.save();
       }
-      // await this._wssSend(dbEntity, dbEvent);
 
       return dbEvent;
     };
@@ -140,20 +139,30 @@ export default class extends IEventHandler {
     const fieldName = entityToFieldName(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
+    let result;
     switch (updateType) {
       case EntityEventKind.Create: {
-        return createEntityFn(entityKind, fieldValue, author);
+        result = await createEntityFn(entityKind, fieldValue, author);
+        break;
       }
       case EntityEventKind.Update:
       case EntityEventKind.Vote: {
-        return updateEntityFn(entityKind, fieldValue);
+        result = await updateEntityFn(entityKind, fieldValue);
+        break;
       }
       case EntityEventKind.Complete: {
-        return updateEntityFn(entityKind, fieldValue, true);
+        result = await updateEntityFn(entityKind, fieldValue, true);
+        break;
       }
       default: {
-        return null;
+        result = null;
+        break;
       }
+    }
+
+    // TODO: trim result to only include the values the main service needs
+    if (result) {
+      await this._rmqController.publish(result, RascalPublications.ChainEntityCDMain)
     }
   }
 }

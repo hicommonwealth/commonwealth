@@ -1,11 +1,13 @@
-export enum RabbitMQQueues {
-  ChainEvents = 'ChainEventsQueue'
-}
-
 export enum RascalSubscriptions {
-  ChainEvents
+  ChainEvents = 'ChainEventsPublication',
+  ChainCDChainEvents = 'ChainCDChainEventsPublication',
+  ChainEntityCDMain = 'ChainEntityCDMainPublication',
+  ChainEventNotifications = 'ChainEventNotificationsPublication'
 }
 
 export enum RascalPublications {
-  ChainEvents = "ijij",
+  ChainEvents = 'ChainEventsSubscription',
+  ChainCDChainEvents = 'ChainCDChainEventsSubscription',
+  ChainEntityCDMain = 'ChainEntityCDMainSubscription',
+  ChainEventNotifications = 'ChainEventNotificationsSubscription'
 }
