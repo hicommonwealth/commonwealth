@@ -40,6 +40,8 @@ async function setupMainConsumer() {
     msgProcessorContext: chainEntityCUDContext,
   };
 
+  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
+
   let subscriptions: RabbitMQSubscription[] = [chainEntityCUDProcessorRmqSub];
 
   const serviceConsumer = new ServiceConsumer(
@@ -53,3 +55,14 @@ async function setupMainConsumer() {
     `Consumer started. Name: ${serviceConsumer.serviceName}, id: ${serviceConsumer.serviceId}`
   );
 }
+
+async function main() {
+  try {
+    log.info("Starting main consumer");
+    await setupMainConsumer();
+  } catch (error) {
+    log.fatal("Consumer setup failed", error);
+  }
+}
+
+main();

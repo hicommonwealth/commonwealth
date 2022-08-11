@@ -65,7 +65,6 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   object_id: string,
   notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
-  wss?: WebSocket.Server,
   excludeAddresses?: string[],
   includeAddresses?: string[],
 ) => Promise<NotificationInstance> };
@@ -107,7 +106,6 @@ export default (
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
     webhook_data?: WebhookContent,
-    wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
   ): Promise<NotificationInstance> => {

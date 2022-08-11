@@ -1,7 +1,6 @@
 /**
  * Generic handler that transforms events into notifications.
  */
-import WebSocket from 'ws';
 import {
   IEventHandler,
   CWEvent,
@@ -18,9 +17,7 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models,
-    private readonly _wss?: WebSocket.Server,
     private readonly _excludedEvents: IChainEventKind[] = [],
-    private readonly _rabbitMqController?: RabbitMQController
   ) {
     super();
   }
@@ -54,7 +51,6 @@ export default class extends IEventHandler {
         dbEventType.id,
         { chainEvent: dbEvent, chainEventType: dbEventType, chain_id: event.chain },
         { chainEvent: dbEvent, chainEventType: dbEventType, chain: event.chain }, // TODO: add webhook data once specced out
-        this._wss,
         event.excludeAddresses,
         event.includeAddresses
       );
@@ -63,9 +59,6 @@ export default class extends IEventHandler {
       const formattedEvent: ChainEventNotification = dbNotification.toJSON();
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
-
-      // publish notification to the appropriate RabbitMQ queue (sends to socket.io servers to send to clients)
-      await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
 
       return dbEvent;
     } catch (e) {
