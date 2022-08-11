@@ -39,7 +39,6 @@ import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
-import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 
@@ -61,11 +60,8 @@ async function main() {
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
-  const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-  const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
-  const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
   const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
 
   // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
@@ -78,48 +74,8 @@ async function main() {
 
   const tokenBalanceCache = new TokenBalanceCache();
   const ruleCache = new RuleCache();
-  const listenChainEvents = async () => {
-    try {
-      // configure chain list from events
-      let chains: string[] | 'all' | 'none' = 'all';
-      if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
-        chains = CHAIN_EVENTS;
-      } else if (CHAIN_EVENTS) {
-        chains = CHAIN_EVENTS.split(',');
-      }
-      const subscribers = await setupChainEventListeners(
-        null,
-        chains,
-        SKIP_EVENT_CATCHUP
-      );
-      // construct storageFetchers needed for the identity cache
-      const fetchers = {};
-      for (const [chain, subscriber] of subscribers) {
-        if (chain.base === ChainBase.Substrate) {
-          fetchers[chain.id] = new SubstrateEvents.StorageFetcher(
-            subscriber.api
-          );
-        }
-      }
-      await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
-      return 0;
-    } catch (e) {
-      console.error(`Chain event listener setup failed: ${e.message}`);
-      return 1;
-    }
-  };
   let rc = null;
-  if (RUN_AS_LISTENER) {
-    // hack to keep process running indefinitely
-    process.stdin.resume();
-    listenChainEvents().then((retcode) => {
-      if (retcode) {
-        process.exit(retcode);
-      }
-      // if recode === 0, continue indefinitely
-    });
-    return;
-  } else if (SHOULD_SEND_EMAILS) {
+  if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
   } else if (IDENTITY_MIGRATION) {
     log.info('Started migrating chain identities into the DB');
@@ -243,7 +199,7 @@ async function main() {
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
-  
+
 
     // add other middlewares
     app.use(logger('dev'));
@@ -301,15 +257,6 @@ async function main() {
 
   setupErrorHandlers(app, rollbar);
 
-  if (CHAIN_EVENTS) {
-    const exitCode = await listenChainEvents();
-    console.log(`setup chain events listener with code: ${exitCode}`);
-    if (exitCode) {
-      await models.sequelize.close();
-      await closeMiddleware();
-      process.exit(exitCode);
-    }
-  }
   setupServer(app, rollbar, models);
 }
 
