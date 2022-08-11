@@ -6,7 +6,8 @@ import EntityArchivalHandler from "./ChainEventHandlers/entityArchival";
 import { ChainBase } from "common-common/src/types";
 import { factory, formatFilename } from "common-common/src/logging";
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
-import models from "../database";
+import { RascalSubscriptions } from "common-common/src/rabbitmq/types";
+import models from "../app/database";
 import { RABBITMQ_URI } from "../config";
 import { processChainEvents, Ithis as CeProcessorContextType } from "./MessageProcessors/ChainEventsQueue";
 

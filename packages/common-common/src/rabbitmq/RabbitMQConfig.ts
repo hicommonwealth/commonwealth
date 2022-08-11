@@ -1,4 +1,5 @@
 import Rascal from "rascal";
+import { RascalPublications, RascalSubscriptions } from "./types";
 
 /**
  * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.
@@ -91,7 +92,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           }
         },
         'publications': {
-          'ChainEventsPublication': {
+          [RascalPublications.ChainEvents]: {
             'exchange': 'ChainEventsExchange',
             'routingKey': 'ChainEvents',
             'confirm': true,
@@ -100,7 +101,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             }
           },
-          'ChainCDChainEventsPublication': {
+          [RascalPublications.ChainCDChainEvents]: {
             'exchange': 'CreateDeleteExchange',
             'routingKey': 'ChainCD',
             'confirm': true,
@@ -109,7 +110,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             }
           },
-          'ChainEntityCDMainPublication': {
+          [RascalPublications.ChainEntityCDMain]: {
             'exchange': 'CreateDeleteExchange',
             'routingKey': 'ChainEntityCD',
             'confirm': true,
@@ -118,18 +119,9 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             },
           },
-          'ChainEventNotificationsPublication': {
-            'exchange': 'ChainEventsExchange',
-            'routingKey': 'ChainEvents',
-            'confirm': true,
-            'timeout': 10000,
-            'options': {
-              'persistent': true
-            }
-          }
         },
         'subscriptions': {
-          'ChainEventsSubscription': {
+          [RascalSubscriptions.ChainEvents]: {
             'queue': 'ChainEventsQueue',
             'contentType': 'application/json',
             'retry': {
@@ -137,7 +129,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
             'prefetch': 10,
           },
-          'ChainCDChainEventsSubscription': {
+          [RascalSubscriptions.ChainCDChainEvents]: {
             'queue': 'ChainCDChainEventsQueue',
             'contentType': 'application/json',
             'retry': {
@@ -145,7 +137,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
             'prefetch': 10,
           },
-          'ChainEntityCDMainSubscription': {
+          [RascalSubscriptions.ChainEntityCDMain]: {
             'queue': 'ChainEntityCDMainQueue',
             'contentType': 'application/json',
             'retry': {
@@ -153,7 +145,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
             'prefetch': 10,
           },
-          'ChainEventNotificationsSubscription': {
+          [RascalSubscriptions.ChainEventNotifications]: {
             'queue': 'ChainEventNotificationsQueue',
             'contentType': 'application/json',
             'retry': {

@@ -9,5 +9,4 @@ export enum RascalPublications {
   ChainEvents = 'ChainEventsSubscription',
   ChainCDChainEvents = 'ChainCDChainEventsSubscription',
   ChainEntityCDMain = 'ChainEntityCDMainSubscription',
-  ChainEventNotifications = 'ChainEventNotificationsSubscription'
 }
