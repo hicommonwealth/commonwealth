@@ -27,7 +27,7 @@ const validateTopicThreshold = async (
             // only support thresholds on token forums
             // TODO: can we support for token-backed DAOs as well?
             type: ChainType.Token,
-          } as WhereOptions<ChainAttributes>
+          } as WhereOptions<ChainAttributes>,
         },
       ]
     });
@@ -35,12 +35,17 @@ const validateTopicThreshold = async (
       // if associated with an offchain community, or if not token forum, always allow
       return true;
     }
+    const communityContracts = await models.CommunityContract.findOne({
+      where: { community_id: topic.chain.id },
+      include: [{ model: models.Contract, required: true }],
+    }); // TODO: @JAKE in the future, we will have more than one contract, 
+      // need to handle this through the TBC Rule, passing in associated Contract.id
     const threshold = topic.token_threshold;
     if (threshold && threshold > 0) {
       const tokenBalance = await tbc.getBalance(
         topic.chain.chain_node_id,
         userAddress,
-        topic.chain.address,
+        communityContracts?.Contract?.address,
         topic.chain.network === ChainNetwork.ERC20
           ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
             ? 'erc721' : topic.chain.network === ChainNetwork.SPL

@@ -45,7 +45,6 @@ export type ChainAttributes = {
   snapshot?: string[];
   bech32_prefix?: string;
   Contract?: ContractInstance;
-  address?: string;
   token_name?: string;
   ce_verbose?: boolean;
 
@@ -79,6 +78,7 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     TopicInstance,
     TopicInstance['id']
   >;
+  getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>; // TODO: @JAKE Is this all that's needed bc association through CommunityContracts?
 };
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
@@ -94,7 +94,6 @@ export default (
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
-      address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
@@ -159,7 +158,10 @@ export default (
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
     });
-    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'community_id'}); // @TODO: Is this right?
+    models.Chain.belongsToMany(models.Contract, {
+      through: models.CommunityContract,
+    }); // TODO: is this correct?
+    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'community_id'}); // @TODO: Is this necessary with above?
   };
 
   return Chain;
