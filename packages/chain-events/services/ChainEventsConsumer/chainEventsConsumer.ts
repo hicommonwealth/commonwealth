@@ -1,18 +1,16 @@
-import { BrokerConfig, SubscriberSessionAsPromised } from "rascal";
+import { BrokerConfig } from "rascal";
 import getRabbitMQConfig from "common-common/src/rabbitmq/RabbitMQConfig";
 import { RabbitMQSubscription, ServiceConsumer } from "common-common/src/ServiceConsumer";
 import EventStorageHandler from "./ChainEventHandlers/storage";
 import EntityArchivalHandler from "./ChainEventHandlers/entityArchival";
-import { ChainBase } from "common-common/src/types";
 import { factory, formatFilename } from "common-common/src/logging";
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
 import { RascalSubscriptions } from "common-common/src/rabbitmq/types";
 import models from "../app/database";
 import { RABBITMQ_URI } from "../config";
-import { processChainEvents, Ithis as CeProcessorContextType } from "./MessageProcessors/ChainEventsQueue";
+import { Ithis as ChainEventsProcessorContextType, processChainEvents } from "./MessageProcessors/ChainEventsQueue";
+import { processChainCUD, Ithis as chainCUDContextType } from "./MessageProcessors/ChainCUDChainEventsQueue";
 
-
-// TODO: move userFlags, profileCreation, and notificationHandler to main service
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,19 +47,29 @@ async function setupChainEventConsumers() {
     entityArchivalHandler,
   ];
 
-  // build the context the queue processor needs
-  const ceProcessorContext: CeProcessorContextType = {
+  // setup Chain
+  const chainEventsProcessorContext: ChainEventsProcessorContextType = {
     allChainEventHandlers,
     log
   }
-  // build the RabbitMQ subscription
-  const ceProcessorRmqSub: RabbitMQSubscription = {
+  const chainEventsProcessorRmqSub: RabbitMQSubscription = {
     messageProcessor: processChainEvents,
     subscriptionName: RascalSubscriptions.ChainEvents,
-    msgProcessorContext: ceProcessorContext
+    msgProcessorContext: chainEventsProcessorContext
   }
 
-  let subscriptions: RabbitMQSubscription[] = [ceProcessorRmqSub];
+  // setup ChainCUDChainEventsQueue message processor context + subscription
+  const chainCUDContext: chainCUDContextType = {
+    models,
+    log
+  }
+  const chainCUDProcessorRmqSub: RabbitMQSubscription = {
+    messageProcessor: processChainCUD,
+    subscriptionName: RascalSubscriptions.ChainCUDChainEvents,
+    msgProcessorContext: chainCUDContext
+  }
+
+  let subscriptions: RabbitMQSubscription[] = [chainEventsProcessorRmqSub, chainCUDProcessorRmqSub];
 
   const serviceConsumer = new ServiceConsumer("ChainEventsConsumer", rmqController, subscriptions);
   await serviceConsumer.init();

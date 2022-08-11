@@ -162,7 +162,7 @@ export default class extends IEventHandler {
 
     // TODO: trim result to only include the values the main service needs
     if (result) {
-      await this._rmqController.publish(result, RascalPublications.ChainEntityCDMain)
+      await this._rmqController.publish(result, RascalPublications.ChainEntityCUDMain)
     }
   }
 }

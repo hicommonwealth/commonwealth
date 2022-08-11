@@ -1,12 +1,12 @@
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsPublication',
-  ChainCDChainEvents = 'ChainCDChainEventsPublication',
-  ChainEntityCDMain = 'ChainEntityCDMainPublication',
+  ChainCUDChainEvents = 'ChainCUDChainEventsPublication',
+  ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication'
 }
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsSubscription',
-  ChainCDChainEvents = 'ChainCDChainEventsSubscription',
-  ChainEntityCDMain = 'ChainEntityCDMainSubscription',
+  ChainCUDChainEvents = 'ChainCUDChainEventsSubscription',
+  ChainEntityCUDMain = 'ChainEntityCUDMainSubscription',
 }

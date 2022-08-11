@@ -39,7 +39,7 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'durable': true,
             }
           },
-          'CreateDeleteExchange': {
+          'CreateUpdateDeleteExchange': {
             'assert': true,
             'type': 'topic',
             'options': {
@@ -52,11 +52,11 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'assert': true,
             'purge': purge,
           },
-          'ChainCDChainEventsQueue': {
+          'ChainCUDChainEventsQueue': {
             'assert': true,
             'purge': purge,
           },
-          'ChainEntityCDMainQueue': {
+          'ChainEntityCUDMainQueue': {
             'assert': true,
             'purge': purge,
           },
@@ -72,17 +72,17 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destinationType': 'queue',
             'bindingKey': 'ChainEvents'
           },
-          'ChainCDChainEventsBinding': {
-            'source': 'CreateDeleteExchange',
-            'destination': 'ChainCDChainEventsQueue',
+          'ChainCUDChainEventsBinding': {
+            'source': 'CreateUpdateDeleteExchange',
+            'destination': 'ChainCUDChainEventsQueue',
             'destinationType': 'queue',
-            'bindingKey': 'ChainCD'
+            'bindingKey': 'ChainCUD'
           },
-          'ChainEntityCDMainBinding': {
-            'source': 'CreateDeleteExchange',
-            'destination': 'ChainEntityCDMainQueue',
+          'ChainEntityCUDMainBinding': {
+            'source': 'CreateUpdateDeleteExchange',
+            'destination': 'ChainEntityCUDMainQueue',
             'destinationType': 'queue',
-            'bindingKey': 'ChainEntityCD'
+            'bindingKey': 'ChainEntityCUD'
           },
           'ChainEventNotificationsBinding': {
             'source': 'ChainEventsExchange',
@@ -101,18 +101,18 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             }
           },
-          [RascalPublications.ChainCDChainEvents]: {
-            'exchange': 'CreateDeleteExchange',
-            'routingKey': 'ChainCD',
+          [RascalPublications.ChainCUDChainEvents]: {
+            'exchange': 'CreateUpdateDeleteExchange',
+            'routingKey': 'ChainCUD',
             'confirm': true,
             'timeout': 10000,
             'options': {
               'persistent': true
             }
           },
-          [RascalPublications.ChainEntityCDMain]: {
-            'exchange': 'CreateDeleteExchange',
-            'routingKey': 'ChainEntityCD',
+          [RascalPublications.ChainEntityCUDMain]: {
+            'exchange': 'CreateUpdateDeleteExchange',
+            'routingKey': 'ChainEntityCUD',
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -129,16 +129,16 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
             'prefetch': 10,
           },
-          [RascalSubscriptions.ChainCDChainEvents]: {
-            'queue': 'ChainCDChainEventsQueue',
+          [RascalSubscriptions.ChainCUDChainEvents]: {
+            'queue': 'ChainCUDChainEventsQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
             },
             'prefetch': 10,
           },
-          [RascalSubscriptions.ChainEntityCDMain]: {
-            'queue': 'ChainEntityCDMainQueue',
+          [RascalSubscriptions.ChainEntityCUDMain]: {
+            'queue': 'ChainEntityCUDMainQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
