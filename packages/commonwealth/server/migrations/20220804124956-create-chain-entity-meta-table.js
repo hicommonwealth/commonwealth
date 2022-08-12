@@ -40,9 +40,32 @@ module.exports = {
         ADD CONSTRAINT "ChainEntityMeta_chain_fkey"
             FOREIGN KEY (chain) REFERENCES "Chains";
     `);
+
+    await queryInterface.sequelize.query(`
+      ALTER TABLE "ChainEntities"
+        DROP COLUMN title,
+        DROP COLUMN thread_id;
+    `);
   },
 
   down: async (queryInterface, Sequelize) => {
+    // WARNING: This will not work long-term since the ChainEntity table will be
+    // dropped from the main database
+    await queryInterface.sequelize.query(`
+      ALTER TABLE "ChainEntities"
+        ADD COLUMN title VARCHAR(255),
+        ADD COLUMN thread_id INTEGER REFERENCES "Threads";
+    `)
+
+    await queryInterface.sequelize.query(`
+      UPDATE "ChainEntities"
+        SET title = "ChainEntityMeta".title,
+            thread_id = "ChainEntityMeta".thread_id
+        FROM "ChainEntityMeta"
+        WHERE "ChainEntities".id = "ChainEntityMeta".id;
+    `);
+
+
     return queryInterface.dropTable('ChainEntityMeta');
   }
 };

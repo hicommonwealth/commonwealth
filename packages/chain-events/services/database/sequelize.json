@@ -2,7 +2,7 @@
   "development": {
     "username": "commonwealth",
     "password": "edgeware",
-    "database": "commonwealthChainEvents",
+    "database": "commonwealth_chain_events",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },

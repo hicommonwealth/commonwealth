@@ -8,7 +8,8 @@
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "load-db": "yarn --cwd packages/commonwealth load-db",
-    "migrate-db": "yarn --cwd packages/commonwealth migrate-db"
+    "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
+    "start-all": "cd packages/commonwealth && yarn start && cd ../chain-events && yarn start"
   },
   "engines": {
     "node": "14.x"
