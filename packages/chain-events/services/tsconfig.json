@@ -8,28 +8,25 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "outDir": "./build",
+    "baseUrl": ".",
     "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "sourceMap": true,
     "typeRoots": [
-      "./node_modules/@types"
+      "../node_modules/@types"
     ]
   },
   "paths": {
-    "common-common": ["../../packages/common-common"],
-    "common-common/*": ["../../packages/common-common/*"],
+    "common-common": ["../../../packages/common-common"],
+    "common-common/*": ["../../../packages/common-common/*"],
   },
-  "include": [
-    "./src",
-  ],
   "exclude": [
-    "./dist",
-    "./node_modules",
-    "./test",
-    "./scripts"
+    "./build",
+    "../node_modules",
+    "../test",
+    "../scripts"
   ]
 }

@@ -41,7 +41,7 @@ export async function processChainEventNotificationsCUD(
       chainEventData.event.includeAddresses
     );
 
-    const formattedEvent: ChainEventNotification = {
+    const formattedEvent = {
       ...dbNotification.toJSON(),
       ChainEvent: chainEvent,
     };
