@@ -21,7 +21,7 @@ export const Errors = {
   TopicRequired: 'Topic name required',
   DefaultTemplateRequired: 'Default Template required',
   RuleNotFound: 'Rule not found',
-  InvalidTopicName: 'Only alphanumeric chars allowed',
+  InvalidTopicName: 'Topic uses disallowed special characters',
 };
 
 type EditTopicReq = {

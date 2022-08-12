@@ -9,7 +9,7 @@ export const Errors = {
   MustBeAdmin: 'Must be an admin',
   InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required',
-  InvalidTopicName: 'Only alphanumeric chars allowed',
+  InvalidTopicName: 'Topic uses disallowed special characters',
 };
 
 const createTopic = async (
