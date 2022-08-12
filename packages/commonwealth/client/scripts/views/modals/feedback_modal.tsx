@@ -28,7 +28,7 @@ export class FeedbackModal implements m.ClassComponent {
         <div class="compact-modal-body">
           <CWTextArea
             placeholder="Report a bug, or suggest an improvement"
-            defaultValue={this.feedbackText}
+            value={this.feedbackText}
             oninput={(e) => {
               this.feedbackText = e.target.value;
             }}

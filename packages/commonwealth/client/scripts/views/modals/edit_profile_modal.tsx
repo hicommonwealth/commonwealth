@@ -64,7 +64,7 @@ export class EditProfileModal
           <CWTextInput
             label="Name"
             name="name"
-            defaultValue={this.name}
+            value={this.name}
             placeholder="Add your name"
             disabled={account.profile.isOnchain}
             autocomplete="off"
@@ -77,7 +77,7 @@ export class EditProfileModal
           <CWTextInput
             label="Headline"
             name="headline"
-            defaultValue={this.headline}
+            value={this.headline}
             placeholder="Add a headline"
             autocomplete="off"
             oninput={(e) => {
@@ -89,7 +89,7 @@ export class EditProfileModal
           <CWTextArea
             name="bio"
             label="Bio"
-            defaultValue={this.bio}
+            value={this.bio}
             placeholder="Add a bio"
             oninput={(e) => {
               if (account.profile) {

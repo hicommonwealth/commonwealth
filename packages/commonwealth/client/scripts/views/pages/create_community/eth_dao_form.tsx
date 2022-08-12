@@ -148,7 +148,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
         {this.state.form.network === ChainNetwork.Compound && (
           <InputRow
             title="Token Name (Case Sensitive)"
-            defaultValue={this.state.form.tokenName}
+            value={this.state.form.tokenName}
             onChangeHandler={(v) => {
               this.state.form.tokenName = v;
               this.state.loaded = false;
@@ -167,13 +167,15 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
             await updateDAO();
           }}
         />
-        <CWValidationText
-          message={this.state.message}
-          status={this.state.status}
-        />
+        {this.state.message && (
+          <CWValidationText
+            message={this.state.message}
+            status={this.state.status}
+          />
+        )}
         <InputRow
           title="Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           disabled={disableField}
           onChangeHandler={(v) => {
             this.state.form.name = v;
@@ -184,7 +186,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
         <InputRow
           title="Symbol"
           disabled={disableField}
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
@@ -219,7 +221,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id,
+                  res.result.role.chain_id
                 );
               }
               await initAppState(false);
