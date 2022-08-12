@@ -24,7 +24,6 @@ const storeNewTopicOrder = (
   state.topics = Array.from(HTMLContainer.childNodes).map((node: HTMLElement) =>
     getTopicFromElement(node, state.topics)
   );
-  console.log(state.topics);
   state.topics.forEach((t, idx) => {
     t.order = idx + 1;
   });
@@ -53,7 +52,6 @@ const OrderTopicsModal: m.Component<null, { topics: Topic[] }> = {
     dragula([document.querySelector('.featured-topic-list')]).on(
       'drop',
       async (draggedEle, targetDiv, sourceDiv) => {
-        console.log(sourceDiv);
         storeNewTopicOrder(sourceDiv, vnode.state);
       }
     );
