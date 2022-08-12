@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'
 import passport from "passport";
 import setupPassport from "./passport";
 import setupRouter from "./router";
-import { DB } from "../database/database";
+import models from "../database/database";
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -20,7 +20,7 @@ async function main() {
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
 
-  const router = setupRouter(DB);
+  const router = setupRouter(models);
   app.use('/', router);
   app.set('port', port);
 
