@@ -65,12 +65,14 @@
         flex-wrap: wrap;
         gap: 8px;
 
-        .topic-selection-drop-menu {
-          height: 40px;
+        @include mediumInclusive {
+          .Button {
+            flex: 1;
+          }
         }
 
         .TextInput {
-          max-width: 400px;
+          flex: 2;
         }
       }
 

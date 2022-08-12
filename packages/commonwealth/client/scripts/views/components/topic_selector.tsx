@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
+import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
 
 import { Topic } from 'models';
 import { isNotUndefined } from 'helpers/typeGuards';
+import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {
   defaultTopic?: Topic | string | boolean;
@@ -94,13 +95,14 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
           hasArrow: false,
         }}
         trigger={
-          <Button
-            align="left"
-            class="topic-selection-drop-menu"
-            compact={true}
-            iconRight={Icons.CHEVRON_DOWN}
-            label={isNotUndefined(selectedTopic) ? selectedTopic.name : ''}
-            sublabel={isNotUndefined(selectedTopic) ? '' : 'Select a topic'}
+          <CWButton
+            buttonType="lg-secondary-blue"
+            iconName="chevronDown"
+            label={
+              isNotUndefined(selectedTopic)
+                ? selectedTopic.name
+                : 'Select a topic'
+            }
             tabindex={tabindex}
           />
         }

@@ -9,15 +9,13 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
 import { Thread, Topic, ThreadStage } from 'models';
-import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
 
 type ThreadMenuItemAttrs = { proposal: Thread };
-
-type EditorMenuItemAttrs = { openTopicEditor: () => void };
 
 export class ThreadSubscriptionMenuItem
   implements m.ClassComponent<ThreadMenuItemAttrs>
@@ -81,19 +79,27 @@ export class ThreadSubscriptionMenuItem
   }
 }
 
-export class TopicEditorMenuItem
-  implements m.ClassComponent<EditorMenuItemAttrs>
+export class ChangeTopicMenuItem
+  implements m.ClassComponent<{ proposal: any }>
 {
   view(vnode) {
-    const { openTopicEditor } = vnode.attrs;
+    const { proposal } = vnode.attrs;
 
     return (
       <MenuItem
-        fluid={true}
-        label="Edit topic"
+        label="Change topic"
         onclick={(e) => {
           e.preventDefault();
-          openTopicEditor();
+          app.modals.create({
+            modal: ChangeTopicModal,
+            data: {
+              // onChangeHandler: (topic: Topic) => {
+              //   proposal.topic = topic;
+              //   m.redraw();
+              // },
+              thread: proposal,
+            },
+          });
         }}
       />
     );
@@ -157,7 +163,6 @@ class StageEditorMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
 export class DiscussionRowMenu
   implements m.ClassComponent<ThreadMenuItemAttrs>
 {
-  private topicEditorIsOpen: boolean;
   private stageEditorIsOpen: boolean;
 
   view(vnode) {
@@ -220,13 +225,7 @@ export class DiscussionRowMenu
                 label={proposal.readOnly ? 'Unlock thread' : 'Lock thread'}
               />
             ),
-            hasAdminPermissions && (
-              <TopicEditorMenuItem
-                openTopicEditor={() => {
-                  this.topicEditorIsOpen = true;
-                }}
-              />
-            ),
+            hasAdminPermissions && <ChangeTopicMenuItem proposal={proposal} />,
             (isAuthor || hasAdminPermissions) && (
               <StageEditorMenuItem
                 openStageEditor={() => {
@@ -244,20 +243,6 @@ export class DiscussionRowMenu
             </div>
           }
         />
-        {this.topicEditorIsOpen && (
-          <TopicEditor
-            thread={vnode.attrs.proposal}
-            popoverMenu={true}
-            onChangeHandler={(topic: Topic) => {
-              proposal.topic = topic;
-              m.redraw();
-            }}
-            openStateHandler={(v) => {
-              this.topicEditorIsOpen = v;
-              m.redraw();
-            }}
-          />
-        )}
         {this.stageEditorIsOpen && (
           <StageEditor
             thread={vnode.attrs.proposal}

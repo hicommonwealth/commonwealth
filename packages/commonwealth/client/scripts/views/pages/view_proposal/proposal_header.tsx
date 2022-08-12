@@ -12,15 +12,13 @@ import { slugify } from 'utils';
 import {
   Thread,
   ThreadKind,
-  Topic,
   ThreadStage,
   AnyProposal,
   ChainEntity,
 } from 'models';
-import { TopicEditor } from 'views/components/topic_editor';
 import { StageEditor } from 'views/components/stage_editor';
 import {
-  TopicEditorMenuItem,
+  ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
 } from 'views/pages/discussions/discussion_row_menu';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -96,7 +94,6 @@ export class ProposalHeader
   private quillEditorState: QuillEditor;
   private savedEdit: string;
   private saving: boolean;
-  private topicEditorIsOpen: boolean;
   private updatedTitle: string;
   private updatedUrl: string;
 
@@ -191,11 +188,7 @@ export class ProposalHeader
                                 },
                               }),
                             isAdmin && proposal instanceof Thread && (
-                              <TopicEditorMenuItem
-                                openTopicEditor={() => {
-                                  this.topicEditorIsOpen = true;
-                                }}
-                              />
+                              <ChangeTopicMenuItem proposal={proposal} />
                             ),
                             (isAuthor || isAdmin || app.user.isSiteAdmin) &&
                               m(ProposalBodyDeleteMenuItem, { item: proposal }),
@@ -248,20 +241,6 @@ export class ProposalHeader
                         // TODO: Onchange logic
                         onChangeHandler: () => {},
                       }),
-                    this.topicEditorIsOpen && proposal instanceof Thread && (
-                      <TopicEditor
-                        thread={vnode.attrs.proposal as Thread}
-                        popoverMenu
-                        onChangeHandler={(topic: Topic) => {
-                          proposal.topic = topic;
-                          m.redraw();
-                        }}
-                        openStateHandler={(v) => {
-                          this.topicEditorIsOpen = v;
-                          m.redraw();
-                        }}
-                      />
-                    ),
                     vnode.attrs.stageEditorIsOpen &&
                       proposal instanceof Thread && (
                         <StageEditor
