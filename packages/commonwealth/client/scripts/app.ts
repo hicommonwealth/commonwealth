@@ -109,7 +109,6 @@ export async function initAppState(
         app.user.setStarredCommunities(
           data.user ? data.user.starredCommunities : []
         );
-          console.log(data.user.selectedChain);
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
