@@ -16,7 +16,7 @@ import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 const getTopicFromElement = (
   htmlEle: HTMLElement,
   allTopics: Array<Topic>
-): Topic => allTopics.find((t) => t.name === htmlEle.innerText);
+): Topic => allTopics.find((t: Topic) => t.name.trim() === htmlEle.innerText);
 
 const storeNewTopicOrder = (
   HTMLContainer: HTMLElement,
