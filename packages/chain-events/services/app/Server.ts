@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'
 import passport from "passport";
 import setupPassport from "./passport";
 import setupRouter from "./router";
-import { DB } from "./database";
+import { DB } from "../database/database";
 
 
 const log = factory.getLogger(formatFilename(__filename));

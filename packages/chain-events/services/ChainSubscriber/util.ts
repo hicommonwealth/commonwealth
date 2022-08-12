@@ -11,7 +11,7 @@ import { ChainBase, ChainNetwork } from "common-common/src/types";
 import { Pool } from "pg";
 import format from "pg-format";
 import { IListenerInstances } from "./types";
-import { ChainAttributes } from "../app/models/chain";
+import { ChainAttributes } from "../database/models/chain";
 import { factory, formatFilename } from "common-common/src/logging";
 import { RabbitMqHandler } from "../ChainEventsConsumer/ChainEventHandlers/rabbitMQ";
 import Rollbar from "rollbar";

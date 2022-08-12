@@ -6,7 +6,7 @@ import {
 } from 'chain-events/src';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import { addPrefix, factory } from '../../../src/logging';
-import { ChainEventAttributes } from '../../app/models/chain_event';
+import { ChainEventAttributes } from '../../database/models/chain_event';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 export default class extends IEventHandler {

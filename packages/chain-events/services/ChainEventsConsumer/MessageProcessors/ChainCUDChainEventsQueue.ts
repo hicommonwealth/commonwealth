@@ -1,5 +1,5 @@
-import { ChainAttributes } from '../../app/models/chain';
-import { DB } from '../../app/database';
+import { ChainAttributes } from '../../database/models/chain';
+import { DB } from '../../database/database';
 import { Logger } from "typescript-logging";
 
 export type Ithis = {

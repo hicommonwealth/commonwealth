@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import _ from 'underscore';
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { RabbitMqHandler } from "../ChainEventsConsumer/ChainEventHandlers/rabbitMQ";
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI, NUM_WORKERS, RABBITMQ_URI, WORKER_NUMBER, ROLLBAR_SERVER_TOKEN, REPEAT_TIME } from "../config";
@@ -9,6 +10,8 @@ import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 import { manageErcListeners, getListenerNames, queryDb, manageRegularListeners } from "./util";
 import { IListenerInstances } from "./types";
 import Rollbar from 'rollbar';
+import models from '../database/database';
+import { ChainAttributes } from "../database/models/chain";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -31,22 +34,23 @@ async function mainProcess(
     log.info("No active listeners");
   }
 
+
   // selects the chain data needed to create the listeners for the current chainSubscriber
-  let query =`
-      WITH allListeners AS (
-          SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Listeners" WHERE active = True
-      ) SELECT allListeners.id,
-               allListeners.spec,
-               allListeners.contract_address,
-               allListeners.network,
-               allListeners.base,
-               allListeners.verbose_logging,
-               "ChainEndpoints".url
+  const allChainsAndTokens: any = await models.sequelize.query(`
+    WITH allListeners AS (
+        SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Listeners" WHERE active = True
+    ) SELECT allListeners.id,
+        allListeners.spec,
+        allListeners.contract_address,
+        allListeners.network,
+        allListeners.base,
+        allListeners.verbose_logging,
+        "ChainEndpoints".url
       FROM allListeners
-               JOIN "ChainEndpoints" ON allListeners.url_id = "ChainEndpoints".id
+      JOIN "ChainEndpoints" ON allListeners.url_id = "ChainEndpoints".id
       WHERE MOD(allListeners.index, ?) = ?;
-  `;
-  const allChainsAndTokens = await queryDb(pool, query, NUM_WORKERS, WORKER_NUMBER);
+  `, { replacements: [NUM_WORKERS, WORKER_NUMBER ], raw: true});
+  console.log(allChainsAndTokens);
 
   const erc20Tokens = [];
   const erc721Tokens = [];
@@ -83,7 +87,7 @@ async function mainProcess(
 
 async function initializer(): Promise<void> {
   // begin process
-  log.info('db-node initialization');
+  log.info('Initializing ChainEventsSubscriber');
 
   rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
@@ -105,9 +109,9 @@ async function initializer(): Promise<void> {
     log.error('Unexpected error on idle client', err);
   });
 
-  log.info(`Worker Number: ${WORKER_NUMBER}\tNumber of Workers: ${NUM_WORKERS}`);
+  log.info(`Worker Number: ${WORKER_NUMBER}, Number of Workers: ${NUM_WORKERS}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI), 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI), RascalPublications.ChainEvents);
   try {
     await producer.init();
   } catch (e) {

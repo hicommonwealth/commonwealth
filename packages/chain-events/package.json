@@ -24,7 +24,8 @@
     "start-app": "ts-node --project services/tsconfig.json services/app/Server.ts",
     "start-consumer": "ts-node --project services/tsconfig.json services/ChainEventsConsumer/chainEventsConsumer.ts",
     "start-subscriber": "ts-node --project services/tsconfig.json services/ChainSubscriber/chainSubscriber.ts",
-    "start": "yarn start-app && yarn start-consumer && yarn start-subscriber"
+    "start": "yarn start-app && yarn start-consumer && yarn start-subscriber",
+    "create-db": "npx sequelize db:create"
   },
   "engines": {
     "node": ">=14"

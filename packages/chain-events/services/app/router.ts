@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import passport from 'passport';
 import entities from "./routes/entities";
-import { DB } from "./database";
+import { DB } from "../database/database";
 import viewChainActivity from "./routes/viewChainActivity";
 
 

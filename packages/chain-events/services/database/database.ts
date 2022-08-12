@@ -7,7 +7,7 @@ import ChainEventTypeFactory, {
 } from './models/chain_event_type';
 import { Sequelize, DataTypes } from "sequelize";
 import { DATABASE_URI } from "../config";
-import { factory, formatFilename } from 'common-common/src/logging';
+import { factory, formatFilename } from '../../common-common/src/logging';
 import ChainFactory, { ChainModelStatic } from "./models/chain";
 import ChainNodeFactory, { ChainNodeModelStatic } from "./models/chain_node";
 

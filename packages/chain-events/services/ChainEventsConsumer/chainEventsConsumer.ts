@@ -10,7 +10,7 @@ import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
-import models from '../app/database';
+import models from '../database/database';
 import { RABBITMQ_URI } from '../config';
 import {
   Ithis as ChainEventsProcessorContextType,
