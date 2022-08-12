@@ -427,10 +427,12 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     onclick={async (e) => {
                       this.saving = true;
 
-                      const { quillEditorState } = this;
-
                       try {
-                        await this._newThread(form, quillEditorState, author);
+                        await this._newThread(
+                          form,
+                          this.quillEditorState,
+                          author
+                        );
                         this.overwriteConfirmationModal = true;
                         this.saving = false;
                         if (
@@ -465,7 +467,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                     buttonType="tertiary-blue"
                     onclick={async (e) => {
                       // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
-                      const { quillEditorState } = this;
                       this.saving = true;
 
                       const existingDraftId =
@@ -476,7 +477,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                       try {
                         await this._saveDraft(
                           form,
-                          quillEditorState,
+                          this.quillEditorState,
                           existingDraftId
                         );
                         this.saving = false;

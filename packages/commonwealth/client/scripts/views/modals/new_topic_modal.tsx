@@ -17,6 +17,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 type NewTopicModalForm = {
   description: string;
@@ -73,12 +74,12 @@ export class NewTopicModal implements m.ClassComponent {
             oninput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
             }}
-            inputValidationFn={(text) => {
+            inputValidationFn={(text: string) => {
               let errorMsg;
 
-              const currentCommunityTopicNames = app.chain.meta.topics.map(
-                (t) => t.name.toLowerCase()
-              );
+              const currentCommunityTopicNames = app.topics
+                .getByCommunity(app.activeChainId())
+                .map((t) => t.name.toLowerCase());
 
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
@@ -164,17 +165,17 @@ export class NewTopicModal implements m.ClassComponent {
           <CWButton
             label="Create topic"
             disabled={this.saving || this.error || disabled}
-            onclick={async (e) => {
+            onclick={async (e: Event) => {
               e.preventDefault();
-              const { quillEditorState, form } = this;
-
-              quillEditorState.disable();
-
-              const defaultOffchainTemplate =
-                quillEditorState.textContentsAsString;
-
-              app.topics
-                .add(
+              const { form } = this;
+              try {
+                let defaultOffchainTemplate;
+                if (this.quillEditorState) {
+                  this.quillEditorState.disable();
+                  defaultOffchainTemplate =
+                    this.quillEditorState.textContentsAsString;
+                }
+                await app.topics.add(
                   form.name,
                   form.description,
                   null,
@@ -182,20 +183,24 @@ export class NewTopicModal implements m.ClassComponent {
                   form.featuredInNewPost,
                   this.form.tokenThreshold || '0',
                   defaultOffchainTemplate as string
-                )
-                .then(() => {
-                  this.saving = false;
-                  m.redraw();
-                  $(e.target).trigger('modalexit');
-                })
-                .catch(() => {
-                  this.error = 'Error creating topic';
-                  this.saving = false;
-                  m.redraw();
-                });
+                );
+
+                this.saving = false;
+                m.redraw();
+                $(e.target).trigger('modalexit');
+              } catch (err) {
+                this.error = 'Error creating topic';
+                this.saving = false;
+                if (this.quillEditorState) {
+                  this.quillEditorState.enable();
+                }
+                m.redraw();
+              }
             }}
           />
-          {this.error && <div class="error-message">{this.error}</div>}
+          {this.error && (
+            <CWValidationText message={this.error} status="failure" />
+          )}{' '}
         </div>
       </div>
     );
