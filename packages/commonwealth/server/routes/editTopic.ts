@@ -9,6 +9,9 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// TODO Graham 8-12-22: This route has high redundancy with createTopic, and has fallen out of sync.
+// We should consider merging or consolidating somehow, to prevent checks diverging again.
+
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NoTopicId: 'Must supply topic ID',
@@ -18,6 +21,7 @@ export const Errors = {
   TopicRequired: 'Topic name required',
   DefaultTemplateRequired: 'Default Template required',
   RuleNotFound: 'Rule not found',
+  InvalidTopicName: 'Only alphanumeric chars allowed',
 };
 
 type EditTopicReq = {
@@ -47,12 +51,17 @@ const editTopic = async (
   if (!req.body.id) {
     return next(new Error(Errors.NoTopicId));
   }
-  if (!req.body.name) return next(new Error(Errors.TopicRequired));
-  if (
-    req.body.featured_in_new_post === 'true' &&
-    (!req.body.default_offchain_template ||
-      !req.body.default_offchain_template.trim())
-  ) {
+
+  const name = req.body.name.trim();
+  if (!name) return next(new Error(Errors.TopicRequired));
+  if (req.body.name.match(/["<>%{}|\\/^`]/g)) {
+    return next(new Error(Errors.InvalidTopicName));
+  }
+
+  const featured_in_sidebar = req.body.featured_in_sidebar === 'true';
+  const featured_in_new_post = req.body.featured_in_new_post === 'true';
+  const default_offchain_template = req.body.default_offchain_template?.trim();
+  if (featured_in_new_post && !default_offchain_template) {
     return next(new Error(Errors.DefaultTemplateRequired));
   }
 
@@ -66,24 +75,15 @@ const editTopic = async (
     return next(new Error(Errors.NotAdmin));
   }
 
-  const {
-    id,
-    name,
-    description,
-    telegram,
-    featured_in_sidebar,
-    featured_in_new_post,
-    default_offchain_template,
-    rule_id,
-  } = req.body;
+  const { id, description, telegram, rule_id } = req.body;
   try {
     const topic = await models.Topic.findOne({ where: { id } });
     if (!topic) return next(new Error(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';
     if (name || telegram) topic.telegram = telegram || '';
-    topic.featured_in_sidebar = !!(featured_in_sidebar === 'true');
-    topic.featured_in_new_post = !!(featured_in_new_post === 'true');
+    topic.featured_in_sidebar = featured_in_sidebar;
+    topic.featured_in_new_post = featured_in_new_post;
     topic.default_offchain_template = default_offchain_template || '';
     if (rule_id) {
       const rule = await models.Rule.findOne({ where: { id: rule_id } });

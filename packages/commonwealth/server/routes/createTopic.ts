@@ -60,7 +60,7 @@ const createTopic = async (
     token_threshold: req.body.token_threshold,
     featured_in_sidebar,
     featured_in_new_post,
-    default_offchain_template: req.body.default_offchain_template || '',
+    default_offchain_template: default_offchain_template || '',
     chain_id: chain.id,
   };
 

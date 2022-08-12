@@ -12,6 +12,7 @@ import { Topic } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { pluralizeWithoutNumberPrefix } from 'client/scripts/helpers';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
@@ -72,7 +73,6 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
     }
 
     const updateTopic = async (form) => {
-      console.log(form);
       if (form.featuredInNewPost) {
         if (!this.quillEditorState || this.quillEditorState?.isBlank()) {
           this.error = 'Must provide template.';
@@ -127,14 +127,46 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
           <CWTextInput
             label="Name"
             name="name"
-            oncreate={(vvnode) => {
-              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
-              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
-            }}
-            tabindex={1}
             defaultValue={this?.form?.name}
             oninput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
+            }}
+            inputValidationFn={(text) => {
+              let errorMsg;
+
+              const currentCommunityTopicNames = app.topics
+                .getByCommunity(app.activeChainId())
+                .map((t) => t.name.toLowerCase());
+
+              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
+                errorMsg = 'Topic name already used within community.';
+                this.error = errorMsg;
+                m.redraw();
+                return ['failure', errorMsg];
+              }
+
+              const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
+
+              if (disallowedCharMatches) {
+                errorMsg = `The ${pluralizeWithoutNumberPrefix(
+                  disallowedCharMatches.length,
+                  'char'
+                )} 
+                ${disallowedCharMatches.join(', ')} are not permitted`;
+                this.error = errorMsg;
+                m.redraw();
+                return ['failure', errorMsg];
+              }
+
+              if (this.error) delete this.error;
+
+              return ['success', 'Valid topic name'];
+            }}
+            autocomplete="off"
+            tabindex={1}
+            oncreate={(vvnode) => {
+              // use oncreate to focus because autofocus: true fails when component is recycled in a modal
+              setTimeout(() => $(vvnode.dom).find('input').focus(), 0);
             }}
           />
           <CWTextInput
