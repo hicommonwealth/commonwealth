@@ -114,9 +114,11 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
         />
         <CWButton
           onclick={() => {
-            openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
-              address: '0xTestTestTest',
-            });
+            // openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
+            //   address: '0xTestTestTest',
+            // });
+
+            localStorage.removeItem('user-survey-locked');
           }}
           label="lolll"
         />

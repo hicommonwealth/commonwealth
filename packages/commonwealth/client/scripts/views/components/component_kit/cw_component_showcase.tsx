@@ -24,6 +24,7 @@ import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
+import { CWGrowl } from './cw_growl';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -75,6 +76,14 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         /> */}
+        <CWGrowl position="bottom-left">
+          <CWButton
+            iconName="person"
+            buttonType="primary-red"
+            label="Primary red with icon"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </CWGrowl>
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWThreadVoteButton

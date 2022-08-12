@@ -16,6 +16,7 @@ import app from 'state';
 import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
 import { AppModals } from './app_modals';
+import { UserSurveyPopup } from './components/user_survey_popup';
 
 class LoadingLayout implements m.ClassComponent {
   view() {
@@ -38,6 +39,23 @@ type LayoutAttrs = {
 export class Layout implements m.ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
+  private surveyLocked: boolean;
+  private surveyReadyForDisplay: boolean;
+  private surveyDelayTriggered: boolean;
+
+  oncreate() {
+    const surveyStatus = localStorage.getItem('user-survey-locked');
+    this.surveyReadyForDisplay = false;
+    if (!surveyStatus) {
+      localStorage.setItem('user-survey-locked', 'false');
+      this.surveyLocked = false;
+    } else if (surveyStatus === 'false') {
+      this.surveyLocked = false;
+    } else {
+      this.surveyLocked = true;
+    }
+    console.log('running again');
+  }
 
   view(vnode) {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
@@ -45,6 +63,17 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       scope && scope.startsWith('0x') && scope.length === 42;
 
     const scopeMatchesChain = app.config.chains.getById(scope);
+
+    if (
+      !this.surveyDelayTriggered &&
+      app.isLoggedIn() &&
+      !this.surveyReadyForDisplay
+    ) {
+      this.surveyDelayTriggered = true;
+      setTimeout(() => {
+        this.surveyReadyForDisplay = true;
+      }, 3000);
+    }
 
     if (app.loadingError) {
       return (
@@ -119,6 +148,13 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
         {vnode.children}
         <AppModals />
         <AppToasts />
+        {this.surveyReadyForDisplay && !this.surveyLocked && app.isLoggedIn() && (
+          <UserSurveyPopup
+            onclose={() => {
+              this.surveyLocked = true;
+            }}
+          />
+        )}
       </div>
     );
   }
