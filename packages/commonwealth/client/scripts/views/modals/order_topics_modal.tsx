@@ -35,7 +35,7 @@ export class OrderTopicsModal implements m.ClassComponent {
   private topics: Array<Topic>;
 
   oninit() {
-    this.topics = app.chain.meta.topics.filter(
+    this.topics = app.topics.store.getByCommunity(app.chain.id).filter(
       (topic) => topic.featuredInSidebar
     );
 
