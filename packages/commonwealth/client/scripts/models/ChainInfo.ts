@@ -37,6 +37,8 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
+  // TODO Graham 8-12-22: We should consider removing this topic prop,
+  // as it does not stay in step with topic store, potentially causing problems
   public readonly topics: Topic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
