@@ -72,6 +72,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
     }
 
     const updateTopic = async (form) => {
+      console.log(form);
       if (form.featuredInNewPost) {
         if (!this.quillEditorState || this.quillEditorState?.isBlank()) {
           this.error = 'Must provide template.';

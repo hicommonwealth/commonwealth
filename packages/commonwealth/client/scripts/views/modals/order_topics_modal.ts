@@ -6,13 +6,14 @@ import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Topic } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from './confirm_modal';
 
 const getTopicFromElement = (
   htmlEle: HTMLElement,
   allTopics: Topic[]
 ): Topic => {
-  const topic = allTopics.find((t) => t.name === htmlEle.innerText);
+  const topic = allTopics.find(
+    (t: Topic) => t.name.trim() === htmlEle.innerText
+  );
   return topic;
 };
 
@@ -23,6 +24,7 @@ const storeNewTopicOrder = (
   state.topics = Array.from(HTMLContainer.childNodes).map((node: HTMLElement) =>
     getTopicFromElement(node, state.topics)
   );
+  console.log(state.topics);
   state.topics.forEach((t, idx) => {
     t.order = idx + 1;
   });
@@ -51,6 +53,7 @@ const OrderTopicsModal: m.Component<null, { topics: Topic[] }> = {
     dragula([document.querySelector('.featured-topic-list')]).on(
       'drop',
       async (draggedEle, targetDiv, sourceDiv) => {
+        console.log(sourceDiv);
         storeNewTopicOrder(sourceDiv, vnode.state);
       }
     );
