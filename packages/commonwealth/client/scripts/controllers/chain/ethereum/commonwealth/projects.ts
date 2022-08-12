@@ -3,7 +3,7 @@ import $ from 'jquery';
 import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
-} from 'common-common/src/eth/types';
+} from 'chain-events/src/contractTypes';
 import { ChainInfo, NodeInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
@@ -149,7 +149,7 @@ export default class ProjectsController {
       this._factoryInfo.address
     );
 
-    const projectId = (await contract.numProjects());
+    const projectId = await contract.numProjects();
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
     const tx = await contract.createProject(

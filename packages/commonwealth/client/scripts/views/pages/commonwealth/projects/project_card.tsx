@@ -14,7 +14,6 @@ import { weiToTokens } from 'helpers';
 import BN from 'bn.js';
 import app from 'state';
 import moment from 'moment';
-import { BigNumberish } from 'ethers';
 
 export enum ProjectRole {
   Curator = 'curator',

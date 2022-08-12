@@ -21,6 +21,7 @@ import CommunitiesController from './controllers/server/communities';
 import UserController from './controllers/server/user/index';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import ProjectsController from './controllers/chain/ethereum/commonwealth/projects';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
