@@ -1,4 +1,15 @@
 @import 'shared';
 
 .UpdateProposalStatusModal {
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  }
 }

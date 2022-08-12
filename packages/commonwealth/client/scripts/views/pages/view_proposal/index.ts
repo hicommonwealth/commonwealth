@@ -105,7 +105,6 @@ export interface IProposalPageState {
   recentlyEdited: boolean;
   recentlySubmitted: number; // comment ID for CSS highlight transitions
   replying: boolean;
-  stageEditorIsOpen: boolean;
   tabSelected: 'viewProposal' | 'viewSidebar';
   threadFetched;
   threadFetchFailed;
@@ -999,11 +998,6 @@ const ViewProposalPage: m.Component<
                   isAuthor,
                   isEditor,
                   isAdmin: isAdminOrMod,
-                  stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-                  closeStageEditor: () => {
-                    vnode.state.stageEditorIsOpen = false;
-                    m.redraw();
-                  },
                 }),
                 !(proposal instanceof Thread) &&
                   m(LinkedProposalsEmbed, { proposal }),
@@ -1040,9 +1034,6 @@ const ViewProposalPage: m.Component<
                   proposal instanceof Thread &&
                   m(LinkedProposalsCard, {
                     proposal,
-                    openStageEditor: () => {
-                      vnode.state.stageEditorIsOpen = true;
-                    },
                     showAddProposalButton: isAuthor || isAdminOrMod,
                   }),
                 showLinkedThreadOptions &&
@@ -1163,9 +1154,6 @@ const ViewProposalPage: m.Component<
               proposal instanceof Thread &&
               m(LinkedProposalsCard, {
                 proposal,
-                openStageEditor: () => {
-                  vnode.state.stageEditorIsOpen = true;
-                },
                 showAddProposalButton: isAuthor || isAdminOrMod,
               }),
             showLinkedThreadOptions &&

@@ -193,8 +193,6 @@ class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
 export class DiscussionRowMenu
   implements m.ClassComponent<ThreadMenuItemAttrs>
 {
-  private stageEditorIsOpen: boolean;
-
   view(vnode) {
     if (!app.isLoggedIn()) return;
 

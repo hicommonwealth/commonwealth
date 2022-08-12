@@ -21,6 +21,7 @@ import {
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 class ProposalSidebarLinkedChainEntity
   implements
@@ -105,13 +106,12 @@ class ProposalSidebarLinkedSnapshot
 export class LinkedProposalsCard
   implements
     m.ClassComponent<{
-      openStageEditor: () => void;
       proposal: Thread;
       showAddProposalButton: boolean;
     }>
 {
   view(vnode) {
-    const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
+    const { proposal, showAddProposalButton } = vnode.attrs;
 
     return (
       <CWCard className="LinkedProposalsCard">
@@ -149,7 +149,16 @@ export class LinkedProposalsCard
             label="Connect a proposal"
             onclick={(e) => {
               e.preventDefault();
-              openStageEditor();
+              app.modals.create({
+                modal: UpdateProposalStatusModal,
+                data: {
+                  // onChangeHandler={(stage: ThreadStage) => {
+                  //   proposal.stage = stage;
+                  //   m.redraw();
+                  // }},
+                  thread: proposal,
+                },
+              });
             }}
           />
         )}
