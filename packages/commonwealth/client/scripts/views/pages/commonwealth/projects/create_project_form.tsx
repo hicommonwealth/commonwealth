@@ -135,6 +135,8 @@ export class InformationSlide
           name="Short Description"
           onsuccess={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
+            console.log(e.target.value);
+            console.log(vnode.attrs.form.shortDescription);
           }}
           inputValidationFn={(value: string) =>
             validateProjectForm('shortDescription', value)
@@ -327,12 +329,12 @@ export default class CreateProjectForm implements m.ClassComponent {
         token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         tokenIdx: null,
         creator: app.user.activeAccount.address,
-        beneficiary: '',
-        description: '',
-        shortDescription: '',
-        coverImage: '',
-        curatorFee: 0,
-        threshold: 0,
+        beneficiary: null,
+        description: null,
+        shortDescription: null,
+        coverImage: null,
+        curatorFee: null,
+        threshold: null,
         fundraiseLength: weekInSeconds,
         fundraiseLengthIdx: null,
         chainId: app.activeChainId(),

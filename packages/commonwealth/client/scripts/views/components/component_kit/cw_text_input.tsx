@@ -23,6 +23,7 @@ export type TextInputAttrs = {
   maxlength?: number;
   name: string;
   oninput?: (e) => void;
+  onsuccess?: (e) => void;
   placeholder?: string;
   tabindex?: number;
 };

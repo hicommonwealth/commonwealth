@@ -32,6 +32,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
       maxlength,
       name,
       oninput,
+      onsuccess,
       placeholder,
       tabindex,
     } = vnode.attrs;
@@ -70,6 +71,9 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
                 if (inputValidationFn && e.target.value?.length > 3) {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
+                  if (onsuccess && this.validationStatus === 'success') {
+                    onsuccess(e);
+                  }
                   m.redraw();
                 }
               }, timeout);
