@@ -25,7 +25,7 @@
   "include": [
     "./client",
     "./client/scripts",
-    "./shared/adapters",
+    "./shared",
     "./test",
     "./globals.d.ts"
   ],
