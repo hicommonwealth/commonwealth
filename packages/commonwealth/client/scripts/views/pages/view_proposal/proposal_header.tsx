@@ -16,7 +16,6 @@ import {
   AnyProposal,
   ChainEntity,
 } from 'models';
-import { StageEditor } from 'views/components/stage_editor';
 import {
   ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
@@ -84,8 +83,6 @@ export class ProposalHeader
       isAuthor: boolean;
       isEditor: boolean;
       isAdmin: boolean;
-      stageEditorIsOpen: boolean;
-      closeStageEditor: Function;
     }>
 {
   private currentText: any;
@@ -241,33 +238,6 @@ export class ProposalHeader
                         // TODO: Onchange logic
                         onChangeHandler: () => {},
                       }),
-                    vnode.attrs.stageEditorIsOpen &&
-                      proposal instanceof Thread && (
-                        <StageEditor
-                          thread={vnode.attrs.proposal as Thread}
-                          popoverMenu
-                          onChangeHandler={(
-                            stage: ThreadStage,
-                            chainEntities: ChainEntity[],
-                            snapshotProposal: SnapshotProposal[]
-                          ) => {
-                            proposal.stage = stage;
-                            proposal.chainEntities = chainEntities;
-                            if (app.chain?.meta.snapshot) {
-                              proposal.snapshotProposal =
-                                snapshotProposal[0]?.id;
-                            }
-                            app.threads.fetchThreadsFromId([
-                              proposal.identifier,
-                            ]);
-                            m.redraw();
-                          }}
-                          openStateHandler={(v) => {
-                            if (!v) vnode.attrs.closeStageEditor();
-                            m.redraw();
-                          }}
-                        />
-                      ),
                   ]
                 : [
                     m(ProposalBodyAuthor, { item: proposal }),

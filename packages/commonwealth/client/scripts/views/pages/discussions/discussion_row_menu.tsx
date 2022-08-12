@@ -8,12 +8,12 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
-import { Thread, Topic, ThreadStage } from 'models';
-import { StageEditor } from 'views/components/stage_editor';
+import { Thread, ThreadStage } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 type ThreadMenuItemAttrs = { proposal: Thread };
 
@@ -106,6 +106,59 @@ export class ChangeTopicMenuItem
   }
 }
 
+class UpdateProposalStatusMenuItem
+  implements m.ClassComponent<{ proposal: any }>
+{
+  view(vnode) {
+    const { proposal } = vnode.attrs;
+
+    if (!app.chain?.meta) return;
+
+    const { stagesEnabled } = app.chain?.meta;
+
+    if (!stagesEnabled) return;
+
+    //   <UpdateProposalStatusModal
+    //   thread={vnode.attrs.proposal as Thread}
+    //   onChangeHandler={(
+    //     stage: ThreadStage,
+    //     chainEntities: ChainEntity[],
+    //     snapshotProposal: SnapshotProposal[]
+    //   ) => {
+    //     proposal.stage = stage;
+    //     proposal.chainEntities = chainEntities;
+    //     if (app.chain?.meta.snapshot) {
+    //       proposal.snapshotProposal =
+    //         snapshotProposal[0]?.id;
+    //     }
+    //     app.threads.fetchThreadsFromId([
+    //       proposal.identifier,
+    //     ]);
+    //     m.redraw();
+    //   }}
+    // />
+
+    return (
+      <MenuItem
+        label="Update proposal status"
+        onclick={(e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: UpdateProposalStatusModal,
+            data: {
+              // onChangeHandler={(stage: ThreadStage) => {
+              //   proposal.stage = stage;
+              //   m.redraw();
+              // }},
+              thread: proposal,
+            },
+          });
+        }}
+      />
+    );
+  }
+}
+
 class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
   view(vnode) {
     const { proposal } = vnode.attrs;
@@ -132,29 +185,6 @@ class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
           });
         }}
         label="Delete"
-      />
-    );
-  }
-}
-
-class StageEditorMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
-  view(vnode) {
-    const { openStageEditor } = vnode.attrs;
-
-    if (!app.chain?.meta) return;
-
-    const { stagesEnabled } = app.chain?.meta;
-
-    if (!stagesEnabled) return;
-
-    return (
-      <MenuItem
-        fluid={true}
-        label="Edit stage"
-        onclick={(e) => {
-          e.preventDefault();
-          openStageEditor();
-        }}
       />
     );
   }
@@ -227,11 +257,7 @@ export class DiscussionRowMenu
             ),
             hasAdminPermissions && <ChangeTopicMenuItem proposal={proposal} />,
             (isAuthor || hasAdminPermissions) && (
-              <StageEditorMenuItem
-                openStageEditor={() => {
-                  this.stageEditorIsOpen = true;
-                }}
-              />
+              <UpdateProposalStatusMenuItem proposal={proposal} />
             ),
             (isAuthor || hasAdminPermissions || app.user.isSiteAdmin) && (
               <ThreadDeletionMenuItem proposal={proposal} />
@@ -243,20 +269,6 @@ export class DiscussionRowMenu
             </div>
           }
         />
-        {this.stageEditorIsOpen && (
-          <StageEditor
-            thread={vnode.attrs.proposal}
-            popoverMenu={true}
-            onChangeHandler={(stage: ThreadStage) => {
-              proposal.stage = stage;
-              m.redraw();
-            }}
-            openStateHandler={(v) => {
-              this.stageEditorIsOpen = v;
-              m.redraw();
-            }}
-          />
-        )}
       </div>
     );
   }

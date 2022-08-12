@@ -1129,11 +1129,6 @@ const ViewProposalPage: m.Component<
               isAuthor,
               isEditor,
               isAdmin: isAdminOrMod,
-              stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-              closeStageEditor: () => {
-                vnode.state.stageEditorIsOpen = false;
-                m.redraw();
-              },
             }),
             !(proposal instanceof Thread) &&
               m(LinkedProposalsEmbed, { proposal }),
