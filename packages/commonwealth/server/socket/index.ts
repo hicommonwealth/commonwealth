@@ -2,7 +2,6 @@
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
-import { instrument } from '@socket.io/admin-ui';
 import { BrokerConfig } from 'rascal';
 import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
@@ -27,6 +26,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -207,7 +207,7 @@ export async function setupWebSocketServer(
     await rabbitController.init();
     await rabbitController.startSubscription(
       publishToCERoom.bind(ceNamespace),
-      'ChainEventsNotificationsSubscription'
+      RascalSubscriptions.ChainEventNotifications
     );
   } catch (e) {
     log.error(

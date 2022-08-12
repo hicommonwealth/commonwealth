@@ -4,10 +4,10 @@ import { ModelStatic, ModelInstance } from './types';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 
 export type NotificationAttributes = {
+  id: number;
   notification_data: string;
   chain_id?: string;
   category_id: string;
-  id?: number;
   chain_event_id?: number;
   created_at?: Date;
   updated_at?: Date;

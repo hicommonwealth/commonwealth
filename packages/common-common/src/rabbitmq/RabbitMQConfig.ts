@@ -46,6 +46,13 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'durable': true
             }
           },
+          'NotificationsExchange': {
+            'assert': true,
+            'type': 'topic',
+            'options': {
+              'durable': true
+            }
+          }
         },
         'queues': {
           'ChainEventsQueue': {
@@ -60,10 +67,14 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'assert': true,
             'purge': purge,
           },
-          'ChainEventNotificationsQueue': {
+          'ChainEventNotificationsCUDMainQueue': {
             'assert': true,
             'purge': purge,
           },
+          'ChainEventNotificationsQueue': {
+            'assert': true,
+            'purge': purge,
+          }
         },
         'bindings': {
           'ChainEventsBinding': {
@@ -84,12 +95,18 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destinationType': 'queue',
             'bindingKey': 'ChainEntityCUD'
           },
+          'ChainEventNotificationsCUDBinding': {
+            'source': 'CreateUpdateDeleteExchange',
+            'destination': 'ChainEventNotificationsCUDMainQueue',
+            'destinationType': 'queue',
+            'bindingKey': 'ChainEventNotificationsCUD'
+          },
           'ChainEventNotificationsBinding': {
-            'source': 'ChainEventsExchange',
+            'source': 'NotificationsExchange',
             'destination': 'ChainEventNotificationsQueue',
             'destinationType': 'queue',
             'bindingKey': 'ChainEventNotifications'
-          }
+          },
         },
         'publications': {
           [RascalPublications.ChainEvents]: {
@@ -119,6 +136,24 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             },
           },
+          [RascalPublications.ChainEventNotificationsCUDMain]: {
+            'exchange': 'CreateUpdateDeleteExchange',
+            'routingKey': 'ChainEventNotificationsCUD',
+            'confirm': true,
+            'timeout': 10000,
+            'options': {
+              'persistent': true
+            },
+          },
+          [RascalPublications.ChainEventNotifications]: {
+            'exchange': 'NotificationsExchange',
+            'routingKey': 'ChainEventNotifications',
+            'confirm': true,
+            'timeout': 10000,
+            'options': {
+              'persistent': true
+            },
+          },
         },
         'subscriptions': {
           [RascalSubscriptions.ChainEvents]: {
@@ -139,6 +174,14 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEntityCUDMain]: {
             'queue': 'ChainEntityCUDMainQueue',
+            'contentType': 'application/json',
+            'retry': {
+              'delay': 1000
+            },
+            'prefetch': 10,
+          },
+          [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
+            'queue': 'ChainEventNotificationsCUDMainQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000

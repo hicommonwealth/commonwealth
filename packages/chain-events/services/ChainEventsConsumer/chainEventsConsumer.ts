@@ -5,6 +5,7 @@ import {
   ServiceConsumer,
 } from 'common-common/src/ServiceConsumer';
 import EventStorageHandler from './ChainEventHandlers/storage';
+import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
@@ -19,6 +20,7 @@ import {
   processChainCUD,
   Ithis as chainCUDContextType,
 } from './MessageProcessors/ChainCUDChainEventsQueue';
+import { SubstrateTypes } from '../../src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -36,17 +38,6 @@ async function setupChainEventConsumer() {
     throw e;
   }
 
-  // TODO: move this
-  // emits notifications by writing into the db's Notifications table, and also optionally
-  // sending a notification to the client via websocket
-  // const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
-  // const notificationHandler = new EventNotificationHandler(
-  //   models,
-  //   wss,
-  //   excludedNotificationEvents,
-  //   consumer
-  // );
-
   // writes events into the db as ChainEvents rows
   const storageHandler = new EventStorageHandler(models);
 
@@ -57,7 +48,19 @@ async function setupChainEventConsumer() {
     rmqController
   );
 
-  const allChainEventHandlers = [storageHandler, entityArchivalHandler];
+  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
+  const notificationsHandler = new NotificationsHandler(
+    models,
+    rmqController,
+    excludedNotificationEvents
+  );
+
+  // WARNING: due to dbEvent in each handler ORDER OF HANDLERS MATTERS!
+  const allChainEventHandlers = [
+    storageHandler,
+    notificationsHandler,
+    entityArchivalHandler,
+  ];
 
   // setup Chain
   const chainEventsProcessorContext: ChainEventsProcessorContextType = {

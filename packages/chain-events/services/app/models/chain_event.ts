@@ -9,9 +9,9 @@ import {
 import { ChainEntityAttributes } from './chain_entity';
 
 export type ChainEventAttributes = {
+  id: number;
   chain_event_type_id: string;
   block_number: number;
-  id?: number;
   entity_id?: number;
   event_data: any;
   created_at?: Date;

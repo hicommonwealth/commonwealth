@@ -13,6 +13,7 @@ import {
   processChainEntityCUD,
 } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
+import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -40,9 +41,21 @@ async function setupMainConsumer() {
     msgProcessorContext: chainEntityCUDContext,
   };
 
-  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
+  // the Ithis type for this context contains the publish function that
+  // only becomes available when the rmqControllers context is added to the
+  // functions' context within the rmqController itself. Thus, this context
+  // is untyped
+  const chainEventNotificationsCUDContext = {
+    models,
+    log,
+  };
+  const ceNotifsCUDProcessorRmqSub: RabbitMQSubscription = {
+    messageProcessor: processChainEventNotificationsCUD,
+    subscriptionName: RascalSubscriptions.ChainEventNotificationsCUDMain,
+    msgProcessorContext: chainEventNotificationsCUDContext
+  }
 
-  let subscriptions: RabbitMQSubscription[] = [chainEntityCUDProcessorRmqSub];
+  let subscriptions: RabbitMQSubscription[] = [chainEntityCUDProcessorRmqSub, ceNotifsCUDProcessorRmqSub];
 
   const serviceConsumer = new ServiceConsumer(
     'MainConsumer',

@@ -13,9 +13,9 @@ export enum WebsocketMessageNames {
 }
 
 export type ChainEventNotification = {
-  id: string;
-  notification_data: '';
-  chain_event_id: string;
+  id: number;
+  notification_data: string;
+  chain_event_id: number;
   category_id: 'chain-event';
   chain_id: string;
   updated_at: moment.Moment;
