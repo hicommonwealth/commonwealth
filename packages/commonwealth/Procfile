@@ -1,0 +1,6 @@
+web: USE_NEW_IDENTITY_CACHE=true cd packages/commonwealth && ts-node -P tsconfig.node.json -T server.ts
+ceConsumer: cd packages/commonwealth && node build/commonwealth/server/scripts/chainEventsConsumer.js
+ceNode0: WORKER_NUMBER=0 cd packages/commonwealth && node build/commonwealth/server/scripts/dbNode.js
+ceNode1: WORKER_NUMBER=1 cd packages/commonwealth && node build/commonwealth/server/scripts/dbNode.js
+ceNode2: WORKER_NUMBER=2 cd packages/commonwealth && node build/commonwealth/server/scripts/dbNode.js
+release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json

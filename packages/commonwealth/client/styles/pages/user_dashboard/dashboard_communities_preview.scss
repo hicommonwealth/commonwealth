@@ -1,0 +1,39 @@
+@import 'shared';
+
+.CommunityPreviewCard.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 320px;
+
+  .card-top {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+
+    .CommunityAvatar {
+      margin-right: 8px;
+    }
+  }
+
+  .card-subtext.Text {
+    color: $neutral-500;
+  }
+}
+
+.DashboardCommunitiesPreview {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @include smallInclusive {
+    display: none;
+  }
+
+  .community-preview-cards-collection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}

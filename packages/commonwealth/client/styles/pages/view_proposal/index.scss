@@ -1,0 +1,404 @@
+@import 'shared';
+
+$discussion-outer-padding: 60px;
+$discussion-meta-padding: 12px; // padding between comment meta & comment content
+$discussion-reaction-padding: 18px; // padding between comment content & comment reaction
+$discussion-comment-padding: 28px; // padding between comment content & avatar
+$discussion-comment-padding-mobile: 16px;
+
+$discussion-meta-font-size: 1rem;
+$discussion-meta-color: $neutral-500;
+
+$discussion-title-font-size: 1.45rem;
+
+@mixin supports-jump-highlight() {
+  &.highlighted {
+    border-radius: 20px;
+    background-color: $yellow-200;
+
+    .thread-connector {
+      background: $green-500;
+    }
+  }
+
+  &.highlighted.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+
+    .thread-connector {
+      background: $neutral-200;
+      transition: background 1s ease-in-out;
+    }
+  }
+}
+
+.view-proposal-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 704px;
+  width: 100%;
+}
+
+.view-sidebar-content-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ViewProposalPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
+  .view-proposal-body-with-tabs {
+    .TabBar {
+      margin-bottom: 8px;
+    }
+
+    @include medium {
+      display: none;
+    }
+
+    @include large {
+      display: none;
+    }
+  }
+
+  .view-proposal-body {
+    display: flex;
+    gap: 56px;
+    justify-content: space-between;
+    width: 100%;
+
+    &.hasSidebar {
+      @include mediumSmallInclusive {
+        display: none;
+      }
+    }
+
+    @include mediumSmallInclusive {
+      gap: 0;
+    }
+  }
+
+  .ProposalHeader {
+    .proposal-content {
+      position: relative;
+    }
+  }
+
+  .ProposalHeader,
+  .ProposalComment {
+    @include supports-jump-highlight();
+  }
+
+  .proposal-body-bottom,
+  .comment-body-bottom {
+    display: flex;
+    justify-content: space-between;
+
+    .comment-response-row,
+    .proposal-response-row {
+      width: 100%;
+      display: flex;
+      max-width: 300px;
+      align-items: center;
+      margin-top: 16px;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
+
+    .proposal-body-button-group,
+    .comment-body-bottom-right,
+    .comment-edit-buttons {
+      margin-top: 18px;
+
+      .cancel-editing {
+        margin-right: 15px;
+      }
+    }
+  }
+
+  .threading-level-1 {
+    .new-comment-child {
+      margin-left: 108px !important;
+
+      @include extraSmall {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+    }
+  }
+
+  .threading-level-2 {
+    .InlineReplyButton {
+      display: none !important;
+    }
+  }
+
+  h3 {
+    font-size: 23px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  //
+  // body
+  //
+  .ProposalComment {
+    position: relative;
+    display: flex;
+    margin-bottom: 40px;
+    padding-top: 16px;
+
+    .comment-body {
+      flex: 1;
+      overflow-x: auto;
+      padding-left: $discussion-comment-padding;
+
+      @include extraSmall {
+        padding-left: $discussion-comment-padding-mobile;
+      }
+    }
+
+    .comment-body-top {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      svg {
+        color: $neutral-500;
+        cursor: pointer;
+      }
+    }
+
+    .comment-body-bottom {
+      padding: 4px 0 2px;
+    }
+
+    .comment-body-content {
+      @include extraSmall {
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .ProposalComments {
+    .new-comment-child {
+      margin-left: 72px;
+
+      @include extraSmall {
+        margin-left: 0 !important;
+        width: 100%;
+      }
+    }
+  }
+
+  // proposal-meta
+  .ProposalHeaderStage,
+  .ProposalHeaderTopics,
+  .ProposalHeaderOnchainId,
+  .ProposalHeaderOnchainStatus,
+  .ProposalBodyAuthor,
+  .ProposalBodyCreated,
+  .ProposalBodyLastEnded,
+  .ProposalBodyDelete,
+  .ProposalBodyEdit,
+  .ProposalBodyDelete,
+  .ProposalBodyCancelEdit,
+  .ProposalBodySaveEdit,
+  .ViewCountBlock,
+  .ProposalHeaderExternalLink {
+    font-size: $discussion-meta-font-size;
+    display: inline-block;
+    color: $discussion-meta-color;
+    > a:link,
+    > a:visited,
+    a.proposal-collaborators,
+    > .User a.user-display-name {
+      color: $discussion-meta-color;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .ProposalSocialHeader {
+    font-size: $discussion-meta-font-size;
+    display: inline-block;
+    color: $discussion-meta-color;
+    margin-left: 10px;
+
+    > a:link,
+    > a:visited,
+    a.proposal-collaborators,
+    > .User a.user-display-name {
+      color: $discussion-meta-color;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    svg {
+      cursor: pointer;
+      stroke: $neutral-500;
+    }
+
+    svg:hover {
+      stroke: $neutral-500;
+    }
+  }
+
+  .ProposalTitleEditor {
+    .ProposalTitleSaveEdit {
+      font-size: $discussion-meta-font-size;
+      color: $discussion-meta-color;
+    }
+
+    .cui-input {
+      margin-right: 10px;
+    }
+
+    .proposal-title-buttons {
+      display: inline-flex;
+      position: relative;
+      bottom: 5px;
+
+      .ProposalTitleCancelEdit {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .ProposalHeaderStage {
+    &.primary {
+      color: $primary-500;
+    }
+
+    &.positive {
+      color: $green-500;
+    }
+
+    &.negative {
+      color: $rorange-500;
+    }
+  }
+
+  .proposal-collaborators-popover {
+    color: $neutral-800;
+
+    .cui-popover-content {
+      padding-top: 22px;
+
+      .User {
+        display: block;
+      }
+    }
+  }
+
+  .right-content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 24px 24px 0;
+    width: 296px;
+
+    @include smallInclusive {
+      display: none;
+    }
+  }
+
+  .ProposalSidebarPollEditorModule,
+  .ProposalLinkedThreadsEditorModule {
+    border-radius: 10px;
+    border: 1px solid $neutral-100;
+    padding: 22px 18px 21px;
+    margin-bottom: 24px;
+  }
+
+  .ProposalLinkedThreadsEditorModule {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .cui-list-item {
+      &:first-child {
+        padding-top: 0 !important;
+      }
+
+      &:hover {
+        background: none;
+      }
+    }
+
+    .linked-threads-title {
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+  }
+
+  .ProposalSidebarPollEditorModule {
+    .placeholder-copy {
+      color: $neutral-600;
+      margin: 2px 0 12px;
+    }
+
+    .proposal-chain-entities {
+      margin-bottom: 12px;
+    }
+  }
+
+  .QuillEditor {
+    margin-top: 8px;
+  }
+
+  .ProposalBodyCancelEdit,
+  .ProposalBodySaveEdit {
+    margin-right: 12px;
+    margin-top: 14px;
+  }
+
+  .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
+    stroke: $neutral-500;
+
+    &:hover {
+      stroke: $neutral-500;
+    }
+  }
+
+  .InlineReplyButton {
+    display: flex;
+  }
+
+  .ProposalBodyText.proposal-body-placeholder {
+    &,
+    .User .user-display-name {
+      color: $neutral-500;
+    }
+  }
+
+  .proposal-content,
+  .ProposalComment {
+    position: relative;
+  }
+
+  .thread-connector {
+    position: absolute;
+    top: 48px;
+    bottom: -40px;
+    background: $neutral-200;
+    left: 19px;
+    width: 2px;
+    z-index: -1;
+  }
+}

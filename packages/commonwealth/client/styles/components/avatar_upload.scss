@@ -1,0 +1,109 @@
+@import 'shared';
+
+@mixin avatarUploadSizing($size) {
+  @if $size == small {
+    height: 60px;
+    width: 60px;
+
+    .dropzone-attach {
+      border-radius: $border-radius-round;
+      height: 60px;
+      width: 60px;
+
+      &.hasNoAvatar {
+        background-color: $neutral-500;
+      }
+    }
+
+    .dropzone-preview-container {
+      border-radius: $border-radius-round;
+      height: 60px;
+      overflow: hidden;
+      width: 60px;
+    }
+  }
+
+  @if $size == large {
+    height: 108px;
+    width: 108px;
+
+    .dropzone-attach {
+      border-radius: $border-radius-round;
+      height: 108px;
+      width: 108px;
+
+      &.hasNoAvatar {
+        background-color: $neutral-500;
+      }
+    }
+
+    .dropzone-preview-container {
+      border-radius: $border-radius-round;
+      height: 108px;
+      overflow: hidden;
+      width: 108px;
+    }
+  }
+}
+
+.AvatarUpload {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  position: relative;
+
+  &.small {
+    @include avatarUploadSizing(small);
+  }
+
+  &.large {
+    @include avatarUploadSizing(large);
+  }
+
+  .icon-button-container {
+    background-color: $white;
+    border-radius: $border-radius-round;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    &.darkMode {
+      background-color: $neutral-800;
+
+      .IconButton {
+        color: $primary-200;
+
+        &:hover {
+          color: $primary-400;
+        }
+      }
+    }
+  }
+
+  .dropzone-preview-container {
+    .dz-preview {
+      .dz-image {
+        height: 100%;
+        width: 100%;
+
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
+
+      .dz-details,
+      .dz-progress,
+      .dz-success-mark,
+      .dz-error-mark,
+      .dz-error-message {
+        display: none;
+      }
+    }
+
+    &.hidden {
+      display: none;
+    }
+  }
+}

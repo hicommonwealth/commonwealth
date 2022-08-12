@@ -1,0 +1,51 @@
+@import 'shared';
+
+.CouncilVotingModal {
+  width: 400px;
+
+  @include extraSmall {
+    width: 100%;
+  }
+
+  .chooser {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .TextInput {
+      margin: 0;
+    }
+
+    .candidates-container {
+      height: 256px;
+      overflow-y: auto;
+
+      @include visibleScrollbar(light);
+
+      .candidate-row {
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        height: 32px;
+        padding-left: 8px;
+
+        &:hover {
+          background-color: $neutral-50;
+        }
+
+        .User {
+          align-items: center;
+          display: flex;
+          margin-left: 4px;
+        }
+      }
+    }
+  }
+
+  .compact-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 0 16px 16px;
+  }
+}
