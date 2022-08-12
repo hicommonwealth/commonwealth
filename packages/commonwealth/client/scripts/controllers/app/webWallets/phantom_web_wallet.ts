@@ -1,7 +1,7 @@
 declare let window: any;
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -31,7 +31,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     const encodedMessage = new TextEncoder().encode(account.validationToken);
     const { signature } = await window.solana.signMessage(encodedMessage, 'utf8');
     const signedMessage = Buffer.from(signature as Uint8Array).toString('base64');

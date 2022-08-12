@@ -21,7 +21,7 @@ import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(
+function createAddress(
   address: string,
   walletId: WalletId,
   chain?: string
@@ -34,19 +34,36 @@ function createAccount(
   });
 }
 
+export async function verifyAddress (
+  signature: string,
+  address: string,
+  chain?: string,
+  wallet_id?: WalletId
+) {
+  console.log('verify')
+  return $.post(`${app.serverUrl()}/verifyAddress`, {
+    address: address,
+    chain: chain,
+    signature,
+    jwt: app.user.jwt,
+    wallet_id: wallet_id,
+  });
+}
+
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  keytype?: string,
-  community?: string
-): Promise<Account<any>> {
-  const response = await createAccount(address, walletId, community);
-  const token = response.result.verification_token;
-  const newAccount = app.chain.accounts.get(response.result.address, keytype);
-  newAccount.setValidationToken(token);
-  newAccount.setAddressId(response.result.id);
-  newAccount.setWalletId(walletId);
-  return newAccount;
+  chain: string
+): Promise<AddressInfo> {
+  const response = await createAddress(address, walletId, chain);
+  const newAddr = new AddressInfo(
+    null,
+    address,
+    chain
+  )
+  newAddr.setValidationToken(response.result.verification_token);
+  console.log(newAddr.validationToken);
+  return newAddr;
 }
 
 export function linkExistingAddressToChainOrCommunity(
@@ -166,6 +183,25 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
         );
       });
       if (account) await setActiveAccount(account);
+    }
+  }
+}
+
+/* Questionable: This could be refactored*/
+export async function updateActiveAddressesWithGhost() {
+  // update ghost address for discourse users
+  const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
+      ghostAddress && this.chain.id === chain &&
+      app.user.activeAccounts.some((account) => account.address === address)
+  ))
+  if (hasGhostAddress) {
+    const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+    if (success && ghostAddressId) {
+      // remove ghost address from addresses
+      app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
+        return !ghostAddress
+      }));
+      app.user.setActiveAccounts([]);
     }
   }
 }

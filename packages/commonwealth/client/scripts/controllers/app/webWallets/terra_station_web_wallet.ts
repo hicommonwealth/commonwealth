@@ -1,5 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
 class TerraStationWebWalletController implements IWebWallet<string> {
@@ -53,7 +53,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {

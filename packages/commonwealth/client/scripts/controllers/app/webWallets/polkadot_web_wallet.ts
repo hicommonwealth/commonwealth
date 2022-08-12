@@ -9,7 +9,7 @@ import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 class PolkadotWebWalletController
@@ -53,7 +53,7 @@ class PolkadotWebWalletController
   }
 
   // ACTIONS
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     const signer = await this.getSigner(account.address);
     const token = account.validationToken;
     const payload: SignerPayloadRaw = {

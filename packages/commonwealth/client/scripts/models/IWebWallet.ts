@@ -1,5 +1,5 @@
 import { ChainBase, WalletId, ChainNetwork } from 'common-common/src/types';
-import Account from './Account';
+import AddressInfo from './AddressInfo';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
@@ -9,7 +9,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   enable: () => Promise<void>;
-  validateWithAccount: (account: Account<any>) => Promise<void>;
+  validateWithAccount: (address: AddressInfo) => Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;

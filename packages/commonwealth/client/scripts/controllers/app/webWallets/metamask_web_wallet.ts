@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import $ from 'jquery';
 import { provider } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
@@ -52,21 +52,28 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signLoginToken(message: string): Promise<string> {
     const msgParams = constructTypedMessage(
-      app.chain.meta.node.ethChainId || 1,
+      app.chain?.meta.node.ethChainId || 1,
       message
     );
-    const signature = await this._web3.givenProvider.request({
-      method: 'eth_signTypedData_v4',
-      params: [this._accounts[0], JSON.stringify(msgParams)],
-    });
-    return signature;
+    
+    try {
+      const signature = await this._web3.givenProvider.request({
+        method: 'eth_signTypedData_v4',
+        params: [this._accounts[0], JSON.stringify(msgParams)],
+      });
+
+      return signature;
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
     const webWalletSignature = await this.signLoginToken(
       account.validationToken
     );
+    console.log('in here')
     return account.validate(webWalletSignature);
   }
 

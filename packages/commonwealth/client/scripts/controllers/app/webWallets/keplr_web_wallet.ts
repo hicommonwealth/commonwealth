@@ -4,7 +4,7 @@ import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, WalletId, ChainNetwork } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 
@@ -43,11 +43,11 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get api() { return window.keplr; }
   public get offlineSigner() { return this._offlineSigner; }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino)
       throw new Error('Missing or misconfigured web wallet');
 
-    if (this._chain !== app.chain.id) {
+    if (this._chain !== app.chain?.id) {
       // disable then re-enable on chain switch
       await this.enable();
     }

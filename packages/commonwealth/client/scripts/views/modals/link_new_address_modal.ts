@@ -74,7 +74,7 @@ const LinkAccountItem: m.Component<
   {
     account: { address: string; meta?: { name: string } };
     targetCommunity: string;
-    accountVerifiedCallback: (account: Account<any>) => Promise<void>;
+    accountVerifiedCallback: (address: AddressInfo, account?: Account<any>) => Promise<void>;
     errorCallback: (error: string) => void;
     linkNewAddressModalVnode: m.Vnode<
       ILinkNewAddressModalAttrs,
@@ -95,8 +95,6 @@ const LinkAccountItem: m.Component<
       base,
       webWallet,
     } = vnode.attrs;
-
-    console.log('bro -1 ')
     const address =
       base === ChainBase.Substrate
         ? addressSwapper({
@@ -117,7 +115,6 @@ const LinkAccountItem: m.Component<
         ? `${app.chain.meta.name} address ${account.address.slice(0, 6)}...`
         : `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`);
 
-    console.log('bro')
     return m(
       '.LinkAccountItem.account-item',
       {
@@ -161,12 +158,13 @@ const LinkAccountItem: m.Component<
             const signerAccount = await createUserWithAddress(
               address,
               webWallet.name,
-              undefined,
-              targetCommunity
+              !!app.chain ? app.chain.id : webWallet.defaultNetwork,
             );
             vnode.state.linking = true;
             m.redraw();
+            console.log('hey before validateWithWebWallet');
             await webWallet.validateWithAccount(signerAccount);
+            console.log('hey')
             vnode.state.linking = false;
             m.redraw();
             // return if user signs for two addresses
@@ -176,7 +174,7 @@ const LinkAccountItem: m.Component<
           } catch (err) {
             // catch when the user rejects the sign message prompt
             vnode.state.linking = false;
-            errorCallback(`Verification failed: ${err}`);
+            errorCallback(`Verification failed: ${err.toString()}`);
             m.redraw();
           }
         },
@@ -285,7 +283,7 @@ const LinkNewAddressModal: m.Component<
     // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
     // polkadot-js 'https://github.com/polkadot-js/extension'
 
-    const accountVerifiedCallback = async (account: Account<any>) => {
+    const accountVerifiedCallback = async (address: AddressInfo, account?: Account<any>) => {
       if (app.isLoggedIn()) {
         // existing user
 
@@ -304,34 +302,36 @@ const LinkNewAddressModal: m.Component<
             (a) => a.address === account.address && a.chain === account.chain.id
           );
 
-          if (!addressInfo && account.addressId) {
+          if (!addressInfo && address.id) {
             // TODO: add keytype
             addressInfo = new AddressInfo(
-              account.addressId,
-              account.address,
-              account.chain.id,
-              account.walletId
+              address.id,
+              address.address,
+              address.chain,
+              address.walletId
             );
             app.user.addresses.push(addressInfo);
           }
 
           // link the address to the community
-          try {
-            if (
-              vnode.attrs.joiningChain &&
-              !app.user.getRoleInCommunity({
-                account,
-                chain: vnode.attrs.joiningChain,
-              })
-            ) {
-              await app.user.createRole({
-                address: addressInfo,
-                chain: vnode.attrs.joiningChain,
-              });
+          if (app.chain) {
+            try {
+              if (
+                vnode.attrs.joiningChain &&
+                !app.user.getRoleInCommunity({
+                  account,
+                  chain: vnode.attrs.joiningChain,
+                })
+              ) {
+                await app.user.createRole({
+                  address: addressInfo,
+                  chain: vnode.attrs.joiningChain,
+                });
+              }
+            } catch (e) {
+              // this may fail if the role already exists, e.g. if the address is being migrated from another user
+              console.error('Failed to create role');
             }
-          } catch (e) {
-            // this may fail if the role already exists, e.g. if the address is being migrated from another user
-            console.error('Failed to create role');
           }
 
           // set the address as active
@@ -369,20 +369,9 @@ const LinkNewAddressModal: m.Component<
             app.user.selectedChain ||
             app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
-        } else {
-          notifyError('Signed in, but no chain or community found');
         }
-        // if we're logging in and have a profile, we can just close out the modal
-        if (
-          account.profile &&
-          account.profile.initialized &&
-          account.profile.name
-        ) {
-          $('.LinkNewAddressModal').trigger('modalforceexit');
-          if (vnode.attrs.successCallback) vnode.attrs.successCallback();
-        } else {
-          vnode.state.step = LinkNewAddressSteps.Step2CreateProfile;
-        }
+        $('.LinkNewAddressModal').trigger('modalforceexit');
+        if (vnode.attrs.successCallback) vnode.attrs.successCallback();
         vnode.state.newAddress = account;
         vnode.state.isNewLogin = true;
         vnode.state.error = null;

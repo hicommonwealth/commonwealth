@@ -1,5 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -41,7 +41,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(app.chain.meta.node.ethChainId || 1, message);
+    const msgParams = constructTypedMessage(app.chain?.meta.node.ethChainId || 1, message);
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
       JSON.stringify(msgParams),
@@ -49,7 +49,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     // TODO: test whether signTypedData works on WC
     const webWalletSignature = await this.signLoginToken(account.validationToken);
     return account.validate(webWalletSignature);

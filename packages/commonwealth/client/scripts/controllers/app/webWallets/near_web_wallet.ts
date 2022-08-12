@@ -1,5 +1,5 @@
 import { ChainBase, WalletId, ChainNetwork } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { AddressInfo, IWebWallet } from 'models';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
 // is handled through redirects involving the `/finishNearLogin` page.
@@ -18,7 +18,7 @@ class NearWebWalletController implements IWebWallet<any> {
     return [];
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: AddressInfo): Promise<void> {
     throw new Error('not implemented');
   }
 
