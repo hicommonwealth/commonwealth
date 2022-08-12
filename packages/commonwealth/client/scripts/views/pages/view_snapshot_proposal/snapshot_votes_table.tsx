@@ -66,7 +66,7 @@ export class SnapshotVotesTable
                 {choices[vote.choice - 1]}
               </CWText>
               <CWText className="column-text" noWrap>
-                ${formatNumberLong(vote.balance)} ${symbol}
+                {formatNumberLong(vote.balance)} {symbol}
               </CWText>
             </div>
           ))}

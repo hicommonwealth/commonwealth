@@ -659,9 +659,8 @@ export const ProposalBodySaveEdit: m.Component<{
               }
             }
             parentState.saving = true;
-            const { quillEditorState } = parentState;
-            quillEditorState.disable();
-            const itemText = quillEditorState.textContentsAsString;
+            parentState.quillEditorState.disable();
+            const itemText = parentState.quillEditorState.textContentsAsString;
             if (item instanceof Thread) {
               app.threads
                 .edit(

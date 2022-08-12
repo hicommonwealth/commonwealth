@@ -6,13 +6,14 @@ import { ListItem, Button, List, Icon, Icons } from 'construct-ui';
 import app from 'state';
 import { Topic } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { confirmationModalWithText } from './confirm_modal';
 
 const getTopicFromElement = (
   htmlEle: HTMLElement,
   allTopics: Topic[]
 ): Topic => {
-  const topic = allTopics.find((t) => t.name === htmlEle.innerText);
+  const topic = allTopics.find(
+    (t: Topic) => t.name.trim() === htmlEle.innerText
+  );
   return topic;
 };
 
