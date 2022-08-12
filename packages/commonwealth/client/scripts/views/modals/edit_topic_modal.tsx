@@ -134,17 +134,6 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
             inputValidationFn={(text: string) => {
               let errorMsg;
 
-              const currentCommunityTopicNames = app.topics
-                .getByCommunity(app.activeChainId())
-                .map((t) => t.name.toLowerCase());
-
-              if (currentCommunityTopicNames.includes(text.toLowerCase())) {
-                errorMsg = 'Topic name already used within community.';
-                this.error = errorMsg;
-                m.redraw();
-                return ['failure', errorMsg];
-              }
-
               const disallowedCharMatches = text.match(/["<>%{}|\\/^`]/g);
               if (disallowedCharMatches) {
                 errorMsg = `The ${pluralizeWithoutNumberPrefix(
