@@ -25,13 +25,17 @@ module.exports = {
         token_name: { type: Sequelize.STRING, allowNull: true },
         symbol: {type: Sequelize.STRING, allowNull: true},
         type: { type: Sequelize.STRING, allowNull: false }, // for governance erc20, etc.
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
 
       // Create CommunityContracts Table
       await queryInterface.createTable('CommunityContracts', {
         id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-        community_id: { type: Sequelize.STRING, allowNull: false, references: { model: 'Chains', key: 'id' } },
-        contract_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'Contracts', key: 'id' }}
+        chain_id: { type: Sequelize.STRING, allowNull: false, references: { model: 'Chains', key: 'id' } },
+        contract_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'Contracts', key: 'id' }},
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
 
       // Migrate Current Chains to Contracts + CommunityContracts
@@ -51,6 +55,8 @@ module.exports = {
           token_name: c.token_name,
           symbol: c.symbol,
           type: c.network,
+          created_at: new Date(),
+          updated_at: new Date(),
         }], {transaction: t});
 
         const contract = await queryInterface.sequelize.query(
@@ -58,8 +64,10 @@ module.exports = {
           { transaction: t});
         if (!contract[0][0].id) console.log('null!', contract[0]);
         await queryInterface.bulkInsert('CommunityContracts', [{
-          community_id: c.cid,
+          chain_id: c.cid,
           contract_id: contract[0][0].id,
+          created_at: new Date(),
+          updated_at: new Date(),
         }], {transaction: t });
       }));
 
@@ -113,19 +121,19 @@ module.exports = {
 
       // Re-add ContractCategories Table
       await queryInterface.createTable('ContractCategories', {
-        id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        name: { type: dataTypes.STRING, allowNull: false },
-        description: { type: dataTypes.TEXT, allowNull: false },
-        color: { type: dataTypes.STRING, allowNull: false },
+        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+        name: { type: Sequelize.STRING, allowNull: false },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        color: { type: Sequelize.STRING, allowNull: false },
       }, { transaction: t });
 
       await queryInterface.createTable('ContractItems', {
-        id:          { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
-        chain:       { type: dataTypes.STRING, allowNull: false },
-        name:        { type: dataTypes.STRING, allowNull: false },
-        description: { type: dataTypes.TEXT, allowNull: false },
-        color:       { type: dataTypes.STRING, allowNull: false },
-        category_id: { type: dataTypes.INTEGER, allowNull: false },
+        id:          { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
+        chain:       { type: Sequelize.STRING, allowNull: false },
+        name:        { type: Sequelize.STRING, allowNull: false },
+        description: { type: Sequelize.TEXT, allowNull: false },
+        color:       { type: Sequelize.STRING, allowNull: false },
+        category_id: { type: Sequelize.INTEGER, allowNull: false },
       }, { transaction: t });
     });
   },

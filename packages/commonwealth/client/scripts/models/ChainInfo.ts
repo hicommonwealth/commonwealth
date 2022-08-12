@@ -150,7 +150,7 @@ class ChainInfo {
     decimals,
     substrate_spec,
     token_name,
-    Contract,
+    Contracts,
     ChainNode,
     admin_only_polling,
   }) {
@@ -190,7 +190,7 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      address: Contract?.address,
+      address: Contracts[0]?.address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });

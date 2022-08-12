@@ -80,7 +80,7 @@ const getTokenForum = async (
         }
       });
       await models.CommunityContract.create({
-        community_id: chain.id,
+        chain_id: chain.id,
         contract_id: contract.id,
       });
       chain.Contract = contract;

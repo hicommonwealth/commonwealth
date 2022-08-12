@@ -41,11 +41,13 @@ export default (
       token_name: { type: dataTypes.STRING, allowNull: true },
       symbol: { type: dataTypes.STRING, allowNull: true },
       type: { type: dataTypes.STRING, allowNull: false }, // for governance erc20, etc. formerly network
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'Contracts',
       timestamps: true,
-      underscored: false,
+      underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     }

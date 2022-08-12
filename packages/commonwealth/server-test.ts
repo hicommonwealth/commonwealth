@@ -129,18 +129,6 @@ const resetServer = (debug = false): Promise<void> => {
         )
       );
 
-      // For all smart contract support chains
-      await models.ContractCategory.create({
-        name: 'Tokens',
-        description: 'Token related contracts',
-        color: '#4a90e2',
-      });
-      await models.ContractCategory.create({
-        name: 'DAOs',
-        description: 'DAO related contracts',
-        color: '#9013fe',
-      });
-
       // Initialize different chain + node URLs
       const edgMain = await models.Chain.create({
         id: 'edgeware',

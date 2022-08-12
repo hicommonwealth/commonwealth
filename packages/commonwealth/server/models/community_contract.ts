@@ -7,7 +7,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type CommunityContractAttributes = {
     id: number;
-    community_id: string;
+    chain_id: string;
     contract_id: number;
 
     // Associations
@@ -30,24 +30,26 @@ export default (
     'CommunityContract',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      community_id: { type: dataTypes.STRING, allowNull: false },
-      contract_id: { type: dataTypes.INTEGER, allowNull: false }
+      chain_id: { type: dataTypes.STRING, allowNull: false },
+      contract_id: { type: dataTypes.INTEGER, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'CommunityContracts',
       timestamps: true,
-      underscored: false,
+      underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [
-        { fields: ['community_id'], unique: true },
+        { fields: ['chain_id'], unique: true },
       ],
     }
   );
 
   CommunityContract.associate = (models) => {
     models.CommunityContract.belongsTo(models.Contract, { foreignKey: 'contract_id', targetKey: 'id' });
-    models.CommunityContract.belongsTo(models.Chain, { foreignKey: 'community_id', targetKey: 'id' });
+    models.CommunityContract.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
   };
 
   return CommunityContract;

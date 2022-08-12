@@ -1,4 +1,4 @@
-import { QueryTypes, Op } from 'sequelize';
+import { QueryTypes, Op, Sequelize } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
@@ -34,6 +34,10 @@ const status = async (
           {
             model: models.ChainNode,
           },
+          {
+            model: models.Contract,
+            required: false,
+          }
         ],
       }),
       models.ChainNode.findAll(),

@@ -160,8 +160,10 @@ export default (
     });
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
+      // as: 'contracts',
     }); // TODO: is this correct?
-    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'community_id'}); // @TODO: Is this necessary with above?
+    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'chain_id' });
+      // @TODO: Is this necessary with above?
   };
 
   return Chain;

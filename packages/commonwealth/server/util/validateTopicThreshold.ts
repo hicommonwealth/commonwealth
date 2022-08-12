@@ -36,7 +36,7 @@ const validateTopicThreshold = async (
       return true;
     }
     const communityContracts = await models.CommunityContract.findOne({
-      where: { community_id: topic.chain.id },
+      where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],
     }); // TODO: @JAKE in the future, we will have more than one contract, 
       // need to handle this through the TBC Rule, passing in associated Contract.id
