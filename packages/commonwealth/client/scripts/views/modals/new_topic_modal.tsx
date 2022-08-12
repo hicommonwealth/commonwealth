@@ -74,7 +74,7 @@ export class NewTopicModal implements m.ClassComponent {
             oninput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
             }}
-            inputValidationFn={(text) => {
+            inputValidationFn={(text: string) => {
               let errorMsg;
 
               const currentCommunityTopicNames = app.topics
