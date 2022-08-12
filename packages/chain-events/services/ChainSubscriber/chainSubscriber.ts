@@ -3,15 +3,26 @@ import _ from 'underscore';
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { RabbitMqHandler } from "../ChainEventsConsumer/ChainEventHandlers/rabbitMQ";
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DATABASE_URI, NUM_WORKERS, RABBITMQ_URI, WORKER_NUMBER, ROLLBAR_SERVER_TOKEN, REPEAT_TIME } from "../config";
+import {
+  DATABASE_URI,
+  NUM_WORKERS,
+  RABBITMQ_URI,
+  REPEAT_TIME,
+  ROLLBAR_SERVER_TOKEN,
+  WORKER_NUMBER,
+} from '../config';
 import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
-import { manageErcListeners, getListenerNames, queryDb, manageRegularListeners } from "./util";
-import { IListenerInstances } from "./types";
+import {
+  getListenerNames,
+  manageErcListeners,
+  manageRegularListeners,
+} from './util';
+import { IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import models from '../database/database';
-import { ChainAttributes } from "../database/models/chain";
+import { QueryTypes } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -37,20 +48,19 @@ async function mainProcess(
 
   // selects the chain data needed to create the listeners for the current chainSubscriber
   const allChainsAndTokens: any = await models.sequelize.query(`
-    WITH allListeners AS (
-        SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Listeners" WHERE active = True
-    ) SELECT allListeners.id,
-        allListeners.spec,
-        allListeners.contract_address,
-        allListeners.network,
-        allListeners.base,
-        allListeners.verbose_logging,
-        "ChainEndpoints".url
-      FROM allListeners
-      JOIN "ChainEndpoints" ON allListeners.url_id = "ChainEndpoints".id
-      WHERE MOD(allListeners.index, ?) = ?;
-  `, { replacements: [NUM_WORKERS, WORKER_NUMBER ], raw: true});
-  console.log(allChainsAndTokens);
+      WITH allChains AS (
+          SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Chains" WHERE active = True
+      ) SELECT allChains.id,
+               allChains.substrate_spec,
+               allChains.contract_address,
+               allChains.network,
+               allChains.base,
+               allChains.verbose_logging,
+               "ChainNodes".url
+      FROM allChains
+               JOIN "ChainNodes" ON allChains.chain_node_id = "ChainNodes".id
+      WHERE MOD(allChains.index, ?) = ?;
+  `, { replacements: [NUM_WORKERS, WORKER_NUMBER], raw: true, type: QueryTypes.SELECT });
 
   const erc20Tokens = [];
   const erc721Tokens = [];

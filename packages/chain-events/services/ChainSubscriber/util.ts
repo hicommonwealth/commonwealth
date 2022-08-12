@@ -1,20 +1,20 @@
-import _ from "underscore";
+import _ from 'underscore';
 import {
   createListener,
   ErcLoggingHandler,
   LoggingHandler,
   SubstrateEvents,
   SubstrateTypes,
-  SupportedNetwork
-} from "../../src";
-import { ChainBase, ChainNetwork } from "common-common/src/types";
-import { Pool } from "pg";
-import format from "pg-format";
-import { IListenerInstances } from "./types";
-import { ChainAttributes } from "../database/models/chain";
-import { factory, formatFilename } from "common-common/src/logging";
-import { RabbitMqHandler } from "../ChainEventsConsumer/ChainEventHandlers/rabbitMQ";
-import Rollbar from "rollbar";
+  SupportedNetwork,
+} from '../../src';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { Pool } from 'pg';
+import format from 'pg-format';
+import { IListenerInstances } from './types';
+import { ChainAttributes } from '../database/models/chain';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,21 +27,18 @@ export async function manageErcListeners(
   producer: RabbitMqHandler,
   rollbar: Rollbar
 ) {
-  const ercListenerInstances: IListenerInstances = {}
-  for (const [name, instance] of Object.entries(listenerInstances)) {
-    if (
-      !name.startsWith(ChainNetwork.ERC20) &&
-      !name.startsWith(ChainNetwork.ERC721)
-    )
-      ercListenerInstances[name] = instance;
-  }
-
   // delete any listeners that have no more tokens to listen to
   const currentChainUrls = Object.keys(groupedTokens);
   for (const listenerName of Object.keys(listenerInstances)) {
-    if ((listenerName.startsWith(ChainNetwork.ERC20) || listenerName.startsWith(ChainNetwork.ERC721))) {
-      const url = listenerName.slice(listenerName.indexOf('_') + 1)
+    if (
+      (listenerName.startsWith(ChainNetwork.ERC20) &&
+        network === ChainNetwork.ERC20) ||
+      (listenerName.startsWith(ChainNetwork.ERC721) &&
+        network === ChainNetwork.ERC721)
+    ) {
+      const url = listenerName.slice(listenerName.indexOf('_') + 1);
       if (!currentChainUrls.includes(url)) {
+        log.info(`Deleting listener: ${listenerName}`);
         await listenerInstances[listenerName].unsubscribe();
         delete listenerInstances[listenerName];
       }
@@ -58,10 +55,11 @@ export async function manageErcListeners(
     // if there is an existing listener for the given url and the tokens assigned
     // to it are different from the tokens given then delete the listener so that
     // we can create a new one with the updated token list
-    if (listener && !_.isEqual(
-      tokenAddresses,
-      listener.options.tokenAddresses
-    )) {
+    if (
+      listener &&
+      !_.isEqual(tokenAddresses, listener.options.tokenAddresses)
+    ) {
+      log.info(`Deleting listener: ${listenerName}`);
       await listener.unsubscribe();
       delete listenerInstances[listenerName];
     }
@@ -92,41 +90,62 @@ export async function manageErcListeners(
           }
         );
       } catch (e) {
-        log.error(`An error occurred while starting a listener for ${JSON.stringify(tokenNames)} connecting to ${url}`, e)
-        rollbar.critical(`An error occurred while starting a listener for ${JSON.stringify(tokenNames)} connecting to ${url}`, e)
+        log.error(
+          `An error occurred while starting a listener for ${JSON.stringify(
+            tokenNames
+          )} connecting to ${url}`,
+          e
+        );
+        rollbar.critical(
+          `An error occurred while starting a listener for ${JSON.stringify(
+            tokenNames
+          )} connecting to ${url}`,
+          e
+        );
       }
     }
 
     // get all the tokens who have verbose_logging set to true
-    const tokenLog = tokens.filter((token) => {
-      token.verbose_logging;
-    }).map(token => token.id);
+    const tokenLog = tokens
+      .filter((token) => token.verbose_logging)
+      .map((token) => token.id);
 
     let logger = <ErcLoggingHandler>(
       (<unknown>listenerInstances[listenerName].eventHandlers['logger'])
     );
     // create the logger if this is a brand-new listener
-    if (!logger) {
-      if (network === ChainNetwork.ERC20) logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
-      else if (network === ChainNetwork.ERC721) logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
+    if (!logger && tokenLog.length > 0) {
+      log.info(`Create a logger for listener: ${listenerName}`);
+      if (network === ChainNetwork.ERC20)
+        logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
+      else if (network === ChainNetwork.ERC721)
+        logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
 
       listenerInstances[listenerName].eventHandlers['logger'] = {
         handler: logger,
-        excludedEvents: []
-      }
+        excludedEvents: [],
+      };
+    } else if (logger && tokenLog.length === 0) {
+      log.info(`Deleting logger on listener: ${listenerName}`);
+      delete listenerInstances[listenerName].eventHandlers['logger'];
+    } else if (logger && tokenLog.length > 0) {
+      // update the tokens to log events for
+      logger.tokenNames = tokenLog;
     }
-    // update the tokens to log events for
-    logger.tokenNames = tokenLog;
 
     if (!listenerInstances[listenerName].eventHandlers['rabbitmq']) {
+      log.info(`Adding RabbitMQ event handler to listener: ${listenerName}`);
       listenerInstances[listenerName].eventHandlers['rabbitmq'] = {
         handler: producer,
-        excludedEvents: []
-      }
+        excludedEvents: [],
+      };
     }
 
     // subscribe the listener to its chain/RPC if it isn't yet subscribed
-    if (!listenerInstances[listenerName].subscribed) await listenerInstances[listenerName].subscribe();
+    if (!listenerInstances[listenerName].subscribed) {
+      log.info(`Subscribing listener: ${listenerName}`);
+      await listenerInstances[listenerName].subscribe();
+    }
   }
 }
 
@@ -173,7 +192,13 @@ export async function manageRegularListeners(
   });
 
   // create listeners for all the new chains -- this does not update any existing chains!
-  await setupNewListeners(newChains, listenerInstances, pool, producer, rollbar);
+  await setupNewListeners(
+    newChains,
+    listenerInstances,
+    pool,
+    producer,
+    rollbar
+  );
 
   // update existing listeners whose verbose_logging or substrate_spec has changed
   await updateExistingListeners(chains, listenerInstances, rollbar);
@@ -225,7 +250,8 @@ async function setupNewListeners(
       delete listenerInstances[chain.id];
       log.error(`Unable to create a listener instance for ${chain.id}`, error);
       rollbar.critical(
-        `Unable to create a listener instance for ${chain.id}`, error
+        `Unable to create a listener instance for ${chain.id}`,
+        error
       );
       continue;
     }
@@ -343,8 +369,14 @@ async function fetchSubstrateIdentities(
       );
       identitiesToFetch = (await pool.query(query)).rows.map((c) => c.address);
     } catch (error) {
-      log.error(`Failed to query the database Identity Cache for ${chain.id}`, error)
-      rollbar.critical(`Failed to query the database Identity Cache for ${chain.id}`, error);
+      log.error(
+        `Failed to query the database Identity Cache for ${chain.id}`,
+        error
+      );
+      rollbar.critical(
+        `Failed to query the database Identity Cache for ${chain.id}`,
+        error
+      );
       continue;
     }
 
@@ -361,7 +393,7 @@ async function fetchSubstrateIdentities(
         identitiesToFetch
       );
     } catch (error) {
-      log.error(`Failed to fetch identities from ${chain.id}`, error)
+      log.error(`Failed to fetch identities from ${chain.id}`, error);
       rollbar.critical(`Failed to fetch identities from ${chain.id}`, error);
       continue;
     }
@@ -386,8 +418,14 @@ async function fetchSubstrateIdentities(
       await pool.query(query);
       log.info(`Identity cache for ${chain.id} cleared`);
     } catch (error) {
-      log.error(`Failed to clear the database identity cache for ${chain.id}`, error)
-      rollbar.critical(`Failed to clear the database identity cache for ${chain.id}`, error);
+      log.error(
+        `Failed to clear the database identity cache for ${chain.id}`,
+        error
+      );
+      rollbar.critical(
+        `Failed to clear the database identity cache for ${chain.id}`,
+        error
+      );
     }
   }
 }
