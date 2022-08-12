@@ -66,10 +66,11 @@ export class RabbitMQController {
     msgProcessorContext?: {[key: string]: any}
   ): Promise<any> {
     let subscription: Rascal.SubscriberSessionAsPromised;
-    log.info(`Subscribing to ${subscriptionName}`);
     try {
       if (!this.subscribers.includes(subscriptionName))
         throw new Error('Subscription does not exist');
+
+      log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
         try {

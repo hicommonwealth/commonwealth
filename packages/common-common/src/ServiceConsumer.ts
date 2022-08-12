@@ -33,10 +33,12 @@ export class ServiceConsumer {
     log = factory.getLogger(
       addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId])
     );
+
+    this.rabbitMQController = _rabbitmqController;
   }
 
   public async init(): Promise<void> {
-    log.info(`Starting the ${this.serviceName}-${this.serviceId} consumer`);
+    log.info(`Initializing service-consumer: ${this.serviceName}-${this.serviceId}`);
 
     if (!this.rabbitMQController.initialized) {
       try {
@@ -51,7 +53,7 @@ export class ServiceConsumer {
       for (const sub of this.subscriptions) {
         await this.rabbitMQController.startSubscription(
           sub.messageProcessor,
-          RascalSubscriptions[sub.subscriptionName],
+          sub.subscriptionName,
           sub.msgProcessorContext
         );
       }
