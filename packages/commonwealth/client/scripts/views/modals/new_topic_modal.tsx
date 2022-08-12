@@ -70,7 +70,7 @@ export class NewTopicModal implements m.ClassComponent {
           <CWTextInput
             label="Name"
             name="name"
-            defaultValue={this.form.name}
+            value={this.form.name}
             oninput={(e) => {
               this.form.name = (e.target as HTMLInputElement).value;
             }}
@@ -117,7 +117,7 @@ export class NewTopicModal implements m.ClassComponent {
             label="Description"
             name="description"
             tabindex={2}
-            defaultValue={this.form.description}
+            value={this.form.description}
             oninput={(e) => {
               this.form.description = (e.target as any).value;
             }}

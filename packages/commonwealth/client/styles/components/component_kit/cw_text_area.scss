@@ -3,7 +3,6 @@
 .TextArea {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
   width: 100%;
 
   textarea {
@@ -15,10 +14,5 @@
     resize: none;
 
     @include inputStyles;
-  }
-
-  &.success,
-  &.failure {
-    margin-bottom: 0px;
   }
 }

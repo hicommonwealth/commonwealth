@@ -12,6 +12,7 @@
   .CreateCommunityForm {
     display: flex;
     flex-direction: column;
+    gap: 16px;
     margin: auto;
     width: 480px;
 
@@ -34,7 +35,6 @@
     .ToggleRow {
       display: flex;
       flex-direction: column;
-      margin-bottom: 20px;
 
       .toggle-and-label {
         display: flex;
