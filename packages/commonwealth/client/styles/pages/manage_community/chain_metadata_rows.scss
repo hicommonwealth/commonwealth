@@ -3,6 +3,7 @@
 .ChainMetadataRows {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   margin-bottom: 24px;
   width: 100%;
 
@@ -15,15 +16,10 @@
     }
   }
 
-  .chain-metadata-quill-editor {
-    margin-bottom: 24px;
-  }
-
   .AvatarUploadRow,
   .ToggleRow {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
 
     .toggle-and-label {
       display: flex;
@@ -34,7 +30,6 @@
   .tag-row {
     display: flex;
     flex-direction: column;
-    margin-bottom: 24px;
 
     .tag-group {
       display: flex;

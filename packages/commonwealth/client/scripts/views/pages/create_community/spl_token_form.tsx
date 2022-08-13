@@ -19,7 +19,6 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
-
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
   decimals: number;
@@ -94,7 +93,7 @@ export class SplTokenForm implements m.ClassComponent {
         />
         <InputRow
           title="Mint Address"
-          defaultValue={this.state.form.mint}
+          value={this.state.form.mint}
           placeholder="2sgDUTgTP6e9CrJtexGdba7qZZajVVHf9TiaCtS9Hp3P"
           onChangeHandler={(v) => {
             this.state.form.mint = v.trim();
@@ -108,13 +107,15 @@ export class SplTokenForm implements m.ClassComponent {
             await updateTokenForum();
           }}
         />
-        <CWValidationText
-          message={this.state.message}
-          status={this.state.status}
-        />
+        {this.state.message && (
+          <CWValidationText
+            message={this.state.message}
+            status={this.state.status}
+          />
+        )}
         <InputRow
           title="Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           disabled={disableField}
           onChangeHandler={(v) => {
             this.state.form.name = v;
@@ -125,7 +126,7 @@ export class SplTokenForm implements m.ClassComponent {
         <InputRow
           title="Symbol"
           disabled={disableField}
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
@@ -133,7 +134,7 @@ export class SplTokenForm implements m.ClassComponent {
         />
         <InputRow
           title="Decimals"
-          defaultValue={`${this.state.form.decimals}`}
+          value={`${this.state.form.decimals}`}
           disabled={true}
           onChangeHandler={(v) => {
             this.state.form.decimals = +v;
@@ -167,7 +168,7 @@ export class SplTokenForm implements m.ClassComponent {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id,
+                  res.result.role.chain_id
                 );
               }
               await initAppState(false);
