@@ -7,8 +7,9 @@ import 'components/component_kit/cw_text_input.scss';
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
-import { CWValidationText, ValidationStatus } from './cw_validation_text';
+import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
 
 type TextInputSize = 'small' | 'large';
 
@@ -16,7 +17,7 @@ export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
-  defaultValue?: string;
+  value?: string;
   iconRight?: string;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
@@ -40,6 +41,41 @@ type InputInternalStyleAttrs = {
   isTyping: boolean;
 };
 
+type MessageRowAttrs = {
+  hasFeedback?: boolean;
+  label: string;
+  statusMessage?: string;
+  validationStatus?: ValidationStatus;
+};
+
+export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
+  view(vnode) {
+    const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
+
+    return (
+      <div
+        class={getClasses<{ hasFeedback: boolean }>(
+          { hasFeedback },
+          'MessageRow'
+        )}
+      >
+        <CWLabel label={label} />
+        {hasFeedback && (
+          <CWText
+            type="caption"
+            className={getClasses<{ status: ValidationStatus }>(
+              { status: validationStatus },
+              'feedback-message-text'
+            )}
+          >
+            {statusMessage}
+          </CWText>
+        )}
+      </div>
+    );
+  }
+}
+
 export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
@@ -52,7 +88,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       autofocus,
       containerClassName,
       darkMode,
-      defaultValue,
+      value,
       disabled,
       iconRight,
       inputClassName,
@@ -79,7 +115,14 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           ComponentType.TextInput
         )}
       >
-        {label && <CWLabel label={label} />}
+        {label && (
+          <MessageRow
+            hasFeedback={!!inputValidationFn}
+            label={label}
+            statusMessage={this.statusMessage}
+            validationStatus={this.validationStatus}
+          />
+        )}
         <div class="input-and-icon-container">
           <input
             autofocus={autofocus}
@@ -134,7 +177,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 }
               }
             }}
-            defaultValue={defaultValue}
+            value={value}
           />
           {!!iconRight && !disabled && (
             <CWIcon
@@ -144,12 +187,6 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             />
           )}
         </div>
-        {this.statusMessage && (
-          <CWValidationText
-            message={this.statusMessage}
-            status={this.validationStatus}
-          />
-        )}
       </div>
     );
   }

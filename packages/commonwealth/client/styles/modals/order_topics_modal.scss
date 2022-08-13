@@ -1,25 +1,31 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .OrderTopicsModal {
+  width: 360px;
+
   .featured-topic-list {
-    .cui-list-item {
-      cursor: default;
-      pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    height: 320px;
+    margin-bottom: 16px;
+    overflow-y: auto;
+
+    @include visibleScrollbar(light);
+
+    .topic-row {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+
       &:hover {
-        cursor: default;
-        background-color: $white;
+        background-color: $neutral-50;
       }
+
       &.gu-transit {
         background-color: $neutral-100;
       }
-      .cui-icon {
-        padding: 2px;
-        cursor: pointer;
-        pointer-events: all;
-      }
     }
-  }
-  .cui-button {
-    margin-top: 15px;
   }
 }
