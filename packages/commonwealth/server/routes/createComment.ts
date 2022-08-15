@@ -37,7 +37,6 @@ export const Errors = {
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
-  // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to comment",

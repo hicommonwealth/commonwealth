@@ -73,7 +73,7 @@ const bulkOffchain = async (
                 as: 'topic',
               },
               {
-                model: models.ChainEntity,
+                model: models.ChainEntityMeta,
               },
               {
                 model: models.LinkedThread,

@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { Sequelize, DataTypes } from 'sequelize';
 
 import { DATABASE_URI } from './config';
@@ -20,6 +18,7 @@ import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channe
 import ChainEntityMetaFactory, {
   ChainEntityMetaModelStatic
 } from './models/chain_entity_meta';
+import ChainEventTypeFactory, { ChainEventTypeModelStatic } from "./models/chain_event_type";
 import ChatMessageFactory, {
   ChatMessageModelStatic,
 } from './models/chat_message';
@@ -111,6 +110,7 @@ export type Models = {
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
   ChainEntityMeta: ChainEntityMetaModelStatic;
+  ChainEventType: ChainEventTypeModelStatic;
   ChatMessage: ChatMessageModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
@@ -191,6 +191,7 @@ const models: Models = {
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
   ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
+  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),

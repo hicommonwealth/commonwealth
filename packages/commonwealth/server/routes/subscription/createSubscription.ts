@@ -2,11 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import proposalIdToEntity from '../../util/proposalIdToEntity';
 import Errors from './errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { DB } from "../../database";
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async (
-  models,
+  models: DB,
   req: Request,
   res: Response,
   next: NextFunction
@@ -60,13 +61,13 @@ export default async (
       } else {
         if (!req.body.chain_id)
           return next(new Error(Errors.ChainRequiredForEntity));
-        const chainEntity = await proposalIdToEntity(
-          models,
-          req.body.chain_id,
-          req.body.object_id
-        );
-        if (!chainEntity) return next(new Error(Errors.NoChainEntity));
-        obj = { chain_id: chainEntity.chain, chain_entity_id: chainEntity.id };
+        const chainEntityMeta = await models.ChainEntityMeta.findOne({
+          where: {
+            ce_id: req.body.chain_entity_id
+          }
+        });
+        if (!chainEntityMeta) return next(new Error(Errors.NoChainEntity));
+        obj = { chain_id: chainEntityMeta.chain, chain_entity_id: chainEntityMeta.ce_id };
       }
       break;
     }

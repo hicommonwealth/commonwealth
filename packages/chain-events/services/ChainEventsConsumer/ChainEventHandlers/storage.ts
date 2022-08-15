@@ -6,10 +6,12 @@ import {
   CWEvent,
   IChainEventKind,
   SubstrateTypes,
-  Erc20Types,
 } from 'chain-events/src';
 import Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -24,7 +26,8 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models,
     private readonly _chain?: string,
-    private readonly _filterConfig: StorageFilterConfig = {}
+    private readonly _filterConfig: StorageFilterConfig = {},
+    private readonly _rmqController?: RabbitMQController
   ) {
     super();
   }
@@ -96,6 +99,11 @@ export default class extends IEventHandler {
         event_name: event.data.kind.toString(),
       }
     });
+
+    if (created) {
+      this._rmqController.publish({chainEventTypeId: dbEventType.id}, RascalPublications.ChainEventTypeCUDMain);
+    }
+
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;

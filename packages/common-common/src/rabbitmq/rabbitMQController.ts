@@ -104,6 +104,9 @@ export class RabbitMQController {
     try {
       const publication = await this.broker.publish(publisherName, data);
       publication.on('error', (err, messageId) => {
+        // TODO: we need guaranteed message delivery so attempt message delivery
+        //  to dead-letter-queue with less requirements or send fatal error
+        //  report with highest level priority to backend devs
         log.error(`Publisher error ${messageId}`, err);
       });
     } catch (err) {

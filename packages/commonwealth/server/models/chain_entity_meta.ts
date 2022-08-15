@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityMetaAttributes = {
