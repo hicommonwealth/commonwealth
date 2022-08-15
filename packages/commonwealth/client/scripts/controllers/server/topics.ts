@@ -219,7 +219,6 @@ class TopicsController {
 
   public updateFeaturedOrder = async (featuredTopics: Topic[]) => {
     // Only topics which have had their order altered are passed to the backend
-    console.log(featuredTopics);
     const reorderedTopics = featuredTopics.filter((t) => {
       const newPosition = +t.order;
       const previousPosition = +this.getByIdentifier(t.id).order;
@@ -228,7 +227,6 @@ class TopicsController {
     const orderedIds = reorderedTopics
       .sort((a, b) => a.order - b.order)
       .map((t) => t.id);
-    console.log({ orderedIds, reorderedTopics });
     const response = await $.post(`${app.serverUrl()}/orderTopics`, {
       chain: app.activeChainId(),
       'order[]': orderedIds,
