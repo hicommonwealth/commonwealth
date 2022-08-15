@@ -92,6 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
           </div>
           <div class="sidebar-and-body-container">
             {!app.isCustomDomain() &&
+              !hideQuickSwitcher &&
               !isWindowMediumSmallInclusive(window.innerWidth) && (
                 <SidebarQuickSwitcher />
               )}
