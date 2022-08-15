@@ -39,12 +39,22 @@ type LayoutAttrs = {
 export class Layout implements m.ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
+  private surveyDelayTriggered = false;
+  private surveyReadyForDisplay = false;
 
   view(vnode) {
     const { scope, deferChain, hideSidebar } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
+
+    // Put the survey on a timer so it doesn't immediately appear
+    if (!this.surveyDelayTriggered && !this.surveyReadyForDisplay) {
+      this.surveyDelayTriggered = true;
+      setTimeout(() => {
+        this.surveyReadyForDisplay = true;
+      }, 4000);
+    }
 
     if (app.loadingError) {
       return (
@@ -119,7 +129,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
         {vnode.children}
         <AppModals />
         <AppToasts />
-        <UserSurveyPopup />
+        <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
       </div>
     );
   }

@@ -9,8 +9,9 @@ import { CWButton } from './component_kit/cw_button';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWGrowl } from './component_kit/cw_growl';
 import { CWText } from './component_kit/cw_text';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 1; // Wait one day before showing it again (if they didn't click "never show again")
+const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 1; // How long to wait before redisplaying the survey
 
 type UserSurveyViewAttrs = {
   disabled: boolean;
@@ -26,21 +27,32 @@ class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
     return (
       <CWGrowl position="bottom-right" disabled={disabled}>
         <div class="UserSurveyPopup">
-          <CWButton label="redirect" onclick={onRedirectClick}></CWButton>
-
-          <CWButton label="close" onclick={onClose}></CWButton>
-          <CWButton
-            label="reset all"
-            onclick={() => {
-              localStorage.deleteItem('user-survey-locked');
-            }}
-          ></CWButton>
-          <CWText type="caption">{`checkbox: ${checked}`}</CWText>
-
+          <div class="survey-svg-header"></div>
+          <CWIcon iconName="close" className="close-icon" onclick={onClose} />
+          <CWText type="h3" fontWeight="bold" className="header-text">
+            Want a Milk Carton NFT?
+          </CWText>
+          <CWText type="b1" className="body-text">
+            Take a quick survey to help us improve Common and get a special NFT
+            dropped to your ETH address!
+          </CWText>
+          <div class="button-wrapper">
+            <CWButton
+              buttonType="secondary-black"
+              label="No Thanks"
+              onclick={onClose}
+            />
+            <CWButton
+              buttonType="primary-black"
+              label="Sure Thing!"
+              onclick={onRedirectClick}
+            />
+          </div>
           <CWCheckbox
             checked={checked}
-            label="hide forev"
+            label="Please don't show this again"
             onchange={onCheckboxClick}
+            className="checkbox"
           />
         </div>
       </CWGrowl>
@@ -48,54 +60,63 @@ class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
   }
 }
 
-type UserSurveyPopupAttrs = {
-  redirectLink: string;
-};
-
 function surveyDisplayTimeElapsed() {
   const lastSurvey = localStorage.getItem('user-survey-last-displayed');
   if (!lastSurvey) {
-    // They have never seen the survey before
+    // They have never seen the survey growl before
     return true;
   }
   const lastSurveyDate = new Date(parseInt(lastSurvey, 10));
   const now = new Date();
 
   const timeSinceLastSurvey = now.getTime() - lastSurveyDate.getTime();
-  console.log('timeSinceLastSurvey', timeSinceLastSurvey);
   return timeSinceLastSurvey > USER_SURVEY_DISPLAY_INTERVAL;
 }
 
+const openTypeform = (
+  typeformBaseUrl: string,
+  params: { [param: string]: string }
+) => {
+  let paramsString = '';
+  Object.keys(params).forEach((key, i) => {
+    if (i > 0) {
+      paramsString += '&';
+    } else {
+      paramsString += '#';
+    }
+    paramsString += `${key}=${params[key]}`;
+  });
+
+  window.open(`${typeformBaseUrl}${paramsString}`, '_blank');
+};
+
+type UserSurveyPopupAttrs = {
+  surveyReadyForDisplay: boolean;
+};
 export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
   private surveyLocked: boolean;
-  private surveyReadyForDisplay: boolean;
-  private surveyDelayTriggered: boolean;
   private hideForeverChecked: boolean; // radio button indicating whether the user wants to hide the survey forever
 
   oncreate() {
     this.hideForeverChecked = false;
     const surveyCurrentlyLocked = localStorage.getItem('user-survey-locked');
-    const surveyTimeElapsed = surveyDisplayTimeElapsed();
-    this.surveyReadyForDisplay = true;
+    const surveyDelayTimeElapsed = surveyDisplayTimeElapsed();
 
     if (surveyCurrentlyLocked) {
       this.surveyLocked = true;
     } else {
-      if (surveyTimeElapsed) {
+      if (surveyDelayTimeElapsed) {
+        console.log('setting new survey-last-displayed');
         this.surveyLocked = false;
-        console.log('setting new survey last displayed');
       } else {
         this.surveyLocked = true;
       }
     }
   }
 
-  // survey currently locked -> means they clicked teh button, so this.surveyLocked = true
-  // survey not locked -> surveyTimeElapsed (or no time found) -> means they have waited long enough, so this.surveyLocked = false
-  // survey not locked -> !surveyTimeElapsed -> means they have seen it, closed it, and it hasnt been long enough, so this.surveyLocked = true
-
   view(vnode) {
-    const { redirectLink } = vnode.attrs;
+    const { surveyReadyForDisplay } = vnode.attrs;
+
     const handleClose = () => {
       if (this.hideForeverChecked) {
         localStorage.setItem('user-survey-locked', 'true');
@@ -105,29 +126,31 @@ export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
       m.redraw();
     };
 
-    // Trigger a delay before showing the survey growl
-    // if (
-    //   !this.surveyDelayTriggered &&
-    //   app.isLoggedIn() &&
-    //   !this.surveyReadyForDisplay
-    // ) {
-    //   this.surveyDelayTriggered = true;
-    //   setTimeout(() => {
-    //     this.surveyReadyForDisplay = true;
-    //   }, 10);
-    // }
+    const handleRedirect = () => {
+      const address =
+        app.user.activeAccount?.address ?? app.user.addresses[0].address;
+      const name = app.user.activeAccount?.profile.name ?? 'there';
+
+      openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
+        address,
+        name,
+      });
+
+      // We don't need to display it to this user again
+      this.surveyLocked = true;
+      localStorage.setItem('user-survey-locked', 'true');
+    };
 
     return (
       <UserSurveyView
         disabled={
-          !this.surveyReadyForDisplay || this.surveyLocked || !app.isLoggedIn()
+          !surveyReadyForDisplay || this.surveyLocked || !app.isLoggedIn()
         }
         checked={this.hideForeverChecked}
-        onRedirectClick={() => window.open(redirectLink, '_blank')}
+        onRedirectClick={handleRedirect}
         onClose={handleClose}
         onCheckboxClick={() => {
           this.hideForeverChecked = !this.hideForeverChecked;
-          m.redraw();
         }}
       />
     );

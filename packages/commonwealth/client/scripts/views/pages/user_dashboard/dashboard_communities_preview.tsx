@@ -74,18 +74,6 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
   }
 }
 
-const openTypeform = (
-  typeformBaseUrl: string,
-  params: { [param: string]: string }
-) => {
-  let paramsString = '';
-  Object.keys(params).forEach((key) => {
-    paramsString += `#${key}=${params[key]}`;
-  });
-
-  window.open(`${typeformBaseUrl}${paramsString}`, '_blank');
-};
-
 export class DashboardCommunitiesPreview implements m.ClassComponent {
   view() {
     const sortedChains = app.config.chains
@@ -111,17 +99,6 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
             m.redraw();
           }}
           label="View more communities"
-        />
-        <CWButton
-          onclick={() => {
-            // openTypeform('https://hicommonwealth.typeform.com/to/dS5q7cM2', {
-            //   address: '0xTestTestTest',
-            // });
-
-            localStorage.removeItem('user-survey-locked');
-            localStorage.removeItem('user-survey-last-displayed');
-          }}
-          label="lolll"
         />
       </div>
     );
