@@ -249,11 +249,11 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                 <div class="token-requirement">
                   Commenting in {activeTopicName} requires{' '}
                   {weiToTokens(tokenPostingThreshold.toString(), decimals)} $
-                  {app.chain.meta.symbol}.
+                  {app.chain.meta.default_symbol}.
                   {userBalance && app.user.activeAccount && (
                     <>
                       You have ${weiToTokens(userBalance.toString(), decimals)}{' '}
-                      ${app.chain.meta.symbol}.
+                      ${app.chain.meta.default_symbol}.
                     </>
                   )}
                 </div>

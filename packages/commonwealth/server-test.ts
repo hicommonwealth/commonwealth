@@ -28,6 +28,7 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
+import { ContractType } from '../chain-events/src/chains/commonwealth/types';
 
 require('express-async-errors');
 
@@ -133,7 +134,7 @@ const resetServer = (debug = false): Promise<void> => {
       const edgMain = await models.Chain.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
-        symbol: 'EDG',
+        default_symbol: 'EDG',
         name: 'Edgeware',
         icon_url: '/static/img/protocols/edg.png',
         active: true,
@@ -146,7 +147,7 @@ const resetServer = (debug = false): Promise<void> => {
       const eth = await models.Chain.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
-        symbol: 'ETH',
+        default_symbol: 'ETH',
         name: 'Ethereum',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
@@ -158,7 +159,7 @@ const resetServer = (debug = false): Promise<void> => {
       const alex = await models.Chain.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
-        symbol: 'ALEX',
+        default_symbol: 'ALEX',
         name: 'Alex',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
@@ -166,12 +167,21 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
-        address: '0xFab46E002BbF0b4509813474841E0716E6730136',
       });
+      const alexContract = await models.Contract.create({
+        address: '0xFab46E002BbF0b4509813474841E0716E6730136',
+        token_name: 'Alex',
+        symbol: 'ALEX',
+        type: ChainNetwork.ERC20,
+      });
+      const alexCommunityContract = await models.CommunityContract.create({
+        chain_id: alex.id,
+        contract_id: alexContract.id,
+      })
       const yearn = await models.Chain.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
-        symbol: 'YFI',
+        default_symbol: 'YFI',
         name: 'yearn.finance',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
@@ -179,12 +189,21 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
+      });
+      const yearnContract = await models.Contract.create({
         address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+        token_name: 'yearn',
+        symbol: 'YFI',
+        type: ChainNetwork.ERC20,
+      });
+      const yearnCommunityContract = await models.CommunityContract.create({
+        chain_id: yearn.id,
+        contract_id: yearnContract.id,
       });
       const sushi = await models.Chain.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
-        symbol: 'SUSHI',
+        default_symbol: 'SUSHI',
         name: 'Sushi',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
@@ -192,7 +211,16 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
+      });
+      const sushiContract = await models.Contract.create({
         address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
+        token_name: 'sushi',
+        symbol: 'SUSHI',
+        type: ChainNetwork.ERC20,
+      });
+      const sushiCommunityContract = await models.CommunityContract.create({
+        chain_id: sushi.id,
+        contract_id: sushiContract.id,
       });
 
       // Admin roles for specific communities

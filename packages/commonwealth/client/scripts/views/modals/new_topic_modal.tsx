@@ -124,7 +124,7 @@ export class NewTopicModal implements m.ClassComponent {
           {app.activeChainId() && (
             <>
               <CWLabel
-                label={`Number of tokens needed to post (${app.chain?.meta.symbol})`}
+                label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
               />
               <TokenDecimalInput
                 decimals={decimals}

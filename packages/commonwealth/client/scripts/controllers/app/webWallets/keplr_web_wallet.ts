@@ -122,21 +122,21 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.symbol,
-            coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+            coinDenom: app.chain.meta.default_symbol,
+            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
