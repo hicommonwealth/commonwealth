@@ -48,6 +48,7 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
+        app.chain.network === ChainNetwork.Commonwealth ||
         app.chain.meta.snapshot);
     if (!hasProposals) return;
 
@@ -61,6 +62,8 @@ export class GovernanceSection
       isNotOffchain &&
       showMolochMenuOptions &&
       (app.user.activeAccount as any)?.shares?.gtn(0);
+    const showCommonwealthMenuOptions =
+      isNotOffchain && app.chain?.network === ChainNetwork.Commonwealth;
     const showCompoundOptions =
       isNotOffchain &&
       app.user.activeAccount &&

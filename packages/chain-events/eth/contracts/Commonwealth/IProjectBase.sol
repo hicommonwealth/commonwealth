@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {DataTypes} from '../../DataTypes.sol';
+import {DataTypes} from './DataTypes.sol';
 
 interface IProjectBase {
     event Back(address indexed sender, address indexed token, uint256 amount);
