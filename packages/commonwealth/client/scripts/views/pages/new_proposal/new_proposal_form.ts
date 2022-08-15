@@ -710,7 +710,7 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics &&
             m(TopicSelector, {
-              topics: app.chain.meta.topics,
+              topics: app.topics.getByCommunity(app.chain.id),
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;

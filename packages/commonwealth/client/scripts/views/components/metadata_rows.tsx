@@ -8,20 +8,19 @@ import { CWLabel } from './component_kit/cw_label';
 import { CWTextArea } from './component_kit/cw_text_area';
 
 type InputRowAttrs = {
-  defaultValue: string;
+  value: string;
   disabled?: boolean;
   maxlength?: number;
   onChangeHandler: (e) => void;
   placeholder?: string;
   textarea?: boolean;
   title: string;
-  value?: string;
 };
 
 export class InputRow implements m.ClassComponent<InputRowAttrs> {
   view(vnode) {
     const {
-      defaultValue,
+      value,
       disabled,
       maxlength,
       onChangeHandler,
@@ -35,7 +34,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
         {textarea && <CWLabel label={title} />}
         {textarea ? (
           <CWTextArea
-            defaultValue={defaultValue}
+            value={value}
             placeholder={placeholder}
             disabled={disabled || false}
             maxlength={maxlength}
@@ -46,7 +45,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
         ) : (
           <CWTextInput
             label={title}
-            defaultValue={defaultValue}
+            value={value}
             placeholder={placeholder}
             maxlength={maxlength}
             disabled={disabled || false}

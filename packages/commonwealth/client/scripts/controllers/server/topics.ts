@@ -60,10 +60,7 @@ class TopicsController {
     }
   }
 
-  public async setTopicThreshold(
-    topic: Topic,
-    token_threshold: string
-  ) {
+  public async setTopicThreshold(topic: Topic, token_threshold: string) {
     try {
       const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
         topic_id: topic.id,
