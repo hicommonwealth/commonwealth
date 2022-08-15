@@ -167,7 +167,9 @@ export class EditCollaboratorsModal
             </div>
           ) : (
             <div class="no-collaborators">
-              <CWText>No collaborators selected</CWText>
+              <CWText className="no-collaborators-text">
+                No collaborators selected
+              </CWText>
             </div>
           )}
           <div class="buttons-row">
