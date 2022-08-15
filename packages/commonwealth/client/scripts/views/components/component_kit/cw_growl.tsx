@@ -21,21 +21,18 @@ type GrowlAttrs = {
 export class CWGrowl implements m.ClassComponent<GrowlAttrs> {
   view(vnode) {
     const { className, position, disabled } = vnode.attrs;
-    console.log(vnode.children);
     return (
       !disabled && (
-        <CWPortal>
-          <div
-            class={getClasses<{ className?: string; position: GrowlPosition }>(
-              { className, position },
-              ComponentType.Growl
-            )}
-          >
-            <CWCard className="growl-card" elevation="elevation-3" interactive>
-              {vnode.children}
-            </CWCard>
-          </div>
-        </CWPortal>
+        <div
+          class={getClasses<{ className?: string; position: GrowlPosition }>(
+            { className, position },
+            ComponentType.Growl
+          )}
+        >
+          <CWCard className="growl-card" elevation="elevation-3" interactive>
+            {vnode.children}
+          </CWCard>
+        </div>
       )
     );
   }

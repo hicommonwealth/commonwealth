@@ -119,6 +119,7 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
             // });
 
             localStorage.removeItem('user-survey-locked');
+            localStorage.removeItem('user-survey-last-displayed');
           }}
           label="lolll"
         />
