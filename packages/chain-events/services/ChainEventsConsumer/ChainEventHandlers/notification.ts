@@ -57,6 +57,7 @@ export default class extends IEventHandler {
       RascalPublications.ChainEventNotificationsCUDMain
     );
 
+    log.info("Chain-event Notification sent to CUD queue.");
     return dbEvent;
   }
 }

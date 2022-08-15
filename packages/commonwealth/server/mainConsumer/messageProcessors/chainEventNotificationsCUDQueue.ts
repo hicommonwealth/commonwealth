@@ -48,6 +48,7 @@ export async function processChainEventNotificationsCUD(
 
     // send to socket.io for WebSocket notifications
     await this.publish(formattedEvent, RascalPublications.ChainEventNotifications);
+    this.log.info("Notification pushed to socket queue");
   } catch (e) {
     if (e.errors && e.errors.length > 0) {
       const errors = e.errors.map((x) => x.message);

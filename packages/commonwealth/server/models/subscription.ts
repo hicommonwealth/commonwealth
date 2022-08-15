@@ -174,11 +174,10 @@ export default (
     });
 
     // if the notification does not yet exist create it here
-    // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
       if (isChainEventData) {
-        const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
-        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+        const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
+        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
 
         notification = await models.Notification.create({
           notification_data: JSON.stringify(event),
