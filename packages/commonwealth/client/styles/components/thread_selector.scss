@@ -3,16 +3,17 @@
 .ThreadSelector {
   border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
-  margin: 16px 0;
-  padding: 0;
+  margin-bottom: 16px;
 
-  .linked-threads-selector-placeholder {
-    padding: 112px 0;
-    text-align: center;
-  }
+  .cui-list {
+    .cui-list-item {
+      padding: 8px 16px 8px 48px;
 
-  .linked-threads-selector-placeholder-text {
-    color: $neutral-600;
-    height: 32px;
+      .thread-preview-row {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+    }
   }
 }

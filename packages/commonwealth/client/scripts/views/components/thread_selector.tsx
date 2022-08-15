@@ -11,26 +11,28 @@ import { SearchParams } from 'models/SearchQuery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWTextInput } from './component_kit/cw_text_input';
-import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWText } from './component_kit/cw_text';
 
 const renderThreadPreview = (state, thread: Thread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
+
   return (
     <ListItem
       label={
-        <div class="linked-thread-info">
-          <div class="linked-thread-top">{thread.title}</div>,
-          <div class="linked-thread-bottom">
+        <div class="thread-preview-row">
+          <CWText fontWeight="medium" noWrap>
+            {thread.title}
+          </CWText>
+          <CWText type="caption">
             {author.name
               ? `${author.name} • ${formatAddressShort(thread.author)}`
               : thread.author}
-          </div>
+          </CWText>
         </div>
       }
       selected={selected}
       key={idx}
-      style={state.selectInProgress ? 'cursor: wait' : ''}
     />
   );
 };
@@ -45,20 +47,18 @@ export class ThreadSelector
       linkingThread: Thread;
     }>
 {
-  private fetchingResults: boolean;
-  private fetchLinkedThreads: boolean;
   private inputTimeout;
   private linkedThreads: Thread[];
   private loading: boolean;
   private searchResults: Thread[];
   private searchTerm: string;
-  private selectInProgress: boolean;
   private showOnlyLinkedThreads: boolean;
 
   oninit(vnode) {
     this.showOnlyLinkedThreads = true;
     this.searchResults = [];
     this.linkedThreads = vnode.attrs.linkedThreads;
+    this.searchTerm = '';
   }
 
   view(vnode) {
@@ -91,6 +91,13 @@ export class ThreadSelector
           <>
             <CWTextInput
               placeholder="Search thread titles..."
+              iconRightonclick={() => {
+                this.searchTerm = '';
+                this.searchResults = [];
+                this.showOnlyLinkedThreads = true;
+              }}
+              value={this.searchTerm}
+              iconRight="close"
               oninput={(e) => {
                 e.preventDefault();
 
@@ -106,8 +113,6 @@ export class ThreadSelector
 
                 this.inputTimeout = setTimeout(async () => {
                   if (target.value?.trim().length > 4) {
-                    this.fetchingResults = true;
-
                     const params: SearchParams = {
                       chainScope: app.activeChainId(),
                       resultSize: 20,
@@ -116,7 +121,6 @@ export class ThreadSelector
                     app.search
                       .searchThreadTitles(this.searchTerm, params)
                       .then((results) => {
-                        this.fetchingResults = false;
                         this.searchResults = results;
                         results.forEach((thread) => {
                           app.profiles.getProfile(
@@ -133,17 +137,6 @@ export class ThreadSelector
                     this.showOnlyLinkedThreads = true;
                   }
                 }, 250);
-              }}
-            />
-            <CWIconButton
-              iconName="close"
-              onclick={(e) => {
-                e.stopPropagation();
-                const input = $('.ThreadSelector').find('input');
-                input.prop('value', '');
-                this.searchTerm = '';
-                this.searchResults = [];
-                this.showOnlyLinkedThreads = true;
               }}
             />
             <QueryList
@@ -166,30 +159,24 @@ export class ThreadSelector
                   (linkedThread) => linkedThread.id === thread.id
                 );
 
-                this.selectInProgress = true;
-
                 if (selectedThreadIdx !== -1) {
                   app.threads
                     .removeLinkedThread(linkingThread.id, thread.id)
                     .then(() => {
                       this.linkedThreads.splice(selectedThreadIdx, 1);
-                      this.selectInProgress = false;
                       notifySuccess('Thread unlinked.');
                     })
                     .catch(() => {
-                      this.selectInProgress = false;
                       notifyError('Thread failed to unlink.');
                     });
                 } else {
                   app.threads
                     .addLinkedThread(linkingThread.id, thread.id)
                     .then(() => {
-                      this.selectInProgress = false;
                       this.linkedThreads.push(thread);
                       notifySuccess('Thread linked.');
                     })
                     .catch(() => {
-                      this.selectInProgress = false;
                       notifyError('Thread failed to link.');
                     });
                 }
