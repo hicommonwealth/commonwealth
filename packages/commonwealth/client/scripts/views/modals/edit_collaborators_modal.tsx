@@ -180,6 +180,7 @@ export class EditCollaboratorsModal
           <div class="buttons-row">
             <CWButton
               label="Cancel"
+              buttonType="secondary-blue"
               onclick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
