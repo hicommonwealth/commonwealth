@@ -319,7 +319,7 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
 };
 
 export const EditCollaboratorsButton: m.Component<{
-  proposal: any;
+  proposal: Thread;
 }> = {
   view: (vnode) => {
     const { proposal } = vnode.attrs;

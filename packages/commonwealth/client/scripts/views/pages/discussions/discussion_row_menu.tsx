@@ -8,7 +8,7 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
-import { Thread, ThreadStage } from 'models';
+import { Thread } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -80,7 +80,7 @@ export class ThreadSubscriptionMenuItem
 }
 
 export class ChangeTopicMenuItem
-  implements m.ClassComponent<{ proposal: any }>
+  implements m.ClassComponent<{ proposal: Thread }>
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
@@ -107,7 +107,7 @@ export class ChangeTopicMenuItem
 }
 
 class UpdateProposalStatusMenuItem
-  implements m.ClassComponent<{ proposal: any }>
+  implements m.ClassComponent<{ proposal: Thread }>
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
