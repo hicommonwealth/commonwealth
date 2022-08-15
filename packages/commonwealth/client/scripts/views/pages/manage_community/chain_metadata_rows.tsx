@@ -51,6 +51,7 @@ export class ChainMetadataRows
   customDomain: string;
   terms: string;
   defaultSummaryView: boolean;
+  hideProjects: boolean;
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
@@ -78,6 +79,7 @@ export class ChainMetadataRows
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
     this.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
+    this.hideProjects = vnode.attrs.chain.hideProjects;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
@@ -184,6 +186,19 @@ export class ChainMetadataRows
               : 'Discussion listing defaults to latest activity view'
           }
         />
+        <ToggleRow
+          title="Hide Projects"
+          defaultValue={vnode.attrs.chain.hideProjects}
+          onToggle={(checked) => {
+            vnode.state.hideProjects = checked;
+          }}
+          caption={(checked) =>
+            checked
+              ? 'Projects are displayed in sidebar'
+              : 'Projects are hidden from sidebar'
+          }
+        />
+        ,
         <InputRow
           title="Custom Stages"
           value={this.customStages}
@@ -295,6 +310,7 @@ export class ChainMetadataRows
               terms,
               iconUrl,
               defaultSummaryView,
+              hideProjects,
             } = this;
 
             for (const space of snapshot) {
@@ -355,6 +371,7 @@ export class ChainMetadataRows
                 terms,
                 iconUrl,
                 defaultSummaryView,
+                hideProjects,
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');

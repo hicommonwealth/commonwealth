@@ -1,0 +1,49 @@
+@import 'shared';
+
+.ProjectListing {
+  width: calc(100% - 200px);
+  margin: 72px 100px;
+  .listing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1056px;
+    > div,
+    > button {
+      margin: 0 8px 32px;
+      width: fit-content;
+      &.cui-tabs {
+        .cui-tabs-item {
+          .Text {
+            color: $primary-200;
+          }
+        }
+        .cui-active {
+          border-color: $primary-500;
+          .Text {
+            color: $primary-500;
+          }
+        }
+      }
+    }
+  }
+  .listing-body {
+    display: flex;
+    justify-content: center;
+
+    .ExplorePage,
+    .YourPage,
+    .BackedProjectsPage {
+      width: 100%;
+      .projects-listing {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: left;
+        .ProjectCard.large {
+          margin: 8px;
+        }
+      }
+    }
+  }
+}

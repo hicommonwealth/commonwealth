@@ -74,6 +74,7 @@ const updateChain = async (
     element,
     telegram,
     github,
+    hide_projects,
     stages_enabled,
     custom_stages,
     custom_domain,
@@ -127,6 +128,7 @@ const updateChain = async (
   if (element) chain.element = element;
   if (telegram) chain.telegram = telegram;
   if (github) chain.github = github;
+  if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;

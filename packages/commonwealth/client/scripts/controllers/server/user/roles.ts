@@ -12,11 +12,16 @@ import Base from './base';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
   switch (permission) {
-    case undefined: return 0;
-    case RolePermission.member: return 1;
-    case RolePermission.moderator: return 2;
-    case RolePermission.admin: return 3;
-    default: return 4;
+    case undefined:
+      return 0;
+    case RolePermission.member:
+      return 1;
+    case RolePermission.moderator:
+      return 2;
+    case RolePermission.admin:
+      return 3;
+    default:
+      return 4;
   }
 };
 
@@ -26,9 +31,9 @@ export default class extends Base {
   }
 
   public createRole(options: {
-    address: AddressInfo,
-    chain?: string,
-    community?: string,
+    address: AddressInfo;
+    chain?: string;
+    community?: string;
   }): JQueryPromise<void> {
     // TODO: Change to POST /role
     return $.post('/api/createRole', {
@@ -41,7 +46,11 @@ export default class extends Base {
     });
   }
 
-  public deleteRole(options: { address: AddressInfo, chain?: string, community?: string }): JQueryPromise<void> {
+  public deleteRole(options: {
+    address: AddressInfo;
+    chain?: string;
+    community?: string;
+  }): JQueryPromise<void> {
     // TODO: Change to DELETE /role
     return $.post('/api/deleteRole', {
       jwt: this.jwt,
@@ -54,13 +63,18 @@ export default class extends Base {
       // handle state updates
       if (options.chain) {
         this.removeRole((r) => {
-          return r.chain_id === options.chain && r.address_id === options.address.id;
+          return (
+            r.chain_id === options.chain && r.address_id === options.address.id
+          );
         });
       }
     });
   }
 
-  public acceptInvite(options: { address: string, inviteCode: any}): JQueryPromise<void> {
+  public acceptInvite(options: {
+    address: string;
+    inviteCode: any;
+  }): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/acceptInvite`, {
       address: options.address,
       reject: false,
@@ -86,7 +100,10 @@ export default class extends Base {
    * @param account An arbitrary Commonwealth account
    * @param options A chain or a community ID
    */
-  public getRoleInCommunity(options: { account?: Account<any>, chain?: string }): RoleInfo {
+  public getRoleInCommunity(options: {
+    account?: Account<any>;
+    chain?: string;
+  }): RoleInfo {
     const account = options.account || this.activeAccount;
     if (!account) return;
 
@@ -96,7 +113,7 @@ export default class extends Base {
 
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
-      const communityMatches = r.chain_id === options.chain
+      const communityMatches = r.chain_id === options.chain;
       return addressMatches && communityMatches;
     });
   }
@@ -106,14 +123,26 @@ export default class extends Base {
    * @param role Either 'admin', 'moderator', or 'member'
    * @param options A chain or a community ID
    */
-  public getRoleOfCommunity(options: { role: string, chain?: string, community?: string }): RoleInfo {
-    if (!this.activeAccount || !app.isLoggedIn() || this.addresses.length === 0 || this.roles.length === 0) return;
+  public getRoleOfCommunity(options: {
+    role: string;
+    chain?: string;
+    community?: string;
+  }): RoleInfo {
+    if (
+      !this.activeAccount ||
+      !app.isLoggedIn() ||
+      this.addresses.length === 0 ||
+      this.roles.length === 0
+    )
+      return;
     return this.roles.find((r) => {
-      const permission = (r.permission === options.role);
-      const referencedAddress = this.addresses.find((address) => address.id === r.address_id);
+      const permission = r.permission === options.role;
+      const referencedAddress = this.addresses.find(
+        (address) => address.id === r.address_id
+      );
       if (!referencedAddress) return;
       const isSame = this.activeAccount.address === referencedAddress.address;
-      const ofCommunity = r.chain_id === options.chain
+      const ofCommunity = r.chain_id === options.chain;
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -123,7 +152,11 @@ export default class extends Base {
    * @param role Either 'admin', 'moderator', or 'member'
    * @param options A chain or a community ID
    */
-  public isRoleOfCommunity(options: { role: string, chain?: string, community?: string }): boolean {
+  public isRoleOfCommunity(options: {
+    role: string;
+    chain?: string;
+    community?: string;
+  }): boolean {
     return !!this.getRoleOfCommunity(options);
   }
 
@@ -133,7 +166,7 @@ export default class extends Base {
    */
   public getAllRolesInCommunity(options: { chain?: string }) {
     return this.roles.filter((r) => {
-      return r.chain_id === options.chain
+      return r.chain_id === options.chain;
     });
   }
 
@@ -142,26 +175,30 @@ export default class extends Base {
    * of active roles for a given chain/community.
    * @param options A chain or a community ID
    */
-  getAddressIdsFromRoles(options: { chain: string; community: string; }): number[] {
+  getAddressIdsFromRoles(options: {
+    chain: string;
+    community: string;
+  }): number[] {
     return this.roles
       .filter((role) => role.chain_id === options.chain)
-      .map((role) => role.address_id)
+      .map((role) => role.address_id);
   }
 
   /**
    * Grabs all joinable addresses for a potential chain/community
    * @param options A chain or a community ID
    */
-  getJoinableAddresses(options: { chain?: string, community?: string }): AddressInfo[] {
-    return (options.chain)
+  getJoinableAddresses(options: {
+    chain?: string;
+    community?: string;
+  }): AddressInfo[] {
+    return options.chain
       ? this.addresses.filter((a) => a.chain === options.chain)
       : this.addresses;
   }
 
   public getChainsOfRoles(): string[] {
-    return this.roles
-      .filter((role) => role.chain_id)
-      .map((r) => r.chain_id);
+    return this.roles.filter((role) => role.chain_id).map((r) => r.chain_id);
   }
 
   public getActiveAccountsByRole(): [Account<any>, RoleInfo][] {
@@ -172,19 +209,24 @@ export default class extends Base {
       });
       return [account, role];
     });
-    const filteredActiveAccountsByRole = activeAccountsByRole.reduce((
-      arr: [Account<any>, RoleInfo][],
-      current: [Account<any>, RoleInfo]
-    ) => {
-      const index = arr.findIndex((item) => item[0].address === current[0].address);
-      if (index < 0) {
-        return [...arr, current];
-      }
-      if (getPermissionLevel(arr[index][1]?.permission) < getPermissionLevel(current[1]?.permission)) {
-        return [...arr.splice(0, index), current, ...arr.splice(index + 1)];
-      }
-      return arr;
-    }, []);
+    const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
+      (arr: [Account<any>, RoleInfo][], current: [Account<any>, RoleInfo]) => {
+        const index = arr.findIndex(
+          (item) => item[0].address === current[0].address
+        );
+        if (index < 0) {
+          return [...arr, current];
+        }
+        if (
+          getPermissionLevel(arr[index][1]?.permission) <
+          getPermissionLevel(current[1]?.permission)
+        ) {
+          return [...arr.splice(0, index), current, ...arr.splice(index + 1)];
+        }
+        return arr;
+      },
+      []
+    );
 
     return filteredActiveAccountsByRole;
   }
@@ -199,9 +241,12 @@ export default class extends Base {
     if (app.user.isSiteAdmin) return true;
 
     const adminRole = this.roles.find((role) => {
-      return role.address === this.activeAccount.address
-        && role.permission === RolePermission.admin
-        && ((options.chain && role.chain_id === options.chain));
+      return (
+        role.address === this.activeAccount.address &&
+        role.permission === RolePermission.admin &&
+        options.chain &&
+        role.chain_id === options.chain
+      );
     });
 
     return !!adminRole;
@@ -214,19 +259,21 @@ export default class extends Base {
    * TODO: Should we default to this.activeAccount if address is null?
    */
   public isMember(options: {
-    account: AddressInfo | Account<any> | undefined,
-    chain?: string,
-    community?: string
+    account: AddressInfo | Account<any> | undefined;
+    chain?: string;
+    community?: string;
   }): boolean {
-    const addressinfo: AddressInfo | undefined = (options.account instanceof Account)
-      ? this.addresses.find((a) => (
-        options.account.address === a.address
-          && (options.account.chain as ChainInfo).id === a.chain
-      ))
-      : options.account;
-    const roles = this.roles.filter((role) => addressinfo
-      ? role.address_id === addressinfo.id
-      : true);
+    const addressinfo: AddressInfo | undefined =
+      options.account instanceof Account
+        ? this.addresses.find(
+            (a) =>
+              options.account.address === a.address &&
+              (options.account.chain as ChainInfo).id === a.chain
+          )
+        : options.account;
+    const roles = this.roles.filter((role) =>
+      addressinfo ? role.address_id === addressinfo.id : true
+    );
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
     } else {

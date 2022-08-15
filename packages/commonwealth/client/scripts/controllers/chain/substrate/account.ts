@@ -346,7 +346,6 @@ class SubstrateAccounts implements IAccountsModule<SubstrateCoin, SubstrateAccou
       }
 
       this.validators.then((results) => {
-        console.log(results);
         this.cachedValidators = Object.entries(results).map(([address, info]) => ({
           chain: this._Chain.app.chain?.meta?.id,
           stash: address,

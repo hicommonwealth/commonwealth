@@ -1,0 +1,33 @@
+@import 'shared';
+
+.Table {
+  width: 100%;
+  h1 {
+    padding-left: 16px;
+  }
+  table {
+    width: 100%;
+    th,
+    tr,
+    td {
+      padding: 16px;
+    }
+    th {
+      color: $neutral-600;
+    }
+    tr:nth-child(odd) {
+      background: $white;
+    }
+    tr:nth-child(even) {
+      background: $neutral-300;
+    }
+    th,
+    td {
+      text-align: right;
+    }
+    th:nth-child(1),
+    td:nth-child(1) {
+      text-align: left;
+    }
+  }
+}

@@ -21,10 +21,10 @@ import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
+import ProjectHandler from '../eventHandlers/project';
 import { default as models, sequelize } from '../database';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, factory, formatFilename } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNodeInstance } from '../models/chain_node';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -62,7 +62,11 @@ export const generateHandlers = (
   storageConfig: StorageFilterConfig = {}
 ) => {
   // writes events into the db as ChainEvents rows
-  const storageHandler = new EventStorageHandler(models, chain.id, storageConfig);
+  const storageHandler = new EventStorageHandler(
+    models,
+    chain.id,
+    storageConfig
+  );
 
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
@@ -74,7 +78,11 @@ export const generateHandlers = (
   );
 
   // creates and updates ChainEntity rows corresponding with entity-related events
-  const entityArchivalHandler = new EntityArchivalHandler(models, chain.id, wss);
+  const entityArchivalHandler = new EntityArchivalHandler(
+    models,
+    chain.id,
+    wss
+  );
 
   // creates empty Address and OffchainProfile models for users who perform certain
   // actions, like voting on proposals or registering an identity
@@ -98,6 +106,12 @@ export const generateHandlers = (
     const userFlagsHandler = new UserFlagsHandler(models, chain.id);
 
     handlers.push(identityHandler, userFlagsHandler);
+  }
+
+  // only handle CWP events on Common Protocol
+  if (chain.network === ChainNetwork.CommonProtocol) {
+    const projectHandler = new ProjectHandler(models);
+    handlers.push(projectHandler);
   }
 
   return handlers;
@@ -143,9 +157,7 @@ const setupChainEventListeners = async (
   log.info('Setting up event listeners...');
   const subscribers = await Promise.all(
     nodes.map(
-      async (
-        node,
-      ): Promise<[ChainInstance, IEventSubscriber<any, any>]> => {
+      async (node): Promise<[ChainInstance, IEventSubscriber<any, any>]> => {
         let subscriber: IEventSubscriber<any, any>;
         if (node.base === ChainBase.Substrate) {
           const nodeUrl = constructSubstrateUrl(node.ChainNode.url);
@@ -189,7 +201,10 @@ const setupChainEventListeners = async (
             contractVersion,
           });
         } else if (node.network === ChainNetwork.Compound) {
-          const api = await CompoundEvents.createApi(node.ChainNode.url, node.address);
+          const api = await CompoundEvents.createApi(
+            node.ChainNode.url,
+            node.address
+          );
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
             chain: node.id,
@@ -199,9 +214,26 @@ const setupChainEventListeners = async (
             api,
           });
         } else if (node.network === ChainNetwork.Aave) {
-          const api = await AaveEvents.createApi(node.ChainNode.url, node.address);
+          const api = await AaveEvents.createApi(
+            node.ChainNode.url,
+            node.address
+          );
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
+            chain: node.id,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.id),
+            api,
+            verbose: true,
+          });
+        } else if (node.network === ChainNetwork.CommonProtocol) {
+          const api = await CommonwealthEvents.createApi(
+            node.ChainNode.url,
+            node.address
+          );
+          const handlers = generateHandlers(node, wss);
+          subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.id,
             handlers,
             skipCatchup,

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./IProjectBaseFactory.sol";
 
 interface ICuratedProjectFactory is IProjectBaseFactory {
-    function setCmnProjTokenImpl(address _cmnProjTokenImpl) external;
+    function setPTokenImpl(address _pToken) external;
 
     function createProject(
         bytes32 _name,

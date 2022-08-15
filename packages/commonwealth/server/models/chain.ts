@@ -44,6 +44,7 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
+  hide_projects?: boolean;
   address?: string;
   token_name?: string;
   ce_verbose?: boolean;
@@ -133,6 +134,7 @@ export default (
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
+      hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },

@@ -21,13 +21,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
         name: "sender",
         type: "address",
       },
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
         name: "token",
         type: "address",
@@ -53,31 +53,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "bytes32",
-        name: "name",
-        type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "oldData",
-        type: "bytes32",
-      },
-      {
-        indexed: false,
-        internalType: "bytes32",
-        name: "newData",
-        type: "bytes32",
-      },
-    ],
-    name: "ProjectDataChange",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
@@ -96,13 +71,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
         name: "sender",
         type: "address",
       },
       {
-        indexed: true,
+        indexed: false,
         internalType: "address",
         name: "token",
         type: "address",
@@ -122,6 +97,19 @@ const _abi = [
     ],
     name: "Withdraw",
     type: "event",
+  },
+  {
+    inputs: [],
+    name: "acceptedToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [
@@ -157,6 +145,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "beneficiary",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "beneficiaryWithdraw",
     outputs: [
       {
@@ -166,6 +167,19 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "deadline",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -217,7 +231,7 @@ const _abi = [
           },
           {
             internalType: "bytes32",
-            name: "url",
+            name: "cwUrl",
             type: "bytes32",
           },
           {
@@ -236,34 +250,12 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "projectData",
+    name: "protocolFee",
     outputs: [
       {
-        components: [
-          {
-            internalType: "uint256",
-            name: "threshold",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "deadline",
-            type: "uint256",
-          },
-          {
-            internalType: "address",
-            name: "beneficiary",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "acceptedToken",
-            type: "address",
-          },
-        ],
-        internalType: "struct DataTypes.ProjectData",
+        internalType: "uint256",
         name: "",
-        type: "tuple",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -271,24 +263,12 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "protocolData",
+    name: "protocolFeeTo",
     outputs: [
       {
-        components: [
-          {
-            internalType: "uint8",
-            name: "fee",
-            type: "uint8",
-          },
-          {
-            internalType: "address",
-            name: "feeTo",
-            type: "address",
-          },
-        ],
-        internalType: "struct DataTypes.ProtocolData",
+        internalType: "address",
         name: "",
-        type: "tuple",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -321,16 +301,16 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "threshold",
+    outputs: [
       {
-        internalType: "bytes32",
-        name: "_url",
-        type: "bytes32",
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
-    name: "setUrl",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {

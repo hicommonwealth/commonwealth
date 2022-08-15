@@ -30,7 +30,7 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
     "protocolData()": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
     "setProjectImpl(address)": FunctionFragment;
-    "setProtocolFee(uint8)": FunctionFragment;
+    "setProtocolFee(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -99,17 +99,9 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
 
   events: {
     "ProjectCreated(uint256,address)": EventFragment;
-    "ProjectImplChange(address,address)": EventFragment;
-    "ProtocolFeeChange(uint8,uint8)": EventFragment;
-    "ProtocolFeeToChange(address,address)": EventFragment;
-    "ProtocolTokenImplChange(address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ProjectCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProjectImplChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolFeeChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolFeeToChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolTokenImplChange"): EventFragment;
 }
 
 export class IProjectBaseFactory extends Contract {
@@ -176,9 +168,9 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    numProjects(overrides?: CallOverrides): Promise<[number]>;
+    numProjects(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "numProjects()"(overrides?: CallOverrides): Promise<[number]>;
+    "numProjects()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -231,7 +223,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -254,9 +246,9 @@ export class IProjectBaseFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  numProjects(overrides?: CallOverrides): Promise<number>;
+  numProjects(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "numProjects()"(overrides?: CallOverrides): Promise<number>;
+  "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -309,7 +301,7 @@ export class IProjectBaseFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setProtocolFee(uint8)"(
+  "setProtocolFee(uint256)"(
     _protocolFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -332,9 +324,9 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    numProjects(overrides?: CallOverrides): Promise<number>;
+    numProjects(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "numProjects()"(overrides?: CallOverrides): Promise<number>;
+    "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -384,7 +376,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -393,31 +385,11 @@ export class IProjectBaseFactory extends Contract {
   filters: {
     ProjectCreated(
       projectIndex: null,
-      projectAddress: null
+      newProject: null
     ): TypedEventFilter<
       [BigNumber, string],
-      { projectIndex: BigNumber; projectAddress: string }
+      { projectIndex: BigNumber; newProject: string }
     >;
-
-    ProjectImplChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
-
-    ProtocolFeeChange(
-      oldFee: null,
-      newFee: null
-    ): TypedEventFilter<[number, number], { oldFee: number; newFee: number }>;
-
-    ProtocolFeeToChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
-
-    ProtocolTokenImplChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
   };
 
   estimateGas: {
@@ -492,7 +464,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -570,7 +542,7 @@ export class IProjectBaseFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

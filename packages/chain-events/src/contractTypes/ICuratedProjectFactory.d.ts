@@ -29,10 +29,10 @@ interface ICuratedProjectFactoryInterface extends ethers.utils.Interface {
     "projectImp()": FunctionFragment;
     "projects(uint32)": FunctionFragment;
     "protocolData()": FunctionFragment;
-    "setCmnProjTokenImpl(address)": FunctionFragment;
+    "setCWTokenImpl(address)": FunctionFragment;
     "setFeeTo(address)": FunctionFragment;
     "setProjectImpl(address)": FunctionFragment;
-    "setProtocolFee(uint8)": FunctionFragment;
+    "setProtocolFee(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -74,7 +74,7 @@ interface ICuratedProjectFactoryInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setCmnProjTokenImpl",
+    functionFragment: "setCWTokenImpl",
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "setFeeTo", values: [string]): string;
@@ -111,7 +111,7 @@ interface ICuratedProjectFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setCmnProjTokenImpl",
+    functionFragment: "setCWTokenImpl",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setFeeTo", data: BytesLike): Result;
@@ -126,17 +126,9 @@ interface ICuratedProjectFactoryInterface extends ethers.utils.Interface {
 
   events: {
     "ProjectCreated(uint256,address)": EventFragment;
-    "ProjectImplChange(address,address)": EventFragment;
-    "ProtocolFeeChange(uint8,uint8)": EventFragment;
-    "ProtocolFeeToChange(address,address)": EventFragment;
-    "ProtocolTokenImplChange(address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ProjectCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProjectImplChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolFeeChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolFeeToChange"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProtocolTokenImplChange"): EventFragment;
 }
 
 export class ICuratedProjectFactory extends Contract {
@@ -196,7 +188,7 @@ export class ICuratedProjectFactory extends Contract {
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -208,7 +200,7 @@ export class ICuratedProjectFactory extends Contract {
     "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -227,9 +219,9 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    numProjects(overrides?: CallOverrides): Promise<[number]>;
+    numProjects(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "numProjects()"(overrides?: CallOverrides): Promise<[number]>;
+    "numProjects()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -257,13 +249,13 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
 
-    setCmnProjTokenImpl(
-      _cmnProjTokenImpl: string,
+    setCWTokenImpl(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setCmnProjTokenImpl(address)"(
-      _cmnProjTokenImpl: string,
+    "setCWTokenImpl(address)"(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -292,7 +284,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -311,7 +303,7 @@ export class ICuratedProjectFactory extends Contract {
   createProject(
     _name: BytesLike,
     _ipfsHash: BytesLike,
-    _url: BytesLike,
+    _cwUrl: BytesLike,
     _beneficiary: string,
     _acceptedToken: string,
     _threshold: BigNumberish,
@@ -323,7 +315,7 @@ export class ICuratedProjectFactory extends Contract {
   "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
     _name: BytesLike,
     _ipfsHash: BytesLike,
-    _url: BytesLike,
+    _cwUrl: BytesLike,
     _beneficiary: string,
     _acceptedToken: string,
     _threshold: BigNumberish,
@@ -339,9 +331,9 @@ export class ICuratedProjectFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  numProjects(overrides?: CallOverrides): Promise<number>;
+  numProjects(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "numProjects()"(overrides?: CallOverrides): Promise<number>;
+  "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -369,13 +361,13 @@ export class ICuratedProjectFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
-  setCmnProjTokenImpl(
-    _cmnProjTokenImpl: string,
+  setCWTokenImpl(
+    _cwToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setCmnProjTokenImpl(address)"(
-    _cmnProjTokenImpl: string,
+  "setCWTokenImpl(address)"(
+    _cwToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -404,7 +396,7 @@ export class ICuratedProjectFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "setProtocolFee(uint8)"(
+  "setProtocolFee(uint256)"(
     _protocolFee: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -423,7 +415,7 @@ export class ICuratedProjectFactory extends Contract {
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -435,7 +427,7 @@ export class ICuratedProjectFactory extends Contract {
     "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -451,9 +443,9 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    numProjects(overrides?: CallOverrides): Promise<number>;
+    numProjects(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "numProjects()"(overrides?: CallOverrides): Promise<number>;
+    "numProjects()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -481,13 +473,10 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[number, string] & { fee: number; feeTo: string }>;
 
-    setCmnProjTokenImpl(
-      _cmnProjTokenImpl: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    setCWTokenImpl(_cwToken: string, overrides?: CallOverrides): Promise<void>;
 
-    "setCmnProjTokenImpl(address)"(
-      _cmnProjTokenImpl: string,
+    "setCWTokenImpl(address)"(
+      _cwToken: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -513,7 +502,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -522,31 +511,11 @@ export class ICuratedProjectFactory extends Contract {
   filters: {
     ProjectCreated(
       projectIndex: null,
-      projectAddress: null
+      newProject: null
     ): TypedEventFilter<
       [BigNumber, string],
-      { projectIndex: BigNumber; projectAddress: string }
+      { projectIndex: BigNumber; newProject: string }
     >;
-
-    ProjectImplChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
-
-    ProtocolFeeChange(
-      oldFee: null,
-      newFee: null
-    ): TypedEventFilter<[number, number], { oldFee: number; newFee: number }>;
-
-    ProtocolFeeToChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
-
-    ProtocolTokenImplChange(
-      oldAddr: null,
-      newAddr: null
-    ): TypedEventFilter<[string, string], { oldAddr: string; newAddr: string }>;
   };
 
   estimateGas: {
@@ -563,7 +532,7 @@ export class ICuratedProjectFactory extends Contract {
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -575,7 +544,7 @@ export class ICuratedProjectFactory extends Contract {
     "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -620,13 +589,13 @@ export class ICuratedProjectFactory extends Contract {
 
     "protocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setCmnProjTokenImpl(
-      _cmnProjTokenImpl: string,
+    setCWTokenImpl(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setCmnProjTokenImpl(address)"(
-      _cmnProjTokenImpl: string,
+    "setCWTokenImpl(address)"(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -655,7 +624,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -675,7 +644,7 @@ export class ICuratedProjectFactory extends Contract {
     createProject(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -687,7 +656,7 @@ export class ICuratedProjectFactory extends Contract {
     "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
-      _url: BytesLike,
+      _cwUrl: BytesLike,
       _beneficiary: string,
       _acceptedToken: string,
       _threshold: BigNumberish,
@@ -732,13 +701,13 @@ export class ICuratedProjectFactory extends Contract {
 
     "protocolData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    setCmnProjTokenImpl(
-      _cmnProjTokenImpl: string,
+    setCWTokenImpl(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setCmnProjTokenImpl(address)"(
-      _cmnProjTokenImpl: string,
+    "setCWTokenImpl(address)"(
+      _cwToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -767,7 +736,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "setProtocolFee(uint8)"(
+    "setProtocolFee(uint256)"(
       _protocolFee: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

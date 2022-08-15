@@ -34,7 +34,9 @@ import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+import(
+  /* webpackPrefetch: true */ 'views/pages/commonwealth/whycommonwealth/index'
+);
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
@@ -54,7 +56,7 @@ export async function initAppState(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`)
-      .then(async (data) => {
+      .then((data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
         app.user.notifications.clear();
@@ -122,6 +124,7 @@ export async function initAppState(
           app.setCustomDomain(customDomain);
         }
 
+        app.projects.init(app);
         resolve();
       })
       .catch((err: any) => {
@@ -325,15 +328,6 @@ export async function selectChain(
       )
     ).default;
     newChain = new Solana(chain, app);
-  } else if (chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(chain, app);
   } else if (
     chain.base === ChainBase.Ethereum &&
     chain.type === ChainType.Offchain
@@ -663,14 +657,34 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             // CMN
-            '/projects': importRoute('views/pages/commonwealth/projects', {
-              scoped: true,
-            }),
-            '/backers': importRoute('views/pages/commonwealth/backers', {
+
+            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
+            // are replaced by redirects to scopeless URI for time being
+            '/:scope/projects': redirectRoute(() => `/projects/explore`),
+            '/projects': redirectRoute(() => `/projects/explore`),
+            '/:scope/projects/:subpage': redirectRoute(
+              (attrs) => `/projects/${attrs.subpage}`
+            ),
+            '/projects/:subpage': importRoute(
+              'views/pages/commonwealth/projects/index.tsx',
+              { scoped: false, hideSidebar: false }
+            ),
+            '/:scope/project/:identifier': redirectRoute(
+              (attrs) => `/project/${attrs.identifier}`
+            ),
+            '/project/:identifier': importRoute(
+              'views/pages/commonwealth/projects/view_project.tsx',
+              { scoped: false, hideSidebar: true }
+            ),
+            '/:scope/new/project': importRoute(
+              'views/pages/commonwealth/projects/create_project_form.tsx',
+              { scoped: true, hideSidebar: true }
+            ),
+            '/backers': importRoute('views/pages/commonwealth/backers/index', {
               scoped: true,
             }),
             '/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
+              'views/pages/commonwealth/collectives/index',
               { scoped: true }
             ),
             // NEAR
@@ -793,9 +807,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
-            '/:scope/projects': redirectRoute(() => '/projects'),
-            '/:scope/backers': redirectRoute(() => '/backers'),
-            '/:scope/collectives': redirectRoute(() => '/collectives'),
+            // TODO: ??
+            '/:scope/backers': redirectRoute(() => '/backers/index'),
+            '/:scope/collectives': redirectRoute(() => '/collectives/index'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
@@ -906,15 +920,48 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               () => '/edgeware/notification-settings'
             ),
             // CMN
-            '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
+
+            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
+            // are replaced by redirects to scopeless URI for time being
+            '/:scope/projects': redirectRoute(() => `/projects/explore`),
+            // '/:scope/projects': redirectRoute(
+            //   (attrs) => `/${attrs.scope}/projects/explore`
+            // ),
+            '/projects': redirectRoute(() => `/projects/explore`),
+            '/projects/:subpage': importRoute(
+              'views/pages/commonwealth/projects/index.tsx',
+              { scoped: false, hideSidebar: true }
             ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
+            '/:scope/projects/:subpage': redirectRoute(
+              (attrs) => `/projects/${attrs.subpage}`
+            ),
+            // '/:scope/projects/:subpage': importRoute(
+            //   'views/pages/commonwealth/projects/index.tsx',
+            //   { scoped: true, hideSidebar: true }
+            // ),
+            '/:scope/project/:identifier': redirectRoute(
+              (attrs) => `/project/${attrs.identifier}`
+            ),
+            '/project/:identifier': importRoute(
+              'views/pages/commonwealth/projects/view_project.tsx',
+              { scoped: false, hideSidebar: true }
+            ),
+            // '/:scope/project/:identifier': importRoute(
+            //   'views/pages/commonwealth/projects/view_project.tsx',
+            //   { scoped: true, hideSidebar: true }
+            // ),
+            '/:scope/new/project': importRoute(
+              'views/pages/commonwealth/projects/create_project_form.tsx',
+              { scoped: true, hideSidebar: true }
+            ),
+            '/:scope/backers': importRoute(
+              'views/pages/commonwealth/backers/index',
+              {
+                scoped: true,
+              }
+            ),
             '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
+              'views/pages/commonwealth/collectives/index',
               { scoped: true }
             ),
             // NEAR
@@ -926,6 +973,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
             }),
             // Settings
+            // TODO Graham 5.14.22: This edgeware redirect is way out of date
             '/settings': redirectRoute(() => '/edgeware/settings'),
             '/:scope/settings': importRoute('views/pages/settings', {
               scoped: true,

@@ -1,0 +1,230 @@
+@import 'shared';
+
+.ProjectCard {
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.3));
+  flex-direction: column;
+  width: 336px;
+
+  // TODO: Mockup only
+  .dummy-chain-wrap {
+    left: 8px;
+    position: relative;
+    .chain-icon {
+      border-radius: 100%;
+    }
+  }
+
+  .ProjectHeaderPanel {
+    background-color: $white;
+    background-size: 100%;
+    border-radius: 5px 5px 0 0;
+    flex: 32;
+    min-height: 184px;
+    max-height: 184px;
+    .user-role-banner {
+      height: 40px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      &.author {
+        background-color: $primary-50;
+        .Text {
+          color: $primary-300;
+        }
+      }
+      &.curator {
+        background-color: $pink-50;
+        .banner-left {
+          .Text {
+            color: $pink-300;
+          }
+          svg > path {
+            fill: $pink-300;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $pink-500;
+          }
+        }
+      }
+      &.backer {
+        background-color: $purple-50;
+        .banner-left {
+          .Text {
+            color: $purple-200;
+          }
+          svg > path {
+            fill: $purple-200;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $purple-400;
+          }
+        }
+      }
+      .banner-left {
+        display: flex;
+        .caption {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .ProjectCompletionBar {
+    flex: 1;
+    height: 8px;
+    background-color: $neutral-300;
+    .completed-percentage {
+      height: 100%;
+      background-color: $green-400;
+      &.failed {
+        background-color: $rorange-500;
+      }
+    }
+  }
+
+  .ProjectInfoPanel {
+    background-color: $white;
+    padding: 8px 16px;
+    min-height: 208px;
+    max-height: 208px;
+    .funding-data {
+      display: flex;
+      justify-content: space-between;
+      .cui-tag {
+        background: $neutral-50;
+        border: none;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        padding: 4px;
+        .Text,
+        svg {
+          color: $neutral-500;
+        }
+      }
+      .funding-state {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        .bold {
+          margin-right: 4px;
+        }
+      }
+    }
+    .description {
+      border-radius: 0 0 5px 5px;
+      flex: 32;
+      margin: 16px 0 8px;
+      .h5 {
+        color: $neutral-800;
+        display: flex;
+        .DummyChainIcon {
+          margin-right: 6px;
+        }
+      }
+      .Text {
+        color: $neutral-800;
+        text-overflow: ellipsis;
+        white-space: break-spaces;
+        overflow: hidden;
+        &.caption {
+          height: 80px;
+        }
+      }
+    }
+    .beneficiary-data {
+      margin-top: 5px;
+      .User {
+        display: flex;
+        align-items: center;
+        .user-display-name {
+          margin-left: 4px;
+          color: $neutral-800;
+          font-size: 14px;
+        }
+        .user-avatar-only {
+          svg {
+            margin: 0 1px 1px 0 !important;
+          }
+        }
+      }
+    }
+  }
+
+  // &.medium {
+  //   height: 114px;
+  //   width: 400px;
+  //   .ProjectHeaderPanel {
+  //     flex: 7;
+  //   }
+  //   .right-panel {
+  //     display: flex;
+  //     flex-direction: column;
+  //     flex: 18;
+  //     background-color: $neutral-200;
+  //     .ProjectCompletionBar {
+  //       flex: 1;
+  //     }
+  //     .ProjectInfoPanel {
+  //       flex: 13;
+  //       margin: 6px 1px 0 14px;
+  //       .User {
+  //         position: relative;
+  //         top: -2px;
+  //         .user-display-name {
+  //           top: 1px;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
+  // &.small {
+  //   flex-direction: column;
+  //   width: 272px;
+  //   padding: 4px;
+  //   &:hover {
+  //     background-color: $neutral-200;
+  //   }
+  //   .top-panel {
+  //     display: flex;
+  //     justify-content: space-between;
+  //     h3 {
+  //       @include header;
+  //       color: $neutral-500;
+  //     }
+  //     .project-status {
+  //       font-size: 14px;
+  //       padding: 6px 12px 4px;
+  //       height: min-content;
+  //       border-radius: 6px;
+  //       &.funded {
+  //         background-color: $green-400;
+  //         color: $green-700;
+  //       }
+  //     }
+  //   }
+  //   .bottom-panel {
+  //     display: flex;
+  //     justify-content: left;
+  //     .project-token-name {
+  //       @include body;
+  //       margin-left: 7px;
+  //       color: $neutral-300;
+  //       font-size: 14px;
+  //       line-height: 17px;
+  //       position: relative;
+  //       top: 1px;
+  //     }
+  //   }
+  // }
+}

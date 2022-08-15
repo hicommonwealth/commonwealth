@@ -19,7 +19,9 @@ import { isWindowMediumSmallInclusive } from './components/component_kit/helpers
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
   hideFooter?: boolean;
+  hideQuickSwitcher?: boolean;
   hideSearch?: boolean;
+  hideSidebar?: boolean;
   onscroll: () => null; // lazy loading for page content
   showNewProposalButton?: boolean;
   title?: string; // displayed at the top of the layout
@@ -54,7 +56,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const {
       alwaysShowTitle,
       hideFooter = false,
+      hideQuickSwitcher,
       hideSearch,
+      hideSidebar,
       onscroll,
       showNewProposalButton,
       title,
@@ -91,7 +95,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               !isWindowMediumSmallInclusive(window.innerWidth) && (
                 <SidebarQuickSwitcher />
               )}
-            <Sidebar />
+            {!hideSidebar && <Sidebar />}
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

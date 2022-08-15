@@ -48,6 +48,7 @@ class ChainInfo {
   public readonly bech32Prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
+  public hideProjects: boolean;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
 
@@ -78,11 +79,12 @@ class ChainInfo {
     topics,
     adminsAndMods,
     base,
-    ss58_prefix,
-    bech32_prefix,
+    ss58Prefix,
+    bech32Prefix,
     type,
     decimals,
     substrateSpec,
+    hideProjects,
     ChainNode,
     tokenName,
     address,
@@ -112,10 +114,11 @@ class ChainInfo {
     this.topics = topics ? topics.map((t) => new Topic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
-    this.ss58Prefix = ss58_prefix;
-    this.bech32Prefix = bech32_prefix;
+    this.ss58Prefix = ss58Prefix;
+    this.bech32Prefix = bech32Prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
+    this.hideProjects = hideProjects;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
     this.address = address;
@@ -151,6 +154,7 @@ class ChainInfo {
     type,
     decimals,
     substrate_spec,
+    hide_projects,
     token_name,
     address,
     ChainNode,
@@ -186,11 +190,12 @@ class ChainInfo {
       topics,
       adminsAndMods,
       base,
-      ss58_prefix,
-      bech32_prefix,
+      ss58Prefix: ss58_prefix,
+      bech32Prefix: bech32_prefix,
       type,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
+      hideProjects: hide_projects,
       tokenName: token_name,
       address,
       ChainNode,
@@ -270,6 +275,7 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultSummaryView,
+    hideProjects,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -288,6 +294,7 @@ class ChainInfo {
       terms,
       icon_url: iconUrl,
       default_summary_view: defaultSummaryView,
+      hide_projects: hideProjects,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -298,6 +305,7 @@ class ChainInfo {
     this.element = updatedChain.element;
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
+    this.hideProjects = updatedChain.hide_projects;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;

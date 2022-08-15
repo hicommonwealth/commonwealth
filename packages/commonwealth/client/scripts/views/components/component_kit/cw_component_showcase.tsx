@@ -482,7 +482,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Text</h1>
         <div class="text-gallery">
           <CWText fontWeight="semiBold" type="d1">
-            Display1 semi bold
+            Display1 semibold
           </CWText>
           <CWText type="d1" fontWeight="bold">
             Display1 bold
@@ -491,7 +491,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Display1 black
           </CWText>
           <CWText fontWeight="semiBold" type="d2">
-            Display2 semi bold
+            Display2 semibold
           </CWText>
           <CWText type="d2" fontWeight="bold">
             Display2 bold
@@ -503,7 +503,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Heading1 medium
           </CWText>
           <CWText type="h1" fontWeight="semiBold">
-            Heading1 semi bold
+            Heading1 semibold
           </CWText>
           <CWText type="h1" fontWeight="bold">
             Heading1 bold
@@ -512,7 +512,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Heading2 medium
           </CWText>
           <CWText type="h2" fontWeight="semiBold">
-            Heading2 semi bold
+            Heading2 semibold
           </CWText>
           <CWText type="h2" fontWeight="bold">
             Heading2 bold
@@ -521,7 +521,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Heading3 medium
           </CWText>
           <CWText type="h3" fontWeight="semiBold">
-            Heading3 semi bold
+            Heading3 semibold
           </CWText>
           <CWText type="h3" fontWeight="bold">
             Heading3 bold
@@ -530,7 +530,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Heading4 medium
           </CWText>
           <CWText type="h4" fontWeight="semiBold">
-            Heading4 semi bold
+            Heading4 semibold
           </CWText>
           <CWText type="h4" fontWeight="bold">
             Heading4 bold
@@ -539,7 +539,7 @@ export class ComponentShowcase implements m.ClassComponent {
             Heading5 medium
           </CWText>
           <CWText type="h5" fontWeight="semiBold">
-            Heading5 semi bold
+            Heading5 semibold
           </CWText>
           <CWText type="h5" fontWeight="bold">
             Heading5 bold

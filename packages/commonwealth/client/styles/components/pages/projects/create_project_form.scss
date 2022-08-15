@@ -1,0 +1,32 @@
+@import 'shared';
+
+.CreateProjectForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 56px;
+  .h5 {
+    color: $primary-500;
+  }
+  .form-panel {
+    width: 480px;
+    .h1 + .caption {
+      margin: 8px 0 16px;
+    }
+  }
+  .NavigationButtons.cui-button-group {
+    width: 480px;
+    margin: 56px 0 28px;
+    .cui-button {
+      width: 50%;
+      .cui-button-label {
+        display: flex;
+        span {
+          position: relative;
+          top: 2px;
+          padding: 0 5px;
+        }
+      }
+    }
+  }
+}

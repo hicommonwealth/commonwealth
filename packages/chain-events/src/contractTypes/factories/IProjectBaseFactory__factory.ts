@@ -29,87 +29,11 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "projectAddress",
+        name: "newProject",
         type: "address",
       },
     ],
     name: "ProjectCreated",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "oldAddr",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "newAddr",
-        type: "address",
-      },
-    ],
-    name: "ProjectImplChange",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint8",
-        name: "oldFee",
-        type: "uint8",
-      },
-      {
-        indexed: false,
-        internalType: "uint8",
-        name: "newFee",
-        type: "uint8",
-      },
-    ],
-    name: "ProtocolFeeChange",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "oldAddr",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "newAddr",
-        type: "address",
-      },
-    ],
-    name: "ProtocolFeeToChange",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "oldAddr",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "newAddr",
-        type: "address",
-      },
-    ],
-    name: "ProtocolTokenImplChange",
     type: "event",
   },
   {
@@ -149,9 +73,9 @@ const _abi = [
     name: "numProjects",
     outputs: [
       {
-        internalType: "uint32",
+        internalType: "uint256",
         name: "",
-        type: "uint32",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -214,7 +138,7 @@ const _abi = [
             type: "uint8",
           },
           {
-            internalType: "address",
+            internalType: "address payable",
             name: "feeTo",
             type: "address",
           },
@@ -230,7 +154,7 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
+        internalType: "address payable",
         name: "_feeTo",
         type: "address",
       },
@@ -256,9 +180,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint8",
+        internalType: "uint256",
         name: "_protocolFee",
-        type: "uint8",
+        type: "uint256",
       },
     ],
     name: "setProtocolFee",

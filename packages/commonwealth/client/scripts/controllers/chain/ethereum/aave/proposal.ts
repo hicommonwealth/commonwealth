@@ -24,7 +24,7 @@ import { blocknumToTime } from 'helpers';
 
 import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
-import { attachSigner } from '../contractApi';
+import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveChain from './chain';
 import EthereumAccounts from '../accounts';
 import EthereumAccount from '../account';

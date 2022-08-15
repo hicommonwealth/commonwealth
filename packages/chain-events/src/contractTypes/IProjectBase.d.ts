@@ -21,29 +21,41 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IProjectBaseInterface extends ethers.utils.Interface {
   functions: {
+    "acceptedToken()": FunctionFragment;
     "back(uint256)": FunctionFragment;
     "backersWithdraw()": FunctionFragment;
+    "beneficiary()": FunctionFragment;
     "beneficiaryWithdraw()": FunctionFragment;
+    "deadline()": FunctionFragment;
     "funded()": FunctionFragment;
     "lockedWithdraw()": FunctionFragment;
     "metaData()": FunctionFragment;
-    "projectData()": FunctionFragment;
-    "protocolData()": FunctionFragment;
+    "protocolFee()": FunctionFragment;
+    "protocolFeeTo()": FunctionFragment;
     "setIpfsHash(bytes32)": FunctionFragment;
     "setName(bytes32)": FunctionFragment;
-    "setUrl(bytes32)": FunctionFragment;
+    "threshold()": FunctionFragment;
     "totalFunding()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "acceptedToken",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "back", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "backersWithdraw",
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "beneficiary",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "beneficiaryWithdraw",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "deadline", values?: undefined): string;
   encodeFunctionData(functionFragment: "funded", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lockedWithdraw",
@@ -51,11 +63,11 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "metaData", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "projectData",
+    functionFragment: "protocolFee",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "protocolData",
+    functionFragment: "protocolFeeTo",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -63,21 +75,30 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "setName", values: [BytesLike]): string;
-  encodeFunctionData(functionFragment: "setUrl", values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: "threshold", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalFunding",
     values?: undefined
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "acceptedToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "back", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "backersWithdraw",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "beneficiary",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "beneficiaryWithdraw",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "deadline", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "funded", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockedWithdraw",
@@ -85,11 +106,11 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "metaData", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "projectData",
+    functionFragment: "protocolFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "protocolData",
+    functionFragment: "protocolFeeTo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -97,7 +118,7 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setName", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setUrl", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "threshold", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalFunding",
     data: BytesLike
@@ -106,14 +127,12 @@ interface IProjectBaseInterface extends ethers.utils.Interface {
   events: {
     "Back(address,address,uint256)": EventFragment;
     "Failed()": EventFragment;
-    "ProjectDataChange(bytes32,bytes32,bytes32)": EventFragment;
     "Succeeded(uint256,uint256)": EventFragment;
     "Withdraw(address,address,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Back"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Failed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ProjectDataChange"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Succeeded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
@@ -162,6 +181,10 @@ export class IProjectBase extends Contract {
   interface: IProjectBaseInterface;
 
   functions: {
+    acceptedToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<[string]>;
+
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -180,6 +203,10 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    beneficiary(overrides?: CallOverrides): Promise<[string]>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<[string]>;
+
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -187,6 +214,10 @@ export class IProjectBase extends Contract {
     "beneficiaryWithdraw()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    deadline(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "deadline()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     funded(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -204,7 +235,7 @@ export class IProjectBase extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-          url: string;
+          cwUrl: string;
           creator: string;
         }
       ]
@@ -218,45 +249,19 @@ export class IProjectBase extends Contract {
           id: BigNumber;
           name: string;
           ipfsHash: string;
-          url: string;
+          cwUrl: string;
           creator: string;
         }
       ]
     >;
 
-    projectData(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string, string] & {
-          threshold: BigNumber;
-          deadline: BigNumber;
-          beneficiary: string;
-          acceptedToken: string;
-        }
-      ]
-    >;
+    protocolFee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "projectData()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [
-        [BigNumber, BigNumber, string, string] & {
-          threshold: BigNumber;
-          deadline: BigNumber;
-          beneficiary: string;
-          acceptedToken: string;
-        }
-      ]
-    >;
+    "protocolFee()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    protocolData(
-      overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    protocolFeeTo(overrides?: CallOverrides): Promise<[string]>;
 
-    "protocolData()"(
-      overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<[string]>;
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -278,20 +283,18 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setUrl(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    threshold(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "setUrl(bytes32)"(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    "threshold()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     totalFunding(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "totalFunding()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
+
+  acceptedToken(overrides?: CallOverrides): Promise<string>;
+
+  "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
 
   back(
     _amount: BigNumberish,
@@ -311,6 +314,10 @@ export class IProjectBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  beneficiary(overrides?: CallOverrides): Promise<string>;
+
+  "beneficiary()"(overrides?: CallOverrides): Promise<string>;
+
   beneficiaryWithdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -318,6 +325,10 @@ export class IProjectBase extends Contract {
   "beneficiaryWithdraw()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  deadline(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   funded(overrides?: CallOverrides): Promise<boolean>;
 
@@ -334,7 +345,7 @@ export class IProjectBase extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-      url: string;
+      cwUrl: string;
       creator: string;
     }
   >;
@@ -346,40 +357,18 @@ export class IProjectBase extends Contract {
       id: BigNumber;
       name: string;
       ipfsHash: string;
-      url: string;
+      cwUrl: string;
       creator: string;
     }
   >;
 
-  projectData(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string, string] & {
-      threshold: BigNumber;
-      deadline: BigNumber;
-      beneficiary: string;
-      acceptedToken: string;
-    }
-  >;
+  protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "projectData()"(
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, string, string] & {
-      threshold: BigNumber;
-      deadline: BigNumber;
-      beneficiary: string;
-      acceptedToken: string;
-    }
-  >;
+  "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  protocolData(
-    overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  protocolFeeTo(overrides?: CallOverrides): Promise<string>;
 
-  "protocolData()"(
-    overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
 
   setIpfsHash(
     _ipfsHash: BytesLike,
@@ -401,21 +390,19 @@ export class IProjectBase extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setUrl(
-    _url: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  threshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "setUrl(bytes32)"(
-    _url: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
   "totalFunding()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    acceptedToken(overrides?: CallOverrides): Promise<string>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<string>;
+
     back(_amount: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
     "back(uint256)"(
@@ -427,9 +414,17 @@ export class IProjectBase extends Contract {
 
     "backersWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
 
+    beneficiary(overrides?: CallOverrides): Promise<string>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<string>;
+
     beneficiaryWithdraw(overrides?: CallOverrides): Promise<boolean>;
 
     "beneficiaryWithdraw()"(overrides?: CallOverrides): Promise<boolean>;
+
+    deadline(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     funded(overrides?: CallOverrides): Promise<boolean>;
 
@@ -446,7 +441,7 @@ export class IProjectBase extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-        url: string;
+        cwUrl: string;
         creator: string;
       }
     >;
@@ -458,40 +453,18 @@ export class IProjectBase extends Contract {
         id: BigNumber;
         name: string;
         ipfsHash: string;
-        url: string;
+        cwUrl: string;
         creator: string;
       }
     >;
 
-    projectData(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string, string] & {
-        threshold: BigNumber;
-        deadline: BigNumber;
-        beneficiary: string;
-        acceptedToken: string;
-      }
-    >;
+    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "projectData()"(
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, string, string] & {
-        threshold: BigNumber;
-        deadline: BigNumber;
-        beneficiary: string;
-        acceptedToken: string;
-      }
-    >;
+    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    protocolData(
-      overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    protocolFeeTo(overrides?: CallOverrides): Promise<string>;
 
-    "protocolData()"(
-      overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<string>;
 
     setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -507,12 +480,9 @@ export class IProjectBase extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setUrl(_url: BytesLike, overrides?: CallOverrides): Promise<void>;
+    threshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setUrl(bytes32)"(
-      _url: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -521,8 +491,8 @@ export class IProjectBase extends Contract {
 
   filters: {
     Back(
-      sender: string | null,
-      token: string | null,
+      sender: null,
+      token: null,
       amount: null
     ): TypedEventFilter<
       [string, string, BigNumber],
@@ -530,15 +500,6 @@ export class IProjectBase extends Contract {
     >;
 
     Failed(): TypedEventFilter<[], {}>;
-
-    ProjectDataChange(
-      name: null,
-      oldData: null,
-      newData: null
-    ): TypedEventFilter<
-      [string, string, string],
-      { name: string; oldData: string; newData: string }
-    >;
 
     Succeeded(
       timestamp: null,
@@ -549,8 +510,8 @@ export class IProjectBase extends Contract {
     >;
 
     Withdraw(
-      sender: string | null,
-      token: string | null,
+      sender: null,
+      token: null,
       amount: null,
       withdrawalType: null
     ): TypedEventFilter<
@@ -565,6 +526,10 @@ export class IProjectBase extends Contract {
   };
 
   estimateGas: {
+    acceptedToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -583,6 +548,10 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    beneficiary(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -590,6 +559,10 @@ export class IProjectBase extends Contract {
     "beneficiaryWithdraw()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    deadline(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "deadline()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     funded(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -603,13 +576,13 @@ export class IProjectBase extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    projectData(overrides?: CallOverrides): Promise<BigNumber>;
+    protocolFee(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "projectData()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "protocolFee()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    protocolData(overrides?: CallOverrides): Promise<BigNumber>;
+    protocolFeeTo(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "protocolData()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -631,15 +604,9 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setUrl(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    threshold(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setUrl(bytes32)"(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    "threshold()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalFunding(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -647,6 +614,10 @@ export class IProjectBase extends Contract {
   };
 
   populateTransaction: {
+    acceptedToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "acceptedToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     back(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -665,6 +636,10 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    beneficiary(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "beneficiary()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     beneficiaryWithdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -672,6 +647,10 @@ export class IProjectBase extends Contract {
     "beneficiaryWithdraw()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    deadline(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "deadline()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     funded(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -687,13 +666,13 @@ export class IProjectBase extends Contract {
 
     "metaData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    projectData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    protocolFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "projectData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "protocolFee()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    protocolData(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    protocolFeeTo(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "protocolData()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "protocolFeeTo()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -715,15 +694,9 @@ export class IProjectBase extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setUrl(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    threshold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    "setUrl(bytes32)"(
-      _url: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    "threshold()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalFunding(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

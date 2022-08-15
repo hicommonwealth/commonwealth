@@ -147,6 +147,7 @@ async function mainProcess(
     (chain, index) => index % numWorkers === workerNumber
   );
 
+  console.log(myChainData);
   // passed to listeners that support it
   const discoverReconnectRange = async (chain: string) => {
     let latestBlock;

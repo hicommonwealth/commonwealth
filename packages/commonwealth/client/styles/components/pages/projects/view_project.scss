@@ -1,0 +1,127 @@
+@import 'shared';
+
+.ViewProject {
+  margin: 72px 200px;
+  max-width: 900px;
+  .User {
+    display: flex;
+    align-items: center;
+    .username {
+      position: relative;
+      top: 1.5px;
+      margin-left: 5px;
+    }
+  }
+  .project-metadata {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+    .metadata-left {
+      display: flex;
+      align-items: center;
+    }
+    .metadata-right {
+      display: flex;
+    }
+  }
+  .project-overview-and-support {
+    display: flex;
+    .project-overview-panel {
+      flex: 2;
+      margin-right: 16px;
+      .project-header-img {
+        width: 100%;
+        height: auto;
+      }
+      .ProjectCompletionBar {
+        height: 24px;
+        font-weight: 500px;
+        background: $neutral-50;
+        .completed-percentage {
+          height: 100%;
+          background: $green-500;
+        }
+      }
+      .project-funding-data {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        .left-panel {
+          display: flex;
+          .project-funds-raised,
+          .project-funds-goal {
+            display: flex;
+            flex-direction: column;
+            margin-right: 48px;
+            .h1,
+            .h5 {
+              margin-top: 0;
+              text-transform: uppercase;
+              color: $neutral-800;
+            }
+          }
+          .project-funds-goal {
+            .h1 {
+              color: $green-500;
+            }
+          }
+        }
+        .right-panel {
+          .Button {
+            background-color: $rorange-500;
+            border-radius: 100px;
+          }
+        }
+      }
+      .project-curator-data {
+        display: flex;
+        justify-content: left;
+        margin: 40px 0;
+        .User {
+          margin-right: 112px;
+        }
+        .caption {
+          color: $neutral-400;
+        }
+      }
+    }
+    .project-support-panel {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      .SupportCard {
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  hr {
+    border-top: 3px solid $neutral-200;
+    margin: 48px 0;
+  }
+  .project-about {
+    .MarkdownFormattedText > p {
+      color: $neutral-800;
+    }
+  }
+  .project-backers-wrap {
+    .CWTable {
+    }
+  }
+
+  .User {
+    // TODO Graham 5-16-22: Our User components are jenky as hell and
+    // should be prioritized in ongoing component kit refactor
+    .user-display-name {
+      position: relative;
+      top: 1px;
+      font-size: 12px;
+    }
+    // TODO Graham 5-16-22: We should come up with global, dynamic,
+    // avatar-size-adapted adjustments for centering jdenticons
+    .user-avatar-only svg {
+      margin: 0;
+    }
+  }
+}
