@@ -4,7 +4,8 @@ import 'pages/projects/create_project_form.scss';
 import m from 'mithril';
 
 import app from 'state';
-import QuillEditor from 'views/components/quill_editor';
+import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ButtonGroup, Button, SelectList, Icons } from 'construct-ui';
@@ -268,15 +269,14 @@ export class DescriptionSlide
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
           sapien maecenas vel nisl faucibus ultricies.
         </CWText>
-        {m(QuillEditor, {
-          oncreateBind: (state) => {
-            vnode.attrs.form.description = state.editor;
-          },
-          editorNamespace: 'project-description',
-          disableRichText: true,
-          placeholder:
-            'Write a full-length description of your project proposal,',
-        })}
+        <QuillEditorComponent
+          oncreateBind={(state: QuillEditor) => {
+            vnode.attrs.form.description = state;
+          }}
+          editorNamespace="project-description"
+          mode="richText"
+          placeholder="Write a full-length description of your project proposal,"
+        />
       </div>
     );
   }
