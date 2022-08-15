@@ -19,7 +19,7 @@ class NewThreadPage implements m.ClassComponent {
 
     if (!app.chain) return <PageLoading />;
 
-    const hasTopics = !!app.chain?.meta.topics.length;
+    const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
 
     return (
       <Sublayout title="New Thread">
