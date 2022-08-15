@@ -2,8 +2,8 @@ import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import { JWT_SECRET } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { JWT_SECRET } from '../config';
 import '../types';
 import { DB, sequelize } from '../database';
 import { ServerError } from '../util/errors';
@@ -27,15 +27,6 @@ const status = async (
     ] = await Promise.all([
       models.Chain.findAll({
         where: { active: true },
-        include: [
-          {
-            model: models.Topic,
-            as: 'topics',
-          },
-          {
-            model: models.ChainNode,
-          },
-        ],
       }),
       models.ChainNode.findAll(),
       models.ContractCategory.findAll(),
