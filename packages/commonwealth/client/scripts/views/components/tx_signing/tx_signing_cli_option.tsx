@@ -58,7 +58,7 @@ export class TXSigningCLIOption
             <CWTextArea
               label="Enter the output here"
               placeholder="Signed TX"
-              defaultValue={this.signedTx}
+              value={this.signedTx}
               oninput={(e) => {
                 this.signedTx = e.target.value;
               }}

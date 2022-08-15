@@ -283,9 +283,15 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.post(`https://ipfs.infura.io:5001/api/v0/cat?arg=${this._ipfsAddress}`)
+    $.post(`https://cloudflare-ipfs.com/ipfs/${this._ipfsAddress}#x-ipfs-companion-no-redirect`)
       .then((ipfsData) => {
-        this._ipfsData = JSON.parse(ipfsData);
+        if (typeof ipfsData === 'string') {
+          this._ipfsData = JSON.parse(ipfsData);
+        } else if (typeof ipfsData === 'object') {
+          this._ipfsData = ipfsData;
+        } else {
+          throw new Error('Invalid IPFS data format');
+        }
       })
       .catch((e) =>
         console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)

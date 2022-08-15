@@ -7,13 +7,9 @@
     width: 100%;
   }
 
-  .AvatarUpload {
-    margin-bottom: 16px;
-  }
-
-  .buttons-row {
+  .compact-modal-body {
     display: flex;
-    flex-direction: row;
-    gap: 8px;
+    flex-direction: column;
+    gap: 16px;
   }
 }

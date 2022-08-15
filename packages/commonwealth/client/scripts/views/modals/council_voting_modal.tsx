@@ -127,7 +127,7 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
               and claim your bond.
             </CWText>
             <CWTextInput
-              defaultValue={String(this.currentStake)}
+              value={String(this.currentStake)}
               placeholder="Amount to lock"
               oninput={(e) => {
                 this.phragmenStakeAmount = app.chain.chain.coins(
