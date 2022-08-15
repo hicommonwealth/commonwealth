@@ -1,233 +1,30 @@
 @import 'shared';
 
 .CreateInviteModal {
-  form {
-    margin: 0;
-    max-width: 560px;
+  width: 400px;
 
-    .chain-select-group {
-      max-width: calc(33.3% - 5px);
-
-      .chain-select-label {
-        display: block;
-      }
-    }
-
-    .address-input-group {
-      max-width: calc(66.7% - 5px);
-
-      .cui-input input {
-        height: 40px;
-        padding: 4px 8px;
-      }
-    }
-
-    h4 {
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
+  @include smallInclusive {
+    width: 100%;
   }
 
-  .add-address-form {
-    column-gap: 10px;
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-    .cui-form-group {
+    .community-and-address-row {
+      display: flex;
+      gap: 8px;
+
+      .community-select-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .no-addresses {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-    }
-  }
-
-  .invite-email-form {
-    .cui-input input {
-      height: 40px;
-      padding: 4px 8px;
-    }
-  }
-
-  form + form {
-    margin-top: 40px;
-  }
-
-  .valid input {
-    border: solid 1px green;
-  }
-
-  .invalid input {
-    border: solid 1px red;
-  }
-
-  .error-message {
-    margin: 10px 0;
-    font-weight: 500;
-    color: $rorange-500;
-  }
-
-  .success-message {
-    margin: 10px 0;
-    font-weight: 500;
-    color: $green-500;
-  }
-
-  .copy-link-line {
-    display: flex;
-    align-items: center;
-    height: 40px;
-
-    img {
-      width: 30px;
-      margin-left: 10px;
-      content: url('/static/img/copy_default.svg');
-      cursor: pointer;
-
-      &:hover {
-        content: url('/static/img/copy_hover.svg');
-      }
-    }
-  }
-
-  .divider {
-    width: calc(100% + 56px);
-    height: 1px;
-    background: $neutral-25;
-    margin-top: 20px;
-    margin-left: -28px;
-  }
-
-  .CreateInviteLink {
-    margin-top: 30px;
-
-    .cui-input input {
-      height: 40px;
-      padding: 4px 8px;
-    }
-
-    .invite-link-title {
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    .cui-form-label {
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .cui-radio {
-      font-size: 18px;
-      font-weight: 400;
-      padding-left: 24px;
-
-      .cui-control-indicator {
-        width: 16px;
-        height: 16px;
-      }
-    }
-  }
-
-  .search-results-list,
-  .cui-list {
-    position: absolute;
-    z-index: 10;
-    top: 68px;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.15);
-    overflow-y: visible;
-    max-height: none !important;
-
-    &.search-results-loading {
-      display: flex;
-      justify-content: center;
-    }
-
-    .cui-list-item {
-      border-bottom: none;
-      padding: 5px 20px !important;
-
-      &:focus {
-        outline: $purple-100 auto 2px;
-      }
-
-      .search-results-item {
-        color: $neutral-800;
-        text-decoration: none;
-        padding: 12px 0 6px;
-        font-size: 18px;
-        overflow: hidden;
-
-        .search-results-thread-title {
-          font-weight: 500;
-          margin-bottom: 4px;
-        }
-
-        .search-results-thread-subtitle {
-          margin-bottom: 2px;
-
-          .User {
-            margin-left: 5px;
-          }
-        }
-
-        mark {
-          background-color: $purple-100;
-        }
-      }
-
-      &.disabled,
-      &.no-results {
-        font-weight: 500;
-        font-size: 14px;
-        letter-spacing: 0.3px;
-        margin-bottom: 3px;
-        text-transform: uppercase;
-        color: $neutral-400;
-        margin-top: 18px;
-        top: 2px;
-
-        &:first-child {
-          margin-top: 0px;
-        }
-
-        &:hover {
-          background: $white;
-        }
-      }
-
-      &.disabled {
-        margin-top: 5px;
-
-        &:hover {
-          cursor: default;
-        }
-      }
-
-      &.no-results {
-        display: flex;
-        justify-content: space-between;
-
-        b {
-          width: 50%;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-
-        span {
-          width: 50%;
-          color: $primary-500;
-          text-align: right;
-        }
-      }
-    }
-
-    .UserBlock {
-      .user-block-left {
-        display: flex;
-        align-items: center;
-      }
-
-      .user-block-right {
-        display: none;
-      }
     }
   }
 }

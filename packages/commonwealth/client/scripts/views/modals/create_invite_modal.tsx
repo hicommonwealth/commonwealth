@@ -18,6 +18,8 @@ import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWLabel } from '../components/component_kit/cw_label';
+import { CWText } from '../components/component_kit/cw_text';
 
 type SearchParams = {
   chainScope?: string;
@@ -274,7 +276,6 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
 
     return (
       <CWButton
-        // name: selection,
         loading={this.loading}
         disabled={disabled}
         label={selection === 'email' ? 'Send Invite' : 'Add address'}
@@ -359,6 +360,253 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
           );
         }}
       />
+    );
+  }
+}
+
+export class CreateInviteModal
+  implements
+    m.ClassComponent<{
+      chainInfo?: ChainInfo;
+    }>
+{
+  private closeResults: () => void;
+  private disabled: boolean;
+  private enterAddress: (address: string) => void;
+  private error: string;
+  private errorText: string;
+  private failure: boolean;
+  private hideResults: boolean;
+  private inputTimeout: any;
+  private invitedAddressChain: string;
+  private invitedEmail: string;
+  private isAddressValid: boolean;
+  private isTyping: boolean; // only monitors address search
+  private newAddressToValidate: boolean;
+  private results: any[];
+  private searchAddressTerm: string;
+  private success: boolean;
+
+  view(vnode) {
+    const { chainInfo } = vnode.attrs;
+
+    const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;
+
+    if (!chainOrCommunityObj) return;
+
+    const selectedChainId =
+      this.invitedAddressChain ||
+      (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
+
+    const selectedChain = app.config.chains.getById(selectedChainId);
+
+    if (this.isTyping) {
+      this.isAddressValid = false;
+    }
+
+    if (
+      this.searchAddressTerm?.length > 0 &&
+      !this.isTyping &&
+      this.newAddressToValidate
+    ) {
+      if (selectedChain?.base === ChainBase.Substrate) {
+        try {
+          decodeAddress(this.searchAddressTerm);
+          this.isAddressValid = true;
+        } catch (e) {
+          console.log(e);
+        }
+      } else if (selectedChain?.base === ChainBase.Ethereum) {
+        this.isAddressValid = checkAddressChecksum(this.searchAddressTerm);
+      } else {
+        // TODO: check Cosmos & Near?
+      }
+
+      this.newAddressToValidate = false;
+    }
+
+    const isEmailValid = validateEmail(this.invitedEmail);
+
+    const { results, searchAddressTerm } = this;
+
+    this.closeResults = () => {
+      this.hideResults = true;
+    };
+
+    this.enterAddress = (address: string) => {
+      this.searchAddressTerm = address;
+      this.newAddressToValidate = true;
+    };
+
+    return (
+      <div class="CreateInviteModal">
+        <div class="compact-modal-title">
+          <h3>Invite members</h3>
+          <ModalExitButton />
+        </div>
+        <div class="compact-modal-body">
+          <div class="community-and-address-row">
+            <div class="community-select-container">
+              <CWLabel label="Community" />
+              <SelectList
+                closeOnSelect
+                items={
+                  chainInfo
+                    ? [{ label: chainInfo.name, value: chainInfo.id }]
+                    : app.config.chains
+                        .getAll()
+                        .map((chain) => ({
+                          label: chain.name.toString(),
+                          value: chain.id.toString(),
+                        }))
+                        .sort((a: CommunityOption, b: CommunityOption) => {
+                          if (a.label > b.label) return 1;
+                          if (a.label < b.label) return -1;
+                          return 0;
+                        })
+                }
+                itemRender={(item: CommunityOption) => (
+                  <ListItem
+                    label={item.label}
+                    selected={
+                      this.invitedAddressChain &&
+                      this.invitedAddressChain === item.value
+                    }
+                  />
+                )}
+                itemPredicate={(query: string, item: CommunityOption) => {
+                  return item.label.toLowerCase().includes(query.toLowerCase());
+                }}
+                onSelect={(item: CommunityOption) => {
+                  this.invitedAddressChain = item.value;
+                }}
+                loading={false}
+                popoverAttrs={{
+                  hasArrow: false,
+                }}
+                trigger={
+                  <CWButton
+                    iconName="chevronDown"
+                    buttonType="lg-secondary-blue"
+                    label={selectedChainId}
+                  />
+                }
+                emptyContent="No communities found"
+                inputAttrs={{
+                  placeholder: 'Search Community...',
+                }}
+                checkmark={false}
+              />
+            </div>
+            <CWTextInput
+              label="Address"
+              placeholder="Type to search by name or address"
+              value={this.searchAddressTerm}
+              oninput={(e) => {
+                e.stopPropagation();
+                this.isTyping = true;
+                this.searchAddressTerm = e.target.value?.toLowerCase();
+                if (this.hideResults) {
+                  this.hideResults = false;
+                }
+                if (!app.searchAddressCache[this.searchAddressTerm]) {
+                  app.searchAddressCache[this.searchAddressTerm] = {
+                    loaded: false,
+                  };
+                }
+                if (e.target.value?.length > 3) {
+                  const params: SearchParams = {
+                    communityScope: null,
+                    chainScope:
+                      this.invitedAddressChain ||
+                      (chainInfo
+                        ? chainInfo.id
+                        : app.config.chains.getAll()[0].id),
+                  };
+                  clearTimeout(this.inputTimeout);
+                  this.inputTimeout = setTimeout(() => {
+                    this.isTyping = false;
+                    return search(this.searchAddressTerm, params, this);
+                  }, 500);
+                }
+              }}
+            />
+          </div>
+          {searchAddressTerm?.length > 3 && !this.hideResults && (
+            <List>
+              {!results || results?.length === 0 ? (
+                app.searchAddressCache[searchAddressTerm]?.loaded ? (
+                  <ListItem
+                    label={
+                      <div class="no-addresses">
+                        <CWText fontWeight="medium">{searchAddressTerm}</CWText>
+                        <CWText type="caption">No addresses found</CWText>
+                      </div>
+                    }
+                    onclick={() => {
+                      if (searchAddressTerm.length < 4) {
+                        notifyError('Query must be at least 4 characters');
+                      }
+                    }}
+                  />
+                ) : (
+                  <ListItem label={<Spinner active />} />
+                )
+              ) : this.isTyping ? (
+                <ListItem label={<Spinner active />} />
+              ) : (
+                results
+              )}
+            </List>
+          )}
+          <InviteButton
+            selection="address"
+            disabled={!this.isAddressValid}
+            successCallback={(v: boolean) => {
+              this.success = v;
+              this.searchAddressTerm = '';
+              m.redraw();
+            }}
+            failureCallback={(v: boolean, err?: string) => {
+              this.failure = v;
+              if (err) this.error = err;
+              m.redraw();
+            }}
+            invitedAddress={this.searchAddressTerm}
+            invitedAddressChain={selectedChainId}
+            {...chainOrCommunityObj}
+          />
+          <CWTextInput
+            label="Email"
+            placeholder="Enter email"
+            oninput={(e) => {
+              this.invitedEmail = (e.target as any).value;
+            }}
+          />
+          <InviteButton
+            selection="email"
+            disabled={!isEmailValid}
+            successCallback={(v: boolean) => {
+              this.success = v;
+              this.invitedEmail = '';
+              m.redraw();
+            }}
+            failureCallback={(v: boolean, err?: string) => {
+              this.failure = v;
+              if (err) this.error = err;
+              m.redraw();
+            }}
+            invitedEmail={this.invitedEmail}
+            {...chainOrCommunityObj}
+          />
+          {this.success && (
+            <div class="success-message">Success! Your invite was sent</div>
+          )}
+          {this.failure && (
+            <div class="error-message">{this.error || 'An error occurred'}</div>
+          )}
+        </div>
+      </div>
     );
   }
 }
@@ -475,261 +723,3 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
 //     ]);
 //   },
 // };
-
-class EmptySearchPreview implements m.ClassComponent<{ searchTerm: string }> {
-  view(vnode) {
-    const { searchTerm } = vnode.attrs;
-
-    return (
-      <ListItem
-        label={
-          <>
-            <b>{searchTerm}</b>
-            <span>No addresses found</span>
-          </>
-        }
-        onclick={() => {
-          if (searchTerm.length < 4) {
-            notifyError('Query must be at least 4 characters');
-          }
-        }}
-      />
-    );
-  }
-}
-
-export class CreateInviteModal
-  implements
-    m.ClassComponent<{
-      chainInfo?: ChainInfo;
-    }>
-{
-  private closeResults: () => void;
-  private disabled: boolean;
-  private enterAddress: (address: string) => void;
-  private error: string;
-  private errorText: string;
-  private failure: boolean;
-  private hideResults: boolean;
-  private inputTimeout: any;
-  private invitedAddressChain: string;
-  private invitedEmail: string;
-  private isAddressValid: boolean;
-  private isTyping: boolean; // only monitors address search
-  private newAddressToValidate: boolean;
-  private results: any[];
-  private searchAddressTerm: string;
-  private success: boolean;
-
-  view(vnode) {
-    const { chainInfo } = vnode.attrs;
-
-    const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;
-
-    if (!chainOrCommunityObj) return;
-
-    const selectedChainId =
-      this.invitedAddressChain ||
-      (chainInfo ? chainInfo.id : app.config.chains.getAll()[0].id);
-
-    const selectedChain = app.config.chains.getById(selectedChainId);
-
-    if (this.isTyping) {
-      this.isAddressValid = false;
-    }
-
-    if (
-      this.searchAddressTerm?.length > 0 &&
-      !this.isTyping &&
-      this.newAddressToValidate
-    ) {
-      if (selectedChain?.base === ChainBase.Substrate) {
-        try {
-          decodeAddress(this.searchAddressTerm);
-          this.isAddressValid = true;
-        } catch (e) {
-          console.log(e);
-        }
-      } else if (selectedChain?.base === ChainBase.Ethereum) {
-        this.isAddressValid = checkAddressChecksum(this.searchAddressTerm);
-      } else {
-        // TODO: check Cosmos & Near?
-      }
-
-      this.newAddressToValidate = false;
-    }
-
-    const isEmailValid = validateEmail(this.invitedEmail);
-
-    const { results, searchAddressTerm } = this;
-
-    const LoadingPreview = (
-      <List class="search-results-loading">
-        <ListItem label={<Spinner active />} />
-      </List>
-    );
-
-    const searchResults =
-      !results || results?.length === 0 ? (
-        app.searchAddressCache[searchAddressTerm]?.loaded ? (
-          <List>
-            <EmptySearchPreview searchTerm={searchAddressTerm} />
-          </List>
-        ) : (
-          LoadingPreview
-        )
-      ) : this.isTyping ? (
-        LoadingPreview
-      ) : (
-        <List class="search-results-list">{results}</List>
-      );
-
-    this.closeResults = () => {
-      this.hideResults = true;
-    };
-
-    this.enterAddress = (address: string) => {
-      this.searchAddressTerm = address;
-      this.newAddressToValidate = true;
-    };
-
-    return (
-      <div class="CreateInviteModal">
-        <div class="compact-modal-title">
-          <h3>Invite members</h3>,
-          <ModalExitButton />
-        </div>
-        <div class="compact-modal-body">
-          <SelectList
-            closeOnSelect
-            items={
-              chainInfo
-                ? [{ label: chainInfo.name, value: chainInfo.id }]
-                : app.config.chains
-                    .getAll()
-                    .map((chain) => ({
-                      label: chain.name.toString(),
-                      value: chain.id.toString(),
-                    }))
-                    .sort((a: CommunityOption, b: CommunityOption) => {
-                      if (a.label > b.label) return 1;
-                      if (a.label < b.label) return -1;
-                      return 0;
-                    })
-            }
-            itemRender={(item: CommunityOption) => (
-              <ListItem
-                label={item.label}
-                selected={
-                  this.invitedAddressChain &&
-                  this.invitedAddressChain === item.value
-                }
-              />
-            )}
-            itemPredicate={(query: string, item: CommunityOption) => {
-              return item.label.toLowerCase().includes(query.toLowerCase());
-            }}
-            onSelect={(item: CommunityOption) => {
-              this.invitedAddressChain = item.value;
-            }}
-            loading={false}
-            popoverAttrs={{
-              hasArrow: false,
-            }}
-            trigger={
-              <CWButton iconName="chevronDown" label={selectedChainId} />
-            }
-            emptyContent="No communities found"
-            inputAttrs={{
-              placeholder: 'Search Community...',
-            }}
-            checkmark={false}
-          />
-          <CWTextInput
-            placeholder="Type to search by name or address"
-            value={this.searchAddressTerm}
-            oninput={(e) => {
-              e.stopPropagation();
-              this.isTyping = true;
-              this.searchAddressTerm = e.target.value?.toLowerCase();
-              if (this.hideResults) {
-                this.hideResults = false;
-              }
-              if (!app.searchAddressCache[this.searchAddressTerm]) {
-                app.searchAddressCache[this.searchAddressTerm] = {
-                  loaded: false,
-                };
-              }
-              if (e.target.value?.length > 3) {
-                const params: SearchParams = {
-                  communityScope: null,
-                  chainScope:
-                    this.invitedAddressChain ||
-                    (chainInfo
-                      ? chainInfo.id
-                      : app.config.chains.getAll()[0].id),
-                };
-                clearTimeout(this.inputTimeout);
-                this.inputTimeout = setTimeout(() => {
-                  this.isTyping = false;
-                  return search(this.searchAddressTerm, params, this);
-                }, 500);
-              }
-            }}
-          />
-          {searchAddressTerm?.length > 3 && !this.hideResults && searchResults}
-          <InviteButton
-            selection="address"
-            disabled={!this.isAddressValid}
-            successCallback={(v: boolean) => {
-              this.success = v;
-              this.searchAddressTerm = '';
-              m.redraw();
-            }}
-            failureCallback={(v: boolean, err?: string) => {
-              this.failure = v;
-              if (err) this.error = err;
-              m.redraw();
-            }}
-            invitedAddress={this.searchAddressTerm}
-            invitedAddressChain={selectedChainId}
-            {...chainOrCommunityObj}
-          />
-          <CWTextInput
-            placeholder="Enter email"
-            // class: !this.invitedEmail?.length
-            //   ? ''
-            //   : isEmailValid
-            //   ? 'valid'
-            //   : 'invalid',
-            oninput={(e) => {
-              this.invitedEmail = (e.target as any).value;
-            }}
-          />
-          <InviteButton
-            selection="email"
-            disabled={!isEmailValid}
-            successCallback={(v: boolean) => {
-              this.success = v;
-              this.invitedEmail = '';
-              m.redraw();
-            }}
-            failureCallback={(v: boolean, err?: string) => {
-              this.failure = v;
-              if (err) this.error = err;
-              m.redraw();
-            }}
-            invitedEmail={this.invitedEmail}
-            {...chainOrCommunityObj}
-          />
-          {this.success && (
-            <div class="success-message">Success! Your invite was sent</div>
-          )}
-          {this.failure && (
-            <div class="error-message">{this.error || 'An error occurred'}</div>
-          )}
-        </div>
-      </div>
-    );
-  }
-}
