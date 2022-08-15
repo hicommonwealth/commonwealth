@@ -4,11 +4,12 @@ import { CWEvent } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
 
 export type Ithis = {
   models: DB;
   log: Logger;
-  publish: (data: any, publisherName: any) => Promise<any>
+  rmqController: RabbitMQController;
 };
 
 export async function processChainEventNotificationsCUD(
@@ -20,9 +21,10 @@ export async function processChainEventNotificationsCUD(
   }
 ) {
   const chainEvent = chainEventData.ChainEvent;
+  let dbNotification;
   try {
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-    const dbNotification = await this.models.Subscription.emitNotifications(
+    dbNotification = await this.models.Subscription.emitNotifications(
       this.models,
       NotificationCategories.ChainEvent,
       chainEvent.ChainEventType.id,
@@ -39,7 +41,16 @@ export async function processChainEventNotificationsCUD(
       chainEventData.event.excludeAddresses,
       chainEventData.event.includeAddresses
     );
+  } catch (e) {
+    this.log.error(
+      `Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(
+        chainEventData.event
+      )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`, e
+    );
+    return;
+  }
 
+  try {
     const formattedEvent = {
       ...dbNotification.toJSON(),
       ChainEvent: chainEvent,
@@ -47,24 +58,16 @@ export async function processChainEventNotificationsCUD(
     formattedEvent.ChainEvent = chainEvent;
 
     // send to socket.io for WebSocket notifications
-    await this.publish(formattedEvent, RascalPublications.ChainEventNotifications);
-    this.log.info("Notification pushed to socket queue");
+    await this.rmqController.publish(
+      formattedEvent,
+      RascalPublications.ChainEventNotifications
+    );
+    this.log.info('Notification pushed to socket queue');
   } catch (e) {
-    if (e.errors && e.errors.length > 0) {
-      const errors = e.errors.map((x) => x.message);
-      this.log.error(
-        `Failed to generate notification (${
-          e.message
-        }): ${errors}!\nevent: ${JSON.stringify(
-          chainEventData.event
-        )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`
-      );
-    } else {
-      this.log.error(
-        `Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(
-          chainEventData.event
-        )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`
-      );
-    }
+    this.log.error(
+      `Failed to publish notification: ${e.message}\nevent: ${JSON.stringify(
+        chainEventData.event
+      )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`, e
+    );
   }
 }
