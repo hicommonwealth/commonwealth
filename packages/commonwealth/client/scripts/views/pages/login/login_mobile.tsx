@@ -91,7 +91,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
               <CWAvatarUsernameInput
                 address={address}
                 darkMode
-                defaultValue={username}
+                value={username}
                 onAvatarChangeHandler={(a) => {
                   handleSetAvatar(a);
                 }}

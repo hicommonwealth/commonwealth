@@ -115,7 +115,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
               </div>
               <CWAvatarUsernameInput
                 address={address}
-                defaultValue={username}
+                value={username}
                 onAvatarChangeHandler={(a) => {
                   handleSetAvatar(a);
                 }}

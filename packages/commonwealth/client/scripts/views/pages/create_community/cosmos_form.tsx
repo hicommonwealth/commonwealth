@@ -50,7 +50,7 @@ export class CosmosForm implements m.ClassComponent {
       <div class="CreateCommunityForm">
         <InputRow
           title="RPC URL"
-          defaultValue={this.state.form.nodeUrl}
+          value={this.state.form.nodeUrl}
           placeholder="http://my-rpc.cosmos-chain.com:26657/"
           onChangeHandler={async (v) => {
             this.state.form.nodeUrl = v;
@@ -58,7 +58,7 @@ export class CosmosForm implements m.ClassComponent {
         />
         <InputRow
           title="Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v;
             this.state.form.id = slugifyPreserveDashes(v);
@@ -67,7 +67,7 @@ export class CosmosForm implements m.ClassComponent {
         <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
@@ -75,7 +75,7 @@ export class CosmosForm implements m.ClassComponent {
         />
         <InputRow
           title="Bech32 Prefix"
-          defaultValue={this.state.form.bech32Prefix}
+          value={this.state.form.bech32Prefix}
           placeholder="cosmos"
           onChangeHandler={async (v) => {
             this.state.form.bech32Prefix = v;
@@ -83,7 +83,7 @@ export class CosmosForm implements m.ClassComponent {
         />
         <InputRow
           title="Decimals"
-          defaultValue={`${this.state.form.decimals}`}
+          value={`${this.state.form.decimals}`}
           disabled={true}
           onChangeHandler={(v) => {
             this.state.form.decimals = +v;
@@ -126,7 +126,7 @@ export class CosmosForm implements m.ClassComponent {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id,
+                  res.result.role.chain_id
                 );
               }
               await initAppState(false);

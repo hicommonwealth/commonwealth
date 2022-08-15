@@ -107,14 +107,14 @@ export class ChainMetadataRows
         </div>
         <InputRow
           title="Name"
-          defaultValue={this.name}
+          value={this.name}
           onChangeHandler={(v) => {
             this.name = v;
           }}
         />
         <InputRow
           title="Description"
-          defaultValue={this.description}
+          value={this.description}
           onChangeHandler={(v) => {
             this.description = v;
           }}
@@ -122,7 +122,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Website"
-          defaultValue={this.website}
+          value={this.website}
           placeholder="https://example.com"
           onChangeHandler={(v) => {
             this.website = v;
@@ -130,7 +130,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Discord"
-          defaultValue={this.discord}
+          value={this.discord}
           placeholder="https://discord.com/invite"
           onChangeHandler={(v) => {
             this.discord = v;
@@ -138,7 +138,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Element"
-          defaultValue={this.element}
+          value={this.element}
           placeholder="https://matrix.to/#"
           onChangeHandler={(v) => {
             this.element = v;
@@ -146,7 +146,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Telegram"
-          defaultValue={this.telegram}
+          value={this.telegram}
           placeholder="https://t.me"
           onChangeHandler={(v) => {
             this.telegram = v;
@@ -154,7 +154,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Github"
-          defaultValue={this.github}
+          value={this.github}
           placeholder="https://github.com"
           onChangeHandler={(v) => {
             this.github = v;
@@ -186,7 +186,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Custom Stages"
-          defaultValue={this.customStages}
+          value={this.customStages}
           placeholder='["Temperature Check", "Consensus Check"]'
           onChangeHandler={(v) => {
             this.customStages = v;
@@ -194,7 +194,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Domain"
-          defaultValue={this.customDomain}
+          value={this.customDomain}
           placeholder="Contact support" // gov.edgewa.re
           onChangeHandler={(v) => {
             this.customDomain = v;
@@ -204,7 +204,7 @@ export class ChainMetadataRows
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            defaultValue={this.snapshot}
+            value={this.snapshot}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -223,7 +223,7 @@ export class ChainMetadataRows
         )}
         <InputRow
           title="Terms of Service"
-          defaultValue={this.terms}
+          value={this.terms}
           placeholder="Url that new users see"
           onChangeHandler={(v) => {
             this.terms = v;
@@ -235,7 +235,7 @@ export class ChainMetadataRows
           label="Banner"
           maxlength={512}
           placeholder="Text for across the top of your community"
-          defaultValue={this.communityBanner}
+          value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}

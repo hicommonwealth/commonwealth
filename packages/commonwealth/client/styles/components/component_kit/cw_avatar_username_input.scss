@@ -21,11 +21,8 @@
   .input-and-address-container {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     width: 240px;
-
-    .username-input-container {
-      margin: 0 0 8px 0;
-    }
 
     .abbreviated-address {
       color: $neutral-500;

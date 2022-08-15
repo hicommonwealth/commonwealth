@@ -17,7 +17,7 @@ type AvatarUsernameInputAttrs = {
   account?: Account<any>;
   address: string;
   darkMode?: boolean;
-  defaultValue: string;
+  value: string;
   onAvatarChangeHandler: (e) => void;
   onUsernameChangeHandler: (e) => void;
   orientation?: Orientation;
@@ -31,7 +31,7 @@ export class CWAvatarUsernameInput
       account,
       address,
       darkMode,
-      defaultValue,
+      value,
       onAvatarChangeHandler,
       onUsernameChangeHandler,
       orientation = 'horizontal',
@@ -66,8 +66,7 @@ export class CWAvatarUsernameInput
             darkMode={darkMode}
             size="small"
             iconRight="edit"
-            containerClassName="username-input-container"
-            defaultValue={defaultValue}
+            value={value}
             oninput={(e) => {
               onUsernameChangeHandler((e.target as any).value);
             }}
