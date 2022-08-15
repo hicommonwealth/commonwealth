@@ -27,6 +27,7 @@ const status = async (
     ] = await Promise.all([
       models.Chain.findAll({
         where: { active: true },
+        include: [{ model: models.ChainNode }],
       }),
       models.ChainNode.findAll(),
       models.ContractCategory.findAll(),
