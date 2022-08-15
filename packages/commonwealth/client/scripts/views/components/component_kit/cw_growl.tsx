@@ -12,10 +12,10 @@ import { CWPortal } from './cw_portal';
 type GrowlPosition = 'bottom-left' | 'bottom-right';
 
 type GrowlAttrs = {
-  onclose: () => void;
-  disabled: boolean;
-  position: GrowlPosition;
   className?: string;
+  disabled: boolean;
+  onclose: () => void;
+  position: GrowlPosition;
 };
 
 export class CWGrowl implements m.ClassComponent<GrowlAttrs> {

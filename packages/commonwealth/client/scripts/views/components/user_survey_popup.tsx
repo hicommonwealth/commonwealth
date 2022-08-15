@@ -20,6 +20,7 @@ type UserSurveyViewAttrs = {
   onClose: () => void;
   onCheckboxClick: () => void;
 };
+
 class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
   view(vnode) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
@@ -93,6 +94,7 @@ const openTypeform = (
 type UserSurveyPopupAttrs = {
   surveyReadyForDisplay: boolean;
 };
+
 export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
   private surveyLocked: boolean;
   private hideForeverChecked: boolean; // radio button indicating whether the user wants to hide the survey forever
