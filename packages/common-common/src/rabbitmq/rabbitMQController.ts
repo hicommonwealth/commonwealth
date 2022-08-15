@@ -74,7 +74,7 @@ export class RabbitMQController {
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
         try {
-          if (msgProcessorContext) messageProcessor.apply({...this, ...msgProcessorContext}, content);
+          if (msgProcessorContext) messageProcessor.call({...this, ...msgProcessorContext}, content);
           else messageProcessor(content);
           ackOrNack();
         } catch (e) {
