@@ -173,6 +173,7 @@ const resetServer = (debug = false): Promise<void> => {
         token_name: 'Alex',
         symbol: 'ALEX',
         type: ChainNetwork.ERC20,
+        chain_node_id: testnetNode.id,
       });
       const alexCommunityContract = await models.CommunityContract.create({
         chain_id: alex.id,
@@ -195,6 +196,7 @@ const resetServer = (debug = false): Promise<void> => {
         token_name: 'yearn',
         symbol: 'YFI',
         type: ChainNetwork.ERC20,
+        chain_node_id: mainnetNode.id,
       });
       const yearnCommunityContract = await models.CommunityContract.create({
         chain_id: yearn.id,
@@ -217,6 +219,7 @@ const resetServer = (debug = false): Promise<void> => {
         token_name: 'sushi',
         symbol: 'SUSHI',
         type: ChainNetwork.ERC20,
+        chain_node_id: mainnetNode.id,
       });
       const sushiCommunityContract = await models.CommunityContract.create({
         chain_id: sushi.id,
