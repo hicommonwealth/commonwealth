@@ -3,14 +3,19 @@
 .NewTopicModal {
   width: 420px;
 
-  .checkboxes {
+  .compact-modal-body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
+    gap: 16px;
 
-  .QuillEditor {
-    margin-bottom: 16px;
+    .checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .QuillEditor {
+      margin-bottom: 16px;
+    }
   }
 }

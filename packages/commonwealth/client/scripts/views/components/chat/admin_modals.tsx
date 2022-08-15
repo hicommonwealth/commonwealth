@@ -11,6 +11,7 @@ import { CWCard } from '../component_kit/cw_card';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 export class CreateCategory
   implements m.ClassComponent<{ handleClose: () => void }>
@@ -50,10 +51,10 @@ export class CreateCategory
     return (
       <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Create Category</h3>
+          <CWText type="h5">Create Category</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>A new category will be added to chat.</h4>
+        <CWText>A new category will be added to chat.</CWText>
         <CWTextInput
           label="*Category Title"
           placeholder="Enter a category title"
@@ -106,13 +107,13 @@ export class CreateChannel
     return (
       <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Create Channel</h3>
+          <CWText type="h5">Create Channel</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>
+        <CWText>
           A new channel will be added to the <b>{vnode.attrs.category}</b>{' '}
           category
-        </h4>
+        </CWText>
         <CWTextInput
           label="*Channel Title"
           placeholder="Enter a channel title"
@@ -159,12 +160,12 @@ export class RenameChannel
     return (
       <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Rename Channel</h3>
+          <CWText type="h5">Rename Channel</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>
+        <CWText>
           Give a new name to <b>{vnode.attrs.channel.name}</b>
-        </h4>
+        </CWText>
         <CWTextInput
           label="*Channel Name"
           placeholder="Enter a new channel name"
@@ -211,12 +212,12 @@ export class RenameCategory
     return (
       <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Rename Category</h3>
+          <CWText type="h5">Rename Category</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>
+        <CWText>
           Give a new name to <b>{vnode.attrs.category}</b>
-        </h4>
+        </CWText>
         <CWTextInput
           label="*Category Name"
           placeholder="Enter a category name"
@@ -250,15 +251,15 @@ export class DeleteChannel
     };
 
     return (
-      <CWCard className="danger" elevation="elevation-1" interactive={false}>
+      <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Delete Channel</h3>
+          <CWText type="h5">Delete Channel</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>
+        <CWText>
           The <b>{vnode.attrs.channel.name} </b> channel will be deleted.
           <b> All messages within will be lost forever.</b> Ok?
-        </h4>
+        </CWText>
         <div class="button-bar">
           <CWButton
             buttonType="secondary-black"
@@ -286,16 +287,16 @@ export class DeleteCategory
     };
 
     return (
-      <CWCard className="danger" elevation="elevation-1" interactive={false}>
+      <CWCard elevation="elevation-1" interactive={false}>
         <div class="header">
-          <h3>Delete Category</h3>
+          <CWText type="h5">Delete Category</CWText>
           <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
         </div>
-        <h4>
+        <CWText>
           Deleting the <b>{vnode.attrs.category}</b> category will delete all
           channels inside.
           <b> All messages inside all the channels will be lost forever.</b> Ok?
-        </h4>
+        </CWText>
         <div class="button-bar">
           <CWButton
             buttonType="secondary-black"

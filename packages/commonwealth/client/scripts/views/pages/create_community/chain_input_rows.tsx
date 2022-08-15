@@ -39,11 +39,11 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Description"
       disabled={disabled}
-      defaultValue={state.description}
+      value={state.description}
       onChangeHandler={(v) => {
         state.description = v;
       }}
-      textarea={true}
+      textarea
     />,
     <div class="AvatarUploadRow">
       <CWLabel label="Upload Icon" />
@@ -67,7 +67,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Icon URL"
       disabled={disabled}
-      defaultValue={state.iconUrl}
+      value={state.iconUrl}
       placeholder="https://"
       onChangeHandler={(v) => {
         state.iconUrl = v;
@@ -76,7 +76,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Website"
       disabled={disabled}
-      defaultValue={state.website}
+      value={state.website}
       placeholder="https://example.com"
       onChangeHandler={(v) => {
         state.website = v;
@@ -91,7 +91,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Discord"
       disabled={disabled}
-      defaultValue={state.discord}
+      value={state.discord}
       placeholder="https://discord.com/invite"
       onChangeHandler={(v) => {
         state.discord = v;
@@ -100,7 +100,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Element"
       disabled={disabled}
-      defaultValue={state.element}
+      value={state.element}
       placeholder="https://matrix.to/#"
       onChangeHandler={(v) => {
         state.element = v;
@@ -109,7 +109,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Telegram"
       disabled={disabled}
-      defaultValue={state.telegram}
+      value={state.telegram}
       placeholder="https://t.me"
       onChangeHandler={(v) => {
         state.telegram = v;
@@ -118,7 +118,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
     <InputRow
       title="Github"
       disabled={disabled}
-      defaultValue={state.github}
+      value={state.github}
       placeholder="https://github.com"
       onChangeHandler={(v) => {
         state.github = v;
@@ -168,7 +168,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     state.chainString === 'Custom' && (
       <InputRow
         title="Chain ID"
-        defaultValue={state.ethChainId}
+        value={state.ethChainId}
         placeholder="1"
         onChangeHandler={async (v) => {
           state.ethChainId = v;
@@ -179,7 +179,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     state.chainString === 'Custom' && (
       <InputRow
         title="Websocket URL"
-        defaultValue={state.nodeUrl}
+        value={state.nodeUrl}
         placeholder="wss://... (leave empty for default)"
         onChangeHandler={async (v) => {
           state.nodeUrl = v;
@@ -190,7 +190,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     state.chainString === 'Custom' && (
       <InputRow
         title="HTTP URL"
-        defaultValue={state.altWalletUrl}
+        value={state.altWalletUrl}
         placeholder="https://...  (leave empty for default)"
         onChangeHandler={async (v) => {
           state.altWalletUrl = v;
@@ -200,7 +200,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
     ),
     <InputRow
       title="Address"
-      defaultValue={state.address}
+      value={state.address}
       placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
       onChangeHandler={(v) => {
         state.address = v;

@@ -35,7 +35,8 @@ $discussion-title-font-size: 1.45rem;
 .view-proposal-content-container {
   display: flex;
   flex-direction: column;
-  max-width: 768px;
+  gap: 16px;
+  max-width: 704px;
   width: 100%;
 }
 
@@ -75,6 +76,10 @@ $discussion-title-font-size: 1.45rem;
       @include mediumSmallInclusive {
         display: none;
       }
+    }
+
+    @include mediumSmallInclusive {
+      gap: 0;
     }
   }
 
@@ -139,139 +144,6 @@ $discussion-title-font-size: 1.45rem;
     font-size: 23px;
     font-weight: 500;
     margin-bottom: 8px;
-  }
-
-  //
-  // header
-  //
-  .ProposalHeader {
-    position: relative;
-
-    &.proposal-snapshot {
-      .snapshot-proposal-top {
-        display: flex;
-        border-bottom: 1px solid $neutral-200;
-      }
-
-      .proposal-content {
-        padding: 25px 0;
-      }
-    }
-
-    .proposal-top {
-      display: flex;
-      padding-bottom: 16px;
-      border-bottom: 1px solid $neutral-200;
-    }
-
-    .proposal-top-left {
-      flex: 1;
-
-      .cui-input {
-        width: 70%;
-        padding-bottom: 10px;
-      }
-
-      .proposal-body-link {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-
-        > * div {
-          margin-right: 8px;
-        }
-      }
-
-      .proposal-body-meta {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 12px;
-
-        svg {
-          color: $neutral-500;
-          cursor: pointer;
-        }
-      }
-
-      .proposal-meta-top {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        height: 35px;
-
-        button {
-          margin-left: 17px;
-          border-radius: 8px;
-          height: 39px;
-          font-size: 18px;
-          text-transform: uppercase;
-        }
-
-        .proposal-meta-top-left {
-          display: flex;
-          align-items: center;
-        }
-
-        .proposal-meta-top-right {
-          display: flex;
-        }
-
-        .ProposalHeaderOnchainId {
-          font-size: 18px;
-          color: $black;
-        }
-      }
-    }
-
-    .proposal-content {
-      display: flex;
-      padding-top: 24px;
-    }
-
-    .proposal-content-right {
-      flex: 1;
-      overflow-x: auto;
-      margin-left: $discussion-comment-padding;
-      margin-bottom: 40px;
-
-      @include extraSmall {
-        margin-left: $discussion-comment-padding-mobile;
-      }
-
-      .proposal-content-meta {
-        padding-bottom: $discussion-meta-padding;
-        font-size: $discussion-meta-font-size;
-      }
-    }
-
-    .social-right {
-      margin-right: 10px;
-    }
-
-    .proposal-title {
-      margin-bottom: 6px;
-
-      .ProposalHeaderTitle {
-        display: inline;
-        font-size: $discussion-title-font-size;
-        font-weight: 600;
-        flex: 1;
-
-        .cui-tag {
-          font-weight: 400;
-          margin-left: 12px;
-          position: relative;
-          top: -2px;
-
-          .cui-icon {
-            margin-right: 3px;
-          }
-        }
-      }
-    }
   }
 
   //

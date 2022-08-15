@@ -67,22 +67,20 @@
     width: 500px;
     z-index: 100;
 
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
     .header {
       align-items: center;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      margin-bottom: 24px;
       width: 100%;
 
       svg {
         cursor: pointer;
       }
-    }
-
-    h4 {
-      font-weight: 400;
-      margin-bottom: 24px;
     }
 
     .TextInput {

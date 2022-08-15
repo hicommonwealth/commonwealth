@@ -57,7 +57,7 @@ export class EmailSection implements m.ClassComponent {
           </CWText>
           <CWTextInput
             placeholder="name@example.com"
-            defaultValue={app.user.email || null}
+            value={app.user.email || null}
             oninput={(e) => {
               this.emailInputUpdated = true;
               this.verificationSent = false;
