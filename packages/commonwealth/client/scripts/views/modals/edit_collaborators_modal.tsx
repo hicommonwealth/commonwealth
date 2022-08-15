@@ -18,6 +18,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWLabel } from '../components/component_kit/cw_label';
 
 export class EditCollaboratorsModal
   implements
@@ -78,65 +79,69 @@ export class EditCollaboratorsModal
           <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          <QueryList
-            checkmark
-            items={items}
-            inputAttrs={{
-              placeholder: 'Enter username or address...',
-            }}
-            itemRender={(role: any) => {
-              const user: Profile = app.profiles.getProfile(
-                role.Address.chain,
-                role.Address.address
-              );
+          <div class="user-list-container">
+            <CWLabel label="Users" />
+            <QueryList
+              checkmark
+              items={items}
+              inputAttrs={{
+                placeholder: 'Enter username or address...',
+              }}
+              itemRender={(role: any) => {
+                const user: Profile = app.profiles.getProfile(
+                  role.Address.chain,
+                  role.Address.address
+                );
 
-              const recentlyAdded = !$.isEmptyObject(
-                this.addedEditors[role.Address.address]
-              );
+                const recentlyAdded = !$.isEmptyObject(
+                  this.addedEditors[role.Address.address]
+                );
 
-              return (
-                <ListItem
-                  label={m(User, { user })}
-                  selected={recentlyAdded}
-                  key={role.Address.address}
-                />
-              );
-            }}
-            itemPredicate={(query, item) => {
-              const address = (item as any).Address;
+                return (
+                  <ListItem
+                    label={m(User, { user })}
+                    selected={recentlyAdded}
+                    key={role.Address.address}
+                  />
+                );
+              }}
+              itemPredicate={(query, item) => {
+                const address = (item as any).Address;
 
-              return address.name
-                ? address.name.toLowerCase().includes(query.toLowerCase())
-                : address.address.toLowerCase().includes(query.toLowerCase());
-            }}
-            onSelect={(item) => {
-              const addrItem = (item as any).Address;
+                return address.name
+                  ? address.name.toLowerCase().includes(query.toLowerCase())
+                  : address.address.toLowerCase().includes(query.toLowerCase());
+              }}
+              onSelect={(item) => {
+                const addrItem = (item as any).Address;
 
-              // If already scheduled for removal, un-schedule
-              if (this.removedEditors[addrItem.address]) {
-                delete this.removedEditors[addrItem.address];
-              }
+                // If already scheduled for removal, un-schedule
+                if (this.removedEditors[addrItem.address]) {
+                  delete this.removedEditors[addrItem.address];
+                }
 
-              // If already scheduled for addition, un-schedule
-              if (this.addedEditors[addrItem.address]) {
-                delete this.addedEditors[addrItem.address];
-              } else if (
-                thread.collaborators.filter((c) => {
-                  return (
-                    c.address === addrItem.address && c.chain === addrItem.chain
-                  );
-                }).length === 0
-              ) {
-                // If unscheduled for addition, and not an existing editor, schedule
-                this.addedEditors[addrItem.address] = addrItem;
-              } else {
-                notifyInfo('Already an editor');
-              }
-            }}
-          />
+                // If already scheduled for addition, un-schedule
+                if (this.addedEditors[addrItem.address]) {
+                  delete this.addedEditors[addrItem.address];
+                } else if (
+                  thread.collaborators.filter((c) => {
+                    return (
+                      c.address === addrItem.address &&
+                      c.chain === addrItem.chain
+                    );
+                  }).length === 0
+                ) {
+                  // If unscheduled for addition, and not an existing editor, schedule
+                  this.addedEditors[addrItem.address] = addrItem;
+                } else {
+                  notifyInfo('Already an editor');
+                }
+              }}
+            />
+          </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">
-              <CWText fontWeight="medium">Selected collaborators</CWText>
+              <CWLabel label="Selected collaborators" />
               <div class="collaborator-rows-container">
                 {allCollaborators.map((c) => {
                   const user: Profile = app.profiles.getProfile(
