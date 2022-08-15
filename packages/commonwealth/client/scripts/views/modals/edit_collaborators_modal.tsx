@@ -15,8 +15,9 @@ import {
   notifySuccess,
 } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 export class EditCollaboratorsModal
   implements
@@ -133,10 +134,10 @@ export class EditCollaboratorsModal
               }
             }}
           />
-          {allCollaborators.length > 0 && (
-            <div class="existing-collaborators">
-              <span>Selected collaborators</span>
-              <div class="collaborator-listing">
+          {allCollaborators.length > 0 ? (
+            <div class="selected-collaborators-section">
+              <CWText fontWeight="medium">Selected collaborators</CWText>
+              <div class="collaborator-rows-container">
                 {allCollaborators.map((c) => {
                   const user: Profile = app.profiles.getProfile(
                     c.chain,
@@ -144,11 +145,11 @@ export class EditCollaboratorsModal
                   );
 
                   return (
-                    <div class="user-wrap">
+                    <div class="collaborator-row">
                       {m(User, { user })}
-                      <CWIcon
+                      <CWIconButton
                         iconName="close"
-                        size="small"
+                        iconSize="small"
                         onclick={async () => {
                           // If already scheduled for addition, un-schedule
                           if (this.addedEditors[c.address]) {
@@ -164,8 +165,12 @@ export class EditCollaboratorsModal
                 })}
               </div>
             </div>
+          ) : (
+            <div class="no-collaborators">
+              <CWText>No collaborators selected</CWText>
+            </div>
           )}
-          <div>
+          <div class="buttons-row">
             <CWButton
               label="Cancel"
               onclick={(e) => {
