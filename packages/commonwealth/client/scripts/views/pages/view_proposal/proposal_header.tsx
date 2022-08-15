@@ -9,13 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import {
-  Thread,
-  ThreadKind,
-  ThreadStage,
-  AnyProposal,
-  ChainEntity,
-} from 'models';
+import { Thread, ThreadKind, AnyProposal } from 'models';
 import {
   ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
@@ -25,7 +19,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
 import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,
@@ -51,7 +44,7 @@ import {
   ProposalBodyEditor,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
-  EditPermissionsButton,
+  EditCollaboratorsButton,
 } from './body';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
@@ -70,7 +63,6 @@ import {
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { IProposalPageState, scrollToForm } from '.';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { ProposalEditorPermissions } from './proposal_editor_permissions';
 
 export class ProposalHeader
   implements
@@ -87,7 +79,6 @@ export class ProposalHeader
 {
   private currentText: any;
   private editing: boolean;
-  private editPermissionsIsOpen: boolean;
   private quillEditorState: QuillEditor;
   private savedEdit: string;
   private saving: boolean;
@@ -179,10 +170,8 @@ export class ProposalHeader
                                 parentState: this,
                               }),
                             isAuthor &&
-                              m(EditPermissionsButton, {
-                                openEditPermissions: () => {
-                                  this.editPermissionsIsOpen = true;
-                                },
+                              m(EditCollaboratorsButton, {
+                                proposal,
                               }),
                             isAdmin && proposal instanceof Thread && (
                               <ChangeTopicMenuItem proposal={proposal} />
@@ -227,17 +216,6 @@ export class ProposalHeader
                         />
                       ),
                     <SocialSharingCarat />,
-                    this.editPermissionsIsOpen &&
-                      proposal instanceof Thread &&
-                      m(ProposalEditorPermissions, {
-                        thread: vnode.attrs.proposal as Thread,
-                        popoverMenu: true,
-                        openStateHandler: (v) => {
-                          this.editPermissionsIsOpen = v;
-                        },
-                        // TODO: Onchange logic
-                        onChangeHandler: () => {},
-                      }),
                   ]
                 : [
                     m(ProposalBodyAuthor, { item: proposal }),

@@ -1,0 +1,9 @@
+@import 'shared';
+
+.EditCollaboratorsModal {
+  width: 400px;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+}

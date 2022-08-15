@@ -28,6 +28,7 @@ import {
   countLinesMarkdown,
   countLinesQuill,
 } from '../../components/quill/helpers';
+import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
@@ -317,16 +318,22 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
   },
 };
 
-export const EditPermissionsButton: m.Component<{
-  openEditPermissions: Function;
+export const EditCollaboratorsButton: m.Component<{
+  proposal: any;
 }> = {
   view: (vnode) => {
-    const { openEditPermissions } = vnode.attrs;
+    const { proposal } = vnode.attrs;
+
     return m(MenuItem, {
       label: 'Edit collaborators',
       onclick: async (e) => {
         e.preventDefault();
-        openEditPermissions();
+        app.modals.create({
+          modal: EditCollaboratorsModal,
+          data: {
+            thread: proposal,
+          },
+        });
       },
     });
   },
