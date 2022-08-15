@@ -52,7 +52,6 @@ import {
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
   EditPermissionsButton,
-  ProposalEditorPermissions,
 } from './body';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
@@ -71,6 +70,7 @@ import {
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { IProposalPageState, scrollToForm } from '.';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { ProposalEditorPermissions } from './proposal_editor_permissions';
 
 export class ProposalHeader
   implements

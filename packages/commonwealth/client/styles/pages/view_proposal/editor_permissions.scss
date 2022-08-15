@@ -2,6 +2,7 @@
   .proposal-editor-permissions-wrap {
     display: flex;
     justify-content: space-between;
+
     .cui-query-list {
       display: flex;
       flex-direction: column;
@@ -10,40 +11,50 @@
       min-height: 270px;
       max-height: 270px;
       max-width: 300px;
+
       &:last-child {
         margin-right: 0;
       }
     }
+
     .existing-collaborators {
       display: flex;
       flex-direction: column;
       flex: 1;
+
       span {
         font-weight: 600;
         margin-bottom: 7px;
       }
+
       .collaborator-listing {
         display: flex;
         flex-direction: column;
+
         .user-wrap {
           margin-right: 10px;
           margin-bottom: 3px;
           white-space: nowrap;
+
           .cui-icon {
             margin-left: 3px;
           }
         }
       }
     }
+
     .username:hover {
       text-decoration: none;
     }
+
     .cui-list-item-content-left {
       position: static !important;
     }
+
     .cui-active {
       background: initial;
     }
+
     .cui-query-list-checkmark .cui-list-item {
       padding-left: 4px;
     }
