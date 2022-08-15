@@ -1,7 +1,6 @@
 import { DB } from '../../database';
 import { Logger } from 'typescript-logging';
-import { CWEvent, IChainEventKind } from 'chain-events/src';
-import { ChainEventNotification } from '../../../shared/types';
+import { CWEvent } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';

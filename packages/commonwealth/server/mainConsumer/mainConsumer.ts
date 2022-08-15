@@ -5,7 +5,7 @@ import {
   ServiceConsumer,
 } from 'common-common/src/ServiceConsumer';
 import { BrokerConfig } from 'rascal';
-import { RABBITMQ_URI } from 'chain-events/services/config';
+import { RABBITMQ_URI } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import {

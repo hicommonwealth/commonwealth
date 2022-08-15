@@ -5,8 +5,8 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "outDir": "../build",
-    "baseUrl": "..",
+    "outDir": "../../build",
+    "baseUrl": "../..",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
@@ -21,13 +21,13 @@
     }
   },
   "include": [
-    "./mainConsumer"
+    "./"
   ],
   "exclude": [
-    "../node_modules",
+    "../../node_modules",
     "./node_modules",
     "node_modules",
     "build",
-    "dist",
+    "dist"
   ]
 }
