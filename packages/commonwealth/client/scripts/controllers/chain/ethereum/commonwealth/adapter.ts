@@ -3,7 +3,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
+import { ChainInfo, IChainAdapter } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -12,7 +12,10 @@ import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
 import CommonwealthGovernance from './governance';
 
-export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Commonwealth extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: CommonwealthChain;
   public accounts: EthereumAccounts;
@@ -23,14 +26,21 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     super(meta, app);
     this.chain = new CommonwealthChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.governance = new CommonwealthGovernance(this.app, !this.usingServerChainEntities);
+    this.governance = new CommonwealthGovernance(
+      this.app,
+      !this.usingServerChainEntities
+    );
   }
 
   public async initApi() {
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    const api = new CommonwealthAPI(() => null, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new CommonwealthAPI(
+      () => null,
+      this.meta.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.chain.commonwealthApi = api;
     await super.initApi();

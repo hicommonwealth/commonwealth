@@ -6,12 +6,12 @@ import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import { weiToTokens } from 'helpers';
+import Sublayout from 'views/sublayout';
+import { AnonymousUser } from 'views/components/widgets/user';
+import { PageNotFound } from 'views/pages/404';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
+import { CWTable } from 'views/components/component_kit/cw_table';
 import { ProjectCompletionBar, ProjectRole } from './project_card';
-import Sublayout from '../../../sublayout';
-import { AnonymousUser } from '../../../components/widgets/user';
-import { PageNotFound } from '../../404';
-import MarkdownFormattedText from '../../../components/markdown_formatted_text';
-import { CWTable } from '../../../components/component_kit/cw_table';
 import { createNewDummyProject } from './dummy_project';
 import SupportCard from './support_card';
 

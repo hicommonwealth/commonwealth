@@ -5,7 +5,12 @@ import m from 'mithril';
 import 'components/sidebar/index.scss';
 
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import {
+  ProposalType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+} from 'common-common/src/types';
 import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
@@ -48,7 +53,7 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
-        app.chain.network === ChainNetwork.Commonwealth ||
+        app.chain.network === ChainNetwork.CommonProtocol ||
         app.chain.meta.snapshot);
     if (!hasProposals) return;
 
@@ -62,8 +67,8 @@ export class GovernanceSection
       isNotOffchain &&
       showMolochMenuOptions &&
       (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonwealthMenuOptions =
-      isNotOffchain && app.chain?.network === ChainNetwork.Commonwealth;
+    const showCommonProtocolMenuOptions =
+      isNotOffchain && app.chain?.network === ChainNetwork.CommonProtocol;
     const showCompoundOptions =
       isNotOffchain &&
       app.user.activeAccount &&

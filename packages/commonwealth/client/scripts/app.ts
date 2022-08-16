@@ -17,8 +17,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
-
 import {
   notifyError,
   notifyInfo,
@@ -34,9 +32,6 @@ import { pathIsDiscussion } from './identifiers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(
-  /* webpackPrefetch: true */ 'views/pages/commonwealth/whycommonwealth/index'
-);
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 
@@ -680,13 +675,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/commonwealth/projects/create_project_form.tsx',
               { scoped: true, hideSidebar: true }
             ),
-            '/backers': importRoute('views/pages/commonwealth/backers/index', {
-              scoped: true,
-            }),
-            '/collectives': importRoute(
-              'views/pages/commonwealth/collectives/index',
-              { scoped: true }
-            ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -807,9 +795,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
-            // TODO: ??
-            '/:scope/backers': redirectRoute(() => '/backers/index'),
-            '/:scope/collectives': redirectRoute(() => '/collectives/index'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
@@ -891,10 +876,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
-              scoped: false,
-              hideSidebar: true,
-            }),
             '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               deferChain: true,
@@ -953,16 +934,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/new/project': importRoute(
               'views/pages/commonwealth/projects/create_project_form.tsx',
               { scoped: true, hideSidebar: true }
-            ),
-            '/:scope/backers': importRoute(
-              'views/pages/commonwealth/backers/index',
-              {
-                scoped: true,
-              }
-            ),
-            '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives/index',
-              { scoped: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(

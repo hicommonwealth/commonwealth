@@ -4,7 +4,7 @@ import 'pages/projects/create_project_form.scss';
 import m from 'mithril';
 
 import app from 'state';
-import QuillEditor from 'views/components/quill/quill_editor';
+import { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
@@ -13,7 +13,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
-import { ChainBase } from 'types';
+import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import CoverImageUpload from './cover_image_upload';
 
@@ -90,9 +90,9 @@ export interface ICreateProjectForm {
   token: string;
   creator: string;
   beneficiary: string;
-  threshold: string;
-  fundraiseLength: string;
-  curatorFee: string;
+  threshold: number;
+  fundraiseLength: number;
+  curatorFee: number;
 }
 
 export class InformationSlide
@@ -301,16 +301,16 @@ export default class CreateProjectForm implements m.ClassComponent {
     }
     if (!this.form) {
       this.form = {
-        title: '',
+        title: null,
         // WETH hard-coded as default raise token, but can be overwritten
         token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         creator: app.user.activeAccount.address,
-        beneficiary: '',
-        description: '',
-        shortDescription: '',
-        coverImage: '',
-        curatorFee: 0,
-        threshold: 0,
+        beneficiary: null,
+        description: null,
+        shortDescription: null,
+        coverImage: null,
+        curatorFee: null,
+        threshold: null,
         fundraiseLength: weekInSeconds,
         chainId: app.activeChainId(),
       };
@@ -402,7 +402,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                         token: this.form.token,
                         creator: this.form.creator,
                         beneficiary: this.form.beneficiary,
-                        threshold: +this.form.threshold,
+                        threshold: this.form.threshold,
                         deadline: nowInSeconds + this.form.fundraiseLength,
                         curatorFee: Math.round(this.form.curatorFee * 100),
                       });

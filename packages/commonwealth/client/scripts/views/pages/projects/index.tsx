@@ -8,8 +8,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { RoleInfo } from 'models';
-import { ChainBase } from 'types';
-import Sublayout from '../../../sublayout';
+import { ChainBase } from 'common-common/src/types';
+import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
 

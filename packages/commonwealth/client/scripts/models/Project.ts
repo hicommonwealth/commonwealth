@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import moment from 'moment';
-import { CommonwealthTypes } from '@commonwealth/chain-events';
+import * as CommonwealthTypes from 'chain-events/src/chains/commonwealth/types';
 import ChainEntityT from './ChainEntity';
 import { CWParticipant } from '../controllers/chain/ethereum/commonwealth/participants';
 import AddressInfo from './AddressInfo';
