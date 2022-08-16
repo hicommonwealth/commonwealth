@@ -1,3 +1,4 @@
+import app from 'state';
 import topics from 'controllers/server/topics';
 import { IChainAdapter, ThreadKind, Topic } from 'models';
 import { NewThreadFormType, NewThreadErrors } from './types';
@@ -21,16 +22,14 @@ export const checkNewThreadErrors = (
 
 export const updateTopicList = (
   topic: Topic,
-  activeEntity: IChainAdapter<any, any>
+  chain: IChainAdapter<any, any>
 ) => {
   try {
-    const topicNames = Array.isArray(activeEntity?.meta?.topics)
-      ? activeEntity.meta.topics.map((t) => t.name)
-      : [];
+    const topicNames = app.topics.getByCommunity(chain.id).map((t) => t.name);
     if (!topicNames.includes(topic.name)) {
-      activeEntity.meta.topics.push(topic);
+      app.topics.store.add(topic);
     }
   } catch (e) {
-    console.log(`Error adding new topic to ${activeEntity.name}.`);
+    console.log(`Error adding new topic to ${chain.name}.`);
   }
 };

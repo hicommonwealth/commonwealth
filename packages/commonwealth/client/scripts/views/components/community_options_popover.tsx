@@ -59,7 +59,7 @@ export class CommunityOptionsPopover implements m.ClassComponent {
             />
           ),
           isAdmin &&
-            app.chain.meta.topics.filter((topic) => topic.featuredInSidebar)
+            app.topics.store.getByCommunity(app.chain.id).filter((topic) => topic.featuredInSidebar)
               .length > 0 && (
               <MenuItem
                 label="Order sidebar topics"

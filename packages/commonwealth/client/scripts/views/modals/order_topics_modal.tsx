@@ -13,32 +13,29 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-const getTopicFromElement = (
-  htmlEle: HTMLElement,
-  allTopics: Array<Topic>
-): Topic => allTopics.find((t: Topic) => t.name.trim() === htmlEle.innerText);
-
-const storeNewTopicOrder = (
-  HTMLContainer: HTMLElement,
-  topics: Array<Topic>
-) => {
-  topics = Array.from(HTMLContainer.childNodes).map((node: HTMLElement) =>
-    getTopicFromElement(node, topics)
-  );
-
-  topics.forEach((t, idx) => {
-    t.order = idx + 1;
-  });
-};
-
 export class OrderTopicsModal implements m.ClassComponent {
   private topics: Array<Topic>;
 
-  oninit() {
-    this.topics = app.chain.meta.topics.filter(
-      (topic) => topic.featuredInSidebar
+  private _getTopicFromElement = (
+    htmlEle: HTMLElement,
+    allTopics: Array<Topic>
+  ): Topic => allTopics.find((t: Topic) => t.name.trim() === htmlEle.innerText);
+
+  private _storeNewTopicOrder = (HTMLContainer: HTMLElement) => {
+    this.topics = Array.from(HTMLContainer.childNodes).map(
+      (node: HTMLElement) => this._getTopicFromElement(node, this.topics)
     );
 
+    this.topics.forEach((t, idx) => {
+      t.order = idx + 1;
+    });
+  };
+
+  oninit() {
+    this.topics = app.topics.store
+      .getByCommunity(app.chain.id)
+      .filter((topic) => topic.featuredInSidebar)
+      .map((topic) => ({ ...topic } as Topic));
     // If featured topics have not been re-ordered previously, they may lack
     // an order prop. We auto-generate a temporary order for these topics so
     // they may be properly shuffled.
@@ -57,20 +54,18 @@ export class OrderTopicsModal implements m.ClassComponent {
     dragula([document.querySelector('.featured-topic-list')]).on(
       'drop',
       async (_draggedEle, _targetDiv, sourceDiv) => {
-        storeNewTopicOrder(sourceDiv, this.topics);
+        this._storeNewTopicOrder(sourceDiv);
       }
     );
   }
 
   view() {
-    const { topics } = this;
-
     return (
       <div class="OrderTopicsModal">
         <h3 class="compact-modal-title">Reorder Topics</h3>
         <div class="compact-modal-body">
           <div class="featured-topic-list">
-            {topics.map((t) => (
+            {this.topics.map((t) => (
               <div class="topic-row">
                 <CWText>{t.name}</CWText>
                 <CWIcon iconName="hamburger" />
@@ -81,7 +76,7 @@ export class OrderTopicsModal implements m.ClassComponent {
             onclick={async (e) => {
               e.preventDefault();
               try {
-                app.topics.updateFeaturedOrder(topics);
+                app.topics.updateFeaturedOrder(this.topics);
                 $(e.target).trigger('modalexit');
               } catch (err) {
                 notifyError('Failed to update order');
