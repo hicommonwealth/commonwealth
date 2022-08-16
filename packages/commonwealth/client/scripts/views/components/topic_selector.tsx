@@ -13,7 +13,7 @@ type TopicSelectorAttrs = {
   defaultTopic?: Topic | string | boolean;
   tabindex?: number;
   topics: Topic[];
-  updateFormData: () => void;
+  updateFormData: (topic: Topic, topicId?: string) => void;
 };
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
@@ -74,7 +74,7 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
         class="TopicSelector"
         filterable={false}
         checkmark={false}
-        closeOnSelect={true}
+        closeOnSelect
         emptyContent={
           // This appears if no topics are available because all require token thresholds
           <Callout

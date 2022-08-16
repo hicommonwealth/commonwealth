@@ -8,12 +8,12 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
-import { Thread } from 'models';
+import { Thread, Topic } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
 
 type ThreadMenuItemAttrs = { proposal: Thread };
 
@@ -80,10 +80,14 @@ export class ThreadSubscriptionMenuItem
 }
 
 export class ChangeTopicMenuItem
-  implements m.ClassComponent<{ proposal: Thread }>
+  implements
+    m.ClassComponent<{
+      onChangeHandler: (topic: Topic) => void;
+      proposal: Thread;
+    }>
 {
   view(vnode) {
-    const { proposal } = vnode.attrs;
+    const { onChangeHandler, proposal } = vnode.attrs;
 
     return (
       <MenuItem
@@ -93,10 +97,7 @@ export class ChangeTopicMenuItem
           app.modals.create({
             modal: ChangeTopicModal,
             data: {
-              // onChangeHandler: (topic: Topic) => {
-              //   proposal.topic = topic;
-              //   m.redraw();
-              // },
+              onChangeHandler,
               thread: proposal,
             },
           });

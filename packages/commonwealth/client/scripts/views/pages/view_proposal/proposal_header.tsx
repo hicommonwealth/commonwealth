@@ -9,7 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { Thread, ThreadKind, AnyProposal } from 'models';
+import { Thread, ThreadKind, AnyProposal, Topic } from 'models';
 import {
   ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
@@ -174,7 +174,13 @@ export class ProposalHeader
                                 proposal,
                               }),
                             isAdmin && proposal instanceof Thread && (
-                              <ChangeTopicMenuItem proposal={proposal} />
+                              <ChangeTopicMenuItem
+                                proposal={proposal}
+                                onChangeHandler={(topic: Topic) => {
+                                  proposal.topic = topic;
+                                  m.redraw();
+                                }}
+                              />
                             ),
                             (isAuthor || isAdmin || app.user.isSiteAdmin) &&
                               m(ProposalBodyDeleteMenuItem, { item: proposal }),

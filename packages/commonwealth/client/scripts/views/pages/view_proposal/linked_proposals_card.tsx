@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/view_proposal/linked_proposals_card.scss';
 
@@ -12,7 +11,7 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { Thread } from 'models';
+import { Thread, ThreadStage } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
@@ -152,10 +151,10 @@ export class LinkedProposalsCard
               app.modals.create({
                 modal: UpdateProposalStatusModal,
                 data: {
-                  // onChangeHandler={(stage: ThreadStage) => {
-                  //   proposal.stage = stage;
-                  //   m.redraw();
-                  // }},
+                  onChangeHandler: (stage: ThreadStage) => {
+                    proposal.stage = stage;
+                    m.redraw();
+                  },
                   thread: proposal,
                 },
               });
