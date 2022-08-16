@@ -7,6 +7,7 @@ import 'components/proposals/aave_proposal_card_detail.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import User from '../widgets/user';
 import { CWText } from '../component_kit/cw_text';
+import { CWLabel } from '../component_kit/cw_label';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);
@@ -33,22 +34,28 @@ export class AaveProposalCardDetail
 
     return (
       <div class="AaveProposalCardDetail">
-        <div class="aave-metadata">
-          <div class="aave-author">
-            <CWText>Author</CWText>
+        <div class="aave-metadata-container">
+          <div class="aave-metadata-column">
+            <CWLabel label="Author" />
             {proposal.ipfsData?.author
               ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
                   return idx === 0 ? (
-                    <p class="collapsed-line-height">{ele}</p>
+                    <CWText>{ele}</CWText>
                   ) : (
-                    <p class="card-subheader">{ele.slice(0, ele.length - 1)}</p>
+                    <CWText type="caption" className="ipfs-subheader-text">
+                      {ele.slice(0, ele.length - 1)}
+                    </CWText>
                   );
                 })
-              : m(User, { user: proposal.author, popover: true })}
+              : m(User, {
+                  user: proposal.author,
+                  hideAvatar: true,
+                  linkify: true,
+                })}
           </div>
-          <div class="aave-status">
-            <CWText>Status</CWText>
-            <CWText>{statusText}</CWText>
+          <div class="aave-metadata-column">
+            <CWLabel label="Status" />
+            <CWText noWrap>{statusText}</CWText>
           </div>
         </div>
         <div class="aave-voting">

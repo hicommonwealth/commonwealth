@@ -1,4 +1,24 @@
 @import 'shared';
 
 .AaveProposalCardDetail {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .aave-metadata-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .aave-metadata-column {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+
+      .ipfs-subheader-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
 }

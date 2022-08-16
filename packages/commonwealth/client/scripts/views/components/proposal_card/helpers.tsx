@@ -5,11 +5,10 @@ import m from 'mithril'; // required for getStatusText
 import moment from 'moment';
 import { AaveTypes, CompoundTypes } from 'chain-events/src';
 
-import 'components/proposal_card.scss';
+import 'components/proposal_card/index.scss';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
 import { ProposalStatus, AnyProposal } from 'models';
-
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import MolochProposal, {
@@ -17,8 +16,13 @@ import MolochProposal, {
 } from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-
 import { Countdown } from 'views/components/countdown';
+import { SubstrateDemocracyReferendum } from 'client/scripts/controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
+import {
+  chainEntityTypeToProposalShortName,
+  proposalSlugToChainEntityType,
+} from 'client/scripts/identifiers';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing
@@ -178,4 +182,39 @@ export const getStatusText = (proposal: AnyProposal) => {
   if (proposal.isPassing === ProposalStatus.Failing)
     return ['Not passing, ', countdown];
   return '';
+};
+
+export const primaryTagText = (proposal: AnyProposal) => [
+  chainEntityTypeToProposalShortName(
+    proposalSlugToChainEntityType(proposal.slug)
+  ),
+  ' ',
+  proposal.shortIdentifier,
+];
+
+export const getSecondaryTagText = (proposal: AnyProposal) => {
+  if (
+    (proposal instanceof SubstrateDemocracyProposal ||
+      proposal instanceof SubstrateCollectiveProposal) &&
+    proposal.getReferendum()
+  ) {
+    return `REF #${proposal.getReferendum().identifier}`;
+  } else if (proposal instanceof SubstrateDemocracyReferendum) {
+    const originatingProposalOrMotion = proposal.getProposalOrMotion(
+      proposal.preimage
+    );
+
+    return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
+      ? `PROP #${originatingProposalOrMotion.identifier}`
+      : originatingProposalOrMotion instanceof SubstrateCollectiveProposal
+      ? `MOT #${originatingProposalOrMotion.identifier}`
+      : 'MISSING PROP';
+  } else if (
+    proposal instanceof SubstrateTreasuryProposal &&
+    !proposal.data.index
+  ) {
+    return 'MISSING DATA';
+  } else {
+    return false;
+  }
 };

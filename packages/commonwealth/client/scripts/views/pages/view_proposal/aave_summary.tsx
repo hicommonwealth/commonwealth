@@ -17,12 +17,12 @@ export class AaveViewProposalDetail
     return (
       <div class="AaveSummary">
         {proposal.ipfsData?.shortDescription && (
-          <>
+          <div>
             <CWText type="h4" fontWeight="semiBold">
               Simple Summary
             </CWText>
             <CWText>{proposal.ipfsData?.shortDescription}</CWText>
-          </>
+          </div>
         )}
         <CWText type="h4" fontWeight="semiBold">
           Voting

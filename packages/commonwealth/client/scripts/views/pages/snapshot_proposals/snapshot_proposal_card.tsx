@@ -2,15 +2,15 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import { Tag } from 'construct-ui';
 
-import 'components/proposal_card.scss';
+import 'components/proposal_card/index.scss';
 
 import app from 'state';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
+import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 
 export class SnapshotProposalCard
   implements
@@ -43,13 +43,10 @@ export class SnapshotProposalCard
         }}
       >
         <div class="proposal-card-metadata">
-          <Tag
+          <ProposalTag
             label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
               proposal.ipfs.length - 6
             )}`}
-            intent="primary"
-            rounded={true}
-            size="xs"
           />
           <div class="proposal-title">{proposal.title}</div>
         </div>
