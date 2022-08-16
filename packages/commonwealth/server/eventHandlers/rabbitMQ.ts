@@ -13,6 +13,10 @@ export class RabbitMqHandler extends RabbitMQController implements IEventHandler
   }
 
   public async handle(event: CWEvent): Promise<any> {
+    if (!event) {
+      return;
+    }
+
     try {
       await this.publish(event, this.publication);
     } catch (err) {
