@@ -2,4 +2,10 @@
 
 .FeedbackModal {
   width: 400px;
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 }

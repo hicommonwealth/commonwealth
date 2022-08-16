@@ -160,6 +160,9 @@ $width: 360px;
   }
 
   .form-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: $width;
   }
 }

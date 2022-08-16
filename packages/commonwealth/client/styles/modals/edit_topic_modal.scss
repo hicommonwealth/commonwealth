@@ -7,16 +7,22 @@
     width: 100%;
   }
 
-  .checkboxes-container {
+  .compact-modal-body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 24px;
-  }
+    gap: 16px;
 
-  .buttons-row {
-    display: flex;
-    gap: 8px;
-    width: 100%;
+    .checkboxes-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
   }
 }

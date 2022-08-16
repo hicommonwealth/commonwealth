@@ -6,9 +6,8 @@ import 'components/component_kit/cw_text_area.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
-import { CWLabel } from './cw_label';
-import { CWValidationText, ValidationStatus } from './cw_validation_text';
-import { TextInputAttrs } from './cw_text_input';
+import { ValidationStatus } from './cw_validation_text';
+import { MessageRow, TextInputAttrs } from './cw_text_input';
 
 type TextAreaStyleAttrs = {
   disabled?: boolean;
@@ -25,7 +24,7 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
     const {
       autocomplete,
       autofocus,
-      defaultValue,
+      value,
       disabled,
       inputValidationFn,
       label,
@@ -38,7 +37,14 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
 
     return (
       <div class={ComponentType.TextArea}>
-        {label && <CWLabel label={label} />}
+        {label && (
+          <MessageRow
+            hasFeedback={!!inputValidationFn}
+            label={label}
+            statusMessage={this.statusMessage}
+            validationStatus={this.validationStatus}
+          />
+        )}
         <textarea
           autofocus={autofocus}
           autocomplete={autocomplete}
@@ -89,14 +95,8 @@ export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
               }
             }
           }}
-          defaultValue={defaultValue}
+          value={value}
         />
-        {this.statusMessage && (
-          <CWValidationText
-            message={this.statusMessage}
-            status={this.validationStatus}
-          />
-        )}
       </div>
     );
   }
