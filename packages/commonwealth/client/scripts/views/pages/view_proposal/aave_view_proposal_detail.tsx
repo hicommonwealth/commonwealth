@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { roundVote } from '../../components/proposals/aave_proposal_card_detail';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export class AaveViewProposalDetail
   implements m.ClassComponent<{ proposal: AaveProposal }>
@@ -13,36 +14,38 @@ export class AaveViewProposalDetail
 
     return (
       <div class="AaveViewProposalDetail">
-        <h3>Voting</h3>
-        <div class="aave-turnout">
-          <p class="detail-highlight emphasize">
+        <CWText type="h4" fontWeight="semiBold">
+          Voting
+        </CWText>
+        <div>
+          <CWText type="h5" fontWeight="semiBold">
             {roundVote(proposal.turnout * 100)}%
-          </p>
-          <p> of token holders</p>
+          </CWText>
+          <CWText>of token holders</CWText>
         </div>
-        <div class="aave-support">
-          <p class="detail-highlight emphasize">
+        <div>
+          <CWText type="h5" fontWeight="semiBold">
             {roundVote(proposal.support * 100)}%
-          </p>
-          <p> in favor</p>
+          </CWText>
+          <CWText>in favor</CWText>
         </div>
-        <div class="aave-differential">
-          <p class="detail-highlight emphasize">
+        <div>
+          <CWText type="h5" fontWeight="semiBold">
             {roundVote(proposal.voteDifferential * 100)}%
-          </p>
-          <p> differential</p>
+          </CWText>
+          <CWText>differential</CWText>
         </div>
-        <div class="aave-turnout-requirement">
-          <p class="detail-highlight emphasize">
+        <div>
+          <CWText type="h5" fontWeight="semiBold">
             {proposal.minimumQuorum * 100}%
-          </p>
-          <p> of token holders required to pass</p>
+          </CWText>
+          <CWText>of token holders required to pass</CWText>
         </div>
-        <div class="aave-differential-requirement">
-          <p class="detail-highlight emphasize">
+        <div>
+          <CWText type="h5" fontWeight="semiBold">
             {proposal.minimumVoteDifferential * 100}%
-          </p>
-          <p> differential required to pass</p>
+          </CWText>
+          <CWText>differential required to pass</CWText>
         </div>
       </div>
     );
@@ -59,8 +62,10 @@ export class AaveViewProposalSummary
 
     return (
       <div class="AaveViewProposalSummary">
-        <h3>Simple Summary</h3>
-        <div class="aave-summary">{proposal.ipfsData?.shortDescription}</div>
+        <CWText type="h4" fontWeight="semiBold">
+          Simple Summary
+        </CWText>
+        <CWText>{proposal.ipfsData?.shortDescription}</CWText>
       </div>
     );
   }

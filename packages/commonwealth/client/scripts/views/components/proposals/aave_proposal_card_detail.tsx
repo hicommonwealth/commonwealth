@@ -6,6 +6,7 @@ import 'components/proposals/aave_detail.scss';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import User from '../widgets/user';
+import { CWText } from '../component_kit/cw_text';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);
@@ -39,7 +40,7 @@ export class AaveProposalCardDetail
       >
         <div class="aave-metadata">
           <div class="aave-author">
-            <div class="card-subheader">Author</div>
+            <CWText>Author</CWText>
             {proposal.ipfsData?.author
               ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
                   return idx === 0 ? (
@@ -51,44 +52,44 @@ export class AaveProposalCardDetail
               : m(User, { user: proposal.author, popover: true })}
           </div>
           <div class="aave-status">
-            <div class="card-subheader">Status</div>
-            <div class="proposal-injected-status">{statusText}</div>
+            <CWText>Status</CWText>
+            <CWText>{statusText}</CWText>
           </div>
         </div>
         <div class="aave-voting">
-          <div class="card-subheader">Voting</div>
-          <div class="aave-turnout">
-            <p class="detail-highlight emphasize">
+          <CWText>Voting</CWText>
+          <div>
+            <CWText type="h5" fontWeight="semiBold">
               {roundVote(proposal.turnout * 100)}%
-            </p>
-            <p>of token holders</p>
+            </CWText>
+            <CWText>of token holders</CWText>
           </div>
-          <div class="aave-support">
-            <p class="detail-highlight emphasize">
+          <div>
+            <CWText type="h5" fontWeight="semiBold">
               {roundVote(proposal.support * 100)}%
-            </p>
-            <p>in favor</p>
+            </CWText>
+            <CWText>in favor</CWText>
           </div>
-          <div class="aave-differential">
-            <p class="detail-highlight emphasize">
+          <div>
+            <CWText type="h5" fontWeight="semiBold">
               {roundVote(proposal.voteDifferential * 100)}%
-            </p>
-            <p>differential</p>
+            </CWText>
+            <CWText>differential</CWText>
           </div>
         </div>
         <div class="aave-requirements">
-          <div class="card-subheader">Required to pass</div>
-          <div class="aave-turnout-requirement">
-            <p class="detail-highlight emphasize">
+          <CWText>Required to pass</CWText>
+          <div>
+            <CWText type="h5" fontWeight="semiBold">
               {proposal.minimumQuorum * 100}%
-            </p>
-            <p>of token holders</p>
+            </CWText>
+            <CWText>of token holders</CWText>
           </div>
-          <div class="aave-differential-requirement">
-            <p class="detail-highlight emphasize">
+          <div>
+            <CWText type="h5" fontWeight="semiBold">
               {proposal.minimumVoteDifferential * 100}%
-            </p>
-            <p>differential</p>
+            </CWText>
+            <CWText>differential</CWText>
           </div>
         </div>
       </div>
