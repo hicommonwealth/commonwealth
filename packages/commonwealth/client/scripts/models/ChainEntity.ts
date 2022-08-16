@@ -4,7 +4,7 @@ import { IChainEntityKind } from 'chain-events/src';
 import ChainEvent from './ChainEvent';
 
 class ChainEntity {
-  public readonly id?: number;
+  public readonly id?: number; // this id is the chain-events service chain-entity id -> equivalent to ce_id in ChainEntityMeta in main service
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;

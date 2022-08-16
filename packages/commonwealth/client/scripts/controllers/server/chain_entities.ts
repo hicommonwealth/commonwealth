@@ -105,6 +105,7 @@ class ChainEntityController {
       options.completed = true;
     }
 
+    // TODO: do in parallel and consolidate when both return
     // load the chain-entity objects
     const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents), options);
     if (entities) {
@@ -276,6 +277,17 @@ class ChainEntityController {
       const incomingEvents = await processor.process(block);
       this._handleEvents(chain, network, incomingEvents);
     });
+  }
+
+  private async fetchEntity(entity_type: string, entity_type_id: string) {
+
+  }
+
+  private async getEntityId(entity: ChainEntity) {
+    if (entity.id) return entity.id;
+    else {
+
+    }
   }
 }
 
