@@ -28,6 +28,8 @@ import {
   Account,
   ProposalModule,
   DepositVote,
+  ThreadStage,
+  ChainEntity,
 } from 'models';
 import { VotingResults } from 'views/components/proposals/voting_results';
 import { VotingActions } from 'views/components/proposals/voting_actions';
@@ -81,6 +83,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { ProposalHeader } from './proposal_header';
+import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1033,6 +1036,19 @@ const ViewProposalPage: m.Component<
                 showLinkedSnapshotOptions &&
                   proposal instanceof Thread &&
                   m(LinkedProposalsCard, {
+                    onChangeHandler: (
+                      stage: ThreadStage,
+                      chainEntities: ChainEntity[],
+                      snapshotProposal: SnapshotProposal[]
+                    ) => {
+                      proposal.stage = stage;
+                      proposal.chainEntities = chainEntities;
+                      if (app.chain?.meta.snapshot) {
+                        proposal.snapshotProposal = snapshotProposal[0]?.id;
+                      }
+                      app.threads.fetchThreadsFromId([proposal.identifier]);
+                      m.redraw();
+                    },
                     proposal,
                     showAddProposalButton: isAuthor || isAdminOrMod,
                   }),
@@ -1153,6 +1169,19 @@ const ViewProposalPage: m.Component<
             showLinkedSnapshotOptions &&
               proposal instanceof Thread &&
               m(LinkedProposalsCard, {
+                onChangeHandler: (
+                  stage: ThreadStage,
+                  chainEntities: ChainEntity[],
+                  snapshotProposal: SnapshotProposal[]
+                ) => {
+                  proposal.stage = stage;
+                  proposal.chainEntities = chainEntities;
+                  if (app.chain?.meta.snapshot) {
+                    proposal.snapshotProposal = snapshotProposal[0]?.id;
+                  }
+                  app.threads.fetchThreadsFromId([proposal.identifier]);
+                  m.redraw();
+                },
                 proposal,
                 showAddProposalButton: isAuthor || isAdminOrMod,
               }),

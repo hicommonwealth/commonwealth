@@ -8,7 +8,7 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
-import { Thread, Topic } from 'models';
+import { Thread, ThreadStage, Topic } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -108,36 +108,20 @@ export class ChangeTopicMenuItem
 }
 
 class UpdateProposalStatusMenuItem
-  implements m.ClassComponent<{ proposal: Thread }>
+  implements
+    m.ClassComponent<{
+      onChangeHandler: (stage: ThreadStage) => void;
+      proposal: Thread;
+    }>
 {
   view(vnode) {
-    const { proposal } = vnode.attrs;
+    const { onChangeHandler, proposal } = vnode.attrs;
 
     if (!app.chain?.meta) return;
 
     const { stagesEnabled } = app.chain?.meta;
 
     if (!stagesEnabled) return;
-
-    //   <UpdateProposalStatusModal
-    //   thread={vnode.attrs.proposal as Thread}
-    //   onChangeHandler={(
-    //     stage: ThreadStage,
-    //     chainEntities: ChainEntity[],
-    //     snapshotProposal: SnapshotProposal[]
-    //   ) => {
-    //     proposal.stage = stage;
-    //     proposal.chainEntities = chainEntities;
-    //     if (app.chain?.meta.snapshot) {
-    //       proposal.snapshotProposal =
-    //         snapshotProposal[0]?.id;
-    //     }
-    //     app.threads.fetchThreadsFromId([
-    //       proposal.identifier,
-    //     ]);
-    //     m.redraw();
-    //   }}
-    // />
 
     return (
       <MenuItem
@@ -147,10 +131,7 @@ class UpdateProposalStatusMenuItem
           app.modals.create({
             modal: UpdateProposalStatusModal,
             data: {
-              // onChangeHandler={(stage: ThreadStage) => {
-              //   proposal.stage = stage;
-              //   m.redraw();
-              // }},
+              onChangeHandler,
               thread: proposal,
             },
           });
@@ -256,7 +237,13 @@ export class DiscussionRowMenu
             ),
             hasAdminPermissions && <ChangeTopicMenuItem proposal={proposal} />,
             (isAuthor || hasAdminPermissions) && (
-              <UpdateProposalStatusMenuItem proposal={proposal} />
+              <UpdateProposalStatusMenuItem
+                proposal={proposal}
+                onChangeHandler={(stage: ThreadStage) => {
+                  proposal.stage = stage;
+                  m.redraw();
+                }}
+              />
             ),
             (isAuthor || hasAdminPermissions || app.user.isSiteAdmin) && (
               <ThreadDeletionMenuItem proposal={proposal} />

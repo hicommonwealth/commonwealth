@@ -15,7 +15,11 @@ import { SnapshotProposalSelector } from '../components/snapshot_proposal_select
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type UpdateProposalStatusModalAttrs = {
-  onChangeHandler: () => void;
+  onChangeHandler: (
+    stage: ThreadStage,
+    chainEntities?: ChainEntity[],
+    snapshotProposal?: SnapshotProposal[]
+  ) => void;
   thread: Thread;
 };
 

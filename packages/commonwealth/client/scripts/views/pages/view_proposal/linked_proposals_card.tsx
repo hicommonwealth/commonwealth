@@ -11,7 +11,7 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { Thread, ThreadStage } from 'models';
+import { ChainEntity, Thread, ThreadStage } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
@@ -105,12 +105,17 @@ class ProposalSidebarLinkedSnapshot
 export class LinkedProposalsCard
   implements
     m.ClassComponent<{
+      onChangeHandler: (
+        stage: ThreadStage,
+        chainEntities?: ChainEntity[],
+        snapshotProposal?: SnapshotProposal[]
+      ) => void;
       proposal: Thread;
       showAddProposalButton: boolean;
     }>
 {
   view(vnode) {
-    const { proposal, showAddProposalButton } = vnode.attrs;
+    const { onChangeHandler, proposal, showAddProposalButton } = vnode.attrs;
 
     return (
       <CWCard className="LinkedProposalsCard">
@@ -151,10 +156,7 @@ export class LinkedProposalsCard
               app.modals.create({
                 modal: UpdateProposalStatusModal,
                 data: {
-                  onChangeHandler: (stage: ThreadStage) => {
-                    proposal.stage = stage;
-                    m.redraw();
-                  },
+                  onChangeHandler,
                   thread: proposal,
                 },
               });
