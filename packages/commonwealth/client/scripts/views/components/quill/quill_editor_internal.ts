@@ -72,7 +72,8 @@ export default class QuillEditorInternal {
           [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
         ]),
         imageDropAndPaste: {
-          handler: this._imageHandler,
+          handler: (imageDataUrl, type) =>
+            this._imageHandler(imageDataUrl, type),
         },
         // TODO: Currently works, but throws Parchment error. Smooth functionality
         // requires troubleshooting
@@ -88,7 +89,7 @@ export default class QuillEditorInternal {
           mentionDenotationChars: ['@'],
           dataAttributes: ['name', 'link', 'component'],
           renderItem: (item) => item.component,
-          onSelect: this._selectMention,
+          onSelect: (item: QuillMention) => this._selectMention(item),
           source: _.debounce(this._queryMentions, 300, {
             leading: true,
             trailing: true,
@@ -152,7 +153,6 @@ export default class QuillEditorInternal {
     // Restore defaultContent
     if (defaultContents) this._restoreSavedContents(defaultContents);
 
-    // TODO: What is the purpose of this??
     setInterval(() => {
       if (this._unsavedChanges.length() > 0) {
         if (this._quill.isEnabled()) {
@@ -166,7 +166,7 @@ export default class QuillEditorInternal {
         }
         m.redraw();
       }
-    }, 2500);
+    }, 250);
 
     return this._quill;
   }
@@ -926,7 +926,6 @@ export default class QuillEditorInternal {
 
   private _listAutofillHandler(range, context) {
     if (this._activeMode === 'markdown') return true;
-    debugger;
     const length = context.prefix.length;
     const [line, offset] = this._quill.getLine(range.index);
 

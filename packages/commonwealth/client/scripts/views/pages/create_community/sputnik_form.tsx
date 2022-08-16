@@ -26,7 +26,6 @@ import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
-
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
@@ -46,7 +45,7 @@ export class SputnikForm implements m.ClassComponent {
       <div class="CreateCommunityForm">
         <InputRow
           title="DAO Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v.toLowerCase();
           }}
@@ -147,7 +146,7 @@ export class SputnikForm implements m.ClassComponent {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id,
+                  res.result.role.chain_id
                 );
               }
               await initAppState(false);

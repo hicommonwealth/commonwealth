@@ -109,7 +109,7 @@ class DelegateForm implements m.ClassComponent {
           <CWTextInput
             label="Amount to delegate"
             placeholder="10000"
-            defaultValue=""
+            value=""
             oninput={(e) => {
               const result = (e.target as any).value;
               this.form.amount = result;

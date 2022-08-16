@@ -3,6 +3,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -24,8 +25,8 @@ import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-// import { NewLoginModal } from '../../modals/login_modal';
-// import { isWindowMediumSmallInclusive } from './helpers';
+import { NewLoginModal } from '../../modals/login_modal';
+import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -62,7 +63,7 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        {/* <CWButton
+        <CWButton
           label="Click for Login modal"
           onclick={() =>
             app.modals.create({
@@ -74,7 +75,7 @@ export class ComponentShowcase implements m.ClassComponent {
               },
             })
           }
-        /> */}
+        />
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWThreadVoteButton
@@ -307,7 +308,7 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Text field"
             label="Disabled"
             disabled
-            defaultValue="Some disabled text"
+            value="Some disabled text"
           />
           <CWTextInput
             name="Text field dark mode"

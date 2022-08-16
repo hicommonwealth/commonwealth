@@ -15,11 +15,7 @@ export class CWLabel implements m.ClassComponent<LabelAttrs> {
   view(vnode) {
     const { label } = vnode.attrs;
     return (
-      <CWText
-        type="caption"
-        fontWeight="medium"
-        className={ComponentType.Label}
-      >
+      <CWText type="caption" className={ComponentType.Label}>
         {label}
       </CWText>
     );

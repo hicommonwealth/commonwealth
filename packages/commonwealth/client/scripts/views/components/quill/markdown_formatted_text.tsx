@@ -11,12 +11,9 @@ import 'components/quill/markdown_formatted_text.scss';
 
 import { getClasses } from '../component_kit/helpers';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { countLinesMarkdown } from './helpers';
 
 const renderer = new marked.Renderer();
-
-const countLinesMarkdown = (text) => {
-  return text.split('\n').length - 1;
-};
 
 marked.setOptions({
   renderer,
