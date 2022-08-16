@@ -15,7 +15,6 @@ import {
   chainEntityTypeToProposalShortName,
   getProposalUrlPath,
 } from 'identifiers';
-
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -37,7 +36,7 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
     return (
       <CWCard
         elevation="elevation-2"
-        interactive={true}
+        interactive
         className="ProposalCard"
         onclick={(e) => {
           e.stopPropagation();

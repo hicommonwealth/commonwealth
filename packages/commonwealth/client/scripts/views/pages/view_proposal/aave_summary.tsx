@@ -2,6 +2,8 @@
 
 import m from 'mithril';
 
+import 'pages/view_proposal/aave_summary.scss';
+
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { roundVote } from '../../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -13,7 +15,15 @@ export class AaveViewProposalDetail
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="AaveViewProposalDetail">
+      <div class="AaveSummary">
+        {proposal.ipfsData?.shortDescription && (
+          <>
+            <CWText type="h4" fontWeight="semiBold">
+              Simple Summary
+            </CWText>
+            <CWText>{proposal.ipfsData?.shortDescription}</CWText>
+          </>
+        )}
         <CWText type="h4" fontWeight="semiBold">
           Voting
         </CWText>
@@ -47,25 +57,6 @@ export class AaveViewProposalDetail
           </CWText>
           <CWText>differential required to pass</CWText>
         </div>
-      </div>
-    );
-  }
-}
-
-export class AaveViewProposalSummary
-  implements m.ClassComponent<{ proposal: AaveProposal }>
-{
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-
-    if (!proposal.ipfsData?.shortDescription) return;
-
-    return (
-      <div class="AaveViewProposalSummary">
-        <CWText type="h4" fontWeight="semiBold">
-          Simple Summary
-        </CWText>
-        <CWText>{proposal.ipfsData?.shortDescription}</CWText>
       </div>
     );
   }

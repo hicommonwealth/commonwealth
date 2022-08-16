@@ -39,10 +39,6 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import Poll from 'models/Poll';
 import {
-  AaveViewProposalDetail,
-  AaveViewProposalSummary,
-} from './aave_view_proposal_detail';
-import {
   activeQuillEditorHasText,
   GlobalStatus,
   ProposalBodyAvatar,
@@ -81,6 +77,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { ProposalHeader } from './proposal_header';
+import { AaveViewProposalDetail } from './aave_summary';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1014,7 +1011,6 @@ const ViewProposalPage: m.Component<
                 !(proposal instanceof Thread) &&
                   m(LinkedProposalsEmbed, { proposal }),
                 proposal instanceof AaveProposal && [
-                  m(AaveViewProposalSummary, { proposal }),
                   m(AaveViewProposalDetail, { proposal }),
                 ],
                 !(proposal instanceof Thread) && m(VotingResults, { proposal }),
@@ -1152,7 +1148,6 @@ const ViewProposalPage: m.Component<
             !(proposal instanceof Thread) &&
               m(LinkedProposalsEmbed, { proposal }),
             proposal instanceof AaveProposal && [
-              m(AaveViewProposalSummary, { proposal }),
               m(AaveViewProposalDetail, { proposal }),
             ],
             !(proposal instanceof Thread) && m(VotingResults, { proposal }),

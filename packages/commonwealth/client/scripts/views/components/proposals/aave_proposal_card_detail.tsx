@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/proposals/aave_detail.scss';
+import 'components/proposals/aave_proposal_card_detail.scss';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import User from '../widgets/user';
@@ -32,12 +32,7 @@ export class AaveProposalCardDetail
     // const executor = proposal.Executor;
 
     return (
-      <div
-        class="AaveProposalCardDetail"
-        onclick={(e) => {
-          e.preventDefault();
-        }}
-      >
+      <div class="AaveProposalCardDetail">
         <div class="aave-metadata">
           <div class="aave-author">
             <CWText>Author</CWText>
