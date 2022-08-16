@@ -218,13 +218,7 @@ class TopicsController {
   };
 
   public updateFeaturedOrder = async (featuredTopics: Topic[]) => {
-    // Only topics which have had their order altered are passed to the backend
-    const reorderedTopics = featuredTopics.filter((t) => {
-      const newPosition = +t.order;
-      const previousPosition = +this.getByIdentifier(t.id).order;
-      return newPosition !== previousPosition;
-    });
-    const orderedIds = reorderedTopics
+    const orderedIds = featuredTopics
       .sort((a, b) => a.order - b.order)
       .map((t) => t.id);
     const response = await $.post(`${app.serverUrl()}/orderTopics`, {
@@ -233,9 +227,9 @@ class TopicsController {
       jwt: app.user.jwt,
     });
 
-    response.result.forEach((t) => {
+    (response.result || []).forEach((t) => {
       // TODO Graham 3/29/22: Add 'update' method to TopicStore,
-      // consolidate methods
+      // consolidate add/remove methods
       const modeledTopic = new Topic(t);
       this.store.remove(modeledTopic);
       this.store.add(modeledTopic);
