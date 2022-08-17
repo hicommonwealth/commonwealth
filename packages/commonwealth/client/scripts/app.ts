@@ -397,7 +397,6 @@ export async function initChain(): Promise<void> {
   if (!app.chain.apiInitialized) {
     await app.chain.initApi();
   }
-  console.log(app.chain.meta);
   app.chain.deferred = false;
   const chain = app.chain.meta;
   await app.chain.initData();
