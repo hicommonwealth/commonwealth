@@ -1,24 +1,40 @@
 @import 'shared';
 
+.aave-num-text.Text {
+  color: $purple-400;
+}
+
 .AaveProposalCardDetail {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   width: 100%;
 
   .aave-metadata-container {
     align-items: center;
     display: flex;
-    justify-content: space-between;
+    gap: 8px;
     width: 100%;
 
     .aave-metadata-column {
       display: flex;
+      flex: 1;
       flex-direction: column;
       overflow: hidden;
 
       .ipfs-subheader-text.Text {
         color: $neutral-500;
       }
+    }
+  }
+
+  .aave-voting-section {
+    display: flex;
+    flex-direction: column;
+
+    .vote-row {
+      display: grid;
+      grid-template-columns: 72px auto;
     }
   }
 }

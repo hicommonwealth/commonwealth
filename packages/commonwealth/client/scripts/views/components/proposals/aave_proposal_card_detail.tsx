@@ -18,6 +18,18 @@ type AaveProposalCardDetailAttrs = {
   statusText: any;
 };
 
+class AavePercent implements m.ClassComponent<{ aaveNum: number }> {
+  view(vnode) {
+    const { aaveNum } = vnode.attrs;
+
+    return (
+      <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
+        {roundVote(aaveNum * 100)}%
+      </CWText>
+    );
+  }
+}
+
 export class AaveProposalCardDetail
   implements m.ClassComponent<AaveProposalCardDetailAttrs>
 {
@@ -37,60 +49,46 @@ export class AaveProposalCardDetail
         <div class="aave-metadata-container">
           <div class="aave-metadata-column">
             <CWLabel label="Author" />
-            {proposal.ipfsData?.author
-              ? proposal.ipfsData.author.split(' (').map((ele, idx) => {
-                  return idx === 0 ? (
-                    <CWText>{ele}</CWText>
-                  ) : (
-                    <CWText type="caption" className="ipfs-subheader-text">
-                      {ele.slice(0, ele.length - 1)}
-                    </CWText>
-                  );
-                })
-              : m(User, {
-                  user: proposal.author,
-                  hideAvatar: true,
-                  linkify: true,
-                })}
+            {proposal.ipfsData?.author ? (
+              <CWText title={proposal.ipfsData.author.split(' (')[0]} noWrap>
+                {proposal.ipfsData.author.split(' (')[0]}
+              </CWText>
+            ) : (
+              m(User, {
+                user: proposal.author,
+                hideAvatar: true,
+                linkify: true,
+              })
+            )}
           </div>
           <div class="aave-metadata-column">
             <CWLabel label="Status" />
             <CWText noWrap>{statusText}</CWText>
           </div>
         </div>
-        <div class="aave-voting">
-          <CWText>Voting</CWText>
-          <div>
-            <CWText type="h5" fontWeight="semiBold">
-              {roundVote(proposal.turnout * 100)}%
-            </CWText>
-            <CWText>of token holders</CWText>
+        <div class="aave-voting-section">
+          <CWLabel label="Voting" />
+          <div class="vote-row">
+            <AavePercent aaveNum={proposal.turnout} />
+            <CWText noWrap>of token holders</CWText>
           </div>
-          <div>
-            <CWText type="h5" fontWeight="semiBold">
-              {roundVote(proposal.support * 100)}%
-            </CWText>
+          <div class="vote-row">
+            <AavePercent aaveNum={proposal.support} />
             <CWText>in favor</CWText>
           </div>
-          <div>
-            <CWText type="h5" fontWeight="semiBold">
-              {roundVote(proposal.voteDifferential * 100)}%
-            </CWText>
+          <div class="vote-row">
+            <AavePercent aaveNum={proposal.voteDifferential} />
             <CWText>differential</CWText>
           </div>
         </div>
-        <div class="aave-requirements">
-          <CWText>Required to pass</CWText>
-          <div>
-            <CWText type="h5" fontWeight="semiBold">
-              {proposal.minimumQuorum * 100}%
-            </CWText>
+        <div class="aave-voting-section">
+          <CWLabel label="Required to pass" />
+          <div class="vote-row">
+            <AavePercent aaveNum={proposal.minimumQuorum} />
             <CWText>of token holders</CWText>
           </div>
-          <div>
-            <CWText type="h5" fontWeight="semiBold">
-              {proposal.minimumVoteDifferential * 100}%
-            </CWText>
+          <div class="vote-row">
+            <AavePercent aaveNum={proposal.minimumVoteDifferential} />
             <CWText>differential</CWText>
           </div>
         </div>
