@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import { Tag } from 'construct-ui';
+import $ from 'jquery';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
@@ -99,6 +100,25 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
             m.redraw();
           }}
           label="View more communities"
+        />
+        <CWButton
+          onclick={async () => {
+            // TODO: For testing, delete when merged
+            try {
+              const res = await $.post(`${app.serverUrl()}/bulkBalances`, {
+                userId: 47203,
+                '37': [
+                  '0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F',
+                  '0x383518188C0C6d7730D91b2c03a03C837814a899',
+                ],
+                '38': ['0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F'],
+              });
+              console.log('res', res);
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          label="test me"
         />
       </div>
     );
