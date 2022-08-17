@@ -18,14 +18,19 @@ type AaveProposalCardDetailAttrs = {
   statusText: any;
 };
 
-class AavePercent implements m.ClassComponent<{ aaveNum: number }> {
+export class AaveInfoRow
+  implements m.ClassComponent<{ aaveNum: number; aaveText: string }>
+{
   view(vnode) {
-    const { aaveNum } = vnode.attrs;
+    const { aaveNum, aaveText } = vnode.attrs;
 
     return (
-      <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
-        {roundVote(aaveNum * 100)}%
-      </CWText>
+      <div class="AaveInfoRow">
+        <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
+          {roundVote(aaveNum * 100)}%
+        </CWText>
+        <CWText noWrap>{aaveText}</CWText>
+      </div>
     );
   }
 }
@@ -68,29 +73,23 @@ export class AaveProposalCardDetail
         </div>
         <div class="aave-voting-section">
           <CWLabel label="Voting" />
-          <div class="vote-row">
-            <AavePercent aaveNum={proposal.turnout} />
-            <CWText noWrap>of token holders</CWText>
-          </div>
-          <div class="vote-row">
-            <AavePercent aaveNum={proposal.support} />
-            <CWText>in favor</CWText>
-          </div>
-          <div class="vote-row">
-            <AavePercent aaveNum={proposal.voteDifferential} />
-            <CWText>differential</CWText>
-          </div>
+          <AaveInfoRow aaveNum={proposal.turnout} aaveText="of token holders" />
+          <AaveInfoRow aaveNum={proposal.support} aaveText="in favor" />
+          <AaveInfoRow
+            aaveNum={proposal.voteDifferential}
+            aaveText="differential"
+          />
         </div>
         <div class="aave-voting-section">
           <CWLabel label="Required to pass" />
-          <div class="vote-row">
-            <AavePercent aaveNum={proposal.minimumQuorum} />
-            <CWText>of token holders</CWText>
-          </div>
-          <div class="vote-row">
-            <AavePercent aaveNum={proposal.minimumVoteDifferential} />
-            <CWText>differential</CWText>
-          </div>
+          <AaveInfoRow
+            aaveNum={proposal.minimumQuorum}
+            aaveText="of token holders"
+          />
+          <AaveInfoRow
+            aaveNum={proposal.minimumVoteDifferential}
+            aaveText="differential"
+          />
         </div>
       </div>
     );

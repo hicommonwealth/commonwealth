@@ -1,7 +1,12 @@
 @import 'shared';
 
-.aave-num-text.Text {
-  color: $purple-400;
+.AaveInfoRow {
+  display: grid;
+  grid-template-columns: 72px auto;
+
+  .aave-num-text.Text {
+    color: $purple-400;
+  }
 }
 
 .AaveProposalCardDetail {
@@ -31,10 +36,5 @@
   .aave-voting-section {
     display: flex;
     flex-direction: column;
-
-    .vote-row {
-      display: grid;
-      grid-template-columns: 72px auto;
-    }
   }
 }

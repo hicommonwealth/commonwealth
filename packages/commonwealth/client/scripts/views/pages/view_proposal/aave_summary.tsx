@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/view_proposal/aave_summary.scss';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { roundVote } from '../../components/proposals/aave_proposal_card_detail';
+import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../../components/component_kit/cw_text';
 
 export class AaveViewProposalDetail
@@ -27,36 +27,20 @@ export class AaveViewProposalDetail
         <CWText type="h4" fontWeight="semiBold">
           Voting
         </CWText>
-        <div>
-          <CWText type="h5" fontWeight="semiBold">
-            {roundVote(proposal.turnout * 100)}%
-          </CWText>
-          <CWText>of token holders</CWText>
-        </div>
-        <div>
-          <CWText type="h5" fontWeight="semiBold">
-            {roundVote(proposal.support * 100)}%
-          </CWText>
-          <CWText>in favor</CWText>
-        </div>
-        <div>
-          <CWText type="h5" fontWeight="semiBold">
-            {roundVote(proposal.voteDifferential * 100)}%
-          </CWText>
-          <CWText>differential</CWText>
-        </div>
-        <div>
-          <CWText type="h5" fontWeight="semiBold">
-            {proposal.minimumQuorum * 100}%
-          </CWText>
-          <CWText>of token holders required to pass</CWText>
-        </div>
-        <div>
-          <CWText type="h5" fontWeight="semiBold">
-            {proposal.minimumVoteDifferential * 100}%
-          </CWText>
-          <CWText>differential required to pass</CWText>
-        </div>
+        <AaveInfoRow aaveNum={proposal.turnout} aaveText="of token holders" />
+        <AaveInfoRow aaveNum={proposal.support} aaveText="in favor" />
+        <AaveInfoRow
+          aaveNum={proposal.voteDifferential}
+          aaveText="differential"
+        />
+        <AaveInfoRow
+          aaveNum={proposal.minimumQuorum}
+          aaveText="of token holders required to pass"
+        />
+        <AaveInfoRow
+          aaveNum={proposal.minimumVoteDifferential}
+          aaveText="differential required to pass"
+        />
       </div>
     );
   }
