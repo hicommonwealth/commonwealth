@@ -42,7 +42,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get api() { return window.keplr; }
   public get offlineSigner() { return this._offlineSigner; }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     if (!this._chainId || !window.keplr?.signAmino)
       throw new Error('Missing or misconfigured web wallet');
 

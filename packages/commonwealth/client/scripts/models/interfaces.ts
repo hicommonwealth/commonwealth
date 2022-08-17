@@ -16,7 +16,7 @@ export interface IBlockInfo {
 
 // Implemented by a chain's top-level module. Responsible for high-level
 // metadata, API, and event-handling functionality.
-export interface IChainModule<C extends Coin, A extends Account<C>> {
+export interface IChainModule<C extends Coin, A extends Account> {
   coins(n: number | BN, inDollars?: boolean): C;
   denom: string;
 
@@ -31,14 +31,14 @@ export interface IChainModule<C extends Coin, A extends Account<C>> {
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IAccountsModule<C extends Coin, A extends Account> extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string): A;
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account<C>> extends StorageModule {
+export interface IOffchainAccountsModule<C extends Coin, A extends Account> extends StorageModule {
   get(address: string, chain?: string): A;
 }
 
@@ -57,7 +57,7 @@ export interface ITXData {
 
 // TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
 export interface ITXModalData {
-  author: Account<any>;
+  author: Account;
   txType: string;
   txData: {
     // subscribe to transaction events
@@ -75,7 +75,7 @@ export interface ITXModalData {
 }
 
 export interface IVote<C extends Coin> {
-  account: Account<C>;
+  account: Account & { balance: Promise<C> };
 }
 
 export interface IUniqueId extends IIdentifiable {

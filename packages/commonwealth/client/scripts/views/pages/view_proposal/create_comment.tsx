@@ -136,7 +136,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     let parentScopedClass = 'new-thread-child';
 
-    let parentAuthor: Account<any>;
+    let parentAuthor: Account;
 
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';

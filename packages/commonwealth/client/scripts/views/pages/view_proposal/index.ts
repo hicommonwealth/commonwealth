@@ -905,7 +905,7 @@ const ViewProposalPage: m.Component<
                         proposal.submitVoteTx(
                           new DepositVote(
                             app.user.activeAccount,
-                            vnode.state.tipAmount
+                            app.chain.chain.coins(vnode.state.tipAmount)
                           )
                         )
                       );
