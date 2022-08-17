@@ -7,32 +7,34 @@ import 'components/proposal_card/index.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
+import { isNotNil } from 'helpers/typeGuards';
 import { AnyProposal } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import { getProposalUrlPath } from 'identifiers';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWCard } from '../component_kit/cw_card';
 import {
   getSecondaryTagText,
   getStatusClass,
   getStatusText,
-  primaryTagText,
+  getPrimaryTagText,
 } from './helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWDivider } from '../component_kit/cw_divider';
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {
-  injectedContent?: any;
+  injectedContent?: m.Vnode;
   proposal: AnyProposal;
 };
 
 export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
   view(vnode) {
     const { proposal, injectedContent } = vnode.attrs;
+
+    const secondaryTagText = getSecondaryTagText(proposal);
 
     return (
       <CWCard
@@ -56,18 +58,24 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
         }}
       >
         <div class="proposal-card-metadata">
-          <ProposalTag label={primaryTagText(proposal)} />
-          {!!getSecondaryTagText(proposal) && (
-            <ProposalTag label={getSecondaryTagText(proposal)} />
-          )}
-          <CWText title={proposal.title} fontWeight="medium">
+          <div class="tag-row">
+            <ProposalTag label={getPrimaryTagText(proposal)} />
+            {isNotNil(secondaryTagText) && (
+              <ProposalTag label={secondaryTagText} />
+            )}
+          </div>
+          <CWText title={proposal.title} fontWeight="semiBold" noWrap>
             {proposal.title}
           </CWText>
           {proposal instanceof SubstrateTreasuryProposal && (
-            <div class="proposal-amount">{proposal.value?.format(true)}</div>
+            <CWText className="proposal-amount-text">
+              {proposal.value?.format(true)}
+            </CWText>
           )}
           {proposal instanceof SubstrateDemocracyReferendum && (
-            <div class="proposal-amount">{proposal.threshold}</div>
+            <CWText className="proposal-amount-text">
+              {proposal.threshold}
+            </CWText>
           )}
           {proposal instanceof AaveProposal &&
             proposal.ipfsData?.shortDescription && (
@@ -82,12 +90,15 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
             <div class="proposal-injected">{injectedContent}</div>
           </>
         ) : proposal.isPassing !== 'none' ? (
-          <div class={`proposal-status ${getStatusClass(proposal)}`}>
+          <CWText
+            fontWeight="medium"
+            className={`proposal-status-text ${getStatusClass(proposal)}`}
+          >
             {getStatusText(proposal)}
-          </div>
+          </CWText>
         ) : null}
         {proposal.threadId && (
-          <div class="proposal-thread-link">
+          <CWText type="caption" className="proposal-thread-link-text">
             <a
               href={getProposalUrlPath(
                 ProposalType.Thread,
@@ -111,12 +122,9 @@ export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
                 // avoid resetting scroll point
               }}
             >
-              <CWIcon iconName="expand" iconSize="small" />
-              <span>
-                {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
-              </span>
+              {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
             </a>
-          </div>
+          </CWText>
         )}
       </CWCard>
     );

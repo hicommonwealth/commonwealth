@@ -9,71 +9,27 @@
   .proposal-card-metadata {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     width: 100%;
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .proposal-amount-text.Text {
+      color: $neutral-500;
+    }
   }
 
   .proposal-injected {
     display: flex;
-    height: 100%;
-    margin-bottom: 4px;
-    padding: 0 2px;
     width: 100%;
   }
 
-  .card-subheader {
-    color: $neutral-600;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-
-  .proposal-title {
-    font-size: 18px;
-    font-weight: 500;
-    margin: 8px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .proposal-amount,
-  .proposal-comments {
-    color: $neutral-500;
-  }
-
-  .proposal-action {
-    color: $neutral-500;
+  .proposal-status-text.Text {
     display: inline-block;
-    font-size: 80%;
-    font-weight: 500;
-    text-transform: uppercase;
-  }
-
-  .proposal-thread-link {
-    background: $neutral-100;
-    border-radius: 6px;
-    font-size: 92%;
-    font-weight: 500;
-    padding: 8px 16px;
-
-    &:hover {
-      background: $neutral-200;
-    }
-
-    a:hover {
-      text-decoration: none;
-    }
-
-    svg {
-      position: relative;
-      display: inline;
-      right: 8px;
-      top: 4px;
-    }
-  }
-
-  .proposal-status {
-    color: $neutral-800;
-    font-weight: 500;
 
     &.pass {
       color: $green-600;
@@ -82,5 +38,11 @@
     &.fail {
       color: $rorange-600;
     }
+  }
+
+  .proposal-thread-link-text.Text {
+    background: $neutral-100;
+    border-radius: $border-radius-corners;
+    padding: 8px;
   }
 }

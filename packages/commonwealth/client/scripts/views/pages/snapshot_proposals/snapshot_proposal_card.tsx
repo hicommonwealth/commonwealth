@@ -11,6 +11,7 @@ import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export class SnapshotProposalCard
   implements
@@ -23,6 +24,7 @@ export class SnapshotProposalCard
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
+
     const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;
 
     const time = moment(+proposal.end * 1000);
@@ -48,13 +50,15 @@ export class SnapshotProposalCard
               proposal.ipfs.length - 6
             )}`}
           />
-          <div class="proposal-title">{proposal.title}</div>
+          <CWText title={proposal.title} fontWeight="semiBold" noWrap>
+            {proposal.title}
+          </CWText>
         </div>
-        <div class="proposal-status">
+        <CWText>
           {now > time
             ? `Ended ${formatLastUpdated(time)}`
             : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
-        </div>
+        </CWText>
       </CWCard>
     );
   }

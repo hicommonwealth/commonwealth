@@ -17,12 +17,12 @@ import MolochProposal, {
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import { Countdown } from 'views/components/countdown';
-import { SubstrateDemocracyReferendum } from 'client/scripts/controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'client/scripts/controllers/chain/substrate/treasury_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import {
   chainEntityTypeToProposalShortName,
   proposalSlugToChainEntityType,
-} from 'client/scripts/identifiers';
+} from 'identifiers';
 
 export const getStatusClass = (proposal: AnyProposal) =>
   proposal.isPassing === ProposalStatus.Passing
@@ -184,7 +184,7 @@ export const getStatusText = (proposal: AnyProposal) => {
   return '';
 };
 
-export const primaryTagText = (proposal: AnyProposal) => [
+export const getPrimaryTagText = (proposal: AnyProposal) => [
   chainEntityTypeToProposalShortName(
     proposalSlugToChainEntityType(proposal.slug)
   ),
@@ -215,6 +215,6 @@ export const getSecondaryTagText = (proposal: AnyProposal) => {
   ) {
     return 'MISSING DATA';
   } else {
-    return false;
+    return null;
   }
 };

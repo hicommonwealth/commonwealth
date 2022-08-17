@@ -11,9 +11,9 @@ export class ProposalTag implements m.ClassComponent<{ label: string }> {
     const { label } = vnode.attrs;
 
     return (
-      <div class="ProposalTag">
-        <CWText fontWeight="medium">{label}</CWText>
-      </div>
+      <CWText fontWeight="medium" className="ProposalTag">
+        {label}
+      </CWText>
     );
   }
 }
