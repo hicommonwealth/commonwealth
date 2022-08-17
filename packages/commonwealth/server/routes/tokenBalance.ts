@@ -68,7 +68,7 @@ const tokenBalance = async (
       chain.network === ChainNetwork.ERC20
         ? 'erc20' : chain.network === ChainNetwork.ERC721
           ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined, // TODO: @Jake, should we be using Chain.ChainNode.base instead of network?
+            ? 'spl-token' : undefined,
     );
     return success(res, balance.toString());
   } catch (err) {

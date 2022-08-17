@@ -33,6 +33,7 @@ const status = async (
           },
           {
             model: models.ChainNode,
+            required: true,
           },
           {
             model: models.Contract,
