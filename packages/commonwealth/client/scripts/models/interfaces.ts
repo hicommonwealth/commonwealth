@@ -74,8 +74,10 @@ export interface ITXModalData {
   cb?: (success: boolean) => void;
 }
 
+export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };
+
 export interface IVote<C extends Coin> {
-  account: Account & { balance: Promise<C> };
+  account: IBalanceAccount<C>;
 }
 
 export interface IUniqueId extends IIdentifiable {

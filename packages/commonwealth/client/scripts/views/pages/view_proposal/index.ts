@@ -38,6 +38,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import Poll from 'models/Poll';
+import { IBalanceAccount } from 'models/interfaces';
 import {
   AaveViewProposalDetail,
   AaveViewProposalSummary,
@@ -904,7 +905,7 @@ const ViewProposalPage: m.Component<
                       createTXModal(
                         proposal.submitVoteTx(
                           new DepositVote(
-                            app.user.activeAccount,
+                            app.user.activeAccount as IBalanceAccount<any>,
                             app.chain.chain.coins(vnode.state.tipAmount)
                           )
                         )
