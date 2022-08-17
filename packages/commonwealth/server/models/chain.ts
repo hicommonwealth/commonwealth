@@ -78,7 +78,7 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     TopicInstance,
     TopicInstance['id']
   >;
-  getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>; // TODO: @JAKE Is this all that's needed bc association through CommunityContracts?
+  getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
@@ -160,10 +160,7 @@ export default (
     });
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
-      // as: 'contracts',
-    }); // TODO: is this correct?
-    models.Chain.hasMany(models.CommunityContract, { foreignKey: 'chain_id' });
-      // @TODO: Is this necessary with above?
+    });
   };
 
   return Chain;
