@@ -1,20 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .WebhookSettingsModal {
-  p {
-    margin-bottom: 16px;
-  }
-
-  h4 {
-    margin-bottom: 16px;
-  }
-  .cui-list {
-    margin-bottom: 16px;
-
-    .cui-list-item {
-      border: none;
-      margin-bottom: 8px;
-      padding: 0;
-    }
-  }
 }
