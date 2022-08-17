@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
+import smartTruncate from 'smart-truncate';
 
 import 'pages/manage_community/webhooks_form.scss';
 
@@ -83,83 +84,104 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
 
     return (
       <div class="WebhooksForm">
-        {webhooks.map((webhook) => {
-          const label =
-            webhook.url.indexOf('discord') !== -1
-              ? 'Discord'
-              : webhook.url.indexOf('slack') !== -1
-              ? 'Slack'
-              : null;
+        <div class="webhooks-container">
+          {webhooks.map((webhook) => {
+            const label =
+              webhook.url.indexOf('discord') !== -1
+                ? 'Discord'
+                : webhook.url.indexOf('slack') !== -1
+                ? 'Slack'
+                : null;
 
-          return (
-            <div class="webhook-row">
-              <CWText>{webhook.url}</CWText>
-              <div class="label-and-tags">
-                <CWIconButton
-                  iconName="gear"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    app.modals.create({
-                      modal: WebhookSettingsModal,
-                      data: {
-                        webhook,
-                        updateSuccessCallback: (wh) => {
-                          const idx = vnode.attrs.webhooks.findIndex(
-                            (wh2) => wh2.id === wh.id
-                          );
-                          vnode.attrs.webhooks[idx].categories = wh.categories;
+            return (
+              <div class="webhook-row">
+                <div class="webhook-info">
+                  <CWText>{smartTruncate(webhook.url, 25)}</CWText>
+                  {label && (
+                    <CWText type="caption" className="webhook-tag-text">
+                      {label}
+                    </CWText>
+                  )}
+                  <CWText type="caption" className="webhook-tag-text">
+                    {pluralize(webhook.categories.length, 'event')}
+                  </CWText>
+                </div>
+                <div class="buttons">
+                  <CWIconButton
+                    iconName="gear"
+                    iconSize="small"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: WebhookSettingsModal,
+                        data: {
+                          webhook,
+                          updateSuccessCallback: (wh) => {
+                            const idx = vnode.attrs.webhooks.findIndex(
+                              (wh2) => wh2.id === wh.id
+                            );
+                            vnode.attrs.webhooks[idx].categories =
+                              wh.categories;
+                          },
                         },
-                      },
-                    });
-                  }}
-                />
-                {label && <div>{label}</div>}
-                <div>{pluralize(webhook.categories.length, 'event')}</div>
-              </div>
-              <CWIconButton
-                iconName="trash"
-                iconSize="small"
-                disabled={this.disabled}
-                onclick={(e) => {
-                  e.preventDefault();
-                  this.disabled = true;
-                  this.success = false;
-                  this.failure = false;
+                      });
+                    }}
+                  />
+                  <CWIconButton
+                    iconName="trash"
+                    iconSize="small"
+                    disabled={this.disabled}
+                    onclick={(e) => {
+                      e.preventDefault();
+                      this.disabled = true;
+                      this.success = false;
+                      this.failure = false;
 
-                  // TODO: Change to DELETE /webhook
-                  $.post(`${app.serverUrl()}/deleteWebhook`, {
-                    ...chainOrCommObj,
-                    webhookUrl: webhook.url,
-                    auth: true,
-                    jwt: app.user.jwt,
-                  }).then(
-                    (result) => {
-                      this.disabled = false;
-                      if (result.status === 'Success') {
-                        const idx = vnode.attrs.webhooks.findIndex(
-                          (w) => w.url === webhook.url
-                        );
-                        if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
-                        this.success = true;
-                        notifySuccess('Success! Webhook deleted');
-                      } else {
-                        this.failure = true;
-                        notifyError(result.message);
-                      }
-                      m.redraw();
-                    },
-                    (err) => {
-                      this.failure = true;
-                      this.disabled = false;
-                      notifyError(err?.responseJSON?.error || 'Unknown error');
-                      m.redraw();
-                    }
-                  );
-                }}
-              />
-            </div>
-          );
-        })}
+                      // TODO: Change to DELETE /webhook
+                      $.post(`${app.serverUrl()}/deleteWebhook`, {
+                        ...chainOrCommObj,
+                        webhookUrl: webhook.url,
+                        auth: true,
+                        jwt: app.user.jwt,
+                      }).then(
+                        (result) => {
+                          this.disabled = false;
+                          if (result.status === 'Success') {
+                            const idx = vnode.attrs.webhooks.findIndex(
+                              (w) => w.url === webhook.url
+                            );
+
+                            if (idx !== -1) vnode.attrs.webhooks.splice(idx, 1);
+
+                            this.success = true;
+
+                            notifySuccess('Success! Webhook deleted');
+                          } else {
+                            this.failure = true;
+
+                            notifyError(result.message);
+                          }
+                          m.redraw();
+                        },
+                        (err) => {
+                          this.failure = true;
+
+                          this.disabled = false;
+
+                          notifyError(
+                            err?.responseJSON?.error || 'Unknown error'
+                          );
+
+                          m.redraw();
+                        }
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
         {webhooks.length === 0 && (
           <CWText className="no-webhooks-text">
             No webhooks yet. Slack, Discord, and Telegram webhooks are

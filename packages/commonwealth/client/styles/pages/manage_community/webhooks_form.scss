@@ -5,17 +5,42 @@
   flex-direction: column;
   gap: 16px;
 
-  .no-webhooks-text.Text {
-    display: inline-block;
-  }
-
-  .webhook-row {
+  .webhooks-container {
+    border: 1px solid $neutral-300;
+    border-radius: $border-radius-corners;
     display: flex;
     flex-direction: column;
+    max-height: 120px;
+    overflow-y: auto;
 
-    .label-and-tags {
+    @include visibleScrollbar(light);
+
+    .webhook-row {
       align-items: center;
       display: flex;
+      justify-content: space-between;
+      padding: 8px;
+
+      .webhook-info {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+
+        .webhook-tag-text {
+          background-color: $neutral-100;
+          padding: 4px 8px;
+        }
+      }
+
+      .buttons {
+        align-items: center;
+        display: flex;
+        gap: 4px;
+      }
     }
+  }
+
+  .no-webhooks-text.Text {
+    display: inline-block;
   }
 }
