@@ -97,15 +97,19 @@ export class WebhookSettingsModal
         </div>
         <div class="compact-modal-body">
           <CWText>Which events should trigger this webhook?</CWText>
-          <div class="forum-events">
-            <CWText>Off-chain discussions</CWText>
+          <div class="checkbox-section">
+            <CWText type="h5" fontWeight="semiBold">
+              Off-chain discussions
+            </CWText>
             {row('New thread', [NotificationCategories.NewThread])}
             {row('New comment', [NotificationCategories.NewComment])}
             {row('New reaction', [NotificationCategories.NewReaction])}
           </div>
           {isChain && Object.keys(chainNotifications).length > 0 && (
-            <div class="chain-events">
-              <CWText>On-chain events</CWText>
+            <div class="checkbox-section">
+              <CWText type="h5" fontWeight="semiBold">
+                On-chain events
+              </CWText>
               {/* iterate over chain events */}
               {Object.keys(chainNotifications).map((k) =>
                 row(`${k} event`, chainNotifications[k])
