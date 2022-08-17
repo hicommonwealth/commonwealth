@@ -107,12 +107,7 @@ export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
     if (surveyCurrentlyLocked) {
       this.surveyLocked = true;
     } else {
-      if (surveyDelayTimeElapsed) {
-        console.log('setting new survey-last-displayed');
-        this.surveyLocked = false;
-      } else {
-        this.surveyLocked = true;
-      }
+      this.surveyLocked = !surveyDelayTimeElapsed;
     }
   }
 
@@ -125,6 +120,7 @@ export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
       }
       this.surveyLocked = true;
       localStorage.setItem('user-survey-last-displayed', Date.now().toString());
+      console.log('setting new survey-last-displayed');
       m.redraw();
     };
 
