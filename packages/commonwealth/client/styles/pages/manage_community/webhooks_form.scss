@@ -1,50 +1,21 @@
+@import 'shared';
+
 .WebhooksForm {
-  .cui-list-item {
-    margin-bottom: 16px;
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
-    .cui-list-item-content-left .webhook-row {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 8px;
-      padding: 0;
-
-      .url {
-        font-size: 19px;
-        margin-bottom: 8px;
-      }
-
-      .label-and-tags {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-
-        .settings-button {
-          height: 32px;
-          line-height: 32px;
-          min-height: 32px;
-          padding: 0;
-          width: 32px;
-        }
-
-        > * {
-          margin-right: 8px;
-        }
-      }
-    }
-
-    .cui-list-item-content-right {
-      svg {
-        cursor: pointer;
-      }
-    }
+  .no-webhooks-text.Text {
+    display: inline-block;
   }
 
-  .cui-form-group {
-    margin-bottom: 16px;
+  .webhook-row {
+    display: flex;
+    flex-direction: column;
 
-    .cui-input {
-      margin-bottom: 16px;
+    .label-and-tags {
+      align-items: center;
+      display: flex;
     }
   }
 }

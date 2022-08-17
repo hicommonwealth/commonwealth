@@ -2,11 +2,11 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import smartTruncate from 'smart-truncate';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
+import { formatAddressShort } from 'helpers';
 import { RolePermission } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -41,9 +41,8 @@ export class UpgradeRolesForm
 
       const roletext = role.permission === 'moderator' ? '(moderator)' : '';
 
-      const fullText = `${displayName}: ${smartTruncate(
-        role.Address.address,
-        6
+      const fullText = `${displayName} - ${formatAddressShort(
+        role.Address.address
       )} ${roletext}`;
 
       return { label: fullText, value: fullText };
