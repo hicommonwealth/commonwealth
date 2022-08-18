@@ -1,6 +1,6 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError } from '../util/errors';
 
 enum UpdatePriorityErrors {
   NoChainID = 'No chain_id provided.',
@@ -32,7 +32,7 @@ const updateChainPriority = async (
   const chain = await models.Chain.findOne({
     where: { id: chain_id },
   });
-  if (!chain) throw new ServerError(UpdatePriorityErrors.NoChain);
+  if (!chain) throw new AppError(UpdatePriorityErrors.NoChain);
 
   if (!process.env.AIRPLANE_SECRET) {
     throw new AppError(UpdatePriorityErrors.Failed);
