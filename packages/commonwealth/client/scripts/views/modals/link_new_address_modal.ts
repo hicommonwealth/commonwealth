@@ -160,6 +160,7 @@ const LinkAccountItem: m.Component<
               undefined,
               targetCommunity
             );
+            console.log('signerAccount:', signerAccount);
             vnode.state.linking = true;
             m.redraw();
             await webWallet.validateWithAccount(signerAccount);

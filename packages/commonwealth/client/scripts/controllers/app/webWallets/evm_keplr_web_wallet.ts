@@ -1,7 +1,9 @@
 import app from 'state';
-
+import { createMessageSend } from '@tharsis/transactions';
+import { generateEndpointAccount } from '@tharsis/provider';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import { Address } from 'ethereumjs-util';
 
 import { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
@@ -9,12 +11,13 @@ import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 import { bech32 } from 'bech32';
 import { ChainBase, WalletId } from '../../../../../../common-common/src/types';
 
-// function encodeEthAddress(bech32Prefix: string, address: string): string {
-//   return bech32.encode(
-//     bech32Prefix,
-//     bech32.toWords(Address.fromString(address).toBuffer())
-//   );
-// }
+function encodeEthAddress(bech32Prefix: string, address: string): string {
+  console.log('got here at least');
+  return bech32.encode(
+    bech32Prefix,
+    bech32.toWords(Address.fromString(address).toBuffer())
+  );
+}
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -56,7 +59,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async validateWithAccount(account: Account<any>): Promise<void> {
-    if (!this._chainId || !window.keplr?.signAmino)
+    if (!this._chainId || !window.keplr?.signDirect)
       throw new Error('Missing or misconfigured web wallet');
 
     if (this._chain !== app.chain.id) {
@@ -69,6 +72,42 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       account.validationToken
     );
+    console.log('chainid: ', this._chainId);
+    console.log('signDoc', signDoc);
+    console.log('account', account);
+    console.log('endpoint', generateEndpointAccount(account.address));
+    //
+
+    const chain = {
+      chainId: 9001,
+      cosmosChainId: this._chainId,
+    };
+
+    const sender = {
+      accountAddress: account.address,
+      sequence: parseInt(signDoc.sequence, 10),
+      accountNumber: parseInt(signDoc.account_number, 10),
+      pubkey: 'AgTw+4v0daIrxsNSW4FcQ+IoingPseFwHO1DnssyoOqZ',
+    };
+
+    const fee = {
+      amount: '20',
+      denom: 'aevmos',
+      gas: '200000',
+    };
+
+    const memo = '';
+
+    const params = {
+      destinationAddress: 'evmos1pmk2r32ssqwps42y3c9d4clqlca403yd9wymgr',
+      amount: '1',
+      denom: 'aevmos',
+    };
+
+    const msg = createMessageSend(chain, sender, fee, memo, params);
+
+    console.log('message: ', msg);
+    //
 
     // save and restore default options after setting to no fee/memo for login
     const defaultOptions = window.keplr.defaultOptions;
@@ -80,11 +119,18 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       },
     };
 
-    const signature = await window.keplr.signAmino(
-      this._chainId,
-      account.address,
-      signDoc
-    );
+    let signature;
+
+    try {
+      signature = await window.keplr.signDirect(
+        this._chainId,
+        account.address,
+        { chainId: this._chainId }
+      );
+      console.log('signature', signature, JSON.stringify(signature));
+    } catch (e) {
+      console.log(e);
+    }
 
     window.keplr.defaultOptions = defaultOptions;
     return account.validate(JSON.stringify(signature));

@@ -74,6 +74,8 @@ const verifySignature = async (
     return false;
   }
 
+  console.log('signatureString', signatureString);
+
   let isValid: boolean;
   if (chain.base === ChainBase.Substrate) {
     //
@@ -194,11 +196,14 @@ const verifySignature = async (
     const { signed, signature: stdSignature }: AminoSignResponse =
       JSON.parse(signatureString);
 
+    console.log('signed', signed);
+    console.log('stdSignature', stdSignature);
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
     // the account they registered with.
     // TODO: ensure ion works
     const bech32Prefix = chain.bech32_prefix;
+    console.log('bech32Prefix', bech32Prefix);
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
@@ -211,6 +216,14 @@ const verifySignature = async (
         stdSignature.pub_key,
         'cosmos'
       );
+
+      console.log('generatedAddress', generatedAddress);
+      console.log(
+        'generatedAddressWithCosmosPrefix',
+        generatedAddressWithCosmosPrefix
+      );
+
+      console.log('addressModel.address', addressModel.address);
 
       if (
         generatedAddress === addressModel.address ||
