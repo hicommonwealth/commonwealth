@@ -141,11 +141,7 @@ export class LoginSelectorMenuRight
     return (
       <>
         <Cui.MenuItem
-          onclick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/notification-settings')
-              : m.route.set('/notification-settings')
-          }
+          onclick={() => m.route.set('/notification-settings')}
           label={
             <div class="label-wrap">
               {mobile && <CWIcon iconName="bell" />}

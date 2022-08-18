@@ -5,7 +5,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
-import { Button, Icons, ListItem, SelectList, RadioGroup } from 'construct-ui';
+import { Button, Icons, ListItem, SelectList } from 'construct-ui';
 
 import 'pages/notification_settings/index.scss';
 
@@ -15,13 +15,6 @@ import { NotificationSubscription, ChainInfo } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { link, pluralize } from 'helpers';
 import { sortSubscriptions } from 'helpers/notifications';
-import {
-  EdgewareChainNotificationTypes,
-  KusamaChainNotificationTypes,
-  PolkadotChainNotificationTypes,
-  KulupuChainNotificationTypes,
-  DydxChainNotificationTypes,
-} from 'helpers/chain_notification_types';
 import { notifyError } from 'controllers/app/notifications';
 
 // left column - for identifying the notification type
@@ -38,64 +31,6 @@ const NOTIFICATION_ON_IMMEDIATE_EMAIL_OPTION = 'On (immediate)';
 const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple';
 const NOTIFICATION_OFF_OPTION = 'Off';
-
-export class EmailIntervalConfiguration implements m.ClassComponent {
-  private interval: string;
-  private saving: boolean;
-
-  view() {
-    if (!app.user) return;
-    if (this.interval === undefined) this.interval = app.user.emailInterval;
-
-    return (
-      <>
-        <RadioGroup
-          options={['daily', 'never']}
-          name="interval"
-          onchange={(e) => {
-            this.saving = true;
-            const value = (e.target as HTMLInputElement).value;
-
-            $.post(`${app.serverUrl()}/writeUserSetting`, {
-              jwt: app.user.jwt,
-              key: 'updateEmailInterval',
-              value,
-            })
-              .then(() => {
-                this.saving = false;
-                this.interval = value;
-                app.user.setEmailInterval(value);
-                m.redraw();
-              })
-              .catch(() => {
-                this.saving = false;
-                m.redraw();
-              });
-          }}
-          value={this.interval}
-        />
-        {!app.user.email
-          ? m('p', [
-              link('a', `/${app.activeChainId()}/settings`, 'Set an email'),
-              ' to start receiving notification digests.',
-            ])
-          : !app.user.emailVerified
-          ? m('p', [
-              'Your email has not been verified. ',
-              link(
-                'a',
-                `/${app.activeChainId()}/settings`,
-                'Finish verification'
-              ),
-              ' to continue receiving notification emails.',
-            ])
-          : ''}
-        {this.saving === false && m('p', 'Setting saved!')}
-        {/* this.saving is undefined upon init */}
-      </>
-    );
-  }
-}
 
 export class BatchedSubscriptionRow
   implements
@@ -331,11 +266,13 @@ export class NewThreadRow
 {
   view(vnode) {
     const { subscriptions, community } = vnode.attrs;
+
     const subscription = subscriptions.find(
       (s) =>
         s.category === NotificationCategories.NewThread &&
         s.objectId === community.id
     );
+
     return (
       subscription &&
       m(BatchedSubscriptionRow, {
@@ -359,12 +296,14 @@ export class ChainEventSubscriptionRow
 
   view(vnode) {
     const { title, notificationTypeArray } = vnode.attrs;
+
     const subscriptions = app.user.notifications.subscriptions.filter((s) => {
       return (
         s.category === NotificationCategories.ChainEvent &&
         notificationTypeArray.includes(s.objectId)
       );
     });
+
     const everySubscriptionActive = subscriptions.every((s) => s.isActive);
     const everySubscriptionEmail = subscriptions.every((s) => s.immediateEmail);
     const someSubscriptionsEmail = subscriptions.some((s) => s.immediateEmail);
@@ -492,143 +431,6 @@ export class ChainEventSubscriptionRow
         }),
       ]),
     ]);
-  }
-}
-
-export class EdgewareChainEventNotifications implements m.ClassComponent {
-  view() {
-    return [
-      m(ChainEventSubscriptionRow, {
-        title: 'Council events',
-        notificationTypeArray: EdgewareChainNotificationTypes.Council,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Democracy events',
-        notificationTypeArray: EdgewareChainNotificationTypes.Democracy,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Treasury events',
-        notificationTypeArray: EdgewareChainNotificationTypes.Treasury,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Preimage events',
-        notificationTypeArray: EdgewareChainNotificationTypes.Preimage,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Voting delegation events',
-        notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation,
-      }),
-    ];
-  }
-}
-
-export class KusamaChainEventNotifications implements m.ClassComponent {
-  view() {
-    return [
-      m(ChainEventSubscriptionRow, {
-        title: 'Council events',
-        notificationTypeArray: KusamaChainNotificationTypes.Council,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Democracy events',
-        notificationTypeArray: KusamaChainNotificationTypes.Democracy,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Treasury events',
-        notificationTypeArray: KusamaChainNotificationTypes.Treasury,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Preimage events',
-        notificationTypeArray: KusamaChainNotificationTypes.Preimage,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Voting delegation events',
-        notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation,
-      }),
-    ];
-  }
-}
-
-export class PolkadotChainEventNotifications implements m.ClassComponent {
-  view() {
-    return [
-      m(ChainEventSubscriptionRow, {
-        title: 'Council events',
-        notificationTypeArray: PolkadotChainNotificationTypes.Council,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Democracy events',
-        notificationTypeArray: PolkadotChainNotificationTypes.Democracy,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Treasury events',
-        notificationTypeArray: PolkadotChainNotificationTypes.Treasury,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Preimage events',
-        notificationTypeArray: PolkadotChainNotificationTypes.Preimage,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Voting delegation events',
-        notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation,
-      }),
-    ];
-  }
-}
-
-export class KulupuChainEventNotifications implements m.ClassComponent {
-  view() {
-    return [
-      m(ChainEventSubscriptionRow, {
-        title: 'Council events',
-        notificationTypeArray: KulupuChainNotificationTypes.Council,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Democracy events',
-        notificationTypeArray: KulupuChainNotificationTypes.Democracy,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Treasury events',
-        notificationTypeArray: KulupuChainNotificationTypes.Treasury,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Preimage events',
-        notificationTypeArray: KulupuChainNotificationTypes.Preimage,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Voting delegation events',
-        notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation,
-      }),
-    ];
-  }
-}
-
-export class DydxChainEventNotifications implements m.ClassComponent {
-  view() {
-    return [
-      m(ChainEventSubscriptionRow, {
-        title: 'Governance events',
-        notificationTypeArray: DydxChainNotificationTypes.Governance,
-        recommended: true,
-      }),
-      m(ChainEventSubscriptionRow, {
-        title: 'Token events',
-        notificationTypeArray: DydxChainNotificationTypes.Token,
-        recommended: true,
-      }),
-    ];
   }
 }
 
@@ -781,101 +583,197 @@ export class AllCommunitiesNotifications
   }
 }
 
-// m(EmailIntervalConfiguration),
-// communities &&
-//   subscriptions &&
-//  m('.CommunityNotifications', [
-//    m('.header', [
-//       m(SelectList, {
-//        class: 'CommunityNotificationSelectList',
-//        filterable: false,
-//        checkmark: false,
-//        emptyContent: null,
-//        popoverAttrs: {
-//          transitionDuration: 0,
-//        },
-//        itemRender: (community: string) => {
-//          return m(ListItem, {
-//            label: community,
-//            selected: this.selectedCommunityId === community,
-//          });
-//        },
-//        items: selectableCommunityIds,
-//        trigger: m(Button, {
-//          align: 'left',
-//          compact: true,
-//          rounded: true,
-//          disabled: !app.user.emailVerified,
-//          iconRight: Icons.CHEVRON_DOWN,
-//          label: this.selectedCommunity
-//            ? this.selectedCommunityId
-//            : ALL_COMMUNITIES,
-//        }),
-//        onSelect: (community: string) => {
-//          this.selectedCommunity =
-//            communities.find((c) => c.name === community) ||
-//            chains.find((c) => c.name === community);
-//          this.selectedCommunityId =
-//            this.selectedCommunity?.name || ALL_COMMUNITIES;
-//          m.redraw();
-//        },
-//      }),
-//    ]),
-//    m(Table, { class: 'NotificationsTable' }, [
-//      // off-chain discussion notifications
-//      m('tr', [m('th', NOTIFICATION_TABLE_PRE_COPY), m('th', '')]),
-//      selectedCommunityId === ALL_COMMUNITIES && [
-//        m(AllCommunitiesNotifications, {
-//          communities: allCommunityIds,
-//          subscriptions,
-//        }),
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, 'Edgeware chain events')
-//        ),
-//        m(EdgewareChainEventNotifications),
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, 'Kulupu chain events')
-//        ),
-//        m(KulupuChainEventNotifications),
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, 'Kusama chain events')
-//        ),
-//        m(KusamaChainEventNotifications),
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, 'Polkadot chain events')
-//        ),
-//        m(PolkadotChainEventNotifications),
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, 'dYdX chain events')
-//        ),
-//        m(DydxChainEventNotifications),
-//      ],
-//      selectedCommunity &&
-//        m(IndividualCommunityNotifications, {
-//          subscriptions,
-//          community: selectedCommunity,
-//        }),
-//      // on-chain event notifications
-//      selectedCommunity instanceof ChainInfo && [
-//        m(
-//          'tr.on-chain-events-header',
-//          m('th', { colspan: 2 }, CHAIN_NOTIFICATION_TABLE_PRE_COPY)
-//        ),
-//        selectedCommunity.network === ChainNetwork.Edgeware &&
-//          m(EdgewareChainEventNotifications),
-//        selectedCommunity.network === ChainNetwork.Kulupu &&
-//          m(KulupuChainEventNotifications),
-//        selectedCommunity.network === ChainNetwork.Kusama &&
-//          m(KusamaChainEventNotifications),
-//        selectedCommunity.network === ChainNetwork.Polkadot &&
-//          m(PolkadotChainEventNotifications),
-//        selectedCommunity.network === ChainNetwork.Aave &&
-//          m(DydxChainEventNotifications),
-//      ],
-//    ]),
-//  ]),
+// export class EdgewareChainEventNotifications implements m.ClassComponent {
+//     view() {
+//       return [
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Council events',
+//           notificationTypeArray: EdgewareChainNotificationTypes.Council,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Democracy events',
+//           notificationTypeArray: EdgewareChainNotificationTypes.Democracy,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Treasury events',
+//           notificationTypeArray: EdgewareChainNotificationTypes.Treasury,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Preimage events',
+//           notificationTypeArray: EdgewareChainNotificationTypes.Preimage,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Voting delegation events',
+//           notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation,
+//         }),
+//       ];
+//     }
+//   }
+
+//   export class KusamaChainEventNotifications implements m.ClassComponent {
+//     view() {
+//       return [
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Council events',
+//           notificationTypeArray: KusamaChainNotificationTypes.Council,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Democracy events',
+//           notificationTypeArray: KusamaChainNotificationTypes.Democracy,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Treasury events',
+//           notificationTypeArray: KusamaChainNotificationTypes.Treasury,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Preimage events',
+//           notificationTypeArray: KusamaChainNotificationTypes.Preimage,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Voting delegation events',
+//           notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation,
+//         }),
+//       ];
+//     }
+//   }
+
+//   export class PolkadotChainEventNotifications implements m.ClassComponent {
+//     view() {
+//       return [
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Council events',
+//           notificationTypeArray: PolkadotChainNotificationTypes.Council,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Democracy events',
+//           notificationTypeArray: PolkadotChainNotificationTypes.Democracy,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Treasury events',
+//           notificationTypeArray: PolkadotChainNotificationTypes.Treasury,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Preimage events',
+//           notificationTypeArray: PolkadotChainNotificationTypes.Preimage,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Voting delegation events',
+//           notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation,
+//         }),
+//       ];
+//     }
+//   }
+
+//   export class KulupuChainEventNotifications implements m.ClassComponent {
+//     view() {
+//       return [
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Council events',
+//           notificationTypeArray: KulupuChainNotificationTypes.Council,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Democracy events',
+//           notificationTypeArray: KulupuChainNotificationTypes.Democracy,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Treasury events',
+//           notificationTypeArray: KulupuChainNotificationTypes.Treasury,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Preimage events',
+//           notificationTypeArray: KulupuChainNotificationTypes.Preimage,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Voting delegation events',
+//           notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation,
+//         }),
+//       ];
+//     }
+//   }
+
+//   export class DydxChainEventNotifications implements m.ClassComponent {
+//     view() {
+//       return [
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Governance events',
+//           notificationTypeArray: DydxChainNotificationTypes.Governance,
+//           recommended: true,
+//         }),
+//         m(ChainEventSubscriptionRow, {
+//           title: 'Token events',
+//           notificationTypeArray: DydxChainNotificationTypes.Token,
+//           recommended: true,
+//         }),
+//       ];
+//     }
+//   }
+
+// export class EmailIntervalConfiguration implements m.ClassComponent {
+//     private interval: string;
+//     private saving: boolean;
+
+//     view() {
+//       if (!app.user) return;
+//       if (this.interval === undefined) this.interval = app.user.emailInterval;
+
+//       return (
+//         <>
+//           <RadioGroup
+//             options={['daily', 'never']}
+//             name="interval"
+//             onchange={(e) => {
+//               this.saving = true;
+//               const value = (e.target as HTMLInputElement).value;
+
+//               $.post(`${app.serverUrl()}/writeUserSetting`, {
+//                 jwt: app.user.jwt,
+//                 key: 'updateEmailInterval',
+//                 value,
+//               })
+//                 .then(() => {
+//                   this.saving = false;
+//                   this.interval = value;
+//                   app.user.setEmailInterval(value);
+//                   m.redraw();
+//                 })
+//                 .catch(() => {
+//                   this.saving = false;
+//                   m.redraw();
+//                 });
+//             }}
+//             value={this.interval}
+//           />
+//           {!app.user.email
+//             ? m('p', [
+//                 link('a', `/${app.activeChainId()}/settings`, 'Set an email'),
+//                 ' to start receiving notification digests.',
+//               ])
+//             : !app.user.emailVerified
+//             ? m('p', [
+//                 'Your email has not been verified. ',
+//                 link(
+//                   'a',
+//                   `/${app.activeChainId()}/settings`,
+//                   'Finish verification'
+//                 ),
+//                 ' to continue receiving notification emails.',
+//               ])
+//             : ''}
+//           {this.saving === false && m('p', 'Setting saved!')}
+//           {/* this.saving is undefined upon init */}
+//         </>
+//       );
+//     }
+//   }

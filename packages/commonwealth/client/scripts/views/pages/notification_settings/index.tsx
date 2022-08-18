@@ -2,37 +2,31 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import _ from 'lodash';
 
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import { NotificationSubscription, ChainInfo } from 'models';
+import { NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
+// import { PageLoading } from 'views/pages/loading';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
-import ErrorPage from '../error';
 import { CWText } from '../../components/component_kit/cw_text';
-
-const ALL_COMMUNITIES = 'All communities';
+import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+// import ErrorPage from '../error';
 
 class NotificationSettingsPage implements m.ClassComponent {
-  private allCommunityIds: string[];
-  private communities: ChainInfo[];
-  private selectableCommunityIds: string[];
-  private selectedCommunity: ChainInfo;
-  private selectedCommunityId: string;
   private subscriptions: NotificationSubscription[];
 
   async oninit() {
-    if (!app.isLoggedIn) {
+    if (!app.isLoggedIn()) {
       notifyError('Must be logged in to configure notifications');
       m.route.set('/');
     }
 
-    // initialize this.subscriptions
     this.subscriptions = [];
+
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
     }).then(
@@ -47,69 +41,27 @@ class NotificationSettingsPage implements m.ClassComponent {
         m.route.set('/');
       }
     );
-
-    // initialize this.communities
-    this.communities = [];
-    const selectableCommunityIds = app.user.roles
-      .filter((role) => role.chain_id)
-      .map((r) => r.chain_id);
-    this.communities = _.uniq(
-      app.config.chains
-        .getAll()
-        .filter((c) => selectableCommunityIds.includes(c.id))
-    );
-
-    // initialize this.allCommunityIds
-    this.allCommunityIds = [];
-    _.uniq(app.config.chains.getAll()).forEach((c) =>
-      this.allCommunityIds.push(c.id)
-    );
-    this.communities.forEach((c) => this.allCommunityIds.push(c.id));
-
-    // initialize selectableCommunityIds
-    this.selectableCommunityIds = [ALL_COMMUNITIES];
-    this.communities.forEach((c) => this.selectableCommunityIds.push(c.name));
-    const chainsWithRole = app.user.roles.map((r) => r.chain_id);
-    const chains = _.uniq(app.config.chains.getAll());
-    chains.forEach((c) => {
-      if (chainsWithRole.includes(c.id))
-        this.selectableCommunityIds.push(c.name);
-    });
-    this.selectableCommunityIds.sort();
-
-    // initialize this.selectedCommunity, this.selectedCommunityId
-    this.selectedCommunityId = ALL_COMMUNITIES;
-    this.selectedCommunity = null;
   }
 
   view() {
-    const {
-      allCommunityIds,
-      communities,
-      selectableCommunityIds,
-      selectedCommunity,
-      selectedCommunityId,
-      subscriptions,
-    } = this;
+    // console.log(this.subscriptions);
 
-    const chains = _.uniq(app.config.chains.getAll());
-
-    if (!app.loginStatusLoaded()) {
-      <PageLoading
-        title={<BreadcrumbsTitleTag title="Notification Settings" />}
-      />;
-    } else if (!app.isLoggedIn()) {
-      <ErrorPage
-        message="This page requires you to be logged in"
-        title={<BreadcrumbsTitleTag title="Notification Settings" />}
-      />;
-    } else if (subscriptions.length < 1) {
-      <PageLoading
-        title={<BreadcrumbsTitleTag title="Notification Settings" />}
-      />;
-    }
-
-    console.log(allCommunityIds);
+    // if (!app.loginStatusLoaded()) {
+    //   <PageLoading
+    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
+    //   />;
+    // }
+    // if (!app.isLoggedIn()) {
+    //   <ErrorPage
+    //     message="This page requires you to be logged in"
+    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
+    //   />;
+    // }
+    // } else if (this.subscriptions.length < 1) {
+    //   <PageLoading
+    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
+    //   />;
+    // }
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
@@ -122,13 +74,21 @@ class NotificationSettingsPage implements m.ClassComponent {
             likes, and chain events in the following communities.
           </CWText>
           <CWText fontWeight="semiBold">subscriptions</CWText>
-          {subscriptions.map((s) => (
-            <div>{s.Chain}</div>
-          ))}
-          <CWText fontWeight="semiBold">communities</CWText>
-          {communities.map((s) => (
-            <div>{s.name}</div>
-          ))}
+          {this.subscriptions.map((s) => {
+            const chainInfo = app.config.chains.getById(s.Chain);
+
+            console.log(chainInfo);
+
+            return (
+              <div class="notification-row">
+                <CWText type="h5" fontWeight="medium">
+                  {chainInfo.name}
+                </CWText>
+                <CWCommunityAvatar size="medium" community={chainInfo} />
+                <CWCheckbox label="Email" />
+              </div>
+            );
+          })}
         </div>
       </Sublayout>
     );

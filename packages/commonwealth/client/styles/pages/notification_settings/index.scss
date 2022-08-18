@@ -3,4 +3,10 @@
 .NotificationSettingsPage {
   flex: 1;
   padding: 24px;
+
+  .notification-row {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+  }
 }

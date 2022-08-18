@@ -898,12 +898,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
             '/:scope/projects': importRoute(
