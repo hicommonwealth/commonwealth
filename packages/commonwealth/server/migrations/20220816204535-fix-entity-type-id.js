@@ -24,6 +24,117 @@ module.exports = {
     await queryInterface.sequelize.query(`
       DELETE FROM "ChainEntities" WHERE length(type_id) != 32;
     `);
+
+    // deletes a unique instance of identical chain-events with different chain-entities
+    // One of the entities has an author, so we delete the entity that does not have
+    // an author and the chain-event that created it
+    await queryInterface.sequelize.query(`
+      DELETE FROM "ChainEvents" WHERE id = 543427;
+    `);
+    await queryInterface.sequelize.query(`
+      DELETE FROM "ChainEntities" WHERE id = 506;
+    `);
+
+    //////////////////////////////// chain-events that do not reference chain-entities //////////////////
+
+    // creates a view of all duplicate (not including original) chain-events that do not reference a chain-entity and need to be deleted
+    await queryInterface.sequelize.query(`
+      CREATE VIEW ce_delete_null_entity AS
+      SELECT COUNT(*)
+      FROM (SELECT id,
+                   entity_id,
+                   ROW_NUMBER()
+                   OVER (PARTITION BY chain_event_type_id, block_number, event_data ORDER BY id) AS Row
+            FROM "ChainEvents") dups
+      WHERE dups.row > 1
+        AND dups.entity_id IS NULL;
+    `);
+    // deletes the notificationsRead that reference the above chain-events
+    await queryInterface.sequelize.query(`
+      WITH notifications_to_delete AS (SELECT id
+                                       FROM "Notifications"
+                                       WHERE chain_event_id IN (SELECT * FROM ce_delete_null_entity))
+      DELETE
+      FROM "NotificationsRead"
+      WHERE notification_id IN (SELECT * FROM "notifications_to_delete");
+    `);
+    // deletes the notifications that reference the above chain-events
+    await queryInterface.sequelize.query(`
+      DELETE
+      FROM "Notifications"
+      WHERE chain_event_id IN (SELECT * FROM ce_delete_null_entity);
+    `);
+    // deletes the duplicate chain-events that reference null entities
+    await queryInterface.sequelize.query(`
+      DELETE
+      FROM "ChainEvents"
+      WHERE id IN (SELECT * FROM ce_delete_null_entity);
+    `);
+    await queryInterface.sequelize.query(`
+      DROP VIEW ce_delete_null_entity
+    `);
+
+
+    ///////////// duplicate chain-entities and the chain-events that reference them //////////////
+
+    // select all duplicate chain-entities that have less chain-events referencing them than their counter-parts
+    // create a view that contains the ids of all chain-entities that need to be deleted
+    await queryInterface.sequelize.query(`
+      CREATE VIEW chain_entities_to_delete AS
+      SELECT id
+      FROM (SELECT *,
+                   row_number()
+                   over (PARTITION BY chain, type, type_id ORDER BY eventCount DESC)      AS real_entity,
+                   row_number() over (partition by chain, type, type_id ORDER BY id)      AS row,
+                   row_number() over (partition by chain, type, type_id ORDER BY id DESC) AS reverse_row
+            FROM (SELECT *
+                  FROM "ChainEntities"
+                           JOIN (SELECT entity_id, COUNT(*) AS eventCount
+                                 FROM "ChainEvents"
+                                 WHERE entity_id IS NOT NULL
+                                 GROUP BY entity_id) AS ceCount
+                                ON ceCount.entity_id = id) AS dups) AS ce_ids
+      WHERE ce_ids.row + ce_ids.reverse_row > 2
+        AND ce_ids.real_entity != 1;
+    `);
+
+    // create a view that contains the ids of all chain-events that need to be deleted
+    await queryInterface.sequelize.query(`
+      CREATE VIEW chain_events_to_delete AS
+      SELECT id FROM "ChainEvents"
+      WHERE entity_id IN (SELECT * FROM "chain_entities_to_delete");
+    `);
+
+    // delete NotificationReads that reference notifications that are to be deleted
+    await queryInterface.sequelize.query(`
+      WITH notifications_to_delete AS (SELECT *
+                                       FROM "Notifications"
+                                       WHERE chain_event_id IN (SELECT * FROM "chain_events_to_delete"))
+      DELETE
+      FROM "NotificationsRead"
+      WHERE notification_id IN (SELECT * FROM notifications_to_delete);
+    `);
+
+    await queryInterface.sequelize.query(`
+      DELETE
+      FROM "ChainEvents"
+      WHERE id IN (SELECT * FROM chain_events_to_delete);
+    `);
+
+    await queryInterface.sequelize.query(`
+      DELETE
+      FROM "ChainEntities"
+      WHERE id IN (SELECT * FROM chain_entities_to_delete);
+    `);
+
+    await queryInterface.sequelize.query(`
+      DROP VIEW chain_events_to_delete;
+    `);
+
+    await queryInterface.sequelize.query(`
+      DROP VIEW chain_entities_to_delete;
+    `)
+
   },
 
   down: async (queryInterface, Sequelize) => {
