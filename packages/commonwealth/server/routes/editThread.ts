@@ -6,7 +6,11 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import {
+  getProposalUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
 
@@ -78,15 +82,15 @@ const editThread = async (
   const collaboration = await models.Collaboration.findOne({
     where: {
       thread_id,
-      address_id: { [Op.in]: userOwnedAddressIds }
-    }
+      address_id: { [Op.in]: userOwnedAddressIds },
+    },
   });
 
   const admin = await models.Role.findOne({
     where: {
       chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
-      permission: 'admin',
+      permission: ['admin', 'moderator'],
     },
   });
 
