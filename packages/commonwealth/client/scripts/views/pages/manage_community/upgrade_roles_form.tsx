@@ -26,14 +26,14 @@ export class UpgradeRolesForm
   view(vnode) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
-    const noAdmins = roleData.filter((role) => {
+    const nonAdmins = roleData.filter((role) => {
       return (
         role.permission === RolePermission.member ||
         role.permission === RolePermission.moderator
       );
     });
 
-    const names = noAdmins.map((role) => {
+    const nonAdminNames = nonAdmins.map((role) => {
       const displayName = app.profiles.getProfile(
         role.Address.chain,
         role.Address.address
@@ -45,7 +45,7 @@ export class UpgradeRolesForm
         role.Address.address
       )} ${roletext}`;
 
-      return { label: fullText, value: fullText };
+      return fullText;
     });
 
     const chainOrCommObj = { chain: app.activeChainId() };
@@ -55,7 +55,7 @@ export class UpgradeRolesForm
         <div class="members-container">
           <CWRadioGroup
             name="members/mods"
-            options={names}
+            options={nonAdminNames.map((n) => ({ label: n, value: n }))}
             toggledOption={this.user}
             onchange={(e) => {
               this.user = e.target.value;
@@ -78,9 +78,9 @@ export class UpgradeRolesForm
             label="Upgrade Member"
             disabled={!this.role || !this.user}
             onclick={() => {
-              const indexOfName = names.indexOf(this.user);
+              const indexOfName = nonAdminNames.indexOf(this.user);
 
-              const user = noAdmins[indexOfName];
+              const user = nonAdmins[indexOfName];
 
               const newRole =
                 this.role === 'Admin'
@@ -92,7 +92,6 @@ export class UpgradeRolesForm
               if (!user) return;
 
               if (!newRole) return;
-
               $.post(`${app.serverUrl()}/upgradeMember`, {
                 new_role: newRole,
                 address: user.Address.address,
