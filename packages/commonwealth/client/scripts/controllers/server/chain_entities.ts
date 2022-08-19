@@ -17,6 +17,7 @@ import {
   SupportedNetwork,
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
+import MD5 from "crypto-js/md5";
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -141,15 +142,11 @@ class ChainEntityController {
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
 
       // create entity
-      const fieldName = entityToFieldName(network, entityKind);
-      // eslint-disable-next-line no-continue
-      if (!fieldName) continue;
-      const fieldValue = event.data[fieldName];
       const author = event.data['proposer'];
       let entity = new ChainEntity({
         chain,
         type: entityKind,
-        typeId: fieldValue.toString(),
+        typeId: MD5(JSON.stringify(event.data)),
         chainEvents: [],
         createdAt: null,
         updatedAt: null,
