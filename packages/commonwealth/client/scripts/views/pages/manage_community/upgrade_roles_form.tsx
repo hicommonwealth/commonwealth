@@ -7,14 +7,14 @@ import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
-import { RolePermission } from 'models';
+import { RoleInfo, RolePermission } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 type UpgradeRolesFormAttrs = {
   onRoleUpgrade: (oldRole: string, newRole: string) => void;
-  roleData: any[];
+  roleData: RoleInfo[];
 };
 
 export class UpgradeRolesForm
@@ -26,14 +26,14 @@ export class UpgradeRolesForm
   view(vnode) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
-    const nonAdmins = roleData.filter((role) => {
+    const nonAdmins: RoleInfo[] = roleData.filter((role) => {
       return (
         role.permission === RolePermission.member ||
         role.permission === RolePermission.moderator
       );
     });
 
-    const nonAdminNames = nonAdmins.map((role) => {
+    const nonAdminNames: string[] = nonAdmins.map((role) => {
       const displayName = app.profiles.getProfile(
         role.Address.chain,
         role.Address.address
