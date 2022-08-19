@@ -14,6 +14,7 @@ import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 // import ErrorPage from '../error';
 
 class NotificationSettingsPage implements m.ClassComponent {
@@ -81,6 +82,7 @@ class NotificationSettingsPage implements m.ClassComponent {
 
             return (
               <div class="notification-row">
+                <CWIconButton iconName="chevronRight" />
                 <CWText type="h5" fontWeight="medium">
                   {chainInfo.name}
                 </CWText>
