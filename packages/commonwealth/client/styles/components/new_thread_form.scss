@@ -34,6 +34,7 @@
     .new-thread-form-inputs {
       display: flex;
       flex-direction: column;
+      gap: 16px;
       width: 768px;
 
       @include mediumInclusive {

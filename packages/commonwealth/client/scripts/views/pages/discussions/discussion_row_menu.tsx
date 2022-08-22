@@ -235,7 +235,15 @@ export class DiscussionRowMenu
                 label={proposal.readOnly ? 'Unlock thread' : 'Lock thread'}
               />
             ),
-            hasAdminPermissions && <ChangeTopicMenuItem proposal={proposal} />,
+            hasAdminPermissions && (
+              <ChangeTopicMenuItem
+                proposal={proposal}
+                onChangeHandler={(topic: Topic) => {
+                  proposal.topic = topic;
+                  m.redraw();
+                }}
+              />
+            ),
             (isAuthor || hasAdminPermissions) && (
               <UpdateProposalStatusMenuItem
                 proposal={proposal}
