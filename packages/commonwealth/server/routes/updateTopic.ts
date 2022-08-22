@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 enum UpdateTopicErrors {
   NoUser = 'Not logged in',
@@ -17,16 +18,16 @@ const updateTopic = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new Error(UpdateTopicErrors.NoUser));
-  if (!req.body.thread_id) return next(new Error(UpdateTopicErrors.NoThread));
-  if (!req.body.address) return next(new Error(UpdateTopicErrors.NoAddr));
-  if (!req.body.topic_name) return next(new Error(UpdateTopicErrors.NoTopic));
+  if (!req.user) return next(new ServerError(UpdateTopicErrors.NoUser));
+  if (!req.body.thread_id) return next(new AppError(UpdateTopicErrors.NoThread));
+  if (!req.body.address) return next(new AppError(UpdateTopicErrors.NoAddr));
+  if (!req.body.topic_name) return next(new AppError(UpdateTopicErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find(
     (a) => !!a.verified && a.address === req.body.address
   );
-  if (!userAddress) return next(new Error(UpdateTopicErrors.InvalidAddr));
+  if (!userAddress) return next(new AppError(UpdateTopicErrors.InvalidAddr));
 
   const thread = await models.Thread.findOne({
     where: {
@@ -43,7 +44,7 @@ const updateTopic = async (
   });
   const isAdminOrMod = roles.length > 0;
   if (!isAdminOrMod) {
-    return next(new Error(UpdateTopicErrors.NoPermission));
+    return next(new AppError(UpdateTopicErrors.NoPermission));
   }
 
   // remove deleted topics

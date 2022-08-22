@@ -15,6 +15,7 @@ import { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AddressInstance } from '../models/address';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {
@@ -36,7 +37,7 @@ export function useMagicAuth(models: DB) {
       try {
         userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
       } catch (e) {
-        return cb(new Error(`Magic fetch failed: ${e.message} - ${JSON.stringify(e.data)}`));
+        return cb(new ServerError(`Magic fetch failed: ${e.message} - ${JSON.stringify(e.data)}`));
       }
 
       // check if this is a new signup or a login
@@ -54,7 +55,7 @@ export function useMagicAuth(models: DB) {
       // if not on root URL and we don't support the chain base for magic don't allow users to sign up
       if (!existingUser && registrationChain?.base && !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)) {
         // unsupported chain -- client should send through old email flow
-        return cb(new Error('Unsupported magic chain.'));
+        return cb(new ServerError('Unsupported magic chain.'));
       } 
 
       // if on root URL, no chain base, we allow users to sign up and generate a Substrate + Ethereum Address
@@ -69,7 +70,7 @@ export function useMagicAuth(models: DB) {
             .set('X-Magic-Secret-key', MAGIC_API_KEY)
             .accept('json');
           if (polkadotResp.body?.status !== 'ok') {
-            throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
+            throw new ServerError(polkadotResp.body?.message || 'Failed to fetch polkadot address');
           }
           const polkadotRespAddress = polkadotResp.body?.data?.public_address;
 
@@ -81,7 +82,7 @@ export function useMagicAuth(models: DB) {
             polkadotAddress = encodeAddress(polkadotRespAddress, 7); // edgeware SS58 prefix
           }
         } catch (err) {
-          return cb(new Error(err.message));
+          return cb(new ServerError(err.message));
         }
 
         const result = await sequelize.transaction(async (t) => {
@@ -172,7 +173,7 @@ export function useMagicAuth(models: DB) {
             .set('X-Magic-Secret-key', MAGIC_API_KEY)
             .accept('json');
           if (polkadotResp.body?.status !== 'ok') {
-            throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
+            throw new ServerError(polkadotResp.body?.message || 'Failed to fetch polkadot address');
           }
           const polkadotRespAddress = polkadotResp.body?.data?.public_address;
 
@@ -184,7 +185,7 @@ export function useMagicAuth(models: DB) {
             polkadotAddress = encodeAddress(polkadotRespAddress, 7); // edgeware SS58 prefix
           }
         } catch (err) {
-          return cb(new Error(err.message));
+          return cb(new ServerError(err.message));
         }
 
         const result = await sequelize.transaction(async (t) => {
