@@ -140,7 +140,7 @@ class ChainEntityController {
 
       // create event
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", JSON.stringify(cwEvent), MD5(JSON.stringify(event.data)).toHex());
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", JSON.stringify(cwEvent), MD5(JSON.stringify(event.data)).toString());
 
       // create entity
       const author = event.data['proposer'];
