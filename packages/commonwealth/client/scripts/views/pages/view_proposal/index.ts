@@ -31,6 +31,7 @@ import {
   ThreadStage,
   ChainEntity,
 } from 'models';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { VotingResults } from 'views/components/proposals/voting_results';
 import { VotingActions } from 'views/components/proposals/voting_actions';
 import { PageLoading } from 'views/pages/loading';
@@ -40,10 +41,6 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import Poll from 'models/Poll';
-import {
-  AaveViewProposalDetail,
-  AaveViewProposalSummary,
-} from './aave_view_proposal_detail';
 import {
   activeQuillEditorHasText,
   GlobalStatus,
@@ -83,7 +80,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { ProposalHeader } from './proposal_header';
-import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import { AaveViewProposalDetail } from './aave_summary';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -1005,7 +1002,6 @@ const ViewProposalPage: m.Component<
                 !(proposal instanceof Thread) &&
                   m(LinkedProposalsEmbed, { proposal }),
                 proposal instanceof AaveProposal && [
-                  m(AaveViewProposalSummary, { proposal }),
                   m(AaveViewProposalDetail, { proposal }),
                 ],
                 !(proposal instanceof Thread) && m(VotingResults, { proposal }),
@@ -1140,7 +1136,6 @@ const ViewProposalPage: m.Component<
             !(proposal instanceof Thread) &&
               m(LinkedProposalsEmbed, { proposal }),
             proposal instanceof AaveProposal && [
-              m(AaveViewProposalSummary, { proposal }),
               m(AaveViewProposalDetail, { proposal }),
             ],
             !(proposal instanceof Thread) && m(VotingResults, { proposal }),
