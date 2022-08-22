@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InsufficientPermissions:
@@ -19,18 +20,18 @@ const updateLinkedThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
-    return next(new Error(Errors.MustHaveLinkedThreadId));
+    return next(new AppError(Errors.MustHaveLinkedThreadId));
   }
   if (!linking_thread_id) {
-    return next(new Error(Errors.MustHaveLinkingThreadId));
+    return next(new AppError(Errors.MustHaveLinkingThreadId));
   }
 
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses
@@ -59,7 +60,7 @@ const updateLinkedThreads = async (
           },
         });
         if (!requesterIsAdminOrMod) {
-          return next(new Error(Errors.InsufficientPermissions));
+          return next(new AppError(Errors.InsufficientPermissions));
         }
       }
     }
@@ -83,7 +84,7 @@ const updateLinkedThreads = async (
       if (threadsShareChain) {
         await models.LinkedThread.findOrCreate({ where: params });
       } else {
-        return next(new Error(Errors.ThreadsMustShareCommunity));
+        return next(new AppError(Errors.ThreadsMustShareCommunity));
       }
     }
 
@@ -126,7 +127,7 @@ const updateLinkedThreads = async (
     });
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new AppError(e));
   }
 };
 

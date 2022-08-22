@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { ServerError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 
@@ -16,9 +16,9 @@ export const Errors = {
 
 const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id, stage } = req.body;
-  if (!thread_id) return next(new Error(Errors.NoThreadId));
-  if (!stage) return next(new Error(Errors.NoStage));
-  if (!req.user) return next(new Error(Errors.NotAdminOrOwner));
+  if (!thread_id) return next(new AppError(Errors.NoThreadId));
+  if (!stage) return next(new AppError(Errors.NoStage));
+  if (!req.user) return next(new AppError(Errors.NotAdminOrOwner));
 
   try {
     const thread = await models.Thread.findOne({
@@ -26,7 +26,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
         id: thread_id,
       },
     });
-    if (!thread) return next(new Error(Errors.NoThread));
+    if (!thread) return next(new AppError(Errors.NoThread));
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
     if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
       const roles = await models.Role.findAll({
@@ -38,7 +38,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
       const role = roles.find((r) => {
         return r.chain_id === thread.chain;
       });
-      if (!role) return next(new Error(Errors.NotAdminOrOwner));
+      if (!role) return next(new AppError(Errors.NotAdminOrOwner));
     }
 
     // fetch available stages
@@ -56,7 +56,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
     ] : custom_stages;
 
     if (availableStages.indexOf(stage) === -1) {
-      return next(new Error(Errors.InvalidStage));
+      return next(new AppError(Errors.InvalidStage));
     }
 
     await thread.update({ stage });
@@ -83,7 +83,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

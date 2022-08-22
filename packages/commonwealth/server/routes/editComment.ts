@@ -9,6 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -19,12 +20,12 @@ export const Errors = {
 
 const editComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   if (!req.body.id) {
-    return next(new Error(Errors.NoId));
+    return next(new AppError(Errors.NoId));
   }
 
   // check if banned
@@ -33,7 +34,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     address: author.address,
   });
   if (!canInteract) {
-    return next(new Error(banError));
+    return next(new AppError(banError));
   }
 
   const attachFiles = async () => {
@@ -106,7 +107,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
       log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
     }
     if (!proposal) {
-      throw new Error(Errors.NoProposal);
+      throw new AppError(Errors.NoProposal);
     }
 
     const cwUrl = typeof proposal === 'string'
@@ -155,7 +156,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         return !alreadyExists;
       });
     } catch (e) {
-      return next(new Error('Failed to parse mentions'));
+      return next(new AppError('Failed to parse mentions'));
     }
 
     // grab mentions to notify tagged users
@@ -172,7 +173,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
           });
           return user;
         } catch (err) {
-          return next(new Error(err));
+          return next(new AppError(err));
         }
       }));
       // filter null results
