@@ -2,13 +2,13 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
 
 import 'modals/linked_thread_modal.scss';
 
 import { Thread } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { ThreadSelector } from 'views/components/thread_selector';
+import { CWButton } from '../components/component_kit/cw_button';
 
 type LinkedThreadModalAttrs = {
   linkedThreads: Thread[];
@@ -29,13 +29,12 @@ export class LinkedThreadModal
           <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          {m(ThreadSelector, {
-            linkingThread,
-            linkedThreads,
-          })}
-          <Button
+          <ThreadSelector
+            linkingThread={linkingThread}
+            linkedThreads={linkedThreads}
+          />
+          <CWButton
             label="Close"
-            intent="primary"
             onclick={(e) => {
               e.preventDefault();
               if (onclose) onclose();
