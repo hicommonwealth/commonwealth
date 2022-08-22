@@ -30,8 +30,6 @@ class ChainEntity {
   }
 
   constructor({ chain, type, typeId, chainEvents, createdAt, updatedAt, id, threadId, threadTitle, title, author }) {
-    console.log("Creating a chain entity:", JSON.stringify({ chain, type, typeId, chainEvents, createdAt,
-      updatedAt, id, threadId, threadTitle, title, author }));
     this.id = id;
     this.chain = chain;
     this.type = type;

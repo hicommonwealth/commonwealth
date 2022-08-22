@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -9,7 +8,6 @@ import app from 'state';
 import {
   CWEvent,
   eventToEntity,
-  entityToFieldName,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
@@ -140,7 +138,6 @@ class ChainEntityController {
 
       // create event
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", JSON.stringify(cwEvent), MD5(JSON.stringify(event.data)).toString());
 
       // create entity
       const author = event.data['proposer'];
