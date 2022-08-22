@@ -34,6 +34,7 @@
     .new-thread-form-inputs {
       display: flex;
       flex-direction: column;
+      gap: 16px;
       width: 768px;
 
       @include mediumInclusive {
@@ -65,12 +66,14 @@
         flex-wrap: wrap;
         gap: 8px;
 
-        .topic-selection-drop-menu {
-          height: 40px;
+        @include mediumInclusive {
+          .Button {
+            flex: 1;
+          }
         }
 
         .TextInput {
-          max-width: 400px;
+          flex: 2;
         }
       }
 

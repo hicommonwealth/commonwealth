@@ -9,19 +9,9 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
+import { Thread, ThreadKind, AnyProposal, Topic } from 'models';
 import {
-  Thread,
-  ThreadKind,
-  Topic,
-  ThreadStage,
-  AnyProposal,
-  ChainEntity,
-} from 'models';
-import { TopicEditor } from 'views/components/topic_editor';
-import { StageEditor } from 'views/components/stage_editor';
-import { PollEditor } from 'views/components/poll_editor';
-import {
-  TopicEditorMenuItem,
+  ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
 } from 'views/pages/discussions/discussion_row_menu';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -29,7 +19,6 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
 import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,
@@ -55,8 +44,7 @@ import {
   ProposalBodyEditor,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
-  EditPermissionsButton,
-  ProposalEditorPermissions,
+  EditCollaboratorsButton,
 } from './body';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
@@ -87,19 +75,13 @@ export class ProposalHeader
       isAuthor: boolean;
       isEditor: boolean;
       isAdmin: boolean;
-      stageEditorIsOpen: boolean;
-      pollEditorIsOpen: boolean;
-      closePollEditor: Function;
-      closeStageEditor: Function;
     }>
 {
   private currentText: any;
   private editing: boolean;
-  private editPermissionsIsOpen: boolean;
   private quillEditorState: QuillEditor;
   private savedEdit: string;
   private saving: boolean;
-  private topicEditorIsOpen: boolean;
   private updatedTitle: string;
   private updatedUrl: string;
 
@@ -188,15 +170,15 @@ export class ProposalHeader
                                 parentState: this,
                               }),
                             isAuthor &&
-                              m(EditPermissionsButton, {
-                                openEditPermissions: () => {
-                                  this.editPermissionsIsOpen = true;
-                                },
+                              m(EditCollaboratorsButton, {
+                                proposal,
                               }),
                             isAdmin && proposal instanceof Thread && (
-                              <TopicEditorMenuItem
-                                openTopicEditor={() => {
-                                  this.topicEditorIsOpen = true;
+                              <ChangeTopicMenuItem
+                                proposal={proposal}
+                                onChangeHandler={(topic: Topic) => {
+                                  proposal.topic = topic;
+                                  m.redraw();
                                 }}
                               />
                             ),
@@ -240,67 +222,6 @@ export class ProposalHeader
                         />
                       ),
                     <SocialSharingCarat />,
-                    this.editPermissionsIsOpen &&
-                      proposal instanceof Thread &&
-                      m(ProposalEditorPermissions, {
-                        thread: vnode.attrs.proposal as Thread,
-                        popoverMenu: true,
-                        openStateHandler: (v) => {
-                          this.editPermissionsIsOpen = v;
-                        },
-                        // TODO: Onchange logic
-                        onChangeHandler: () => {},
-                      }),
-                    this.topicEditorIsOpen && proposal instanceof Thread && (
-                      <TopicEditor
-                        thread={vnode.attrs.proposal as Thread}
-                        popoverMenu
-                        onChangeHandler={(topic: Topic) => {
-                          proposal.topic = topic;
-                          m.redraw();
-                        }}
-                        openStateHandler={(v) => {
-                          this.topicEditorIsOpen = v;
-                          m.redraw();
-                        }}
-                      />
-                    ),
-                    vnode.attrs.stageEditorIsOpen &&
-                      proposal instanceof Thread && (
-                        <StageEditor
-                          thread={vnode.attrs.proposal as Thread}
-                          popoverMenu
-                          onChangeHandler={(
-                            stage: ThreadStage,
-                            chainEntities: ChainEntity[],
-                            snapshotProposal: SnapshotProposal[]
-                          ) => {
-                            proposal.stage = stage;
-                            proposal.chainEntities = chainEntities;
-                            if (app.chain?.meta.snapshot) {
-                              proposal.snapshotProposal =
-                                snapshotProposal[0]?.id;
-                            }
-                            app.threads.fetchThreadsFromId([
-                              proposal.identifier,
-                            ]);
-                            m.redraw();
-                          }}
-                          openStateHandler={(v) => {
-                            if (!v) vnode.attrs.closeStageEditor();
-                            m.redraw();
-                          }}
-                        />
-                      ),
-                    vnode.attrs.pollEditorIsOpen && proposal instanceof Thread && (
-                      <PollEditor
-                        thread={vnode.attrs.proposal as Thread}
-                        onChangeHandler={() => {
-                          vnode.attrs.closePollEditor();
-                          m.redraw();
-                        }}
-                      />
-                    ),
                   ]
                 : [
                     m(ProposalBodyAuthor, { item: proposal }),
