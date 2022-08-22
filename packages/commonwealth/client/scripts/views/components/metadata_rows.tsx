@@ -1,11 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Select, Switch } from 'construct-ui';
+import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
 import { CWTextArea } from './component_kit/cw_text_area';
+import { CWCheckbox } from './component_kit/cw_checkbox';
 
 type InputRowAttrs = {
   value: string;
@@ -80,17 +81,15 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
     return (
       <div class="ToggleRow">
         <CWLabel label={title} />
-        <div class="toggle-and-label">
-          <Switch
-            checked={this.checked}
-            disabled={disabled || false}
-            onchange={() => {
-              this.checked = !this.checked;
-              onToggle(this.checked);
-            }}
-          />
-          {label && <div class="switch-label">{label(this.checked)}</div>}
-        </div>
+        <CWCheckbox
+          checked={this.checked}
+          disabled={disabled || false}
+          onchange={() => {
+            this.checked = !this.checked;
+            onToggle(this.checked);
+          }}
+          label={label ? label(this.checked) : undefined}
+        />
       </div>
     );
   }

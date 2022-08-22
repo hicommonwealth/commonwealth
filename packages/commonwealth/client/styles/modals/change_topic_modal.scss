@@ -1,13 +1,10 @@
 @import 'shared';
 
-.EditProfileModal {
-  width: 480px;
-
-  @include smallInclusive {
-    width: 100%;
-  }
+.ChangeTopicModal {
+  width: 320px;
 
   .compact-modal-body {
+    align-items: center;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -16,6 +13,7 @@
       display: flex;
       gap: 8px;
       justify-content: flex-end;
+      width: 100%;
     }
   }
 }

@@ -1,5 +1,12 @@
 @import 'shared';
 
+@mixin iconPositionStyles {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .MessageRow {
   display: flex;
 
@@ -68,10 +75,12 @@
 
     .text-input-right-icon.Icon {
       color: $primary-300;
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
+
+      @include iconPositionStyles;
+    }
+
+    .text-input-right-onclick-icon {
+      @include iconPositionStyles;
     }
   }
 }
