@@ -22,10 +22,8 @@ export class ProposalHeaderExternalLink
 
     return (
       <div class="ProposalHeaderLink">
-        {externalLink('a', proposal.url, [
-          extractDomain(proposal.url),
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {externalLink('a', proposal.url, [extractDomain(proposal.url)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -46,8 +44,8 @@ export class ProposalHeaderBlockExplorerLink
         {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
-          <CWIcon iconName="externalLink" iconSize="small" />,
         ])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -68,8 +66,8 @@ export class ProposalHeaderVotingInterfaceLink
         {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
-          <CWIcon iconName="externalLink" iconSize="small" />,
         ])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -91,10 +89,8 @@ export class ProposalHeaderThreadLink
 
     return (
       <div class="ProposalHeaderLink">
-        {link('a', path, [
-          'Go to discussion',
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {link('a', path, ['Go to discussion'])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -113,10 +109,8 @@ export class ProposalHeaderSnapshotThreadLink
 
     return (
       <div class="ProposalHeaderLink">
-        {link('a', proposalLink, [
-          decodeURIComponent(title),
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {link('a', proposalLink, [decodeURIComponent(title)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
