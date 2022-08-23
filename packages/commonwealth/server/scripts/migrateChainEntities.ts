@@ -20,6 +20,7 @@ import { ChainInstance } from '../models/chain';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,7 +30,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
   if (!chain) {
-    throw new Error('must provide chain');
+    throw new AppError('must provide chain');
   }
 
   // query one node for each supported chain
@@ -37,13 +38,13 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     where: { id: chain },
   })
   if (!chainInstance) {
-    throw new Error('no chain found for chain entity migration');
+    throw new AppError('no chain found for chain entity migration');
   }
   const node = await models['ChainNode'].scope('withPrivateData').findOne({
     where: { id: chainInstance.chain_node_id }
   });
   if (!node) {
-    throw new Error('no nodes found for chain entity migration');
+    throw new AppError('no nodes found for chain entity migration');
   }
 
   // 2. for each node, fetch and migrate chain entities
@@ -63,7 +64,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
-      throw new Error('Moloch migration not yet implemented.');
+      throw new AppError('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const api = await CompoundEvents.createApi(
         node.private_url || node.url,
@@ -79,7 +80,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else {
-      throw new Error('Unsupported migration chain');
+      throw new AppError('Unsupported migration chain');
     }
 
     log.info('Fetching chain events...');
