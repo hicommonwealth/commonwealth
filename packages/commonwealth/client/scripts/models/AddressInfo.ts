@@ -15,6 +15,7 @@ class AddressInfo extends Account {
     ghostAddress?: boolean,
   ) {
     const chain = app.config.chains.getById(chainId);
+    if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);
     super({
       address,
       chain,

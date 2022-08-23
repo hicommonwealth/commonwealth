@@ -40,6 +40,7 @@ const renderCommunity = (item) => {
             }}
           >
             {roles.map((role) => {
+              // TODO: sometimes address_chain is null here -- why??
               return m(User, {
                 avatarSize: 18,
                 avatarOnly: true,
