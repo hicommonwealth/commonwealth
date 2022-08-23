@@ -45,9 +45,9 @@ const renderCommunity = (item) => {
                 avatarSize: 18,
                 avatarOnly: true,
                 user: new AddressInfo(
-                  null,
+                  role.address_id,
                   role.address,
-                  role.address_chain,
+                  role.address_chain || role.chain_id,
                   null
                 ),
               });

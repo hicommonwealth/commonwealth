@@ -22,8 +22,7 @@ const SelectAddressModal: m.Component<
   { selectedIndex: number; loading: boolean }
 > = {
   view: (vnode) => {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> =
-      app.user.getActiveAccountsByRole();
+    const activeAccountsByRole: Array<[Account, RoleInfo]> = app.user.getActiveAccountsByRole();
     const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
@@ -216,7 +215,7 @@ const SelectAddressModal: m.Component<
             fluid: true,
             rounded: true,
             disabled:
-              vnode.state.selectedIndex === undefined || vnode.state.loading,
+              typeof vnode.state.selectedIndex !== 'number' || vnode.state.loading,
             onclick: createRole.bind(this),
           }),
         m(LoginWithWalletDropdown, {
