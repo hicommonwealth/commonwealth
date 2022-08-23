@@ -50,10 +50,9 @@ class Account {
     this._walletId = walletId;
     this._validationToken = validationToken;
     this.ghostAddress = !!ghostAddress;
-    this
     if (profile) {
       this._profile = profile;
-    } else if (!ignoreProfile) {
+    } else if (!ignoreProfile && chain?.id) {
       this._profile = app.profiles.getProfile(chain.id, address);
     }
   }
