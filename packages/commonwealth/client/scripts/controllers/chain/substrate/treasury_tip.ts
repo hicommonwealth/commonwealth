@@ -8,6 +8,7 @@ import {
 import { SubstrateTypes } from 'chain-events/src';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
+import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';
@@ -18,7 +19,7 @@ const backportEventToAdapter = (
 ): ISubstrateTreasuryTip => {
   const { proposalHash, reason, who, finder, deposit, findersFee } = event;
   return {
-    identifier: proposalHash,
+    identifier: MD5(JSON.stringify(event)),
     hash: proposalHash,
     reason,
     who,

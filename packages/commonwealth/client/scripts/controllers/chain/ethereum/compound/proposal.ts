@@ -23,6 +23,7 @@ import {
 } from 'models';
 import { blocknumToTime } from 'helpers';
 
+import MD5 from "crypto-js/md5";
 import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
@@ -55,7 +56,7 @@ const backportEntityToAdapter = (
   const startEvent = entity.chainEvents.find((e) => e.data.kind === CompoundTypes.EventKind.ProposalCreated);
   const startData = startEvent.data as CompoundTypes.IProposalCreated;
   return {
-    identifier: `${startData.id}`,
+    identifier: MD5(JSON.stringify(startData)),
     queued: false,
     executed: false,
     cancelled: false,

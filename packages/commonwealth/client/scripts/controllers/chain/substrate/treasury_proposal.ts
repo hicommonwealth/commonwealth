@@ -1,24 +1,25 @@
-import { ApiPromise } from '@polkadot/api';
-import { formatCoin } from 'adapters/currency';
-import { ISubstrateTreasuryProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import {ApiPromise} from '@polkadot/api';
+import {formatCoin} from 'adapters/currency';
+import {ISubstrateTreasuryProposal, SubstrateCoin} from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent
 } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from 'chain-events/src';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
+import {ProposalType} from 'common-common/src/types';
+import {SubstrateTypes} from 'chain-events/src';
+import {chainEntityTypeToProposalSlug} from 'identifiers';
+import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import SubstrateAccounts, {SubstrateAccount} from './account';
 import SubstrateTreasury from './treasury';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
   event: SubstrateTypes.ITreasuryProposed | string
 ): ISubstrateTreasuryProposal => {
-  if (typeof event === 'string') return { identifier: event } as ISubstrateTreasuryProposal;
+  if (typeof event === 'string') return {identifier: MD5(event)} as ISubstrateTreasuryProposal;
   return {
-    identifier: event.proposalIndex.toString(),
+    identifier: MD5(JSON.stringify(event)),
     index: event.proposalIndex,
     value: ChainInfo.createType('u128', event.value),
     beneficiary: event.beneficiary,
@@ -32,18 +33,26 @@ export class SubstrateTreasuryProposal
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
+
   public generateTitle() {
     return `Proposal for ${formatCoin(this.value)}`;
   }
-  public get description() { return null; }
+
+  public get description() {
+    return null;
+  }
 
   private readonly _author: SubstrateAccount;
-  public get author() { return this._author; }
+  public get author() {
+    return this._author;
+  }
 
   public title: string;
 
   private _awarded: boolean = false;
-  get awarded() { return this._awarded; }
+  get awarded() {
+    return this._awarded;
+  }
 
   public readonly value: SubstrateCoin;
   public readonly bond: SubstrateCoin;
@@ -52,15 +61,19 @@ export class SubstrateTreasuryProposal
   public get votingType() {
     return VotingType.None;
   }
+
   public get votingUnit() {
     return VotingUnit.None;
   }
+
   public canVoteFrom(account) {
     return false;
   }
+
   public get support() {
     return null;
   }
+
   public get turnout() {
     return null;
   }
@@ -69,8 +82,9 @@ export class SubstrateTreasuryProposal
     if (this.awarded) return ProposalStatus.Passed;
     return ProposalStatus.None;
   }
-  get endTime() : ProposalEndTime {
-    return { kind: 'unavailable' };
+
+  get endTime(): ProposalEndTime {
+    return {kind: 'unavailable'};
   }
 
   private _Chain: SubstrateChain;

@@ -14,6 +14,7 @@ import {
 } from 'models';
 import { SubstrateTypes } from 'chain-events/src';
 import { Coin } from 'adapters/currency';
+import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
@@ -111,7 +112,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
 const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubstrateDemocracyReferendum => {
   const enc = new TextEncoder();
   return {
-    identifier: event.referendumIndex.toString(),
+    identifier: MD5(JSON.stringify(event)),
     index: event.referendumIndex,
     endBlock: event.endBlock,
     threshold: event.voteThreshold as DemocracyThreshold,

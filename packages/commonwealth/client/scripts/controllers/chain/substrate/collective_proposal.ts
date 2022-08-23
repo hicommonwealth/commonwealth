@@ -1,5 +1,3 @@
-import _ from 'underscore';
-
 import { SubstrateTypes } from 'chain-events/src';
 import { ApiPromise } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
@@ -13,6 +11,7 @@ import {
 import { ProposalType } from 'common-common/src/types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 
+import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
@@ -31,7 +30,7 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
 
 const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISubstrateCollectiveProposal => {
   return {
-    identifier: event.proposalHash.toString(),
+    identifier: MD5(JSON.stringify(event)),
     index: event.proposalIndex,
     threshold: event.threshold,
     hash: event.proposalHash,

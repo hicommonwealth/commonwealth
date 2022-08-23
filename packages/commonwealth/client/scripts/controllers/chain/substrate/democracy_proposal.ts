@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import BN from 'bn.js';
 
 import { SubstrateTypes } from 'chain-events/src';
@@ -17,6 +16,7 @@ import {
 } from 'models';
 
 import { chainEntityTypeToProposalSlug } from 'identifiers';
+import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -29,7 +29,7 @@ const backportEventToAdapter = (
 ): ISubstrateDemocracyProposal => {
   const enc = new TextEncoder();
   return {
-    identifier: event.proposalIndex.toString(),
+    identifier: MD5(JSON.stringify(event)),
     index: event.proposalIndex,
     hash: enc.encode(event.proposalHash),
     deposit: ChainInfo.createType('u128', event.deposit),

@@ -11,7 +11,6 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
   }
 
   public update(newProposal: ProposalT) {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>> proposal updated:", newProposal)
     const oldProposal = this.getByIdentifier(newProposal.identifier);
     if (oldProposal) {
       this.remove(oldProposal);

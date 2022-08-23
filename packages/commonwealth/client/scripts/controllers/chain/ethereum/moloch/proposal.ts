@@ -18,6 +18,7 @@ import {
   ChainEvent,
 } from 'models';
 
+import MD5 from "crypto-js/md5";
 import MolochMember from './member';
 import MolochMembers from './members';
 import MolochAPI from './api';
@@ -59,7 +60,7 @@ const backportEntityToAdapter = (
   if (!startEvent) {
     throw new Error('Proposal start event not found!');
   }
-  const identifier = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
+  const identifier = MD5(JSON.stringify(startEvent.data));
   const id = identifier;
   const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
   const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;

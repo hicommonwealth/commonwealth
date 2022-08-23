@@ -22,6 +22,7 @@ import {
 } from 'models';
 import { blocknumToTime } from 'helpers';
 
+import MD5 from "crypto-js/md5";
 import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
 import { attachSigner } from '../contractApi';
@@ -57,7 +58,7 @@ const backportEntityToAdapter = (
   );
   const startData = startEvent.data as AaveTypes.IProposalCreated;
   return {
-    identifier: `${startData.id}`,
+    identifier: MD5(JSON.stringify(startData)),
     queued: false,
     executed: false,
     cancelled: false,

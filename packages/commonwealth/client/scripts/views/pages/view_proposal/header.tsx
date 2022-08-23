@@ -190,7 +190,6 @@ export const ProposalTitleSaveEdit: m.Component<{
           intent: 'primary',
           rounded: true,
           onclick: (e) => {
-            console.log(JSON.stringify(proposal))
             e.preventDefault();
             parentState.saving = true;
             app.chain.chainEntities
