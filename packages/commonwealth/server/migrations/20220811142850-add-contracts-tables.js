@@ -102,14 +102,14 @@ module.exports = {
         { type: Sequelize.STRING, allowNull: true }, { transaction: t });
 
       const contracts = await queryInterface.sequelize.query(
-        `SELECT c.decimals, c.address, cc.community_id FROM "Contracts" c 
+        `SELECT c.decimals, c.address, cc.chain_id FROM "Contracts" c 
         LEFT JOIN "CommunityContracts" cc ON c.id = cc.contract_id;`,
         { transaction: t });
 
       await Promise.all(contracts[0].map(async (c) => {
         // Add contract stuff back on Chains model
         await queryInterface.sequelize.query(
-          `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = '${c.community_id}';`,
+          `UPDATE "Chains" c SET decimals=${c.decimals}, address='${c.address}' WHERE c.id = '${c.chain_id}';`,
           {transaction: t });
       }));
 
