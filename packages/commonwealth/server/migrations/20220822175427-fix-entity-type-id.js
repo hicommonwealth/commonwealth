@@ -106,12 +106,12 @@ module.exports = {
             await queryInterface.sequelize.query(`
                 DELETE
                 FROM "ChainEvents"
-                WHERE id IN (SELECT * FROM to_delete_edge_case_entities);
+                WHERE entity_id IN (SELECT id FROM to_delete_edge_case_entities);
             `, { transaction: t});
             await queryInterface.sequelize.query(`
                 DELETE
                 FROM "ChainEntities"
-                WHERE id IN (SELECT * FROM to_delete_edge_case_entities);
+                WHERE id IN (SELECT id FROM to_delete_edge_case_entities);
             `, { transaction: t});
 
             await queryInterface.sequelize.query(`
