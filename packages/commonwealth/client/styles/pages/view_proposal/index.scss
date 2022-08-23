@@ -318,46 +318,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalSidebarPollEditorModule,
-  .ProposalLinkedThreadsEditorModule {
-    border-radius: 10px;
-    border: 1px solid $neutral-100;
-    padding: 22px 18px 21px;
-    margin-bottom: 24px;
-  }
-
-  .ProposalLinkedThreadsEditorModule {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .cui-list-item {
-      &:first-child {
-        padding-top: 0 !important;
-      }
-
-      &:hover {
-        background: none;
-      }
-    }
-
-    .linked-threads-title {
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-  }
-
-  .ProposalSidebarPollEditorModule {
-    .placeholder-copy {
-      color: $neutral-600;
-      margin: 2px 0 12px;
-    }
-
-    .proposal-chain-entities {
-      margin-bottom: 12px;
-    }
-  }
-
   .QuillEditor {
     margin-top: 8px;
   }

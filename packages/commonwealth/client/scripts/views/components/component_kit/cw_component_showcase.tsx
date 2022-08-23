@@ -63,7 +63,7 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <CWButton
+        {/* <CWButton
           label="Click for Login modal"
           onclick={() =>
             app.modals.create({
@@ -75,7 +75,7 @@ export class ComponentShowcase implements m.ClassComponent {
               },
             })
           }
-        />
+        /> */}
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWThreadVoteButton

@@ -5,7 +5,6 @@ import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
 import { ChainInstance } from 'server/models/chain';
-import Topic from './Topic';
 import NodeInfo from './NodeInfo';
 
 import {
@@ -37,9 +36,6 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
-  // TODO Graham 8-12-22: We should consider removing this topic prop,
-  // as it does not stay in step with topic store, potentially causing problems
-  public readonly topics: Topic[];
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -75,7 +71,6 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultSummaryView,
-    topics,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -109,7 +104,6 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
-    this.topics = topics ? topics.map((t) => new Topic(t)) : [];
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
@@ -143,7 +137,6 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
-    topics,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -183,7 +176,6 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultSummaryView: default_summary_view,
-      topics,
       adminsAndMods,
       base,
       ss58_prefix,
