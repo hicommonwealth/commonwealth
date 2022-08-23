@@ -1,16 +1,16 @@
 @import 'shared';
 
-.EditProfileModal {
-  width: 480px;
-
-  @include smallInclusive {
-    width: 100%;
-  }
-
+.UpdateProposalStatusModal {
   .compact-modal-body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    .stage-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
     .buttons-row {
       display: flex;

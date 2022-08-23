@@ -28,7 +28,10 @@ import {
   Account,
   ProposalModule,
   DepositVote,
+  ThreadStage,
+  ChainEntity,
 } from 'models';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { VotingResults } from 'views/components/proposals/voting_results';
 import { VotingActions } from 'views/components/proposals/voting_actions';
 import { PageLoading } from 'views/pages/loading';
@@ -39,10 +42,6 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import Poll from 'models/Poll';
 import { IBalanceAccount } from 'models/interfaces';
-import {
-  AaveViewProposalDetail,
-  AaveViewProposalSummary,
-} from './aave_view_proposal_detail';
 import {
   activeQuillEditorHasText,
   GlobalStatus,
@@ -82,6 +81,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { ProposalHeader } from './proposal_header';
+import { AaveViewProposalDetail } from './aave_summary';
 
 const MAX_THREAD_LEVEL = 2;
 
@@ -101,13 +101,11 @@ export interface IProposalPageState {
   editing: boolean;
   highlightedComment: boolean;
   parentCommentId: number; // if null or undefined, reply is thread-scoped
-  pollEditorIsOpen: boolean;
   prefetch: IPrefetch;
   proposal: AnyProposal | Thread;
   recentlyEdited: boolean;
   recentlySubmitted: number; // comment ID for CSS highlight transitions
   replying: boolean;
-  stageEditorIsOpen: boolean;
   tabSelected: 'viewProposal' | 'viewSidebar';
   threadFetched;
   threadFetchFailed;
@@ -1001,21 +999,10 @@ const ViewProposalPage: m.Component<
                   isAuthor,
                   isEditor,
                   isAdmin: isAdminOrMod,
-                  stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-                  pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-                  closeStageEditor: () => {
-                    vnode.state.stageEditorIsOpen = false;
-                    m.redraw();
-                  },
-                  closePollEditor: () => {
-                    vnode.state.pollEditorIsOpen = false;
-                    m.redraw();
-                  },
                 }),
                 !(proposal instanceof Thread) &&
                   m(LinkedProposalsEmbed, { proposal }),
                 proposal instanceof AaveProposal && [
-                  m(AaveViewProposalSummary, { proposal }),
                   m(AaveViewProposalDetail, { proposal }),
                 ],
                 !(proposal instanceof Thread) && m(VotingResults, { proposal }),
@@ -1046,10 +1033,20 @@ const ViewProposalPage: m.Component<
                 showLinkedSnapshotOptions &&
                   proposal instanceof Thread &&
                   m(LinkedProposalsCard, {
-                    proposal,
-                    openStageEditor: () => {
-                      vnode.state.stageEditorIsOpen = true;
+                    onChangeHandler: (
+                      stage: ThreadStage,
+                      chainEntities: ChainEntity[],
+                      snapshotProposal: SnapshotProposal[]
+                    ) => {
+                      proposal.stage = stage;
+                      proposal.chainEntities = chainEntities;
+                      if (app.chain?.meta.snapshot) {
+                        proposal.snapshotProposal = snapshotProposal[0]?.id;
+                      }
+                      app.threads.fetchThreadsFromId([proposal.identifier]);
+                      m.redraw();
                     },
+                    proposal,
                     showAddProposalButton: isAuthor || isAdminOrMod,
                   }),
                 showLinkedThreadOptions &&
@@ -1122,9 +1119,6 @@ const ViewProposalPage: m.Component<
                   m(PollEditorCard, {
                     proposal,
                     proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                    openPollEditor: () => {
-                      vnode.state.pollEditorIsOpen = true;
-                    },
                   }),
               ]),
           ]),
@@ -1139,21 +1133,10 @@ const ViewProposalPage: m.Component<
               isAuthor,
               isEditor,
               isAdmin: isAdminOrMod,
-              stageEditorIsOpen: vnode.state.stageEditorIsOpen,
-              pollEditorIsOpen: vnode.state.pollEditorIsOpen,
-              closeStageEditor: () => {
-                vnode.state.stageEditorIsOpen = false;
-                m.redraw();
-              },
-              closePollEditor: () => {
-                vnode.state.pollEditorIsOpen = false;
-                m.redraw();
-              },
             }),
             !(proposal instanceof Thread) &&
               m(LinkedProposalsEmbed, { proposal }),
             proposal instanceof AaveProposal && [
-              m(AaveViewProposalSummary, { proposal }),
               m(AaveViewProposalDetail, { proposal }),
             ],
             !(proposal instanceof Thread) && m(VotingResults, { proposal }),
@@ -1182,10 +1165,20 @@ const ViewProposalPage: m.Component<
             showLinkedSnapshotOptions &&
               proposal instanceof Thread &&
               m(LinkedProposalsCard, {
-                proposal,
-                openStageEditor: () => {
-                  vnode.state.stageEditorIsOpen = true;
+                onChangeHandler: (
+                  stage: ThreadStage,
+                  chainEntities: ChainEntity[],
+                  snapshotProposal: SnapshotProposal[]
+                ) => {
+                  proposal.stage = stage;
+                  proposal.chainEntities = chainEntities;
+                  if (app.chain?.meta.snapshot) {
+                    proposal.snapshotProposal = snapshotProposal[0]?.id;
+                  }
+                  app.threads.fetchThreadsFromId([proposal.identifier]);
+                  m.redraw();
                 },
+                proposal,
                 showAddProposalButton: isAuthor || isAdminOrMod,
               }),
             showLinkedThreadOptions &&
@@ -1252,9 +1245,6 @@ const ViewProposalPage: m.Component<
               m(PollEditorCard, {
                 proposal,
                 proposalAlreadyHasPolling: !vnode.state.polls?.length,
-                openPollEditor: () => {
-                  vnode.state.pollEditorIsOpen = true;
-                },
               }),
           ]),
         ]),
