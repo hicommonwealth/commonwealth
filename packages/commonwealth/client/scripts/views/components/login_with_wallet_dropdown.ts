@@ -72,7 +72,7 @@ const LoginWithWalletDropdown: m.Component<{
     const sortedChainBases = [
       ChainBase.CosmosSDK,
       ChainBase.Ethereum,
-      ChainBase.NEAR,
+      // ChainBase.NEAR,
       ChainBase.Substrate,
       ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));

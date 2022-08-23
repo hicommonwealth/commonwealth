@@ -476,8 +476,10 @@ const LinkNewAddressModal: m.Component<
                         rounded: true,
                         onclick: async (e) => {
                           // redirect to NEAR page for login
-                          const WalletAccount = (await import('near-api-js'))
-                            .WalletAccount;
+                          const WalletAccount = (await import('near-api-js')).WalletAccount;
+                          if (!app.chain.apiInitialized) {
+                            await app.chain.initApi();
+                          }
                           const wallet = new WalletAccount(
                             (app.chain as Near).chain.api,
                             'commonwealth_near'
