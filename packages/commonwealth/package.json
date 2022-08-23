@@ -101,6 +101,7 @@
     "@socket.io/redis-adapter": "^7.1.0",
     "@terra-money/terra.js": "^3.1.3",
     "@tharsis/address-converter": "^0.1.8",
+    "@tharsis/proto": "^0.1.19",
     "@tharsis/provider": "^0.2.4",
     "@tharsis/transactions": "^0.2.5",
     "@types/bluebird": "^3.5.36",

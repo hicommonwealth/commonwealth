@@ -1,15 +1,27 @@
 import app from 'state';
+import Long from 'long';
+import axios from 'axios';
+
 import { createMessageSend } from '@tharsis/transactions';
-import { generateEndpointAccount } from '@tharsis/provider';
+import {
+  generateEndpointAccount,
+  generatePostBodyBroadcast,
+  generateEndpointBroadcast,
+} from '@tharsis/provider';
+import { StdSignature } from '@cosmjs/amino';
+
+import { createTxRaw, createSignerInfo } from '@tharsis/proto';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 import { Address } from 'ethereumjs-util';
 
+import { ChainEntityStore } from 'client/scripts/stores';
 import { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 import { bech32 } from 'bech32';
 import { ChainBase, WalletId } from '../../../../../../common-common/src/types';
+import KeplrWebWalletController from './keplr_web_wallet';
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   console.log('got here at least');
@@ -58,83 +70,116 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return this._offlineSigner;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
-    if (!this._chainId || !window.keplr?.signDirect)
-      throw new Error('Missing or misconfigured web wallet');
-
-    if (this._chain !== app.chain.id) {
-      // disable then re-enable on chain switch
-      await this.enable();
-    }
-
-    // Get the verification token & placeholder TX to send
-    const signDoc = validationTokenToSignDoc(
+  public async signLoginToken(
+    message: string,
+    address: string
+  ): Promise<StdSignature> {
+    const signature = await window.keplr.signArbitrary(
       this._chainId,
-      account.validationToken
+      address,
+      message
     );
-    console.log('chainid: ', this._chainId);
-    console.log('signDoc', signDoc);
-    console.log('account', account);
-    console.log('endpoint', generateEndpointAccount(account.address));
-    //
-
-    const chain = {
-      chainId: 9001,
-      cosmosChainId: this._chainId,
-    };
-
-    const sender = {
-      accountAddress: account.address,
-      sequence: parseInt(signDoc.sequence, 10),
-      accountNumber: parseInt(signDoc.account_number, 10),
-      pubkey: 'AgTw+4v0daIrxsNSW4FcQ+IoingPseFwHO1DnssyoOqZ',
-    };
-
-    const fee = {
-      amount: '20',
-      denom: 'aevmos',
-      gas: '200000',
-    };
-
-    const memo = '';
-
-    const params = {
-      destinationAddress: 'evmos1pmk2r32ssqwps42y3c9d4clqlca403yd9wymgr',
-      amount: '1',
-      denom: 'aevmos',
-    };
-
-    const msg = createMessageSend(chain, sender, fee, memo, params);
-
-    console.log('message: ', msg);
-    //
-
-    // save and restore default options after setting to no fee/memo for login
-    const defaultOptions = window.keplr.defaultOptions;
-    window.keplr.defaultOptions = {
-      sign: {
-        preferNoSetFee: true,
-        preferNoSetMemo: true,
-        disableBalanceCheck: true,
-      },
-    };
-
-    let signature;
-
-    try {
-      signature = await window.keplr.signDirect(
-        this._chainId,
-        account.address,
-        { chainId: this._chainId }
-      );
-      console.log('signature', signature, JSON.stringify(signature));
-    } catch (e) {
-      console.log(e);
-    }
-
-    window.keplr.defaultOptions = defaultOptions;
-    return account.validate(JSON.stringify(signature));
+    return signature;
   }
+
+  public async validateWithAccount(account: Account<any>): Promise<void> {
+    const webWalletSignature = await this.signLoginToken(
+      account.validationToken,
+      account.address
+    );
+
+    console.log('webwalltsign', webWalletSignature);
+    return account.validate(JSON.stringify(webWalletSignature));
+  }
+
+  // public async validateWithAccount(account: Account<any>): Promise<void> {
+  //   if (!this._chainId || !window.keplr?.signDirect)
+  //     throw new Error('Missing or misconfigured web wallet');
+
+  //   if (this._chain !== app.chain.id) {
+  //     // disable then re-enable on chain switch
+  //     await this.enable();
+  //   }
+
+  //   console.log('im hre');
+
+  //   // Get the verification token & placeholder TX to send
+  //   const signDoc = validationTokenToSignDoc(
+  //     this._chainId,
+  //     account.validationToken
+  //   );
+
+  //   const { msg, accountNumber } = await evmosAddrToMsgSend(
+  //     account.address,
+  //     this._chainId,
+  //     window.keplr
+  //   );
+
+  //   // const info = createSignerInfo('ethsecp256k1', pubkey, sequence, SIGN_DIRECT)
+
+  //   // save and restore default options after setting to no fee/memo for login
+  //   const defaultOptions = window.keplr.defaultOptions;
+  //   window.keplr.defaultOptions = {
+  //     sign: {
+  //       preferNoSetFee: true,
+  //       preferNoSetMemo: true,
+  //       disableBalanceCheck: true,
+  //     },
+  //   };
+
+  //   let signature;
+
+  //   try {
+  //     signature = await window?.keplr?.signDirect(
+  //       this._chainId,
+  //       account.address,
+  //       {
+  //         bodyBytes: msg.signDirect.body.serializeBinary(),
+  //         authInfoBytes: msg.signDirect.authInfo.serializeBinary(),
+  //         chainId: this._chainId,
+  //         accountNumber: new Long(accountNumber),
+  //       },
+  //       // @ts-expect-error the types are not updated on Keplr side
+  //       { isEthereum: false }
+  //     );
+
+  //     // try {
+  //     //   signature = await window?.keplr
+  //     //     ?.getOfflineSigner(this._chainId)
+  //     //     .signDirect(account.address, {
+  //     //       bodyBytes: msg.signDirect.body.serializeBinary(),
+  //     //       authInfoBytes: msg.signDirect.authInfo.serializeBinary(),
+  //     //       chainId: this._chainId,
+  //     //       accountNumber: new Long(accountNumber),
+  //     //     });
+  //     // } catch (e) {
+  //     //   console.log('wtf', e);
+  //     // }
+
+  //     console.log('sig', signature);
+
+  //     if (signature !== undefined) {
+  //       const rawTx = createTxRaw(
+  //         signature.signed.bodyBytes,
+  //         signature.signed.authInfoBytes,
+  //         [new Uint8Array(Buffer.from(signature.signature.signature, 'base64'))]
+  //       );
+
+  //       console.log('rawTx', rawTx);
+
+  //       const broadcastPost = await axios.post(
+  //         `https://rest.bd.evmos.org:1317${generateEndpointBroadcast()}`,
+  //         generatePostBodyBroadcast(rawTx)
+  //       );
+  //       console.log('wtf is going on: ', broadcastPost);
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+
+  //   window.keplr.defaultOptions = defaultOptions;
+  //   return account.validate(JSON.stringify(signature));
+  // }
 
   // ACTIONS
   public async enable() {

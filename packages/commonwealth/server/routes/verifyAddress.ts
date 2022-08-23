@@ -21,6 +21,7 @@ import {
   serializeSignDoc,
   decodeSignature,
   StdSignDoc,
+  StdSignature,
 } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
@@ -193,10 +194,9 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { signed, signature: stdSignature }: AminoSignResponse =
+    const { pub_key, signature: stdSignature }: StdSignature =
       JSON.parse(signatureString);
 
-    console.log('signed', signed);
     console.log('stdSignature', stdSignature);
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
@@ -208,12 +208,9 @@ const verifySignature = async (
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(
-        stdSignature.pub_key,
-        bech32Prefix
-      );
+      const generatedAddress = pubkeyToAddress(pub_key, bech32Prefix);
       const generatedAddressWithCosmosPrefix = pubkeyToAddress(
-        stdSignature.pub_key,
+        pub_key,
         'cosmos'
       );
 
@@ -225,42 +222,15 @@ const verifySignature = async (
 
       console.log('addressModel.address', addressModel.address);
 
-      if (
-        generatedAddress === addressModel.address ||
-        generatedAddressWithCosmosPrefix === addressModel.address
-      ) {
-        let generatedSignDoc: StdSignDoc;
-
+      if (generatedAddress === addressModel.address) {
         try {
-          // query chain ID from URL
-          const node = await chain.getChainNode();
-          const client = await StargateClient.connect(node.url);
-          const chainId = await client.getChainId();
-          client.disconnect();
-
-          generatedSignDoc = validationTokenToSignDoc(
-            chainId,
-            addressModel.verification_token.trim(),
-            signed.fee,
-            signed.memo,
-            <any>signed.msgs
+          // directly verify the generated signature, generated via SignBytes
+          const { pubkey, signature } = decodeSignature(
+            JSON.parse(signatureString)
           );
-        } catch (e) {
-          log.info(e.message);
-        }
-
-        // ensure correct document was signed
-        if (
-          generatedSignDoc &&
-          serializeSignDoc(signed).toString() ===
-            serializeSignDoc(generatedSignDoc).toString()
-        ) {
-          // ensure valid signature
-          const { pubkey, signature } = decodeSignature(stdSignature);
-
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
-            serializeSignDoc(generatedSignDoc)
+            Buffer.from(addressModel.verification_token.trim())
           ).digest();
 
           isValid = await Secp256k1.verifySignature(
@@ -269,23 +239,75 @@ const verifySignature = async (
             pubkey
           );
 
-          if (!isValid) {
-            log.error('Signature verification failed.');
-          }
-        } else {
-          log.error(
-            `Sign doc not matched. Generated: ${JSON.stringify(
-              generatedSignDoc
-            )}, found: ${JSON.stringify(signed)}.`
-          );
+          console.log('isValid here', isValid);
+        } catch (e) {
+          console.log(e);
           isValid = false;
         }
-      } else {
-        log.error(
-          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
-        );
-        isValid = false;
       }
+
+      // if (
+      //   generatedAddress === addressModel.address ||
+      //   generatedAddressWithCosmosPrefix === addressModel.address
+      // ) {
+      //   let generatedSignDoc: StdSignDoc;
+
+      //   try {
+      //     // query chain ID from URL
+      //     const node = await chain.getChainNode();
+      //     const client = await StargateClient.connect(node.url);
+      //     const chainId = await client.getChainId();
+      //     client.disconnect();
+
+      //     generatedSignDoc = validationTokenToSignDoc(
+      //       chainId,
+      //       addressModel.verification_token.trim()
+      //       // signed.fee,
+      //       // signed.memo,
+      //       // <any>signed.msgs
+      //     );
+      //     console.log('generatedSignDoc', generatedSignDoc);
+      //   } catch (e) {
+      //     log.info(e.message);
+      //   }
+
+      //   // ensure correct document was signed
+      //   // if (
+      //   //   generatedSignDoc &&
+      //   //   serializeSignDoc(signed).toString() ===
+      //   //     serializeSignDoc(generatedSignDoc).toString()
+      //   // ) {
+      //   //   // ensure valid signature
+      //   //   const { pubkey, signature } = decodeSignature(stdSignature);
+
+      //   //   const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+      //   //   const messageHash = new Sha256(
+      //   //     serializeSignDoc(generatedSignDoc)
+      //   //   ).digest();
+
+      //   //   isValid = await Secp256k1.verifySignature(
+      //   //     secpSignature,
+      //   //     messageHash,
+      //   //     pubkey
+      //   //   );
+
+      //   //   if (!isValid) {
+      //   //     log.error('Signature verification failed.');
+      //   //   }
+      //   // } else {
+      //   //   log.error(
+      //   //     `Sign doc not matched. Generated: ${JSON.stringify(
+      //   //       generatedSignDoc
+      //   //     )}, found: ${JSON.stringify(signed)}.`
+      //   //   );
+      //   //   isValid = false;
+      //   // }
+      // } else {
+      //   log.error(
+      //     `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
+      //   );
+      //   isValid = false;
+      // }
     }
   } else if (chain.base === ChainBase.Ethereum) {
     //
@@ -353,6 +375,8 @@ const verifySignature = async (
   }
 
   addressModel.last_active = new Date();
+
+  console.log('isValid at end', isValid);
 
   if (isValid && user_id === null) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user
