@@ -28,7 +28,6 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
-import { ContractType } from '../chain-events/src/chains/commonwealth/types';
 
 require('express-async-errors');
 

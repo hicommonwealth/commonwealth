@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
+import { ContractType } from 'chain-events/src/chains/commonwealth/types';
 import { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import { CommunityContractAttributes, CommunityContractInstance } from './community_contract';
 import { ModelStatic, ModelInstance } from './types';
@@ -12,7 +13,7 @@ export type ContractAttributes = {
   decimals?: number;
   token_name?: string;
   symbol?: string;
-  type: string;
+  type: ContractType;
 
   // associations
   ChainNode?: ChainNodeAttributes;
