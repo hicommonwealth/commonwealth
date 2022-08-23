@@ -14,7 +14,7 @@ export const Errors = {
 const deleteRole = async (models: DB, req, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  if (!req.user) return next(new ServerError(Errors.NotLoggedIn));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({

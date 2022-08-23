@@ -17,7 +17,7 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!req.user) {
-    return next(new ServerError(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.id) {
     return next(new AppError(Errors.NoTopicId));

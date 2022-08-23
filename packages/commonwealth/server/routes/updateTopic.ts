@@ -18,7 +18,7 @@ const updateTopic = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new ServerError(UpdateTopicErrors.NoUser));
+  if (!req.user) return next(new AppError(UpdateTopicErrors.NoUser));
   if (!req.body.thread_id) return next(new AppError(UpdateTopicErrors.NoThread));
   if (!req.body.address) return next(new AppError(UpdateTopicErrors.NoAddr));
   if (!req.body.topic_name) return next(new AppError(UpdateTopicErrors.NoTopic));

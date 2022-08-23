@@ -12,7 +12,7 @@ export const Errors = {
 
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-        return next(new ServerError(Errors.NotLoggedIn));
+        return next(new AppError(Errors.NotLoggedIn));
     }
 
     if (!req.user.isAdmin) {

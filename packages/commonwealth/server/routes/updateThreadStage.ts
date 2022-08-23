@@ -47,7 +47,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
     try {
       custom_stages = Array.from(JSON.parse(entity.custom_stages)).map((s) => s.toString()).filter((s) => s);
     } catch (e) {
-      throw new ServerError("Could not parse", e)
+      throw new AppError(e)
     }
 
     // validate stage
@@ -83,7 +83,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new ServerError(e));
+    return next(new AppError(e));
   }
 };
 

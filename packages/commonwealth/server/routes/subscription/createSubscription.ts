@@ -13,7 +13,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new ServerError(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.category || req.body.object_id === undefined) {
     return next(new AppError(Errors.NoCategoryAndObjectId));

@@ -118,7 +118,7 @@ const searchDiscussions = async (
     );
   } catch (e) {
     console.log(e);
-    return next(new ServerError(Errors.UnexpectedError));
+    return next(new ServerError(Errors.UnexpectedError)); 
   }
 
   return res.json({

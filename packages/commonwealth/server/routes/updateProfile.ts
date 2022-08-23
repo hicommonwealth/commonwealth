@@ -27,7 +27,7 @@ const updateProfile = async (
   models: DB, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
 ) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
-    return next(new ServerError(Errors.MissingParams));
+    return next(new AppError(Errors.MissingParams));
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
