@@ -83,7 +83,7 @@ const getTokenForum = async (
         chain_id: chain.id,
         contract_id: contract.id,
       });
-      chain.Contract = contract;
+      chain.Contract = contract.toJSON();
 
       const nodeJSON = node.toJSON();
       delete nodeJSON.private_url;

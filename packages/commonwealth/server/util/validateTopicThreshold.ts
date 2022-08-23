@@ -4,7 +4,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../database';
-import { ChainAttributes } from '../models/chain';
+import { ChainAttributes, ChainInstance } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -35,6 +35,7 @@ const validateTopicThreshold = async (
       // if associated with an offchain community, or if not token forum, always allow
       return true;
     }
+
     const communityContracts = await models.CommunityContract.findOne({
       where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],

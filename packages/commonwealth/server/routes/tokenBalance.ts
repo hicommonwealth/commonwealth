@@ -52,7 +52,8 @@ const tokenBalance = async (
     contract = await models.Contract.findOne({
       where: {
         address: contract_address,
-      }
+      },
+      include: [{ model: models.ChainNode, required: true }],
     });
   } catch (err) {
     throw new AppError(err);
@@ -62,7 +63,7 @@ const tokenBalance = async (
 
   try {
     const balance = await tokenBalanceCache.getBalance(
-      chain.chain_node_id,
+      contract.ChainNode.id,
       author.address,
       contract.address,
       chain.network === ChainNetwork.ERC20
