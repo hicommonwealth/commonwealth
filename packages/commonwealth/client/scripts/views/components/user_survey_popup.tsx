@@ -11,7 +11,7 @@ import { CWGrowl } from './component_kit/cw_growl';
 import { CWText } from './component_kit/cw_text';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 1; // How long to wait before redisplaying the survey
+const USER_SURVEY_DISPLAY_INTERVAL = 1000 * 60 * 60; // 1 Hour wait
 
 type UserSurveyViewAttrs = {
   disabled: boolean;
@@ -139,10 +139,17 @@ export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
       localStorage.setItem('user-survey-locked', 'true');
     };
 
+    const hasAnAddress =
+      (app.user.activeAccount?.address ?? app.user.addresses[0]?.address) !==
+      undefined;
+
     return (
       <UserSurveyView
         disabled={
-          !surveyReadyForDisplay || this.surveyLocked || !app.isLoggedIn()
+          !surveyReadyForDisplay ||
+          this.surveyLocked ||
+          !app.isLoggedIn() ||
+          !hasAnAddress
         }
         checked={this.hideForeverChecked}
         onRedirectClick={handleRedirect}
