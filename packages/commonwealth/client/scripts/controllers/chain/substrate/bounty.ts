@@ -8,17 +8,17 @@ import {
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import { SubstrateTypes } from 'chain-events/src';
-import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';
+import {formatTypeId} from "helpers";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
   event: SubstrateTypes.ITreasuryBountyProposed
 ): ISubstrateBounty => {
   return {
-    identifier: MD5(JSON.stringify(event)),
+    identifier: formatTypeId(event),
     description: 'Unknown bounty', // TODO: add to chain-events
     index: event.bountyIndex,
     value: ChainInfo.createType('u128', event.value),
@@ -31,7 +31,7 @@ const backportEventToAdapter = (
 
 export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
-    return `#${this.identifier.toString()}`;
+    return `#${this.data.index.toString()}`;
   }
 
   public setStatus(status) {

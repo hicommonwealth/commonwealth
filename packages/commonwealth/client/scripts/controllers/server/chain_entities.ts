@@ -14,8 +14,8 @@ import {
   IChainEntityKind,
   SupportedNetwork,
 } from 'chain-events/src';
-import MD5 from "crypto-js/md5";
 import { notifyError } from '../app/notifications';
+import {formatTypeId} from "helpers";
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -141,10 +141,11 @@ class ChainEntityController {
 
       // create entity
       const author = event.data['proposer'];
+      if ("proposalIndex" in event.data && event.data.proposalIndex === 28) console.log("Treasury #28 event data:", event.data)
       let entity = new ChainEntity({
         chain,
         type: entityKind,
-        typeId: MD5(JSON.stringify(event.data)),
+        typeId: formatTypeId(event.data),
         chainEvents: [],
         createdAt: null,
         updatedAt: null,

@@ -11,12 +11,12 @@ import {
 import { ProposalType } from 'common-common/src/types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 
-import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import Substrate from './main';
+import {formatTypeId} from "helpers";
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -30,7 +30,7 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
 
 const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISubstrateCollectiveProposal => {
   return {
-    identifier: MD5(JSON.stringify(event)),
+    identifier: formatTypeId(event),
     index: event.proposalIndex,
     threshold: event.threshold,
     hash: event.proposalHash,

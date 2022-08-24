@@ -14,7 +14,6 @@ import {
 } from 'models';
 import { SubstrateTypes } from 'chain-events/src';
 import { Coin } from 'adapters/currency';
-import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracy from './democracy';
@@ -22,6 +21,7 @@ import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 import Substrate from './main';
+import {formatTypeId} from "helpers";
 
 export enum DemocracyConviction {
   None = 0,
@@ -112,7 +112,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
 const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubstrateDemocracyReferendum => {
   const enc = new TextEncoder();
   return {
-    identifier: MD5(JSON.stringify(event)),
+    identifier: formatTypeId(event),
     index: event.referendumIndex,
     endBlock: event.endBlock,
     threshold: event.voteThreshold as DemocracyThreshold,
@@ -125,7 +125,7 @@ export class SubstrateDemocracyReferendum
   ApiPromise, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
-    return `#${this.identifier.toString()}`;
+    return `#${this.data.index.toString()}`;
   }
   public get description() { return null; }
   public get author() { return null; }
@@ -274,9 +274,9 @@ export class SubstrateDemocracyReferendum
     }
 
     console.log('could not find:',
-      this.hash,
-      chain.council?.store.getAll().map((c) => c.data.hash),
-      chain.democracyProposals?.store.getAll().map((c) => c.hash));
+      this.hash)
+      // chain.council?.store.getAll().map((c) => c.data.hash),
+      // chain.democracyProposals?.store.getAll().map((c) => c.hash));
     return undefined;
   }
 

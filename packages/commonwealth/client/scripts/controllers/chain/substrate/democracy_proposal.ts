@@ -8,7 +8,7 @@ import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
 
 import { ISubstrateDemocracyProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
-import { formatProposalHashShort } from 'helpers';
+import {formatProposalHashShort, formatTypeId} from 'helpers';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, DepositVote,
@@ -16,7 +16,6 @@ import {
 } from 'models';
 
 import { chainEntityTypeToProposalSlug } from 'identifiers';
-import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposals from './democracy_proposals';
@@ -29,7 +28,7 @@ const backportEventToAdapter = (
 ): ISubstrateDemocracyProposal => {
   const enc = new TextEncoder();
   return {
-    identifier: MD5(JSON.stringify(event)),
+    identifier: formatTypeId(event),
     index: event.proposalIndex,
     hash: enc.encode(event.proposalHash),
     deposit: ChainInfo.createType('u128', event.deposit),
@@ -44,7 +43,7 @@ class SubstrateDemocracyProposal extends Proposal<
   DepositVote<SubstrateCoin>
 > {
   public get shortIdentifier() {
-    return `#${this.identifier.toString()}`;
+    return `#${this.data.index.toString()}`;
   }
 
   public title: string;

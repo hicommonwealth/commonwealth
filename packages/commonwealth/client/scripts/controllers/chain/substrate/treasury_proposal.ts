@@ -8,18 +8,18 @@ import {
 import {ProposalType} from 'common-common/src/types';
 import {SubstrateTypes} from 'chain-events/src';
 import {chainEntityTypeToProposalSlug} from 'identifiers';
-import MD5 from "crypto-js/md5";
 import SubstrateChain from './shared';
 import SubstrateAccounts, {SubstrateAccount} from './account';
 import SubstrateTreasury from './treasury';
+import {formatTypeId} from "helpers";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
   event: SubstrateTypes.ITreasuryProposed | string
 ): ISubstrateTreasuryProposal => {
-  if (typeof event === 'string') return {identifier: MD5(event)} as ISubstrateTreasuryProposal;
+  if (typeof event === 'string') return {identifier: formatTypeId(JSON.parse(event))} as ISubstrateTreasuryProposal;
   return {
-    identifier: MD5(JSON.stringify(event)),
+    identifier: formatTypeId(event),
     index: event.proposalIndex,
     value: ChainInfo.createType('u128', event.value),
     beneficiary: event.beneficiary,
@@ -31,7 +31,7 @@ const backportEventToAdapter = (
 export class SubstrateTreasuryProposal
   extends Proposal<ApiPromise, SubstrateCoin, ISubstrateTreasuryProposal, null> {
   public get shortIdentifier() {
-    return `#${this.identifier.toString()}`;
+    return `#${this.data.index.toString()}`;
   }
 
   public generateTitle() {

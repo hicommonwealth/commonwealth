@@ -13,7 +13,6 @@ export const pathIsDiscussion = (scope: string | null, path: string): boolean =>
 // returns a URL path to a proposal based on its type and id, taking into account
 // custom domain prefixes as well.
 export const getProposalUrlPath = (type: ProposalType, id: string, omitActiveId = false, chainId?: string): string => {
-  console.log(">>>>>>>>>>> Getting proposal url", type, id);
   let basePath: string;
   const useTypeSlug = requiresTypeSlug(type);
   if (type === ProposalType.Thread) {
