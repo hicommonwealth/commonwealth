@@ -59,7 +59,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     const webWalletSignature = await this.signLoginToken(
       account.validationToken.trim(),
       account.address
