@@ -3,7 +3,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
+// import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -25,8 +25,9 @@ import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { NewLoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from './helpers';
+import { CWToggle } from './cw_toggle';
+// import { NewLoginModal } from '../../modals/login_modal';
+// import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -52,6 +53,7 @@ export class ComponentShowcase implements m.ClassComponent {
   private radioGroupSelection: string;
   private selectedIconButton: number;
   private selectedTab: number;
+  private toggleToggled: boolean;
   private voteCount: number;
 
   oninit() {
@@ -76,6 +78,28 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         /> */}
+        <div class="basic-gallery">
+          <h1>Toggle</h1>
+          <CWToggle
+            checked={this.toggleToggled}
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+          <CWToggle
+            disabled
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+          <CWToggle
+            checked
+            disabled
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+        </div>
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWThreadVoteButton
@@ -672,7 +696,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Checkbox</h1>
         <div class="choice-gallery">
           <CWCheckbox
-            checked={this.checkboxChecked === true}
+            checked={this.checkboxChecked}
             label="Click me"
             onchange={() => {
               this.checkboxChecked = !this.checkboxChecked;
