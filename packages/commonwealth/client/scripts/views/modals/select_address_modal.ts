@@ -22,15 +22,14 @@ const SelectAddressModal: m.Component<
   { selectedIndex: number; loading: boolean }
 > = {
   view: (vnode) => {
-    const activeAccountsByRole: Array<[Account<any>, RoleInfo]> =
-      app.user.getActiveAccountsByRole();
+    const activeAccountsByRole: Array<[Account, RoleInfo]> = app.user.getActiveAccountsByRole();
     const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
 
       const [account, role] = activeAccountsByRole[vnode.state.selectedIndex];
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain === account.chain.id
+        (a) => a.address === account.address && a.chain.id === account.chain.id
       );
       app.user
         .createRole({
@@ -45,7 +44,7 @@ const SelectAddressModal: m.Component<
           notifySuccess(
             `Joined with ${formatAddressShort(
               addressInfo.address,
-              addressInfo.chain,
+              addressInfo.chain.id,
               true
             )}`
           );
@@ -65,7 +64,7 @@ const SelectAddressModal: m.Component<
       vnode.state.loading = true;
       const [account, role] = activeAccountsByRole[index];
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain === account.chain.id
+        (a) => a.address === account.address && a.chain.id === account.chain.id
       );
 
       // confirm
@@ -128,7 +127,7 @@ const SelectAddressModal: m.Component<
                       app.user.addresses.find(
                         (a) =>
                           a.address === account.address &&
-                          a.chain === account.chain.id
+                          a.chain.id === account.chain.id
                       )?.walletId === WalletId.Magic &&
                         m(
                           '.magic-label',
@@ -173,7 +172,7 @@ const SelectAddressModal: m.Component<
                         app.user.addresses.find(
                           (a) =>
                             a.address === account.address &&
-                            a.chain === account.chain.id
+                            a.chain.id === account.chain.id
                         )?.walletId === WalletId.Magic &&
                           m(
                             '.magic-label',
@@ -216,7 +215,7 @@ const SelectAddressModal: m.Component<
             fluid: true,
             rounded: true,
             disabled:
-              vnode.state.selectedIndex === undefined || vnode.state.loading,
+              typeof vnode.state.selectedIndex !== 'number' || vnode.state.loading,
             onclick: createRole.bind(this),
           }),
         m(LoginWithWalletDropdown, {

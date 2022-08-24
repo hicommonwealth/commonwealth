@@ -17,7 +17,7 @@ import { WebSocketController } from '../controllers/server/socket';
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
-abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
+abstract class IChainAdapter<C extends Coin, A extends Account> {
   protected _apiInitialized = false;
   public get apiInitialized() {
     return this._apiInitialized;

@@ -14,7 +14,7 @@ import { getClasses } from './helpers';
 type Orientation = 'horizontal' | 'vertical';
 
 type AvatarUsernameInputAttrs = {
-  account?: Account<any>;
+  account?: Account;
   address: string;
   darkMode?: boolean;
   value: string;

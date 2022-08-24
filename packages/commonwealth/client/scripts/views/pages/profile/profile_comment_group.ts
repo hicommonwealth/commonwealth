@@ -10,7 +10,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 interface IProfileCommentGroupAttrs {
   proposal: Thread | any;
   comments: Array<Comment<any>>;
-  account: Account<any>;
+  account: Account;
 }
 
 const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
@@ -34,7 +34,7 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
               proposal instanceof Thread ? 'thread' : 'proposal',
               {},
-              `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
+              `profile-${account.address}-${account.chain.id}-${proposal.chain}-scrollY`
             ),
             ' in ',
             link('a.link-bold', `/${proposal.chain}`, ` ${proposal.chain}`),
