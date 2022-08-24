@@ -44,7 +44,7 @@ module.exports = {
                 SELECT *
                 INTO to_delete_edge_case_entities
                 FROM "ChainEntities"
-                WHERE length(type_id) != 32
+                WHERE length(type_id) != 40
                    OR id = 506;
             `, {transaction: t});
 
@@ -53,7 +53,7 @@ module.exports = {
                 INTO to_delete_edge_case_events
                 FROM "ChainEvents"
                 WHERE entity_id IN (SELECT id FROM to_delete_edge_case_entities);
-            `);
+            `, {transaction: t});
 
             await queryInterface.sequelize.query(`
                  CREATE TEMP TABLE comments_to_delete AS (SELECT C.id
@@ -120,7 +120,7 @@ module.exports = {
                 DELETE
                 FROM "NotificationsRead"
                 WHERE notification_id IN (SELECT * FROM notifications_to_delete);
-            `);
+            `, {transaction: t});
 
             await queryInterface.sequelize.query(`
                 WITH notifications_to_delete AS (SELECT id
@@ -130,7 +130,7 @@ module.exports = {
                 DELETE
                 FROM "Notifications"
                 WHERE id IN (SELECT * FROM notifications_to_delete);
-            `);
+            `, {transaction: t});
 
             // deletes a unique instance of identical chain-events with different chain-entities
             // One of the entities has an author, so we delete the entity that does not have
@@ -329,6 +329,10 @@ module.exports = {
 
             await queryInterface.sequelize.query(`
                 DROP TABLE "OldEntities";
+            `, {transaction: t});
+
+            await queryInterface.sequelize.query(`
+                DROP TABLE "entity_hashes";
             `, {transaction: t});
         });
     },
