@@ -38,7 +38,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
           <CWTextArea
             value={value}
             placeholder={placeholder}
-            disabled={disabled}
+            disabled={!!disabled}
             maxlength={maxlength}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
@@ -50,7 +50,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             value={value}
             placeholder={placeholder}
             maxlength={maxlength}
-            disabled={disabled}
+            disabled={!!disabled}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
@@ -85,7 +85,7 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
         <div class="toggle-and-caption">
           <CWToggle
             checked={this.checked}
-            disabled={disabled}
+            disabled={!!disabled}
             onchange={() => {
               this.checked = !this.checked;
               onToggle(this.checked);
