@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/view_proposal/linked_proposals_card.scss';
 
@@ -12,7 +11,7 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { Thread } from 'models';
+import { ChainEntity, Thread, ThreadStage } from 'models';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
@@ -21,6 +20,7 @@ import {
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 class ProposalSidebarLinkedChainEntity
   implements
@@ -105,13 +105,17 @@ class ProposalSidebarLinkedSnapshot
 export class LinkedProposalsCard
   implements
     m.ClassComponent<{
-      openStageEditor: () => void;
+      onChangeHandler: (
+        stage: ThreadStage,
+        chainEntities?: ChainEntity[],
+        snapshotProposal?: SnapshotProposal[]
+      ) => void;
       proposal: Thread;
       showAddProposalButton: boolean;
     }>
 {
   view(vnode) {
-    const { proposal, openStageEditor, showAddProposalButton } = vnode.attrs;
+    const { onChangeHandler, proposal, showAddProposalButton } = vnode.attrs;
 
     return (
       <CWCard className="LinkedProposalsCard">
@@ -149,7 +153,13 @@ export class LinkedProposalsCard
             label="Connect a proposal"
             onclick={(e) => {
               e.preventDefault();
-              openStageEditor();
+              app.modals.create({
+                modal: UpdateProposalStatusModal,
+                data: {
+                  onChangeHandler,
+                  thread: proposal,
+                },
+              });
             }}
           />
         )}

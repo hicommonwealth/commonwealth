@@ -31,11 +31,7 @@ import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
 const getProfileStatus = (account) => {
-  const onOwnProfile =
-    typeof app.user.activeAccount?.chain === 'string'
-      ? account.chain === app.user.activeAccount?.chain &&
-        account.address === app.user.activeAccount?.address
-      : account.chain === app.user.activeAccount?.chain?.id &&
+  const onOwnProfile = account.chain.id === app.user.activeAccount?.chain?.id &&
         account.address === app.user.activeAccount?.address;
   const onLinkedProfile =
     !onOwnProfile &&

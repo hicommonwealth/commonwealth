@@ -17,7 +17,7 @@ const postsRemaining = (contentLength, count) => {
 
 const ProfileContent: m.Component<
   {
-    account: Account<any>;
+    account: Account;
     type: UserContent;
     content: any[];
     localStorageScrollYKey: string;
