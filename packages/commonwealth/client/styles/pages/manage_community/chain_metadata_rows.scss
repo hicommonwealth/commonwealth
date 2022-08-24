@@ -26,6 +26,14 @@
     }
   }
 
+  .ToggleRow {
+    .toggle-and-caption {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+    }
+  }
+
   .tag-row {
     display: flex;
     flex-direction: column;

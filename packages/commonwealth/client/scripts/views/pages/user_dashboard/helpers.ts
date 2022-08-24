@@ -22,8 +22,7 @@ export const getCommentPreview = (commentText) => {
 
     decodedCommentText = m(QuillFormattedText, {
       doc,
-      hideFormatting: true,
-      collapse: false,
+      collapse: true,
     });
   } catch (e) {
     let doc = decodeURIComponent(commentText);
@@ -38,7 +37,6 @@ export const getCommentPreview = (commentText) => {
 
     decodedCommentText = m(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
-      hideFormatting: true,
       collapse: true,
     });
   }
