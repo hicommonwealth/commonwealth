@@ -22,7 +22,7 @@ const SelectAddressModal: m.Component<
   { selectedIndex: number; loading: boolean }
 > = {
   view: (vnode) => {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> = app.user.getActiveAccountsByRole();
+    const activeAccountsByRole: Array<[Account, RoleInfo]> = app.roles.getActiveAccountsByRole();
     const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
@@ -31,8 +31,7 @@ const SelectAddressModal: m.Component<
       const addressInfo = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
       );
-      app.user
-        .createRole({
+      app.roles.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         })
@@ -77,8 +76,7 @@ const SelectAddressModal: m.Component<
         return;
       }
 
-      app.user
-        .deleteRole({
+      app.roles.deleteRole({
           address: addressInfo,
           chain: app.activeChainId(),
         })

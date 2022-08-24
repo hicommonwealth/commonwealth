@@ -75,7 +75,7 @@ export async function initAppState(
               })
             );
           });
-        app.user.setRoles(data.roles);
+        app.roles.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
         );

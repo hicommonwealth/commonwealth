@@ -132,7 +132,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
     let parentScopedClass = 'new-thread-child';
 

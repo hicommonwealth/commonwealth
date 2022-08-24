@@ -120,7 +120,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                               {name}
                             </div>
                           </div>
-                          {app.user?.isAdminOfEntity({
+                          {app.roles?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (
                             <Button

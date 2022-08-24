@@ -17,11 +17,11 @@ export class CommunityOptionsPopover implements m.ClassComponent {
   view() {
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
-    const isMod = app.user.isRoleOfCommunity({
+    const isMod = app.roles.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
     });
