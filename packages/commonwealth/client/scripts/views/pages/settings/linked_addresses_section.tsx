@@ -27,7 +27,7 @@ class AccountRow
     const { account } = vnode.attrs;
     const isActiveAccount =
       app.user.activeAccount &&
-      app.user.activeAccount.chain.id === account.chain &&
+      app.user.activeAccount.chain.id === account.chain.id &&
       app.user.activeAccount.address === account.address;
 
     return (
@@ -36,7 +36,7 @@ class AccountRow
           { isSelected: isActiveAccount },
           'AccountRow'
         )}
-        key={`${account.chain}#${account.address}`}
+        key={`${account.chain.id}#${account.address}`}
         onclick={vnode.attrs.onclick}
       >
         {m(User, {
@@ -55,7 +55,7 @@ class AccountRow
           })}
           <CWText className="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}
-            {app.config.chains.getById(account.chain)?.name}
+            {app.config.chains.getById(account.chain.id)?.name}
           </CWText>
           {account.walletId === WalletId.Magic && (
             <CWText className="address-text" type="caption">
@@ -87,7 +87,7 @@ class AccountRow
               this.removing = true;
               if (
                 app.user.activeAccount?.address === account.address &&
-                app.user.activeAccount?.chain.id === account.chain
+                app.user.activeAccount?.chain.id === account.chain.id
               ) {
                 app.user.ephemerallySetActiveAccount(null);
               }
@@ -112,7 +112,7 @@ class AccountRow
 export class LinkedAddressesSection implements m.ClassComponent {
   view() {
     const addressGroups = Object.entries(
-      _.groupBy(app.user.addresses, (account) => account.chain)
+      _.groupBy(app.user.addresses, (account) => account.chain.id)
     );
 
     return (

@@ -37,7 +37,7 @@ export default class WebWalletController {
   }
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
-  private async _setWalletId(account: Account<any>, wallet: WalletId): Promise<void> {
+  private async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
     if (app.user.activeAccount.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
@@ -56,8 +56,8 @@ export default class WebWalletController {
     }
   }
 
-  public async locateWallet(account: Account<any>, chain?: ChainBase): Promise<IWebWallet<any>> {
-    if (chain && account.chainBase !== chain) {
+  public async locateWallet(account: Account, chain?: ChainBase): Promise<IWebWallet<any>> {
+    if (chain && account.chain.base !== chain) {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {
