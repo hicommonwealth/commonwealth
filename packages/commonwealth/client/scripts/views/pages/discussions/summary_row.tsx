@@ -36,7 +36,7 @@ type SummaryRowAttrs = {
   topic: Topic;
 };
 
-class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
+export class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
   view(vnode) {
     const { isMobile, monthlyThreads, topic } = vnode.attrs;
 
@@ -69,5 +69,3 @@ class SummaryRow implements m.ClassComponent<SummaryRowAttrs> {
     );
   }
 }
-
-export default SummaryRow;
