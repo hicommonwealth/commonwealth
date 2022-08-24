@@ -184,6 +184,7 @@
     "node-statsd": "^0.1.1",
     "nodemon": "^1.18.10",
     "numeral": "^2.0.6",
+    "object-hash": "^3.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "parchment": "^1.1.4",
     "passport": "^0.4.0",
