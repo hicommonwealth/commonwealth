@@ -61,7 +61,7 @@ const backportEntityToAdapter = (
     throw new Error('Proposal start event not found!');
   }
   const identifier = formatTypeId(startEvent.data);
-  const id = identifier;
+  const id = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
   const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
   const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;
   const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
@@ -112,7 +112,7 @@ export default class MolochProposal extends Proposal<
   private _yesShares: number = 0;
   private _noShares: number = 0;
 
-  public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
+  public get shortIdentifier() { return `MGP-${this.data.id}`; }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.details);

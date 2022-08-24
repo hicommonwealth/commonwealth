@@ -104,7 +104,7 @@ export default class AaveProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
   public get title(): string {
-    return this._ipfsData?.title || `Proposal #${this.data.identifier}`;
+    return this._ipfsData?.title || `Proposal #${this.data.id}`;
   }
   public get description(): string {
     return this._ipfsData?.description || '';

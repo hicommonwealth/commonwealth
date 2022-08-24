@@ -84,7 +84,7 @@ export default class CompoundProposal extends Proposal<
   private _Gov: CompoundGovernance;
 
   public get shortIdentifier() {
-    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`;
+    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.id}`;
   }
   public get title(): string {
     try {
