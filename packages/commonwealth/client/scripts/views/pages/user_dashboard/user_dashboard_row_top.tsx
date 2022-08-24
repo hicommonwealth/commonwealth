@@ -95,7 +95,7 @@ export class UserDashboardRowTop
             </a>
             <span>({formatTimestamp(moment(created_at))})</span>
           </CWText>
-          <div class="comment-body-concat">
+          <div class="comment-preview-container">
             {getCommentPreview(comment_text)}
           </div>
         </div>

@@ -14,7 +14,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 
 type EditProfileModalAttrs = {
-  account: Account<any>;
+  account: Account;
   refreshCallback: () => void;
 };
 
@@ -99,6 +99,14 @@ export class EditProfileModal
           />
           <div class="buttons-row">
             <CWButton
+              buttonType="secondary-blue"
+              onclick={(e) => {
+                e.preventDefault();
+                $(vnode.dom).trigger('modalexit');
+              }}
+              label="Cancel"
+            />
+            <CWButton
               disabled={this.saving}
               onclick={(e) => {
                 e.preventDefault();
@@ -130,16 +138,10 @@ export class EditProfileModal
               }}
               label="Save Changes"
             />
-            <CWButton
-              buttonType="secondary-blue"
-              onclick={(e) => {
-                e.preventDefault();
-                $(vnode.dom).trigger('modalexit');
-              }}
-              label="Cancel"
-            />
           </div>
-          <CWValidationText message={this.error} status="failure" />
+          {this.error && (
+            <CWValidationText message={this.error} status="failure" />
+          )}
         </div>
       </div>
     );

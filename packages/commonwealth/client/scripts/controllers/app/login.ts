@@ -22,14 +22,14 @@ import { notifyError } from 'controllers/app/notifications';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 function createAccount(
-  account: Account<any>,
+  account: Account,
   walletId: WalletId,
   community?: string
 ) {
   return $.post(`${app.serverUrl()}/createAddress`, {
     address: account.address,
     keytype:
-      account.chainBase === ChainBase.Substrate && (account as any).isEd25519
+      account.chain.base === ChainBase.Substrate && (account as any).isEd25519
         ? 'ed25519'
         : undefined,
     chain: account.chain.id,
@@ -45,14 +45,14 @@ export function linkExistingAddressToChainOrCommunity(
   originChain: string
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    address: address,
-    chain: chain,
-    originChain: originChain,
+    address,
+    chain,
+    originChain,
     jwt: app.user.jwt,
   });
 }
 
-export async function setActiveAccount(account: Account<any>): Promise<void> {
+export async function setActiveAccount(account: Account): Promise<void> {
   const chain = app.activeChainId();
   const role = app.user.getRoleInCommunity({ account, chain });
 
@@ -128,7 +128,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
-      .filter((a) => a.chain === chain.id)
+      .filter((a) => a.chain.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
       .filter((addr) => addr)
   );
@@ -151,7 +151,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.chain.id === existingAddress.chain &&
+          a.chain.id === existingAddress.chain.id &&
           a.address === existingAddress.address
         );
       });
@@ -216,7 +216,7 @@ export async function createUserWithAddress(
   walletId: WalletId,
   keytype?: string,
   community?: string
-): Promise<Account<any>> {
+): Promise<Account> {
   const account = app.chain.accounts.get(address, keytype);
   const response = await createAccount(account, walletId, community);
   const token = response.result.verification_token;
@@ -227,12 +227,12 @@ export async function createUserWithAddress(
   return newAccount;
 }
 
-export async function unlinkLogin(account) {
+export async function unlinkLogin(account: AddressInfo) {
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
   await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
-    chain: account.chain,
+    chain: account.chain.id,
     auth: true,
     jwt: app.user.jwt,
   });

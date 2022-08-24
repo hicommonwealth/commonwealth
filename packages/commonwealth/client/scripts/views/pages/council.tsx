@@ -148,7 +148,7 @@ class CouncilPage implements m.ClassComponent {
     const activeAccountIsCandidate =
       app.chain &&
       app.user.activeAccount &&
-      app.user.activeAccount.chainBase === ChainBase.Substrate &&
+      app.user.activeAccount.chain.base === ChainBase.Substrate &&
       !!candidates.find(
         ([who]) => who.address === app.user.activeAccount.address
       );
