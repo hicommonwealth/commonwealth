@@ -53,7 +53,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   private async _newThread(
     form: NewThreadFormType,
     quillEditorState: QuillEditor,
-    author: Account<any>,
+    author: Account,
     stage = ThreadStage.Discussion
   ) {
     if (!this) throw new Error('no this');
@@ -341,7 +341,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
               <div class="set-display-name-callout">
                 <CWText>You haven't set a display name yet.</CWText>
                 <a
-                  href={`/${chainId}/account/${author.address}?base=${author.chain}`}
+                  href={`/${chainId}/account/${author.address}?base=${author.chain.id}`}
                   onclick={(e) => {
                     e.preventDefault();
                     app.modals.create({

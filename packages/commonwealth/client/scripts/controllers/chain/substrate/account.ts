@@ -30,7 +30,7 @@ export interface IValidators {
 
 type Delegation = [ AccountId, Conviction ] & Codec;
 
-export class SubstrateAccount extends Account<SubstrateCoin> {
+export class SubstrateAccount extends Account {
   // GETTERS AND SETTERS
   // staking
   public get stakedBalance(): Promise<SubstrateCoin> {
@@ -167,19 +167,17 @@ export class SubstrateAccount extends Account<SubstrateCoin> {
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
-      super(app, app.chain.meta, address, null);
+      super({ chain: app.chain.meta, address });
       app.chainModuleReady.once('ready', () => {
         if (app.chain.chain instanceof SubstrateChain) {
           this._Chain = app.chain.chain;
-          this.setEncoding(this._Chain.ss58Format);
         } else {
           console.error('Did not successfully initialize account with chain');
         }
       });
     } else {
-      super(app, app.chain.meta, address, ChainInfo.ss58Format);
+      super({ chain: app.chain.meta, address });
       this._Chain = ChainInfo;
-      this.setEncoding(this._Chain.ss58Format);
     }
     this.isEd25519 = isEd25519;
     this._Accounts = Accounts;
