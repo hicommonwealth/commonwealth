@@ -75,8 +75,6 @@ const verifySignature = async (
     return false;
   }
 
-  console.log('signatureString', signatureString);
-
   let isValid: boolean;
   if (chain.base === ChainBase.Substrate) {
     //
@@ -194,43 +192,43 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { pub_key, signature: stdSignature }: StdSignature =
-      JSON.parse(signatureString);
+    const { signature: stdSignature } = JSON.parse(signatureString);
 
-    console.log('stdSignature', stdSignature);
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
     // the account they registered with.
     // TODO: ensure ion works
     const bech32Prefix = chain.bech32_prefix;
-    console.log('bech32Prefix', bech32Prefix);
     if (!bech32Prefix) {
       log.error('No bech32 prefix found.');
       isValid = false;
     } else {
-      const generatedAddress = pubkeyToAddress(pub_key, bech32Prefix);
+      const generatedAddress = pubkeyToAddress(
+        stdSignature.pub_key,
+        bech32Prefix
+      );
       const generatedAddressWithCosmosPrefix = pubkeyToAddress(
-        pub_key,
+        stdSignature.pub_key,
         'cosmos'
       );
 
-      console.log('generatedAddress', generatedAddress);
-      console.log(
-        'generatedAddressWithCosmosPrefix',
-        generatedAddressWithCosmosPrefix
-      );
+      if (
+        generatedAddress === addressModel.address ||
+        generatedAddressWithCosmosPrefix === addressModel.address
+      ) {
+        let generatedSignDoc: StdSignDoc;
 
-      console.log('addressModel.address', addressModel.address);
-
-      if (generatedAddress === addressModel.address) {
         try {
-          // directly verify the generated signature, generated via SignBytes
-          const { pubkey, signature } = decodeSignature(
-            JSON.parse(signatureString)
+          // Generate sign doc from token and verify it against the signature
+          generatedSignDoc = validationTokenToSignDoc(
+            Buffer.from(addressModel.verification_token.trim()),
+            generatedAddress
           );
+
+          const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
-            Buffer.from(addressModel.verification_token.trim())
+            serializeSignDoc(generatedSignDoc)
           ).digest();
 
           isValid = await Secp256k1.verifySignature(
@@ -238,78 +236,93 @@ const verifySignature = async (
             messageHash,
             pubkey
           );
-
-          console.log('isValid here', isValid);
         } catch (e) {
           console.log(e);
           isValid = false;
         }
       }
-
-      // if (
-      //   generatedAddress === addressModel.address ||
-      //   generatedAddressWithCosmosPrefix === addressModel.address
-      // ) {
-      //   let generatedSignDoc: StdSignDoc;
-
-      //   try {
-      //     // query chain ID from URL
-      //     const node = await chain.getChainNode();
-      //     const client = await StargateClient.connect(node.url);
-      //     const chainId = await client.getChainId();
-      //     client.disconnect();
-
-      //     generatedSignDoc = validationTokenToSignDoc(
-      //       chainId,
-      //       addressModel.verification_token.trim()
-      //       // signed.fee,
-      //       // signed.memo,
-      //       // <any>signed.msgs
-      //     );
-      //     console.log('generatedSignDoc', generatedSignDoc);
-      //   } catch (e) {
-      //     log.info(e.message);
-      //   }
-
-      //   // ensure correct document was signed
-      //   // if (
-      //   //   generatedSignDoc &&
-      //   //   serializeSignDoc(signed).toString() ===
-      //   //     serializeSignDoc(generatedSignDoc).toString()
-      //   // ) {
-      //   //   // ensure valid signature
-      //   //   const { pubkey, signature } = decodeSignature(stdSignature);
-
-      //   //   const secpSignature = Secp256k1Signature.fromFixedLength(signature);
-      //   //   const messageHash = new Sha256(
-      //   //     serializeSignDoc(generatedSignDoc)
-      //   //   ).digest();
-
-      //   //   isValid = await Secp256k1.verifySignature(
-      //   //     secpSignature,
-      //   //     messageHash,
-      //   //     pubkey
-      //   //   );
-
-      //   //   if (!isValid) {
-      //   //     log.error('Signature verification failed.');
-      //   //   }
-      //   // } else {
-      //   //   log.error(
-      //   //     `Sign doc not matched. Generated: ${JSON.stringify(
-      //   //       generatedSignDoc
-      //   //     )}, found: ${JSON.stringify(signed)}.`
-      //   //   );
-      //   //   isValid = false;
-      //   // }
-      // } else {
-      //   log.error(
-      //     `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
-      //   );
-      //   isValid = false;
-      // }
     }
-  } else if (chain.base === ChainBase.Ethereum) {
+  }
+  //
+  // cosmos-sdk address handling
+  //
+  // provided string should be serialized AminoSignResponse object
+  // const { pub_key, signature: stdSignature }: StdSignature =
+  //   JSON.parse(signatureString);
+  // console.log('stdSignature', stdSignature);
+  // // we generate an address from the actual public key and verify that it matches,
+  // // this prevents people from using a different key to sign the message than
+  // // the account they registered with.
+  // // TODO: ensure ion works
+  // const bech32Prefix = chain.bech32_prefix;
+  // console.log('bech32Prefix', bech32Prefix);
+  // if (!bech32Prefix) {
+  //   log.error('No bech32 prefix found.');
+  //   isValid = false;
+  // } else {
+  //   const generatedAddress = pubkeyToAddress(pub_key, bech32Prefix);
+  //   const generatedAddressWithCosmosPrefix = pubkeyToAddress(
+  //     pub_key,
+  //     'cosmos'
+  //   );
+  //   if (
+  //     generatedAddress === addressModel.address ||
+  //     generatedAddressWithCosmosPrefix === addressModel.address
+  //   ) {
+  //     let generatedSignDoc: StdSignDoc;
+  //     try {
+  //       // query chain ID from URL
+  //       const node = await chain.getChainNode();
+  //       const client = await StargateClient.connect(node.url);
+  //       const chainId = await client.getChainId();
+  //       client.disconnect();
+  //       generatedSignDoc = validationTokenToSignDoc(
+  //         chainId,
+  //         addressModel.verification_token.trim()
+  //         // signed.fee,
+  //         // signed.memo,
+  //         // <any>signed.msgs
+  //       );
+  //       console.log('generatedSignDoc', generatedSignDoc);
+  //     } catch (e) {
+  //       log.info(e.message);
+  //     }
+  //     // ensure correct document was signed
+  //     if (
+  //       generatedSignDoc &&
+  //       serializeSignDoc(signed).toString() ===
+  //         serializeSignDoc(generatedSignDoc).toString()
+  //     ) {
+  //       // ensure valid signature
+  //       const { pubkey, signature } = decodeSignature(stdSignature);
+  //       const secpSignature = Secp256k1Signature.fromFixedLength(signature);
+  //       const messageHash = new Sha256(
+  //         serializeSignDoc(generatedSignDoc)
+  //       ).digest();
+  //       isValid = await Secp256k1.verifySignature(
+  //         secpSignature,
+  //         messageHash,
+  //         pubkey
+  //       );
+  //       if (!isValid) {
+  //         log.error('Signature verification failed.');
+  //       }
+  //     } else {
+  //       log.error(
+  //         `Sign doc not matched. Generated: ${JSON.stringify(
+  //           generatedSignDoc
+  //         )}, found: ${JSON.stringify(signed)}.`
+  //       );
+  //       isValid = false;
+  //     }
+  //   } else {
+  //     log.error(
+  //       `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
+  //     );
+  //     isValid = false;
+  //   }
+  // }
+  else if (chain.base === ChainBase.Ethereum) {
     //
     // ethereum address handling
     //
@@ -375,8 +388,6 @@ const verifySignature = async (
   }
 
   addressModel.last_active = new Date();
-
-  console.log('isValid at end', isValid);
 
   if (isValid && user_id === null) {
     // mark the address as verified, and if it doesn't have an associated user, create a new user

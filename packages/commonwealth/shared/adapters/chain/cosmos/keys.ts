@@ -2,25 +2,40 @@
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
-
+import { toBase64 } from '@cosmjs/encoding';
 export const validationTokenToSignDoc = (
-  chainId: string,
-  token: string,
-  fee?: StdFee,
-  memo?: string,
-  msgs?: AminoMsg[],
+  token: Uint8Array,
+  address: string
 ): StdSignDoc => {
-  const jsonTx: AminoMsg = {
-    type: 'cosmos-sdk/TextProposal',
-    value: {
-      title: token.trim(),
-      description: '',
-      // proposer: address,
-      // initial_deposit: [{ denom: 'stake', amount: '0' }]
-    }
+  // type: "sign/MsgSignData",
+  // value: {
+  //   signer: signerAddress,
+  //   data: toBase64(d),
+  // },
+
+  const accountNumber = 0;
+  const sequence = 0;
+  const chainId = '';
+  const fee: StdFee = {
+    gas: '0',
+    amount: [],
   };
-  fee = fee || { gas: '1', amount: [{ denom: 'astr', amount: '0' }] };
-  memo = memo || '';
-  const signDoc = makeSignDoc(msgs || [jsonTx], fee, chainId, memo, '0', '0');
+  const memo = '';
+
+  const jsonTx: AminoMsg = {
+    type: 'sign/MsgSignData',
+    value: {
+      signer: address,
+      data: toBase64(token),
+    },
+  };
+  const signDoc = makeSignDoc(
+    [jsonTx],
+    fee,
+    chainId,
+    memo,
+    accountNumber,
+    sequence
+  );
   return signDoc;
 };
