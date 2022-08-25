@@ -14,7 +14,7 @@ import {
   ChainInfo,
   AddressInfo,
   SocialAccount,
-  Profile,
+  NewProfile as Profile,
   Comment,
 } from 'models';
 import NewProfileHeader from './new_profile_header';

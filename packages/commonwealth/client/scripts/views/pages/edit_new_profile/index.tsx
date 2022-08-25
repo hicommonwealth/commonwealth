@@ -178,7 +178,7 @@ class EditNewProfile implements m.Component<EditNewProfileAttrs> {
   };
 
   view(vnode) {
-    if (vnode.state.error !== EditProfileError.None)
+    if (vnode.state.error === EditProfileError.None)
       return (
         <div className="EditProfilePage">
           <h3> Edit Profile </h3>
@@ -351,16 +351,12 @@ class EditNewProfile implements m.Component<EditNewProfileAttrs> {
   }
 }
 
-const EditNewProfilePage: m.Component = {
-  view: () => {
-    return m(
-      Sublayout,
-      {
-        class: 'Homepage',
-      },
-      [m(EditNewProfile)]
+export default class EditNewProfilePage implements m.Component<any> {
+  view(vnode) {
+    return (
+      <Sublayout class="Homepage">
+        <EditNewProfile />
+      </Sublayout>
     );
-  },
-};
-
-export default EditNewProfilePage;
+  }
+}
