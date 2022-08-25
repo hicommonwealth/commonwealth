@@ -7,36 +7,58 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
 
-  get name() { return this._name; }
-  get email() { return this._email; }
-  get website() { return this._website; }
-  get bio() { return this._bio; }
-  get isDefault() { return this._isDefault; }
-  get avatarUrl() { return this._avatarUrl; }
-  get slug() { return this._slug; }
+  get name() {
+    return this._name;
+  }
+  get email() {
+    return this._email;
+  }
+  get website() {
+    return this._website;
+  }
+  get bio() {
+    return this._bio;
+  }
+  get isDefault() {
+    return this._isDefault;
+  }
+  get avatarUrl() {
+    return this._avatarUrl;
+  }
+  get slug() {
+    return this._slug;
+  }
 
-  constructor({profile_name, email, website, bio, is_default, avatarUrl, slug}) {
+  constructor({
+    profile_name,
+    email,
+    website,
+    bio,
+    is_default,
+    avatar_url,
+    slug,
+  }) {
     this._name = profile_name;
     this._email = email;
     this._website = website;
     this._bio = bio;
     this._isDefault = is_default;
-    this._avatarUrl = avatarUrl;
+    this._avatarUrl = avatar_url;
     this._slug = slug;
   }
 
-  public initialize(name, email, website, bio, isDefault, avatarUrl, slug) {
+  public initialize(name, email, website, bio, isDefault, avatar_url, slug) {
     this._name = name;
     this._email = email;
     this._website = website;
     this._bio = bio;
     this._isDefault = isDefault;
-    this._avatarUrl = avatarUrl;
+    this._avatarUrl = avatar_url;
     this._slug = slug;
   }
 
   public static fromJSON(json) {
-    return new NewProfile(json)
+    return new NewProfile(json);
   }
 }
 

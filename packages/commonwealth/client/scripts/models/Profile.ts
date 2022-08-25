@@ -142,6 +142,10 @@ class Profile {
   public static getSVGAvatar(address, size) {
     return jdenticon.toSvg(address, size);
   }
+
+  public static fromJSON(json) {
+    console.log('Should create a thing from ', json);
+  }
 }
 
 export default Profile;

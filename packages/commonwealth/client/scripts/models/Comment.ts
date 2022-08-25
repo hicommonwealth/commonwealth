@@ -2,6 +2,7 @@ import moment from 'moment';
 import { VersionHistory } from '../controllers/server/threads';
 import { IUniqueId } from './interfaces';
 import Attachment from './Attachment';
+import AddressInfo from './AddressInfo';
 
 class Comment<T extends IUniqueId> {
   [x: string]: any;
@@ -19,6 +20,7 @@ class Comment<T extends IUniqueId> {
   public readonly versionHistory: VersionHistory[];
   public readonly lastEdited: moment.Moment;
   public readonly deleted: boolean;
+  public readonly addressInfo: AddressInfo;
 
   constructor({
     chain,
@@ -36,6 +38,23 @@ class Comment<T extends IUniqueId> {
     authorChain,
     lastEdited, // moment.Moment
     deleted,
+    address,
+  }: {
+    chain: string;
+    author?: string;
+    text: string;
+    plaintext: string;
+    versionHistory: VersionHistory[];
+    attachments?: Attachment[];
+    proposal?: T;
+    id: number;
+    createdAt: moment.Moment;
+    parentComment: number;
+    rootProposal?: string;
+    authorChain?: string;
+    lastEdited?: moment.Moment;
+    deleted?: boolean;
+    address?: any;
   }) {
     this.chain = chain;
     this.author = author;
@@ -51,6 +70,38 @@ class Comment<T extends IUniqueId> {
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;
+    this.addressInfo = new AddressInfo(
+      address?.id,
+      address?.address,
+      address?.chain,
+      address?.keytype,
+      address?.wallet_id,
+      address?.ghost_address
+    );
+  }
+
+  public static fromJSON({
+    id,
+    chain,
+    parent_id,
+    text,
+    created_at,
+    updated_at,
+    version_history,
+    plaintext,
+    Address,
+  }) {
+    return new Comment({
+      id,
+      chain,
+      parentComment: parent_id,
+      text,
+      plaintext,
+      createdAt: created_at,
+      versionHistory: version_history,
+      lastEdited: updated_at,
+      address: Address,
+    });
   }
 }
 

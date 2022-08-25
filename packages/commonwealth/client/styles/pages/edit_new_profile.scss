@@ -1,0 +1,170 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.EditProfilePage {
+  padding: 50px;
+
+  .edit-pane {
+    position: relative;
+    width: 100%;
+    display: flex;
+    margin: 50px 0;
+
+    .save-button {
+      position: absolute;
+      top: -20px;
+      right: 0;
+
+      &.confirm {
+        background-color: green;
+        color: white;
+      }
+
+      &.fail {
+        background-color: red;
+        color: white;
+      }
+    }
+
+    .cui-spinner.cui-spinner-active {
+      position: absolute;
+      top: -10px;
+      right: 100px;
+    }
+
+    .save-button-message {
+      position: absolute;
+      top: -10px;
+      right: 80px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+
+      &.show {
+        opacity: 1;
+      }
+    }
+
+    .general-info {
+      flex: 1;
+      margin-right: 50px;
+
+      .title {
+        margin-bottom: 24px;
+      }
+
+      input[name='bio-form-field'] {
+        height: 150px;
+      }
+
+      .bio-container {
+        label {
+          font-size: 14px;
+          color: #656167;
+        }
+
+        .bio-textarea {
+          width: 100%;
+          height: 150px;
+          padding: 10px;
+          background-color: #f7f6f7;
+          border: 2px solid white;
+          border-radius: 4px;
+          margin: 4px 0 24px 0;
+          &:hover,
+          &:focus {
+            border: 2px solid #bd99ff;
+          }
+        }
+      }
+
+      .profile-image-section {
+        .title {
+          margin-bottom: 24px;
+        }
+
+        .flex {
+          position: relative;
+          display: flex;
+          width: 100%;
+          align-items: center;
+
+          .profile-image {
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            min-height: 90px;
+            img {
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+            &.hide {
+              img {
+                display: none;
+              }
+            }
+          }
+
+          .AvatarUpload {
+            position: absolute;
+            left: 45px;
+            top: 45px;
+            transform: translate(-50%, -50%);
+            opacity: 0.45;
+            transition: opacity 0.3s ease;
+            &:hover {
+              opacity: 1;
+            }
+
+            .dz-image {
+              width: 90px;
+              height: 90px;
+            }
+          }
+
+          .TextInput {
+            width: 75%;
+          }
+
+          p {
+            margin: 0 20px;
+            color: #999999;
+          }
+        }
+      }
+    }
+
+    .social-links {
+      flex: 1;
+
+      .title {
+        margin-bottom: 24px;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .EditProfilePage {
+    .edit-pane {
+      display: block;
+
+      .general-info {
+        margin-right: 0;
+
+        .profile-image-section {
+          .flex {
+            .TextInput {
+              width: 50%;
+            }
+          }
+        }
+      }
+
+      .social-links {
+        margin-top: 30px;
+      }
+    }
+  }
+}

@@ -1,0 +1,360 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.ProfilePage {
+  position: relative;
+  width: 70%;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .heavy {
+    color: black;
+    font-weight: 600;
+  }
+
+  .ProfileHeader {
+    margin: 30px 0;
+
+    .profile-info {
+      min-height: 215px;
+      &.expand {
+        height: auto;
+      }
+      padding: 0;
+      display: grid;
+      grid-template-areas:
+        'image info'
+        'social social';
+      grid-template-columns: 15% 85%;
+      grid-template-rows: auto 55px;
+      border: 1px solid #cccccc;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      // row-gap: 20px;
+
+      .profile-image {
+        position: relative;
+        grid-area: image;
+        height: 100%;
+        border-right: 1px solid #cccccc;
+        img {
+          position: absolute;
+          left: 50%;
+          top: 30px;
+          transform: translateX(-50%);
+          height: 90px;
+          width: 90px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+
+      .profile-name-and-bio {
+        grid-area: info;
+        padding: 20px;
+        .name,
+        .bio {
+          margin-bottom: 8px;
+        }
+        .bio {
+          line-height: 21px;
+        }
+        .read-more {
+          margin-bottom: 15px;
+          color: #338fff;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+
+      .social-accounts-and-edit {
+        position: relative;
+        grid-area: social;
+        width: 100%;
+        height: 100%;
+        border-top: 1px solid #cccccc;
+
+        .social-account-icon {
+          position: absolute;
+          left: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .edit-button {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          button {
+            height: 35px;
+          }
+        }
+      }
+    }
+  }
+
+  .ProfileActivity {
+    margin: 60px 0;
+
+    .activity-nav {
+      display: flex;
+
+      .activity-nav-option {
+        position: relative;
+        display: flex;
+        min-width: 50px;
+        padding: 6px 0;
+        margin-right: 20px;
+
+        h4 {
+          color: #dddddd;
+          margin-top: 2px;
+          transition: color 0.2s ease-in;
+          user-select: none;
+        }
+
+        .chevron-down {
+          color: #999999;
+        }
+
+        .activity-count {
+          position: relative;
+          width: 45px;
+          height: 25px;
+          background-color: white;
+          border-radius: 12px;
+          margin-left: 12px;
+          transition: background-color 0.2s ease-in;
+
+          p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            font-size: small;
+            font-weight: 600;
+          }
+        }
+
+        .drop-down {
+          position: absolute;
+          width: 100%;
+          &.wide {
+            width: 170%;
+          }
+          top: 40px;
+          left: 0;
+          background-color: white;
+          z-index: 2;
+
+          .option {
+            position: relative;
+            display: flex;
+            height: 35px;
+            border: 1px solid #dddddd;
+            border-top: none;
+            border-radius: 2px;
+            p {
+              padding: 7px 10px;
+              user-select: none;
+            }
+            .check {
+              position: absolute;
+              right: 5px;
+              top: 4px;
+            }
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            &:hover {
+              background-color: #eeeeee;
+            }
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          h4,
+          .chevron {
+            color: black;
+          }
+
+          .activity-count {
+            background-color: #efefef;
+          }
+        }
+
+        &.selected {
+          border-bottom: 2px solid #4723ad;
+          h4 {
+            color: black;
+          }
+
+          .activity-count {
+            background-color: #efefef;
+          }
+        }
+      }
+
+      .divider {
+        width: 1px;
+        height: 24px;
+        border-right: 1px solid #dddddd;
+        margin: 7px 20px 0 0;
+      }
+    }
+
+    .activity-section {
+      margin: 40px 0;
+
+      .activity {
+        position: relative;
+        height: 130px;
+        padding: 10px 25px;
+        border-bottom: 1px solid #dddddd;
+
+        .comment-icon {
+          position: absolute;
+          top: 14px;
+          left: 0px;
+        }
+
+        .comment-chain,
+        .thread-chain {
+          margin-bottom: 10px;
+          p {
+            color: #bbbbbb;
+          }
+        }
+
+        .comment-date,
+        .thread-date {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          p {
+            color: #bbbbbb;
+          }
+        }
+
+        .comment-text {
+          width: 85%;
+          max-height: 90px;
+          font-size: 16px;
+        }
+
+        .thread-title {
+          margin-bottom: 10px;
+        }
+
+        .thread-body {
+          width: 85%;
+          color: #bbbbbb;
+        }
+      }
+    }
+  }
+
+  .loading-spinner {
+    position: relative;
+    width: 100%;
+    min-height: 350px;
+    .cui-spinner.cui-spinner-active {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .ErrorPage {
+    min-height: 240px;
+    padding: 60px 0;
+    text-align: center;
+    h3 {
+      margin-bottom: 40px;
+    }
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .ProfilePage {
+    width: 90%;
+
+    .ProfileHeader {
+      .profile-info {
+        min-height: 260px;
+        grid-template-columns: 20% 80%;
+        grid-template-rows: 80% 20%;
+
+        .profile-image {
+          img {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: none;
+          }
+        }
+      }
+
+      .social-accounts-and-edit {
+        padding: 15px 15px;
+      }
+    }
+
+    .ProfileActivity {
+      .activity-section {
+        .activity {
+          .comment-text {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .ProfilePage {
+    .ProfileActivity {
+      .activity-nav {
+        .activity-nav-option {
+          .drop-down.wide {
+            width: 130%;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .ProfilePage {
+    .ProfileHeader {
+      .profile-info {
+        height: 300px;
+        grid-template-columns: 30% 70%;
+        grid-template-rows: 85% 15%;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 530px) {
+  .ProfilePage {
+    .ProfileActivity {
+      .activity-nav {
+        display: block;
+
+        .activity-nav-option {
+          .drop-down.wide {
+            width: 100%;
+          }
+        }
+
+        .divider {
+          display: none;
+        }
+      }
+    }
+  }
+}

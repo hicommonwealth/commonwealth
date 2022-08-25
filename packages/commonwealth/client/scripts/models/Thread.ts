@@ -10,7 +10,7 @@ import Attachment from './Attachment';
 import Topic from './Topic';
 import Vote from './Vote';
 import { VersionHistory } from '../controllers/server/threads';
-import { ChainEntity } from '.';
+import { AddressInfo, ChainEntity } from '.';
 import Poll from './Poll';
 
 // field names copied from snapshot
@@ -59,6 +59,7 @@ class Thread implements IUniqueId {
   public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
+  public readonly addressInfo: AddressInfo;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -89,18 +90,19 @@ class Thread implements IUniqueId {
     hasPoll,
     lastCommentedOn,
     linkedThreads,
+    address,
   }: {
-    author: string;
+    author?: string;
     title: string;
-    attachments: Attachment[];
-    id: number;
-    createdAt: moment.Moment;
+    attachments?: Attachment[];
+    id?: number;
+    createdAt?: moment.Moment;
     lastCommentedOn: moment.Moment;
-    topic: Topic;
-    kind: ThreadKind;
-    stage: ThreadStage;
+    topic?: Topic;
+    kind?: ThreadKind;
+    stage?: ThreadStage;
     versionHistory: VersionHistory[];
-    chain: string;
+    chain?: string;
     readOnly: boolean;
     body?: string;
     plaintext?: string;
@@ -110,9 +112,10 @@ class Thread implements IUniqueId {
     collaborators?: any[];
     chainEntities?: any[];
     lastEdited?: moment.Moment;
-    snapshotProposal: string;
-    hasPoll: boolean;
-    linkedThreads: LinkedThreadRelation[];
+    snapshotProposal?: string;
+    hasPoll?: boolean;
+    linkedThreads?: LinkedThreadRelation[];
+    address?: { [key: string]: any };
     polls?: Poll[];
   }) {
     this.author = author;
@@ -150,6 +153,54 @@ class Thread implements IUniqueId {
     this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
+    this.addressInfo = new AddressInfo(
+      address?.id,
+      address?.address,
+      address?.chain,
+      address?.keytype,
+      address?.wallet_id,
+      address?.ghost_address
+    );
+  }
+
+  public static fromJSON({
+    title,
+    body,
+    created_at,
+    updated_at,
+    chain,
+    pinned,
+    kind,
+    url,
+    version_history,
+    read_only,
+    plaintext,
+    stage,
+    voting_ends_at,
+    voting_votes,
+    voting_options,
+    snapshot_proposal,
+    voting_enabled,
+    last_commented_on,
+    Address,
+  }) {
+    return new Thread({
+      title,
+      createdAt: created_at,
+      kind,
+      stage,
+      versionHistory: version_history,
+      chain,
+      readOnly: read_only,
+      body,
+      plaintext,
+      url,
+      pinned,
+      lastEdited: updated_at,
+      snapshotProposal: snapshot_proposal,
+      lastCommentedOn: last_commented_on,
+      address: Address,
+    });
   }
 }
 

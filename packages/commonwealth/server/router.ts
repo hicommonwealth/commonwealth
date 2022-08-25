@@ -58,6 +58,7 @@ import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfile from './routes/getProfile';
+import getNewProfile from './routes/getNewProfile';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -95,6 +96,7 @@ import deleteChain from './routes/deleteChain';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
+import updateNewProfile from './routes/updateNewProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
@@ -330,6 +332,7 @@ function setupRouter(
   router.get('/searchComments', searchComments.bind(this, models));
 
   router.get('/profile', getProfile.bind(this, models));
+  router.get('/profile/v2', getNewProfile.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -508,6 +511,13 @@ function setupRouter(
     updateProfile.bind(this, models, identityFetchCache)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
+
+  // new profile
+  router.post(
+    '/updateProfile/v2',
+    passport.authenticate('jwt', { session: false }),
+    updateNewProfile.bind(this, models)
+  );
 
   // social accounts
   router.delete(
