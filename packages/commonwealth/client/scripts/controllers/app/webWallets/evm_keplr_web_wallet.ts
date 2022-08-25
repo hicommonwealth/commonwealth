@@ -82,14 +82,21 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     const webWalletSignature = await this.signLoginToken(
-      account.validationToken,
+      account.validationToken.trim(),
       account.address
     );
+    console.log('account.address', account.address);
 
     console.log('webwalltsign', webWalletSignature);
-    return account.validate(JSON.stringify(webWalletSignature));
+    const signature = {
+      signature: {
+        pub_key: webWalletSignature.pub_key,
+        signature: webWalletSignature.signature,
+      },
+    };
+    return account.validate(JSON.stringify(signature));
   }
 
   // public async validateWithAccount(account: Account<any>): Promise<void> {

@@ -64,9 +64,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       account.validationToken.trim(),
       account.address
     );
-    console.log('account.address', account.address);
-
-    console.log('webwalltsign', webWalletSignature);
     const signature = {
       signature: {
         pub_key: webWalletSignature.pub_key,
@@ -75,41 +72,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     };
     return account.validate(JSON.stringify(signature));
   }
-
-  // public async validateWithAccount(account: Account<any>): Promise<void> {
-  //   if (!this._chainId || !window.keplr?.signAmino)
-  //     throw new Error('Missing or misconfigured web wallet');
-
-  //   if (this._chain !== app.chain.id) {
-  //     // disable then re-enable on chain switch
-  //     await this.enable();
-  //   }
-
-  //   // Get the verification token & placeholder TX to send
-  //   const signDoc = validationTokenToSignDoc(
-  //     this._chainId,
-  //     account.validationToken
-  //   );
-
-  //   // save and restore default options after setting to no fee/memo for login
-  //   const defaultOptions = window.keplr.defaultOptions;
-  //   window.keplr.defaultOptions = {
-  //     sign: {
-  //       preferNoSetFee: true,
-  //       preferNoSetMemo: true,
-  //       disableBalanceCheck: true,
-  //     }
-  //   };
-
-  //   const signature = await window.keplr.signAmino(
-  //     this._chainId,
-  //     account.address,
-  //     signDoc
-  //   );
-
-  //   window.keplr.defaultOptions = defaultOptions;
-  //   return account.validate(JSON.stringify(signature));
-  // }
 
   // ACTIONS
   public async enable() {
