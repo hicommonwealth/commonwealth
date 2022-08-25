@@ -27,7 +27,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly specificChains = ['evmos'];
 
   public get available() {
-    return window.getOfflineSigner && !!window.keplr;
+    return !!window.keplr;
   }
   public get enabling() {
     return this._enabling;

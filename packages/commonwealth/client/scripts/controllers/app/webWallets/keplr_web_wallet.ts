@@ -29,7 +29,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
-    return window.getOfflineSigner && !!window.keplr;
+    return !!window.keplr;
   }
   public get enabling() {
     return this._enabling;
