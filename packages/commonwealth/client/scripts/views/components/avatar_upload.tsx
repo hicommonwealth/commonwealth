@@ -18,7 +18,7 @@ type AvatarUploadStyleAttrs = {
 };
 
 type AvatarUploadAttrs = {
-  account?: Account<any>;
+  account?: Account;
   darkMode?: boolean;
   scope: 'community' | 'user';
   uploadCompleteCallback?: CallableFunction;

@@ -136,8 +136,8 @@ export class SubstrateDemocracyReferendum
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
-  public canVoteFrom(account: Account<any>) {
-    return account.chainBase === ChainBase.Substrate;
+  public canVoteFrom(account: Account) {
+    return account.chain.base === ChainBase.Substrate;
   }
   public title: string;
   private _preimage;

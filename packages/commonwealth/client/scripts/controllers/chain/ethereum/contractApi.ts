@@ -10,7 +10,7 @@ export type ContractFactoryT<ContractT> = (address: string, provider: Provider) 
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
-  sender: Account<any>,
+  sender: Account,
   contract: CT
 ): Promise<CT> {
   const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);

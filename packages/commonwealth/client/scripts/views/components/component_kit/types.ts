@@ -14,6 +14,7 @@ export enum ComponentType {
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
   GradientButton = 'GradientButton',
+  Growl = 'Growl',
   Icon = 'Icon',
   IconButton = 'IconButton',
   Label = 'Label',
@@ -29,6 +30,7 @@ export enum ComponentType {
   TextArea = 'TextArea',
   TextInput = 'TextInput',
   ThreadVoteButton = 'ThreadVoteButton',
+  Toggle = 'Toggle',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
 }
