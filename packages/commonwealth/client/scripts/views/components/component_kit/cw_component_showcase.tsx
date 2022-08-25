@@ -18,7 +18,6 @@ import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_popover/cw_tooltip';
-import { CWPopover } from './cw_popover/cw_popover';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
@@ -82,7 +81,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Popover Menu</h1>
         <div class="basic-gallery">
           <CWPopoverMenu
-            trigger={<CWIconButton iconName="dots" />}
+            trigger={<CWIconButton iconName="dotsVertical" />}
             popoverMenuItems={[
               { type: 'header', label: 'Community' },
               { label: 'Create Thread', iconName: 'edit' },

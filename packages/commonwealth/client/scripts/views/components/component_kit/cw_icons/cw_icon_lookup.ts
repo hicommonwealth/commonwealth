@@ -25,6 +25,7 @@ export const iconLookup = {
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
+  dotsVertical: Icons.CWDotsVertical,
   downvote: Icons.CWDownvote,
   edit: Icons.CWEdit,
   element: Icons.CWElement,
