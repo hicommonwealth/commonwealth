@@ -229,10 +229,18 @@ const verifySignature = async (
             messageHash,
             pubkey
           );
+          if (!isValid) {
+            log.error('Signature verification failed.');
+          }
         } catch (e) {
           console.log(e);
           isValid = false;
         }
+      } else {
+        log.error(
+          `Address not matched. Generated ${generatedAddress}, found ${addressModel.address}.`
+        );
+        isValid = false;
       }
     }
   } else if (chain.base === ChainBase.Ethereum) {
