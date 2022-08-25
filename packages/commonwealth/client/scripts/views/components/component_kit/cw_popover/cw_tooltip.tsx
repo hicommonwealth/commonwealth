@@ -12,7 +12,7 @@ export type TooltipType =
   | 'solidNoArrow';
 
 type TooltipAttrs = {
-  tooltipContents: string | m.Vnode;
+  tooltipContent: string | m.Vnode;
 } & SharedPopoverAttrs;
 
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
@@ -22,7 +22,7 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
       hoverOpenDelay,
       interactionType,
       persistOnHover,
-      tooltipContents,
+      tooltipContent,
       tooltipType,
       toSide,
       trigger,
@@ -31,10 +31,10 @@ export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
     return (
       <CWPopover
         content={
-          typeof tooltipContents === 'string' ? (
-            <CWText type="caption">{tooltipContents}</CWText>
+          typeof tooltipContent === 'string' ? (
+            <CWText type="caption">{tooltipContent}</CWText>
           ) : (
-            tooltipContents
+            tooltipContent
           )
         }
         hoverCloseDelay={hoverCloseDelay}

@@ -18,7 +18,7 @@ export class CWAddressTooltip implements m.ClassComponent<{ address: string }> {
       <CWTooltip
         persistOnHover
         interactionType="hover"
-        tooltipContents={
+        tooltipContent={
           <div class={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
             <CWIconButton

@@ -44,7 +44,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
           {hasNoWalletsLink && (
             <CWTooltip
               interactionType="click"
-              tooltipContents={
+              tooltipContent={
                 <>
                   <CWText type="caption">
                     If you don’t see your wallet then make sure:

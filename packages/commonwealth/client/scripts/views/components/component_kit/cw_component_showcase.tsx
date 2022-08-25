@@ -26,6 +26,7 @@ import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
+import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -78,12 +79,28 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         /> */}
-        <h1>Popover</h1>
+        <h1>Popover Menu</h1>
         <div class="basic-gallery">
-          <CWPopover
+          <CWPopoverMenu
             trigger={<CWIconButton iconName="dots" />}
-            content={<>Some content</>}
-            interactionType="click"
+            popoverMenuItems={[
+              { type: 'header', label: 'Community' },
+              { label: 'Create Thread', iconName: 'edit' },
+              { label: 'Create Proposal', iconName: 'edit' },
+              { label: 'Create Poll', iconName: 'edit' },
+              { label: 'Create Snapshot', iconName: 'edit', disabled: true },
+              { type: 'divider' },
+              { type: 'header', label: 'Universal' },
+              { label: 'Create Community', iconName: 'people' },
+              { label: 'Create Crowdfund', iconName: 'wallet' },
+              { type: 'divider' },
+              {
+                label: 'Report',
+                iconName: 'cautionCircle',
+                isSecondary: true,
+                onclick: () => console.log('clicked'),
+              },
+            ]}
           />
         </div>
         <h1>Tooltip</h1>
@@ -92,7 +109,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Hover</CWText>
             <CWTooltip
               interactionType="hover"
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -104,7 +121,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Hover to side</CWText>
             <CWTooltip
               interactionType="hover"
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -117,7 +134,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Persist on hover</CWText>
             <CWTooltip
               trigger={<CWIcon iconName="infoEmpty" />}
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -131,7 +148,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Hover open and close delay</CWText>
             <CWTooltip
               trigger={<CWIcon iconName="infoEmpty" />}
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -145,7 +162,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Click</CWText>
             <CWTooltip
               interactionType="click"
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -157,7 +174,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Solid background</CWText>
             <CWTooltip
               interactionType="hover"
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
@@ -169,7 +186,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWText>Solid background, no arrow</CWText>
             <CWTooltip
               interactionType="hover"
-              tooltipContents={`
+              tooltipContent={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
               `}
