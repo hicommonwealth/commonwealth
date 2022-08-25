@@ -25,7 +25,7 @@ export interface IAddressDisplayOptions {
 
 const User: m.Component<
   {
-    user: Account<any> | AddressInfo | Profile;
+    user: Account | AddressInfo | Profile;
     avatarSize?: number;
     avatarOnly?: boolean; // overrides most other properties
     hideAvatar?: boolean;
@@ -62,7 +62,7 @@ const User: m.Component<
 
     if (!user) return;
 
-    let account: Account<any>;
+    let account: Account;
     let profile: Profile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
@@ -106,7 +106,7 @@ const User: m.Component<
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId) {
+      if (app.chain && app.chain.id === chainId.id) {
         try {
           account = app.chain.accounts.get(address);
         } catch (e) {
@@ -115,10 +115,10 @@ const User: m.Component<
         }
       }
 
-      profile = app.profiles.getProfile(chainId, address);
+      profile = app.profiles.getProfile(chainId.id, address);
 
       role = adminsAndMods.find(
-        (r) => r.address === address && r.address_chain === chainId
+        (r) => r.address === address && r.address_chain === chainId.id
       );
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
@@ -139,8 +139,7 @@ const User: m.Component<
       account = vnode.attrs.user;
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
-      const chainId =
-        typeof account.chain === 'string' ? account.chain : account.chain.id;
+      const chainId = account.chain.id;
       profile = account.profile;
       role = adminsAndMods.find(
         (r) => r.address === account.address && r.address_chain === chainId
@@ -370,7 +369,7 @@ const User: m.Component<
 };
 
 export const UserBlock: m.Component<{
-  user: Account<any> | AddressInfo | Profile;
+  user: Account | AddressInfo | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
   showRole?: boolean;
@@ -405,7 +404,7 @@ export const UserBlock: m.Component<{
 
     if (user instanceof AddressInfo) {
       if (!user.chain || !user.address) return;
-      profile = app.profiles.getProfile(user.chain, user.address);
+      profile = app.profiles.getProfile(user.chain.id, user.address);
     } else if (user instanceof Profile) {
       profile = user;
     } else {

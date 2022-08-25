@@ -85,7 +85,7 @@ export const ProposalBodyAvatar: m.Component<{
       ]);
     }
 
-    const author: Account<any> = app.chain.accounts.get(item.author);
+    const author: Account = app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
       (item as Comment<any>).deleted
@@ -132,7 +132,7 @@ export const ProposalBodyAuthor: m.Component<{
       }
     }
 
-    const author: Account<any> =
+    const author: Account =
       item instanceof Thread || item instanceof Comment
         ? app.chain.accounts.get(item.author)
         : item.author;
@@ -498,7 +498,7 @@ export const ProposalBodyText: m.Component<
 
     const getPlaceholder = () => {
       if (!(vnode.attrs.item instanceof Thread)) return;
-      const author: Account<any> = app.chain
+      const author: Account = app.chain
         ? app.chain.accounts.get(vnode.attrs.item.author)
         : null;
 

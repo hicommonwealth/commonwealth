@@ -86,12 +86,12 @@ export default class extends Base {
    * @param account An arbitrary Commonwealth account
    * @param options A chain or a community ID
    */
-  public getRoleInCommunity(options: { account?: Account<any>, chain?: string }): RoleInfo {
+  public getRoleInCommunity(options: { account?: Account, chain?: string }): RoleInfo {
     const account = options.account || this.activeAccount;
     if (!account) return;
 
     const address_id = this.addresses.find((a) => {
-      return a.address === account.address && a.chain === account.chain.id;
+      return a.address === account.address && a.chain.id === account.chain.id;
     })?.id;
 
     return this.roles.find((r) => {
@@ -154,7 +154,7 @@ export default class extends Base {
    */
   getJoinableAddresses(options: { chain?: string, community?: string }): AddressInfo[] {
     return (options.chain)
-      ? this.addresses.filter((a) => a.chain === options.chain)
+      ? this.addresses.filter((a) => a.chain.id === options.chain)
       : this.addresses;
   }
 
@@ -164,7 +164,7 @@ export default class extends Base {
       .map((r) => r.chain_id);
   }
 
-  public getActiveAccountsByRole(): [Account<any>, RoleInfo][] {
+  public getActiveAccountsByRole(): [Account, RoleInfo][] {
     const activeAccountsByRole = this.activeAccounts.map((account) => {
       const role = this.getRoleInCommunity({
         account,
@@ -173,8 +173,8 @@ export default class extends Base {
       return [account, role];
     });
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce((
-      arr: [Account<any>, RoleInfo][],
-      current: [Account<any>, RoleInfo]
+      arr: [Account, RoleInfo][],
+      current: [Account, RoleInfo]
     ) => {
       const index = arr.findIndex((item) => item[0].address === current[0].address);
       if (index < 0) {
@@ -214,14 +214,14 @@ export default class extends Base {
    * TODO: Should we default to this.activeAccount if address is null?
    */
   public isMember(options: {
-    account: AddressInfo | Account<any> | undefined,
+    account: AddressInfo | Account | undefined,
     chain?: string,
     community?: string
   }): boolean {
     const addressinfo: AddressInfo | undefined = (options.account instanceof Account)
       ? this.addresses.find((a) => (
         options.account.address === a.address
-          && (options.account.chain as ChainInfo).id === a.chain
+          && (options.account.chain as ChainInfo).id === a.chain.id
       ))
       : options.account;
     const roles = this.roles.filter((role) => addressinfo
