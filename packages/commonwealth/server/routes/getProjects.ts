@@ -11,7 +11,11 @@ export const Errors = {
   InvalidAddress: 'Invalid address',
 };
 
-type GetProjectsReq = { creator_address?: string, chain_id?: string, project_id?: number };
+type GetProjectsReq = {
+  creator_address?: string;
+  chain_id?: string;
+  project_id?: number;
+};
 type GetProjectsResp = ProjectAttributes[];
 
 const getProjects = async (
@@ -19,7 +23,8 @@ const getProjects = async (
   req: TypedRequestQuery<GetProjectsReq>,
   res: TypedResponse<GetProjectsResp>
 ) => {
-  const { creator_address, chain_id, project_id } = req.query;
+  console.log(req.query);
+  const { creator_address, chain_id, project_id } = req.query as GetProjectsReq;
   const params: WhereOptions<ProjectAttributes> = {};
   if (chain_id) {
     try {
@@ -45,12 +50,20 @@ const getProjects = async (
       where: params,
       include: {
         model: models.ChainEntity,
-        include: [{
-          model: models.ChainEvent,
-        }]
-      }
+        include: [
+          {
+            model: models.ChainEvent,
+            order: [[models.ChainEvent, 'id', 'asc']],
+            include: [models.ChainEventType],
+          },
+        ],
+      },
     });
-    return success(res, projects.map((p) => p.toJSON()));
+    console.log(projects[0]);
+    return success(
+      res,
+      projects.map((p) => p.toJSON())
+    );
   } catch (err) {
     throw new ServerError(err);
   }

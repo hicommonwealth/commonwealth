@@ -31,6 +31,7 @@ export default class extends IEventHandler {
 
     if (event.data.kind === CommonwealthTypes.EventKind.ProjectCreated) {
       // handle creation event by checking against projects table
+      console.log({ event });
       const entityId = dbEvent?.entity_id;
       if (!entityId) {
         log.error(`Entity not found on dbEvent: ${dbEvent.toString()}`);

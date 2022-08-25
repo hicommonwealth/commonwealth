@@ -48,14 +48,17 @@ export default class ProjectsController {
       `${this._app.serverUrl()}/getProjects`,
       project_id ? { project_id } : {}
     );
-    for (const project of res) {
+    console.log({ res });
+    for (const project of res.result) {
       try {
         const pObj = Project.fromJSON(project);
+        console.log(pObj);
         if (!this._store.getById(pObj.id)) {
           this._store.add(pObj);
         } else {
           this._store.update(pObj);
         }
+        console.log(this._store);
       } catch (e) {
         console.error(
           `Could not load project: ${JSON.stringify(project)}: ${e.message}`
@@ -90,6 +93,7 @@ export default class ProjectsController {
     this._initializing = false;
   }
 
+  // TODO: Should just be "create"
   public async createProject(
     projectData: IProjectCreationData
   ): Promise<[ContractReceipt, number]> {

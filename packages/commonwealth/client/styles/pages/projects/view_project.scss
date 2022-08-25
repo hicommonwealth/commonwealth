@@ -1,59 +1,88 @@
 @import 'shared';
 
 .ViewProject {
-  margin: 72px 200px;
-  max-width: 900px;
+  margin: 56px 0;
+  max-width: 1000px;
+  @include large {
+    margin-left: 256px;
+    margin-right: 256px;
+  }
+  @include mediumInclusive {
+    margin-left: 128px;
+    margin-right: 128px;
+  }
+  @include mediumSmallInclusive {
+    margin-left: 96px;
+    margin-right: 96px;
+  }
+  @include smallInclusive {
+    margin-left: 64px;
+    margin-right: 64px;
+  }
+  @include extraSmall {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+
   .User {
     display: flex;
     align-items: center;
+
     .username {
       position: relative;
       top: 1.5px;
       margin-left: 5px;
     }
   }
+
   .project-metadata {
     display: flex;
     justify-content: space-between;
     margin: 30px 0;
+
     .metadata-left {
       display: flex;
       align-items: center;
     }
+
     .metadata-right {
       display: flex;
     }
   }
   .project-overview-and-support {
     display: flex;
+
+    @include smallInclusive {
+      flex-direction: column;
+    }
+
     .project-overview-panel {
       flex: 2;
       margin-right: 16px;
+
       .project-header-img {
-        width: 100%;
+        max-height: 512px;
         height: auto;
+        width: 100%;
+        object-fit: cover;
+        object-position: left top;
       }
-      .ProjectCompletionBar {
-        height: 24px;
-        font-weight: 500px;
-        background: $neutral-50;
-        .completed-percentage {
-          height: 100%;
-          background: $green-500;
-        }
-      }
+
       .project-funding-data {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 20px;
+
         .left-panel {
           display: flex;
+
           .project-funds-raised,
           .project-funds-goal {
             display: flex;
             flex-direction: column;
             margin-right: 48px;
+
             .h1,
             .h5 {
               margin-top: 0;
@@ -61,12 +90,14 @@
               color: $neutral-800;
             }
           }
+
           .project-funds-goal {
             .h1 {
               color: $green-500;
             }
           }
         }
+
         .right-panel {
           .Button {
             background-color: $rorange-500;
@@ -78,6 +109,7 @@
         display: flex;
         justify-content: left;
         margin: 40px 0;
+
         .User {
           margin-right: 112px;
         }
@@ -86,23 +118,42 @@
         }
       }
     }
+
     .project-support-panel {
       display: flex;
       flex-direction: column;
       flex: 1;
+      gap: 16px;
+      height: min-content;
+
+      @include small {
+        flex-direction: row !important;
+        justify-content: space-between;
+      }
+
+      @include extraSmall {
+        flex-direction: column !important;
+      }
+
       .SupportCard {
-        margin-bottom: 16px;
+        flex: 1;
       }
     }
   }
 
-  hr {
-    border-top: 3px solid $neutral-200;
-    margin: 48px 0;
+  .Divider {
+    margin: 40px 0;
   }
   .project-about {
-    .MarkdownFormattedText > p {
-      color: $neutral-800;
+    margin-top: 56px;
+    .MarkdownFormattedText {
+      p,
+      a,
+      i,
+      b {
+        color: $neutral-800;
+        line-height: 24px;
+      }
     }
   }
   .project-backers-wrap {

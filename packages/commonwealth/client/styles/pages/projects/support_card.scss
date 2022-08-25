@@ -10,7 +10,7 @@
     color: white;
     display: flex;
     justify-content: left;
-    height: 56px;
+    height: fit-content;
     padding: 8px 24px;
     .Text {
       color: inherit;
@@ -24,8 +24,15 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    height: 192px;
+    height: fit-content;
     justify-content: center;
-    padding: 16px;
+    margin: 16px;
+    .Text {
+      color: $neutral-500;
+    }
+    .TextInput,
+    .Button {
+      margin-top: 16px;
+    }
   }
 }

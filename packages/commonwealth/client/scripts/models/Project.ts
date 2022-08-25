@@ -4,6 +4,7 @@ import * as CommonwealthTypes from 'chain-events/src/chains/commonwealth/types';
 import ChainEntityT from './ChainEntity';
 import { CWParticipant } from '../controllers/chain/ethereum/commonwealth/participants';
 import AddressInfo from './AddressInfo';
+import { weiToTokens } from '../helpers';
 
 class Project {
   // Helper getters
@@ -12,7 +13,10 @@ class Project {
   }
 
   public get completionPercent(): number {
-    return this.threshold.div(this.fundingAmount).toNumber();
+    return (
+      +weiToTokens(this.fundingAmount.toString(), 18) /
+      +weiToTokens(this.threshold.toString(), 18)
+    );
   }
 
   public get creatorAddressInfo(): AddressInfo {
@@ -166,7 +170,7 @@ class Project {
     public readonly coverImage: string,
     public readonly curatorFee: BN,
     public readonly threshold: BN,
-    public readonly deadline: moment.Moment,
+    public readonly deadline: BN,
     public readonly createdAt: moment.Moment,
     public fundingAmount: BN,
     public readonly entity: ChainEntityT,
@@ -206,7 +210,7 @@ class Project {
     deadline: number;
     created_at: number;
     funding_amount: string;
-    ChainEntity: ChainEntityT;
+    ChainEntity;
   }) {
     return new Project(
       id,
@@ -214,16 +218,17 @@ class Project {
       creator_address_id,
       beneficiary,
       token,
-      title,
-      description,
-      short_description,
+      title || 'Untitled',
+      description || 'This project has not been provided with a description.',
+      short_description ||
+        'This project has not been provided with a description.',
       cover_image,
       new BN(curator_fee), // TODO: This should perhaps be a % or decimal, not BN
       new BN(threshold),
-      moment.unix(deadline),
-      moment.unix(created_at),
+      new BN(deadline),
+      moment(created_at),
       new BN(funding_amount),
-      ChainEntity,
+      ChainEntityT.fromJSON(ChainEntity),
       chain_id
     );
   }

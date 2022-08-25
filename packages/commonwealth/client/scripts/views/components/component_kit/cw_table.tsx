@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m, { Vnode } from 'mithril';
-import 'components/component_kit/cw_table.scss';
+import 'components/quill/component_kit/cw_table.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 
 export type ButtonAttrs = {
@@ -18,12 +18,11 @@ export class CWTable implements m.ClassComponent<ButtonAttrs> {
     const { className, tableName, headers, entries } = vnode.attrs;
     return (
       <div class={`${className || ''} Table`}>
-        <CWText type="h1">{tableName}</CWText>
         <table>
           <tr>
             {headers.map((headerText: string) => (
               <th>
-                <CWText type="body1" fontWeight="medium">
+                <CWText type="h4" fontWeight="medium">
                   {headerText}
                 </CWText>
               </th>

@@ -1,0 +1,12 @@
+@import 'shared';
+
+.ProjectCompletionBar {
+  height: 24px;
+  background: $neutral-50;
+  border-radius: 0 0 5px 0;
+  .completed-percentage {
+    height: 100%;
+    background: $green-500;
+    border-radius: 0 0 0 5px;
+  }
+}

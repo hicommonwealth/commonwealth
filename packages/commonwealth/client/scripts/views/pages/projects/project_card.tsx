@@ -14,37 +14,15 @@ import { weiToTokens } from 'helpers';
 import BN from 'bn.js';
 import app from 'state';
 import moment from 'moment';
-import { BigNumberish } from 'ethers';
-
-export enum ProjectRole {
-  Curator = 'curator',
-  Backer = 'backer',
-  Author = 'author',
-}
-
-class DummyChainIcon
-  implements m.ClassComponent<{ chain; onclick; size: number }>
-{
-  view(vnode) {
-    const iconUrl = 'https://commonwealth.im/static/img/protocols/edg.png';
-    const size = vnode.attrs.size;
-    return (
-      <div class="DummyChainIcon">
-        <img
-          class="chain-icon"
-          style={`width: ${size}px; height: ${size}px;`}
-          src={iconUrl}
-          onclick={onclick}
-        />
-      </div>
-    );
-  }
-}
+import { CWAvatar } from '../../components/component_kit/cw_avatar';
+import { ProjectRole } from './types';
+import ProjectCompletionBar from './project_completion_bar';
 
 class ProjectHeaderPanel
   implements
     m.ClassComponent<{
       iconSize?: number;
+      iconUrl?: string;
       coverImage: string;
       userRole?: ProjectRole;
       supportAmount?: BN;
@@ -52,9 +30,8 @@ class ProjectHeaderPanel
 {
   view(vnode) {
     const iconSize = vnode.attrs.iconSize || 32;
-    const { coverImage, userRole, supportAmount } = vnode.attrs;
+    const { iconUrl, coverImage, userRole, supportAmount } = vnode.attrs;
     const isSupporter = userRole !== ProjectRole.Author;
-    console.log(userRole);
     return (
       <div
         class="ProjectHeaderPanel"
@@ -80,34 +57,14 @@ class ProjectHeaderPanel
             </div>
           </div>
         )}
-        {iconSize && (
+        {iconUrl && (
           <div
-            class="dummy-chain-wrap"
+            class="chain-wrap"
             style={isSupporter ? 'top: 104px' : 'top: 8px'}
           >
-            <DummyChainIcon chain={null} onclick={null} size={iconSize} />
+            <CWAvatar iconUrl={iconUrl} size={iconSize} />
           </div>
         )}
-      </div>
-    );
-  }
-}
-
-export class ProjectCompletionBar
-  implements
-    m.ClassComponent<{
-      completionPercent: number;
-      projectStatus?: 'succeeded' | 'failed';
-    }>
-{
-  view(vnode) {
-    const { completionPercent, projectStatus } = vnode.attrs;
-    return (
-      <div class="ProjectCompletionBar">
-        <div
-          class={`completed-percentage ${projectStatus}`}
-          style={`width: ${completionPercent * 400}px`}
-        />
       </div>
     );
   }
@@ -137,9 +94,7 @@ class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
                 <>
                   <CWIcon iconName="clock" iconSize="small" />
                   <CWText type="caption" fontWeight="medium">
-                    <div class="project-deadline">{`${project.deadline.fromNow(
-                      true
-                    )}`}</div>
+                    <div class="project-deadline">{`${project.deadline} blocks`}</div>
                   </CWText>
                 </>
               )
@@ -219,32 +174,34 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
   }
 
   view(vnode: m.Vnode<ProjectCardAttrs>) {
-    const { project, size } = vnode.attrs;
+    const { project } = vnode.attrs;
 
-    const projectStatus = project.deadline.isBefore(moment())
-      ? project.fundingAmount.gt(project.threshold)
-        ? 'succeeded'
-        : 'failed'
-      : null;
+    const projectStatus = null;
+    // project.deadline.isBefore(moment())
+    // ? project.fundingAmount.gt(project.threshold)
+    //   ? 'succeeded'
+    //   : 'failed'
+    // : null;
 
     const onclick = () => {
       console.log(`project/${project.id}-${slugify(project.title)}`);
       m.route.set(`project/${project.id}-${slugify(project.title)}`);
     };
 
-    console.log(app.user.addresses);
     const [userRole, supportAmount] = this.getUserRoles(
       project,
       app.user.addresses
     );
-    console.log({ userRole, supportAmount });
-    // const userRole = ProjectRole.Curator;
-    // const supportAmount = '320000000000000000';
+
+    const iconUrl = project.chainId
+      ? null
+      : app.config.chains.getById(project.chainId)?.iconUrl;
 
     return (
       <div class="ProjectCard large" onclick={onclick}>
         <ProjectHeaderPanel
           iconSize={32}
+          iconUrl={iconUrl}
           coverImage={project.coverImage}
           userRole={userRole}
           supportAmount={supportAmount}

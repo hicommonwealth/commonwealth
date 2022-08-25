@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
 import ProjectCard, { ProjectCardSize } from './project_card';
@@ -28,10 +27,13 @@ export default class ExplorePage
   }
 
   view(vnode) {
-    console.log(this.getDummyExploreProjects());
-    const exploreProjects = this.getDummyExploreProjects().map((project) => (
-      <ProjectCard project={project} size={ProjectCardSize.Large} />
-    ));
+    const exploreProjects = app.projects.store
+      .getAll()
+      .map((project) => (
+        <ProjectCard project={project} size={ProjectCardSize.Large} />
+      ));
+
+    console.log({ exploreProjects });
 
     return (
       <div class="ExplorePage">

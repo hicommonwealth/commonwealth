@@ -10,13 +10,13 @@ module.exports = {
       await queryInterface.addColumn(
         'Projects',
         'description',
-        { type: Sequelize.STRING(224) },
+        { type: Sequelize.TEXT },
         { transaction }
       );
       await queryInterface.addColumn(
         'Projects',
         'short_description',
-        { type: Sequelize.TEXT },
+        { type: Sequelize.STRING(224) },
         { transaction }
       );
       await queryInterface.addColumn(

@@ -13,13 +13,15 @@
       padding: 16px;
     }
     th {
-      color: $neutral-600;
+      .h4 {
+        color: $neutral-500;
+      }
     }
     tr:nth-child(odd) {
       background: $white;
     }
     tr:nth-child(even) {
-      background: $neutral-300;
+      background: $neutral-50;
     }
     th,
     td {

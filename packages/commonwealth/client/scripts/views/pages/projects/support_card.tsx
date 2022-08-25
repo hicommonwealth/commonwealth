@@ -10,7 +10,8 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import app from 'state';
-import { ProjectRole } from './project_card';
+import { ProjectRole } from './types';
+import { CWAvatar } from '../../components/component_kit/cw_avatar';
 
 // eslint-disable-next-line max-len
 const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id sed nibh euismod mauris nunc. Est leo fringilla ultrices lectus leo. Et vel consequat blandit.`;
@@ -48,6 +49,10 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
       return;
     }
 
+    const iconUrl = project.chainId
+      ? null
+      : app.config.chains.getById(project.chainId)?.iconUrl;
+
     return (
       <div class="SupportCard">
         <div class="card-header">
@@ -60,10 +65,10 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
           <CWText type="caption">{loremIpsum}</CWText>
           <CWTextInput
             label={inputLabel}
+            iconRight={iconUrl && <CWAvatar iconUrl={iconUrl} size={24} />}
             inputValidationFn={validateSupportAmount}
             oninput={(e) => {
               this.amount = e.target.value;
-              console.log(this.amount);
             }}
             placeholder="0.00"
           />

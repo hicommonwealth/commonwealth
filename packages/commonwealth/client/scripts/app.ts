@@ -661,18 +661,18 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               (attrs) => `/projects/${attrs.subpage}`
             ),
             '/projects/:subpage': importRoute(
-              'views/pages/commonwealth/projects/index.tsx',
+              'views/pages/projects/index.tsx',
               { scoped: false, hideSidebar: false }
             ),
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`
             ),
             '/project/:identifier': importRoute(
-              'views/pages/commonwealth/projects/view_project.tsx',
+              'views/pages/projects/view_project.tsx',
               { scoped: false, hideSidebar: true }
             ),
             '/:scope/new/project': importRoute(
-              'views/pages/commonwealth/projects/create_project_form.tsx',
+              'views/pages/projects/create_project_form.tsx',
               { scoped: true, hideSidebar: true }
             ),
             // NEAR
@@ -910,29 +910,29 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             // ),
             '/projects': redirectRoute(() => `/projects/explore`),
             '/projects/:subpage': importRoute(
-              'views/pages/commonwealth/projects/index.tsx',
+              'views/pages/projects/index.tsx',
               { scoped: false, hideSidebar: true }
             ),
             '/:scope/projects/:subpage': redirectRoute(
               (attrs) => `/projects/${attrs.subpage}`
             ),
             // '/:scope/projects/:subpage': importRoute(
-            //   'views/pages/commonwealth/projects/index.tsx',
+            //   'views/pages/projects/index.tsx',
             //   { scoped: true, hideSidebar: true }
             // ),
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`
             ),
             '/project/:identifier': importRoute(
-              'views/pages/commonwealth/projects/view_project.tsx',
+              'views/pages/projects/view_project.tsx',
               { scoped: false, hideSidebar: true }
             ),
             // '/:scope/project/:identifier': importRoute(
-            //   'views/pages/commonwealth/projects/view_project.tsx',
+            //   'views/pages/projects/view_project.tsx',
             //   { scoped: true, hideSidebar: true }
             // ),
             '/:scope/new/project': importRoute(
-              'views/pages/commonwealth/projects/create_project_form.tsx',
+              'views/pages/projects/create_project_form.tsx',
               { scoped: true, hideSidebar: true }
             ),
             // NEAR

@@ -1,20 +1,21 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
 
-import {
-  CuratedProjectFactory__factory
-} from '../types';
+import { CuratedProjectFactory__factory } from '../types';
 
 async function main() {
   // TODO: configure URL based on chain
-  const web3Provider = new Web3.providers.WebsocketProvider('http://localhost:8545', {
-    reconnect: {
-      auto: true,
-      delay: 5000,
-      maxAttempts: 10,
-      onTimeout: true,
-    },
-  });
+  const web3Provider = new Web3.providers.WebsocketProvider(
+    'http://localhost:8545',
+    {
+      reconnect: {
+        auto: true,
+        delay: 5000,
+        maxAttempts: 10,
+        onTimeout: true,
+      },
+    }
+  );
   const provider = new providers.Web3Provider(web3Provider as any);
 
   const addresses: string[] = await provider.listAccounts();
@@ -35,9 +36,17 @@ async function main() {
   console.log(projectFactory.address);
 
   const newProject = await projectFactory.createProject(
-    'projectName', 'ipfsHash', 'cwUrl', 'beneficiaryAddr', acceptedToken, 10000, 10000, 170
+    'projectName',
+    'ipfsHash',
+    'cwUrl',
+    'beneficiaryAddr',
+    acceptedToken,
+    10000,
+    10000,
+    170
   );
 
+  console.log({ newProject });
 }
 
 main()

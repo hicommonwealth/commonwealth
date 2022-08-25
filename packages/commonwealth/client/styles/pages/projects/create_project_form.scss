@@ -10,9 +10,16 @@
   }
   .form-panel {
     width: 480px;
-    .h1 + .caption {
-      margin: 8px 0 16px;
-    }
+  }
+  .InformationSlide,
+  .DescriptionSlide,
+  .FundraisingSlide {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .CoverImageUpload {
+    margin-top: 16px;
   }
   .NavigationButtons.cui-button-group {
     width: 480px;

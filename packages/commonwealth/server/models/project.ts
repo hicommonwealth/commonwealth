@@ -64,10 +64,10 @@ export default (
       deadline: { type: dataTypes.INTEGER, allowNull: false },
       funding_amount: { type: dataTypes.STRING, allowNull: false },
 
-      title: { type: dataTypes.STRING(64), allowNull: false },
-      short_description: { type: dataTypes.STRING(224), allowNull: false },
-      description: { type: dataTypes.TEXT, allowNull: false },
-      cover_image: { type: dataTypes.TEXT, allowNull: false },
+      title: { type: dataTypes.STRING(64), allowNull: true },
+      short_description: { type: dataTypes.STRING(224), allowNull: true },
+      description: { type: dataTypes.TEXT, allowNull: true },
+      cover_image: { type: dataTypes.TEXT, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

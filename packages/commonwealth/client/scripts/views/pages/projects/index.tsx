@@ -29,13 +29,7 @@ export default class ProjectListing implements m.ClassComponent {
     if (!app.isLoggedIn() && !onExplore) {
       m.route.set('/projects/explore');
     }
-    console.log(
-      app.user.roles
-        .map((role: RoleInfo) => role.chain_id)
-        .filter(
-          (id) => app.config.chains.getById(id).base === ChainBase.Ethereum
-        )
-    );
+
     return (
       <Sublayout
         title="Projects"

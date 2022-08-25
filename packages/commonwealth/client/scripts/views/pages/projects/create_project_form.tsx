@@ -22,10 +22,14 @@ const nowInSeconds = new Date().getTime() / 1000;
 
 // @Zak and @Gabe for PR review: Thoughts on this validation system, and documenting/standardizing?
 // See logic in create_project_form inputValidationFn (on each text input) + final 'submit' button functionality,
-// especially in conjunction with new `onsuccess` attr
+// especially in conjunction with new `oninput` attr
 export const validateProjectForm = (property: string, value: string) => {
+  console.log(property, value);
   if (!value)
-    return ['error', `Form is missing a ${property.split(/(?=[A-Z])/)} input.`];
+    return [
+      'failure',
+      `Form is missing a ${property.split(/(?=[A-Z])/)} input.`,
+    ];
   let errorMessage: string;
   switch (property) {
     case 'title':
@@ -67,7 +71,7 @@ export const validateProjectForm = (property: string, value: string) => {
   }
 
   if (errorMessage) {
-    return ['error', errorMessage];
+    return ['failure', errorMessage];
   } else {
     return ['success', `Valid ${property}`];
   }
@@ -81,7 +85,7 @@ type TokenOption = {
 export interface ICreateProjectForm {
   // Descriptive
   title: string;
-  description: any;
+  description: QuillEditor;
   shortDescription: string;
   coverImage: string;
   chainId: string;
@@ -99,24 +103,26 @@ export class InformationSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
+    if (!vnode.attrs.form.creator) return;
     return (
       <div class="InformationSlide">
         <CWText type="h1">General Information</CWText>
         <CWText type="caption">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
-          sapien maecenas vel nisl faucibus ultricies.
+          Name your crowdfund, add a brief card description and upload a header
+          image.
         </CWText>
         <CWTextInput
           placeholder="Your Project Name Here"
           label="Name Your Crowdfund"
           name="Name"
-          onsuccess={(e) => {
+          oninput={(e) => {
             vnode.attrs.form.title = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(val: string) => validateProjectForm('title', val)}
+          value={vnode.attrs.form.title}
         />
         <CWTextInput
-          defaultValue={app.user.activeAccount.address}
+          value={vnode.attrs.form.creator}
           disabled={true}
           label="Creator Address (Switch active address to change)"
           name="Creator Address"
@@ -125,10 +131,13 @@ export class InformationSlide
           placeholder="Write a short 2 or 3 sentence description of your project,"
           label="Short Description"
           name="Short Description"
-          onsuccess={(e) => {
+          oninput={(e) => {
             vnode.attrs.form.shortDescription = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(val: string) =>
+            validateProjectForm('shortDescription', val)
+          }
+          value={vnode.attrs.form.shortDescription}
         />
         <CoverImageUpload
           uploadStartedCallback={() => {
@@ -158,8 +167,8 @@ export class FundraisingSlide
       <div class="FundraisingSlide">
         <CWText type="h1">Fundraising and Length</CWText>
         <CWText type="caption">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
-          sapien maecenas vel nisl faucibus ultricies.
+          Select what token type, your goal funding goal and period as well as
+          what address the funds will be going.
         </CWText>
         <SelectList
           items={[
@@ -200,15 +209,25 @@ export class FundraisingSlide
               align="left"
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
-              style="width: 100%; margin: 16px 0;"
+              style="width: 100%;"
               label={`Raise token: ${this.tokenName}`}
             />
           }
         />
+        <CWTextInput
+          label="Goal"
+          name="Goal"
+          inputValidationFn={(val: string) =>
+            validateProjectForm('threshold', val)
+          }
+          oninput={(e) => {
+            vnode.attrs.form.threshold = e.target.value;
+          }}
+          value={vnode.attrs.form.threshold}
+        />
         <SelectList
           items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
           itemRender={(i: string) => {
-            console.log(i);
             return (
               <div value={i} style="cursor: pointer">
                 <CWText type="body1">{i}</CWText>
@@ -228,7 +247,7 @@ export class FundraisingSlide
               align="left"
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
-              style="width: 100%; margin: 16px 0;"
+              style="width: 100%;"
               label={`Fundraise period: ${
                 vnode.attrs.form?.fundraiseLength / weekInSeconds
               } week`}
@@ -239,19 +258,25 @@ export class FundraisingSlide
           placeholder="Address"
           label="Beneficiary Address"
           name="Beneficiary Address"
-          inputValidationFn={validateProjectForm}
-          onsuccess={(e) => {
+          inputValidationFn={(val: string) =>
+            validateProjectForm('beneficiary', val)
+          }
+          oninput={(e) => {
             vnode.attrs.form.beneficiary = e.target.value;
           }}
+          value={vnode.attrs.form.beneficiary}
         />
         <CWTextInput
           placeholder="Set Quantity"
           label="Curator Fee (%)"
           name="Curator Fee"
-          onsuccess={(e) => {
+          oninput={(e) => {
             vnode.attrs.form.curatorFee = e.target.value;
           }}
-          inputValidationFn={validateProjectForm}
+          inputValidationFn={(val: string) =>
+            validateProjectForm('curatorFee', val)
+          }
+          value={vnode.attrs.form.curatorFee}
         />
       </div>
     );
@@ -266,8 +291,7 @@ export class DescriptionSlide
       <div class="DescriptionSlide">
         <CWText type="h1">General Information</CWText>
         <CWText type="caption">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. iaculis donec
-          sapien maecenas vel nisl faucibus ultricies.
+          Add any content you feel would aid in describing your project.
         </CWText>
         <QuillEditorComponent
           oncreateBind={(state: QuillEditor) => {
@@ -286,13 +310,13 @@ export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
   private stage: 'information' | 'fundraising' | 'description';
 
-  view() {
+  view(vnode) {
+    // Because we are switching to new chain, activeAccount may not be set
+    if (!app.user?.activeAccount && app.isLoggedIn()) {
+      return;
+    }
     // Create project form must be scoped to an Ethereum page
-    if (
-      !app?.user?.activeAccount ||
-      !app.activeChainId() ||
-      app.user.activeAccount.chainBase !== ChainBase.Ethereum
-    ) {
+    if (app.user.activeAccount.chainBase !== ChainBase.Ethereum) {
       m.route.set(`/projects/explore`);
     }
 
@@ -304,7 +328,7 @@ export default class CreateProjectForm implements m.ClassComponent {
         title: null,
         // WETH hard-coded as default raise token, but can be overwritten
         token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-        creator: app.user.activeAccount.address,
+        creator: null,
         beneficiary: null,
         description: null,
         shortDescription: null,
@@ -315,6 +339,10 @@ export default class CreateProjectForm implements m.ClassComponent {
         chainId: app.activeChainId(),
       };
     }
+    if (!this.form.creator && app.user.activeAccount?.address) {
+      this.form.creator = app.user.activeAccount.address;
+    }
+
     return (
       <Sublayout
         title="Create project"
@@ -380,6 +408,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                   label: 'Submit',
                   onclick: async (e) => {
                     e.preventDefault();
+                    console.log(this.form);
                     for (const property in this.form) {
                       if ({}.hasOwnProperty.call(this.form, property)) {
                         const [state, errorMessage] = validateProjectForm(
@@ -395,7 +424,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                     const [txReceipt, newProjectId] =
                       await app.projects.createProject({
                         title: this.form.title,
-                        description: this.form.description.getText(),
+                        description: this.form.description.textContentsAsString,
                         shortDescription: this.form.shortDescription,
                         coverImage: this.form.coverImage,
                         chainId: app.activeChainId(),
@@ -404,7 +433,7 @@ export default class CreateProjectForm implements m.ClassComponent {
                         beneficiary: this.form.beneficiary,
                         threshold: this.form.threshold,
                         deadline: nowInSeconds + this.form.fundraiseLength,
-                        curatorFee: Math.round(this.form.curatorFee * 100),
+                        curatorFee: Math.round(this.form.curatorFee * 100), // curator fee is between 0 & 10000
                       });
                     if (txReceipt.status !== 1) {
                       notifyError('Project creation failed');
