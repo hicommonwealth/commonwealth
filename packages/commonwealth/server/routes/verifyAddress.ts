@@ -230,10 +230,10 @@ const verifySignature = async (
             pubkey
           );
           if (!isValid) {
-            log.error('Signature verification failed.');
+            log.error('Signature mismatch.');
           }
         } catch (e) {
-          console.log(e);
+          log.error(`Signature verification failed: ${e.message}`);
           isValid = false;
         }
       } else {
