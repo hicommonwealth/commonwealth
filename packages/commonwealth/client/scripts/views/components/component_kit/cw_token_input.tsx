@@ -2,38 +2,32 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_text_input.scss';
+import 'components/component_kit/cw_token_input.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
 import { ValidationStatus } from './cw_validation_text';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWAvatar } from './cw_avatar';
 
-type TextInputSize = 'small' | 'large';
-
-export type TextInputAttrs = {
-  autocomplete?: string;
+export type TokenInputAttrs = {
   autofocus?: boolean;
   containerClassName?: string;
   value?: string;
-  iconRight?: string | CWAvatar;
-  inputValidationFn?: (value: string) => [ValidationStatus, string];
+  inputValidationFn?: (value: number) => [ValidationStatus, string];
   label?: string;
-  maxlength?: number;
-  name: string;
   oninput?: (e) => void;
   placeholder?: string;
   tabindex?: number;
+  tokenId?: string;
+  tokenIconUrl?: string;
 };
 
 type InputStyleAttrs = {
   inputClassName?: string;
   darkMode?: boolean;
   disabled?: boolean;
-  size: TextInputSize;
   validationStatus?: ValidationStatus;
 };
 
@@ -77,7 +71,7 @@ export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   }
 }
 
-export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+export class CWTokenInput implements m.ClassComponent<TokenInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
@@ -85,24 +79,24 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
 
   view(vnode) {
     const {
-      autocomplete = 'off',
       autofocus,
       containerClassName,
       darkMode,
       value,
       disabled,
-      iconRight,
       inputClassName,
       inputValidationFn,
       label,
-      maxlength,
       name,
       oninput,
-      placeholder,
-      size = 'large',
+      placeholder = '0.00',
       tabindex,
+      tokenId,
     } = vnode.attrs;
 
+    // TODO
+    const tokenIconUrl = vnode.attrs.tokenIconUrl; // || tokens.filter((t) => t.id === tokenId)
+    console.log(tokenIconUrl);
     return (
       <div
         class={getClasses<{
@@ -113,7 +107,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             containerClassName,
             validationStatus: this.validationStatus,
           },
-          ComponentType.TextInput
+          ComponentType.TokenInput
         )}
       >
         {label && (
@@ -127,19 +121,15 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
         <div class="input-and-icon-container">
           <input
             autofocus={autofocus}
-            autocomplete={autocomplete}
             class={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
-              size,
               validationStatus: this.validationStatus,
               disabled,
               isTyping: this.isTyping,
-              hasRightIcon: !!iconRight,
               darkMode,
               inputClassName,
             })}
             disabled={disabled}
             tabindex={tabindex}
-            maxlength={maxlength}
             name={name}
             placeholder={placeholder}
             oninput={(e) => {
@@ -178,20 +168,10 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 }
               }
             }}
+            type="number"
             value={value}
           />
-          {!!iconRight &&
-            !disabled &&
-            (typeof iconRight === 'string' ? (
-              <CWIcon
-                iconName={iconRight}
-                iconSize="small"
-                className="text-input-right-icon"
-              />
-            ) : (
-              // Custom icons and avatars passed in should typically be 24x24
-              <div class="text-input-right-icon">{iconRight}</div>
-            ))}
+          {tokenIconUrl && <CWAvatar size={24} avatarUrl={tokenIconUrl} />}
         </div>
       </div>
     );

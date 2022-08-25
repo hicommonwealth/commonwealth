@@ -16,9 +16,13 @@ import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import CoverImageUpload from './cover_image_upload';
+import { CWAvatar } from '../../components/component_kit/cw_avatar';
+import { CWTokenInput } from '../../components/component_kit/cw_token_input';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
+const WethUrl =
+  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png';
 
 // @Zak and @Gabe for PR review: Thoughts on this validation system, and documenting/standardizing?
 // See logic in create_project_form inputValidationFn (on each text input) + final 'submit' button functionality,
@@ -176,18 +180,18 @@ export class FundraisingSlide
               name: 'WETH',
               address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
             },
-            {
-              name: 'DAI',
-              address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-            },
-            {
-              name: 'USDC',
-              address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-            },
-            {
-              name: 'RAI',
-              address: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919',
-            },
+            // {
+            //   name: 'DAI',
+            //   address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+            // },
+            // {
+            //   name: 'USDC',
+            //   address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            // },
+            // {
+            //   name: 'RAI',
+            //   address: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919',
+            // },
           ]}
           itemRender={(token: TokenOption) => {
             return (
@@ -214,7 +218,7 @@ export class FundraisingSlide
             />
           }
         />
-        <CWTextInput
+        <CWTokenInput
           label="Goal"
           name="Goal"
           inputValidationFn={(val: string) =>
@@ -224,6 +228,7 @@ export class FundraisingSlide
             vnode.attrs.form.threshold = e.target.value;
           }}
           value={vnode.attrs.form.threshold}
+          tokenIconUrl={WethUrl}
         />
         <SelectList
           items={['1 week', '2 weeks', '3 weeks', '4 weeks']}

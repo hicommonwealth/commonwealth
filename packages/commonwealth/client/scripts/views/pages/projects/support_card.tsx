@@ -12,9 +12,11 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import app from 'state';
 import { ProjectRole } from './types';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
+import { CWTokenInput } from '../../components/component_kit/cw_token_input';
 
 // eslint-disable-next-line max-len
-const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id sed nibh euismod mauris nunc. Est leo fringilla ultrices lectus leo. Et vel consequat blandit.`;
+const WethUrl =
+  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png';
 
 type SupportCardAttrs = {
   project: Project;
@@ -22,8 +24,8 @@ type SupportCardAttrs = {
 };
 
 const validateSupportAmount = (value: string) => {
-  if (!value) return false;
-  if (Number.isNaN(+value)) return false;
+  if (Number.isNaN(+value)) return ['failure', 'Invalid number'];
+  return ['success', 'Valid amount'];
 };
 
 export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
@@ -49,6 +51,7 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
       return;
     }
 
+    // TODO
     const iconUrl = project.chainId
       ? null
       : app.config.chains.getById(project.chainId)?.iconUrl;
@@ -62,15 +65,18 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
           </CWText>
         </div>
         <div class="card-body">
-          <CWText type="caption">{loremIpsum}</CWText>
-          <CWTextInput
+          <CWText type="caption">
+            {supportType === ProjectRole.Curator
+              ? 'Curate the project at the following amount'
+              : 'Back the project at the following amount'}
+          </CWText>
+          <CWTokenInput
             label={inputLabel}
-            iconRight={iconUrl && <CWAvatar iconUrl={iconUrl} size={24} />}
             inputValidationFn={validateSupportAmount}
             oninput={(e) => {
               this.amount = e.target.value;
             }}
-            placeholder="0.00"
+            tokenIconUrl={WethUrl}
           />
           <CWButton label={buttonLabel} onclick={onclick} />
         </div>

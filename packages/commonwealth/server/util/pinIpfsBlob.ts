@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import axios from 'axios';
-const FormData = require('form-data');
+import { factory, formatFilename } from 'common-common/src/logging';
 import models from '../database';
 import { ServerError } from './errors';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+const FormData = require('form-data');
 const log = factory.getLogger(formatFilename(__filename));
 require('dotenv').config();
 
@@ -15,16 +15,16 @@ export const Errors = {
 };
 
 const pinIpfsBlob = async (
-  userID: number,
-  addressID: number,
+  user_id: number,
+  address_id: number,
   jsonfile: string
 ): Promise<string> => {
   const data = new FormData();
-  data.append('file', JSON.stringify(jsonfile), 'userIDblob');
+  data.append('file', JSON.stringify(jsonfile), 'user_idblob');
   if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
     const headers = {
-      pinata_api_key: process.env.PINATA_API_KEY,
       'Content-Type': `multipart/form-data; boundary= ${data._boundary}`,
+      pinata_api_key: process.env.PINATA_API_KEY,
       pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
     };
     try {
@@ -36,11 +36,12 @@ const pinIpfsBlob = async (
 
       try {
         await models.IpfsPins.create({
-          id: userID,
-          address_id: addressID,
+          user_id,
+          address_id,
           ipfs_hash: pinataResponse.data.IpfsHash,
         });
       } catch (e) {
+        console.log(e);
         log.error('Could not insert the hash into the DB: ', e.message);
         throw new ServerError(Errors.DBInsertError);
       }

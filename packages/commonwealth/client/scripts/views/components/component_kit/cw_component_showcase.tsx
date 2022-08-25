@@ -10,6 +10,7 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
+import { CWTokenInput } from './cw_token_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
@@ -275,6 +276,11 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <h1>Form fields</h1>
         <div class="form-gallery">
+          <CWTokenInput
+            name="Token field"
+            label="Label"
+            tokenIconUrl="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
+          />
           <CWTextInput
             name="Text field"
             label="Large"

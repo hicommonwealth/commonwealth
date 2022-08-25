@@ -28,7 +28,7 @@
   }
 }
 
-.TextInput {
+.TokenInput {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -42,32 +42,20 @@
     input {
       @include inputStyles;
 
+      font-size: 16px;
+      height: 40px;
+      letter-spacing: 0.02em;
+      line-height: 24px;
+      padding: 6px 8px;
+      padding: 8px 24px 8px 8px;
+      text-align: right;
+
       &.darkMode {
         @include darkModeInputStyles;
       }
-
-      &.small {
-        font-size: 14px;
-        height: 32px;
-        line-height: 20px;
-        padding: 8px;
-      }
-
-      &.large {
-        font-size: 16px;
-        height: 40px;
-        letter-spacing: 0.02em;
-        line-height: 24px;
-        padding: 6px 8px;
-      }
-
-      &.hasRightIcon {
-        padding: 8px 24px 8px 8px;
-      }
     }
 
-    .text-input-right-icon {
-      color: $primary-300;
+    .Avatar {
       position: absolute;
       right: 8px;
       top: 50%;

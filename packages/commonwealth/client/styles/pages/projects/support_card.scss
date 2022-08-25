@@ -27,12 +27,12 @@
     height: fit-content;
     justify-content: center;
     margin: 16px;
+    gap: 16px;
     .Text {
       color: $neutral-500;
     }
-    .TextInput,
     .Button {
-      margin-top: 16px;
+      margin-top: 8px;
     }
   }
 }

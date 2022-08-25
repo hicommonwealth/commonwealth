@@ -44,6 +44,15 @@
       color: $neutral-500;
     }
   }
+
+  &[type='number'] {
+    padding-right: 30px;
+    -moz-appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+  }
 }
 
 @mixin darkModeInputStyles {

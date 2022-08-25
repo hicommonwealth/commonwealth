@@ -144,6 +144,19 @@ export default class ProjectsController {
       throw new Error(`Failed to pin IPFS blob: ${err.message}`);
     }
 
+    const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
+
+    console.log({
+      title: title.slice(0, 32),
+      ipfsHash,
+      cwUrl,
+      beneficiary,
+      token,
+      threshold,
+      deadline,
+      curatorFee,
+    });
+
     // instantiate contract (TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
@@ -154,7 +167,6 @@ export default class ProjectsController {
     );
 
     const projectId = await contract.numProjects();
-    const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
     const tx = await contract.createProject(
       title.slice(0, 32),
