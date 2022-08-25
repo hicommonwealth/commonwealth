@@ -44,7 +44,6 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
-  Contract?: ContractInstance;
   token_name?: string;
   ce_verbose?: boolean;
 
@@ -63,6 +62,7 @@ export type ChainAttributes = {
     | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
+  Contract?: ContractInstance;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {

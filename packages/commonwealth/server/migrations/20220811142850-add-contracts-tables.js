@@ -39,6 +39,7 @@ module.exports = {
       }, { transaction: t });
 
       // Migrate Current Chains to Contracts + CommunityContracts
+        // eth + solana
       const query = `
         SELECT c.id as cid, cn.id as cnid, c.address, c.decimals, c.token_name, c.symbol, c.network 
         FROM "Chains" c 
@@ -63,7 +64,6 @@ module.exports = {
         const contract = await queryInterface.sequelize.query(
           `SELECT * FROM "Contracts" WHERE address='${c.address}';`,
           { transaction: t});
-        if (!contract[0][0].id) console.log('null!', contract[0]);
         await queryInterface.bulkInsert('CommunityContracts', [{
           chain_id: c.cid,
           contract_id: contract[0][0].id,
@@ -72,7 +72,40 @@ module.exports = {
         }], {transaction: t });
       }));
 
+      // Migrate sputnik Contracts
+      const sputQuery = `
+      SELECT c.id as cid, cn.id as cnid, c.address, c.decimals, c.token_name, c.symbol, c.network
+        FROM "Chains" c 
+        LEFT JOIN "ChainNodes" cn 
+        ON c.chain_node_id = cn.id WHERE network='sputnik';`;
+      const sputChains = await queryInterface.sequelize.query(sputQuery, { transaction: t });
+      await Promise.all(sputChains[0].map(async (c) => {
+        // create Contract
+        await queryInterface.bulkInsert('Contracts', [{
+          address: c.cid, // sputnik chain id *is* the contract address on NEAR chain
+          chain_node_id: c.cnid,
+          decimals: c.decimals,
+          token_name: c.token_name,
+          symbol: c.symbol,
+          type: c.network,
+          created_at: new Date(),
+          updated_at: new Date(),
+        }], {transaction: t});
 
+        const contract = await queryInterface.sequelize.query(
+          `SELECT * FROM "Contracts" WHERE chain_node_id='19';`, // filter by NEAR's chain_node_id
+          { transaction: t});
+        await queryInterface.bulkInsert('CommunityContracts', [{
+          chain_id: c.cid,
+          contract_id: contract[0][0].id,
+          created_at: new Date(),
+          updated_at: new Date(),
+        }], {transaction: t });
+      }))
+
+
+      // Add indexes
+      await queryInterface.addIndex('Contracts', { fields: ['address'] }, { transaction: t });
 
 
       // Update Columns on Chains Table

@@ -46,6 +46,9 @@ export default (
     },
     {
       tableName: 'Contracts',
+      indexes: [{
+        fields: ['address'],
+      }],
       timestamps: true,
       underscored: true,
       createdAt: 'created_at',
