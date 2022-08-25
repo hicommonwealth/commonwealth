@@ -7,7 +7,7 @@ import 'components/component_kit/cw_wallets_list.scss';
 import { WalletId } from 'common-common/src/types';
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
-import { CWTooltip } from './cw_tooltip';
+import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses } from './helpers';
 
 type WalletsListAttrs = {

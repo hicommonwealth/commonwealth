@@ -2,8 +2,8 @@
 
 import m from 'mithril';
 
-import { CWPopover, SharedPopoverAttrs } from './cw_popover/cw_popover';
-import { CWText } from './cw_text';
+import { CWText } from '../cw_text';
+import { SharedPopoverAttrs, CWPopover } from './cw_popover';
 
 export type TooltipType =
   | 'bordered'
