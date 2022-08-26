@@ -54,7 +54,7 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(account: Account): Promise<void> {
   const chain = app.activeChainId();
-  const role = app.user.getRoleInCommunity({ account, chain });
+  const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
     app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
@@ -88,7 +88,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   }
 
   // update is_user_default
-  app.user.getAllRolesInCommunity({ chain }).forEach((r) => {
+  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
     r.is_user_default = false;
   });
   role.is_user_default = true;
@@ -135,7 +135,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.user.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ chain: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -144,7 +144,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.user.getDefaultAddressInCommunity({
+    const existingAddress = app.roles.getDefaultAddressInCommunity({
       chain: chain.id,
     });
 

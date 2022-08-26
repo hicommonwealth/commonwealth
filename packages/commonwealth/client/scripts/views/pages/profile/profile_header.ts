@@ -94,7 +94,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     // For Banning
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
@@ -105,7 +105,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         (a) => a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
-        await app.user.createRole({
+        await app.roles.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         });

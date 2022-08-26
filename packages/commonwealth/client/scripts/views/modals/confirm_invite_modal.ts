@@ -160,8 +160,7 @@ const ConfirmInviteModal: m.Component<
                           const communityName =
                             invites[location].community_name;
                           if (vnode.state.selectedAddress) {
-                            app.user
-                              .acceptInvite({
+                            app.roles.acceptInvite({
                                 address: vnode.state.selectedAddress,
                                 inviteCode: invites[location].id,
                               })
@@ -206,8 +205,7 @@ const ConfirmInviteModal: m.Component<
                             'Reject this invite? You will need to be invited again.'
                           )();
                           if (!confirmed) return;
-                          app.user
-                            .rejectInvite({ inviteCode: invites[location].id })
+                          app.roles.rejectInvite({ inviteCode: invites[location].id })
                             .then(
                               (result) => {
                                 app.config.invites = app.config.invites.filter(

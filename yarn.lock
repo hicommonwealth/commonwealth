@@ -3200,14 +3200,14 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@keplr-wallet/types@^0.9.10":
-  version "0.9.10"
-  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.9.10.tgz#3b7f8bdb96edffd73bcd5b65f6fe0aef1c9d1f98"
-  integrity sha512-Qzz7YGhFpwGNGSLGYXiKEy0mvd5t9Wa8NmQyN8xSFUIy1HjNxKunhMbfSIyIpBRK7n6ujvlS519rkd+TUjUdqQ==
+"@keplr-wallet/types@^0.10.19":
+  version "0.10.19"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.10.19.tgz#cba3b7eb0012bfde87d5873ded39c3be95719dfc"
+  integrity sha512-oLljU2oj3aYCClxF1M9a6CWOzFsKcQqGJxPrZz2NoYkD1o0NmaRZ2Dw8Fd3qcfb2x9ZWzTkNl4M8w+8IDw+zSg==
   dependencies:
     "@cosmjs/launchpad" "^0.24.0-alpha.25"
     "@cosmjs/proto-signing" "^0.24.0-alpha.25"
-    axios "^0.21.0"
+    axios "^0.21.4"
     long "^4.0.0"
     secretjs "^0.17.0"
 
@@ -5800,7 +5800,7 @@ axios@0.21.1:
   dependencies:
     follow-redirects "^1.10.0"
 
-axios@^0.21.0, axios@^0.21.1:
+axios@^0.21.1, axios@^0.21.4:
   version "0.21.4"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==

@@ -335,7 +335,7 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
                 successCallback(true);
                 if (postType === '/addMember') {
                   const { result } = response;
-                  app.user.addRole(
+                  app.roles.addRole(
                     new RoleInfo(
                       result.id,
                       result.address_id,

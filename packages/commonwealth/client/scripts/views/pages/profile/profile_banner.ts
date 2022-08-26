@@ -26,7 +26,7 @@ const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo },
         return;
       }
 
-      app.user.createRole({
+      app.roles.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
       }).then(() => {

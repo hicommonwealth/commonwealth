@@ -116,7 +116,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         (a) => a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
-        await app.user.createRole({
+        await app.roles.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         });

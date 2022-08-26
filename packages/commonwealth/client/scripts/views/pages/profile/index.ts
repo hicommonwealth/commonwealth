@@ -38,7 +38,7 @@ const getProfileStatus = (account) => {
     app.user.activeAccounts.length > 0 &&
     app.user.activeAccounts
       .filter((account_) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account: account_,
           chain: app.activeChainId(),
         });
@@ -55,8 +55,8 @@ const getProfileStatus = (account) => {
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId() };
-    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
-    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const communityRoles = app.roles.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.roles.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses =
       joinableAddresses.length > communityRoles.length
         ? joinableAddresses.filter((addr) => {

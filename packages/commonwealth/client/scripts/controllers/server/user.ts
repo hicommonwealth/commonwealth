@@ -12,10 +12,10 @@ import {
   ChainInfo,
 } from 'models';
 
-import NotificationsController from '../notifications';
-import DraftsController from '../drafts';
+import NotificationsController from './notifications';
+import DraftsController from './drafts';
 
-export default class {
+export class UserController {
   private _activeAccount: Account;
   public get activeAccount(): Account {
     return this._activeAccount;
@@ -54,14 +54,6 @@ export default class {
   }
   private _setJWT(JWT: string): void {
     this._jwt = JWT;
-  }
-
-  private _roles: RoleInfo[] = [];
-  public get roles(): RoleInfo[] {
-    return this._roles;
-  }
-  private _setRoles(roles: RoleInfo[]): void {
-    this._roles = roles;
   }
 
   private _addresses: AddressInfo[] = [];
@@ -170,25 +162,6 @@ export default class {
   }
   public setJWT(JWT: string): void {
     this._setJWT(JWT);
-  }
-
-  public setRoles(roles = []): void {
-    const roleIds = this.roles.map((r) => r.id);
-    roles.forEach((role) => {
-      if (!roleIds.includes(role.id)) {
-        role.address = role.Address.address;
-        role.address_chain = role.Address.chain;
-        delete role.Address;
-        this._roles.push(role);
-      }
-    });
-  }
-  public addRole(role: RoleInfo): void {
-    this._roles.push(role);
-  }
-  public removeRole(predicate: (r) => boolean): void {
-    const index = this.roles.findIndex(predicate);
-    if (index !== -1) this._roles.splice(index, 1);
   }
 
   public setAddresses(addresses: AddressInfo[]): void {
