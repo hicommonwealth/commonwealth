@@ -317,12 +317,12 @@ const LinkNewAddressModal: m.Component<
           try {
             if (
               vnode.attrs.joiningChain &&
-              !app.user.getRoleInCommunity({
+              !app.roles.getRoleInCommunity({
                 account,
                 chain: vnode.attrs.joiningChain,
               })
             ) {
-              await app.user.createRole({
+              await app.roles.createRole({
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
               });

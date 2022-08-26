@@ -227,14 +227,14 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
 
     const activeAddressesWithRole = app.user.activeAccounts.filter(
       (account) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account,
           chain: app.activeChainId(),
         });
       }
     );
 
-    const activeAccountsByRole = app.user.getActiveAccountsByRole();
+    const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
     const nAccountsWithoutRole = activeAccountsByRole.filter(
       ([account, role], index) => !role
@@ -345,12 +345,12 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                         }
                         if (
                           activeChainId &&
-                          !app.user.getRoleInCommunity({
+                          !app.roles.getRoleInCommunity({
                             account,
                             chain: activeChainId,
                           })
                         ) {
-                          await app.user.createRole({
+                          await app.roles.createRole({
                             address: addressInfo,
                             chain: activeChainId,
                           });

@@ -28,7 +28,7 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
       chain.id
     );
-    const isMember = app.user.isMember({
+    const isMember = app.roles.isMember({
       account: app.user.activeAccount,
       chain: chain.id,
     });
