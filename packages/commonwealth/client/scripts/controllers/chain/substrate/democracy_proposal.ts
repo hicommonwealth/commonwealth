@@ -127,15 +127,9 @@ class SubstrateDemocracyProposal extends Proposal<
     // fake adapter data
     super(ProposalType.SubstrateDemocracyProposal, backportEventToAdapter(
       ChainInfo,
-      entity.chainEvents
-        .find(
-          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
-        ).data as SubstrateTypes.IDemocracyProposed
+      <SubstrateTypes.IDemocracyProposed>entity.creationEvent.data
     ));
-    const eventData = entity.chainEvents
-      .find(
-        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
-      ).data as SubstrateTypes.IDemocracyProposed;
+    const eventData = <SubstrateTypes.IDemocracyProposed>entity.creationEvent.data
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;

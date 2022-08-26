@@ -167,10 +167,7 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   ) {
     super(ProposalType.SubstrateBountyProposal, backportEventToAdapter( // TODO: check if this is the right backport string
       ChainInfo,
-      entity.chainEvents
-        .find(
-          (e) => e.data.kind === SubstrateTypes.EventKind.TreasuryBountyProposed
-        ).data as SubstrateTypes.ITreasuryBountyProposed
+      <SubstrateTypes.ITreasuryBountyProposed>entity.creationEvent.data
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;

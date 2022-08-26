@@ -126,7 +126,7 @@ export class SubstrateTreasuryProposal
     super(ProposalType.SubstrateTreasuryProposal, backportEventToAdapter(
       ChainInfo,
       // sometimes a TreasuryProposed chainEvent isn't available, so we have to fill in stub data
-      (entity.chainEvents.find((e) => e.data.kind === SubstrateTypes.EventKind.TreasuryProposed)?.data as SubstrateTypes.ITreasuryProposed) || entity.typeId
+      <SubstrateTypes.ITreasuryProposed>entity.creationEvent.data || entity.typeId
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;

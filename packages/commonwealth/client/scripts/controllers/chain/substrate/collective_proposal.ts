@@ -99,15 +99,9 @@ export class SubstrateCollectiveProposal
     entity: ChainEntity,
   ) {
     super(ProposalType.SubstrateCollectiveProposal, backportEventToAdapter(
-      entity.chainEvents
-        .find(
-          (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
-        ).data as SubstrateTypes.ICollectiveProposed
+      <SubstrateTypes.ICollectiveProposed>entity.creationEvent.data
     ));
-    const eventData = entity.chainEvents
-      .find(
-        (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
-      ).data as SubstrateTypes.ICollectiveProposed;
+    const eventData = <SubstrateTypes.ICollectiveProposed>entity.creationEvent.data
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;

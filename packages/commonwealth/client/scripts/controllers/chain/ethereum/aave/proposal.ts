@@ -52,10 +52,7 @@ const ONE_HUNDRED_WITH_PRECISION = 10000;
 const backportEntityToAdapter = (
   entity: ChainEntity
 ): IAaveProposalResponse => {
-  const startEvent = entity.chainEvents.find(
-    (e) => e.data.kind === AaveTypes.EventKind.ProposalCreated
-  );
-  const startData = startEvent.data as AaveTypes.IProposalCreated;
+  const startData = <AaveTypes.IProposalCreated>entity.creationEvent.data
   return {
     identifier: formatTypeId(startData),
     queued: false,
