@@ -12,7 +12,7 @@ import {
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
-  SupportedNetwork, EntityEventKind, getUniqueEntityKey,
+  SupportedNetwork, getUniqueEntityKey,
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
 

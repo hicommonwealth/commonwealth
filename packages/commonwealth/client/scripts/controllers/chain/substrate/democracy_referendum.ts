@@ -273,9 +273,9 @@ export class SubstrateDemocracyReferendum
     }
 
     console.log('could not find:',
-      this.hash)
-      // chain.council?.store.getAll().map((c) => c.data.hash),
-      // chain.democracyProposals?.store.getAll().map((c) => c.hash));
+      this.hash,
+      chain.council?.store.getAll().map((c) => c.data.hash),
+      chain.democracyProposals?.store.getAll().map((c) => c.hash));
     return undefined;
   }
 
