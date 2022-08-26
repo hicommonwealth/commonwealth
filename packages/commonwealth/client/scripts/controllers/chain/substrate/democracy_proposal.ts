@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import BN from 'bn.js';
 
 import { SubstrateTypes } from 'chain-events/src';
@@ -127,9 +128,15 @@ class SubstrateDemocracyProposal extends Proposal<
     // fake adapter data
     super(ProposalType.SubstrateDemocracyProposal, backportEventToAdapter(
       ChainInfo,
-      <SubstrateTypes.IDemocracyProposed>entity.creationEvent.data
+      entity.chainEvents
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+        ).data as SubstrateTypes.IDemocracyProposed
     ));
-    const eventData = <SubstrateTypes.IDemocracyProposed>entity.creationEvent.data
+    const eventData = entity.chainEvents
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyProposed
+      ).data as SubstrateTypes.IDemocracyProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Proposals = Proposals;

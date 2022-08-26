@@ -126,7 +126,7 @@ class ChainEntityController {
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
-      const [ entityKind, updateType ] = eventEntity;
+      const [ entityKind ] = eventEntity;
       // create event type
       const eventType = new ChainEventType(
         `${chain}-${cwEvent.data.kind.toString()}`,
@@ -165,8 +165,7 @@ class ChainEntityController {
       } else {
         entity = existingEntity;
       }
-
-      entity.addEvent(event, updateType === EntityEventKind.Create);
+      entity.addEvent(event);
 
       // emit update to handlers
       const handlers = this._handlers[entity.type];

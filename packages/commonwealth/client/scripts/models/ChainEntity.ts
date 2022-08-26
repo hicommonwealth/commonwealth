@@ -15,9 +15,6 @@ class ChainEntity {
   public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
 
-  private _creationEvent?: ChainEvent; // the event that created the chain-entity
-  public get creationEvent() { return this._creationEvent }
-
   private _updatedAt?: moment.Moment;
   public get updatedAt() { return this._updatedAt; }
 
@@ -70,11 +67,11 @@ class ChainEntity {
     });
   }
 
-  public addEvent(chainEvent: ChainEvent, createdEntity: boolean) {
+  public addEvent(chainEvent: ChainEvent, updatedAt?: moment.Moment) {
     if (!this._chainEvents.find((e) => e.eq(chainEvent))) {
       this._chainEvents.push(chainEvent);
-      if (createdEntity) {
-        this._creationEvent = chainEvent;
+      if (updatedAt) {
+        this._updatedAt = updatedAt;
       }
     }
   }

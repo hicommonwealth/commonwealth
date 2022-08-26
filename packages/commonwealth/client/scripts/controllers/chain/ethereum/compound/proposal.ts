@@ -52,7 +52,8 @@ const backportEntityToAdapter = (
   Gov: CompoundGovernance,
   entity: ChainEntity
 ): ICompoundProposalResponse => {
-  const startData = <CompoundTypes.IProposalCreated>entity.creationEvent.data
+  const startEvent = entity.chainEvents.find((e) => e.data.kind === CompoundTypes.EventKind.ProposalCreated);
+  const startData = startEvent.data as CompoundTypes.IProposalCreated;
   return {
     identifier: `${startData.id}`,
     queued: false,

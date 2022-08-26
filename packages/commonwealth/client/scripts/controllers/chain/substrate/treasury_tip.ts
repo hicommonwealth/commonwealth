@@ -130,7 +130,10 @@ export class SubstrateTreasuryTip extends Proposal<
   ) {
     super(ProposalType.SubstrateTreasuryTip, backportEventToAdapter(
       ChainInfo,
-      <SubstrateTypes.INewTip>entity.creationEvent.data
+      entity.chainEvents
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.NewTip
+        ).data as SubstrateTypes.INewTip
     ));
     this._Chain = ChainInfo;
     this._Accounts = Accounts;

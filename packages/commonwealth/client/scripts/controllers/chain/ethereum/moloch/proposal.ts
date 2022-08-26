@@ -53,23 +53,21 @@ const backportEntityToAdapter = (
   Gov: MolochGovernance,
   entity: ChainEntity
 ): IMolochProposalResponse => {
-  const startEvent = entity.creationEvent;
+  const startEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.SubmitProposal);
+  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
+  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
   if (!startEvent) {
     throw new Error('Proposal start event not found!');
   }
-  const startData = <MolochTypes.ISubmitProposal>entity.creationEvent.data;
-  const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
-  const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
-
-  const identifier = `{startData.proposalIndex}`;
-  const id = `${startData.proposalIndex}`;
-  const details = startData.details;
-  const timestamp = `${startData.startTime}`;
+  const identifier = `${(startEvent.data as MolochTypes.ISubmitProposal).proposalIndex}`;
+  const id = identifier;
+  const details = (startEvent.data as MolochTypes.ISubmitProposal).details;
+  const timestamp = `${(startEvent.data as MolochTypes.ISubmitProposal).startTime}`;
   const startingPeriod = (new BN(timestamp, 10)).sub(Gov.summoningTime).div(Gov.periodDuration).toString(10);
-  const delegateKey = startData.member;
-  const applicantAddress = startData.applicant;
-  const tokenTribute = startData.tokenTribute;
-  const sharesRequested = startData.sharesRequested;
+  const delegateKey = (startEvent.data as MolochTypes.ISubmitProposal).member;
+  const applicantAddress = (startEvent.data as MolochTypes.ISubmitProposal).applicant;
+  const tokenTribute = (startEvent.data as MolochTypes.ISubmitProposal).tokenTribute;
+  const sharesRequested = (startEvent.data as MolochTypes.ISubmitProposal).sharesRequested;
   const processed = !!processEvent;
   const proposal: IMolochProposalResponse = {
     identifier,

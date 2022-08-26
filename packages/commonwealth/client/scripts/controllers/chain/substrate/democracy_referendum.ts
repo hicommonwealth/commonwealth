@@ -21,7 +21,6 @@ import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 import Substrate from './main';
-import {IDemocracyStarted} from "chain-events/src/chains/substrate/types";
 
 export enum DemocracyConviction {
   None = 0,
@@ -193,10 +192,16 @@ export class SubstrateDemocracyReferendum
     entity: ChainEntity,
   ) {
     super(ProposalType.SubstrateDemocracyReferendum, backportEventToAdapter(
-      <IDemocracyStarted>entity.creationEvent.data
+      entity.chainEvents
+        .find(
+          (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
+        ).data as SubstrateTypes.IDemocracyStarted
     ));
 
-    const eventData = <IDemocracyStarted>entity.creationEvent.data
+    const eventData = entity.chainEvents
+      .find(
+        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
+      ).data as SubstrateTypes.IDemocracyStarted;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Democracy = Democracy;
