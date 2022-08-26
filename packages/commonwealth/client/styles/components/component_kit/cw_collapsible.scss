@@ -1,0 +1,18 @@
+@import 'shared';
+
+.Collapsible {
+  display: flex;
+
+  .expand-icon-button .IconButton {
+    color: $neutral-500;
+  }
+
+  .header-and-content-container {
+    display: flex;
+    flex-direction: column;
+
+    .collapsible-header {
+      display: flex;
+    }
+  }
+}
