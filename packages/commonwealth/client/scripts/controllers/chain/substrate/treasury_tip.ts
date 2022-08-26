@@ -11,7 +11,6 @@ import { ProposalType } from 'common-common/src/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateTreasuryTips from './treasury_tips';
-import {formatTypeId} from "helpers";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -19,7 +18,7 @@ const backportEventToAdapter = (
 ): ISubstrateTreasuryTip => {
   const { proposalHash, reason, who, finder, deposit, findersFee } = event;
   return {
-    identifier: formatTypeId(event),
+    identifier: proposalHash,
     hash: proposalHash,
     reason,
     who,
@@ -34,7 +33,7 @@ export class SubstrateTreasuryTip extends Proposal<
 > {
   public get shortIdentifier() {
     // TODO: better identifier? Maybe based on user?
-    return `${this.data.hash.toString().slice(0, 5)}…`;
+    return `${this.identifier.toString().slice(0, 5)}…`;
   }
 
   private _title: string;

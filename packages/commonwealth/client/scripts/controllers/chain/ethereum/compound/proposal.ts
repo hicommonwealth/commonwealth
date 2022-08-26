@@ -21,7 +21,7 @@ import {
   ChainEntity,
   ChainEvent,
 } from 'models';
-import {blocknumToTime, formatTypeId} from 'helpers';
+import { blocknumToTime } from 'helpers';
 
 import CompoundAPI, { GovernorType } from './api';
 import CompoundGovernance from './governance';
@@ -54,7 +54,7 @@ const backportEntityToAdapter = (
 ): ICompoundProposalResponse => {
   const startData = <CompoundTypes.IProposalCreated>entity.creationEvent.data
   return {
-    identifier: formatTypeId(startData),
+    identifier: `${startData.id}`,
     queued: false,
     executed: false,
     cancelled: false,
@@ -83,7 +83,7 @@ export default class CompoundProposal extends Proposal<
   private _Gov: CompoundGovernance;
 
   public get shortIdentifier() {
-    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.id}`;
+    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`;
   }
   public get title(): string {
     try {

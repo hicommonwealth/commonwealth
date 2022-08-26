@@ -20,7 +20,7 @@ import {
   ChainEntity,
   ChainEvent,
 } from 'models';
-import {blocknumToTime, formatTypeId} from 'helpers';
+import { blocknumToTime } from 'helpers';
 
 import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
@@ -54,7 +54,7 @@ const backportEntityToAdapter = (
 ): IAaveProposalResponse => {
   const startData = <AaveTypes.IProposalCreated>entity.creationEvent.data
   return {
-    identifier: formatTypeId(startData),
+    identifier: `${startData.id}`,
     queued: false,
     executed: false,
     cancelled: false,
@@ -101,7 +101,7 @@ export default class AaveProposal extends Proposal<
     return `#${this.identifier.toString()}`;
   }
   public get title(): string {
-    return this._ipfsData?.title || `Proposal #${this.data.id}`;
+    return this._ipfsData?.title || `Proposal #${this.data.identifier}`;
   }
   public get description(): string {
     return this._ipfsData?.description || '';

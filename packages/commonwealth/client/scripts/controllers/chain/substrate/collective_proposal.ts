@@ -16,7 +16,6 @@ import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
 import Substrate from './main';
-import {formatTypeId} from "helpers";
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -30,7 +29,7 @@ export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
 
 const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISubstrateCollectiveProposal => {
   return {
-    identifier: formatTypeId(event),
+    identifier: event.proposalHash.toString(),
     index: event.proposalIndex,
     threshold: event.threshold,
     hash: event.proposalHash,

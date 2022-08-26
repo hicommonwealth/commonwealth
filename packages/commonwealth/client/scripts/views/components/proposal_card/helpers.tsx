@@ -198,7 +198,7 @@ export const getSecondaryTagText = (proposal: AnyProposal) => {
       proposal instanceof SubstrateCollectiveProposal) &&
     proposal.getReferendum()
   ) {
-    return `REF #${proposal.getReferendum().data.index}`;
+    return `REF #${proposal.getReferendum().identifier}`;
   } else if (proposal instanceof SubstrateDemocracyReferendum) {
     const originatingProposalOrMotion = proposal.getProposalOrMotion(
       proposal.preimage

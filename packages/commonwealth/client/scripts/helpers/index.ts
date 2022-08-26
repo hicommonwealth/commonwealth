@@ -7,7 +7,6 @@ import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
 import { navigateToSubpage } from '../app';
-import hash from 'object-hash';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -391,7 +390,3 @@ export const handleRedirectClicks = (
     callback();
   }
 };
-
-export const formatTypeId = (event: {}) => {
-  return hash(event, {respectType: false});
-}

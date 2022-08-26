@@ -12,10 +12,9 @@ import {
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
-  SupportedNetwork, EntityEventKind,
+  SupportedNetwork, EntityEventKind, getUniqueEntityKey,
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
-import {formatTypeId} from "helpers";
 
 export enum EntityRefreshOption {
   AllEntities = 'all-entities',
@@ -140,12 +139,15 @@ class ChainEntityController {
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
 
       // create entity
+      const fieldName = getUniqueEntityKey(network, entityKind);
+      // eslint-disable-next-line no-continue
+      if (!fieldName) continue;
+      const fieldValue = event.data[fieldName];
       const author = event.data['proposer'];
-      if ("proposalIndex" in event.data && event.data.proposalIndex === 28) console.log("Treasury #28 event data:", event.data)
       let entity = new ChainEntity({
         chain,
         type: entityKind,
-        typeId: formatTypeId(event.data),
+        typeId: fieldValue.toString(),
         chainEvents: [],
         createdAt: null,
         updatedAt: null,

@@ -11,14 +11,13 @@ import { SubstrateTypes } from 'chain-events/src';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';
-import {formatTypeId} from "helpers";
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
   event: SubstrateTypes.ITreasuryBountyProposed
 ): ISubstrateBounty => {
   return {
-    identifier: formatTypeId(event),
+    identifier: event.bountyIndex.toString(),
     description: 'Unknown bounty', // TODO: add to chain-events
     index: event.bountyIndex,
     value: ChainInfo.createType('u128', event.value),
@@ -31,7 +30,7 @@ const backportEventToAdapter = (
 
 export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstrateBounty, null> {
   public get shortIdentifier() {
-    return `#${this.data.index.toString()}`;
+    return `#${this.identifier.toString()}`;
   }
 
   public setStatus(status) {

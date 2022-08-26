@@ -21,7 +21,6 @@ import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 import { SubstrateCollectiveProposal } from './collective_proposal';
 import Substrate from './main';
-import {formatTypeId} from "helpers";
 import {IDemocracyStarted} from "chain-events/src/chains/substrate/types";
 
 export enum DemocracyConviction {
@@ -113,7 +112,7 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
 const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubstrateDemocracyReferendum => {
   const enc = new TextEncoder();
   return {
-    identifier: formatTypeId(event),
+    identifier: event.referendumIndex.toString(),
     index: event.referendumIndex,
     endBlock: event.endBlock,
     threshold: event.voteThreshold as DemocracyThreshold,
@@ -126,7 +125,7 @@ export class SubstrateDemocracyReferendum
   ApiPromise, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
-    return `#${this.data.index.toString()}`;
+    return `#${this.identifier.toString()}`;
   }
   public get description() { return null; }
   public get author() { return null; }

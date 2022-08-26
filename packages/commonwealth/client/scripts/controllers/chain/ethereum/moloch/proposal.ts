@@ -23,7 +23,6 @@ import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
 import { attachSigner } from '../contractApi';
-import {formatTypeId} from "helpers";
 
 export enum MolochVote {
   NULL = 'Null',
@@ -62,7 +61,7 @@ const backportEntityToAdapter = (
   const processEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.ProcessProposal);
   const abortEvent = entity.chainEvents.find((e) => e.data.kind === MolochTypes.EventKind.Abort);
 
-  const identifier = formatTypeId(startEvent.data);
+  const identifier = `{startData.proposalIndex}`;
   const id = `${startData.proposalIndex}`;
   const details = startData.details;
   const timestamp = `${startData.startTime}`;
@@ -114,7 +113,7 @@ export default class MolochProposal extends Proposal<
   private _yesShares: number = 0;
   private _noShares: number = 0;
 
-  public get shortIdentifier() { return `MGP-${this.data.id}`; }
+  public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.details);
