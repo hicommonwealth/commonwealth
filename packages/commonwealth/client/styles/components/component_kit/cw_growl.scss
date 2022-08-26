@@ -1,0 +1,26 @@
+@import 'shared';
+
+$growl-outside-bottom-padding: 16px;
+$growl-outside-left-padding: 16px;
+$growl-outside-right-padding: 32px; // accounts for scrollbar width
+
+.Growl {
+  bottom: $growl-outside-bottom-padding;
+  display: flex;
+  position: fixed;
+
+  &.bottom-left {
+    left: $growl-outside-left-padding;
+  }
+
+  &.bottom-right {
+    right: $growl-outside-right-padding;
+  }
+
+  .growl-card.Card {
+    padding: 0;
+    width: 300px;
+  }
+
+  z-index: 1001;
+}
