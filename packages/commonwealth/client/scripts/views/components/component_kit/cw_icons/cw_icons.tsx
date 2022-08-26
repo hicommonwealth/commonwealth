@@ -847,6 +847,36 @@ export const CWDots: m.Component<IconAttrs> = {
   },
 };
 
+export const CWDotsVertical: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path d="M16 8.059a3 3 0 110-6 3 3 0 010 6zM16 18.858a3 3 0 110-6 3 3 0 010 6zM16 30.058c-1.657 0-3-1.432-3-3.2 0-1.767 1.343-3.2 3-3.2s3 1.433 3 3.2c0 1.768-1.343 3.2-3 3.2z"></path>
+      </svg>
+    );
+  },
+};
+
 export const CWDownvote: m.Component<IconAttrs> = {
   view: (vnode) => {
     const {
