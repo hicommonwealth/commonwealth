@@ -26,6 +26,7 @@ import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
+import { CWCollapsible } from './cw_collapsible';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -200,6 +201,13 @@ export class ComponentShowcase implements m.ClassComponent {
               trigger={<CWIcon iconName="infoEmpty" />}
             />
           </div>
+        </div>
+        <div class="basic-gallery">
+          <h1>Collapsible</h1>
+          <CWCollapsible
+            headerContent={<CWText>Header content</CWText>}
+            collapsibleContent={<CWText>Body content</CWText>}
+          />
         </div>
         <div class="basic-gallery">
           <h1>Toggle</h1>
