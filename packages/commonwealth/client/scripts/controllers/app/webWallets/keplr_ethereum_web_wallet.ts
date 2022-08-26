@@ -1,32 +1,30 @@
 import app from 'state';
 
-import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
+import { StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
-import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-import { StdSignature } from '@cosmjs/amino';
+import { Window as KeplrWindow, ChainInfo, EthSignType } from '@keplr-wallet/types';
+
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
 
-class KeplrWebWalletController implements IWebWallet<AccountData> {
+class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
   private _enabling = false;
   private _chainId: string;
-  private _chain: string;
   private _offlineSigner: OfflineDirectSigner;
-  private _client: SigningStargateClient;
 
-  public readonly name = WalletId.Keplr;
-  public readonly label = 'Keplr';
+  public readonly name = WalletId.KeplrEthereum;
+  public readonly label = 'Keplr (Ethereum)';
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly specificChains = ['evmos'];
 
   public get available() {
     return !!window.keplr;
@@ -50,13 +48,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public async signLoginToken(
     message: string,
     address: string
-  ): Promise<StdSignature> {
-    const signature = await window.keplr.signArbitrary(
+  ): Promise<string> {
+    const signature = await window.keplr.signEthereum(
       this._chainId,
       address,
-      message
+      message,
+      EthSignType.MESSAGE
     );
-    return signature;
+    return `0x${Buffer.from(signature).toString('hex')}`;
   }
 
   public async validateWithAccount(account: Account): Promise<void> {
@@ -64,13 +63,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       account.validationToken.trim(),
       account.address
     );
-    const signature = {
-      signature: {
-        pub_key: webWalletSignature.pub_key,
-        signature: webWalletSignature.signature,
-      },
-    };
-    return account.validate(JSON.stringify(signature));
+    return account.validate(webWalletSignature);
   }
 
   // ACTIONS
@@ -142,7 +135,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);
-        this._chain = app.chain.id;
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
@@ -157,4 +149,4 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 }
 
-export default KeplrWebWalletController;
+export default EVMKeplrWebWalletController;
