@@ -46,7 +46,11 @@ class CWPopoverMenuItem implements m.ClassComponent<PopoverMenuItemAttrs> {
           onclick={onclick}
         >
           {iconName && (
-            <CWIcon iconName={iconName} className="menu-item-icon" />
+            <CWIcon
+              iconName={iconName}
+              className="menu-item-icon"
+              iconSize="small"
+            />
           )}
           <CWText type="b2" className="menu-item-text">
             {label}
