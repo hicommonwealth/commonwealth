@@ -403,7 +403,7 @@ module.exports = {
             await queryInterface.addConstraint('ChainEntities', {
                 fields: ['chain', 'type', 'type_id'],
                 type: 'unique',
-            });
+            }, {transaction: t});
         });
     },
 
