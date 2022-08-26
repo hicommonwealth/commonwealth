@@ -81,7 +81,10 @@ export class ComponentShowcase implements m.ClassComponent {
         /> */}
         <div class="basic-gallery">
           <h1>Collapsible</h1>
-          <CWCollapsible />
+          <CWCollapsible
+            headerContent={<CWText>Header content</CWText>}
+            collapsibleContent={<CWText>Body content</CWText>}
+          />
         </div>
         <div class="basic-gallery">
           <h1>Toggle</h1>
