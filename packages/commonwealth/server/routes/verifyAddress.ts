@@ -109,11 +109,12 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    addressModel.wallet_id === WalletId.CosmosEvmMetamask
+    (addressModel.wallet_id === WalletId.CosmosEvmMetamask || addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
     //
-    // ethereum address handling on cosmos chains
+    // ethereum address handling on cosmos chains via metamask
     //
+    console.log(signatureString);
     const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -129,14 +130,14 @@ const verifySignature = async (
     const lowercaseAddress = ethUtil.bufferToHex(addressBuffer);
     try {
       // const ethAddress = Web3.utils.toChecksumAddress(lowercaseAddress);
-      const injAddrBuf = ethUtil.Address.fromString(
+      const b32AddrBuf = ethUtil.Address.fromString(
         lowercaseAddress.toString()
       ).toBuffer();
-      const injAddress = bech32.encode(
+      const b32Address = bech32.encode(
         chain.bech32_prefix,
-        bech32.toWords(injAddrBuf)
+        bech32.toWords(b32AddrBuf)
       );
-      if (addressModel.address === injAddress) isValid = true;
+      if (addressModel.address === b32Address) isValid = true;
     } catch (e) {
       isValid = false;
     }
