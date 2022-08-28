@@ -21,14 +21,14 @@ export interface INearValidators {
   };
 }
 
-export class NearAccount extends Account<NearToken> {
+export class NearAccount extends Account {
   private _walletConnection: NearJsAccount;
   public get walletConnection() { return this._walletConnection; }
 
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
-    super(app, app.chain.meta, address);
+    super({ chain: app.chain.meta, address });
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;

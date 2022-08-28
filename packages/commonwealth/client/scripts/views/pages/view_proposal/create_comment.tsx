@@ -132,11 +132,11 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
     let parentScopedClass = 'new-thread-child';
 
-    let parentAuthor: Account<any>;
+    let parentAuthor: Account;
 
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';
@@ -216,7 +216,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                         <a
                           href={`/${app.activeChainId()}/account/${
                             app.user.activeAccount.address
-                          }?base=${app.user.activeAccount.chain}`}
+                          }?base=${app.user.activeAccount.chain.id}`}
                           onclick={(e) => {
                             e.preventDefault();
                             app.modals.create({

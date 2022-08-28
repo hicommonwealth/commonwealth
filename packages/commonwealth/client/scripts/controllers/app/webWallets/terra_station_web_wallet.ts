@@ -52,7 +52,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {

@@ -67,20 +67,21 @@ export class LinkedThreadsCard
     if (allowLinking || proposal.linkedThreads.length) {
       return (
         <div class="LinkedThreadsCard">
-          <CWText type="h5">Link to an existing thread?</CWText>
+          <CWText type="h5">
+            {proposal.linkedThreads.length === 0
+              ? 'Link to an existing thread?'
+              : 'Linked Threads'}
+          </CWText>
           {proposal.linkedThreads.length > 0 && (
-            <>
-              <h4>Linked Threads</h4>
-              <div class="links-container">
-                {this.linkedThreads.map((thread) => {
-                  const discussionLink = getProposalUrlPath(
-                    thread.slug,
-                    `${thread.identifier}-${slugify(thread.title)}`
-                  );
-                  return link('a', discussionLink, thread.title);
-                })}
-              </div>
-            </>
+            <div class="links-container">
+              {this.linkedThreads.map((thread) => {
+                const discussionLink = getProposalUrlPath(
+                  thread.slug,
+                  `${thread.identifier}-${slugify(thread.title)}`
+                );
+                return link('a', discussionLink, thread.title);
+              })}
+            </div>
           )}
           {allowLinking && (
             <CWButton

@@ -43,7 +43,7 @@ interface ILinkNewAddressModalAttrs {
   joiningChain: string; // join chain after verification
   targetCommunity?: string; // valid when loggingInWithAddress=true and user joins community thru default chain.
   webWallet?: IWebWallet<any>;
-  alreadyInitializedAccount?: Account<any>; // skip verification, go straight to profile creation (only used for NEAR)
+  alreadyInitializedAccount?: Account; // skip verification, go straight to profile creation (only used for NEAR)
   prepopulateAddress?: string; // link a specific address rather than prompting
   successCallback;
 }
@@ -57,7 +57,7 @@ interface ILinkNewAddressModalState {
   // step 1 - validate address
   userProvidedSignature: string;
   secretPhraseSaved: boolean;
-  newAddress: Account<any>; // true if account was already initialized, otherwise it's the Account
+  newAddress: Account; // true if account was already initialized, otherwise it's the Account
   linkingComplete: boolean;
   // step 2 - create a profile
   isNewLogin: boolean;
@@ -74,7 +74,7 @@ const LinkAccountItem: m.Component<
   {
     account: { address: string; meta?: { name: string } };
     targetCommunity: string;
-    accountVerifiedCallback: (account: Account<any>) => Promise<void>;
+    accountVerifiedCallback: (account: Account) => Promise<void>;
     errorCallback: (error: string) => void;
     linkNewAddressModalVnode: m.Vnode<
       ILinkNewAddressModalAttrs,
@@ -283,14 +283,14 @@ const LinkNewAddressModal: m.Component<
     // subkey 'https://substrate.dev/docs/en/ecosystem/subkey'
     // polkadot-js 'https://github.com/polkadot-js/extension'
 
-    const accountVerifiedCallback = async (account: Account<any>) => {
+    const accountVerifiedCallback = async (account: Account) => {
       if (app.isLoggedIn()) {
         // existing user
 
         // initialize role
         try {
           // initialize AddressInfo
-          // TODO: refactor so addressId is always stored on Account<any> and we can avoid this
+          // TODO: refactor so addressId is always stored on Account and we can avoid this
           //
           // Note: account.addressId is set by all createAccount
           // methods in controllers/login.ts. this means that all
@@ -299,7 +299,7 @@ const LinkNewAddressModal: m.Component<
           // AddressInfo, or the account is created on the frontend
           // and the id is available here).
           let addressInfo = app.user.addresses.find(
-            (a) => a.address === account.address && a.chain === account.chain.id
+            (a) => a.address === account.address && a.chain.id === account.chain.id
           );
 
           if (!addressInfo && account.addressId) {
@@ -317,12 +317,12 @@ const LinkNewAddressModal: m.Component<
           try {
             if (
               vnode.attrs.joiningChain &&
-              !app.user.getRoleInCommunity({
+              !app.roles.getRoleInCommunity({
                 account,
                 chain: vnode.attrs.joiningChain,
               })
             ) {
-              await app.user.createRole({
+              await app.roles.createRole({
                 address: addressInfo,
                 chain: vnode.attrs.joiningChain,
               });
