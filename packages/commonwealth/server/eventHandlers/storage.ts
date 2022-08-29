@@ -123,7 +123,9 @@ export default class extends IEventHandler {
     }
 
     // duplicate event check
-    const eventKey = hash(eventData);
+    const eventKey = hash(eventData, {
+      respectType: false
+    });
     const cachedEvent = this.eventCache.get(eventKey);
 
     if (!cachedEvent) {
