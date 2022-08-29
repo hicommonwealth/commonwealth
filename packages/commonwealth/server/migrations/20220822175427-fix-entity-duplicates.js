@@ -400,6 +400,10 @@ module.exports = {
                 DROP TABLE temp_ce;
             `, {transaction: t});
 
+            await queryInterface.sequelize.query(`
+                DROP TABLE entities_creation_events;
+            `, {transaction: t});
+
             await queryInterface.addConstraint('ChainEntities', {
                 fields: ['chain', 'type', 'type_id'],
                 type: 'unique',
