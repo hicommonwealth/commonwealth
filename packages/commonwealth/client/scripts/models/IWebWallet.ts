@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
@@ -12,6 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   validateWithAccount: (account: Account) => Promise<void>;
 
   chain: ChainBase;
+  defaultNetwork: ChainNetwork;
 
   // optional parameter used to specify the exact chain that a wallet is associated with (if any)
   specificChains?: string[];

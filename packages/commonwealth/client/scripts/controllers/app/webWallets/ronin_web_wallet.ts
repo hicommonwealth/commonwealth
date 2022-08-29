@@ -10,6 +10,7 @@ class RoninWebWalletController implements IWebWallet<any> {
   public readonly chain = ChainBase.Ethereum;
   public readonly enabling = false;
   public readonly specificChains = [ ChainNetwork.AxieInfinity ];
+  public readonly defaultNetwork = ChainNetwork.AxieInfinity;
 
   private _enabled = false;
 

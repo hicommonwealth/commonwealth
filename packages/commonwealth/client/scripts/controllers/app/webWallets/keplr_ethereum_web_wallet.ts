@@ -3,7 +3,7 @@ import app from 'state';
 import { StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { Window as KeplrWindow, ChainInfo, EthSignType } from '@keplr-wallet/types';
 
@@ -24,6 +24,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly name = WalletId.KeplrEthereum;
   public readonly label = 'Keplr (Ethereum)';
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly defaultNetwork = ChainNetwork.Evmos;
   public readonly specificChains = ['evmos'];
 
   public get available() {

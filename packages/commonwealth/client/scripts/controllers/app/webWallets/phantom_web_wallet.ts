@@ -1,6 +1,6 @@
 declare let window: any;
 
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -12,6 +12,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   public readonly name = WalletId.Phantom;
   public readonly label = 'Phantom';
   public readonly chain = ChainBase.Solana;
+  public readonly defaultNetwork = ChainNetwork.Solana;
 
   public get available() {
     return window.solana && window.solana.isPhantom;
