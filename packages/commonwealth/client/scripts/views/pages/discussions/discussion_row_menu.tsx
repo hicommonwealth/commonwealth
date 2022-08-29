@@ -182,11 +182,11 @@ export class DiscussionRowMenu
 
     const hasAdminPermissions =
       app.user.activeAccount &&
-      (app.user.isRoleOfCommunity({
+      (app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
       }) ||
-        app.user.isRoleOfCommunity({
+        app.roles.isRoleOfCommunity({
           role: 'moderator',
           chain: app.activeChainId(),
         }));

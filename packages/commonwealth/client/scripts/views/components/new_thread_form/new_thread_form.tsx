@@ -265,7 +265,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     const { fromDraft, saving, form } = this;
     const chainId = app.activeChainId();
     const author = app.user.activeAccount;
-    const isAdmin = app.user.isAdminOfEntity({ chain: chainId });
+    const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
     const discussionDrafts =
       app.user.discussionDrafts.store.getByCommunity(chainId);
