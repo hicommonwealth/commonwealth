@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
-import { Webhook } from 'models';
+import { RoleInfo, Webhook } from 'models';
 import { WebhooksForm } from './webhooks_form';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
@@ -12,7 +12,7 @@ import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 type AdminPanelTabsAttrs = {
   defaultTab: number;
   onRoleUpgrade: (oldRole: string, newRole: string) => void;
-  roleData: any[];
+  roleData: RoleInfo[];
   webhooks: Webhook[];
 };
 

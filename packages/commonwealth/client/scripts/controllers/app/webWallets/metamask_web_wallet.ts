@@ -4,7 +4,7 @@ import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
 import { provider } from 'web3-core';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
@@ -19,6 +19,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public readonly name = WalletId.Metamask;
   public readonly label = 'Metamask';
+  public readonly defaultNetwork = ChainNetwork.Ethereum;
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
@@ -51,7 +52,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signLoginToken(message: string): Promise<string> {
     const msgParams = constructTypedMessage(
-      app.chain.meta.node.ethChainId || 1,
+      app.chain?.meta.node.ethChainId || 1,
       message
     );
     const signature = await this._web3.givenProvider.request({
@@ -61,7 +62,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
     const webWalletSignature = await this.signLoginToken(
       account.validationToken

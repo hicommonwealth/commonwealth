@@ -12,15 +12,15 @@ import {
   ChainInfo,
 } from 'models';
 
-import NotificationsController from '../notifications';
-import DraftsController from '../drafts';
+import NotificationsController from './notifications';
+import DraftsController from './drafts';
 
-export default class {
-  private _activeAccount: Account<any>;
-  public get activeAccount(): Account<any> {
+export class UserController {
+  private _activeAccount: Account;
+  public get activeAccount(): Account {
     return this._activeAccount;
   }
-  private _setActiveAccount(account: Account<any>): void {
+  private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
   }
 
@@ -56,14 +56,6 @@ export default class {
     this._jwt = JWT;
   }
 
-  private _roles: RoleInfo[] = [];
-  public get roles(): RoleInfo[] {
-    return this._roles;
-  }
-  private _setRoles(roles: RoleInfo[]): void {
-    this._roles = roles;
-  }
-
   private _addresses: AddressInfo[] = [];
   public get addresses(): AddressInfo[] {
     return this._addresses;
@@ -72,11 +64,11 @@ export default class {
     this._addresses = addresses;
   }
 
-  private _activeAccounts: Account<any>[] = [];
-  public get activeAccounts(): Account<any>[] {
+  private _activeAccounts: Account[] = [];
+  public get activeAccounts(): Account[] {
     return this._activeAccounts;
   }
-  private _setActiveAccounts(activeAccounts: Account<any>[]): void {
+  private _setActiveAccounts(activeAccounts: Account[]): void {
     this._activeAccounts = activeAccounts;
   }
 
@@ -156,7 +148,7 @@ export default class {
   constructor() {}
 
   // Recommend using the setActiveAccount helper in controllers/app/login.ts to persist the setting to the backend.
-  public ephemerallySetActiveAccount(account: Account<any>): void {
+  public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
   }
   public setEmail(email: string): void {
@@ -172,25 +164,6 @@ export default class {
     this._setJWT(JWT);
   }
 
-  public setRoles(roles = []): void {
-    const roleIds = this.roles.map((r) => r.id);
-    roles.forEach((role) => {
-      if (!roleIds.includes(role.id)) {
-        role.address = role.Address.address;
-        role.address_chain = role.Address.chain;
-        delete role.Address;
-        this._roles.push(role);
-      }
-    });
-  }
-  public addRole(role: RoleInfo): void {
-    this._roles.push(role);
-  }
-  public removeRole(predicate: (r) => boolean): void {
-    const index = this.roles.findIndex(predicate);
-    if (index !== -1) this._roles.splice(index, 1);
-  }
-
   public setAddresses(addresses: AddressInfo[]): void {
     this._setAddresses(addresses);
   }
@@ -204,13 +177,13 @@ export default class {
     );
   }
 
-  public setActiveAccounts(activeAccounts: Account<any>[]): void {
+  public setActiveAccounts(activeAccounts: Account[]): void {
     this._setActiveAccounts(activeAccounts);
   }
-  public addActiveAddress(address: Account<any>): void {
+  public addActiveAddress(address: Account): void {
     this._activeAccounts.push(address);
   }
-  public removeActiveAddress(address: Account<any>): void {
+  public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
       1

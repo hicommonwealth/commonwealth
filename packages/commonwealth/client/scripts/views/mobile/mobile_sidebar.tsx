@@ -30,14 +30,14 @@ class MobileAccountMenu implements m.ClassComponent {
   view() {
     const activeAddressesWithRole = app.user.activeAccounts.filter(
       (account) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account,
           chain: app.activeChainId(),
         });
       }
     );
 
-    const activeAccountsByRole = app.user.getActiveAccountsByRole();
+    const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
     const nAccountsWithoutRole = activeAccountsByRole.filter(
       ([role]) => !role

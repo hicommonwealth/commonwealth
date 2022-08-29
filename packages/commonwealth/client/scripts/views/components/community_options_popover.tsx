@@ -9,7 +9,7 @@ import { link } from 'helpers';
 import { ITokenAdapter } from 'models';
 import { NewTopicModal } from 'views/modals/new_topic_modal';
 import { EditTopicThresholdsModal } from 'views/modals/edit_topic_thresholds_modal';
-import CreateInviteModal from 'views/modals/create_invite_modal';
+import { CreateInviteModal } from 'views/modals/create_invite_modal';
 import { OrderTopicsModal } from '../modals/order_topics_modal';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
@@ -17,11 +17,11 @@ export class CommunityOptionsPopover implements m.ClassComponent {
   view() {
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
-    const isMod = app.user.isRoleOfCommunity({
+    const isMod = app.roles.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
     });

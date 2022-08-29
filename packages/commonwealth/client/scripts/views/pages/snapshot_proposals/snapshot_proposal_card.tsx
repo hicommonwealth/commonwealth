@@ -2,15 +2,16 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import { Tag } from 'construct-ui';
 
-import 'components/proposal_card.scss';
+import 'components/proposal_card/index.scss';
 
 import app from 'state';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
+import { ProposalTag } from '../../components/proposal_card/proposal_tag';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export class SnapshotProposalCard
   implements
@@ -23,6 +24,7 @@ export class SnapshotProposalCard
     const { proposal } = vnode.attrs;
 
     if (!proposal) return;
+
     const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;
 
     const time = moment(+proposal.end * 1000);
@@ -43,21 +45,20 @@ export class SnapshotProposalCard
         }}
       >
         <div class="proposal-card-metadata">
-          <Tag
+          <ProposalTag
             label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
               proposal.ipfs.length - 6
             )}`}
-            intent="primary"
-            rounded={true}
-            size="xs"
           />
-          <div class="proposal-title">{proposal.title}</div>
+          <CWText title={proposal.title} fontWeight="semiBold" noWrap>
+            {proposal.title}
+          </CWText>
         </div>
-        <div class="proposal-status">
+        <CWText>
           {now > time
             ? `Ended ${formatLastUpdated(time)}`
             : `Ending in ${formatTimestamp(moment(+proposal.end * 1000))}`}
-        </div>
+        </CWText>
       </CWCard>
     );
   }

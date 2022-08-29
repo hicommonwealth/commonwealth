@@ -6,7 +6,7 @@ import m from 'mithril';
 import app from 'state';
 import { Topic } from 'models';
 import { LoadingRow } from '../../components/loading_row';
-import SummaryRow from './summary_row';
+import { SummaryRow } from './summary_row';
 import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
 
 export class SummaryListing implements m.ClassComponent {

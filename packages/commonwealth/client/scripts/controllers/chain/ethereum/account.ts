@@ -5,7 +5,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from './chain';
 import EthereumAccounts from './accounts';
 
-export default class EthereumAccount extends Account<EthereumCoin> {
+export default class EthereumAccount extends Account {
   public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
     return this._Chain.api.eth.getBalance(this.address).then(
@@ -21,7 +21,7 @@ export default class EthereumAccount extends Account<EthereumCoin> {
 
   // CONSTRUCTORS
   constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
-    super(app, app.chain.meta, address);
+    super({ chain: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
