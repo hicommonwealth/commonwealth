@@ -13,11 +13,8 @@ enum BulkBalancesErrors {
 
 // ----------- OUTSTANDING QUESTIONS -----------
 // 1. Max across addresses or sum across addresses?
-// 2. Return a BN or just a number? And how to handle decimals?
-// 3. Duplicate wallet addresses, registered to different chains? Currently removing duplicates
-// 4. Handling token addresses not deployed on a Chain Node? Currently just ignoring them and still returning a success
-// 5. How is this route being authenticated, if at all?
-// 6. We are defaulting to ERC20, but do we need to support other token standards?
+// 2. Handling token addresses not deployed on a Chain Node? Currently just ignoring them and still returning a success
+// 3. How is this route being authenticated, if at all?
 
 type bulkBalanceReq = {
   profileId: number;
@@ -43,7 +40,9 @@ const bulkBalances = async (
   const { profileId, chainNodes } = req.body;
   if (!profileId) throw new AppError(BulkBalancesErrors.NoProfileId);
 
-  const profile = await models.Profile.findOne({ where: { id: profileId } });
+  const profile = await models.Profile.findOne({
+    where: { id: profileId },
+  });
   if (!profile) throw new ServerError(BulkBalancesErrors.NoProfile);
 
   // Get all addresses registered with user
@@ -59,8 +58,6 @@ const bulkBalances = async (
   if (profileWalletAddresses.length === 0) {
     throw new AppError(BulkBalancesErrors.NoRegisteredAddresses);
   }
-  console.log('profileWalletAddresses', profileWalletAddresses);
-
   const balances: bulkBalanceResp = {};
 
   // Iterate through chain nodes
@@ -77,6 +74,7 @@ const bulkBalances = async (
     if (!tokenAddresses || tokenAddresses.length === 0) {
       let balanceTotal = 0;
       for (const userWalletAddress of profileWalletAddresses) {
+        // TODO: Check wallet against chain node
         try {
           const balance = await tokenBalanceCache.getBalance(
             nodeId,
@@ -85,7 +83,7 @@ const bulkBalances = async (
           balanceTotal += balance.toNumber();
         } catch (e) {
           console.log(
-            "Couldn't get balance for chainNode Id ",
+            "Couldn't get balance for chainNodeId ",
             nodeId,
             ' with wallet ',
             userWalletAddress
@@ -95,11 +93,11 @@ const bulkBalances = async (
       balances[nodeId] = balanceTotal;
     } else {
       const tokenBalances: { [tokenAddress: string]: number } = {};
-
       // Build token balances for each address
       for (const tokenAddress of tokenAddresses) {
         let balanceTotal = 0;
         for (const userWalletAddress of profileWalletAddresses) {
+          // TODO: Check wallet against chain node
           try {
             // TODO: Needs to change to support 721 and spl-token when Zak contracts table is merged
             const balance = await tokenBalanceCache.getBalance(
@@ -113,10 +111,10 @@ const bulkBalances = async (
             console.log(
               "Couldn't get balance for token address",
               tokenAddress,
+              'on chainNodeId',
+              nodeId,
               ' with wallet ',
-              userWalletAddress,
-              'on chainNode Id',
-              nodeId
+              userWalletAddress
             );
           }
         }
