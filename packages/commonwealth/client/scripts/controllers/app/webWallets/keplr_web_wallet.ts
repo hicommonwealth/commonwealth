@@ -3,7 +3,7 @@ import app from 'state';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
@@ -26,6 +26,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
+  public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
@@ -86,7 +87,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
+      const url = `${window.location.origin}/cosmosAPI/${app.chain?.id || this.defaultNetwork}`;
       const client = await StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
