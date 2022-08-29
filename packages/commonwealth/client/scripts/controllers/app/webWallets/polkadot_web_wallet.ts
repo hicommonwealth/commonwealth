@@ -8,7 +8,7 @@ import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
@@ -22,6 +22,7 @@ class PolkadotWebWalletController
 
   public readonly name = WalletId.Polkadot;
   public readonly label = 'polkadot.js';
+  public readonly defaultNetwork = ChainNetwork.Edgeware;
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
