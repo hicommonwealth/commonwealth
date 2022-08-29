@@ -1,4 +1,4 @@
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
@@ -9,6 +9,7 @@ class NearWebWalletController implements IWebWallet<any> {
   public readonly available = true;
   public readonly chain = ChainBase.NEAR;
   public readonly enabling = false;
+  public readonly defaultNetwork = ChainNetwork.NEAR;
 
   private _enabled = false;
 
