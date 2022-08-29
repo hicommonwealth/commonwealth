@@ -19,11 +19,6 @@ import { notifyError } from "../app/notifications";
 import proposalIdToEntity from "helpers/proposalIdToEntity";
 import { getBaseUrl, ServiceUrls } from "helpers/getUrl";
 
-export enum EntityRefreshOption {
-  AllEntities = 'all-entities',
-  CompletedEntities = 'completed-entities',
-  Nothing = 'nothing',
-}
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -97,13 +92,8 @@ class ChainEntityController {
     }
   }
 
-  public async refresh(chain: string, refreshOption: EntityRefreshOption) {
-    if (refreshOption === EntityRefreshOption.Nothing) return;
-
+  public async refresh(chain: string) {
     const options: any = { chain };
-    if (refreshOption === EntityRefreshOption.CompletedEntities) {
-      options.completed = true;
-    }
 
     // TODO: do in parallel and consolidate when both return
     // load the chain-entity objects
@@ -243,25 +233,6 @@ class ChainEntityController {
     });
   }
 
-  public async fetchEntities<T extends CWEvent>(
-    chain: string,
-    network: SupportedNetwork,
-    fetch: () => Promise<T[]>,
-    eventSortFn?: (a: CWEvent, b: CWEvent) => number,
-  ): Promise<T[]> {
-    // get existing events
-    let existingEvents: T[];
-    try {
-      existingEvents = await fetch();
-    } catch (e) {
-      console.error(`Chain entity fetch failed: ${e.message}`);
-      return;
-    }
-    if (eventSortFn) existingEvents.sort(eventSortFn);
-    this._handleEvents(chain, network, existingEvents);
-    return existingEvents;
-  }
-
   public async subscribeEntities<Api, RawEvent>(
     chain: string,
     network: SupportedNetwork,
@@ -277,17 +248,6 @@ class ChainEntityController {
       const incomingEvents = await processor.process(block);
       this._handleEvents(chain, network, incomingEvents);
     });
-  }
-
-  private async fetchEntity(entity_type: string, entity_type_id: string) {
-
-  }
-
-  private async getEntityId(entity: ChainEntity) {
-    if (entity.id) return entity.id;
-    else {
-
-    }
   }
 }
 

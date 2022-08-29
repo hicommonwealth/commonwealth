@@ -9,7 +9,6 @@ import 'components/chain_entities_selector.scss';
 import app from 'state';
 import { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: ChainEntity[];
@@ -31,7 +30,7 @@ export class ChainEntitiesSelector
     if (!this.initialized) {
       this.initialized = true;
       app.chain.chainEntities
-        ?.refresh(app.chain.id, EntityRefreshOption.AllEntities)
+        ?.refresh(app.chain.id)
         .then(() => {
           // refreshing loads the latest chain entities into app.chain.chainEntities store
           this.chainEntitiesLoaded = true;

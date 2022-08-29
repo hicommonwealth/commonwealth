@@ -47,13 +47,6 @@ class SubstrateTreasuryTips extends ProposalModule<
       }
     );
 
-    // fetch proposals from chain
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchTips(this.app.chain.block.height)
-    );
-
     // TODO: ensure council members === tippers for all chains
     const members = await ChainInfo.api.query.council.members() as Vec<AccountId>;
     this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
