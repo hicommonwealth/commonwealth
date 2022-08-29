@@ -58,7 +58,6 @@ async function main() {
       }
     }
 
-    // build and execute the query to update all the type_ids
     let query = `INSERT INTO entities_creation_events (entity_id, chain, type, type_id, event_id) VALUES`
     let index = 0;
     for (const row of final_result) {
