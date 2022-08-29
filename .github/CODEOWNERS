@@ -1,0 +1,8 @@
+# Top level owners: Zak & Jake
+*	@jnaviask @zakhap @dillchen
+
+# CSS owners: Zak, Gabe, Graham
+.scss	@zakhap @affordances @gdjohnson
+
+# Chain Events owners: Jake, Timothee
+packages/chain-events	     @jnaviask @timolegros
