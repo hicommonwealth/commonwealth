@@ -2,20 +2,28 @@
 
 import m from 'mithril';
 import $ from 'jquery';
+import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
+import { formatTimestamp } from 'helpers';
 import { NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-// import { PageLoading } from 'views/pages/loading';
+// import { PageLoading } from '../loading';
+// import ErrorPage from '../error';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
+import { bundleSubs } from './helpers';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-// import ErrorPage from '../error';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 class NotificationSettingsPage implements m.ClassComponent {
   private subscriptions: NotificationSubscription[];
@@ -64,6 +72,10 @@ class NotificationSettingsPage implements m.ClassComponent {
     //   />;
     // }
 
+    const bundledSubs = bundleSubs(this.subscriptions);
+
+    // console.log(bundledSubs);
+
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
         <div class="NotificationSettingsPage">
@@ -74,20 +86,104 @@ class NotificationSettingsPage implements m.ClassComponent {
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
-          <CWText fontWeight="semiBold">subscriptions</CWText>
-          {this.subscriptions.map((s) => {
-            const chainInfo = app.config.chains.getById(s.Chain);
-
-            console.log(chainInfo);
+          <div class="column-header-row">
+            <CWText
+              type="h5"
+              fontWeight="medium"
+              className="column-header-text"
+            >
+              Community
+            </CWText>
+            <CWText
+              type="h5"
+              fontWeight="medium"
+              className="column-header-text"
+            >
+              Email Notifications
+            </CWText>
+            <CWText
+              type="h5"
+              fontWeight="medium"
+              className="column-header-text"
+            >
+              In-App Notifications
+            </CWText>
+          </div>
+          {Object.entries(bundledSubs).map(([k, v]) => {
+            const chainInfo = app.config.chains.getById(k);
 
             return (
               <div class="notification-row">
-                <CWIconButton iconName="chevronRight" />
-                <CWText type="h5" fontWeight="medium">
-                  {chainInfo.name}
-                </CWText>
-                <CWCommunityAvatar size="medium" community={chainInfo} />
-                <CWCheckbox label="Email" />
+                <CWCollapsible
+                  headerContent={
+                    <>
+                      <CWCommunityAvatar size="medium" community={chainInfo} />
+                      <CWText type="h5" fontWeight="medium">
+                        {chainInfo.name}
+                      </CWText>
+                      <CWText>{v.length} subscriptions</CWText>
+                      <CWCheckbox label="Receive Emails" />
+                      <CWToggle />
+                    </>
+                  }
+                  collapsibleContent={
+                    <div>
+                      <CWText type="caption">Title</CWText>
+                      <CWText type="caption">Published</CWText>
+                      <CWText type="caption">Subscribed</CWText>
+                      <CWText type="caption">Author</CWText>
+                      {v.map((sub) => {
+                        console.log(sub);
+
+                        return (
+                          <div>
+                            <CWIcon iconName="feedback" iconSize="small" />
+                            {/* if thread */}
+                            {sub.Thread &&
+                              renderQuillTextBody(sub.Thread.title, {
+                                collapse: true,
+                              })}
+                            {sub.Thread &&
+                              renderQuillTextBody(sub.Thread.body, {
+                                collapse: true,
+                              })}
+                            {sub.Thread &&
+                              formatTimestamp(moment(sub.Thread.created_at))}
+                            {/* if comment */}
+                            {sub.Comment &&
+                              renderQuillTextBody(sub.Comment.text, {
+                                collapse: true,
+                              })}
+                            {sub.Comment &&
+                              formatTimestamp(moment(sub.Comment.created_at))}
+
+                            {formatTimestamp(moment(sub.createdAt))}
+                            {/* {m(User, { user: ? })} */}
+                            <CWPopoverMenu
+                              trigger={<CWIconButton iconName="dotsVertical" />}
+                              popoverMenuItems={[
+                                {
+                                  label: 'Mute Thread',
+                                  iconName: 'mute',
+                                  onclick: () =>
+                                    console.log('mute thread clicked'),
+                                },
+                                { type: 'divider' },
+                                {
+                                  label: 'Unsubscribe',
+                                  iconName: 'close',
+                                  isSecondary: true,
+                                  onclick: () =>
+                                    console.log('unsubscribe clicked'),
+                                },
+                              ]}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  }
+                />
               </div>
             );
           })}

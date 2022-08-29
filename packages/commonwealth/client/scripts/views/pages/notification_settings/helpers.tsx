@@ -32,6 +32,20 @@ const NOTIFICATION_ON_OPTION = 'On';
 const NOTIFICATION_ON_SOMETIMES_OPTION = 'Multiple';
 const NOTIFICATION_OFF_OPTION = 'Off';
 
+export const bundleSubs = (
+  subs: Array<NotificationSubscription>
+): { [k: string]: Array<NotificationSubscription> } => {
+  const result = {};
+  for (const sub of subs) {
+    if (result[sub.Chain]) {
+      result[sub.Chain].push(sub);
+    } else {
+      result[sub.Chain] = [sub];
+    }
+  }
+  return result;
+};
+
 export class BatchedSubscriptionRow
   implements
     m.ClassComponent<{

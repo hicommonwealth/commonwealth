@@ -50,6 +50,7 @@ export const iconLookup = {
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
+  mute: Icons.CWMute,
   people: Icons.CWPeople,
   person: Icons.CWPerson,
   pin: Icons.CWPin,
