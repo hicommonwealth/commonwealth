@@ -74,8 +74,6 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     });
   }
 
-  private _fetcher: SubstrateEvents.StorageFetcher;
-
   private _tokenDecimals: number;
   private _tokenSymbol: string;
 
