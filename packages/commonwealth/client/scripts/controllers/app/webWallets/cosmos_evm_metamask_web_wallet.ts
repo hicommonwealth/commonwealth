@@ -4,7 +4,7 @@ declare let window: any;
 
 import Web3 from 'web3';
 import { provider } from 'web3-core';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
@@ -26,6 +26,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   public readonly name = WalletId.CosmosEvmMetamask;
   public readonly label = 'Metamask (Cosmos)';
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly defaultNetwork = ChainNetwork.Injective;
   public readonly specificChains = ['injective', 'evmos'];
 
   public get available() {
@@ -53,7 +54,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
     const webWalletSignature = await this.signMessage(account.validationToken);
     return account.validate(webWalletSignature);

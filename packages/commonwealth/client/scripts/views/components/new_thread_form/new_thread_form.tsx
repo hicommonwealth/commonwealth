@@ -53,7 +53,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   private async _newThread(
     form: NewThreadFormType,
     quillEditorState: QuillEditor,
-    author: Account<any>,
+    author: Account,
     stage = ThreadStage.Discussion
   ) {
     if (!this) throw new Error('no this');
@@ -265,7 +265,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     const { fromDraft, saving, form } = this;
     const chainId = app.activeChainId();
     const author = app.user.activeAccount;
-    const isAdmin = app.user.isAdminOfEntity({ chain: chainId });
+    const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 
     const discussionDrafts =
       app.user.discussionDrafts.store.getByCommunity(chainId);
@@ -341,7 +341,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
               <div class="set-display-name-callout">
                 <CWText>You haven't set a display name yet.</CWText>
                 <a
-                  href={`/${chainId}/account/${author.address}?base=${author.chain}`}
+                  href={`/${chainId}/account/${author.address}?base=${author.chain.id}`}
                   onclick={(e) => {
                     e.preventDefault();
                     app.modals.create({
