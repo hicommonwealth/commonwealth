@@ -21,24 +21,6 @@ import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(
-  account: Account,
-  walletId: WalletId,
-  community?: string
-) {
-  return $.post(`${app.serverUrl()}/createAddress`, {
-    address: account.address,
-    keytype:
-      account.chain.base === ChainBase.Substrate && (account as any).isEd25519
-        ? 'ed25519'
-        : undefined,
-    chain: account.chain.id,
-    community,
-    jwt: app.user.jwt,
-    wallet_id: walletId,
-  });
-}
-
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
@@ -214,17 +196,24 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  keytype?: string,
-  community?: string
+  chain: string,
 ): Promise<Account> {
-  const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, walletId, community);
-  const token = response.result.verification_token;
-  const newAccount = app.chain.accounts.get(response.result.address, keytype);
-  newAccount.setValidationToken(token);
-  newAccount.setAddressId(response.result.id);
-  newAccount.setWalletId(walletId);
-  return newAccount;
+  const response = await $.post(`${app.serverUrl()}/createAddress`, {
+    address,
+    chain,
+    jwt: app.user.jwt,
+    wallet_id: walletId,
+  });
+  const id = response.result.id;
+  const chainInfo = app.config.chains.getById(chain);
+  const account = new Account({
+    addressId: id,
+    address,
+    chain: chainInfo,
+    validationToken: response.result.verification_token,
+    walletId,
+  })
+  return account;
 }
 
 export async function unlinkLogin(account: AddressInfo) {

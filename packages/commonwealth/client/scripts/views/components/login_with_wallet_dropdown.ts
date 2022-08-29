@@ -72,7 +72,7 @@ const LoginWithWalletDropdown: m.Component<{
     const sortedChainBases = [
       ChainBase.CosmosSDK,
       ChainBase.Ethereum,
-      ChainBase.NEAR,
+      // ChainBase.NEAR,
       ChainBase.Substrate,
       ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));
@@ -94,14 +94,6 @@ const LoginWithWalletDropdown: m.Component<{
           ]),
           onclick: (e) => {
             $('.Login').trigger('modalexit');
-            const defaultChainId =
-              (webWallet?.specificChains && webWallet.specificChains[0]) ||
-              baseToNetwork(base);
-            if (app.activeChainId()) {
-              navigateToSubpage('/web3login', web3loginParams);
-            } else {
-              m.route.set(`${defaultChainId}/web3login`, web3loginParams);
-            }
             app.modals.lazyCreate('link_new_address_modal', {
               loggingInWithAddress,
               joiningChain,

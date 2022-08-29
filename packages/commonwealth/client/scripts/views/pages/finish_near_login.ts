@@ -68,12 +68,15 @@ const validate = async (
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    await createUserWithAddress(acct.address, WalletId.NearWallet);
+    const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+    const newAcct = await createUserWithAddress(acct.address, WalletId.NearWallet, chain.id);
+    acct.setValidationToken(newAcct.validationToken);
+    acct.setWalletId(WalletId.NearWallet);
+    acct.setAddressId(newAcct.addressId);
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
       await initAppState();
-      const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses(chain);
     }
     await setActiveAccount(acct);
