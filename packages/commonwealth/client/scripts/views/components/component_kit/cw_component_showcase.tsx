@@ -3,7 +3,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-// import app from 'state';
+import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -27,6 +27,8 @@ import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
+import { NewLoginModal } from '../../modals/login_modal';
+import { isWindowMediumSmallInclusive } from './helpers';
 // import { NewLoginModal } from '../../modals/login_modal';
 // import { isWindowMediumSmallInclusive } from './helpers';
 
@@ -66,7 +68,7 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        {/* <CWButton
+        <CWButton
           label="Click for Login modal"
           onclick={() =>
             app.modals.create({
@@ -78,7 +80,7 @@ export class ComponentShowcase implements m.ClassComponent {
               },
             })
           }
-        /> */}
+        />
         <h1>Popover Menu</h1>
         <div class="basic-gallery">
           <CWPopoverMenu

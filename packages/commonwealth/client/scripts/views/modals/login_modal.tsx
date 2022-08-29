@@ -42,7 +42,7 @@ export class NewLoginModal implements m.ClassComponent {
 
   oninit() {
     this.avatarUrl = undefined;
-    this.bodyType = 'connectWithEmail';
+    this.bodyType = 'welcome';
     this.profiles = profiles;
     this.sidebarType = 'newAddressLinked';
     this.username = 'elephant-blue.eth';
