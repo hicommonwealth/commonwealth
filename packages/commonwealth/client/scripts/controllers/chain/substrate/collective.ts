@@ -54,13 +54,6 @@ class SubstrateCollective extends ProposalModule<
       }
     );
 
-    // fetch proposals from chain
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchCollectiveProposals(this.moduleName, this.app.chain.block.height)
-    );
-
     const members = await ChainInfo.api.query[this.moduleName].members() as Vec<AccountId>;
     this._members = members.toArray().map((v) => this._Accounts.fromAddress(v.toString()));
 

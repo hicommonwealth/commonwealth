@@ -1,11 +1,8 @@
 import BN from 'bn.js';
-import EthDater from 'ethereum-block-by-date';
 
-import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
+import { ProposalModule, ITXModalData } from 'models';
 
-import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 
 import { MolochEvents } from 'chain-events/src';
 
@@ -15,7 +12,6 @@ import MolochProposal from './proposal';
 import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochMember from './member';
-import Moloch from './adapter';
 import MolochChain from './chain';
 import { attachSigner } from '../contractApi';
 
@@ -55,10 +51,9 @@ export default class MolochGovernance extends ProposalModule<
   }
 
   public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
+  constructor(app: IApp) {
     super(app, (e) => new MolochProposal(this._Members, this, e));
   }
 
@@ -78,32 +73,11 @@ export default class MolochGovernance extends ProposalModule<
     this._proposalDeposit = new BN((await this._api.Contract.proposalDeposit()).toString(), 10);
 
     // fetch all proposals
-    if (this._usingServerChainEntities) {
-      console.log('Fetching moloch proposals from backend.');
-      await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
-      const entities = this.app.chain.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
-      entities.map((p) => this._entityConstructor(p));
-    } else {
-      console.log('Fetching moloch proposals from chain.');
-      const fetcher = new MolochEvents.StorageFetcher(
-        api.Contract as any,
-        1,
-        new EthDater((this.app.chain as Moloch).chain.api)
-      );
-      const subscriber = new MolochEvents.Subscriber(api.Contract as any, this.app.chain.id);
-      const processor = new MolochEvents.Processor(api.Contract as any, 1);
-      await this.app.chain.chainEntities.fetchEntities(
-        this.app.chain.id,
-        chainToEventNetwork(this.app.chain.meta),
-        () => fetcher.fetch()
-      );
-      await this.app.chain.chainEntities.subscribeEntities(
-        this.app.chain.id,
-        chainToEventNetwork(this.app.chain.meta),
-        subscriber,
-        processor,
-      );
-    }
+    console.log('Fetching moloch proposals from backend.');
+    await this.app.chain.chainEntities.refresh(this.app.chain.id);
+    const entities = this.app.chain.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
+    entities.map((p) => this._entityConstructor(p));
+
     this._proposalCount = new BN(this.store.getAll().length);
     this._initialized = true;
   }

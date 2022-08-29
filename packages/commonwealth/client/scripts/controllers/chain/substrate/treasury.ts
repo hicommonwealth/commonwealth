@@ -83,13 +83,6 @@ class SubstrateTreasury extends ProposalModule<
       }
     );
 
-    // fetch proposals from chain
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
-    );
-
     this._initialized = true;
     this._initializing = false;
   }

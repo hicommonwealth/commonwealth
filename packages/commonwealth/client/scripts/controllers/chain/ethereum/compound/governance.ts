@@ -3,7 +3,7 @@ import { ProposalModule, ITXModalData } from 'models';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { CompoundEvents, CompoundTypes } from 'chain-events/src';
 import { IApp } from 'state';
-import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
 import { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import CompoundAPI, { GovernorType } from './api';

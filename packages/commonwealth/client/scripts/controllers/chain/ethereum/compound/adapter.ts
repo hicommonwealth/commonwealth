@@ -29,19 +29,6 @@ export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccoun
     this.accounts.init(this.chain);
   }
 
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    switch (entity.type) {
-      case CompoundTypes.EntityKind.Proposal: {
-        this.governance.updateProposal(entity, event);
-        break;
-      }
-      default: {
-        console.error('Received invalid compound chain entity!');
-        break;
-      }
-    }
-  }
-
   public async initApi() {
     try {
       await this.chain.init(this.meta);

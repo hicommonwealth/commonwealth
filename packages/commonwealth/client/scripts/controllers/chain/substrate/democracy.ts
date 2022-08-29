@@ -70,19 +70,6 @@ class SubstrateDemocracy extends ProposalModule<
       }
     );
 
-    // fetch referenda from chain
-    const events = await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
-    );
-    const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
-    );
-
     this._initialized = true;
     this._initializing = false;
   }

@@ -28,19 +28,6 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
     this.accounts.init(this.chain);
   }
 
-  public handleEntityUpdate(entity: ChainEntity, event: ChainEvent): void {
-    switch (entity.type) {
-      case AaveTypes.EntityKind.Proposal: {
-        this.governance.updateProposal(entity, event);
-        break;
-      }
-      default: {
-        console.error('Received invalid aave chain entity!');
-        break;
-      }
-    }
-  }
-
   public async initApi() {
     try {
       await this.chain.init(this.meta);
