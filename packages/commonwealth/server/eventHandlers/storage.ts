@@ -11,7 +11,7 @@ import {
 import Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import NodeCache from 'node-cache';
-import crypto from 'crypto';
+import hash from 'object-hash'
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -123,12 +123,13 @@ export default class extends IEventHandler {
     }
 
     // duplicate event check
-    const eventKey = crypto.createHash('md5').update(JSON.stringify(eventData)).digest('hex');
+    const eventKey = hash(eventData);
     const cachedEvent = this.eventCache.get(eventKey);
 
     if (!cachedEvent) {
       const dbEvent = await this._models.ChainEvent.create(eventData);
-      this.eventCache.set(eventKey, eventData);
+      // no need to save the entire event data since the key is the hash of the data
+      this.eventCache.set(eventKey, true);
 
       return dbEvent;
     } else {
