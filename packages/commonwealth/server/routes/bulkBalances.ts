@@ -5,9 +5,9 @@ import { AppError, ServerError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 
 enum BulkBalancesErrors {
-  NoUserId = 'No userId provided',
-  NoUser = "User doesn't exist",
-  NoRegisteredAddresses = 'No wallet addresses registered to this user',
+  NoProfileId = 'No profileId provided',
+  NoProfile = "Profile doesn't exist",
+  NoRegisteredAddresses = 'No wallet addresses registered to this profile',
   TokenContractNotDeployed = 'Token contract not deployed on specified chain node', // Currently not used, see point 3
 }
 
@@ -20,14 +20,18 @@ enum BulkBalancesErrors {
 // 6. We are defaulting to ERC20, but do we need to support other token standards?
 
 type bulkBalanceReq = {
-  userId: string;
-  [key: string]: string | string[];
+  profileId: number;
+  chainNodes: {
+    [nodeId: number]: string | string[];
+  };
 };
 
 type bulkBalanceResp = {
-  [nodeId: string]: {
-    [tokenAddress: string]: number;
-  };
+  [nodeId: string]:
+    | {
+        [tokenAddress: string]: number;
+      }
+    | number;
 };
 
 const bulkBalances = async (
@@ -36,63 +40,91 @@ const bulkBalances = async (
   req: TypedRequestBody<bulkBalanceReq>,
   res: TypedResponse<bulkBalanceResp>
 ) => {
-  const { userId } = req.body;
-  if (!userId) throw new AppError(BulkBalancesErrors.NoUserId);
+  const { profileId, chainNodes } = req.body;
+  if (!profileId) throw new AppError(BulkBalancesErrors.NoProfileId);
 
-  const user = await models.User.findOne({ where: { id: userId } });
-  if (!user) throw new ServerError(BulkBalancesErrors.NoUser);
+  const profile = await models.Profile.findOne({ where: { id: profileId } });
+  if (!profile) throw new ServerError(BulkBalancesErrors.NoProfile);
 
   // Get all addresses registered with user
   const addressInstances: AddressInstance[] = await models.Address.findAll({
-    where: { user_id: userId },
+    where: { profile_id: profileId },
   });
 
   // Remove duplicates from addresses
-  const userWalletAddresses: string[] = [
+  const profileWalletAddresses: string[] = [
     ...new Set(addressInstances.map((addressObj) => addressObj.address)),
   ];
 
-  if (userWalletAddresses.length === 0) {
+  if (profileWalletAddresses.length === 0) {
     throw new AppError(BulkBalancesErrors.NoRegisteredAddresses);
   }
+  console.log('profileWalletAddresses', profileWalletAddresses);
 
   const balances: bulkBalanceResp = {};
 
   // Iterate through chain nodes
-  for (const key of Object.keys(req.body)) {
-    // eslint-disable-next-line no-continue
-    if (key === 'userId') continue;
-
-    const nodeId = parseInt(key.slice(0, key.length - 2), 10);
-    let tokenAddresses = req.body[key];
+  for (const nodeIdString of Object.keys(chainNodes)) {
+    let tokenAddresses = req.body.chainNodes[nodeIdString];
+    const nodeId = parseInt(nodeIdString, 10);
 
     // Handle when only one value in array
     if (typeof tokenAddresses === 'string') {
       tokenAddresses = [tokenAddresses];
     }
 
-    const tokenBalances: { [tokenAddress: string]: number } = {};
-
-    // Build token balances for each address
-    for (const tokenAddress of tokenAddresses) {
+    // Handle no token addresses for chain node
+    if (!tokenAddresses || tokenAddresses.length === 0) {
       let balanceTotal = 0;
-      for (const userWalletAddress of userWalletAddresses) {
+      for (const userWalletAddress of profileWalletAddresses) {
         try {
           const balance = await tokenBalanceCache.getBalance(
             nodeId,
-            userWalletAddress,
-            tokenAddress,
-            'erc20'
+            userWalletAddress
           );
           balanceTotal += balance.toNumber();
         } catch (e) {
-          console.log(e);
+          console.log(
+            "Couldn't get balance for chainNode Id ",
+            nodeId,
+            ' with wallet ',
+            userWalletAddress
+          );
         }
       }
-      tokenBalances[tokenAddress] = balanceTotal;
-    }
+      balances[nodeId] = balanceTotal;
+    } else {
+      const tokenBalances: { [tokenAddress: string]: number } = {};
 
-    balances[nodeId] = tokenBalances;
+      // Build token balances for each address
+      for (const tokenAddress of tokenAddresses) {
+        let balanceTotal = 0;
+        for (const userWalletAddress of profileWalletAddresses) {
+          try {
+            // TODO: Needs to change to support 721 and spl-token when Zak contracts table is merged
+            const balance = await tokenBalanceCache.getBalance(
+              nodeId,
+              userWalletAddress,
+              tokenAddress,
+              'erc20'
+            );
+            balanceTotal += balance.toNumber();
+          } catch (e) {
+            console.log(
+              "Couldn't get balance for token address",
+              tokenAddress,
+              ' with wallet ',
+              userWalletAddress,
+              'on chainNode Id',
+              nodeId
+            );
+          }
+        }
+        tokenBalances[tokenAddress] = balanceTotal;
+      }
+
+      balances[nodeId] = tokenBalances;
+    }
   }
 
   return success(res, balances);
