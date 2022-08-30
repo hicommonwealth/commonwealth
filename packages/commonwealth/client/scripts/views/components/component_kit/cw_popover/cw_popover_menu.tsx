@@ -23,7 +23,9 @@ export type PopoverMenuItemAttrs =
       type?: 'action';
     };
 
-class CWPopoverMenuItem implements m.ClassComponent<PopoverMenuItemAttrs> {
+export class CWPopoverMenuItem
+  implements m.ClassComponent<PopoverMenuItemAttrs>
+{
   view(vnode) {
     const { type, label, iconName, onclick, disabled, isSecondary } =
       vnode.attrs;
@@ -62,7 +64,7 @@ class CWPopoverMenuItem implements m.ClassComponent<PopoverMenuItemAttrs> {
 }
 
 type PopoverMenuAttrs = {
-  popoverMenuItems: Array<PopoverMenuItemAttrs>;
+  popoverMenuItems: Array<CWPopoverMenuItem>;
 } & SharedPopoverAttrs;
 
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
@@ -72,11 +74,7 @@ export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
     return (
       <CWPopover
         content={
-          <div class={ComponentType.PopoverMenu}>
-            {popoverMenuItems.map((item) => (
-              <CWPopoverMenuItem {...item} />
-            ))}
-          </div>
+          <div class={ComponentType.PopoverMenu}>{popoverMenuItems}</div>
         }
         interactionType="click"
         trigger={trigger}

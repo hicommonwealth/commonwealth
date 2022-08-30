@@ -5,10 +5,7 @@ import m from 'mithril';
 import 'sublayout_header_right.scss';
 
 import app from 'state';
-import {
-  NewProposalButton,
-  MobileNewProposalButton,
-} from 'views/components/new_proposal_button';
+import { NewProposalButton } from 'views/components/new_proposal_button';
 import { ChainInfo } from 'models';
 import { NotificationsMenu } from 'views/components/header/notifications_menu';
 import { InvitesMenu } from 'views/components/header/invites_menu';
@@ -29,12 +26,9 @@ export class SublayoutHeaderRight
     return (
       <div class="SublayoutHeaderRight">
         {/* threadOnly option assumes all chains have proposals beyond threads */}
-        {showNewProposalButton &&
-          (isWindowMediumSmallInclusive(window.innerWidth) ? (
-            <MobileNewProposalButton />
-          ) : (
-            <NewProposalButton fluid={false} threadOnly={!chain} />
-          ))}
+        {showNewProposalButton && (
+          <NewProposalButton fluid={false} threadOnly={!chain} />
+        )}
         {app.isLoggedIn() && <NotificationsMenu />}
         {app.isLoggedIn() && <InvitesMenu />}
         <InvitesMenu />

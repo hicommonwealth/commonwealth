@@ -10,6 +10,8 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import NotificationRow from 'views/components/notification_row';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 const MAX_NOTIFS = 40;
 
@@ -94,36 +96,37 @@ export class NotificationsMenu
     const unreadNotificationsCount = app.user.notifications.numUnread;
 
     return (
-      <PopoverMenu
+      <CWPopoverMenu
         hasArrow={false}
         transitionDuration={0}
         hoverCloseDelay={0}
         trigger={
-          <Button
-            class="toggle"
-            style="padding: 8px; display: flex;"
-            intent={unreadNotificationsCount > 0 ? 'primary' : undefined}
-            label={
-              <>
-                {unreadNotificationsCount === 0 ? (
-                  <CWIcon
-                    iconName="bell"
-                    iconSize="small"
-                    style="display: flex;"
-                  />
-                ) : (
-                  <span>
-                    {unreadNotificationsCount > 9
-                      ? '∞'
-                      : unreadNotificationsCount}
-                  </span>
-                )}
-              </>
-            }
-            size={small ? 'sm' : 'default'}
-            compact={true}
-          />
+          unreadNotificationsCount === 0 ? (
+            <CWIconButton
+              iconName="bell"
+              iconSize="medium"
+              iconButtonTheme="black"
+              style="display: flex;"
+            />
+          ) : (
+            <span>
+              {unreadNotificationsCount > 9 ? '∞' : unreadNotificationsCount}
+            </span>
+          )
         }
+        // <Button
+        //   class="toggle"
+        //   style="padding: 8px; display: flex;"
+        //   intent={unreadNotificationsCount > 0 ? 'primary' : undefined}
+        //   label={
+        //     <>
+
+        //     </>
+        //   }
+        //   size={small ? 'sm' : 'default'}
+        //   compact={true}
+        // />
+
         position="bottom-end"
         closeOnContentClick={true}
         closeOnOutsideClick={true}
