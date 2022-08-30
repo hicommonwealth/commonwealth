@@ -42,7 +42,6 @@ export default class CompoundGovernance extends ProposalModule<
   public get votingPeriod() { return this._votingPeriod; }
 
   public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // capacities based on governor type
   private _supportsAbstain: boolean;
@@ -141,7 +140,7 @@ export default class CompoundGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
-    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+    await this.app.chain.chainEntities.refresh(this.app.chain.id);
     const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
