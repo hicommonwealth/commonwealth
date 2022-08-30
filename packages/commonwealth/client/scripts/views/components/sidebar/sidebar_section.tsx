@@ -225,7 +225,7 @@ export class SidebarSectionGroup
           class="section-group-title-container"
           onclick={(e) => clickHandler(e)}
         >
-          <CWText type="body1">{title}</CWText>
+          <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
           {carat}
         </div>
