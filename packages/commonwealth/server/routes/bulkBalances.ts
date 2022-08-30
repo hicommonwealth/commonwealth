@@ -8,13 +8,11 @@ enum BulkBalancesErrors {
   NoProfileId = 'No profileId provided',
   NoProfile = "Profile doesn't exist",
   NoRegisteredAddresses = 'No wallet addresses registered to this profile',
-  TokenContractNotDeployed = 'Token contract not deployed on specified chain node', // Currently not used, see point 3
 }
 
 // ----------- OUTSTANDING QUESTIONS -----------
 // 1. Max across addresses or sum across addresses?
-// 2. Handling token addresses not deployed on a Chain Node? Currently just ignoring them and still returning a success
-// 3. How is this route being authenticated, if at all?
+// 2. How is this route being authenticated, if at all?
 
 type bulkBalanceReq = {
   profileId: number;
@@ -73,14 +71,15 @@ const bulkBalances = async (
     // Handle no token addresses for chain node
     if (!tokenAddresses || tokenAddresses.length === 0) {
       let balanceTotal = 0;
+      let atLeastOneTokenAddress = false;
       for (const userWalletAddress of profileWalletAddresses) {
-        // TODO: Check wallet against chain node
         try {
           const balance = await tokenBalanceCache.getBalance(
             nodeId,
             userWalletAddress
           );
           balanceTotal += balance.toNumber();
+          atLeastOneTokenAddress = false;
         } catch (e) {
           console.log(
             "Couldn't get balance for chainNodeId ",
@@ -90,14 +89,17 @@ const bulkBalances = async (
           );
         }
       }
-      balances[nodeId] = balanceTotal;
+      if (atLeastOneTokenAddress) {
+        balances[nodeId] = balanceTotal;
+      }
     } else {
       const tokenBalances: { [tokenAddress: string]: number } = {};
+      let atLeastOneTokenAddress = false;
+
       // Build token balances for each address
       for (const tokenAddress of tokenAddresses) {
         let balanceTotal = 0;
         for (const userWalletAddress of profileWalletAddresses) {
-          // TODO: Check wallet against chain node
           try {
             // TODO: Needs to change to support 721 and spl-token when Zak contracts table is merged
             const balance = await tokenBalanceCache.getBalance(
@@ -107,6 +109,7 @@ const bulkBalances = async (
               'erc20'
             );
             balanceTotal += balance.toNumber();
+            atLeastOneTokenAddress = true;
           } catch (e) {
             console.log(
               "Couldn't get balance for token address",
@@ -118,10 +121,15 @@ const bulkBalances = async (
             );
           }
         }
-        tokenBalances[tokenAddress] = balanceTotal;
+        if (atLeastOneTokenAddress) {
+          tokenBalances[tokenAddress] = balanceTotal;
+        }
       }
 
-      balances[nodeId] = tokenBalances;
+      // Ensure we had some valid lookups
+      if (Object.keys(tokenBalances).length > 0) {
+        balances[nodeId] = tokenBalances;
+      }
     }
   }
 

@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import { Tag } from 'construct-ui';
-import $ from 'jquery';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
@@ -100,32 +99,6 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
             m.redraw();
           }}
           label="View more communities"
-        />
-        <CWButton
-          onclick={async () => {
-            const res = await $.ajax({
-              url: 'http://localhost:8080/api/bulkBalances',
-              type: 'POST',
-              data: JSON.stringify({
-                profileId: 44486,
-                chainNodes: {
-                  37: [
-                    '0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F',
-                    '0x383518188C0C6d7730D91b2c03a03C837814a899',
-                  ],
-                  38: ['0x04F2694C8fcee23e8Fd0dfEA1d4f5Bb8c352111F'],
-                  20: [],
-                },
-              }),
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json',
-              success() {
-                console.log('success');
-              },
-            });
-            console.log('ress', res);
-          }}
-          label="test"
         />
       </div>
     );
