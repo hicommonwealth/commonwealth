@@ -160,22 +160,9 @@ class SubstrateDemocracyProposal extends Proposal<
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    if (!this._completed) {
-      const slug = chainEntityTypeToProposalSlug(entity.type);
-      const uniqueId = `${slug}_${entity.typeId}`;
-      this._Proposals.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this.title = response.result;
-        }
-        this._initialized = true;
-        this.updateVoters();
-        this._Proposals.store.add(this);
-      });
-    } else {
-      this._initialized = true;
-      this.updateVoters();
-      this._Proposals.store.add(this);
-    }
+    this._initialized = true;
+    this.updateVoters();
+    this._Proposals.store.add(this);
   }
 
   protected complete() {
