@@ -16,14 +16,15 @@ const updateChainEntityTitle = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
-  const { title, chain_entity_id } = req.body;
 
+  const { title, chain_entity_id } = req.body;
   const entity = await models.ChainEntityMeta.findOne({
     where: {
       ce_id: chain_entity_id
     }
   })
   if (!entity) return next(new Error(Errors.NoEntity));
+
   const userOwnedAddressObjects = (await req.user.getAddresses()).filter(
     (addr) => !!addr.verified
   );

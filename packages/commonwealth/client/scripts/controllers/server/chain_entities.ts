@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import $ from "jquery";
 
-import { ChainEntityStore } from "stores";
-import { ChainBase, ChainNetwork } from "common-common/src/types";
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from "models";
+import {ChainEntityStore} from "stores";
+import {ChainBase, ChainNetwork} from "common-common/src/types";
+import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from "models";
 import app from "state";
 import {
   CWEvent,
@@ -15,9 +15,8 @@ import {
   getUniqueEntityKey,
   IChainEntityKind
 } from "chain-events/src";
-import { notifyError } from "../app/notifications";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
-import { getBaseUrl, ServiceUrls } from "helpers/getUrl";
+import {notifyError} from "../app/notifications";
+import {getBaseUrl, ServiceUrls} from "helpers/getUrl";
 
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -40,7 +39,7 @@ const get = (route, args, callback) => {
   }).catch((e) => console.error(e));
 };
 
-async function getFetch(url: string, queryParams?: {[key: string]: any}) {
+async function getFetch(url: string, queryParams?: { [key: string]: any }) {
   let queryUrl;
   if (queryParams) queryUrl = url + new URLSearchParams(queryParams);
   try {
@@ -64,7 +63,10 @@ type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
+
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
@@ -93,7 +95,7 @@ class ChainEntityController {
   }
 
   public async refresh(chain: string) {
-    const options: any = { chain };
+    const options: any = {chain};
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
@@ -128,7 +130,7 @@ class ChainEntityController {
 
   public registerEntityHandler(type: IChainEntityKind, fn: EntityHandler) {
     if (!this._handlers[type]) {
-      this._handlers[type] = [ fn ];
+      this._handlers[type] = [fn];
     } else {
       this._handlers[type].push(fn);
     }
@@ -144,7 +146,7 @@ class ChainEntityController {
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
-      const [ entityKind ] = eventEntity;
+      const [entityKind] = eventEntity;
       // create event type
       const eventType = new ChainEventType(
         `${chain}-${cwEvent.data.kind.toString()}`,
@@ -198,21 +200,19 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
-    const chainEntity = proposalIdToEntity(app, app.activeChainId(), uniqueIdentifier);
+    const chainEntity = this.store.getByUniqueId(app.activeChainId(), uniqueIdentifier);
+    if (!chainEntity) console.error("Cannot update title for non-existent entity")
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         'jwt': app.user.jwt,
-        'chain_entity_id': chainEntity?.id,
+        'chain_entity_id': chainEntity.id,
         'title': title,
         'chain': app.activeChainId(),
       },
       success: (response) => {
-        const entity = ChainEntity.fromJSON(response.result);
-        this._store.remove(entity);
-        this._store.add(entity);
-        return entity;
+        chainEntity.title = title;
       },
       error: (err) => {
         notifyError('Could not set entity title');

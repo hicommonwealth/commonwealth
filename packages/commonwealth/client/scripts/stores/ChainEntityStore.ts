@@ -65,9 +65,8 @@ class ChainEntityStore extends Store<ChainEntity> {
    *                 type and type_id e.g. type = 'treasury-proposal' and type_id = '10'.
    */
   public getByUniqueId(chain: string, uniqueId: string) {
-    console.log(`Looking up proposal: ${chain}: ${uniqueId}`);
-    const [prefix, type_id] = uniqueId.split('_');
-    const type = proposalSlugToChainEntityType(<ProposalType>prefix);
+    const [slug, type_id] = uniqueId.split('_');
+    const type = proposalSlugToChainEntityType(<ProposalType>slug);
 
     const entities = this.getByType(type, true);
     for (const entity of entities) {

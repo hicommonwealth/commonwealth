@@ -197,7 +197,7 @@ export const ProposalTitleSaveEdit: m.Component<{
                 proposal.uniqueIdentifier,
                 parentState.updatedTitle
               )
-              .then((response) => {
+              .then(() => {
                 m.route.set(proposalLink);
                 parentState.editing = false;
                 parentState.saving = false;
