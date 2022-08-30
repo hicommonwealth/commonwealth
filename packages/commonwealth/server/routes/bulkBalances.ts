@@ -5,9 +5,11 @@ import { AppError, ServerError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 
 enum BulkBalancesErrors {
+  InvalidToken = 'Invalid token',
   NoProfileId = 'No profileId provided',
   NoProfile = "Profile doesn't exist",
   NoRegisteredAddresses = 'No wallet addresses registered to this profile',
+  Failed = 'Request Failed',
 }
 
 // ----------- OUTSTANDING QUESTIONS -----------
@@ -16,6 +18,7 @@ enum BulkBalancesErrors {
 
 type bulkBalanceReq = {
   profileId: number;
+  token: string;
   chainNodes: {
     [nodeId: number]: string | string[];
   };
@@ -35,7 +38,14 @@ const bulkBalances = async (
   req: TypedRequestBody<bulkBalanceReq>,
   res: TypedResponse<bulkBalanceResp>
 ) => {
-  const { profileId, chainNodes } = req.body;
+  const { profileId, chainNodes, token } = req.body;
+
+  if (!process.env.DISCORD_BOT_TOKEN)
+    throw new AppError(BulkBalancesErrors.Failed);
+
+  if (!token || token !== process.env.DISCORD_BOT_TOKEN)
+    throw new AppError(BulkBalancesErrors.InvalidToken);
+
   if (!profileId) throw new AppError(BulkBalancesErrors.NoProfileId);
 
   const profile = await models.Profile.findOne({
