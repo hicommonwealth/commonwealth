@@ -673,7 +673,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/:scope/new/project': importRoute(
               'views/pages/projects/create_project_form.tsx',
-              { scoped: true, hideSidebar: true }
+              { scoped: true, hideSidebar: true, deferChain: true }
             ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {

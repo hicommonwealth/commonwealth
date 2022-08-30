@@ -52,6 +52,7 @@ export default class WebWalletController {
         wallet_id: wallet,
         jwt: app.user.jwt
       });
+      account.setWalletId(wallet);
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
     }
