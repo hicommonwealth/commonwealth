@@ -12,10 +12,8 @@
     display: flex;
     justify-content: space-between;
     padding: 8px 8px 8px 16px;
-
-    .title-text {
-      font-size: 18px;
-      font-weight: 600;
+    svg {
+      color: $neutral-500;
     }
   }
 
