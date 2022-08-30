@@ -13,6 +13,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 class SidebarQuickSwitcherItem
   implements m.ClassComponent<{ item: ChainInfo }>
@@ -51,19 +52,11 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
-          <Button
-            rounded={true}
-            label={<CWIcon iconName="home" iconSize="small" />}
-            onclick={(e) => {
-              e.preventDefault();
-              m.route.set(app.isLoggedIn() ? '/dashboard/for-you' : '/');
-            }}
-          />
           <CommunitySelector />
           {app.isLoggedIn() && (
-            <Button
-              rounded={true}
-              label={<CWIcon iconName="plus" iconSize="small" />}
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
               onclick={(e) => {
                 e.preventDefault();
                 mixpanelBrowserTrack({
