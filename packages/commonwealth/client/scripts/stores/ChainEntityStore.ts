@@ -2,6 +2,8 @@ import { IChainEntityKind } from 'chain-events/src';
 
 import { ChainEntity } from '../models';
 import Store from './Store';
+import {proposalSlugToChainEntityType} from "identifiers";
+import {ProposalType} from "common-common/src/types";
 
 class ChainEntityStore extends Store<ChainEntity> {
   private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } = { };
@@ -54,6 +56,25 @@ class ChainEntityStore extends Store<ChainEntity> {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the entity that matches the given chain and uniqueId
+   * @param chain
+   * @param uniqueId A root id e.g. 'treasuryproposal_10'. Note the uniqueId given is not the same as the chain-entity
+   *                 type and type_id e.g. type = 'treasury-proposal' and type_id = '10'.
+   */
+  public getByUniqueId(chain: string, uniqueId: string) {
+    console.log(`Looking up proposal: ${chain}: ${uniqueId}`);
+    const [prefix, type_id] = uniqueId.split('_');
+    const type = proposalSlugToChainEntityType(<ProposalType>prefix);
+
+    const entities = this.getByType(type, true);
+    for (const entity of entities) {
+      if (entity.chain == chain && entity.typeId == type_id) {
+        return entity;
+      }
+    }
   }
 }
 

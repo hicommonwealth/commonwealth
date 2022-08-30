@@ -95,26 +95,24 @@ class ChainEntityController {
   public async refresh(chain: string) {
     const options: any = { chain };
 
-    // TODO: do in parallel and consolidate when both return
     // load the chain-entity objects
-    const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents), options);
-    if (entities) {
-      for (const entityJSON of entities) {
-        const entity = ChainEntity.fromJSON(entityJSON);
-        this._store.add(entity);
-      }
+    const [entities, entityMetas] = await Promise.all([
+      getFetch(getBaseUrl(ServiceUrls.chainEvents), options),
+      getFetch(getBaseUrl(), options)
+    ]);
+
+    // save the chain-entity objects in the store
+    for (const entityJSON of entities) {
+      const entity = ChainEntity.fromJSON(entityJSON);
+      this._store.add(entity);
     }
 
-    // load the commonwealth chain-entity metadata and populate the existing
-    // entities in the store with it
-    const entityMetas = await getFetch(getBaseUrl());
-    if (entityMetas) {
-      for (const entityMetaJSON of entityMetas) {
-        const entity = this._store.getById(entityMetaJSON.ce_id);
-        if (entity) {
-          entity.title = entityMetaJSON.title;
-          entity.threadId = entityMetaJSON.thread_id;
-        }
+    // save chain-entity metadata to the appropriate chain-entity
+    for (const entityMetaJSON of entityMetas) {
+      const entity = this._store.getById(entityMetaJSON.ce_id);
+      if (entity) {
+        entity.title = entityMetaJSON.title;
+        entity.threadId = entityMetaJSON.thread_id;
       }
     }
   }
@@ -138,16 +136,6 @@ class ChainEntityController {
 
   public clearEntityHandlers(): void {
     this._handlers = {};
-  }
-
-  public async _fetchTitle(chain_entity_id: number): Promise<any> {
-    try {
-      return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-        chain_entity_id
-      });
-    } catch (e) {
-      return { status: 'Failed' };
-    }
   }
 
   private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {

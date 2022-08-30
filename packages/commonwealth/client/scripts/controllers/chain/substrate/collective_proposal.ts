@@ -120,20 +120,9 @@ export class SubstrateCollectiveProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    if (!this._completed) {
-      this._Chain.app.chain.chainEntities._fetchTitle(entity.id).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this.title = response.result;
-        }
-      });
-      this._initialized = true;
-      this.updateVoters();
-      this._Collective.store.add(this);
-    } else {
-      this._initialized = true;
-      this.updateVoters();
-      this._Collective.store.add(this);
-    }
+    this._initialized = true;
+    this.updateVoters();
+    this._Collective.store.add(this);
   }
 
   protected complete() {
