@@ -7,13 +7,13 @@ import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from "models";
 import app from "state";
 import {
   CWEvent,
-  entityToFieldName,
   eventToEntity,
-  IChainEntityKind,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
-  SupportedNetwork
+  SupportedNetwork,
+  getUniqueEntityKey,
+  IChainEntityKind
 } from "chain-events/src";
 import { notifyError } from "../app/notifications";
 import proposalIdToEntity from "helpers/proposalIdToEntity";
@@ -169,7 +169,7 @@ class ChainEntityController {
       const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
 
       // create entity
-      const fieldName = entityToFieldName(network, entityKind);
+      const fieldName = getUniqueEntityKey(network, entityKind);
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
