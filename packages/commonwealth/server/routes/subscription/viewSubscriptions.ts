@@ -19,7 +19,12 @@ export default async (
     {
       model: models.Thread,
       as: 'Thread',
-      include: [models.Address],
+      include: [
+        {
+          model: models.Address,
+          as: 'Address',
+        },
+      ],
     },
     {
       model: models.Comment,
@@ -29,6 +34,10 @@ export default async (
     {
       model: models.ChainEventType,
       as: 'ChainEventType',
+    },
+    {
+      model: models.Chain,
+      as: 'Chain',
     },
   ];
 
