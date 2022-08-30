@@ -1,71 +1,19 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ThreadSelector {
-  padding: 0;
+  border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
-  margin: 10px 0 20px;
-  border-radius: 5px;
-  .cui-control-group {
-    margin-bottom: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .cui-input {
-    width: calc(100% - 1px);
-    input {
-      border-top: none;
-      border-right: none;
-      border-left: none;
-      border-bottom-color: $neutral-100;
-      height: 44px;
-      border-radius: 0;
-      padding: 22px 14px 15.6px;
-    }
-  }
+  margin-bottom: 16px;
+
   .cui-list {
-    min-height: 150px;
-    max-height: 150px;
-    border-radius: 5px;
-    .cui-active {
-      background: initial;
-    }
     .cui-list-item {
-      padding-left: 14px;
-      padding-right: 14px;
-      border-bottom: 1px solid $neutral-100;
-      .linked-thread-info {
-        .linked-thread-top {
-          font-weight: 500;
-        }
-        .linked-thread-bottom {
-          font-size: 88%;
-          font-weight: 400;
-          color: darkgray;
-        }
-      }
-      &:last-child {
-        border-bottom: none;
+      padding: 8px 16px 8px 48px;
+
+      .thread-preview-row {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
     }
-  }
-  .cui-query-list-empty {
-    position: relative;
-    top: 50px;
-    bottom: 50px;
-    .cui-query-list-message {
-      text-align: center;
-    }
-  }
-  .cui-query-list-checkmark .cui-list-item-content-left {
-    position: unset;
-    left: 0;
-  }
-  .linked-threads-selector-placeholder {
-    padding: 112px 0;
-    text-align: center;
-  }
-  .linked-threads-selector-placeholder-text {
-    height: 30px;
-    color: $neutral-600;
   }
 }

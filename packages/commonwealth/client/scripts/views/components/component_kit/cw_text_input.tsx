@@ -10,7 +10,7 @@ import { CWLabel } from './cw_label';
 import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
-import { CWAvatar } from './cw_avatar';
+import { CWIconButton } from './cw_icon_button';
 
 type TextInputSize = 'small' | 'large';
 
@@ -19,7 +19,8 @@ export type TextInputAttrs = {
   autofocus?: boolean;
   containerClassName?: string;
   value?: string;
-  iconRight?: string | CWAvatar;
+  iconRight?: string;
+  iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   maxlength?: number;
@@ -92,6 +93,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       value,
       disabled,
       iconRight,
+      iconRightonclick,
       inputClassName,
       inputValidationFn,
       label,
@@ -180,18 +182,22 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             }}
             value={value}
           />
-          {!!iconRight &&
-            !disabled &&
-            (typeof iconRight === 'string' ? (
-              <CWIcon
+          {iconRightonclick && !!iconRight && !disabled ? (
+            <div class="text-input-right-onclick-icon">
+              <CWIconButton
                 iconName={iconRight}
                 iconSize="small"
-                className="text-input-right-icon"
+                onclick={iconRightonclick}
+                theme="primary"
               />
-            ) : (
-              // Custom icons and avatars passed in should typically be 24x24
-              <div class="text-input-right-icon">{iconRight}</div>
-            ))}
+            </div>
+          ) : !!iconRight && !disabled ? (
+            <CWIcon
+              iconName={iconRight}
+              iconSize="small"
+              className="text-input-right-icon"
+            />
+          ) : null}
         </div>
       </div>
     );

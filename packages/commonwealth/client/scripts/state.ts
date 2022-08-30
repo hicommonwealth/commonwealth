@@ -18,7 +18,8 @@ import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
-import UserController from './controllers/server/user/index';
+import { UserController } from './controllers/server/user';
+import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import ProjectsController from './controllers/chain/ethereum/commonwealth/projects';
@@ -66,6 +67,7 @@ export interface IApp {
 
   // User
   user: UserController;
+  roles: RolesController;
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
 
@@ -107,6 +109,11 @@ export interface IApp {
   cachedIdentityWidget: any; // lazy loaded substrate identity widget
 }
 
+// INJECT DEPENDENCIES
+const user = new UserController();
+const roles = new RolesController(user);
+
+// INITIALIZE MAIN APP
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
@@ -145,7 +152,8 @@ const app: IApp = {
   projects: new ProjectsController(),
 
   // User
-  user: new UserController(),
+  user,
+  roles,
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
 

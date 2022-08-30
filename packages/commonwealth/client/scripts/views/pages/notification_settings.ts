@@ -953,7 +953,7 @@ const NotificationSettingsPage: m.Component<
     );
 
     // initialize vnode.state.communities
-    const selectableCommunityIds = app.user.roles
+    const selectableCommunityIds = app.roles.roles
       .filter((role) => role.chain_id)
       .map((r) => r.chain_id);
     vnode.state.communities = _.uniq(
@@ -977,7 +977,7 @@ const NotificationSettingsPage: m.Component<
       vnode.state.selectableCommunityIds.push(c.name)
     );
     const chains = _.uniq(app.config.chains.getAll());
-    const chainsWithRole = app.user.roles.map((r) => r.chain_id);
+    const chainsWithRole = app.roles.roles.map((r) => r.chain_id);
     chains.forEach((c) => {
       if (chainsWithRole.includes(c.id))
         vnode.state.selectableCommunityIds.push(c.name);

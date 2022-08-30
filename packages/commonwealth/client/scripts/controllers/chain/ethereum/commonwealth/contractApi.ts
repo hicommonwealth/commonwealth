@@ -12,7 +12,7 @@ export type ContractFactoryT<ContractT> = (
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
-  sender: Account<any>,
+  sender: Account,
   contract?: CT,
   factory?: ContractFactoryT<CT>,
   address?: string,

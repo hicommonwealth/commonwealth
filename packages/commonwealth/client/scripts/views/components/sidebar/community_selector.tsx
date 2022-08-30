@@ -14,7 +14,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
   if (item instanceof ChainInfo) {
-    roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
+    roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
   }
 
   return (
@@ -40,13 +40,14 @@ const renderCommunity = (item) => {
             }}
           >
             {roles.map((role) => {
+              // TODO: sometimes address_chain is null here -- why??
               return m(User, {
                 avatarSize: 18,
                 avatarOnly: true,
                 user: new AddressInfo(
-                  null,
+                  role.address_id,
                   role.address,
-                  role.address_chain,
+                  role.address_chain || role.chain_id,
                   null
                 ),
               });
@@ -91,7 +92,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
 
     const isInCommunity = (item) => {
       if (item instanceof ChainInfo) {
-        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
+        return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
       } else {
         return false;
       }

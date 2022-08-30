@@ -1,7 +1,9 @@
+import { AddressInfo } from 'models';
 import RolePermission from './RolePermission';
 
 class RoleInfo {
   public readonly id: number;
+  public readonly Address?: AddressInfo;
   public readonly address_id: number;
   public readonly address: string;
   public readonly address_chain: string;

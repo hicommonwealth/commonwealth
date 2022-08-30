@@ -56,6 +56,7 @@ export enum WalletId {
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
+  KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',

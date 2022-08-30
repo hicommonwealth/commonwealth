@@ -1,6 +1,6 @@
 declare let window: any;
 
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
@@ -12,6 +12,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   public readonly name = WalletId.Phantom;
   public readonly label = 'Phantom';
   public readonly chain = ChainBase.Solana;
+  public readonly defaultNetwork = ChainNetwork.Solana;
 
   public get available() {
     return window.solana && window.solana.isPhantom;
@@ -29,7 +30,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     const encodedMessage = new TextEncoder().encode(account.validationToken);
     const { signature } = await window.solana.signMessage(encodedMessage, 'utf8');
     const signedMessage = Buffer.from(signature as Uint8Array).toString('base64');

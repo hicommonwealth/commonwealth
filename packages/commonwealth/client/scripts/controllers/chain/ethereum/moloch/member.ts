@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { IApp } from 'state';
+import app, { IApp } from 'state';
 
 import { MolochShares } from 'adapters/chain/ethereum/types';
 import { IMolochMember } from 'adapters/chain/moloch/types';
@@ -44,14 +44,14 @@ export default class MolochMember extends EthereumAccount {
   }
 
   constructor(
-    app: IApp,
+    _app: IApp,
     ChainInfo: EthereumChain,
     Accounts: EthereumAccounts,
     Members: MolochMembers,
     address: string,
     data?: IMolochMember
   ) {
-    super(app, ChainInfo, Accounts, address);
+    super(_app, ChainInfo, Accounts, address);
     this._Members = Members;
     if (data) {
       if (address !== data.id) {
@@ -97,11 +97,7 @@ export default class MolochMember extends EthereumAccount {
   }
 
   public async updateDelegateKeyTx(delegateKey: string) {
-    const contract = await attachSigner(
-      this.app.wallets,
-      this,
-      this._Members.api.Contract
-    );
+    const contract = await attachSigner(app.wallets, this, this._Members.api.Contract);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('caller must be member');
     }
@@ -139,11 +135,7 @@ export default class MolochMember extends EthereumAccount {
   }
 
   public async ragequitTx(sharesToBurn: BN) {
-    const contract = await attachSigner(
-      this.app.wallets,
-      this,
-      this._Members.api.Contract
-    );
+    const contract = await attachSigner(app.wallets, this, this._Members.api.Contract);
     if (!(await this._Members.isMember(this.address))) {
       throw new Error('sender must be member');
     }
