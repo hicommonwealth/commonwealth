@@ -78,10 +78,10 @@ class NotificationSettingsPage implements m.ClassComponent {
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
         <div class="NotificationSettingsPage">
-          <CWText type="h3" fontWeight="semiBold">
+          <CWText type="h3" fontWeight="semiBold" className="page-header-text">
             Notification Settings
           </CWText>
-          <CWText>
+          <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
@@ -103,21 +103,21 @@ class NotificationSettingsPage implements m.ClassComponent {
             <CWText
               type="h5"
               fontWeight="medium"
-              className="column-header-text"
+              className="last-column-header-text"
             >
               In-App Notifications
             </CWText>
           </div>
-          {this.subscriptions.length === 0
-            ? null
-            : Object.entries(bundledSubs).map(([k, v]) => {
-                const chainInfo = app.config.chains.getById(k);
+          {Object.entries(bundledSubs).map(([k, v]) => {
+            const chainInfo = app.config.chains.getById(k);
 
-                return (
-                  <div class="notification-row">
-                    <CWCollapsible
-                      headerContent={
-                        <>
+            return (
+              <div class="notification-row">
+                <CWCollapsible
+                  headerContent={
+                    <div class="notification-row-header">
+                      <div className="left-content-container">
+                        <div class="avatar-and-name">
                           <CWCommunityAvatar
                             size="medium"
                             community={chainInfo}
@@ -125,73 +125,116 @@ class NotificationSettingsPage implements m.ClassComponent {
                           <CWText type="h5" fontWeight="medium">
                             {chainInfo.name}
                           </CWText>
-                          <CWText>{v.length} subscriptions</CWText>
-                          <CWCheckbox label="Receive Emails" />
-                          <CWToggle />
-                        </>
-                      }
-                      collapsibleContent={
-                        <div>
-                          <CWText type="caption">Title</CWText>
-                          <CWText type="caption">Published</CWText>
-                          <CWText type="caption">Subscribed</CWText>
-                          <CWText type="caption">Author</CWText>
-                          {v.map((sub) => {
-                            return (
-                              <div>
-                                <CWIcon iconName="feedback" iconSize="small" />
-                                {/* if thread */}
-                                {sub.Thread &&
-                                  renderQuillTextBody(sub.Thread.title, {
-                                    collapse: true,
-                                  })}
-                                {sub.Thread &&
-                                  renderQuillTextBody(sub.Thread.body, {
-                                    collapse: true,
-                                  })}
-                                {sub.Thread &&
-                                  formatTimestamp(moment(sub.Thread.createdAt))}
-                                {/* if comment */}
+                        </div>
+                        <CWText type="b2" className="subscriptions-count-text">
+                          {v.length} subscriptions
+                        </CWText>
+                      </div>
+                      <CWCheckbox label="Receive Emails" />
+                      <CWToggle />
+                    </div>
+                  }
+                  collapsibleContent={
+                    <div class="subscriptions-list-container">
+                      <div class="subscriptions-list-header">
+                        <CWText
+                          type="caption"
+                          className="subscription-list-header-text"
+                        >
+                          Title
+                        </CWText>
+                        <CWText
+                          type="caption"
+                          className="subscription-list-header-text"
+                        >
+                          Published
+                        </CWText>
+                        <CWText
+                          type="caption"
+                          className="subscription-list-header-text"
+                        >
+                          Subscribed
+                        </CWText>
+                        <CWText
+                          type="caption"
+                          className="subscription-list-header-text"
+                        >
+                          Author
+                        </CWText>
+                      </div>
+                      {v.map((sub) => {
+                        console.log(sub.Thread);
+                        return (
+                          <div class="subscription-row">
+                            <div class="icon-and-text-container">
+                              <CWIcon iconName="feedback" iconSize="small" />
+                              <div class="title-and-body-container">
+                                {sub.Thread && (
+                                  <CWText type="b2" fontWeight="bold" noWrap>
+                                    {renderQuillTextBody(sub.Thread.title, {
+                                      collapse: true,
+                                      hideFormatting: true,
+                                    })}
+                                  </CWText>
+                                )}
+                                {sub.Thread && (
+                                  <CWText
+                                    type="caption"
+                                    className="subscription-body-text"
+                                    noWrap
+                                  >
+                                    {renderQuillTextBody(sub.Thread.body, {
+                                      collapse: true,
+                                    })}
+                                  </CWText>
+                                )}
                                 {sub.Comment &&
                                   renderQuillTextBody(sub.Comment.text, {
                                     collapse: true,
                                   })}
-                                {sub.Comment &&
-                                  formatTimestamp(
-                                    moment(sub.Comment.created_at)
-                                  )}
-                                {formatTimestamp(moment(sub.createdAt))}
-                                {/* {m(User, { user: ? })} */}
-                                <CWPopoverMenu
-                                  trigger={
-                                    <CWIconButton iconName="dotsVertical" />
-                                  }
-                                  popoverMenuItems={[
-                                    {
-                                      label: 'Mute Thread',
-                                      iconName: 'mute',
-                                      onclick: () =>
-                                        console.log('mute thread clicked'),
-                                    },
-                                    { type: 'divider' },
-                                    {
-                                      label: 'Unsubscribe',
-                                      iconName: 'close',
-                                      isSecondary: true,
-                                      onclick: () =>
-                                        console.log('unsubscribe clicked'),
-                                    },
-                                  ]}
-                                />
                               </div>
-                            );
-                          })}
-                        </div>
-                      }
-                    />
-                  </div>
-                );
-              })}
+                            </div>
+
+                            <CWText type="b2">
+                              {sub.Thread &&
+                                formatTimestamp(moment(sub.Thread.createdAt))}
+                            </CWText>
+                            <CWText type="b2">
+                              {sub.Comment &&
+                                formatTimestamp(moment(sub.Comment.created_at))}
+                              {formatTimestamp(moment(sub.createdAt))}
+                            </CWText>
+
+                            {/* {m(User, { user: ? })} */}
+
+                            <CWPopoverMenu
+                              trigger={<CWIconButton iconName="dotsVertical" />}
+                              popoverMenuItems={[
+                                {
+                                  label: 'Mute Thread',
+                                  iconName: 'mute',
+                                  onclick: () =>
+                                    console.log('mute thread clicked'),
+                                },
+                                { type: 'divider' },
+                                {
+                                  label: 'Unsubscribe',
+                                  iconName: 'close',
+                                  isSecondary: true,
+                                  onclick: () =>
+                                    console.log('unsubscribe clicked'),
+                                },
+                              ]}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  }
+                />
+              </div>
+            );
+          })}
         </div>
       </Sublayout>
     );

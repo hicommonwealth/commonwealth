@@ -1,20 +1,118 @@
 @import 'shared';
 
+@mixin subBundleColumns {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+@mixin subColumns {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
+}
+
 .NotificationSettingsPage {
   flex: 1;
-  padding: 24px;
+  padding: 24px 176px;
+
+  .page-header-text.Text {
+    margin-bottom: 16px;
+  }
+
+  .page-subheader-text.Text {
+    margin-bottom: 40px;
+  }
 
   .column-header-row {
-    display: flex;
+    @include subBundleColumns;
+
+    border-bottom: 1px solid $neutral-200;
+    padding: 0 0 8px 40px;
 
     .column-header-text.Text {
       color: $neutral-500;
+    }
+
+    .last-column-header-text.Text {
+      color: $neutral-500;
+      justify-self: end;
     }
   }
 
   .notification-row {
     align-items: center;
+    border-bottom: 1px solid $neutral-100;
     display: flex;
     gap: 16px;
+
+    .notification-row-header {
+      @include subBundleColumns;
+
+      height: 80px;
+      width: 100%;
+
+      .left-content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .avatar-and-name {
+          align-items: center;
+          display: flex;
+          gap: 4px;
+        }
+
+        .subscriptions-count-text.Text {
+          color: $neutral-500;
+          margin-left: 28px;
+        }
+      }
+
+      .Toggle {
+        align-self: center;
+        justify-self: end;
+      }
+    }
+
+    .subscriptions-list-container {
+      display: flex;
+      flex-direction: column;
+
+      .subscriptions-list-header {
+        @include subColumns;
+
+        border-bottom: 1px solid $neutral-100;
+        padding-bottom: 4px;
+
+        .subscription-list-header-text.Text {
+          color: $neutral-500;
+        }
+      }
+
+      .subscription-row {
+        @include subColumns;
+
+        align-items: center;
+        height: 72px;
+
+        .icon-and-text-container {
+          display: flex;
+
+          .Icon {
+            margin-top: 2px;
+          }
+
+          .title-and-body-container {
+            display: flex;
+            flex-direction: column;
+            margin-left: 12px;
+            width: 448px;
+
+            .subscription-body-text.Text {
+              color: $neutral-600;
+            }
+          }
+        }
+      }
+    }
   }
 }
