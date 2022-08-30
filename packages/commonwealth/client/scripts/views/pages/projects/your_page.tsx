@@ -2,152 +2,83 @@
 import 'pages/projects/index.scss';
 
 import m from 'mithril';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { Spinner } from 'construct-ui';
+import Web3 from 'web3';
 import ProjectCard, { ProjectCardSize } from './project_card';
-import { createNewDummyProject } from './dummy_project';
+import { ChainNetwork } from '../../../../../../common-common/src/types';
 
-export default class YourPage implements m.ClassComponent {
-  // private supportedProjects: Project[];
-  // private userProjects: Project[];
-
-  private totalSupportedProjects = 0;
+export default class YourPage
+  implements m.ClassComponent<{ currentBlockNum: number }>
+{
+  // TODO v2: These counts will be used for pagination or scroll
+  private totalActiveProjects = 0;
   private totalEndedProjects = 0;
   private supportedProjectsDisplayed = 6;
   private endedProjectsDisplayed = 6;
 
-  getDummyYoursPageProjects(): Project[] {
-    return [
-      createNewDummyProject({ isAuthor: true }),
-      createNewDummyProject({ isBacker: true }),
-      createNewDummyProject({ isCurator: true }),
-      createNewDummyProject({ isAuthor: true }),
-      createNewDummyProject({ isAuthor: true, isFailed: true }),
-      createNewDummyProject({ isCurator: true, isSucceeded: true }),
-    ];
-  }
-
-  // TODO: These split-up methods are ~legacy from a previous design iteration where
-  //       support types were placed in different sections
-  getAuthoredProjects(): Project[] {
-    const allProjects: Project[] = [];
-    app.user.addresses.forEach(({ address, chain }) => {
-      app.projects.store
-        .getAll()
-        .filter((project) => project.isAuthor(address, chain))
-        .forEach((project) => allProjects.push(project));
-    });
-    // TODO filter by current
-    return allProjects;
-  }
-
-  getSupportedProjects(): Project[] {
-    const allProjects: Project[] = [];
+  // TODO v2: Ended projects will be omitted from supported & authored projects,
+  // which will be scoped to Active (vs Inactive)
+  getAllUserProjects(): Project[] {
+    const allUserProjects: Project[] = [];
     app.user.addresses.forEach(({ address, chain }) => {
       app.projects.store
         .getAll()
         .filter(
           (project) =>
+            project.isAuthor(address, chain) ||
             project.isBacker(address, chain) ||
             project.isCurator(address, chain)
         )
-        .forEach((project) => allProjects.push(project));
+        .forEach((project) => allUserProjects.push(project));
     });
-    this.totalSupportedProjects = allProjects.length;
-    // TODO filter by current
-    return allProjects
-      .sort((a, b) => a.createdAt.diff(b.createdAt))
-      .slice(0, this.supportedProjectsDisplayed);
+    return allUserProjects;
   }
 
-  getEndedProjects() {
-    const allProjects: Project[] = [];
-    app.user.addresses.forEach(({ address, chain }) => {
-      app.projects.store
-        .getAll()
-        .filter(
-          (project) =>
-            project.isBacker(address, chain) ||
-            project.isCurator(address, chain)
-        )
-        .forEach((project) => allProjects.push(project));
-    });
-    this.totalEndedProjects = allProjects.length;
-    return allProjects
-      .sort((a, b) => a.createdAt.diff(b.createdAt))
-      .slice(0, this.endedProjectsDisplayed);
-    return [];
+  getActiveProjects(currentBlockNum): Project[] {
+    const activeProjects = this.getAllUserProjects().filter(
+      (p: Project) => !p.isEnded(currentBlockNum)
+    );
+    this.totalActiveProjects = activeProjects.length;
+    return activeProjects.sort((a, b) => a.createdAt.diff(b.createdAt));
+    // .slice(0, this.supportedProjectsDisplayed);
   }
 
-  view() {
+  getEndedProjects(currentBlockNum) {
+    const endedProjects = this.getAllUserProjects().filter((p: Project) =>
+      p.isEnded(currentBlockNum)
+    );
+    this.totalEndedProjects = endedProjects.length;
+    return endedProjects.sort((a, b) => a.createdAt.diff(b.createdAt));
+    // .slice(0, this.endedProjectsDisplayed);
+  }
+
+  view(vnode) {
     if (!app.isLoggedIn()) {
       m.route.set(`/projects/explore`);
       return;
     }
-    const exploreProjects = this.getDummyYoursPageProjects().map((project) => (
+    if (!app.projects.initialized()) {
+      return (
+        <div class="YourPage">
+          <Spinner active={true} fill={true} size="xl" />
+        </div>
+      );
+    }
+
+    const userProjects = this.getActiveProjects(
+      vnode.attrs.currentBlockNum
+    ).map((project) => (
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
+
+    // web3.eth.getBlock().then(());
+
     return (
       <div class="YourPage">
-        <div class="projects-listing">{exploreProjects}</div>
+        <div class="projects-listing">{userProjects}</div>
       </div>
     );
   }
 }
-
-// OLD YOUR PAGE CODE FR PREVIOUS DESIGN ITERATION
-/* <CWText type="h1">Your Projects</CWText>
-<div class="projects-listing">
-  {this.getAuthoredProjects().map((project) => (
-    <ProjectCard project={project} size={ProjectCardSize.Large} />
-  ))}
-  <CWButton
-    buttonType="secondary"
-    label="Manage"
-    onclick={() =>
-      app.modals.create({
-        modal: SupportProjectModal,
-        // TODO: Real project attr
-        data: { project: null, supportType: 'curate' },
-      })
-    }
-  />
-</div>
-<CWText type="h1">Backed and Curated</CWText>
-<div class="projects-wrap">
-  <div class="projects-listing">
-    {this.getSupportedProjects().map((project) => (
-      <ProjectCard project={project} size={ProjectCardSize.Medium} />
-    ))}
-  </div>
-  <CWButton
-    label="Show More"
-    buttonType="secondary"
-    disable={
-      this.supportedProjectsDisplayed >= this.totalSupportedProjects
-    }
-    onclick={() => {
-      this.supportedProjectsDisplayed += 6;
-      console.log(this.supportedProjectsDisplayed);
-    }}
-  />
-</div>
-<CWText type="h1">Ended Projects</CWText>
-<div class="projects-wrap">
-  <div class="projects-listing">
-    {this.getEndedProjects().map((project) => (
-      <ProjectCard project={project} size={ProjectCardSize.Small} />
-    ))}
-  </div>
-  <CWButton
-    label="Show More"
-    buttonType="secondary"
-    disable={this.endedProjectsDisplayed >= this.totalEndedProjects}
-    onclick={() => {
-      this.endedProjectsDisplayed += 6;
-      console.log(this.endedProjectsDisplayed);
-    }}
-  />
-</div> */

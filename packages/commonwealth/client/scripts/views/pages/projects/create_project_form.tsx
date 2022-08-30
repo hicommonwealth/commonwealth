@@ -18,6 +18,7 @@ import Web3 from 'web3';
 import CoverImageUpload from './cover_image_upload';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -28,7 +29,6 @@ const WethUrl =
 // See logic in create_project_form inputValidationFn (on each text input) + final 'submit' button functionality,
 // especially in conjunction with new `oninput` attr
 export const validateProjectForm = (property: string, value: string) => {
-  console.log(property, value);
   if (!value)
     return [
       'failure',
@@ -54,13 +54,12 @@ export const validateProjectForm = (property: string, value: string) => {
       }
       break;
     case 'fundraiseLength':
-      // TODO: Min fundraiseLength check
+      // TODO v2: Min/max fundraiseLength check to accompany more flex raise lengths
       if (Number.isNaN(+value)) {
         errorMessage = 'Invalid fundraise length. Must be between [X, Y]';
       }
       break;
     case 'threshold':
-      // TODO: Min threshold check
       if (Number.isNaN(+value)) {
         errorMessage = 'Invalid threshold amount. Must be between [X, Y]';
       }
@@ -110,6 +109,27 @@ export class InformationSlide
     if (!vnode.attrs.form.creator) return;
     return (
       <div class="InformationSlide">
+        <CWButton
+          label="Create Project"
+          onclick={async () => {
+            const [txReceipt, newProjectId] = await app.projects.createProject({
+              beneficiary: '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
+              chainId: 'dydx',
+              coverImage:
+                'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/b1e3b3f9-67d8-43a3-be80-e9f038da415f.jpeg',
+              creator: '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
+              curatorFee: 300,
+              deadline: 1662482268.969,
+              description:
+                '{"ops":[{"insert":"This is the general description field.\\n"}]}',
+              shortDescription: 'This is my short description',
+              threshold: 3,
+              title: 'Project title',
+              token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+            });
+            console.log({ txReceipt, newProjectId });
+          }}
+        />
         <CWText type="h1">General Information</CWText>
         <CWText type="caption">
           Name your crowdfund, add a brief card description and upload a header

@@ -3,11 +3,11 @@
 import 'pages/projects/project_card.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
+import _, { chain } from 'lodash';
 import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { AnonymousUser } from 'views/components/widgets/user';
-import { AddressInfo, Project } from 'models';
+import { AddressInfo, ChainInfo, Project } from 'models';
 import { Tag } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { weiToTokens } from 'helpers';
@@ -15,7 +15,7 @@ import BN from 'bn.js';
 import app from 'state';
 import moment from 'moment';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
-import { ProjectRole } from './types';
+import { ProjectRole, ProjectStatus } from './types';
 import ProjectCompletionBar from './project_completion_bar';
 
 class ProjectHeaderPanel
@@ -73,12 +73,12 @@ class ProjectHeaderPanel
 interface ProjectInfoAttrs {
   project: Project;
   avatarSize: number;
-  projectStatus: 'succeeded' | 'failed';
+  projectStatus: ProjectStatus;
 }
 class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
   view(vnode: m.Vnode<ProjectInfoAttrs>) {
     const { project, projectStatus, avatarSize } = vnode.attrs;
-
+    const projectChain: ChainInfo = app.config.chains.getById(project.chainId);
     return (
       <div class="ProjectInfoPanel">
         <div class="funding-data">
@@ -116,10 +116,20 @@ class ProjectInfoPanel implements m.ClassComponent<ProjectInfoAttrs> {
           </CWText>
         </div>
         <div class="beneficiary-data">
+          {/* // TODO: Make real user */}
           {m(AnonymousUser, {
             avatarSize,
             distinguishingKey: '123',
           })}
+          {project.chainId && (
+            <Tag
+              label={
+                <CWText type="caption" fontWeight="medium">
+                  {projectChain.name}
+                </CWText>
+              }
+            />
+          )}
         </div>
       </div>
     );
@@ -134,7 +144,7 @@ export enum ProjectCardSize {
 
 interface ProjectCardAttrs {
   project: Project;
-  size: ProjectCardSize;
+  currentBlockNum: number;
 }
 
 export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
@@ -176,15 +186,13 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
   view(vnode: m.Vnode<ProjectCardAttrs>) {
     const { project } = vnode.attrs;
 
-    const projectStatus = null;
-    // project.deadline.isBefore(moment())
-    // ? project.fundingAmount.gt(project.threshold)
-    //   ? 'succeeded'
-    //   : 'failed'
-    // : null;
+    const projectStatus = project.succeededEvent
+      ? ProjectStatus.Succeeded
+      : project.failedEvent
+      ? ProjectStatus.Failed
+      : ProjectStatus.Active;
 
     const onclick = () => {
-      console.log(`project/${project.id}-${slugify(project.title)}`);
       m.route.set(`project/${project.id}-${slugify(project.title)}`);
     };
 

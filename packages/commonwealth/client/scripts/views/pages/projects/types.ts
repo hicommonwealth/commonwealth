@@ -3,3 +3,9 @@ export enum ProjectRole {
   Backer = 'backer',
   Author = 'author',
 }
+
+export enum ProjectStatus {
+  Failed = 'failed',
+  Succeeded = 'succeeded',
+  Active = 'active',
+}

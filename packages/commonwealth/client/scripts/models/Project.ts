@@ -20,8 +20,12 @@ class Project {
   }
 
   public get creatorAddressInfo(): AddressInfo {
-    // TODO: Address lookup
-    return null;
+    return new AddressInfo(
+      this.creatorAddressId,
+      this.creator,
+      this.chainId,
+      null
+    );
   }
 
   // Event getters
@@ -69,6 +73,10 @@ class Project {
       return evt.data as CommonwealthTypes.IProjectFailed;
     }
     return null;
+  }
+
+  public isEnded(currentBlockNumber: number): boolean {
+    return currentBlockNumber > this.deadline;
   }
 
   public get withdrawEvents(): CommonwealthTypes.IProjectWithdraw[] {
@@ -170,7 +178,7 @@ class Project {
     public readonly coverImage: string,
     public readonly curatorFee: BN,
     public readonly threshold: BN,
-    public readonly deadline: BN,
+    public readonly deadline: number,
     public readonly createdAt: moment.Moment,
     public fundingAmount: BN,
     public readonly entity: ChainEntityT,
@@ -225,7 +233,7 @@ class Project {
       cover_image,
       new BN(curator_fee), // TODO: This should perhaps be a % or decimal, not BN
       new BN(threshold),
-      new BN(deadline),
+      deadline,
       moment(created_at),
       new BN(funding_amount),
       ChainEntityT.fromJSON(ChainEntity),

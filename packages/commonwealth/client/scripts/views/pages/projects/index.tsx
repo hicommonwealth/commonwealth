@@ -8,10 +8,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { RoleInfo } from 'models';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
+import Web3 from 'web3';
 
 enum ProjectListingSubpage {
   Explore = 'explore',
@@ -20,6 +21,27 @@ enum ProjectListingSubpage {
 
 export default class ProjectListing implements m.ClassComponent {
   private subpage: ProjectListingSubpage;
+  private web3Initialized: boolean;
+  private web3: Web3;
+  private currentBlockNum: number;
+
+  async initializeWeb3() {
+    const cmnUrl = app.config.chains.getById(ChainNetwork.CommonProtocol)?.node
+      ?.url;
+    if (!cmnUrl) return;
+    try {
+      const provider = new Web3.providers.WebsocketProvider(cmnUrl);
+      this.web3 = new Web3(provider);
+    } catch (error) {
+      console.log(`Could not connect to Ethereum on ${cmnUrl}`);
+      throw error;
+    }
+    this.web3Initialized = true;
+  }
+
+  async getBlockNumber() {
+    this.currentBlockNum = await this.web3.eth.getBlockNumber();
+  }
 
   view(vnode) {
     const { subpage } = vnode.attrs;
@@ -28,6 +50,11 @@ export default class ProjectListing implements m.ClassComponent {
     const onExplore = subpage !== ProjectListingSubpage.Yours;
     if (!app.isLoggedIn() && !onExplore) {
       m.route.set('/projects/explore');
+    }
+
+    if (!this.web3Initialized) {
+      this.initializeWeb3();
+      this.getBlockNumber();
     }
 
     return (
@@ -98,8 +125,11 @@ export default class ProjectListing implements m.ClassComponent {
             />
           </div>
           <div class="listing-body">
-            {onExplore && <ExplorePage />}
-            {!onExplore && <YourPage />}
+            {onExplore ? (
+              <ExplorePage currentBlockNum={this.currentBlockNum} />
+            ) : (
+              <YourPage currentBlockNum={this.currentBlockNum} />
+            )}
           </div>
         </div>
       </Sublayout>

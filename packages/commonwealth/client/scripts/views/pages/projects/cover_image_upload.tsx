@@ -16,7 +16,7 @@ interface ICoverImageUploadAttrs {
   uploadCompleteCallback?: CallableFunction;
 }
 
-// TODO Graham 6/21/22: Synchronize with new Avatar component
+// TODO Graham 6/21/22: Consider syncing down the line w/ new Avatar upload
 export default class CoverImageUpload
   implements m.ClassComponent<ICoverImageUploadAttrs>
 {
@@ -44,10 +44,9 @@ export default class CoverImageUpload
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
         // TODO: Change to POST /uploadSignature
-        // TODO: Reuse code as this is used in other places
         $.post(`${app.serverUrl()}/getUploadSignature`, {
-          name: file.name, // tokyo.png
-          mimetype: file.type, // image/png
+          name: file.name,
+          mimetype: file.type,
           auth: true,
           jwt: app.user.jwt,
         })

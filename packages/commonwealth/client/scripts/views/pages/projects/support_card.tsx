@@ -8,7 +8,6 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import app from 'state';
 import { ProjectRole } from './types';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
@@ -50,11 +49,6 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
     } else {
       return;
     }
-
-    // TODO
-    const iconUrl = project.chainId
-      ? null
-      : app.config.chains.getById(project.chainId)?.iconUrl;
 
     return (
       <div class="SupportCard">

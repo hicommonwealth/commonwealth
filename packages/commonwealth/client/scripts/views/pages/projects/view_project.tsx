@@ -5,10 +5,10 @@ import m from 'mithril';
 import app from 'state';
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { Project } from 'models';
+import { AddressInfo, ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import Sublayout from 'views/sublayout';
-import { AnonymousUser } from 'views/components/widgets/user';
+import User, { AnonymousUser } from 'views/components/widgets/user';
 import { PageNotFound } from 'views/pages/404';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { CWTable } from 'views/components/component_kit/cw_table';
@@ -16,6 +16,9 @@ import { ProjectRole } from './types';
 import ProjectCompletionBar from './project_completion_bar';
 import SupportCard from './support_card';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CommunityLabel } from '../../components/community_label';
+import Web3 from 'web3';
+import { ChainNetwork } from '../../../../../../common-common/src/types';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -23,23 +26,45 @@ interface ProjectPageAttrs {
 
 export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
   private project: Project;
+  private web3Initialized: boolean;
+  private web3: Web3;
+  private currentBlockNum: number;
+
+  async initializeWeb3() {
+    const cmnUrl = app.config.chains.getById(ChainNetwork.CommonProtocol)?.node
+      ?.url;
+    if (!cmnUrl) return;
+    try {
+      const provider = new Web3.providers.WebsocketProvider(cmnUrl);
+      this.web3 = new Web3(provider);
+    } catch (error) {
+      console.log(`Could not connect to Ethereum on ${cmnUrl}`);
+      throw error;
+    }
+    this.web3Initialized = true;
+  }
+
   view(vnode: m.Vnode<ProjectPageAttrs>) {
     if (!app) return;
+
     const { identifier } = vnode.attrs;
     if (typeof identifier !== 'string') {
       return m(PageNotFound, { title: 'Projects' });
     }
+
     const projectId = identifier.split('-')[0];
     this.project = app.projects.store.getById(projectId);
     if (!this.project) {
       return m(PageNotFound, { title: 'Projects' });
     }
     const { project } = this;
-    console.log({ project });
 
     const threshold = +weiToTokens(project.threshold.toString(), 18);
     const fundingAmount = +weiToTokens(project.fundingAmount.toString(), 18);
-
+    const chain: ChainInfo = project.chainId
+      ? app.config.chains.getById(project.chainId)
+      : null;
+    console.log({ chain });
     return (
       <Sublayout
         title="Project"
@@ -51,14 +76,14 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
           <CWText type="h1">{project.title}</CWText>
           <div class="project-metadata">
             <div class="metadata-left">
-              {/* TODO: Investigate why Chain/TokenIcon + CommLabel invocation is throwing */}
-              {/* <CommunityLabel chain={project.chain} size={32} /> */}
-              {/* TODO: replace below with proper m(User, { user: project.creator }) */}
-              {m(AnonymousUser, { avatarSize: 32, distinguishingKey: '1' })}
+              {!!chain?.name && (
+                <CommunityLabel community={chain} size="large" />
+              )}
+              {/* {m(User, { avatarSize: 32, user: project.creatorAddressInfo })} */}
             </div>
             <div class="metadata-right">
               <Tag label={`${project.createdAt.format('MMMM D, YYYY')}`} />
-              <Tag label={`${project.deadline.toNumber()} Blocks`} />
+              <Tag label={`${project.deadline} Blocks`} />
             </div>
           </div>
 

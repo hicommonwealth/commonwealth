@@ -9,7 +9,7 @@
   flex-direction: column;
   width: 336px;
 
-  // TODO: Mockup only
+  // TODO: REPLACE
   .dummy-chain-wrap {
     left: 8px;
     position: relative;
@@ -142,7 +142,9 @@
       }
     }
     .beneficiary-data {
-      margin-top: 5px;
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
       .User {
         display: flex;
         align-items: center;
@@ -157,74 +159,15 @@
           }
         }
       }
+      .cui-tag {
+        background: $neutral-50;
+        border: none;
+        border-radius: 5px;
+        padding: 4px;
+        .Text {
+          color: $neutral-500;
+        }
+      }
     }
   }
-
-  // &.medium {
-  //   height: 114px;
-  //   width: 400px;
-  //   .ProjectHeaderPanel {
-  //     flex: 7;
-  //   }
-  //   .right-panel {
-  //     display: flex;
-  //     flex-direction: column;
-  //     flex: 18;
-  //     background-color: $neutral-200;
-  //     .ProjectCompletionBar {
-  //       flex: 1;
-  //     }
-  //     .ProjectInfoPanel {
-  //       flex: 13;
-  //       margin: 6px 1px 0 14px;
-  //       .User {
-  //         position: relative;
-  //         top: -2px;
-  //         .user-display-name {
-  //           top: 1px;
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
-  // &.small {
-  //   flex-direction: column;
-  //   width: 272px;
-  //   padding: 4px;
-  //   &:hover {
-  //     background-color: $neutral-200;
-  //   }
-  //   .top-panel {
-  //     display: flex;
-  //     justify-content: space-between;
-  //     h3 {
-  //       @include header;
-  //       color: $neutral-500;
-  //     }
-  //     .project-status {
-  //       font-size: 14px;
-  //       padding: 6px 12px 4px;
-  //       height: min-content;
-  //       border-radius: 6px;
-  //       &.funded {
-  //         background-color: $green-400;
-  //         color: $green-700;
-  //       }
-  //     }
-  //   }
-  //   .bottom-panel {
-  //     display: flex;
-  //     justify-content: left;
-  //     .project-token-name {
-  //       @include body;
-  //       margin-left: 7px;
-  //       color: $neutral-300;
-  //       font-size: 14px;
-  //       line-height: 17px;
-  //       position: relative;
-  //       top: 1px;
-  //     }
-  //   }
-  // }
 }
