@@ -662,14 +662,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/projects/:subpage': importRoute(
               'views/pages/projects/index.tsx',
-              { scoped: false, hideSidebar: false }
+              { scoped: false, hideSidebar: false, deferChain: true }
             ),
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`
             ),
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
-              { scoped: false, hideSidebar: true }
+              { scoped: false, hideSidebar: true, deferChain: true }
             ),
             '/:scope/new/project': importRoute(
               'views/pages/projects/create_project_form.tsx',
@@ -906,7 +906,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/projects': redirectRoute(() => `/projects/explore`),
             '/projects/:subpage': importRoute(
               'views/pages/projects/index.tsx',
-              { scoped: false, hideSidebar: true }
+              { scoped: false, hideSidebar: true, deferChain: true }
             ),
             '/:scope/projects/:subpage': redirectRoute(
               (attrs) => `/projects/${attrs.subpage}`
@@ -920,7 +920,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
-              { scoped: false, hideSidebar: true }
+              { scoped: false, hideSidebar: true, deferChain: true }
             ),
             // '/:scope/project/:identifier': importRoute(
             //   'views/pages/projects/view_project.tsx',
@@ -928,7 +928,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             // ),
             '/:scope/new/project': importRoute(
               'views/pages/projects/create_project_form.tsx',
-              { scoped: true, hideSidebar: true }
+              { scoped: true, hideSidebar: true, deferChain: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(

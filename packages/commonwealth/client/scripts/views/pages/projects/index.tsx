@@ -100,7 +100,7 @@ export default class ProjectListing implements m.ClassComponent {
               />
             </Tabs>
             <SelectList
-              items={app.user.roles
+              items={app.roles.roles
                 .map((role: RoleInfo) => role.chain_id)
                 .filter(
                   (id) =>

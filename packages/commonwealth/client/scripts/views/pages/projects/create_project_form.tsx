@@ -341,7 +341,7 @@ export default class CreateProjectForm implements m.ClassComponent {
       return;
     }
     // Create project form must be scoped to an Ethereum page
-    if (app.user.activeAccount.chainBase !== ChainBase.Ethereum) {
+    if (app.user.activeAccount.chain.base !== ChainBase.Ethereum) {
       m.route.set(`/projects/explore`);
     }
 
