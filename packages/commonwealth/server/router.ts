@@ -126,6 +126,7 @@ import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
+import updateChainPriority from './routes/updateChainPriority';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -700,6 +701,8 @@ function setupRouter(
     '/updateChainCustomDomain',
     updateChainCustomDomain.bind(this, models)
   );
+
+  router.post('/updateChainPriority', updateChainPriority.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));

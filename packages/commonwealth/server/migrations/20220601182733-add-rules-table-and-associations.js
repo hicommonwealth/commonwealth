@@ -30,7 +30,7 @@ module.exports = {
       }, { transaction });
 
       await queryInterface.addColumn(
-        'OffchainTopics',
+        'Topics',
         'rule_id',
         {
           type: Sequelize.INTEGER,
