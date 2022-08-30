@@ -146,6 +146,7 @@ export default class ProjectsController {
 
     // instantiate contract (TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
+      // TODO: pass in CommonProtocol chain node
       this._app.wallets,
       creator,
       null,

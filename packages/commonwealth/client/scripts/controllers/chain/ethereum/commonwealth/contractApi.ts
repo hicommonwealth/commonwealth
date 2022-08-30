@@ -14,6 +14,7 @@ export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
   sender: Account,
   contract?: CT,
+  // TODO: add node argument
   factory?: ContractFactoryT<CT>,
   address?: string,
 ): Promise<CT> {
@@ -21,6 +22,10 @@ export async function attachSigner<CT extends Contract>(
   let signer: JsonRpcSigner;
   if (signingWallet instanceof MetamaskWebWalletController
     || signingWallet instanceof WalletConnectWebWalletController) {
+    if (!signingWallet.enabled) {
+      // TODO: pass node argument into enable() (add node argument to enable optionally)
+      await signingWallet.enable();
+    }
     const walletProvider = new ethers.providers.Web3Provider(signingWallet.provider as any);
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;
