@@ -7,7 +7,6 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiPromise,

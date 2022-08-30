@@ -42,7 +42,6 @@ export default class CompoundGovernance extends ProposalModule<
   public get votingPeriod() { return this._votingPeriod; }
 
   public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // capacities based on governor type
   private _supportsAbstain: boolean;
