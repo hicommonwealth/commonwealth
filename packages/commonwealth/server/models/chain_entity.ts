@@ -32,9 +32,9 @@ export default (
 ): ChainEntityModelStatic => {
   const ChainEntity = <ChainEntityModelStatic>sequelize.define<ChainEntityInstance, ChainEntityAttributes>('ChainEntity', {
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    chain: { type: dataTypes.STRING, allowNull: false, unique: true },
-    type: { type: dataTypes.STRING, allowNull: false, unique: true },
-    type_id: { type: dataTypes.STRING, allowNull: false, unique: true },
+    chain: { type: dataTypes.STRING, allowNull: false },
+    type: { type: dataTypes.STRING, allowNull: false },
+    type_id: { type: dataTypes.STRING, allowNull: false },
     thread_id: { type: dataTypes.INTEGER, allowNull: true },
     completed: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     title: { type: dataTypes.STRING, allowNull: true },
