@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction(async (t) => {
+    await queryInterface.sequelize.transaction(async (t) => {
       // Add Base to ChainNode
       await queryInterface.addColumn('ChainNodes', 'chain_base',
         { type: Sequelize.STRING, allowNull: false, defaultValue: '' }, { transaction: t });
@@ -103,11 +103,6 @@ module.exports = {
         }], {transaction: t });
       }))
 
-
-      // Add indexes
-      await queryInterface.addIndex('Contracts', { fields: ['address'] }, { transaction: t });
-
-
       // Update Columns on Chains Table
       await queryInterface.renameColumn('Chains', 'symbol', 'default_symbol', { transaction: t });
       await queryInterface.changeColumn('Chains', 'default_symbol',
@@ -119,6 +114,10 @@ module.exports = {
       await queryInterface.dropTable('ContractCategories', { transaction: t });
       await queryInterface.dropTable('ContractItems', { transaction: t });
 
+    });
+    // Add indexes
+    await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.addIndex('Contracts', { fields: ['address'] }, { transaction: t });
     });
   },
 
