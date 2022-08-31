@@ -15,7 +15,7 @@ import moment from 'moment';
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
 import { WebSocketController } from 'controllers/server/socket';
 
@@ -67,7 +67,13 @@ export async function initAppState(
         data.chains
           .filter((chain) => chain.active)
           .map((chain) => {
-            delete chain.ChainNode;
+            chain.Contracts.map((contract) => {
+              return app.contracts.addToStore(
+                Contract.fromJSON({
+                ...contract,
+                contract_abi: contract.ContractAbi
+              }));
+            });
             // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({

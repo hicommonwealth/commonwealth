@@ -29,18 +29,17 @@ import { CWValidationText } from 'views/components/component_kit/cw_validation_t
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 
 import {
-  initChainForm,
-  defaultChainRows,
-  ethChainRows,
-} from 'views/pages/create_community/chain_input_rows';
+    initChainForm,
+    defaultChainRows,
+    ethChainRows,
+} from '../create_community/chain_input_rows';
 
 import {
-  ChainFormFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
-} from 'views/pages/create_community/types';
-
+ChainFormFields,
+ChainFormState,
+EthChainAttrs,
+EthFormFields,
+} from '../create_community/types';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -51,7 +50,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
+export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
   private state: CreateEthDaoState = {
     message: '',
     loaded: false,
@@ -91,40 +90,24 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
       this.state.status = undefined;
       this.state.message = '';
       try {
-        if (this.state.form.network === ChainNetwork.Compound) {
-          const provider = new Web3.providers.WebsocketProvider(
-            this.state.form.nodeUrl
+        const provider = new Web3.providers.WebsocketProvider(
+          this.state.form.nodeUrl
+        );
+        const compoundApi = new CompoundAPI(
+          null,
+          this.state.form.address,
+          provider
+        );
+        await compoundApi.init(this.state.form.tokenName);
+        if (!compoundApi.Token) {
+          throw new Error(
+            'Could not find governance token. Is "Token Name" field valid?'
           );
-          const compoundApi = new CompoundAPI(
-            null,
-            this.state.form.address,
-            provider
-          );
-          await compoundApi.init(this.state.form.tokenName);
-          if (!compoundApi.Token) {
-            throw new Error(
-              'Could not find governance token. Is "Token Name" field valid?'
-            );
-          }
-          const govType = GovernorType[compoundApi.govType];
-          const tokenType = GovernorTokenType[compoundApi.tokenType];
-          this.state.status = 'success';
-          this.state.message = `Found ${govType} with token type ${tokenType}`;
-        } else if (this.state.form.network === ChainNetwork.Aave) {
-          const provider = new Web3.providers.WebsocketProvider(
-            this.state.form.nodeUrl
-          );
-          const aaveApi = new AaveApi(
-            IAaveGovernanceV2__factory.connect,
-            this.state.form.address,
-            provider
-          );
-          await aaveApi.init();
-          this.state.status = 'success';
-          this.state.message = `Found Aave type DAO`;
-        } else {
-          throw new Error('invalid chain network');
         }
+        const govType = GovernorType[compoundApi.govType];
+        const tokenType = GovernorTokenType[compoundApi.tokenType];
+        this.state.status = 'success';
+        this.state.message = `Found ${govType} with token type ${tokenType}`;
       } catch (e) {
         this.state.status = 'failure';
         this.state.message = e.message;
@@ -187,15 +170,6 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           }}
         />
         <IdRow id={this.state.form.id} />
-        <InputRow
-          title="Symbol"
-          disabled={disableField}
-          value={this.state.form.symbol}
-          placeholder="XYZ"
-          onChangeHandler={(v) => {
-            this.state.form.symbol = v;
-          }}
-        />
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"

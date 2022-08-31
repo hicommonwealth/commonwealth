@@ -15,7 +15,6 @@ import {
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
-  public readonly address: string;
   public readonly tokenName: string;
   public readonly default_symbol: string;
   public name: string;
@@ -112,7 +111,6 @@ class ChainInfo {
     this.substrateSpec = substrateSpec;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
-    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
   }

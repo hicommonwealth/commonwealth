@@ -39,7 +39,8 @@ class Contract {
     symbol,
     contract_abi
   }) {
-    return new Contract(id,
+    return new Contract(
+      id,
       address,
       chain_node_id,
       type,

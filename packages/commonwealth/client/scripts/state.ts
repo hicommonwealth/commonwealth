@@ -18,6 +18,7 @@ import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
+import ContractsController from './controllers/server/contracts';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
@@ -63,6 +64,9 @@ export interface IApp {
   // Community
   topics: TopicsController;
   communities: CommunitiesController;
+
+  // Contract
+  contracts: ContractsController;
 
   // User
   user: UserController;
@@ -138,6 +142,9 @@ const app: IApp = {
   // Community
   communities: new CommunitiesController(),
   topics: new TopicsController(),
+
+  // Contract
+  contracts: new ContractsController(),
 
   // Search
   search: new SearchController(),
