@@ -173,7 +173,7 @@ class CommentsController {
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      chainEntity = proposalIdToEntity(app, app.activeChainId(), proposalIdentifier);
+      chainEntity = app.chain.chainEntities.store.getByUniqueId(app.activeChainId(), proposalIdentifier);
     }
     try {
       const res = await $.post(`${app.serverUrl()}/createComment`, {

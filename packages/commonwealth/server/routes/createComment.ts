@@ -254,29 +254,6 @@ const createComment = async (
     prefix.includes('referendum') ||
     prefix.includes('motion')
   ) {
-    if (!chain_entity_id) {
-      // send a notification email if commenting on an invalid ChainEntity
-      const msg = {
-        to: 'founders@commonwealth.im',
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        subject: 'Missing ChainEntity',
-        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
-      };
-      sgMail
-        .send(msg)
-        .then((result) => {
-          log.error(
-            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        })
-        .catch((e) => {
-          log.error(
-            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        });
-      // await finalComment.destroy();
-      // return next(new Error(Errors.ChainEntityNotFound));
-    }
     proposal = id;
   } else {
     log.error(
