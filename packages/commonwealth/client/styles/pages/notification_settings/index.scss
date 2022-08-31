@@ -2,7 +2,7 @@
 
 @mixin subBundleColumns {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 3fr 2fr 1fr;
 }
 
 @mixin subColumns {
@@ -13,6 +13,10 @@
 .NotificationSettingsPage {
   flex: 1;
   padding: 24px 176px;
+
+  @include mediumInclusive {
+    padding: 24px 72px;
+  }
 
   .page-header-text.Text {
     margin-bottom: 16px;
@@ -102,10 +106,9 @@
           }
 
           .title-and-body-container {
-            display: flex;
+            display: grid;
             flex-direction: column;
-            margin-left: 12px;
-            width: 448px;
+            padding: 0 32px 0 16px;
 
             .subscription-body-text.Text {
               color: $neutral-600;

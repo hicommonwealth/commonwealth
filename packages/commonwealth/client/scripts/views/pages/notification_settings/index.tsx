@@ -100,14 +100,14 @@ class NotificationSettingsPage implements m.ClassComponent {
               fontWeight="medium"
               className="column-header-text"
             >
-              Email Notifications
+              Email
             </CWText>
             <CWText
               type="h5"
               fontWeight="medium"
               className="last-column-header-text"
             >
-              In-App Notifications
+              In-App
             </CWText>
           </div>
           {Object.entries(bundledSubs).map(([k, v]) => {
