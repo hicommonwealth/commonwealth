@@ -7,7 +7,7 @@
 
 @mixin subColumns {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr;
+  grid-template-columns: 4fr 1fr 1fr 1fr 1fr;
 }
 
 .NotificationSettingsPage {
@@ -110,7 +110,20 @@
             .subscription-body-text.Text {
               color: $neutral-600;
             }
+
+            .comment-header-row {
+              align-items: center;
+              display: flex;
+
+              .attribution-text.Text {
+                margin-right: 4px;
+              }
+            }
           }
+        }
+
+        .trigger-wrapper {
+          justify-self: end;
         }
       }
     }

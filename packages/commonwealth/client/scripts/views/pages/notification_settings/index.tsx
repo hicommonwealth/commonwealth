@@ -9,7 +9,7 @@ import 'pages/notification_settings/index.scss';
 import app from 'state';
 import { formatTimestamp } from 'helpers';
 import { modelFromServer } from 'models/NotificationSubscription';
-import { NotificationSubscription } from 'models';
+import { AddressInfo, NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 // import { PageLoading } from '../loading';
@@ -25,6 +25,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import User from '../../components/widgets/user';
 
 class NotificationSettingsPage implements m.ClassComponent {
   private subscriptions: NotificationSubscription[];
@@ -163,7 +164,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                         </CWText>
                       </div>
                       {v.map((sub) => {
-                        console.log(sub.Thread);
+                        console.log(sub.Comment);
                         return (
                           <div class="subscription-row">
                             <div class="icon-and-text-container">
@@ -185,13 +186,42 @@ class NotificationSettingsPage implements m.ClassComponent {
                                   >
                                     {renderQuillTextBody(sub.Thread.body, {
                                       collapse: true,
+                                      hideFormatting: true,
                                     })}
                                   </CWText>
                                 )}
-                                {sub.Comment &&
-                                  renderQuillTextBody(sub.Comment.text, {
-                                    collapse: true,
-                                  })}
+                                {sub.Comment && (
+                                  <div class="comment-header-row">
+                                    <CWText type="b2" fontWeight="bold">
+                                      {m(User, {
+                                        hideAvatar: true,
+                                        user: new AddressInfo(
+                                          null,
+                                          sub.Comment.author,
+                                          sub.Comment.chain,
+                                          null
+                                        ),
+                                      })}
+                                    </CWText>
+                                    <CWText
+                                      type="b2"
+                                      className="attribution-text"
+                                    >
+                                      's comment
+                                    </CWText>
+                                  </div>
+                                )}
+                                <CWText
+                                  type="caption"
+                                  className="subscription-body-text"
+                                  noWrap
+                                >
+                                  {sub.Comment &&
+                                    renderQuillTextBody(sub.Comment.text, {
+                                      collapse: true,
+                                      hideFormatting: true,
+                                    })}
+                                </CWText>
                               </div>
                             </div>
 
@@ -205,7 +235,25 @@ class NotificationSettingsPage implements m.ClassComponent {
                               {formatTimestamp(moment(sub.createdAt))}
                             </CWText>
 
-                            {/* {m(User, { user: ? })} */}
+                            {sub.Thread &&
+                              m(User, {
+                                user: new AddressInfo(
+                                  null,
+                                  sub.Thread.author,
+                                  sub.Thread.chain,
+                                  null
+                                ),
+                              })}
+
+                            {sub.Comment &&
+                              m(User, {
+                                user: new AddressInfo(
+                                  null,
+                                  sub.Comment.author,
+                                  sub.Comment.chain,
+                                  null
+                                ),
+                              })}
 
                             <CWPopoverMenu
                               trigger={<CWIconButton iconName="dotsVertical" />}
@@ -222,7 +270,11 @@ class NotificationSettingsPage implements m.ClassComponent {
                                   iconName: 'close',
                                   isSecondary: true,
                                   onclick: () =>
-                                    console.log('unsubscribe clicked'),
+                                    app.user.notifications
+                                      .deleteSubscription(sub)
+                                      .then(() => {
+                                        m.redraw();
+                                      }),
                                 },
                               ]}
                             />
