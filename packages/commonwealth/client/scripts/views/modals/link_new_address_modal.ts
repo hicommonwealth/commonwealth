@@ -366,7 +366,7 @@ const LinkNewAddressModal: m.Component<
             app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         }
-        $('.LinkNewAddressModal').trigger('modalforceexit');
+        $('.LoginDesktop').trigger('modalforceexit');
         if (vnode.attrs.successCallback) vnode.attrs.successCallback();
         vnode.state.newAddress = account;
         vnode.state.isNewLogin = true;

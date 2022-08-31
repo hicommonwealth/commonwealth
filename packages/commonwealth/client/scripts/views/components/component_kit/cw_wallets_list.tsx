@@ -9,6 +9,7 @@ import $ from 'jquery';
 import { Account, IWebWallet } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
+import Near from 'controllers/chain/near/main';
 
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
@@ -25,6 +26,7 @@ type WalletsListAttrs = {
   setSidebarType: (sidebarType: string) => void;
   setBodyType: (bodyType: string) => void;
   setAccount: (account: Account) => void;
+  accountVerifiedCallback: (account: Account) => void;
 };
 
 export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
@@ -37,6 +39,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       setBodyType,
       setSidebarType,
       setAccount,
+      accountVerifiedCallback,
     } = vnode.attrs;
     return (
       <div class="WalletsList">
@@ -53,16 +56,24 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
                   if (wallet.chain === 'near') {
                     // do something
-                    console.log('nbear');
                   } else if (wallet.chain === 'substrate') {
                     // do something
-                    console.log('substrate');
                   } else {
+                    let address;
+                    if (
+                      wallet.chain === 'ethereum' ||
+                      wallet.chain === 'solana'
+                    ) {
+                      address = wallet.accounts[0];
+                    } else if (wallet.chain === 'cosmos') {
+                      address = wallet.accounts[0].address;
+                    }
+
                     if (app.isLoggedIn()) {
                       const { result } = await $.post(
                         `${app.serverUrl()}/getAddressStatus`,
                         {
-                          address: wallet.accounts[0],
+                          address,
                           chain: wallet.chain,
                           jwt: app.user.jwt,
                         }
@@ -88,22 +99,24 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       }
                     }
 
+                    console.log('Wallet', wallet);
+
                     try {
                       const signerAccount = await createUserWithAddress(
-                        wallet.accounts[0],
+                        address,
                         wallet.name,
                         app.chain?.id || wallet.defaultNetwork
                       );
-                      m.redraw();
                       await wallet.validateWithAccount(signerAccount);
                       setAccount(signerAccount);
-                      m.redraw();
+
                       // return if user signs for two addresses
                       // if (linkNewAddressModalVnode.state.linkingComplete)
                       //   return;
                       // linkNewAddressModalVnode.state.linkingComplete = true;
-                      // accountVerifiedCallback(signerAccount);
-                      setBodyType('selectAccountType');
+                      accountVerifiedCallback(signerAccount);
+                      // setBodyType('selectAccountType');
+                      // setSidebarType('newOrReturning');
                     } catch (err) {
                       // catch when the user rejects the sign message prompt
                       // vnode.state.linking = false;
