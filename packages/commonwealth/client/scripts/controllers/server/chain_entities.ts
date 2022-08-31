@@ -163,28 +163,13 @@ class ChainEntityController {
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
-      const author = event.data['proposer'];
-      let entity = new ChainEntity({
-        chain,
-        type: entityKind,
-        typeId: fieldValue.toString(),
-        chainEvents: [],
-        createdAt: null,
-        updatedAt: null,
-        id: null,
-        threadId: null,
-        threadTitle: null,
-        title: null,
-        author,
-      });
 
-      // update entity against store
-      const existingEntity = this.store.get(entity);
-      if (!existingEntity) {
-        this._store.add(entity);
-      } else {
-        entity = existingEntity;
+      const entity = this.store.getByUniqueData(chain, entityKind, fieldValue.toString());
+      if (!entity) {
+        console.log("Client creation of entities not supported. Please refresh to fetch new entities from the server.");
+        return;
       }
+
       entity.addEvent(event);
 
       // emit update to handlers
