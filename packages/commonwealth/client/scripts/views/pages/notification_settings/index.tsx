@@ -7,13 +7,12 @@ import moment from 'moment';
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import { formatTimestamp } from 'helpers';
 import { modelFromServer } from 'models/NotificationSubscription';
 import { AddressInfo, NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
-// import { PageLoading } from '../loading';
-// import ErrorPage from '../error';
+import { PageLoading } from '../loading';
+import ErrorPage from '../error';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -55,24 +54,26 @@ class NotificationSettingsPage implements m.ClassComponent {
   }
 
   view() {
-    // console.log(this.subscriptions);
-
-    // if (!app.loginStatusLoaded()) {
-    //   <PageLoading
-    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
-    //   />;
-    // }
-    // if (!app.isLoggedIn()) {
-    //   <ErrorPage
-    //     message="This page requires you to be logged in"
-    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
-    //   />;
-    // }
-    // } else if (this.subscriptions.length < 1) {
-    //   <PageLoading
-    //     title={<BreadcrumbsTitleTag title="Notification Settings" />}
-    //   />;
-    // }
+    if (!app.loginStatusLoaded()) {
+      return (
+        <PageLoading
+          title={<BreadcrumbsTitleTag title="Notification Settings" />}
+        />
+      );
+    } else if (!app.isLoggedIn()) {
+      return (
+        <ErrorPage
+          message="This page requires you to be logged in"
+          title={<BreadcrumbsTitleTag title="Notification Settings" />}
+        />
+      );
+    } else if (this.subscriptions.length < 1) {
+      return (
+        <PageLoading
+          title={<BreadcrumbsTitleTag title="Notification Settings" />}
+        />
+      );
+    }
 
     const bundledSubs = bundleSubs(this.subscriptions);
 
@@ -148,12 +149,6 @@ class NotificationSettingsPage implements m.ClassComponent {
                           type="caption"
                           className="subscription-list-header-text"
                         >
-                          Published
-                        </CWText>
-                        <CWText
-                          type="caption"
-                          className="subscription-list-header-text"
-                        >
                           Subscribed
                         </CWText>
                         <CWText
@@ -164,7 +159,42 @@ class NotificationSettingsPage implements m.ClassComponent {
                         </CWText>
                       </div>
                       {v.map((sub) => {
-                        console.log(sub.Comment);
+                        const getUser = () => {
+                          if (sub.Thread) {
+                            return m(User, {
+                              user: new AddressInfo(
+                                null,
+                                sub.Thread.author,
+                                sub.Thread.chain,
+                                null
+                              ),
+                            });
+                          } else if (sub.Comment) {
+                            return m(User, {
+                              user: new AddressInfo(
+                                null,
+                                sub.Comment.author,
+                                sub.Comment.chain,
+                                null
+                              ),
+                            });
+                          } else {
+                            // return empty div to ensure that grid layout is correct
+                            // even in the absence of a user
+                            return <div></div>;
+                          }
+                        };
+
+                        const getTimeStamp = () => {
+                          if (sub.Thread) {
+                            return moment(sub.Thread.createdAt).format('l');
+                          } else if (sub.Comment) {
+                            return moment(sub.Comment.createdAt).format('l');
+                          } else {
+                            return null;
+                          }
+                        };
+
                         return (
                           <div class="subscription-row">
                             <div class="icon-and-text-container">
@@ -225,35 +255,9 @@ class NotificationSettingsPage implements m.ClassComponent {
                               </div>
                             </div>
 
-                            <CWText type="b2">
-                              {sub.Thread &&
-                                formatTimestamp(moment(sub.Thread.createdAt))}
-                            </CWText>
-                            <CWText type="b2">
-                              {sub.Comment &&
-                                formatTimestamp(moment(sub.Comment.created_at))}
-                              {formatTimestamp(moment(sub.createdAt))}
-                            </CWText>
+                            <CWText type="b2">{getTimeStamp()}</CWText>
 
-                            {sub.Thread &&
-                              m(User, {
-                                user: new AddressInfo(
-                                  null,
-                                  sub.Thread.author,
-                                  sub.Thread.chain,
-                                  null
-                                ),
-                              })}
-
-                            {sub.Comment &&
-                              m(User, {
-                                user: new AddressInfo(
-                                  null,
-                                  sub.Comment.author,
-                                  sub.Comment.chain,
-                                  null
-                                ),
-                              })}
+                            {getUser()}
 
                             <CWPopoverMenu
                               trigger={<CWIconButton iconName="dotsVertical" />}
