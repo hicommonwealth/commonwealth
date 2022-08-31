@@ -17,33 +17,31 @@
 .Popover {
   @include popoverChild;
 
-  align-items: center;
-  background-color: $white;
-  border: 2px solid $neutral-400;
-  border-radius: $border-radius-corners;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  max-width: 196px;
-  min-height: 8px;
   visibility: hidden;
 
   &.bordered {
+    @include baseTooltipStyles;
+
+    border: 2px solid $neutral-400;
+
     .Text {
       color: $neutral-500;
     }
   }
 
   &.solidArrow {
+    @include baseTooltipStyles;
     @include solidTooltipStyles;
   }
 
   &.solidNoArrow {
+    @include baseTooltipStyles;
     @include solidTooltipStyles;
   }
 
   &.singleLine {
+    @include baseTooltipStyles;
+
     background-color: $neutral-800;
     border-color: $neutral-800;
     height: 24px;

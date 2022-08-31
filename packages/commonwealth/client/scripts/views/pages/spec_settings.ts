@@ -30,7 +30,7 @@ const SpecSettingsPage: m.Component<{}, ISpecSettingsState> = {
   view: (vnode: m.VnodeDOM<{}, ISpecSettingsState>) => {
     // loading states
     const isAdmin = app.user?.isSiteAdmin;
-    const roles = app.user?.roles || [];
+    const roles = app.roles?.roles || [];
     const substrateAdminChainIds = roles
       .filter(
         (r) =>

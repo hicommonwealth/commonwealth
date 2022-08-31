@@ -91,7 +91,7 @@ const status = async (
       disableRichText,
       lastVisited,
     ] = await Promise.all([
-      unfilteredAddresses.filter((address) => !!address.verified),
+      unfilteredAddresses.filter((address) => !!address.verified && chains.map((c) => c.id).includes(address.chain)),
       user.getSocialAccounts(),
       user.getSelectedChain(),
       user.isAdmin,

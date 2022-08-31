@@ -172,7 +172,7 @@ export class ChatSection
     this.activeChannel = m.route.param()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
     this.channels = {};
     Object.values(app.socket.chatNs.channels).forEach((c) => {
       const { ChatMessages, ...metadata } = c;

@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import { IApp } from 'state';
 import CosmosChain from 'controllers/chain/cosmos/chain';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account, ITXModalData } from 'models';
+import { Account } from 'models';
 import {
   MsgSendEncodeObject,
   MsgDelegateEncodeObject,
@@ -12,7 +12,7 @@ import {
 } from '@cosmjs/stargate';
 import CosmosAccounts from './accounts';
 
-export default class CosmosAccount extends Account<CosmosToken> {
+export default class CosmosAccount extends Account {
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
@@ -24,7 +24,7 @@ export default class CosmosAccount extends Account<CosmosToken> {
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
-    super(app, app.chain.meta, address);
+    super({ chain: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

@@ -36,7 +36,7 @@ export class ThreadReactionButton
     // token balance check if needed
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
     let topicName = '';
 

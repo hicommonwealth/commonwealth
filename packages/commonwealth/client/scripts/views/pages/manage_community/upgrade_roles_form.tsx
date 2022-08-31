@@ -35,7 +35,7 @@ export class UpgradeRolesForm
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
       const displayName = app.profiles.getProfile(
-        role.Address.chain,
+        role.Address.chain.id,
         role.Address.address
       ).displayName;
 

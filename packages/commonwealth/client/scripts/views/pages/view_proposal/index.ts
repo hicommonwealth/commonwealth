@@ -41,6 +41,7 @@ import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import Poll from 'models/Poll';
+import { IBalanceAccount } from 'models/interfaces';
 import {
   activeQuillEditorHasText,
   GlobalStatus,
@@ -809,15 +810,15 @@ const ViewProposalPage: m.Component<
         );
       }).length > 0;
     const isAdminOrMod =
-      app.user.isRoleOfCommunity({
+      app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
       }) ||
-      app.user.isRoleOfCommunity({
+      app.roles.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
       });
-    const isAdmin = app.user.isRoleOfCommunity({
+    const isAdmin = app.roles.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
     });
@@ -902,8 +903,8 @@ const ViewProposalPage: m.Component<
                       createTXModal(
                         proposal.submitVoteTx(
                           new DepositVote(
-                            app.user.activeAccount,
-                            vnode.state.tipAmount
+                            app.user.activeAccount as IBalanceAccount<any>,
+                            app.chain.chain.coins(vnode.state.tipAmount)
                           )
                         )
                       );

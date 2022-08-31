@@ -4,6 +4,7 @@ import { Button } from 'construct-ui';
 
 import { initChain } from 'app';
 import app from 'state';
+import { Account } from 'models';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
@@ -17,17 +18,17 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 
 const editIdentityAction = (
-  account,
+  account: Account,
   currentIdentity: SubstrateIdentity,
   vnode
 ) => {
-  const chainObj = app.config.chains.getById(account.chain);
+  const chainObj = app.config.chains.getById(account.chain.id);
   if (!chainObj) return;
 
   // TODO: look up the chainObj's chain base
   return (
-    (account.chain.indexOf('edgeware') !== -1 ||
-      account.chain.indexOf('kusama') !== -1) &&
+    (account.chain.id.indexOf('edgeware') !== -1 ||
+      account.chain.id.indexOf('kusama') !== -1) &&
     m(Button, {
       intent: 'primary',
       // wait for info to load before making it clickable
@@ -93,7 +94,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     // For Banning
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
@@ -101,10 +102,10 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain === app.activeChainId()
+        (a) => a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
-        await app.user.createRole({
+        await app.roles.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         });
