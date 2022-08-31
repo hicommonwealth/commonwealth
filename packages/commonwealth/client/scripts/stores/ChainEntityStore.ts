@@ -46,6 +46,15 @@ class ChainEntityStore extends Store<ChainEntity> {
       return [];
     }
   }
+
+  public getByUniqueData(chain: string, type: IChainEntityKind, type_id: string) {
+    const entities = this.getByType(type, true);
+    for (const entity of entities) {
+      if (entity.chain === chain && entity.typeId === type_id) {
+        return entity;
+      }
+    }
+  }
 }
 
 export default ChainEntityStore;
