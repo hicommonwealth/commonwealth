@@ -68,12 +68,7 @@ class ChainEntityStore extends Store<ChainEntity> {
     const [slug, type_id] = uniqueId.split('_');
     const type = proposalSlugToChainEntityType(<ProposalType>slug);
 
-    const entities = this.getByType(type, true);
-    for (const entity of entities) {
-      if (entity.chain == chain && entity.typeId == type_id) {
-        return entity;
-      }
-    }
+    return this.getByUniqueData(chain, type, type_id);
   }
 
   public getByUniqueData(chain: string, type: IChainEntityKind, type_id: string) {
