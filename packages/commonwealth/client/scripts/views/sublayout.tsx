@@ -15,6 +15,8 @@ import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switche
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import { CWButton } from './components/component_kit/cw_button';
+import { NewLoginModal } from './modals/login_modal';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -84,6 +86,19 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <SublayoutHeaderRight
               chain={chain}
               showNewProposalButton={showNewProposalButton}
+            />
+            <CWButton
+              label="test"
+              onclick={() =>
+                app.modals.create({
+                  modal: NewLoginModal,
+                  data: {
+                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                      ? 'fullScreen'
+                      : 'centered',
+                  },
+                })
+              }
             />
           </div>
           <div class="sidebar-and-body-container">

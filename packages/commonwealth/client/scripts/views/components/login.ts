@@ -62,7 +62,6 @@ const Login: m.Component<
         label: 'Continue to Ronin wallet',
       });
     }
-    console.log('magic', !vnode.state.showMagicLoginPrompt);
     return m(
       '.Login',
       {

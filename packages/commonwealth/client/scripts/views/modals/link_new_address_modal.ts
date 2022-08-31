@@ -112,7 +112,9 @@ const LinkAccountItem: m.Component<
     const name =
       account.meta?.name ||
       (base === ChainBase.CosmosSDK
-        ? `${app.chain?.meta.name || webWallet.defaultNetwork} address ${account.address.slice(0, 6)}...`
+        ? `${
+            app.chain?.meta.name || webWallet.defaultNetwork
+          } address ${account.address.slice(0, 6)}...`
         : `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`);
     return m(
       '.LinkAccountItem.account-item',
@@ -157,7 +159,7 @@ const LinkAccountItem: m.Component<
             const signerAccount = await createUserWithAddress(
               address,
               webWallet.name,
-              app.chain?.id || webWallet.defaultNetwork,
+              app.chain?.id || webWallet.defaultNetwork
             );
             vnode.state.linking = true;
             m.redraw();
@@ -181,7 +183,11 @@ const LinkAccountItem: m.Component<
           m(
             '.account-user',
             m(User, {
-              user: new AddressInfo(null, address, app.chain?.id || webWallet.defaultNetwork),
+              user: new AddressInfo(
+                null,
+                address,
+                app.chain?.id || webWallet.defaultNetwork
+              ),
               avatarOnly: true,
               avatarSize: 40,
             })
@@ -193,7 +199,11 @@ const LinkAccountItem: m.Component<
             m(
               '.account-user',
               m(User, {
-                user: new AddressInfo(null, address, app.chain?.id || webWallet.defaultNetwork),
+                user: new AddressInfo(
+                  null,
+                  address,
+                  app.chain?.id || webWallet.defaultNetwork
+                ),
                 hideAvatar: true,
               })
             ),
@@ -219,10 +229,14 @@ const LinkNewAddressModal: m.Component<
 > = {
   // close the modal if the user moves away from the page
   oncreate: async (vnode) => {
-    if (app.chain?.base === ChainBase.NEAR || app.chain?.network === ChainNetwork.AxieInfinity) return;
+    if (
+      app.chain?.base === ChainBase.NEAR ||
+      app.chain?.network === ChainNetwork.AxieInfinity
+    )
+      return;
     if (vnode.attrs.webWallet?.enabled) return;
 
-      // initialize API if needed before starting webwallet
+    // initialize API if needed before starting webwallet
     if (vnode.state.initializingWallet) return;
     vnode.state.initializingWallet = true;
     if (!vnode.attrs.webWallet.enabling && !vnode.attrs.webWallet.enabled) {
@@ -280,7 +294,8 @@ const LinkNewAddressModal: m.Component<
           // AddressInfo, or the account is created on the frontend
           // and the id is available here).
           let addressInfo = app.user.addresses.find(
-            (a) => a.address === account.address && a.chain.id === account.chain.id
+            (a) =>
+              a.address === account.address && a.chain.id === account.chain.id
           );
 
           if (!addressInfo && account.addressId) {
@@ -476,7 +491,8 @@ const LinkNewAddressModal: m.Component<
                         rounded: true,
                         onclick: async (e) => {
                           // redirect to NEAR page for login
-                          const WalletAccount = (await import('near-api-js')).WalletAccount;
+                          const WalletAccount = (await import('near-api-js'))
+                            .WalletAccount;
                           if (!app.chain.apiInitialized) {
                             await app.chain.initApi();
                           }

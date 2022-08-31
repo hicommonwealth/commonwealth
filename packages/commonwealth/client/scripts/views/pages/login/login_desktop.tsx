@@ -3,12 +3,15 @@
 import m from 'mithril';
 
 import 'pages/login/login_desktop.scss';
+import { loginWithMagicLink } from 'controllers/app/login';
+import { Account } from 'models';
 
 import { CWAddress } from '../../components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_username_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../../components/component_kit/cw_modal';
+
 import {
   CWProfilesList,
   CWProfileRow,
@@ -18,20 +21,43 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
+
 import { LoginAttrs } from './types';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
+  private email: string;
+  private account: Account;
   view(vnode) {
     const {
       address,
+      setAddress,
       bodyType,
+      setBodyType,
       handleSetAvatar,
       handleSetUsername,
       profiles,
+      setProfiles,
       sidebarType,
+      setSidebarType,
       username,
       wallets,
+      setWallets,
     } = vnode.attrs;
+
+    const handleEmailLogin = async () => {
+      console.log('email', this.email);
+      if (!this.email) return;
+
+      try {
+        console.log('magic linkin');
+        await loginWithMagicLink(this.email);
+        // TODO: Understand the context of where we are coming from
+        setBodyType('welcome');
+      } catch (e) {
+        console.error(e);
+        // TODO: Error message display somehow
+      }
+    };
 
     return (
       <div class="LoginDesktop">
@@ -43,10 +69,16 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
               <LoginBoilerplate />
               <CWWalletsList
                 connectAnotherWayOnclick={() => {
-                  // sidebarType = 'ethWallet';
-                  // bodyType = 'connectWithEmail';
+                  setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
+                setProfiles={setProfiles}
+                setAddress={setAddress}
+                setSidebarType={setSidebarType}
+                setBodyType={setBodyType}
+                setAccount={(account) => {
+                  this.account = account;
+                }}
               />
             </div>
           )}
@@ -91,10 +123,19 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
               <CWTextInput
                 label="email address"
                 placeholder="your-email@email.com"
+                oninput={(e) => {
+                  this.email = e.target.value;
+                }}
               />
               <div class="buttons-row">
-                <CWButton label="Back" buttonType="secondary-blue" />
-                <CWButton label="Connect" />
+                <CWButton
+                  label="Back"
+                  buttonType="secondary-blue"
+                  onclick={() => {
+                    setBodyType('walletList');
+                  }}
+                />
+                <CWButton label="Connect" onclick={handleEmailLogin} />
               </div>
             </div>
           )}
