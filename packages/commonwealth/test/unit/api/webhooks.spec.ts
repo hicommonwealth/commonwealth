@@ -97,7 +97,7 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      expectErrorOnResponse(500, Errors.NoDuplicates, errorRes);
+      expectErrorOnResponse(400, Errors.NoDuplicates, errorRes);
       webhookUrls = await models['Webhook'].findAll({
         where: { url: webhookUrl },
       });
