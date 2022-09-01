@@ -66,26 +66,25 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain, author }
-        : { type: type.toString(), type_id, chain };
-      const [dbEntity, created] = await this._models.ChainEntity.findOrCreate({
-        where: params,
-        default: { completed },
+        ? { type: type.toString(), type_id, chain, author, completed }
+        : { type: type.toString(), type_id, chain, completed };
+
+      // insert the new entity into the database and publish the entity CUD message
+      // if either one of these fails than the entire operation is reverted
+      const dbEntity = await this._models.sequelize.transaction(async (t) => {
+        const result = await this._models.ChainEntity.create({
+          where: params,
+        }, {transaction: t});
+
+        await this._rmqController.publish(result, RascalPublications.ChainEntityCUDMain)
+
+        return result;
       });
-      if (created) {
-        log.info(
-          `Created db entity, ${type.toString()}: ${type_id}.`
-        );
-      } else {
-        log.info(
-          `Found duplicate db entity,  ${type.toString()}: ${type_id}.`
-        );
-      }
+
 
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;
         await dbEvent.save();
-        // await this._wssSend(dbEntity, dbEvent);
       } else {
         log.info(
           `Db Event is already linked to entity! Doing nothing.`
@@ -158,11 +157,6 @@ export default class extends IEventHandler {
         result = null;
         break;
       }
-    }
-
-    // TODO: trim result to only include the values the main service needs
-    if (result) {
-      await this._rmqController.publish(result, RascalPublications.ChainEntityCUDMain)
     }
   }
 }

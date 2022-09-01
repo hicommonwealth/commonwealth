@@ -1,5 +1,6 @@
 import { DB } from "../../database";
 import { Logger } from "typescript-logging";
+import {isRmqMsgCreateEntityCUD, TRmqMsgEntityCUD} from "common-common/src/rabbitmq/types/chainEntityCUD";
 
 
 export type Ithis = {
@@ -9,17 +10,14 @@ export type Ithis = {
 
 export async function processChainEntityCUD(
   this: Ithis,
-  chainEntityData: {
-    chainEntityMeta: {ce_id: number, chain: string};
-    cud: 'create'
-  }
+  data: TRmqMsgEntityCUD
 ) {
-  if (chainEntityData.cud === 'create') {
+  if (isRmqMsgCreateEntityCUD(data)) {
     const result = await this.models.ChainEntityMeta.create({
-      ce_id: chainEntityData.chainEntityMeta.ce_id,
-      chain: chainEntityData.chainEntityMeta.chain
+      ce_id: data.ce_id,
+      chain: data.chain_id
     });
   } else {
-    this.log.error(`ChainEntityCUD does not support ${chainEntityData.cud}`);
+    this.log.error(`ChainEntityCUD does not support the given data: ${JSON.stringify(data)}`);
   }
 }
