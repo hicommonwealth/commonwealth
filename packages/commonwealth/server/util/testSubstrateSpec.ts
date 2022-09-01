@@ -3,6 +3,7 @@ import { RegisteredTypes } from '@polkadot/types/types';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from './errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,7 +15,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   try {
     unpackedSpec = JSON.parse(specString);
   } catch (e) {
-    throw new Error('Could not parse spec data');
+    throw new ServerError('Could not parse spec data');
   }
   const sanitizedSpec: RegisteredTypes = {
     types: unpackedSpec['types'],
@@ -29,7 +30,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   try {
     await provider.connect();
   } catch (err) {
-    throw new Error('failed to connect to node url');
+    throw new ServerError('failed to connect to node url');
   }
   try {
     log.info('Fetching chain properties...');
@@ -43,7 +44,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   } catch (err) {
     log.info('Disconnecting from provider in error...');
     await provider.disconnect();
-    throw new Error(`failed to initialize polkadot api: ${err.message}`);
+    throw new ServerError(`failed to initialize polkadot api: ${err.message}`);
   }
 };
 

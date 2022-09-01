@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
+
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
@@ -13,7 +15,7 @@ const activeThreads = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   let { threads_per_topic } = req.query;
   if (!threads_per_topic
@@ -68,7 +70,7 @@ const activeThreads = async (
 
       allThreads.push(...(recentTopicThreads || []));
     })).catch((err) => {
-      return next(new Error(err));
+      return next(new AppError(err));
     });
 
     return res.json({
@@ -76,7 +78,7 @@ const activeThreads = async (
       result: allThreads.map((c) => c.toJSON()),
     });
   } catch (err) {
-    return next(new Error(err));
+    return next(new AppError(err));
   }
 };
 

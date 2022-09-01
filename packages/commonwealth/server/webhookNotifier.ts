@@ -7,6 +7,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
 import { getForumNotificationCopy } from '../shared/notificationFormatter';
 import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
+import { AppError, ServerError } from './util/errors';
 
 export interface WebhookContent {
   notificationCategory: string;
@@ -73,7 +74,7 @@ const getFilteredContent = (content, address) => {
       try {
         // parse and use quill document
         const doc = JSON.parse(bodytext);
-        if (!doc.ops) throw new Error();
+        if (!doc.ops) throw new AppError('error');
         const text = renderQuillDeltaToText(doc);
         return smartTrim(text);
       } catch (err) {

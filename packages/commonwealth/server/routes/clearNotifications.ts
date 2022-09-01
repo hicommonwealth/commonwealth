@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB, sequelize } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -17,10 +18,10 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body['notification_ids[]']) {
-    return next(new Error(Errors.NoNotificationIds));
+    return next(new AppError(Errors.NoNotificationIds));
   }
 
   let notification_ids;

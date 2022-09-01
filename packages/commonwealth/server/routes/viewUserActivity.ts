@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Must be logged in to view user dashboard',
@@ -12,7 +13,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   const { id } = req.user;
 

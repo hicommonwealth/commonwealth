@@ -12,6 +12,7 @@ import IdentityEventHandler from '../eventHandlers/identity';
 import { ChainBase } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -33,7 +34,7 @@ export default async function (models, chain?: string): Promise<void> {
     ],
   });
   if (!nodes) {
-    throw new Error('no nodes found for chain entity migration');
+    throw new ServerError('no nodes found for chain entity migration');
   }
 
   // 2. for each node, fetch and migrate identities

@@ -15,6 +15,7 @@ import { ThreadInstance } from '../models/thread';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { RuleInstance } from '../models/rule';
 import { CommunityBannerInstance } from '../models/community_banner';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -27,7 +28,7 @@ const bulkOffchain = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';
@@ -101,7 +102,7 @@ const bulkOffchain = async (
           );
         } catch (e) {
           console.log(e);
-          reject(new Error('Could not fetch threads, comments, or reactions'));
+          reject(new AppError('Could not fetch threads, comments, or reactions'));
         }
       }),
       // admins
@@ -150,7 +151,7 @@ const bulkOffchain = async (
           });
           resolve(mostActiveUsers_);
         } catch (e) {
-          reject(new Error('Could not fetch most active users'));
+          reject(new AppError('Could not fetch most active users'));
         }
       }),
       models.sequelize.query(

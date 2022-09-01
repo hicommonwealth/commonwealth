@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,10 +17,10 @@ const writeUserSetting = async (models: DB, req: Request, res: Response, next: N
   const { key, value } = req.body;
 
   if (!req.user) {
-    return next(new Error(Errors.InvalidUser));
+    return next(new AppError(Errors.InvalidUser));
   }
   if (!key || !value) {
-    return next(new Error(Errors.NoKeyValue));
+    return next(new AppError(Errors.NoKeyValue));
   }
 
   if (key === 'lastVisited') {
@@ -40,7 +41,7 @@ const writeUserSetting = async (models: DB, req: Request, res: Response, next: N
     req.user.emailNotificationInterval = value;
     await req.user.save();
   } else {
-    return next(new Error(Errors.InvalidSetting));
+    return next(new AppError(Errors.InvalidSetting));
   }
 
   return res.json({ status: 'Success', result: { key, value } });

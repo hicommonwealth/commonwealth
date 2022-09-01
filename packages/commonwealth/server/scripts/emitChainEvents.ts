@@ -30,7 +30,7 @@ async function main(chain: string, eventsPath: string) {
     } else if (typeof events === 'object') {
       events = [eventData];
     } else {
-      throw new Error(`Invalid json format: ${typeof events}`);
+      throw new ServerError(`Invalid json format: ${typeof events}`);
     }
   } catch (err) {
     log.error(`Failed to read events file: ${err.message}`);
@@ -57,7 +57,7 @@ async function main(chain: string, eventsPath: string) {
       }],
     });
     if (!chainInstance) {
-      throw new Error(`Chain not found: ${chain}`);
+      throw new ServerError(`Chain not found: ${chain}`);
     }
     handlers = generateHandlers(chainInstance);
   } catch (err) {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NoStarValue: 'Must pass isAlreadyStarred boolean to set starred status',
@@ -13,7 +14,7 @@ const starCommunity = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   if (req.body.isAlreadyStarred === 'false') {
     // star community
@@ -32,7 +33,7 @@ const starCommunity = async (
     }
     return res.json({ status: 'Success' });
   } else {
-    return next(new Error(Errors.NoStarValue));
+    return next(new AppError(Errors.NoStarValue));
   }
 };
 
