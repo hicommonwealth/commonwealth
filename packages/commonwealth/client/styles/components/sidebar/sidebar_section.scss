@@ -8,10 +8,16 @@
   flex-direction: column;
 
   .section-group-title-container {
+    padding: 8px 16px;
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 16px 40px;
+    @include small {
+      padding: 12px 40px;
+    }
+    @include extraSmall {
+      padding: 12px 16px;
+    }
     svg {
       color: $neutral-500;
     }
@@ -25,10 +31,17 @@
 
 .SubSectionGroup {
   .SubSectionGroupTitle {
-    padding: 12px 8px 12px 56px;
     align-items: center;
     display: flex;
     min-width: 0;
+
+    @include small {
+      padding: 12px 56px;
+    }
+
+    @include extraSmall {
+      padding: 12px 32px;
+    }
 
     .title-text {
       font-size: 14px;
