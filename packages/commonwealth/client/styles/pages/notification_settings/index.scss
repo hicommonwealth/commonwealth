@@ -21,6 +21,10 @@
     padding: 24px 72px;
   }
 
+  @include small {
+    padding: 24px 56px;
+  }
+
   @include extraSmall {
     padding: 16px;
   }
