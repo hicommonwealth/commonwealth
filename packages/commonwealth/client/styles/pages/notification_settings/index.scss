@@ -1,11 +1,11 @@
 @import 'shared';
 
-@mixin subBundleColumns {
+@mixin communityBundleColumns {
   display: grid;
   grid-template-columns: 3fr 2fr 1fr;
 }
 
-@mixin subColumns {
+@mixin subscriptionColumns {
   display: grid;
   grid-template-columns: 3fr 1fr 1fr 1fr;
 }
@@ -27,7 +27,7 @@
   }
 
   .column-header-row {
-    @include subBundleColumns;
+    @include communityBundleColumns;
 
     border-bottom: 1px solid $neutral-200;
     padding: 0 0 8px 40px;
@@ -49,7 +49,7 @@
     gap: 16px;
 
     .notification-row-header {
-      @include subBundleColumns;
+      @include communityBundleColumns;
 
       height: 80px;
       width: 100%;
@@ -82,7 +82,7 @@
       flex-direction: column;
 
       .subscriptions-list-header {
-        @include subColumns;
+        @include subscriptionColumns;
 
         border-bottom: 1px solid $neutral-100;
         padding-bottom: 4px;
@@ -93,7 +93,7 @@
       }
 
       .subscription-row {
-        @include subColumns;
+        @include subscriptionColumns;
 
         align-items: center;
         height: 72px;
