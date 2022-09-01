@@ -1,4 +1,3 @@
-import { SubstrateEvents } from 'chain-events/src';
 import session from 'express-session';
 import express from 'express';
 import webpack from 'webpack';
@@ -12,15 +11,16 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import { redirectToHTTPS } from 'express-http-to-https';
+import {redirectToHTTPS} from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
-import { ChainBase } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {factory, formatFilename} from 'common-common/src/logging';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 import ViewCountCache from './server/util/viewCountCache';
@@ -29,23 +29,25 @@ import IdentityFetchCache, {
 } from './server/util/identityFetchCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import {sendBatchedNotificationEmails} from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
+import {BrokerConfig} from "rascal";
 
 // set up express async error handling hack
 require('express-async-errors');
 
 const app = express();
+
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
 
@@ -115,8 +117,8 @@ async function main() {
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
       ? webpackDevMiddleware(compiler, {
-          publicPath: '/build',
-        })
+        publicPath: '/build',
+      })
       : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
@@ -203,8 +205,8 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
+    app.use(bodyParser.json({limit: '1mb'}));
+    app.use(bodyParser.urlencoded({limit: '1mb', extended: false}));
     app.use(cookieParser());
     app.use(sessionParser);
     app.use(passport.initialize());
@@ -233,6 +235,30 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
+  let rabbitMQController: RabbitMQController;
+  try {
+    rabbitMQController = new RabbitMQController(
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+    );
+    await rabbitMQController.init();
+  } catch (e) {
+    console.warn("The main service RabbitMQController failed to initialize!", e)
+    rollbar.critical("The main service RabbitMQController failed to initialize!", e)
+  }
+
+  if (!rabbitMQController.initialized) {
+    console.warn("The RabbitMQController is not initialized! Some services may be unavailable e.g. (Create/Delete chain and Websocket notifications")
+    rollbar.critical("The main service RabbitMQController is not initialized!");
+    // TODO: this requires an immediate response if in production
+  }
+
   await tokenBalanceCache.start();
   await ruleCache.start();
   const banCache = new BanCache(models);
@@ -248,16 +274,9 @@ async function main() {
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
-
   setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models);
+  setupServer(app, rollbar, models, rabbitMQController);
 }
 
 main();

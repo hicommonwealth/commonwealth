@@ -1,5 +1,4 @@
 import { BrokerConfig } from 'rascal';
-import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 import {
   RabbitMQSubscription,
   ServiceConsumer,
@@ -8,8 +7,7 @@ import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
+import { RabbitMQController, getRabbitMQConfig, RascalSubscriptions } from 'common-common/src/rabbitmq';
 import models from '../database/database';
 import { RABBITMQ_URI } from '../config';
 import {

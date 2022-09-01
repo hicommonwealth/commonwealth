@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import _ from 'underscore';
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { RascalPublications, getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
@@ -13,7 +13,6 @@ import {
   ROLLBAR_SERVER_TOKEN,
   WORKER_NUMBER,
 } from '../config';
-import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
 import {
   getListenerNames,
   manageErcListeners,

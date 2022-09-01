@@ -14,19 +14,16 @@ import {
 } from "redis";
 import Rollbar from 'rollbar';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
+import { RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
 import {
   JWT_SECRET,
   REDIS_URL,
-  RABBITMQ_URI,
   VULTR_IP
 } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
-import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,7 +52,8 @@ export const authenticate = (
 export async function setupWebSocketServer(
   httpServer: http.Server,
   rollbar: Rollbar,
-  models: DB
+  models: DB,
+  rabbitMQController: RabbitMQController
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -200,12 +198,7 @@ export async function setupWebSocketServer(
   const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
-    const rabbitController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
-    );
-
-    await rabbitController.init();
-    await rabbitController.startSubscription(
+    await rabbitMQController.startSubscription(
       publishToCERoom.bind(ceNamespace),
       RascalSubscriptions.ChainEventNotifications
     );

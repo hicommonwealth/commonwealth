@@ -28,6 +28,9 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
     return next(new Error(Errors.NotAcceptableAdmin));
   }
 
+  // TODO send message in ChainCUDQueue
+
+
   await models.sequelize.transaction(async (t) => {
     const chain = await models.Chain.findOne({
       where: {

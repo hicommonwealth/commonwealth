@@ -1,9 +1,7 @@
 // @ts-ignore
 import crypto from "crypto";
 import { addPrefix, factory, formatFilename } from "./logging";
-import { RabbitMQController } from "./rabbitmq/rabbitMQController";
-import getRabbitMQConfig from "./rabbitmq/RabbitMQConfig";
-import { RascalSubscriptions } from "./rabbitmq/types";
+import { RabbitMQController, RascalSubscriptions } from "./rabbitmq";
 
 let log;
 

@@ -1,5 +1,4 @@
-import getRabbitMQConfig from 'common-common/src/rabbitmq/RabbitMQConfig';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import { RabbitMQController, getRabbitMQConfig } from 'common-common/src/rabbitmq';
 import {
   RabbitMQSubscription,
   ServiceConsumer,

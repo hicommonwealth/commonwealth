@@ -65,6 +65,10 @@ export class RabbitMQController {
     subscriptionName: string,
     msgProcessorContext?: {[key: string]: any}
   ): Promise<any> {
+    if (!this._initialized) {
+      throw new Error("RabbitMQController is not initialized!")
+    }
+
     let subscription: Rascal.SubscriberSessionAsPromised;
     try {
       if (!this.subscribers.includes(subscriptionName))
@@ -98,6 +102,10 @@ export class RabbitMQController {
   }
 
   public async publish(data: any, publisherName: any): Promise<any> {
+    if (!this._initialized) {
+      throw new Error("RabbitMQController is not initialized!")
+    }
+
     if (!this.publishers.includes(publisherName))
       throw new Error('Publisher is not defined');
 

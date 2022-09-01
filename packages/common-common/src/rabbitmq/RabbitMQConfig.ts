@@ -5,7 +5,7 @@ import { RascalPublications, RascalSubscriptions } from "./types";
  * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.
  * @param rabbitmq_uri The uri of the RabbitMQ instance to connect to.
  */
-function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
+export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
   let vhost, purge;
 
   if (rabbitmq_uri.includes('localhost') || rabbitmq_uri.includes('127.0.0.1')) {
@@ -204,5 +204,3 @@ function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
   // the above configuration is correct but Rascal has some type issues
   return <Rascal.BrokerConfig>config;
 }
-
-export default getRabbitMQConfig
