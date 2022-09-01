@@ -52,7 +52,6 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
-          <CommunitySelector />
           {app.isLoggedIn() && (
             <CWIconButton
               iconName="plusCircle"
@@ -69,6 +68,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
               }}
             />
           )}
+          <CommunitySelector />
         </div>
         <div class="scrollable-community-bar">
           {starredCommunities.map((item) => (
