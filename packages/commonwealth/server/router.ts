@@ -146,6 +146,7 @@ import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
+import authCallback from './routes/authCallback';
 
 function setupRouter(
   app: Express,
@@ -764,6 +765,12 @@ function setupRouter(
     '/auth/sso/callback',
     // passport.authenticate('jwt', { session: false }),
     finishSsoLogin.bind(this, models)
+  );
+
+  router.get(
+    '/auth/callback',
+    passport.authenticate('jwt', { session: false }),
+    authCallback.bind(this, models),
   );
 
   // logout
