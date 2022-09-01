@@ -101,6 +101,10 @@ export class RabbitMQController {
     return subscription;
   }
 
+  // TODO: add a class property that takes an object from publisherName => callback function
+  //      if a message is successfully published to a particular queue then the callback is executed
+
+  // TODO: the publish ACK should be in a transaction with the publish itself
   public async publish(data: any, publisherName: any): Promise<any> {
     if (!this._initialized) {
       throw new Error("RabbitMQController is not initialized!")
