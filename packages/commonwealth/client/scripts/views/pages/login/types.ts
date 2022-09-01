@@ -31,4 +31,8 @@ export type LoginAttrs = {
   username: string;
   wallets: Array<IWebWallet<any>>;
   setWallets: (wallets: Array<string>) => void;
+  linkExistingAccountCallback: () => void;
+  createNewAccountCallback: () => void;
+  accountVerifiedCallback: () => void;
+  logInWithAccountCallback: () => void;
 };

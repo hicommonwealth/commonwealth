@@ -2,10 +2,18 @@
 
 import m from 'mithril';
 import app from 'state';
+import $ from 'jquery';
 
 import _ from 'underscore';
+import { initAppState } from 'app';
+import {
+  loginWithMagicLink,
+  setActiveAccount,
+  updateActiveAddresses,
+} from 'controllers/app/login';
+import { isSameAccount } from 'helpers';
 
-import { IWebWallet } from 'client/scripts/models';
+import { Account, AddressInfo, IWebWallet } from 'models';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Login from 'views/components/login';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
@@ -36,6 +44,7 @@ export class NewLoginModal implements m.ClassComponent {
   private profiles: Array<ProfileRowAttrs>;
   private sidebarType: LoginSidebarType;
   private username: string;
+  private email: string;
   private wallets: Array<IWebWallet<any>>;
 
   oninit() {
@@ -68,6 +77,119 @@ export class NewLoginModal implements m.ClassComponent {
   }
 
   view() {
+    const handleEmailLoginCallback = async () => {
+      if (!this.email) return;
+
+      try {
+        console.log('magic linkin');
+        await loginWithMagicLink(this.email);
+        // TODO: Understand the context of where we are coming from
+        this.bodyType = 'welcome';
+      } catch (e) {
+        console.error(e);
+        // TODO: Error message display somehow
+      }
+    };
+
+    const logInWithAccount = async (account: Account) => {
+      if (app.isLoggedIn()) {
+        // Already logged in with another account
+        try {
+          let addressInfo = app.user.addresses.find(
+            (a) =>
+              a.address === account.address && a.chain.id === account.chain.id
+          );
+
+          if (!addressInfo && account.addressId) {
+            // TODO: add keytype
+            addressInfo = new AddressInfo(
+              account.addressId,
+              account.address,
+              account.chain.id,
+              account.walletId
+            );
+            app.user.addresses.push(addressInfo);
+          }
+
+          // link the address to the community
+          if (app.chain) {
+            try {
+              if (
+                !app.roles.getRoleInCommunity({
+                  account,
+                  chain: app.activeChainId(),
+                })
+              ) {
+                await app.roles.createRole({
+                  address: addressInfo,
+                  chain: app.activeChainId(),
+                });
+              }
+            } catch (e) {
+              // this may fail if the role already exists, e.g. if the address is being migrated from another user
+              console.error('Failed to create role');
+            }
+          }
+
+          // set the address as active
+          await setActiveAccount(account);
+          if (
+            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+              .length === 0
+          ) {
+            app.user.setActiveAccounts(
+              app.user.activeAccounts.concat([account])
+            );
+          }
+        } catch (e) {
+          console.trace(e);
+          // if the address' role wasn't initialized correctly,
+          // setActiveAccount will throw an exception but we should continue
+        }
+
+        $('.LoginDesktop').trigger('modalexit');
+        m.redraw();
+      } else {
+        // log in as the new user
+        console.log('new user');
+
+        await initAppState(false);
+        // load addresses for the current chain/community
+        if (app.chain) {
+          // TODO: this breaks when the user action creates a new token forum
+          const chain =
+            app.user.selectedChain ||
+            app.config.chains.getById(app.activeChainId());
+          await updateActiveAddresses(chain);
+        }
+        $('.LoginDesktop').trigger('modalexit');
+        m.redraw();
+      }
+    };
+
+    const accountVerifiedCallback = async (
+      account: Account,
+      newlyCreated: boolean
+    ) => {
+      if (!newlyCreated) {
+        await logInWithAccount(account);
+      } else {
+        this.sidebarType = 'newOrReturning';
+        this.bodyType = 'selectAccountType';
+        m.redraw();
+      }
+    };
+
+    const createNewAccountCallback = async () => {
+      this.bodyType = 'welcome';
+      m.redraw();
+    };
+
+    const linkExistingAccountCallback = async () => {
+      this.bodyType = 'selectPrevious';
+      m.redraw();
+    };
+
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
       <LoginMobile
         address={dummyAddress}
@@ -97,6 +219,10 @@ export class NewLoginModal implements m.ClassComponent {
         setWallets={(wallets: Array<IWebWallet<any>>) => {
           this.wallets = wallets;
         }}
+        createNewAccountCallback={createNewAccountCallback}
+        linkExistingAccountCallback={linkExistingAccountCallback}
+        accountVerifiedCallback={accountVerifiedCallback}
+        handleEmailLoginCallback={handleEmailLoginCallback}
       />
     ) : (
       <LoginDesktop
@@ -127,6 +253,10 @@ export class NewLoginModal implements m.ClassComponent {
         setWallets={(wallets: Array<IWebWallet<any>>) => {
           this.wallets = wallets;
         }}
+        createNewAccountCallback={createNewAccountCallback}
+        linkExistingAccountCallback={linkExistingAccountCallback}
+        accountVerifiedCallback={accountVerifiedCallback}
+        handleEmailLoginCallback={handleEmailLoginCallback}
       />
     );
   }

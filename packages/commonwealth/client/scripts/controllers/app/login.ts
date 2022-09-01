@@ -196,8 +196,8 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  chain: string,
-): Promise<Account> {
+  chain: string
+): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
@@ -212,8 +212,8 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
-  })
-  return account;
+  });
+  return { account, newlyCreated: response.result.newly_created };
 }
 
 export async function unlinkLogin(account: AddressInfo) {

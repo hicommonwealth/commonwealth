@@ -49,111 +49,19 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       username,
       wallets,
       setWallets,
+      createNewAccountCallback,
+      linkExistingAccountCallback,
+      accountVerifiedCallback,
+      handleEmailLoginCallback,
     } = vnode.attrs;
-
-    const handleEmailLogin = async () => {
-      console.log('email', this.email);
-      if (!this.email) return;
-
-      try {
-        console.log('magic linkin');
-        await loginWithMagicLink(this.email);
-        // TODO: Understand the context of where we are coming from
-        setBodyType('welcome');
-      } catch (e) {
-        console.error(e);
-        // TODO: Error message display somehow
-      }
-    };
-
-    const accountVerifiedCallback = async (account: Account) => {
-      if (app.isLoggedIn()) {
-        // existing user
-
-        // initialize role
-        try {
-          // initialize AddressInfo
-          // TODO: refactor so addressId is always stored on Account and we can avoid this
-          //
-          // Note: account.addressId is set by all createAccount
-          // methods in controllers/login.ts. this means that all
-          // cases should be covered (either the account comes from
-          // the backend and the address is also loaded via
-          // AddressInfo, or the account is created on the frontend
-          // and the id is available here).
-          let addressInfo = app.user.addresses.find(
-            (a) =>
-              a.address === account.address && a.chain.id === account.chain.id
-          );
-
-          if (!addressInfo && account.addressId) {
-            // TODO: add keytype
-            addressInfo = new AddressInfo(
-              account.addressId,
-              account.address,
-              account.chain.id,
-              account.walletId
-            );
-            app.user.addresses.push(addressInfo);
-          }
-
-          // link the address to the community
-          if (app.chain) {
-            try {
-              if (
-                !app.roles.getRoleInCommunity({
-                  account,
-                  chain: vnode.attrs.joiningChain,
-                })
-              ) {
-                await app.roles.createRole({
-                  address: addressInfo,
-                  chain: vnode.attrs.joiningChain,
-                });
-              }
-            } catch (e) {
-              // this may fail if the role already exists, e.g. if the address is being migrated from another user
-              console.error('Failed to create role');
-            }
-          }
-
-          // set the address as active
-          await setActiveAccount(account);
-          if (
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-              .length === 0
-          ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account])
-            );
-          }
-        } catch (e) {
-          console.trace(e);
-          // if the address' role wasn't initialized correctly,
-          // setActiveAccount will throw an exception but we should continue
-        }
-
-        $('.LoginDesktop').trigger('modalexit');
-        m.redraw();
-      } else {
-        // log in as the new user
-        await initAppState(false);
-        // load addresses for the current chain/community
-        if (app.chain) {
-          // TODO: this breaks when the user action creates a new token forum
-          const chain =
-            app.user.selectedChain ||
-            app.config.chains.getById(app.activeChainId());
-          await updateActiveAddresses(chain);
-        }
-        $('.LoginDesktop').trigger('modalexit');
-        m.redraw();
-      }
-    };
 
     return (
       <div class="LoginDesktop">
-        <LoginDesktopSidebar sidebarType={sidebarType} />
+        <LoginDesktopSidebar
+          sidebarType={sidebarType}
+          createNewAccountCallback
+          linkExistingAccountCallback
+        />
         <div class="body">
           <ModalExitButton />
           {bodyType === 'walletList' && (
@@ -228,7 +136,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                     setBodyType('walletList');
                   }}
                 />
-                <CWButton label="Connect" onclick={handleEmailLogin} />
+                <CWButton label="Connect" onclick={handleEmailLoginCallback} />
               </div>
             </div>
           )}
@@ -304,11 +212,17 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
               </div>
               <CWWalletsList
                 connectAnotherWayOnclick={() => {
-                  // sidebarType = 'ethWallet';
-                  // bodyType = 'connectWithEmail';
+                  setBodyType('connectWithEmail');
                 }}
-                hasNoWalletsLink={false}
                 wallets={wallets}
+                setProfiles={setProfiles}
+                setAddress={setAddress}
+                setSidebarType={setSidebarType}
+                setBodyType={setBodyType}
+                setAccount={(account: Account) => {
+                  this.account = account;
+                }}
+                accountVerifiedCallback={accountVerifiedCallback}
               />
             </div>
           )}

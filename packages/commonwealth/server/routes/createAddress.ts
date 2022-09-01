@@ -30,7 +30,7 @@ type CreateAddressReq = {
   keytype?: string;
 };
 
-type CreateAddressResp = AddressAttributes;
+type CreateAddressResp = AddressAttributes & { newly_created: boolean };
 
 const createAddress = async (
   models: DB,
@@ -147,7 +147,8 @@ const createAddress = async (
         });
       }
     }
-    return success(res, updatedObj.toJSON());
+    const output = { ...updatedObj.toJSON(), newly_created: false };
+    return success(res, output);
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -195,8 +196,8 @@ const createAddress = async (
           isCustomDomain: null,
         });
       }
-
-      return success(res, newObj.toJSON());
+      const output = { ...newObj.toJSON(), newly_created: true };
+      return success(res, output);
     } catch (e) {
       return next(e);
     }

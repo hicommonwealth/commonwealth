@@ -99,22 +99,22 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       }
                     }
 
-                    console.log('Wallet', wallet);
-
                     try {
-                      const signerAccount = await createUserWithAddress(
-                        address,
-                        wallet.name,
-                        app.chain?.id || wallet.defaultNetwork
-                      );
+                      const { account: signerAccount, newlyCreated } =
+                        await createUserWithAddress(
+                          address,
+                          wallet.name,
+                          app.chain?.id || wallet.defaultNetwork
+                        );
                       await wallet.validateWithAccount(signerAccount);
+
                       setAccount(signerAccount);
 
                       // return if user signs for two addresses
                       // if (linkNewAddressModalVnode.state.linkingComplete)
                       //   return;
                       // linkNewAddressModalVnode.state.linkingComplete = true;
-                      accountVerifiedCallback(signerAccount);
+                      accountVerifiedCallback(signerAccount, newlyCreated);
                       // setBodyType('selectAccountType');
                       // setSidebarType('newOrReturning');
                     } catch (err) {

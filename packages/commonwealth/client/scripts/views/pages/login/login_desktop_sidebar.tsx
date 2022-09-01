@@ -11,10 +11,19 @@ import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
 
 export class LoginDesktopSidebar
-  implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
+  implements
+    m.ClassComponent<{
+      sidebarType: LoginSidebarType;
+      createNewAccountCallback: () => void;
+      linkExistingAccountCallback: () => void;
+    }>
 {
   view(vnode) {
-    const { sidebarType } = vnode.attrs;
+    const {
+      sidebarType,
+      createNewAccountCallback,
+      linkExistingAccountCallback,
+    } = vnode.attrs;
     return (
       <div class="LoginDesktopSidebar">
         {sidebarType === 'connectWallet' && (
@@ -34,16 +43,10 @@ export class LoginDesktopSidebar
             <CWText type="h4" fontWeight="semiBold" className="header-text">
               New or Returning?
             </CWText>
-            <CWAccountCreationButton
-              onclick={() => {
-                // fill in
-              }}
-            />
+            <CWAccountCreationButton onclick={createNewAccountCallback} />
             <CWAccountCreationButton
               creationType="linkAccount"
-              onclick={() => {
-                // fill in
-              }}
+              onclick={linkExistingAccountCallback}
             />
           </div>
         )}
