@@ -1,3 +1,9 @@
+export * from './chainCUD'
+
+import * as ChainCud from './chainCUD';
+
+export type TRabbitMqMessages = ChainCud.TRmqMsgChainCUD
+
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
   ChainCUDChainEvents = 'ChainCUDChainEventsPublication',
@@ -15,3 +21,4 @@ export enum RascalSubscriptions {
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainSubscription'
 }
+

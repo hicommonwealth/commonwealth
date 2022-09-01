@@ -1,6 +1,12 @@
 import { ChainAttributes } from '../../database/models/chain';
 import { DB } from '../../database/database';
 import { Logger } from "typescript-logging";
+import {
+  isRmqMsgCreateChainCUD,
+  isRmqMsgDeleteChainCUD,
+  isRmqMsgUpdateChainCUD,
+  TRmqMsgChainCUD
+} from 'common-common/src/rabbitmq'
 
 export type Ithis = {
   models: DB;
@@ -9,77 +15,60 @@ export type Ithis = {
 
 export async function processChainCUD(
   this: Ithis,
-  chainData: {
-    chain: ChainAttributes;
-    cud: 'create' | 'update' | 'delete-chain' | 'delete-chainNode';
-    chainNodeUrl?: string;
-  }
+  data: TRmqMsgChainCUD
 ) {
-  if (chainData.cud === 'create') {
+  if (isRmqMsgCreateChainCUD(data)) {
     const [chainNode, created] = await this.models.ChainNode.findOrCreate({
-      where: { url: chainData.chain.ChainNode.url },
+      where: { url: data.chain_node_url },
     });
 
     await this.models.Chain.create({
-      id: chainData.chain.id,
-      base: chainData.chain.base,
-      network: chainData.chain.network,
+      id: data.chain_id,
+      base: data.base,
+      network: data.network,
       chain_node_id: chainNode.id,
-      contract_address: chainData.chain.contract_address,
-      substrate_spec: chainData.chain.substrate_spec,
-      verbose_logging: chainData.chain.verbose_logging,
-      active: chainData.chain.active,
+      contract_address: data.contract_address,
+      substrate_spec: data.substrate_spec,
+      verbose_logging: data.verbose_logging,
+      active: data.active,
     });
-  } else if (chainData.cud === 'update') {
+  } else if (isRmqMsgUpdateChainCUD(data)) {
     // get the existing chain data
     const chain = await this.models.Chain.findOne({
       where: {
-        id: chainData.chain.id,
+        id: data.chain_id,
       },
       include: this.models.ChainNode,
     });
 
     if (!chain) {
       this.log.error(
-        `Cannot update a non-existent chain! ${JSON.stringify(chainData.chain)}`
+        `Cannot update a non-existent chain! ${JSON.stringify(data.chain_id)}`
       );
       return;
     }
 
     // if the chainNode url has changed then findOrCreate the new chainNode
     let chainNode, created;
-    if (chain.ChainNode.url != chainData.chain.ChainNode.url) {
+    if (chain.ChainNode.url != data.chain_node_url) {
       [chainNode, created] = await this.models.ChainNode.findOrCreate({
-        where: { url: chainData.chain.ChainNode.url },
+        where: { url: data.chain_node_url },
       });
       chain.chain_node_id = chainNode.id;
     }
 
-    chain.base = chainData.chain.base;
-    chain.network = chainData.chain.network;
-    chain.contract_address = chainData.chain.contract_address;
-    chain.substrate_spec = chainData.chain.substrate_spec;
-    chain.verbose_logging = chainData.chain.verbose_logging;
-    chain.active = chainData.chain.active;
+    chain.base = data.base;
+    chain.network = data.network;
+    chain.contract_address = data.contract_address;
+    chain.substrate_spec = data.substrate_spec;
+    chain.verbose_logging = data.verbose_logging;
+    chain.active = data.active;
 
     await chain.save();
-  } else if (chainData.cud === 'delete-chain') {
+  } else if (isRmqMsgDeleteChainCUD(data)) {
     await this.models.Chain.destroy({
-      where: { id: chainData.chain.id },
+      where: { id: data.chain_id },
     });
-  } else if (chainData.cud === 'delete-chainNode') {
-    await this.models.ChainNode.destroy({
-      where: { url: chainData.chainNodeUrl },
-    });
-
-    await this.models.sequelize.query(
-      `
-        DELETE
-        FROM "ChainNodes"
-        WHERE (SELECT * FROM "Chains" WHERE chain_node_id = "ChainNodes".id) IS NULL;
-    `,
-      { raw: true }
-    );
-    // TODO: do we have any delete scenarios not handled here i.e. if updating a chain to a new ChainNode
+    // TODO: delete dependencies
   }
 }

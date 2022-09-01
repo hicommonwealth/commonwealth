@@ -354,7 +354,8 @@ const setupServer = () => {
 
 const banCache = new BanCache(models);
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, ruleCache, banCache);
+// TODO: mock RabbitMQController
+setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, ruleCache, banCache, null);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

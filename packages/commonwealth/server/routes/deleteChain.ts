@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import {RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,7 +15,7 @@ export const Errors = {
   NotAcceptableAdmin: 'Not an Acceptable Admin'
 };
 
-const deleteChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const deleteChain = async (models: DB, rabbitMQController: RabbitMQController, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return next(new Error(Errors.NotLoggedIn));
   }
@@ -27,9 +28,6 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
   if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
     return next(new Error(Errors.NotAcceptableAdmin));
   }
-
-  // TODO send message in ChainCUDQueue
-
 
   await models.sequelize.transaction(async (t) => {
     const chain = await models.Chain.findOne({
@@ -166,6 +164,9 @@ const deleteChain = async (models: DB, req: Request, res: Response, next: NextFu
       type: QueryTypes.DELETE,
       transaction: t,
     });
+
+    // if publishing fails, the entire transaction will roll back so no data inconsistencies occur
+    await rabbitMQController.publish({chain_id: req.body.id}, RascalPublications.ChainCUDChainEvents);
   });
 
   return res.json({ status: 'Success', result: 'Deleted chain' });

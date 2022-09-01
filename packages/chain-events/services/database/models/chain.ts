@@ -12,8 +12,8 @@ export type ChainAttributes = {
   chain_node_id: number;
   contract_address: string;
   substrate_spec: RegisteredTypes;
-  verbose_logging: boolean
-  active: boolean
+  verbose_logging: boolean;
+  active: boolean;
 
   ChainNode?: ChainNodeAttributes;
 };
