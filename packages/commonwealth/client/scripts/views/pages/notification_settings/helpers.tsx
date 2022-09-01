@@ -9,7 +9,6 @@
 
 // import 'pages/notification_settings/index.scss';
 
-// import app from 'state';
 // import { ProposalType, NotificationCategories } from 'common-common/src/types';
 // import { getProposalUrlPath } from 'identifiers';
 // import { link, pluralize } from 'helpers';

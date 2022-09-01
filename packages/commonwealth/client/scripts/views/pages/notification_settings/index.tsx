@@ -8,7 +8,7 @@ import 'pages/notification_settings/index.scss';
 
 import app from 'state';
 import { modelFromServer } from 'models/NotificationSubscription';
-import { AddressInfo, NotificationSubscription } from 'models';
+import { AddressInfo, ChainInfo, NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
@@ -29,6 +29,7 @@ import {
 
 class NotificationSettingsPage implements m.ClassComponent {
   private subscriptions: NotificationSubscription[];
+  private joinedCommunities: ChainInfo[];
 
   async oninit() {
     if (!app.isLoggedIn()) {
@@ -37,6 +38,30 @@ class NotificationSettingsPage implements m.ClassComponent {
     }
 
     this.subscriptions = [];
+
+    // Should be factored into a helper
+    // Also used in community_selector.tsx
+    const allCommunities = app.config.chains
+    .getAll()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .filter((item) => {
+      // only show chains with nodes
+      return !!item.node;
+    });
+    
+    // Should be factored into a helper
+    // Also used in community_selector.tsx
+    const isInCommunity = (item) => {
+      if (item instanceof ChainInfo) {
+        return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      } else {
+        return false;
+      }
+    };
+
+    // Should be factored into a helper
+    // Also used in community_selector.tsx
+    this.joinedCommunities = allCommunities.filter((c) => isInCommunity(c));
 
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
@@ -56,27 +81,28 @@ class NotificationSettingsPage implements m.ClassComponent {
 
   view() {
     if (!app.loginStatusLoaded()) {
+      console.log('hello')
       return (
         <PageLoading
           title={<BreadcrumbsTitleTag title="Notification Settings" />}
         />
       );
     } else if (!app.isLoggedIn()) {
+      console.log('hello 1')
       return (
         <ErrorPage
           message="This page requires you to be logged in"
           title={<BreadcrumbsTitleTag title="Notification Settings" />}
         />
       );
-    } else if (this.subscriptions.length < 1) {
-      return (
-        <PageLoading
-          title={<BreadcrumbsTitleTag title="Notification Settings" />}
-        />
-      );
-    }
+    } 
 
-    const bundledSubs = bundleSubs(this.subscriptions);
+    // Sort communities if they have a subscription 
+    const sortedCommunities = this.joinedCommunities.sort((a, b) => {
+      const aHasSub = this.subscriptions.filter((sub) => sub.Chain.id === a.id);
+      const bHasSub = this.subscriptions.filter((sub) => sub.Chain.id === b.id);
+      return bHasSub.length - aHasSub.length;
+    });
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
@@ -111,8 +137,9 @@ class NotificationSettingsPage implements m.ClassComponent {
               In-App
             </CWText>
           </div>
-          {Object.entries(bundledSubs).map(([k, v]) => {
-            const chainInfo = app.config.chains.getById(k);
+          {sortedCommunities.map((chainInfo) => {
+            // Filter subscriptions to only those for this chain
+            const chainSubs = this.subscriptions.filter((sub) => sub.Chain.id === chainInfo.id);
 
             return (
               <div class="notification-row">
@@ -130,7 +157,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                           </CWText>
                         </div>
                         <CWText type="b2" className="subscriptions-count-text">
-                          {v.length} subscriptions
+                          {chainSubs.length} subscriptions
                         </CWText>
                       </div>
                       <CWCheckbox label="Receive Emails" />
@@ -159,7 +186,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                           Author
                         </CWText>
                       </div>
-                      {v.map((sub) => {
+                      {chainSubs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
                             return m(User, {
