@@ -69,6 +69,8 @@ export default class extends IEventHandler {
         ? { type: type.toString(), type_id, chain, author, completed }
         : { type: type.toString(), type_id, chain, completed };
 
+      // TODO: update this to record the entity but use the ACK model to ensure consistency
+      //      rather than a db transaction revert
       // insert the new entity into the database and publish the entity CUD message
       // if either one of these fails than the entire operation is reverted
       const dbEntity = await this._models.sequelize.transaction(async (t) => {

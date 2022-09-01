@@ -1,9 +1,10 @@
 import { DB } from '../../database';
 import { Logger } from 'typescript-logging';
-import { CWEvent } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
-import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import {
+  isRmqMsgCreateCENotificationsCUD,
+  RascalPublications, TRmqMsgCENotificationsCUD
+} from 'common-common/src/rabbitmq/types';
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
 
 export type Ithis = {
@@ -14,13 +15,15 @@ export type Ithis = {
 
 export async function processChainEventNotificationsCUD(
   this: Ithis,
-  chainEventData: {
-    ChainEvent: ChainEventAttributes;
-    event: CWEvent;
-    cud: 'create';
-  }
+  data: TRmqMsgCENotificationsCUD
 ) {
-  const chainEvent = chainEventData.ChainEvent;
+  if (!isRmqMsgCreateCENotificationsCUD(data)) {
+    console.error("Incorrect message format", data);
+    // TODO: rollbar/datadog reporting
+    return;
+  }
+
+  const chainEvent = data.ChainEvent;
   let dbNotification;
   try {
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
@@ -38,14 +41,14 @@ export async function processChainEventNotificationsCUD(
         chainEventType: chainEvent.ChainEventType,
         chain: chainEvent.ChainEventType.chain,
       },
-      chainEventData.event.excludeAddresses,
-      chainEventData.event.includeAddresses
+      data.event.excludeAddresses,
+      data.event.includeAddresses
     );
   } catch (e) {
     this.log.error(
       `Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(
-        chainEventData.event
-      )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`, e
+        data.event
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
     );
     return;
   }
@@ -66,8 +69,8 @@ export async function processChainEventNotificationsCUD(
   } catch (e) {
     this.log.error(
       `Failed to publish notification: ${e.message}\nevent: ${JSON.stringify(
-        chainEventData.event
-      )}\ndbEvent: ${JSON.stringify(chainEventData.ChainEvent)}\n`, e
+        data.event
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
     );
   }
 }

@@ -52,6 +52,8 @@ export default class extends IEventHandler {
     const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
     formattedEvent.ChainEventType = dbEventType.toJSON();
 
+    // TODO: if this publish succeeds update the ACK/Queued column for the corresponding dbEvent
+    //        to ensure consistency
     await this._rmqController.publish(
       {ChainEvent: formattedEvent, event, cud: 'create'},
       RascalPublications.ChainEventNotificationsCUDMain
