@@ -17,10 +17,6 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     }, {
       model: models.Comment,
       as: 'Comment',
-    }, {
-    // TODO: this doesn't mean what we think it does anymore i.e. this only returns id's
-      model: models.ChainEventType,
-      as: 'ChainEventType',
     }];
 
   const searchParams: any[] = [

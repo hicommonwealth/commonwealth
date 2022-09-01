@@ -20,3 +20,23 @@ export function getBaseUrl(service?: ServiceUrls) {
     }
   }
 }
+
+export async function getFetch(url: string, queryParams?: { [key: string]: any }) {
+  let queryUrl;
+  if (queryParams) queryUrl = url + new URLSearchParams(queryParams);
+  try {
+    const response = await fetch(queryUrl || url, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      referrerPolicy: 'strict-origin-when-cross-origin',
+    })
+    if (response.ok) return response.json();
+    else console.error(response)
+  } catch (e) {
+    console.error(e);
+  }
+}

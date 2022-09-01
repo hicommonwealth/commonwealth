@@ -1,14 +1,15 @@
 import moment from 'moment';
 
 class NotificationSubscription {
-  public readonly id: number;
   public readonly category: string;
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: string;
-  public readonly ChainEventType: any;
   public readonly Comment: any;
   public readonly Thread: any;
+
+  public readonly id?: number;
+  public readonly chainEventTypeId?: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() { return this._immediateEmail; }
@@ -28,7 +29,7 @@ class NotificationSubscription {
     createdAt,
     immediateEmail,
     Chain?,
-    ChainEventType?,
+    ChainEventTypeId?,
     Comment?,
     Thread?,
   ) {
@@ -39,7 +40,7 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
-    this.ChainEventType = ChainEventType;
+    this.chainEventTypeId = ChainEventTypeId;
     this.Comment = Comment;
     this.Thread = Thread;
   }
@@ -53,7 +54,7 @@ class NotificationSubscription {
       json.created_at,
       json.immediate_email,
       json.chain_id,
-      json.ChainEventType || json.chain_event_type_id,
+      json.chain_event_type_id,
       json.Comment || json.offchain_comment_id,
       json.Thread || json.offchain_thread_id,
     );

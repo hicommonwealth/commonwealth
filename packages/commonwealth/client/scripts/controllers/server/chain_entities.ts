@@ -16,7 +16,7 @@ import {
   IChainEntityKind
 } from "chain-events/src";
 import {notifyError} from "../app/notifications";
-import {getBaseUrl, ServiceUrls} from "helpers/getUrl";
+import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
 
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -39,25 +39,6 @@ const get = (route, args, callback) => {
   }).catch((e) => console.error(e));
 };
 
-async function getFetch(url: string, queryParams?: { [key: string]: any }) {
-  let queryUrl;
-  if (queryParams) queryUrl = url + new URLSearchParams(queryParams);
-  try {
-    const response = await fetch(queryUrl || url, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      referrerPolicy: 'strict-origin-when-cross-origin',
-    })
-    if (response.ok) return response.json();
-    else console.error(response)
-  } catch (e) {
-    console.error(e);
-  }
-}
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
