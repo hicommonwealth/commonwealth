@@ -19,6 +19,10 @@
         display: flex;
         margin-right: 8px;
 
+        @include smallInclusive {
+          margin-right: 4px;
+        }
+
         .IconButton {
           color: $neutral-500;
         }

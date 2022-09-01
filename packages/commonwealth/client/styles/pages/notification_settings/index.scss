@@ -10,12 +10,48 @@
   grid-template-columns: 3fr 1fr 1fr 1fr;
 }
 
+@mixin iconAndText {
+  .icon-and-text-container {
+    display: flex;
+
+    .Icon {
+      margin-top: 2px;
+    }
+
+    .title-and-body-container {
+      display: grid;
+      flex-direction: column;
+      padding: 0 32px 0 16px;
+
+      .subscription-body-text.Text {
+        color: $neutral-600;
+      }
+
+      .comment-header-row {
+        align-items: center;
+        display: flex;
+
+        .attribution-text.Text {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+}
+
 .NotificationSettingsPage {
   flex: 1;
-  padding: 24px 176px;
+
+  @include large {
+    padding: 24px 176px;
+  }
 
   @include mediumInclusive {
     padding: 24px 72px;
+  }
+
+  @include extraSmall {
+    padding: 16px;
   }
 
   .page-header-text.Text {
@@ -54,6 +90,16 @@
       height: 80px;
       width: 100%;
 
+      @include extraSmall {
+        .Checkbox {
+          margin-left: 24px;
+
+          .checkbox-label {
+            display: none;
+          }
+        }
+      }
+
       .left-content-container {
         display: flex;
         flex-direction: column;
@@ -90,43 +136,66 @@
         .subscription-list-header-text.Text {
           color: $neutral-500;
         }
+
+        @include smallInclusive {
+          .subscription-list-header-text.Text {
+            display: none;
+          }
+        }
       }
 
-      .subscription-row {
+      .subscription-row-desktop {
         @include subscriptionColumns;
+        @include iconAndText;
 
         align-items: center;
         height: 72px;
 
-        .icon-and-text-container {
-          display: flex;
-
-          .Icon {
-            margin-top: 2px;
-          }
-
-          .title-and-body-container {
-            display: grid;
-            flex-direction: column;
-            padding: 0 32px 0 16px;
-
-            .subscription-body-text.Text {
-              color: $neutral-600;
-            }
-
-            .comment-header-row {
-              align-items: center;
-              display: flex;
-
-              .attribution-text.Text {
-                margin-right: 4px;
-              }
-            }
-          }
-        }
-
         .trigger-wrapper {
           justify-self: end;
+        }
+
+        @include smallInclusive {
+          display: none;
+        }
+      }
+
+      .subscription-row-mobile {
+        @include large {
+          display: none;
+        }
+
+        @include mediumInclusive {
+          display: none;
+        }
+
+        @include smallInclusive {
+          @include iconAndText;
+
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          height: 80px;
+          justify-content: center;
+
+          .subscription-row-mobile-top {
+            display: flex;
+            justify-content: space-between;
+          }
+
+          .subscription-row-mobile-bottom {
+            align-items: baseline;
+            display: flex;
+            gap: 8px;
+
+            .username {
+              @include caption;
+            }
+
+            .subscription-list-header-text.Text {
+              color: $neutral-500;
+            }
+          }
         }
       }
     }

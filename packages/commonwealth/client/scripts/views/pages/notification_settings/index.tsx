@@ -25,6 +25,95 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import User from '../../components/widgets/user';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+
+class SubscriptionRowText
+  implements m.ClassComponent<{ subscription: NotificationSubscription }>
+{
+  view(vnode) {
+    const { subscription } = vnode.attrs;
+    return (
+      <div class="icon-and-text-container">
+        <CWIcon iconName="feedback" iconSize="small" />
+        <div class="title-and-body-container">
+          {subscription.Thread && (
+            <CWText type="b2" fontWeight="bold" noWrap>
+              {renderQuillTextBody(subscription.Thread.title, {
+                collapse: true,
+                hideFormatting: true,
+              })}
+            </CWText>
+          )}
+          {subscription.Thread && (
+            <CWText type="caption" className="subscription-body-text" noWrap>
+              {renderQuillTextBody(subscription.Thread.body, {
+                collapse: true,
+                hideFormatting: true,
+              })}
+            </CWText>
+          )}
+          {subscription.Comment && (
+            <div class="comment-header-row">
+              <CWText type="b2" fontWeight="bold">
+                {m(User, {
+                  hideAvatar: true,
+                  user: new AddressInfo(
+                    null,
+                    subscription.Comment.author,
+                    subscription.Comment.chain,
+                    null
+                  ),
+                })}
+              </CWText>
+              <CWText type="b2" className="attribution-text">
+                's comment
+              </CWText>
+            </div>
+          )}
+          <CWText type="caption" className="subscription-body-text" noWrap>
+            {subscription.Comment &&
+              renderQuillTextBody(subscription.Comment.text, {
+                collapse: true,
+                hideFormatting: true,
+              })}
+          </CWText>
+        </div>
+      </div>
+    );
+  }
+}
+
+class SubscriptionRowMenu
+  implements m.ClassComponent<{ subscription: NotificationSubscription }>
+{
+  view(vnode) {
+    const { subscription } = vnode.attrs;
+    return (
+      <CWPopoverMenu
+        trigger={<CWIconButton iconName="dotsVertical" />}
+        popoverMenuItems={[
+          {
+            label: 'Mute Thread',
+            iconName: 'mute',
+            onclick: () => console.log('mute thread clicked'),
+          },
+          { type: 'divider' },
+          {
+            label: 'Unsubscribe',
+            iconName: 'close',
+            isSecondary: true,
+            onclick: () =>
+              app.user.notifications
+                .deleteSubscription(subscription)
+                .then(() => {
+                  m.redraw();
+                }),
+          },
+        ]}
+      />
+    );
+  }
+}
 
 class NotificationSettingsPage implements m.ClassComponent {
   private subscriptions: NotificationSubscription[];
@@ -81,7 +170,7 @@ class NotificationSettingsPage implements m.ClassComponent {
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
         <div class="NotificationSettingsPage">
           <CWText type="h3" fontWeight="semiBold" className="page-header-text">
-            Notification Settings
+            Notification Management
           </CWText>
           <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
@@ -89,21 +178,21 @@ class NotificationSettingsPage implements m.ClassComponent {
           </CWText>
           <div class="column-header-row">
             <CWText
-              type="h5"
+              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Community
             </CWText>
             <CWText
-              type="h5"
+              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Email
             </CWText>
             <CWText
-              type="h5"
+              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
               className="last-column-header-text"
             >
@@ -181,7 +270,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                           } else {
                             // return empty div to ensure that grid layout is correct
                             // even in the absence of a user
-                            return <div></div>;
+                            return <div />;
                           }
                         };
 
@@ -196,93 +285,38 @@ class NotificationSettingsPage implements m.ClassComponent {
                         };
 
                         return (
-                          <div class="subscription-row">
-                            <div class="icon-and-text-container">
-                              <CWIcon iconName="feedback" iconSize="small" />
-                              <div class="title-and-body-container">
-                                {sub.Thread && (
-                                  <CWText type="b2" fontWeight="bold" noWrap>
-                                    {renderQuillTextBody(sub.Thread.title, {
-                                      collapse: true,
-                                      hideFormatting: true,
-                                    })}
-                                  </CWText>
-                                )}
-                                {sub.Thread && (
+                          <>
+                            <div class="subscription-row-desktop">
+                              <SubscriptionRowText subscription={sub} />
+                              <CWText type="b2">{getTimeStamp()}</CWText>
+                              {getUser()}
+                              <SubscriptionRowMenu subscription={sub} />
+                            </div>
+                            <div class="subscription-row-mobile">
+                              <div class="subscription-row-mobile-top">
+                                <SubscriptionRowText subscription={sub} />
+                                <SubscriptionRowMenu subscription={sub} />
+                              </div>
+                              <div class="subscription-row-mobile-bottom">
+                                {getUser()}
+                                {getTimeStamp() && (
                                   <CWText
                                     type="caption"
-                                    className="subscription-body-text"
-                                    noWrap
+                                    className="subscription-list-header-text"
                                   >
-                                    {renderQuillTextBody(sub.Thread.body, {
-                                      collapse: true,
-                                      hideFormatting: true,
-                                    })}
+                                    subscribed
                                   </CWText>
-                                )}
-                                {sub.Comment && (
-                                  <div class="comment-header-row">
-                                    <CWText type="b2" fontWeight="bold">
-                                      {m(User, {
-                                        hideAvatar: true,
-                                        user: new AddressInfo(
-                                          null,
-                                          sub.Comment.author,
-                                          sub.Comment.chain,
-                                          null
-                                        ),
-                                      })}
-                                    </CWText>
-                                    <CWText
-                                      type="b2"
-                                      className="attribution-text"
-                                    >
-                                      's comment
-                                    </CWText>
-                                  </div>
                                 )}
                                 <CWText
                                   type="caption"
-                                  className="subscription-body-text"
-                                  noWrap
+                                  fontWeight="medium"
+                                  className="subscription-list-header-text"
                                 >
-                                  {sub.Comment &&
-                                    renderQuillTextBody(sub.Comment.text, {
-                                      collapse: true,
-                                      hideFormatting: true,
-                                    })}
+                                  {getTimeStamp()}
                                 </CWText>
                               </div>
                             </div>
-
-                            <CWText type="b2">{getTimeStamp()}</CWText>
-
-                            {getUser()}
-
-                            <CWPopoverMenu
-                              trigger={<CWIconButton iconName="dotsVertical" />}
-                              popoverMenuItems={[
-                                {
-                                  label: 'Mute Thread',
-                                  iconName: 'mute',
-                                  onclick: () =>
-                                    console.log('mute thread clicked'),
-                                },
-                                { type: 'divider' },
-                                {
-                                  label: 'Unsubscribe',
-                                  iconName: 'close',
-                                  isSecondary: true,
-                                  onclick: () =>
-                                    app.user.notifications
-                                      .deleteSubscription(sub)
-                                      .then(() => {
-                                        m.redraw();
-                                      }),
-                                },
-                              ]}
-                            />
-                          </div>
+                          </>
                         );
                       })}
                     </div>
