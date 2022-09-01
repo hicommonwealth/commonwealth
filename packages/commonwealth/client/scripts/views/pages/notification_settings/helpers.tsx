@@ -7,15 +7,15 @@
 // import moment from 'moment';
 // import { Button, Icons, ListItem, SelectList } from 'construct-ui';
 
-import 'pages/notification_settings/index.scss';
+// import 'pages/notification_settings/index.scss';
 
 // import app from 'state';
 // import { ProposalType, NotificationCategories } from 'common-common/src/types';
-import { NotificationSubscription, ChainInfo } from 'models';
 // import { getProposalUrlPath } from 'identifiers';
 // import { link, pluralize } from 'helpers';
 // import { sortSubscriptions } from 'helpers/notifications';
 // import { notifyError } from 'controllers/app/notifications';
+import { NotificationSubscription } from 'models';
 
 // left column - for identifying the notification type
 // const NEW_MENTIONS_LABEL = 'When someone mentions me';
