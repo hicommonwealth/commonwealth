@@ -110,7 +110,7 @@ export default class extends IEventHandler {
     });
 
     if (created) {
-      this._rmqController.publish({chainEventTypeId: dbEventType.id}, RascalPublications.ChainEventTypeCUDMain);
+      await this._rmqController.publish({chainEventTypeId: dbEventType.id}, RascalPublications.ChainEventTypeCUDMain);
     }
 
     if (!dbEventType) {

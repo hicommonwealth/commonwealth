@@ -11,6 +11,7 @@ import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
+import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -45,7 +46,7 @@ async function setupMainConsumer() {
   };
 
   const ceTypeCUDProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processChainEntityCUD,
+    messageProcessor: processChainEventTypeCUD,
     subscriptionName: RascalSubscriptions.ChainEventTypeCUDMain,
     msgProcessorContext: context,
   };
