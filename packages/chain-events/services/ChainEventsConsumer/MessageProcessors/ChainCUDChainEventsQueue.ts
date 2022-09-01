@@ -1,4 +1,3 @@
-import { ChainAttributes } from '../../database/models/chain';
 import { DB } from '../../database/database';
 import { Logger } from "typescript-logging";
 import {
@@ -13,6 +12,12 @@ export type Ithis = {
   log: Logger;
 };
 
+/**
+ * This function processes ChainCUD RabbitMQ messages that originate from the 'main' service. This function is passed
+ * as the message processor callback to the RabbitMQ Controller and processes messages from the
+ * {@link RascalSubscriptions.ChainCUDChainEvents} subscription
+ * @param data {TRmqMsgChainCUD} The chain data necessary to execute a specific CUD action
+ */
 export async function processChainCUD(
   this: Ithis,
   data: TRmqMsgChainCUD

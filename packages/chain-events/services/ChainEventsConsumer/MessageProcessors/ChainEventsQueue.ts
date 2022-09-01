@@ -10,9 +10,9 @@ export type Ithis = {
 }
 
 /**
- * This function ingests chain-events from the RabbitMQ ChainEventsQueue and
+ * This function ingests chain-events from the RabbitMQ {@link RascalSubscriptions.ChainEvents} subscription and
  * processes each of them using the given handlers.
- * @param event The chain-event to pass to all the handlers
+ * @param event {CWEvent} The chain-event to pass to all the handlers
  */
 export async function processChainEvents(this: Ithis, event: CWEvent) {
   let prevResult = null;
