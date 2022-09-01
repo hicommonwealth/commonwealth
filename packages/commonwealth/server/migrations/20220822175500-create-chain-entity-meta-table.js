@@ -55,7 +55,7 @@ module.exports = {
       ALTER TABLE "ChainEntities"
         ADD COLUMN title VARCHAR(255),
         ADD COLUMN thread_id INTEGER REFERENCES "Threads";
-    `)
+    `);
 
     await queryInterface.sequelize.query(`
       UPDATE "ChainEntities"
