@@ -101,7 +101,8 @@ module.exports = {
           created_at: new Date(),
           updated_at: new Date(),
         }], {transaction: t });
-      }))
+      }));
+
 
       // Update Columns on Chains Table
       await queryInterface.renameColumn('Chains', 'symbol', 'default_symbol', { transaction: t });
@@ -115,9 +116,14 @@ module.exports = {
       await queryInterface.dropTable('ContractItems', { transaction: t });
 
     });
+
     // Add indexes
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addIndex('Contracts', { fields: ['address'] }, { transaction: t });
+    });
+
+    return new Promise((resolve, reject) => {
+      resolve();
     });
   },
 
