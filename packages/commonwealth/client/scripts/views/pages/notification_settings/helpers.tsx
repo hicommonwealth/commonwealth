@@ -45,6 +45,16 @@ export const bundleSubs = (
   return result;
 };
 
+export const clarifyingText = (category: string) => {
+  if (category === 'new-comment-creation') {
+    return 'Comments on';
+  } else if (category === 'new-reaction') {
+    return 'Reactions to';
+  } else {
+    return null;
+  }
+};
+
 // export class BatchedSubscriptionRow
 //   implements
 //     m.ClassComponent<{

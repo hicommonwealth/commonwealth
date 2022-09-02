@@ -12,16 +12,21 @@
     flex-direction: column;
     padding: 0 32px 0 16px;
 
+    @include extraSmall {
+      padding: 0 16px;
+    }
+
     .subscription-body-text.Text {
       color: $neutral-600;
     }
 
     .comment-header-row {
-      align-items: center;
+      align-items: baseline;
       display: flex;
+      gap: 4px;
 
       .attribution-text.Text {
-        margin-right: 4px;
+        color: $neutral-600;
       }
     }
   }

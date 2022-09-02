@@ -12,6 +12,8 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import User from '../../components/widgets/user';
+import { clarifyingText } from './helpers';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 
 export class SubscriptionRowTextContainer
   implements m.ClassComponent<{ subscription: NotificationSubscription }>
@@ -40,7 +42,16 @@ export class SubscriptionRowTextContainer
           )}
           {subscription.Comment && (
             <div class="comment-header-row">
-              <CWText type="b2" fontWeight="bold">
+              <CWText
+                type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+                className="attribution-text"
+              >
+                {clarifyingText(subscription.category)}
+              </CWText>
+              <CWText
+                type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+                fontWeight="bold"
+              >
                 {m(User, {
                   hideAvatar: true,
                   user: new AddressInfo(
@@ -50,9 +61,13 @@ export class SubscriptionRowTextContainer
                     null
                   ),
                 })}
+                's
               </CWText>
-              <CWText type="b2" className="attribution-text">
-                's comment
+              <CWText
+                type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+                className="attribution-text"
+              >
+                comment
               </CWText>
             </div>
           )}
