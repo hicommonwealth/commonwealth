@@ -78,12 +78,12 @@ export class SubscriptionRowMenu
       <CWPopoverMenu
         trigger={<CWIconButton iconName="dotsVertical" />}
         popoverMenuItems={[
-          {
-            label: 'Mute Thread',
-            iconName: 'mute',
-            onclick: () => console.log('mute thread clicked'),
-          },
-          { type: 'divider' },
+          // {
+          //   label: 'Mute Thread',
+          //   iconName: 'mute',
+          //   onclick: () => console.log('mute thread clicked'),
+          // },
+          // { type: 'divider' },
           {
             label: 'Unsubscribe',
             iconName: 'close',

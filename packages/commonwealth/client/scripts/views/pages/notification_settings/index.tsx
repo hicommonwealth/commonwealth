@@ -18,7 +18,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
-import { bundleSubs } from './helpers';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import User from '../../components/widgets/user';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
@@ -42,13 +41,13 @@ class NotificationSettingsPage implements m.ClassComponent {
     // Should be factored into a helper
     // Also used in community_selector.tsx
     const allCommunities = app.config.chains
-    .getAll()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .filter((item) => {
-      // only show chains with nodes
-      return !!item.node;
-    });
-    
+      .getAll()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter((item) => {
+        // only show chains with nodes
+        return !!item.node;
+      });
+
     // Should be factored into a helper
     // Also used in community_selector.tsx
     const isInCommunity = (item) => {
@@ -81,23 +80,21 @@ class NotificationSettingsPage implements m.ClassComponent {
 
   view() {
     if (!app.loginStatusLoaded()) {
-      console.log('hello')
       return (
         <PageLoading
           title={<BreadcrumbsTitleTag title="Notification Settings" />}
         />
       );
     } else if (!app.isLoggedIn()) {
-      console.log('hello 1')
       return (
         <ErrorPage
           message="This page requires you to be logged in"
           title={<BreadcrumbsTitleTag title="Notification Settings" />}
         />
       );
-    } 
+    }
 
-    // Sort communities if they have a subscription 
+    // Sort communities if they have a subscription
     const sortedCommunities = this.joinedCommunities.sort((a, b) => {
       const aHasSub = this.subscriptions.filter((sub) => sub.Chain.id === a.id);
       const bHasSub = this.subscriptions.filter((sub) => sub.Chain.id === b.id);
@@ -139,7 +136,9 @@ class NotificationSettingsPage implements m.ClassComponent {
           </div>
           {sortedCommunities.map((chainInfo) => {
             // Filter subscriptions to only those for this chain
-            const chainSubs = this.subscriptions.filter((sub) => sub.Chain.id === chainInfo.id);
+            const chainSubs = this.subscriptions.filter(
+              (sub) => sub.Chain.id === chainInfo.id
+            );
 
             return (
               <div class="notification-row">
