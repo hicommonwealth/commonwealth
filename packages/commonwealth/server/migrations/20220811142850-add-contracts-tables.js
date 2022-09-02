@@ -16,11 +16,20 @@ module.exports = {
         await queryInterface.sequelize.query(quer, { transaction: t });
       }));
 
+      // Create ContractAbis Table
+      await queryInterface.createTable('ContractAbis', {
+        id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
+        abi: { type: Sequelize.JSONB, unique: true },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
+      }, { transaction: t });
+
       // Create Contracts Table
       await queryInterface.createTable('Contracts', {
         id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
         address: { type: Sequelize.STRING, allowNull: false },
         chain_node_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'ChainNodes', key: 'id' } },
+        abi_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'ContractAbis', key: 'id' }},
         decimals: { type: Sequelize.INTEGER, allowNull: true },
         token_name: { type: Sequelize.STRING, allowNull: true },
         symbol: {type: Sequelize.STRING, allowNull: true},
@@ -156,6 +165,8 @@ module.exports = {
       // Delete Tables
       await queryInterface.dropTable('CommunityContracts', { transaction: t });
       await queryInterface.dropTable('Contracts', { transaction: t });
+      await queryInterface.dropTable('ContractAbis', { transaction: t });
+
 
       // Re-add ContractCategories Table
       await queryInterface.createTable('ContractCategories', {

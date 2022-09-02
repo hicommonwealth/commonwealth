@@ -38,6 +38,7 @@ const status = async (
           {
             model: models.Contract,
             required: false,
+            include: [{ model: models.ContractAbi, required: false}],
           }
         ],
       }),
