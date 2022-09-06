@@ -10,6 +10,7 @@ class RoninWebWalletController implements IWebWallet<any> {
   public readonly chain = ChainBase.Ethereum;
   public readonly enabling = false;
   public readonly specificChains = [ ChainNetwork.AxieInfinity ];
+  public readonly defaultNetwork = ChainNetwork.AxieInfinity;
 
   private _enabled = false;
 
@@ -17,7 +18,7 @@ class RoninWebWalletController implements IWebWallet<any> {
     return [];
   }
 
-  public async validateWithAccount(account: Account<any>): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     throw new Error('not implemented');
   }
 

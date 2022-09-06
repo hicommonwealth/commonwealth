@@ -35,7 +35,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       } = rxn;
 
       return m(User, {
-        user: new AddressInfo(null, address, chain, null),
+        user: new AddressInfo(null, address, chain?.id || chain, null),
         linkify: true,
       });
     });

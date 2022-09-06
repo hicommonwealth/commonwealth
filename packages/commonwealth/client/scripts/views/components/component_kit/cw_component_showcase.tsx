@@ -3,7 +3,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-import app from 'state';
+// import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -17,16 +17,18 @@ import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWCheckbox } from './cw_checkbox';
-import { CWTooltip } from './cw_tooltip';
-import { CWPopover } from './cw_popover/cw_popover';
-import { CWAddressTooltip } from './cw_address_tooltip';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
 import { CWTextArea } from './cw_text_area';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { NewLoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from './helpers';
+import { CWToggle } from './cw_toggle';
+import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
+import { CWCollapsible } from './cw_collapsible';
+// import { NewLoginModal } from '../../modals/login_modal';
+// import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -52,6 +54,7 @@ export class ComponentShowcase implements m.ClassComponent {
   private radioGroupSelection: string;
   private selectedIconButton: number;
   private selectedTab: number;
+  private toggleToggled: boolean;
   private voteCount: number;
 
   oninit() {
@@ -76,6 +79,158 @@ export class ComponentShowcase implements m.ClassComponent {
             })
           }
         /> */}
+        <h1>Popover Menu</h1>
+        <div class="basic-gallery">
+          <CWPopoverMenu
+            trigger={<CWIconButton iconName="dotsVertical" />}
+            popoverMenuItems={[
+              { type: 'header', label: 'Community' },
+              { label: 'Create Thread', iconName: 'edit' },
+              { label: 'Create Proposal', iconName: 'edit' },
+              { label: 'Create Poll', iconName: 'edit' },
+              { label: 'Create Snapshot', iconName: 'edit', disabled: true },
+              { type: 'divider' },
+              { type: 'header', label: 'Universal' },
+              { label: 'Create Community', iconName: 'people' },
+              { label: 'Create Crowdfund', iconName: 'wallet' },
+              { type: 'divider' },
+              {
+                label: 'Report',
+                iconName: 'cautionCircle',
+                isSecondary: true,
+                onclick: () => console.log('clicked'),
+              },
+            ]}
+          />
+        </div>
+        <h1>Tooltip</h1>
+        <div class="tooltip-gallery">
+          <div class="tooltip-row">
+            <CWText>Hover</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover to side</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              toSide
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Persist on hover</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              persistOnHover
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Hover open and close delay</CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" />}
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              interactionType="hover"
+              hoverOpenDelay={1500}
+              hoverCloseDelay={1500}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Click</CWText>
+            <CWTooltip
+              interactionType="click"
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="bordered"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Solid background, no arrow</CWText>
+            <CWTooltip
+              interactionType="hover"
+              tooltipContent={`
+                I am an informational tool tip here to provide \
+                extra details on things people may need more help on.
+              `}
+              tooltipType="solidNoArrow"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+          <div class="tooltip-row">
+            <CWText>Address tooltip</CWText>
+            <CWAddressTooltip
+              address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
+              trigger={<CWIcon iconName="infoEmpty" />}
+            />
+          </div>
+        </div>
+        <div class="basic-gallery">
+          <h1>Collapsible</h1>
+          <CWCollapsible
+            headerContent={<CWText>Header content</CWText>}
+            collapsibleContent={<CWText>Body content</CWText>}
+          />
+        </div>
+        <div class="basic-gallery">
+          <h1>Toggle</h1>
+          <CWToggle
+            checked={this.toggleToggled}
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+          <CWToggle
+            disabled
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+          <CWToggle
+            checked
+            disabled
+            onchange={() => {
+              this.toggleToggled = !this.toggleToggled;
+            }}
+          />
+        </div>
         <div class="basic-gallery">
           <h1>Vote Button</h1>
           <CWThreadVoteButton
@@ -165,113 +320,6 @@ export class ComponentShowcase implements m.ClassComponent {
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
-        </div>
-        <h1>Popover</h1>
-        <div class="tooltip-gallery">
-          <CWPopover
-            trigger={<CWButton label="Click me" />}
-            content={<>Some content</>}
-            interactionType="click"
-          />
-        </div>
-        <h1>Tooltip</h1>
-        <div class="tooltip-gallery">
-          <div class="tooltip-row">
-            <CWText>Hover</CWText>
-            <CWTooltip
-              interactionType="hover"
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="bordered"
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Hover to side</CWText>
-            <CWTooltip
-              interactionType="hover"
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="bordered"
-              toSide
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Persist on hover</CWText>
-            <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="bordered"
-              interactionType="hover"
-              persistOnHover
-              hoverCloseDelay={1500}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Hover open and close delay</CWText>
-            <CWTooltip
-              trigger={<CWIcon iconName="infoEmpty" />}
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="bordered"
-              interactionType="hover"
-              hoverOpenDelay={1500}
-              hoverCloseDelay={1500}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Click</CWText>
-            <CWTooltip
-              interactionType="click"
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="bordered"
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Solid background</CWText>
-            <CWTooltip
-              interactionType="hover"
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="solidArrow"
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Solid background, no arrow</CWText>
-            <CWTooltip
-              interactionType="hover"
-              tooltipContents={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-              tooltipType="solidNoArrow"
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
-          <div class="tooltip-row">
-            <CWText>Address tooltip</CWText>
-            <CWAddressTooltip
-              address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
-              trigger={<CWIcon iconName="infoEmpty" />}
-            />
-          </div>
         </div>
         <h1>Form fields</h1>
         <div class="form-gallery">
@@ -672,7 +720,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Checkbox</h1>
         <div class="choice-gallery">
           <CWCheckbox
-            checked={this.checkboxChecked === true}
+            checked={this.checkboxChecked}
             label="Click me"
             onchange={() => {
               this.checkboxChecked = !this.checkboxChecked;

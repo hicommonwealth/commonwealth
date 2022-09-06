@@ -4,24 +4,32 @@
   @include baseIconStyles;
 
   &.neutral {
-    color: $neutral-800;
+    color: $neutral-500;
     cursor: pointer;
-
-    &.selected {
-      color: $neutral-500;
-    }
 
     &:hover {
       color: $neutral-600;
     }
+
+    &:active {
+      color: $neutral-800;
+    }
+
+    &.selected {
+      color: $neutral-800;
+    }
   }
 
   &.primary {
-    color: $primary-300;
+    color: $primary-200;
     cursor: pointer;
 
     &:hover {
-      color: $primary-100;
+      color: $primary-400;
+    }
+
+    &:active {
+      color: $primary-500;
     }
 
     &.selected {

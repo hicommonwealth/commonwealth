@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { Button, List, ListItem, Checkbox } from 'construct-ui';
 
 import 'modals/webhook_settings_modal.scss';
 
@@ -18,6 +17,9 @@ import {
 } from 'helpers/chain_notification_types';
 import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWText } from '../components/component_kit/cw_text';
 
 type WebhookSettingsModalAttrs = {
   updateSuccessCallback: () => void;
@@ -64,29 +66,25 @@ export class WebhookSettingsModal
         values.some((v) => this.selectedCategories.includes(v));
 
       return (
-        <ListItem
-          contentLeft={label}
-          contentRight={
-            <Checkbox
-              checked={allValuesPresent}
-              indeterminate={someValuesPresent && !allValuesPresent}
-              onchange={() => {
-                if (allValuesPresent) {
-                  this.selectedCategories = this.selectedCategories.filter(
-                    (v) => !values.includes(v)
-                  );
-                  m.redraw();
-                } else {
-                  values.forEach((v) => {
-                    if (!this.selectedCategories.includes(v)) {
-                      this.selectedCategories.push(v);
-                    }
-                  });
-                  m.redraw();
+        <CWCheckbox
+          checked={allValuesPresent}
+          label={label}
+          indeterminate={someValuesPresent && !allValuesPresent}
+          onchange={() => {
+            if (allValuesPresent) {
+              this.selectedCategories = this.selectedCategories.filter(
+                (v) => !values.includes(v)
+              );
+              m.redraw();
+            } else {
+              values.forEach((v) => {
+                if (!this.selectedCategories.includes(v)) {
+                  this.selectedCategories.push(v);
                 }
-              }}
-            />
-          }
+              });
+              m.redraw();
+            }
+          }}
         />
       );
     };
@@ -98,30 +96,28 @@ export class WebhookSettingsModal
           <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          <p>Which events should trigger this webhook?</p>
-          <div class="forum-events">
-            <h4>Off-chain discussions</h4>
-            <List interactive={false} size="sm">
-              {row('New thread', [NotificationCategories.NewThread])}
-              {row('New comment', [NotificationCategories.NewComment])}
-              {row('New reaction', [NotificationCategories.NewReaction])}
-            </List>
+          <CWText>Which events should trigger this webhook?</CWText>
+          <div class="checkbox-section">
+            <CWText type="h5" fontWeight="semiBold">
+              Off-chain discussions
+            </CWText>
+            {row('New thread', [NotificationCategories.NewThread])}
+            {row('New comment', [NotificationCategories.NewComment])}
+            {row('New reaction', [NotificationCategories.NewReaction])}
           </div>
           {isChain && Object.keys(chainNotifications).length > 0 && (
-            <div class="chain-events">
-              <h4>On-chain events</h4>
-              <List interactive={false} size="sm">
-                {/* iterate over chain events */}
-                {Object.keys(chainNotifications).map((k) =>
-                  row(`${k} event`, chainNotifications[k])
-                )}
-              </List>
+            <div class="checkbox-section">
+              <CWText type="h5" fontWeight="semiBold">
+                On-chain events
+              </CWText>
+              {/* iterate over chain events */}
+              {Object.keys(chainNotifications).map((k) =>
+                row(`${k} event`, chainNotifications[k])
+              )}
             </div>
           )}
-          <Button
+          <CWButton
             label="Save webhook settings"
-            intent="primary"
-            rounded={true}
             onclick={(e) => {
               e.preventDefault();
               const chainOrCommObj = { chain: webhook.chain_id };

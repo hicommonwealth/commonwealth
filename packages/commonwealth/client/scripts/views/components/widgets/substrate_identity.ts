@@ -16,7 +16,7 @@ import SubstrateIdentity, {
 import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface ISubstrateIdentityAttrs {
-  account: Account<any>;
+  account: Account;
   linkify: boolean;
   profile: Profile;
   hideIdentityIcon: boolean; // only applies to substrate identities, also hides councillor icon

@@ -8,16 +8,14 @@ import 'pages/discussions/discussion_row_menu.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
-import { Thread, Topic, ThreadStage } from 'models';
-import { TopicEditor } from 'views/components/topic_editor';
-import { StageEditor } from 'views/components/stage_editor';
+import { Thread, ThreadStage, Topic } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
 
 type ThreadMenuItemAttrs = { proposal: Thread };
-
-type EditorMenuItemAttrs = { openTopicEditor: () => void };
 
 export class ThreadSubscriptionMenuItem
   implements m.ClassComponent<ThreadMenuItemAttrs>
@@ -81,19 +79,62 @@ export class ThreadSubscriptionMenuItem
   }
 }
 
-export class TopicEditorMenuItem
-  implements m.ClassComponent<EditorMenuItemAttrs>
+export class ChangeTopicMenuItem
+  implements
+    m.ClassComponent<{
+      onChangeHandler: (topic: Topic) => void;
+      proposal: Thread;
+    }>
 {
   view(vnode) {
-    const { openTopicEditor } = vnode.attrs;
+    const { onChangeHandler, proposal } = vnode.attrs;
 
     return (
       <MenuItem
-        fluid={true}
-        label="Edit topic"
+        label="Change topic"
         onclick={(e) => {
           e.preventDefault();
-          openTopicEditor();
+          app.modals.create({
+            modal: ChangeTopicModal,
+            data: {
+              onChangeHandler,
+              thread: proposal,
+            },
+          });
+        }}
+      />
+    );
+  }
+}
+
+class UpdateProposalStatusMenuItem
+  implements
+    m.ClassComponent<{
+      onChangeHandler: (stage: ThreadStage) => void;
+      proposal: Thread;
+    }>
+{
+  view(vnode) {
+    const { onChangeHandler, proposal } = vnode.attrs;
+
+    if (!app.chain?.meta) return;
+
+    const { stagesEnabled } = app.chain?.meta;
+
+    if (!stagesEnabled) return;
+
+    return (
+      <MenuItem
+        label="Update proposal status"
+        onclick={(e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: UpdateProposalStatusModal,
+            data: {
+              onChangeHandler,
+              thread: proposal,
+            },
+          });
         }}
       />
     );
@@ -131,35 +172,9 @@ class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
   }
 }
 
-class StageEditorMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
-  view(vnode) {
-    const { openStageEditor } = vnode.attrs;
-
-    if (!app.chain?.meta) return;
-
-    const { stagesEnabled } = app.chain?.meta;
-
-    if (!stagesEnabled) return;
-
-    return (
-      <MenuItem
-        fluid={true}
-        label="Edit stage"
-        onclick={(e) => {
-          e.preventDefault();
-          openStageEditor();
-        }}
-      />
-    );
-  }
-}
-
 export class DiscussionRowMenu
   implements m.ClassComponent<ThreadMenuItemAttrs>
 {
-  private topicEditorIsOpen: boolean;
-  private stageEditorIsOpen: boolean;
-
   view(vnode) {
     if (!app.isLoggedIn()) return;
 
@@ -167,11 +182,11 @@ export class DiscussionRowMenu
 
     const hasAdminPermissions =
       app.user.activeAccount &&
-      (app.user.isRoleOfCommunity({
+      (app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
       }) ||
-        app.user.isRoleOfCommunity({
+        app.roles.isRoleOfCommunity({
           role: 'moderator',
           chain: app.activeChainId(),
         }));
@@ -221,16 +236,20 @@ export class DiscussionRowMenu
               />
             ),
             hasAdminPermissions && (
-              <TopicEditorMenuItem
-                openTopicEditor={() => {
-                  this.topicEditorIsOpen = true;
+              <ChangeTopicMenuItem
+                proposal={proposal}
+                onChangeHandler={(topic: Topic) => {
+                  proposal.topic = topic;
+                  m.redraw();
                 }}
               />
             ),
             (isAuthor || hasAdminPermissions) && (
-              <StageEditorMenuItem
-                openStageEditor={() => {
-                  this.stageEditorIsOpen = true;
+              <UpdateProposalStatusMenuItem
+                proposal={proposal}
+                onChangeHandler={(stage: ThreadStage) => {
+                  proposal.stage = stage;
+                  m.redraw();
                 }}
               />
             ),
@@ -244,34 +263,6 @@ export class DiscussionRowMenu
             </div>
           }
         />
-        {this.topicEditorIsOpen && (
-          <TopicEditor
-            thread={vnode.attrs.proposal}
-            popoverMenu={true}
-            onChangeHandler={(topic: Topic) => {
-              proposal.topic = topic;
-              m.redraw();
-            }}
-            openStateHandler={(v) => {
-              this.topicEditorIsOpen = v;
-              m.redraw();
-            }}
-          />
-        )}
-        {this.stageEditorIsOpen && (
-          <StageEditor
-            thread={vnode.attrs.proposal}
-            popoverMenu={true}
-            onChangeHandler={(stage: ThreadStage) => {
-              proposal.stage = stage;
-              m.redraw();
-            }}
-            openStateHandler={(v) => {
-              this.stageEditorIsOpen = v;
-              m.redraw();
-            }}
-          />
-        )}
       </div>
     );
   }

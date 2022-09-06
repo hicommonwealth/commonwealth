@@ -25,6 +25,7 @@ export const iconLookup = {
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
+  dotsVertical: Icons.CWDotsVertical,
   downvote: Icons.CWDownvote,
   edit: Icons.CWEdit,
   element: Icons.CWElement,
@@ -71,6 +72,7 @@ export const iconLookup = {
 };
 
 export const customIconLookup = {
+  'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
