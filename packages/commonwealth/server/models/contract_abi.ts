@@ -18,7 +18,7 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
 ): ContractAbiModelStatic => {
-  const Abi = <ContractAbiModelStatic>sequelize.define(
+  const ContractAbi = <ContractAbiModelStatic>sequelize.define(
     'ContractAbi',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -35,9 +35,9 @@ export default (
     }
   );
 
-  Abi.associate = (models) => {
-    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'contract_abi_id' });
+  ContractAbi.associate = (models) => {
+    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
   };
 
-  return Abi;
+  return ContractAbi;
 };
