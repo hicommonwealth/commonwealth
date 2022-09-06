@@ -105,8 +105,6 @@ export class SubscriptionRowTextContainer
   view(vnode) {
     const { subscription } = vnode.attrs;
 
-    console.log(subscription);
-
     return (
       <div class="SubscriptionRowTextContainer">
         <CWIcon iconName="feedback" iconSize="small" />

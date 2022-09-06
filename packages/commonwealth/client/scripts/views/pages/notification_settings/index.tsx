@@ -8,7 +8,7 @@ import 'pages/notification_settings/index.scss';
 
 import app from 'state';
 import { modelFromServer } from 'models/NotificationSubscription';
-import { AddressInfo, ChainInfo, NotificationSubscription } from 'models';
+import { AddressInfo, NotificationSubscription } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
@@ -25,10 +25,10 @@ import {
   SubscriptionRowTextContainer,
   SubscriptionRowMenu,
 } from './helper_components';
+import { bundleSubs } from './helpers';
 
 class NotificationSettingsPage implements m.ClassComponent {
   private subscriptions: NotificationSubscription[];
-  private joinedCommunities: ChainInfo[];
 
   async oninit() {
     if (!app.isLoggedIn()) {
@@ -37,30 +37,6 @@ class NotificationSettingsPage implements m.ClassComponent {
     }
 
     this.subscriptions = [];
-
-    // Should be factored into a helper
-    // Also used in community_selector.tsx
-    const allCommunities = app.config.chains
-      .getAll()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((item) => {
-        // only show chains with nodes
-        return !!item.node;
-      });
-
-    // Should be factored into a helper
-    // Also used in community_selector.tsx
-    const isInCommunity = (item) => {
-      if (item instanceof ChainInfo) {
-        return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
-      } else {
-        return false;
-      }
-    };
-
-    // Should be factored into a helper
-    // Also used in community_selector.tsx
-    this.joinedCommunities = allCommunities.filter((c) => isInCommunity(c));
 
     $.get(`${app.serverUrl()}/viewSubscriptions`, {
       jwt: app.user.jwt,
@@ -94,12 +70,7 @@ class NotificationSettingsPage implements m.ClassComponent {
       );
     }
 
-    // Sort communities if they have a subscription
-    const sortedCommunities = this.joinedCommunities.sort((a, b) => {
-      const aHasSub = this.subscriptions.filter((sub) => sub.Chain.id === a.id);
-      const bHasSub = this.subscriptions.filter((sub) => sub.Chain.id === b.id);
-      return bHasSub.length - aHasSub.length;
-    });
+    const bundledSubs = bundleSubs(this.subscriptions);
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
@@ -134,11 +105,8 @@ class NotificationSettingsPage implements m.ClassComponent {
               In-App
             </CWText>
           </div>
-          {sortedCommunities.map((chainInfo) => {
-            // Filter subscriptions to only those for this chain
-            const chainSubs = this.subscriptions.filter(
-              (sub) => sub.Chain.id === chainInfo.id
-            );
+          {Object.entries(bundledSubs).map(([chainName, subs]) => {
+            const chainInfo = app.config.chains.getById(chainName);
 
             return (
               <div class="notification-row">
@@ -156,7 +124,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                           </CWText>
                         </div>
                         <CWText type="b2" className="subscriptions-count-text">
-                          {chainSubs.length} subscriptions
+                          {subs.length} subscriptions
                         </CWText>
                       </div>
                       <CWCheckbox label="Receive Emails" />
@@ -185,7 +153,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                           Author
                         </CWText>
                       </div>
-                      {chainSubs.map((sub) => {
+                      {subs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
                             return m(User, {
