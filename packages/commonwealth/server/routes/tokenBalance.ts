@@ -47,23 +47,25 @@ const tokenBalance = async (
     throw new AppError(err)
   }
 
-  try {
-    const { contract_address } = req.body;
-    contract = await models.Contract.findOne({
-      where: {
-        address: contract_address,
-      },
-      include: [{ model: models.ChainNode, required: true }],
-    });
-  } catch (err) {
-    throw new AppError(err);
+  let chain_node_id = chain.ChainNode.id;
+  if (chain.ChainNode.chain_base !== 'cosmos') {
+    try {
+      const { contract_address } = req.body;
+      contract = await models.Contract.findOne({
+        where: {
+          address: contract_address,
+        },
+        include: [{ model: models.ChainNode, required: true }],
+      });
+      chain_node_id = contract.ChainNode.id; // override based on Contract
+    } catch (err) {
+      throw new AppError(err);
+    }
   }
-
-
 
   try {
     const balance = await tokenBalanceCache.getBalance(
-      contract.ChainNode.id,
+      chain_node_id,
       author.address,
       contract.address,
       chain.network === ChainNetwork.ERC20
