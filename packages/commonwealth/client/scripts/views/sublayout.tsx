@@ -69,7 +69,11 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
     const largeBrowserSize = !isWindowMediumSmallInclusive(window.innerWidth);
-    if (largeBrowserSize) this.sidebarToggled = true;
+    const localStorageToggle =
+      localStorage.getItem('sidebar-toggle') === 'true';
+    if (largeBrowserSize || localStorageToggle) {
+      this.sidebarToggled = true;
+    }
     const { sidebarToggled } = this;
 
     if (m.route.param('triggerInvite') === 't') {
@@ -83,8 +87,11 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             <SublayoutHeaderLeft
               sidebarToggleFn={() => {
                 this.sidebarToggled = !this.sidebarToggled;
+                localStorage.setItem(
+                  'sidebar-toggle',
+                  (!!this.sidebarToggled).toString()
+                );
                 m.redraw();
-                console.log(this.sidebarToggled);
               }}
             />
             {!hideSearch && m(SearchBar)}

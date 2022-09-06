@@ -36,7 +36,7 @@
         display: none;
 
         &.toggled {
-          display: flex;
+          display: flex !important;
         }
       }
       @include smallInclusive {
