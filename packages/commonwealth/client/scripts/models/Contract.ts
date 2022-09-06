@@ -10,11 +10,11 @@ class Contract {
   public readonly updatedAt: moment.Moment;
 
   public readonly decimals?: number;
-  public readonly token_name?: string;
+  public readonly tokenName?: string;
   public readonly symbol?: string;
   public readonly abi?: string;
 
-  constructor(id, address, chainNodeId, type, createdAt, updatedAt, decimals?, token_name?, symbol?, abi?) {
+  constructor(id, address, chainNodeId, type, createdAt, updatedAt, decimals?, tokenName?, symbol?, contractAbi?) {
     this.id = id;
     this.address = address;
     this.chainNodeId = chainNodeId;
@@ -22,13 +22,33 @@ class Contract {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.decimals = decimals;
-    this.token_name = token_name;
+    this.tokenName = tokenName;
     this.symbol = symbol;
-    this.abi = abi;
+    this.abi = contractAbi;
   }
 
-  public static fromJSON(json) {
-    return new Contract(json.id, json.address, json.chainNodeId, json.type, json.createdAt, json.updatedAt, json.decimals, json.token_name, json.symbol, json.abi.abi);
+  public static fromJSON({
+    id,
+    address,
+    chain_node_id,
+    type,
+    created_at,
+    updated_at,
+    decimals,
+    token_name,
+    symbol,
+    contract_abi
+  }) {
+    return new Contract(id,
+      address,
+      chain_node_id,
+      type,
+      created_at,
+      updated_at,
+      decimals,
+      token_name,
+      symbol,
+      contract_abi);
   }
 }
 
