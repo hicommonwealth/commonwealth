@@ -107,6 +107,8 @@ class NotificationSettingsPage implements m.ClassComponent {
           </div>
           {Object.entries(bundledSubs).map(([chainName, subs]) => {
             const chainInfo = app.config.chains.getById(chainName);
+            const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+            const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
             return (
               <div class="notification-row">
@@ -127,8 +129,27 @@ class NotificationSettingsPage implements m.ClassComponent {
                           {subs.length} subscriptions
                         </CWText>
                       </div>
-                      <CWCheckbox label="Receive Emails" />
-                      <CWToggle />
+                      <CWCheckbox
+                        label="Receive Emails"
+                        checked={hasSomeEmailSubs}
+                        onchange={() => {
+                          hasSomeEmailSubs
+                            ? app.user.notifications.disableImmediateEmails(
+                                subs
+                              )
+                            : app.user.notifications.disableImmediateEmails(
+                                subs
+                              );
+                        }}
+                      />
+                      <CWToggle
+                        checked={subs.some((s) => s.isActive)}
+                        onchange={() => {
+                          hasSomeInAppSubs
+                            ? app.user.notifications.disableSubscriptions(subs)
+                            : app.user.notifications.enableSubscriptions(subs);
+                        }}
+                      />
                     </div>
                   }
                   collapsibleContent={
