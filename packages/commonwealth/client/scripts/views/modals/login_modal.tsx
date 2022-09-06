@@ -13,7 +13,8 @@ import {
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
 
-import { Account, AddressInfo, IWebWallet } from 'models';
+import { notifyError } from 'controllers/app/notifications';
+import { Account, AddressInfo, IWebWallet, Profile } from 'models';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Login from 'views/components/login';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
@@ -46,6 +47,9 @@ export class NewLoginModal implements m.ClassComponent {
   private username: string;
   private email: string;
   private wallets: Array<IWebWallet<any>>;
+  private loggedInProfile: Profile;
+  private primaryAccount: Account;
+  private secondaryLinkAccount: Account;
 
   oninit() {
     // Determine if in a community
@@ -91,7 +95,15 @@ export class NewLoginModal implements m.ClassComponent {
       }
     };
 
-    const logInWithAccount = async (account: Account) => {
+    const logInWithAccount = async (
+      account: Account,
+      exitOnComplete: boolean
+    ) => {
+      const profile = account.profile;
+      this.address = account.address;
+      if (profile.name) {
+        this.username = profile.name;
+      }
       if (app.isLoggedIn()) {
         // Already logged in with another account
         try {
@@ -133,6 +145,7 @@ export class NewLoginModal implements m.ClassComponent {
 
           // set the address as active
           await setActiveAccount(account);
+
           if (
             app.user.activeAccounts.filter((a) => isSameAccount(a, account))
               .length === 0
@@ -147,13 +160,12 @@ export class NewLoginModal implements m.ClassComponent {
           // setActiveAccount will throw an exception but we should continue
         }
 
-        $('.LoginDesktop').trigger('modalexit');
+        if (exitOnComplete) $('.LoginDesktop').trigger('modalexit');
         m.redraw();
       } else {
         // log in as the new user
-        console.log('new user');
-
         await initAppState(false);
+
         // load addresses for the current chain/community
         if (app.chain) {
           // TODO: this breaks when the user action creates a new token forum
@@ -162,25 +174,51 @@ export class NewLoginModal implements m.ClassComponent {
             app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         }
-        $('.LoginDesktop').trigger('modalexit');
+        if (exitOnComplete) $('.LoginDesktop').trigger('modalexit');
         m.redraw();
       }
     };
 
     const accountVerifiedCallback = async (
       account: Account,
-      newlyCreated: boolean
+      newlyCreated: boolean,
+      linking: boolean
     ) => {
-      if (!newlyCreated) {
-        await logInWithAccount(account);
+      console.log('linking', linking);
+
+      if (!linking) {
+        this.primaryAccount = account;
+        this.address = account.address;
+        this.loggedInProfile = account.profile;
+        this.profiles = [account.profile];
       } else {
-        this.sidebarType = 'newOrReturning';
-        this.bodyType = 'selectAccountType';
+        if (newlyCreated) {
+          notifyError("This account doesn't exist");
+          return;
+        }
+        this.secondaryLinkAccount = account;
+        this.loggedInProfile = account.profile;
+        // TODO: Should get all profiles associated with the secondaryLinkAccount's User- not merged yet??
+        this.profiles = [account.profile];
+      }
+
+      if (newlyCreated) {
+        await logInWithAccount(account, true);
+      } else {
+        if (!linking) {
+          this.sidebarType = 'newOrReturning';
+          this.bodyType = 'selectAccountType';
+        } else {
+          this.sidebarType = 'newAddressLinked';
+          this.bodyType = 'selectProfile';
+        }
+
         m.redraw();
       }
     };
 
     const createNewAccountCallback = async () => {
+      await logInWithAccount(this.primaryAccount, false);
       this.bodyType = 'welcome';
       m.redraw();
     };
@@ -190,9 +228,46 @@ export class NewLoginModal implements m.ClassComponent {
       m.redraw();
     };
 
+    const performLinkingCallback = async () => {
+      try {
+        // update loggedInProfile to include primaryAccount
+
+        // Remove orphaned address, profile, and User
+
+        // hit /updateAddressOwnerProfile endpoint (not yet written)
+
+        await logInWithAccount(this.primaryAccount, true);
+      } catch (e) {
+        console.log(e);
+        notifyError('Unable to link account');
+      }
+    };
+
+    const saveProfileInfoCallback = async () => {
+      const data = {
+        name: this.username,
+        avatar_url: this.avatarUrl,
+      };
+      try {
+        // TODO: Add in new updateProfile route (dexters PR)
+
+        // await app.profiles.updateProfileForAccount(
+        //   app.user.activeAccount,
+        //   data
+        // );
+
+        // Close Modal
+        $('.LoginDesktop').trigger('modalexit');
+        m.redraw();
+      } catch (e) {
+        console.log(e);
+        notifyError('Failed to save profile info');
+      }
+    };
+
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
       <LoginMobile
-        address={dummyAddress}
+        address={this.address}
         setAddress={(address: string) => {
           this.address = address;
         }}
@@ -223,10 +298,12 @@ export class NewLoginModal implements m.ClassComponent {
         linkExistingAccountCallback={linkExistingAccountCallback}
         accountVerifiedCallback={accountVerifiedCallback}
         handleEmailLoginCallback={handleEmailLoginCallback}
+        saveProfileInfoCallback={saveProfileInfoCallback}
+        performLinkingCallback={performLinkingCallback}
       />
     ) : (
       <LoginDesktop
-        address={dummyAddress}
+        address={this.address}
         setAddress={(address: string) => {
           this.address = address;
         }}
@@ -257,6 +334,8 @@ export class NewLoginModal implements m.ClassComponent {
         linkExistingAccountCallback={linkExistingAccountCallback}
         accountVerifiedCallback={accountVerifiedCallback}
         handleEmailLoginCallback={handleEmailLoginCallback}
+        saveProfileInfoCallback={saveProfileInfoCallback}
+        performLinkingCallback={performLinkingCallback}
       />
     );
   }

@@ -53,14 +53,16 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       linkExistingAccountCallback,
       accountVerifiedCallback,
       handleEmailLoginCallback,
+      saveProfileInfoCallback,
+      performLinkingCallback,
     } = vnode.attrs;
 
     return (
       <div class="LoginDesktop">
         <LoginDesktopSidebar
           sidebarType={sidebarType}
-          createNewAccountCallback
-          linkExistingAccountCallback
+          createNewAccountCallback={createNewAccountCallback}
+          linkExistingAccountCallback={linkExistingAccountCallback}
         />
         <div class="body">
           <ModalExitButton />
@@ -73,13 +75,10 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 }}
                 wallets={wallets}
                 setProfiles={setProfiles}
-                setAddress={setAddress}
                 setSidebarType={setSidebarType}
                 setBodyType={setBodyType}
-                setAccount={(account: Account) => {
-                  this.account = account;
-                }}
                 accountVerifiedCallback={accountVerifiedCallback}
+                linking={false}
               />
             </div>
           )}
@@ -165,7 +164,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                   handleSetUsername(u);
                 }}
               />
-              <CWButton label="Finish" />
+              <CWButton label="Finish" onclick={saveProfileInfoCallback} />
             </div>
           )}
           {bodyType === 'ethWalletList' && (
@@ -216,13 +215,10 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 }}
                 wallets={wallets}
                 setProfiles={setProfiles}
-                setAddress={setAddress}
                 setSidebarType={setSidebarType}
                 setBodyType={setBodyType}
-                setAccount={(account: Account) => {
-                  this.account = account;
-                }}
                 accountVerifiedCallback={accountVerifiedCallback}
+                linking={true}
               />
             </div>
           )}
@@ -246,7 +242,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWProfilesList profiles={profiles} />
-              <CWButton label="Finish" />
+              <CWButton label="Finish" onclick={performLinkingCallback} />
             </div>
           )}
           {bodyType === 'allSet' && (

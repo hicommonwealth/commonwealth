@@ -25,8 +25,8 @@ type WalletsListAttrs = {
   setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
   setSidebarType: (sidebarType: string) => void;
   setBodyType: (bodyType: string) => void;
-  setAccount: (account: Account) => void;
   accountVerifiedCallback: (account: Account) => void;
+  linking: boolean;
 };
 
 export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
@@ -38,8 +38,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       wallets,
       setBodyType,
       setSidebarType,
-      setAccount,
       accountVerifiedCallback,
+      linking,
     } = vnode.attrs;
     return (
       <div class="WalletsList">
@@ -70,6 +70,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                     }
 
                     if (app.isLoggedIn()) {
+                      console.log('logged in already');
                       const { result } = await $.post(
                         `${app.serverUrl()}/getAddressStatus`,
                         {
@@ -106,15 +107,19 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           wallet.name,
                           app.chain?.id || wallet.defaultNetwork
                         );
-                      await wallet.validateWithAccount(signerAccount);
 
-                      setAccount(signerAccount);
+                      await wallet.validateWithAccount(signerAccount);
 
                       // return if user signs for two addresses
                       // if (linkNewAddressModalVnode.state.linkingComplete)
                       //   return;
                       // linkNewAddressModalVnode.state.linkingComplete = true;
-                      accountVerifiedCallback(signerAccount, newlyCreated);
+                      accountVerifiedCallback(
+                        signerAccount,
+                        newlyCreated,
+                        linking
+                      );
+
                       // setBodyType('selectAccountType');
                       // setSidebarType('newOrReturning');
                     } catch (err) {

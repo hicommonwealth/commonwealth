@@ -35,4 +35,6 @@ export type LoginAttrs = {
   createNewAccountCallback: () => void;
   accountVerifiedCallback: () => void;
   logInWithAccountCallback: () => void;
+  saveProfileInfoCallback: () => void;
+  performLinkingCallback: () => void;
 };
