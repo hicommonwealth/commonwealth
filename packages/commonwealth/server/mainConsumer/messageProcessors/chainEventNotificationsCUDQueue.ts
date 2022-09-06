@@ -6,6 +6,8 @@ import {
   RascalPublications, TRmqMsgCENotificationsCUD
 } from 'common-common/src/rabbitmq/types';
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
+import {NotificationInstance} from "../../models/notification";
+import {ChainEventNotification} from "../../../shared/types";
 
 export type Ithis = {
   models: DB;
@@ -24,7 +26,7 @@ export async function processChainEventNotificationsCUD(
   }
 
   const chainEvent = data.ChainEvent;
-  let dbNotification;
+  let dbNotification: NotificationInstance;
   try {
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
     dbNotification = await this.models.Subscription.emitNotifications(
@@ -58,11 +60,11 @@ export async function processChainEventNotificationsCUD(
       ...dbNotification.toJSON(),
       ChainEvent: chainEvent,
     };
-    formattedEvent.ChainEvent = chainEvent;
 
     // send to socket.io for WebSocket notifications
     await this.rmqController.publish(
-      formattedEvent,
+      // TODO: better type here
+      <ChainEventNotification><unknown>formattedEvent,
       RascalPublications.ChainEventNotifications
     );
     this.log.info('Notification pushed to socket queue');

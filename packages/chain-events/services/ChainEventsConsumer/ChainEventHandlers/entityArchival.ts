@@ -12,9 +12,9 @@ import {
   SubstrateTypes,
 } from 'chain-events/src';
 
-import { factory, addPrefix } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import {factory, addPrefix} from 'common-common/src/logging';
+import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
+import {RascalPublications} from 'common-common/src/rabbitmq/types';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -66,8 +66,8 @@ export default class extends IEventHandler {
         completed = true;
       }
       const params = author
-        ? { type: type.toString(), type_id, chain, author, completed }
-        : { type: type.toString(), type_id, chain, completed };
+        ? {type: type.toString(), type_id, chain, author, completed}
+        : {type: type.toString(), type_id, chain, completed};
 
       // TODO: update this to record the entity but use the ACK model to ensure consistency
       //      rather than a db transaction revert
@@ -78,7 +78,11 @@ export default class extends IEventHandler {
           where: params,
         }, {transaction: t});
 
-        await this._rmqController.publish(result, RascalPublications.ChainEntityCUDMain)
+        await this._rmqController.publish({
+          ce_id: result.id,
+          chain_id: result.chain,
+          cud: 'create'
+        }, RascalPublications.ChainEntityCUDMain)
 
         return result;
       });

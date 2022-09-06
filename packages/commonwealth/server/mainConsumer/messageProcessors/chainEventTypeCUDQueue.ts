@@ -27,5 +27,8 @@ export async function processChainEventTypeCUD(
       //  dead-letter queue strategy should also be set up with a consumer which
       //  sends alerts to devs
     }
+  } else {
+    console.log("The received message type is not supported!", data);
+    throw new Error(`The received message type is not supported! ${JSON.stringify(data)}`)
   }
 }

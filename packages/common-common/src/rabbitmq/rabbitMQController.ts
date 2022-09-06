@@ -1,6 +1,6 @@
 import Rascal from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { RascalSubscriptions } from "./types";
+import {RascalSubscriptions, TRmqMessages} from "./types";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -61,7 +61,7 @@ export class RabbitMQController {
    * used when calling the messageProcessor function
    */
   public async startSubscription(
-    messageProcessor: (data: any, ...args: any) => Promise<void>,
+    messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
     subscriptionName: string,
     msgProcessorContext?: {[key: string]: any}
   ): Promise<any> {
@@ -105,7 +105,7 @@ export class RabbitMQController {
   //      if a message is successfully published to a particular queue then the callback is executed
 
   // TODO: the publish ACK should be in a transaction with the publish itself
-  public async publish(data: any, publisherName: any): Promise<any> {
+  public async publish(data: TRmqMessages, publisherName: any): Promise<any> {
     if (!this._initialized) {
       throw new Error("RabbitMQController is not initialized!")
     }

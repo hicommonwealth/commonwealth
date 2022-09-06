@@ -1,14 +1,22 @@
 import {CWEvent} from "chain-events/src";
-import { TRmqMsgChainCUD } from './chainCUD';
+import {TRmqMsgChainCUD} from './chainCUD';
 import {TRmqMsgEntityCUD} from './chainEntityCUD'
 import {TRmqMsgCENotificationsCUD} from "./chainEventNotificationsCUD";
+import {ChainEventNotification} from "commonwealth/shared/types";
+import {TRmqMsgCETypeCUD} from "./chainEventTypeCUD";
 
 
 export * from './chainCUD'
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
 
-export type TRabbitMqMessages = TRmqMsgChainCUD | TRmqMsgEntityCUD | TRmqMsgCENotificationsCUD | CWEvent;
+export type TRmqMessages =
+  TRmqMsgChainCUD
+  | TRmqMsgEntityCUD
+  | TRmqMsgCENotificationsCUD
+  | CWEvent
+  | ChainEventNotification
+  | TRmqMsgCETypeCUD;
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',

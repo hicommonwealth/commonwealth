@@ -166,7 +166,7 @@ const deleteChain = async (models: DB, rabbitMQController: RabbitMQController, r
     });
 
     // if publishing fails, the entire transaction will roll back so no data inconsistencies occur
-    await rabbitMQController.publish({chain_id: req.body.id}, RascalPublications.ChainCUDChainEvents);
+    await rabbitMQController.publish({chain_id: req.body.id, cud: 'delete-chain'}, RascalPublications.ChainCUDChainEvents);
   });
 
   return res.json({ status: 'Success', result: 'Deleted chain' });

@@ -1,13 +1,13 @@
 export type TRmqMsgCETypeCUD = IRmqMsgCreateCETypeCUD;
 
 export interface IRmqMsgCreateCETypeCUD {
-  chainEventTypeId: number;
+  chainEventTypeId: string;
   cud: 'create';
 }
 
 export function IRmqMsgCreateCETypeCUD(data: any): data is IRmqMsgCreateCETypeCUD {
   return (
-    typeof data.chainEventTypeId === 'number'
+    data.chainEventTypeId && typeof data.chainEventTypeId === 'string'
     && data.cud === 'create'
   );
 }
