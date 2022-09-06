@@ -11,6 +11,7 @@ import {
   SidebarSectionAttrs,
 } from './types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
@@ -224,7 +225,7 @@ export class SidebarSectionGroup
           class="section-group-title-container"
           onclick={(e) => clickHandler(e)}
         >
-          <div class="title-text">{title}</div>
+          <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
           {carat}
         </div>

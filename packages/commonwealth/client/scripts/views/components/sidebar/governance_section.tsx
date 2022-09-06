@@ -5,7 +5,12 @@ import m from 'mithril';
 import 'components/sidebar/index.scss';
 
 import app from 'state';
-import { ProposalType, ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import {
+  ProposalType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+} from 'common-common/src/types';
 import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
@@ -113,7 +118,7 @@ export class GovernanceSection
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {
-      toggledState: true,
+      toggledState: false,
       children: {
         Members: {
           toggledState: false,
@@ -178,15 +183,11 @@ export class GovernanceSection
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
-      console.log('setting toggle tree from scratch');
       localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
         JSON.stringify(governanceDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('governance', governanceDefaultToggleTree)
     ) {
-      console.log(
-        'setting discussions toggle tree since the cached version differs from the updated version'
-      );
       localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
         JSON.stringify(governanceDefaultToggleTree);
     }
@@ -473,7 +474,7 @@ export class GovernanceSection
     ];
 
     const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'GOVERNANCE',
+      title: 'Governance',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

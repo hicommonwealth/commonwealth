@@ -5,8 +5,7 @@
 
 .Sidebar {
   background-color: $neutral-25;
-  border-right-color: $neutral-200;
-  border-right-width: 1px;
+  border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
   height: 100%;

@@ -9,14 +9,18 @@
   position: relative;
 
   .section-group-title-container {
+    padding: 8px 16px;
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 8px 8px 8px 16px;
-
-    .title-text {
-      font-size: 18px;
-      font-weight: 600;
+    @include small {
+      padding: 12px 40px;
+    }
+    @include extraSmall {
+      padding: 12px 16px;
+    }
+    svg {
+      color: $neutral-500;
     }
   }
 
@@ -30,23 +34,23 @@
   .SubSectionGroupTitle {
     align-items: center;
     display: flex;
-    height: 32px;
     min-width: 0;
-    padding: 0 8px;
+
+    @include small {
+      padding: 12px 56px;
+    }
+
+    @include extraSmall {
+      padding: 12px 32px;
+    }
 
     .title-text {
       font-size: 14px;
       font-weight: 400;
       overflow: hidden;
-      padding-right: 16px;
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
-    }
-
-    &.section-title-text-active {
-      font-weight: 500;
-      color: $purple-500;
     }
 
     &.section-title-text-stale {
@@ -54,7 +58,7 @@
     }
 
     &.background {
-      background-color: $purple-50;
+      background-color: $primary-50;
     }
 
     &.no-background {
@@ -63,11 +67,7 @@
 
     &.active,
     &:hover {
-      background-color: $purple-50;
-    }
-
-    .no-carat {
-      width: 24px;
+      background-color: $primary-50;
     }
 
     .carat {
