@@ -29,7 +29,7 @@ module.exports = {
         id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
         address: { type: Sequelize.STRING, allowNull: false },
         chain_node_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'ChainNodes', key: 'id' } },
-        abi_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'ContractAbis', key: 'id' }},
+        contract_abi_id: { type: Sequelize.INTEGER, allowNull: true, references: { model: 'ContractAbis', key: 'id' }},
         decimals: { type: Sequelize.INTEGER, allowNull: true },
         token_name: { type: Sequelize.STRING, allowNull: true },
         symbol: {type: Sequelize.STRING, allowNull: true},

@@ -36,7 +36,7 @@ export default (
   );
 
   Abi.associate = (models) => {
-    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'abi_id' });
+    models.ContractAbi.hasMany(models.Contract, { foreignKey: 'contract_abi_id' });
   };
 
   return Abi;

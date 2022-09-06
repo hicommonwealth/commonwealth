@@ -41,7 +41,7 @@ export default (
       token_name: { type: dataTypes.STRING, allowNull: true },
       symbol: { type: dataTypes.STRING, allowNull: true },
       type: { type: dataTypes.STRING, allowNull: false }, // for governance erc20, etc. formerly network
-      abi_id: { type: dataTypes.INTEGER, allowNull: true },
+      contract_abi_id: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -60,7 +60,7 @@ export default (
   Contract.associate = (models) => {
     models.Contract.belongsToMany(models.Chain, { through: models.CommunityContract });
     models.Contract.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id', targetKey: 'id' });
-    models.Contract.belongsTo(models.ContractAbi, { foreignKey: 'abi_id', targetKey: 'id'  });
+    models.Contract.belongsTo(models.ContractAbi, { foreignKey: 'contract_abi_id', targetKey: 'id'  });
   };
 
   return Contract;
