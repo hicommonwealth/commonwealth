@@ -8,6 +8,8 @@
   overflow: hidden;
   min-width: $quick-switcher-width;
   padding: 0 8px;
+  position: relative;
+  top: $sidebar-community-header-height;
 
   .community-nav-bar {
     align-items: center;

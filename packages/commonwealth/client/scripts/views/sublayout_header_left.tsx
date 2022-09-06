@@ -34,7 +34,7 @@ export class SublayoutHeaderLeft
       } else if (isNotNil(chain)) {
         return (
           <>
-            <CWCommunityAvatar size="medium" community={chain} />
+            {/* <CWCommunityAvatar size="medium" community={chain} />
             <h4>
               {link(
                 'a',
@@ -46,7 +46,7 @@ export class SublayoutHeaderLeft
               )}
               {title}
             </h4>
-            <CommunityOptionsPopover />
+            <CommunityOptionsPopover /> */}
           </>
         );
       } else if (alwaysShowTitle) {

@@ -1,15 +1,20 @@
 @import 'client/styles/shared';
 
+// TODO: Add SCSS variables to ensure that widths and heights of various
+// offsets and elements are uniform
+
 .Sidebar {
-  background-color: $neutral-100;
-  border-right-color: $neutral-50;
+  background-color: $neutral-25;
+  border-right-color: $neutral-200;
   border-right-width: 1px;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-width: $sidebar-width;
   overflow-y: auto;
+  position: relative;
   width: $sidebar-width;
+  top: $sidebar-community-header-height;
 
   .section-header {
     color: $neutral-500;

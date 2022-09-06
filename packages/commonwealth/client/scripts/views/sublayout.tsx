@@ -15,6 +15,9 @@ import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switche
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
+import { CWText } from './components/component_kit/cw_text';
+import { CommunityHeader } from './components/sidebar/community_header';
 
 type SublayoutAttrs = {
   alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
@@ -87,6 +90,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
+            <CommunityHeader />
             {!app.isCustomDomain() &&
               !isWindowMediumSmallInclusive(window.innerWidth) && (
                 <SidebarQuickSwitcher />
