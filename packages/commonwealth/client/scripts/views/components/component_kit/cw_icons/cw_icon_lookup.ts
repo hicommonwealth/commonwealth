@@ -59,6 +59,8 @@ export const iconLookup = {
   send: Icons.CWSend,
   share: Icons.CWShare,
   share2: Icons.CWShare2,
+  sidebarCollapse: Icons.CWSidebarCollapse,
+  sidebarExpand: Icons.CWSidebarExpand,
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,

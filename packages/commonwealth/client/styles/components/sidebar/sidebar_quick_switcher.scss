@@ -1,15 +1,14 @@
 @import 'shared';
 
 .SidebarQuickSwitcher {
-  border-right: 1px solid $neutral-50;
+  background: $neutral-50;
+  border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  min-width: $quick-switcher-width;
-  padding: 0 8px;
-  position: relative;
-  top: $sidebar-community-header-height;
+  width: $quick-switcher-width;
+  padding: $sidebar-community-header-height 8px 0;
 
   .community-nav-bar {
     align-items: center;

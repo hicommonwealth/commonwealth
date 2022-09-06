@@ -141,9 +141,9 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
           ) : (
             <div class="no-carat" />
           )}
-          <div title={title} class={`title-text ${titleTextClass}`}>
+          <CWText type="b2" className={`title-text ${titleTextClass}`}>
             {title}
-          </div>
+          </CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
         {containsChildren && toggled && (

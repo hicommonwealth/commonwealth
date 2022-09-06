@@ -4,7 +4,7 @@
 // offsets and elements are uniform
 
 .Sidebar {
-  background-color: $neutral-25;
+  background-color: $white;
   border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
@@ -13,7 +13,11 @@
   overflow-y: auto;
   position: relative;
   width: $sidebar-width;
-  top: $sidebar-community-header-height;
+  top: calc(#{$sidebar-community-header-height} - 1px);
+
+  @include smallInclusive {
+    min-width: calc(100% - #{$quick-switcher-width});
+  }
 
   .section-header {
     color: $neutral-500;
@@ -30,10 +34,6 @@
       justify-content: center;
       margin-bottom: 15px;
     }
-  }
-
-  @include smallInclusive {
-    display: none;
   }
 }
 

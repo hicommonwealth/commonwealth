@@ -9,6 +9,16 @@
     margin-right: 8px;
   }
 
+  .Icon {
+    display: block;
+    @include medium {
+      display: none;
+    }
+    @include large {
+      display: none;
+    }
+  }
+
   h4 {
     margin-right: 4px;
 
@@ -24,9 +34,5 @@
 
   svg {
     cursor: pointer;
-  }
-
-  @include smallInclusive {
-    display: none;
   }
 }

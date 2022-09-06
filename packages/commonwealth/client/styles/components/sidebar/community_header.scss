@@ -2,7 +2,7 @@
 
 .CommunityHeader {
   align-items: center;
-  background: white;
+  background: $white;
   border: 1px solid #e6e5e7;
   border-radius: 30px 0px 0px 30px;
   display: flex;
@@ -12,6 +12,10 @@
   position: absolute;
   top: calc(#{$global-header-height} - 1px);
   width: calc(#{$sidebar-width} + #{$quick-switcher-width});
+
+  @include smallInclusive {
+    min-width: 100%;
+  }
 
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box; /* Firefox, other Gecko */

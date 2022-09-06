@@ -7,7 +7,6 @@ import 'sublayout.scss';
 import app from 'state';
 import { handleEmailInvites } from 'views/components/header/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
-import { MobileHeader } from 'views/mobile/mobile_header';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
 import { SublayoutHeaderRight } from './sublayout_header_right';
@@ -15,8 +14,6 @@ import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switche
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
-import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
-import { CWText } from './components/component_kit/cw_text';
 import { CommunityHeader } from './components/sidebar/community_header';
 
 type SublayoutAttrs = {
@@ -53,6 +50,8 @@ const footercontents = [
 ];
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
+  private sidebarToggled: boolean;
+
   view(vnode) {
     const {
       alwaysShowTitle,
@@ -69,6 +68,10 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
+    const largeBrowserSize = !isWindowMediumSmallInclusive(window.innerWidth);
+    if (largeBrowserSize) this.sidebarToggled = true;
+    const { sidebarToggled } = this;
+
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
@@ -76,12 +79,13 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
-          <MobileHeader />
           <div class="header-container">
             <SublayoutHeaderLeft
-              alwaysShowTitle={alwaysShowTitle}
-              chain={chain}
-              title={title}
+              sidebarToggleFn={() => {
+                this.sidebarToggled = !this.sidebarToggled;
+                m.redraw();
+                console.log(this.sidebarToggled);
+              }}
             />
             {!hideSearch && m(SearchBar)}
             <SublayoutHeaderRight
@@ -90,12 +94,11 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            <CommunityHeader />
-            {!app.isCustomDomain() &&
-              !isWindowMediumSmallInclusive(window.innerWidth) && (
-                <SidebarQuickSwitcher />
-              )}
-            <Sidebar />
+            <div class={`sidebar-container ${sidebarToggled ? 'toggled' : ''}`}>
+              <CommunityHeader />
+              {!app.isCustomDomain() && <SidebarQuickSwitcher />}
+              <Sidebar />
+            </div>
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

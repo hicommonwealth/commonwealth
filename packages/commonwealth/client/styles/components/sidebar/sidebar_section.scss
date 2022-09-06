@@ -19,9 +19,6 @@
     @include extraSmall {
       padding: 12px 16px;
     }
-    svg {
-      color: $neutral-500;
-    }
   }
 
   .sections-container {
@@ -35,6 +32,7 @@
     align-items: center;
     display: flex;
     min-width: 0;
+    padding: 4px 24px;
 
     @include small {
       padding: 12px 56px;
@@ -45,8 +43,7 @@
     }
 
     .title-text {
-      font-size: 14px;
-      font-weight: 400;
+      color: $neutral-600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

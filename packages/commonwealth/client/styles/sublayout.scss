@@ -21,22 +21,27 @@
       justify-content: space-between;
       min-height: $global-header-height;
       padding: 0 24px;
-
-      @include smallInclusive {
-        display: none;
-      }
     }
   }
 
   .sidebar-and-body-container {
     display: flex;
-    flex-direction: row;
     height: 100%;
     overflow: hidden;
     width: 100%;
 
-    @include smallInclusive {
-      margin-top: $global-header-height;
+    .sidebar-container {
+      display: flex;
+      @include mediumSmallInclusive {
+        display: none;
+
+        &.toggled {
+          display: flex;
+        }
+      }
+      @include smallInclusive {
+        min-width: 100%;
+      }
     }
 
     .body-and-sticky-headers-container {
