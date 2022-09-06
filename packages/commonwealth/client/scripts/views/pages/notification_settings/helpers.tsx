@@ -45,7 +45,7 @@ export const bundleSubs = (
   return result;
 };
 
-export const clarifyingText = (category: string) => {
+export const getNotificationTypeText = (category: string) => {
   if (category === 'new-comment-creation') {
     return 'Comments on';
   } else if (category === 'new-reaction') {
