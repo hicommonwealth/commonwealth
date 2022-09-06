@@ -3,19 +3,20 @@
 .SublayoutHeaderLeft {
   align-items: center;
   display: flex;
+  gap: 8px;
   flex-direction: row;
 
-  .CommunityAvatar {
-    margin-right: 8px;
+  .Icon.commonLogo {
+    @include mediumSmallInclusive {
+      padding-right: 8px;
+      border-right: 1px solid $neutral-100;
+    }
   }
 
-  .Icon {
-    display: block;
-    @include medium {
-      display: none;
-    }
-    @include large {
-      display: none;
+  .Icon.sidebarCollapse {
+    display: none;
+    @include mediumSmallInclusive {
+      display: block;
     }
   }
 

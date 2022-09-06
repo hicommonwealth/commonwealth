@@ -84,16 +84,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       <div class="Sublayout">
         <div class="header-and-body-container">
           <div class="header-container">
-            <SublayoutHeaderLeft
-              sidebarToggleFn={() => {
-                this.sidebarToggled = !this.sidebarToggled;
-                localStorage.setItem(
-                  'sidebar-toggle',
-                  (!!this.sidebarToggled).toString()
-                );
-                m.redraw();
-              }}
-            />
+            <SublayoutHeaderLeft parentState={this} />
             {!hideSearch && m(SearchBar)}
             <SublayoutHeaderRight
               chain={chain}
