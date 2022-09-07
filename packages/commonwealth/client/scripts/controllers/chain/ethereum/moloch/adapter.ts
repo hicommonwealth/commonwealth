@@ -34,7 +34,12 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    const api = new MolochAPI(Moloch1__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const molContracts = this.app.contracts.getByType('moloch').filter((c) => c.symbol === this.meta.default_symbol);
+    if (!molContracts || !molContracts.length) {
+      throw new Error('No Mol contracts found');
+    }
+    const molContract = molContracts[0];
+    const api = new MolochAPI(Moloch1__factory.connect, molContract.address, this.chain.api.currentProvider as any);
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);
