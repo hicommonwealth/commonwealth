@@ -5,7 +5,9 @@ import m from 'mithril';
 import 'pages/notification_settings/helper_components.scss';
 
 import app from 'state';
+import { getProposalUrlPath } from 'identifiers';
 import { AddressInfo, NotificationSubscription } from 'models';
+import { slugify } from '../../../../../shared/utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -17,9 +19,22 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 
 const getTextRows = (subscription: NotificationSubscription) => {
   if (subscription.Thread) {
+    const threadUrl = getProposalUrlPath(
+      subscription.Thread.slug,
+      `${subscription.Thread.identifier}-${slugify(subscription.Thread.title)}`,
+      undefined,
+      subscription.Chain.id
+    );
+
     return (
       <>
-        <CWText type="b2" fontWeight="bold" noWrap>
+        <CWText
+          type="b2"
+          fontWeight="bold"
+          noWrap
+          className="thread-title-text"
+          onclick={() => m.route.set(threadUrl)}
+        >
           {renderQuillTextBody(subscription.Thread.title, {
             collapse: true,
             hideFormatting: true,
@@ -34,6 +49,16 @@ const getTextRows = (subscription: NotificationSubscription) => {
       </>
     );
   } else if (subscription.Comment) {
+    // const parentThread = app.threads.getById(
+    //   Number(subscription.Comment.rootProposal.slice(-4))
+    // );
+
+    // const commentUrl = getProposalUrlPath(
+    //   subscription.Thread.slug,
+    //   `${subscription.Thread.identifier}-${slugify(subscription.Thread.title)}`,
+    //   undefined,
+    //   subscription.Chain.id
+    // );
     return (
       <>
         <div class="comment-header-row">
@@ -79,7 +104,10 @@ const getTextRows = (subscription: NotificationSubscription) => {
     subscription.category === 'new-thread-creation'
   ) {
     return (
-      <div class="comment-header-row">
+      <div
+        class="comment-header-row"
+        onclick={() => m.route.set(subscription.Chain.id)}
+      >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           className="attribution-text"

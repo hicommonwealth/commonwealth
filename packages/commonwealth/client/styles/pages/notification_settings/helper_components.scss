@@ -16,14 +16,23 @@
       padding: 0 16px;
     }
 
+    .thread-title-text.Text:hover {
+      text-decoration: underline;
+    }
+
     .subscription-body-text.Text {
       color: $neutral-600;
     }
 
     .comment-header-row {
       align-items: baseline;
+      cursor: pointer;
       display: flex;
       gap: 4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
 
       .attribution-text.Text {
         color: $neutral-600;
