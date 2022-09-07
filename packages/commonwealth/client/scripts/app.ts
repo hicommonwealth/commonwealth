@@ -67,6 +67,7 @@ export async function initAppState(
         data.chains
           .filter((chain) => chain.active)
           .map((chain) => {
+            delete chain.ChainNode;
             chain.Contracts.map((contract) => {
               return app.contracts.addToStore(
                 Contract.fromJSON({
