@@ -5,15 +5,25 @@
   display: flex;
   gap: 8px;
   flex-direction: row;
+  height: $global-header-height;
 
   .Icon.commonLogo {
     @include mediumSmallInclusive {
       padding-right: 8px;
       border-right: 1px solid $neutral-100;
+      height: $global-header-height;
     }
   }
 
   .Icon.sidebarCollapse {
+    display: none;
+    fill: $neutral-600;
+    @include mediumSmallInclusive {
+      display: block;
+    }
+  }
+
+  .Icon.sidebarExpand {
     display: none;
     @include mediumSmallInclusive {
       display: block;

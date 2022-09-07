@@ -30,14 +30,11 @@ export class SublayoutHeaderLeft
         {showChainInfo && (
           <>
             <CWCommunityAvatar size="large" community={app.chain.meta} />
-            <CWText type="h5" fontStyle="medium">
-              {app.chain.meta.name}
-            </CWText>
           </>
         )}
         {app.chain && (
           <CWIcon
-            className="sidebarCollapse"
+            className={sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             iconName={sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             onclick={() => {
               parentState.sidebarToggled = !sidebarToggled;

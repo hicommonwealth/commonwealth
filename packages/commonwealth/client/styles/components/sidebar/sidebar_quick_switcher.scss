@@ -5,27 +5,29 @@
   border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
+  align-items: center;
   height: 100%;
   overflow: hidden;
   width: $quick-switcher-width;
 
   &.chain-scoped {
-    padding: $sidebar-community-header-height 8px 8px;
+    padding: calc(#{$sidebar-community-header-height} + 4px) 4px 4px;
   }
 
   &.global {
-    padding: 8px;
+    padding: 4px;
   }
 
   .community-nav-bar {
     align-items: center;
+    justify-content: center;
     gap: 12px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding: 16px 0;
+    padding: 12px;
     border-bottom: 1px solid $neutral-200;
-    width: 100%;
+    width: min-content;
   }
 
   .scrollable-community-bar {
@@ -33,7 +35,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    padding: 16px 8px;
+    padding: 12px 8px;
 
     .SidebarQuickSwitcherItem {
       margin-bottom: 16px;

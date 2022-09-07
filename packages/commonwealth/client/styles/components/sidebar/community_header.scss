@@ -8,7 +8,7 @@
   display: flex;
   gap: 8px;
   left: 0px;
-  padding: 11px 12px; // We break from our 8px grid system here to accomodate the 1px border
+  padding: 11px 10.5px; // We break from our 8px grid system here to accomodate the 1px border
   position: absolute;
   top: calc(#{$global-header-height} - 1px);
   width: calc(#{$sidebar-width} + #{$quick-switcher-width});

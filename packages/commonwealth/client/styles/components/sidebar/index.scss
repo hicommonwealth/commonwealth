@@ -12,11 +12,8 @@
   min-width: $sidebar-width;
   overflow-y: auto;
   position: relative;
+  top: calc(#{$sidebar-community-header-height} - 1px);
   width: $sidebar-width;
-
-  &.chain-scoped {
-    top: calc(#{$sidebar-community-header-height} - 1px);
-  }
 
   @include smallInclusive {
     min-width: calc(100% - #{$quick-switcher-width});
