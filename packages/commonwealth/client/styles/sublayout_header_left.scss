@@ -8,6 +8,7 @@
   height: $global-header-height;
 
   .Icon.commonLogo {
+    cursor: pointer;
     @include mediumSmallInclusive {
       padding-right: 8px;
       border-right: 1px solid $neutral-100;
@@ -15,19 +16,17 @@
     }
   }
 
-  .Icon.sidebarCollapse {
+  .Icon.sidebarCollapse,
+  .Icon.sidebarExpand {
+    cursor: pointer;
     display: none;
-    fill: $neutral-600;
     @include mediumSmallInclusive {
       display: block;
     }
   }
 
   .Icon.sidebarExpand {
-    display: none;
-    @include mediumSmallInclusive {
-      display: block;
-    }
+    fill: $neutral-600;
   }
 
   h4 {
@@ -41,9 +40,5 @@
   .slash {
     color: $neutral-400;
     margin: 0 8px;
-  }
-
-  svg {
-    cursor: pointer;
   }
 }

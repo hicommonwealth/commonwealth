@@ -25,7 +25,14 @@ export class SublayoutHeaderLeft
 
     return (
       <div class="SublayoutHeaderLeft">
-        <CWIcon className="commonLogo" iconName="commonLogo" iconSize="xl" />
+        <CWIcon
+          className="commonLogo"
+          iconName="commonLogo"
+          iconSize="xl"
+          onclick={() => {
+            m.route.set('/');
+          }}
+        />
         <CommunityOptionsPopover />
         {showChainInfo && (
           <>
