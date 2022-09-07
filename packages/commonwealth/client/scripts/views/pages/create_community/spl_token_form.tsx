@@ -145,7 +145,7 @@ export class SplTokenForm implements m.ClassComponent {
           label="Save changes"
           disabled={this.state.saving || !this.state.loaded}
           onclick={async () => {
-            const { cluster, iconUrl, mint } = this.state.form;
+            const { cluster, iconUrl, mint, symbol } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -162,6 +162,7 @@ export class SplTokenForm implements m.ClassComponent {
                 network: ChainNetwork.SPL,
                 node_url: cluster,
                 type: ChainType.Token,
+                default_symbol: symbol,
                 ...this.state.form,
               });
               if (res.result.admin_address) {
