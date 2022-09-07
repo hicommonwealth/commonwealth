@@ -134,20 +134,32 @@ class NotificationSettingsPage implements m.ClassComponent {
                         checked={hasSomeEmailSubs}
                         onchange={() => {
                           hasSomeEmailSubs
-                            ? app.user.notifications.disableImmediateEmails(
-                                subs
-                              )
-                            : app.user.notifications.disableImmediateEmails(
-                                subs
-                              );
+                            ? app.user.notifications
+                                .disableImmediateEmails(subs)
+                                .then(() => {
+                                  m.redraw();
+                                })
+                            : app.user.notifications
+                                .enableImmediateEmails(subs)
+                                .then(() => {
+                                  m.redraw();
+                                });
                         }}
                       />
                       <CWToggle
                         checked={subs.some((s) => s.isActive)}
                         onchange={() => {
                           hasSomeInAppSubs
-                            ? app.user.notifications.disableSubscriptions(subs)
-                            : app.user.notifications.enableSubscriptions(subs);
+                            ? app.user.notifications
+                                .disableSubscriptions(subs)
+                                .then(() => {
+                                  m.redraw();
+                                })
+                            : app.user.notifications
+                                .enableSubscriptions(subs)
+                                .then(() => {
+                                  m.redraw();
+                                });
                         }}
                       />
                     </div>
