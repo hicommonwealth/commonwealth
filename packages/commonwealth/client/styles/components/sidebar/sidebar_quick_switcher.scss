@@ -8,7 +8,14 @@
   height: 100%;
   overflow: hidden;
   width: $quick-switcher-width;
-  padding: $sidebar-community-header-height 8px 0;
+
+  &.chain-scoped {
+    padding: $sidebar-community-header-height 8px 8px;
+  }
+
+  &.global {
+    padding: 8px;
+  }
 
   .community-nav-bar {
     align-items: center;

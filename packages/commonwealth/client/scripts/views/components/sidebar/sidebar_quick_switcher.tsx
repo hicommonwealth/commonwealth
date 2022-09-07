@@ -50,7 +50,9 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     });
 
     return (
-      <div class="SidebarQuickSwitcher">
+      <div
+        class={`SidebarQuickSwitcher ${app.chain ? 'chain-scoped' : 'global'}`}
+      >
         <div class="community-nav-bar">
           {app.isLoggedIn() && (
             <CWIconButton

@@ -35,18 +35,20 @@ export class SublayoutHeaderLeft
             </CWText>
           </>
         )}
-        <CWIcon
-          className="sidebarCollapse"
-          iconName={sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
-          onclick={() => {
-            parentState.sidebarToggled = !sidebarToggled;
-            localStorage.setItem(
-              'sidebar-toggle',
-              (!sidebarToggled).toString()
-            );
-            m.redraw();
-          }}
-        />
+        {app.chain && (
+          <CWIcon
+            className="sidebarCollapse"
+            iconName={sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
+            onclick={() => {
+              parentState.sidebarToggled = !sidebarToggled;
+              localStorage.setItem(
+                'sidebar-toggle',
+                (!sidebarToggled).toString()
+              );
+              m.redraw();
+            }}
+          />
+        )}
       </div>
     );
   }

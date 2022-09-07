@@ -4,7 +4,7 @@
 // offsets and elements are uniform
 
 .Sidebar {
-  background-color: $white;
+  background-color: $neutral-25;
   border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
@@ -13,7 +13,10 @@
   overflow-y: auto;
   position: relative;
   width: $sidebar-width;
-  top: calc(#{$sidebar-community-header-height} - 1px);
+
+  &.chain-scoped {
+    top: calc(#{$sidebar-community-header-height} - 1px);
+  }
 
   @include smallInclusive {
     min-width: calc(100% - #{$quick-switcher-width});
