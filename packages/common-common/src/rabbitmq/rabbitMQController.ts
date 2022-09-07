@@ -4,6 +4,13 @@ import {RascalSubscriptions, TRmqMessages} from "./types";
 
 const log = factory.getLogger(formatFilename(__filename));
 
+class PublishError extends Error {
+  constructor(msg: string) {
+    super(msg);
+    Object.setPrototypeOf(this, PublishError.prototype);
+  }
+}
+
 export class RabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];
@@ -113,17 +120,19 @@ export class RabbitMQController {
     if (!this.publishers.includes(publisherName))
       throw new Error('Publisher is not defined');
 
+    let publication;
     try {
-      const publication = await this.broker.publish(publisherName, data);
+      publication = await this.broker.publish(publisherName, data);
       publication.on('error', (err, messageId) => {
-        // TODO: we need guaranteed message delivery so attempt message delivery
-        //  to dead-letter-queue with less requirements or send fatal error
-        //  report with highest level priority to backend devs
         log.error(`Publisher error ${messageId}`, err);
+        throw new PublishError(err.message);
       });
     } catch (err) {
-      throw new Error(`Rascal config error: ${err.message}`);
+      if (err instanceof PublishError) throw new Error(`Publish error: ${err.message}`);
+      else throw new Error(`Rascal config error: ${err.message}`);
     }
+
+
   }
 
   public get initialized(): boolean {
