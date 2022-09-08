@@ -36,10 +36,12 @@ export const bundleSubs = (
 ): { [k: string]: Array<NotificationSubscription> } => {
   const result = {};
   for (const sub of subs) {
-    if (result[sub.Chain.id]) {
-      result[sub.Chain.id].push(sub);
-    } else {
-      result[sub.Chain.id] = [sub];
+    if (sub.Chain) {
+      if (result[sub.Chain.id]) {
+        result[sub.Chain.id].push(sub);
+      } else {
+        result[sub.Chain.id] = [sub];
+      }
     }
   }
   return result;

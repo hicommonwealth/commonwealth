@@ -28,31 +28,31 @@ import {
 import { bundleSubs } from './helpers';
 
 class NotificationSettingsPage implements m.ClassComponent {
-  private subscriptions: NotificationSubscription[];
+  // private subscriptions: NotificationSubscription[];
 
-  async oninit() {
-    if (!app.isLoggedIn()) {
-      notifyError('Must be logged in to configure notifications');
-      m.route.set('/');
-    }
+  // async oninit() {
+  //   if (!app.isLoggedIn()) {
+  //     notifyError('Must be logged in to configure notifications');
+  //     m.route.set('/');
+  //   }
 
-    this.subscriptions = [];
+  //   this.subscriptions = [];
 
-    $.get(`${app.serverUrl()}/viewSubscriptions`, {
-      jwt: app.user.jwt,
-    }).then(
-      (result) => {
-        result.result.forEach((sub) =>
-          this.subscriptions.push(modelFromServer(sub))
-        );
-        m.redraw();
-      },
-      () => {
-        notifyError('Could not load notification settings');
-        m.route.set('/');
-      }
-    );
-  }
+  //   $.get(`${app.serverUrl()}/viewSubscriptions`, {
+  //     jwt: app.user.jwt,
+  //   }).then(
+  //     (result) => {
+  //       result.result.forEach((sub) =>
+  //         this.subscriptions.push(modelFromServer(sub))
+  //       );
+  //       m.redraw();
+  //     },
+  //     () => {
+  //       notifyError('Could not load notification settings');
+  //       m.route.set('/');
+  //   }
+  //   );
+  // }
 
   view() {
     if (!app.loginStatusLoaded()) {
@@ -70,7 +70,9 @@ class NotificationSettingsPage implements m.ClassComponent {
       );
     }
 
-    const bundledSubs = bundleSubs(this.subscriptions);
+    const { subscriptions } = app.user.notifications;
+
+    const bundledSubs = bundleSubs(subscriptions);
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
