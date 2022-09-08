@@ -41,10 +41,12 @@ EthFormFields,
 } from '../create_community/types';
 
 type ContractFormFields = {
+  eth_chain_id: number,
   abi: JSON,
   contractType: ContractType.DaoFactory | ContractType.Aave |ContractType.Compound |
   ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
-  tokenName: string;
+  decimals: number;
+  token_name: string;
 };
 
 type CreateContractForm = ChainFormFields & EthFormFields & ContractFormFields;
@@ -61,14 +63,14 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     form: {
       address: '',
       chainString: 'Ethereum Mainnet',
-      ethChainId: 1,
-      id: '',
+      eth_chain_id: 1,
       name: '',
       abi: JSON.parse('[]'),
       contractType: ContractType.DaoFactory,
       nodeUrl: '',
       symbol: '',
-      tokenName: 'token',
+      token_name: '',
+      decimals: null,
       ...initChainForm(),
     },
   };
@@ -116,6 +118,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.form.abi = value;
             this.state.loaded = false;
           }}
+          textarea
         />,
         <SelectRow
           title="Contract Type"
@@ -136,7 +139,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           placeholder="Optional: Enter a name for this contract"
           onChangeHandler={(v) => {
             this.state.form.name = v;
-            this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
         <InputRow
@@ -147,16 +149,24 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.form.symbol = v;
           }}
         />
+        <InputRow
+          title="Decimals"
+          value={this.state.form.decimals}
+          placeholder="Optional: Enter Decimals"
+          onChangeHandler={(v) => {
+            this.state.form.decimals = v;
+          }}
+        />
         <CWButton
           label="Save Contract"
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.ethChainId ||
+            !this.state.form.eth_chain_id ||
             this.state.loading
           }
           onclick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
+            const { altWalletUrl, chainString, eth_chain_id, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
             try {
@@ -164,11 +174,10 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 alt_wallet_url: altWalletUrl,
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
-                eth_chain_id: ethChainId,
+                eth_chain_id,
                 jwt: app.user.jwt,
                 network: ChainNetwork.ERC20,
                 node_url: nodeUrl,
-                type: ChainType.Token,
                 default_symbol: symbol,
                 ...this.state.form,
               });

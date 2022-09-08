@@ -29,6 +29,7 @@ import reactionsCounts from './routes/reactionsCounts';
 import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
+import createContract from './routes/createContract';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
@@ -223,6 +224,12 @@ function setupRouter(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
+  );
+
+  router.post(
+    '/createContract',
+    passport.authenticate('jwt', { session: false }),
+    createContract.bind(this, models)
   );
 
   router.post(
