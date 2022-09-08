@@ -15,11 +15,10 @@ import {
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -528,13 +527,13 @@ async function initializer(): Promise<void> {
 
     if (!res.ok) {
       log.info(`${res.status}, ${res.statusText}`);
-      throw new ServerError('Could not get dynoList');
+      throw new Error('Could not get dynoList');
     }
 
     const dynoList = await res.json();
 
     if (!dynoList || dynoList.length === 0) {
-      throw new ServerError("No dyno's detected");
+      throw new Error("No dyno's detected");
     }
 
     // removes any dyno's that aren't ceNodes
@@ -582,7 +581,7 @@ async function initializer(): Promise<void> {
       );
       if (!result.ok) {
         log.info(`${result.status}, ${result.statusText}`);
-        throw new ServerError('Could not update the config var - overlap may occur');
+        throw new Error('Could not update the config var - overlap may occur');
       }
     }
   } else {

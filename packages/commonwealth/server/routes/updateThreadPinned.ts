@@ -59,7 +59,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new AppError(e));
+    return next(new ServerError(e));
   }
 };
 

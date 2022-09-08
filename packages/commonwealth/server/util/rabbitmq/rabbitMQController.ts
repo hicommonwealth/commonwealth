@@ -1,6 +1,5 @@
 import Rascal from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from '../errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,7 +64,7 @@ export class RabbitMQController {
     log.info(`Subscribing to ${subscriptionName}`);
     try {
       if (!this.subscribers.includes(subscriptionName))
-        throw new AppError('Subscription does not exist');
+        throw new Error('Subscription does not exist');
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
         try {
@@ -86,14 +85,14 @@ export class RabbitMQController {
         ackOrNack(err, {strategy: 'nack'})
       });
     } catch (err) {
-      throw new ServerError(`Rascal config error: ${err.message}`);
+      throw new Error(`Rascal config error: ${err.message}`);
     }
     return subscription;
   }
 
   public async publish(data: any, publisherName: string): Promise<any> {
     if (!this.publishers.includes(publisherName))
-      throw new AppError('Publisher is not defined');
+      throw new Error('Publisher is not defined');
 
     try {
       const publication = await this.broker.publish(publisherName, data);
@@ -101,7 +100,7 @@ export class RabbitMQController {
         log.error(`Publisher error ${messageId}`, err);
       });
     } catch (err) {
-      throw new ServerError(`Rascal config error: ${err.message}`)
+      throw new Error(`Rascal config error: ${err.message}`)
     }
   }
 }

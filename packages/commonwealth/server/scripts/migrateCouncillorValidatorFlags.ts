@@ -12,7 +12,6 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default async function (models, chain?: string): Promise<void> {
@@ -34,7 +33,7 @@ export default async function (models, chain?: string): Promise<void> {
     ],
   });
   if (!nodes) {
-    throw new ServerError('no nodes found for chain entity migration');
+    throw new Error('no nodes found for chain entity migration');
   }
 
   // 2. for each node, fetch councillors and validators

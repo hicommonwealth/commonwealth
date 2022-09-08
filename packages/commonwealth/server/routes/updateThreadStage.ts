@@ -12,6 +12,7 @@ export const Errors = {
   NoThread: 'Cannot find thread',
   NotAdminOrOwner: 'Not an admin or owner of this thread',
   InvalidStage: 'Please Select a Stage',
+  FailedToParse: 'Failed to parse custom stages'
 };
 
 const updateThreadStage = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -47,7 +48,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
     try {
       custom_stages = Array.from(JSON.parse(entity.custom_stages)).map((s) => s.toString()).filter((s) => s);
     } catch (e) {
-      throw new AppError(e)
+      throw new AppError(Errors.FailedToParse);
     }
 
     // validate stage
@@ -83,7 +84,7 @@ const updateThreadStage = async (models: DB, req: Request, res: Response, next: 
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new AppError(e));
+    return next(new ServerError(e));
   }
 };
 

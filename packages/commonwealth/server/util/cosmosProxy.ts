@@ -18,7 +18,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         include: models.ChainNode
       });
       if (!chain) {
-        throw new ServerError('Invalid chain');
+        throw new AppError('Invalid chain');
       }
       log.trace(`Found cosmos endpoint: ${chain.ChainNode.url}`);
       const response = await axios.post(chain.ChainNode.url, req.body, {

@@ -64,7 +64,7 @@ const updateVote = async (
   try {
     const pollOptions = JSON.parse(poll.options);
     selected_option = pollOptions.find((o: string) => o === option);
-    if (!option) throw new AppError("Invalid Poll Response");
+    if (!option) throw new AppError(Errors.InvalidOption);
   } catch (e) {
     return next(new AppError(Errors.InvalidOption));
   }

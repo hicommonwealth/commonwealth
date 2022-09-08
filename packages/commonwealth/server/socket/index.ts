@@ -22,7 +22,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../database';
 import { RedisCache, redisRetryStrategy } from '../util/redisCache';
-import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,13 +37,13 @@ export const authenticate = (
       JWT_SECRET,
       (err, decodedUser) => {
         if (err)
-          return next(new ServerError('Authentication Error: incorrect JWT token'));
+          return next(new Error('Authentication Error: incorrect JWT token'));
         (<any>socket).user = decodedUser;
         next();
       }
     );
   } else {
-    next(new ServerError('Authentication Error: no JWT token given'));
+    next(new Error('Authentication Error: no JWT token given'));
   }
 };
 

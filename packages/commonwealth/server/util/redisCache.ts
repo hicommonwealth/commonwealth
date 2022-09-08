@@ -3,13 +3,12 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
 import Rollbar from 'rollbar';
-import { AppError, ServerError } from './errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export function redisRetryStrategy(retries: number) {
   if (retries > 5) {
-    return new ServerError('Redis max connection retries exceeded');
+    return new Error('Redis max connection retries exceeded');
   }
   // timetable: 0, 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
   // from 1 sec to 16.67 minutes

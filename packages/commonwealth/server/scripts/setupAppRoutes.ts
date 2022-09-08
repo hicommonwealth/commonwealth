@@ -4,7 +4,6 @@ import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import { ChainInstance } from '../models/chain';
-import { AppError, ServerError } from '../util/errors';
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
@@ -30,7 +29,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
   // Retrieve the default bundle from /build/index.html, and overwrite <meta>
   // tags with data fetched from the backend.
   if (!templateFile) {
-    throw new ServerError('Template not found, cannot start production server');
+    throw new Error('Template not found, cannot start production server');
   }
 
   const renderWithMetaTags = (res, title, description, author, image) => {

@@ -15,7 +15,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   try {
     unpackedSpec = JSON.parse(specString);
   } catch (e) {
-    throw new ServerError('Could not parse spec data');
+    throw new AppError('Could not parse spec data');
   }
   const sanitizedSpec: RegisteredTypes = {
     types: unpackedSpec['types'],
@@ -44,7 +44,7 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
   } catch (err) {
     log.info('Disconnecting from provider in error...');
     await provider.disconnect();
-    throw new ServerError(`failed to initialize polkadot api: ${err.message}`);
+    throw new AppError(`failed to initialize polkadot api: ${err.message}`);
   }
 };
 
