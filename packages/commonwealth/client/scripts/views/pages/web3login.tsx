@@ -27,7 +27,7 @@ class Web3LoginPage implements m.ClassComponent {
       if (!app.isLoggedIn()) {
         // TODO: fail
       }
-      const { status, result } = await $.post(
+      const { status, result } = await $.get(
         `${app.serverUrl()}/auth/callback`,
         {
           jwt: app.user.jwt,
@@ -44,13 +44,14 @@ class Web3LoginPage implements m.ClassComponent {
       }
     };
 
+    // TODO: handle case where already logged in (immediate redirect after auth callback)
     return (
       <Sublayout>
         <div class="Web3LoginPage">
           <div class="web3-login-container">
             <h3>Log into Commonwealth</h3>
             {m(LoginWithWalletDropdown, {
-              label: 'Try again',
+              label: 'Log In',
               joiningChain: null,
               loggingInWithAddress: true,
               onSuccess,
