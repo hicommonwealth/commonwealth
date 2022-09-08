@@ -17,6 +17,10 @@ class NearWebWalletController implements IWebWallet<any> {
     return [];
   }
 
+  public async getRecentBlock() {
+    return null;
+  }
+
   public async signWithAccount(account: Account): Promise<string> {
     throw new Error('not implemented');
   }

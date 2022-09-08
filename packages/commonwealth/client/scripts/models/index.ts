@@ -1,6 +1,7 @@
 export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
+export { default as BlockInfo } from './BlockInfo';
 export { default as ChainInfo } from './ChainInfo';
 export { default as ChatMessage } from './ChatMessage';
 export { default as DiscussionDraft } from './DiscussionDraft';
