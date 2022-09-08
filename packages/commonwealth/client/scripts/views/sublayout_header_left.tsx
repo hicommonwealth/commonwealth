@@ -33,7 +33,7 @@ export class SublayoutHeaderLeft
             m.route.set('/');
           }}
         />
-        <CommunityOptionsPopover />
+        {app.chain && <CommunityOptionsPopover />}
         {showChainInfo && (
           <>
             <CWCommunityAvatar size="large" community={app.chain.meta} />
