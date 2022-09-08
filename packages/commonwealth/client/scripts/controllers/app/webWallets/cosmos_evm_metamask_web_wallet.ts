@@ -52,6 +52,10 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async getRecentBlock() {
+    return null;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
       message,

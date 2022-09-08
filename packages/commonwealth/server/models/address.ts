@@ -17,6 +17,7 @@ export type AddressAttributes = {
 	verification_token_expires?: Date;
 	verified?: Date;
 	keytype?: string;
+  block_info?: string;
 	name?: string;
 	last_active?: Date;
 	created_at?: Date;
@@ -70,6 +71,7 @@ export default (
 		ghost_address:              { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 		profile_id:    						  { type: dataTypes.INTEGER, allowNull: true },
 		wallet_id:									{ type: dataTypes.STRING, allowNull: true },
+		block_info:									{ type: dataTypes.STRING, allowNull: true },
 	}, {
 		timestamps: true,
 		createdAt: 'created_at',
@@ -83,7 +85,7 @@ export default (
 		],
 		defaultScope: {
 			attributes: {
-				exclude: [ 'verification_token', 'verification_token_expires', 'created_at', 'updated_at' ],
+		  exclude: [ 'verification_token', 'verification_token_expires', 'block_info', 'created_at', 'updated_at' ],
 			}
 		},
 		scopes: {
