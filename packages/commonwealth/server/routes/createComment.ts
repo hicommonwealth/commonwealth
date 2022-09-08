@@ -154,7 +154,7 @@ const createComment = async (
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new AppError(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed));
       }
     }
   }

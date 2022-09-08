@@ -102,7 +102,7 @@ const bulkOffchain = async (
           );
         } catch (e) {
           console.log(e);
-          reject(new AppError('Could not fetch threads, comments, or reactions'));
+          reject(new ServerError('Could not fetch threads, comments, or reactions'));
         }
       }),
       // admins
@@ -151,7 +151,7 @@ const bulkOffchain = async (
           });
           resolve(mostActiveUsers_);
         } catch (e) {
-          reject(new AppError('Could not fetch most active users'));
+          reject(new ServerError('Could not fetch most active users'));
         }
       }),
       models.sequelize.query(

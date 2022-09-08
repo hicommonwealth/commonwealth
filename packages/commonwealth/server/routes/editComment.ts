@@ -173,7 +173,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
           });
           return user;
         } catch (err) {
-          return next(new AppError(err));
+          return next(new ServerError(err));
         }
       }));
       // filter null results

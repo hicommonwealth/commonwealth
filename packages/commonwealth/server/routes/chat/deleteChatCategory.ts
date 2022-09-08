@@ -35,7 +35,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
             }
         });
     } catch (e) {
-        return next(new AppError(e))
+        return next(new ServerError(e))
     }
 
     return res.json({ status: 'Success' });

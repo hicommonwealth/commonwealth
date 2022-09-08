@@ -42,7 +42,7 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
   topic.destroy().then(() => {
     res.json({ status: 'Success' });
   }).catch((e) => {
-    next(new AppError(Errors.DeleteFail));
+    next(new ServerError(Errors.DeleteFail));
   });
 };
 

@@ -64,7 +64,7 @@ const searchDiscussions = async (
       });
     } catch (e) {
       console.log(e);
-      return next(new AppError(Errors.UnexpectedError));
+      return next(new ServerError(Errors.UnexpectedError));
     }
   }
 

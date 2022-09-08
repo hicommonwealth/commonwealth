@@ -55,8 +55,8 @@ export function useMagicAuth(models: DB) {
       // if not on root URL and we don't support the chain base for magic don't allow users to sign up
       if (!existingUser && registrationChain?.base && !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)) {
         // unsupported chain -- client should send through old email flow
-        return cb(new ServerError('Unsupported magic chain.'));
-      } 
+        return cb(new AppError('Unsupported magic chain.'));
+      }
 
       // if on root URL, no chain base, we allow users to sign up and generate a Substrate + Ethereum Address
       if (!existingUser && !registrationChain?.base) {
@@ -70,7 +70,7 @@ export function useMagicAuth(models: DB) {
             .set('X-Magic-Secret-key', MAGIC_API_KEY)
             .accept('json');
           if (polkadotResp.body?.status !== 'ok') {
-            throw new ServerError(polkadotResp.body?.message || 'Failed to fetch polkadot address');
+            throw new Error(polkadotResp.body?.message || 'Failed to fetch polkadot address');
           }
           const polkadotRespAddress = polkadotResp.body?.data?.public_address;
 

@@ -61,12 +61,12 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
     chain_id: chain?.id,
     permission: 'member',
   });
-  if (!role) return next(new AppError(Errors.RoleCreationFailure));
+  if (!role) return next(new ServerError(Errors.RoleCreationFailure));
 
   const updatedCode = await code.update({
     used: true,
   });
-  if (!updatedCode) return next(new AppError(Errors.CodeUpdateFailure));
+  if (!updatedCode) return next(new ServerError(Errors.CodeUpdateFailure));
 
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,

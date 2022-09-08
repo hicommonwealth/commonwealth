@@ -41,7 +41,7 @@ const deleteAddress = async (models: DB, req: Request, res: Response, next: Next
     const result = await addressObj.save();
     return res.json({ status: 'Success', response: 'Deleted address' });
   } catch (err) {
-    return next(new AppError(err));
+    return next(new ServerError(err));
   }
 };
 

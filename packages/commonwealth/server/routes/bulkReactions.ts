@@ -22,7 +22,7 @@ const bulkReactions = async (models: DB, req: Request, res: Response, next: Next
       });
     }
   } catch (err) {
-    return next(new AppError(err));
+    return next(new ServerError(err));
   }
 
   return res.json({ status: 'Success', result: uniqBy(reactions.map((c) => c.toJSON()), 'id') });

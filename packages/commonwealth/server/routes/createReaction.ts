@@ -124,7 +124,7 @@ const createReaction = async (
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new AppError(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -164,7 +164,7 @@ const createReaction = async (
         include: [models.Address],
       });
   } catch (err) {
-    return next(new AppError(err));
+    return next(new ServerError(err));
   }
 
   let comment;

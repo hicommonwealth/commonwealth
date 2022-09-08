@@ -105,7 +105,7 @@ const reactionsCounts = async (
       return res.json({ result: [] });
     }
   } catch (err) {
-    return next(new AppError(err));
+    return next(new ServerError(err));
   }
 };
 

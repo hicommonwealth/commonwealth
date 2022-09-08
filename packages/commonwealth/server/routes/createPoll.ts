@@ -93,7 +93,7 @@ const createPoll = async (
 
     return res.json({ status: 'Success', result: finalPoll.toJSON() });
   } catch (e) {
-    return next(new AppError(e));
+    return next(new ServerError(e));
   }
 };
 

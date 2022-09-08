@@ -42,7 +42,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     try {
         await Promise.all(channels.map(c => {c.category = req.body.new_category; return c.save()}))
     } catch (e) {
-        return next(new AppError(e))
+        return next(new ServerError(e))
     }
 
     return res.json({ status: 'Success' });

@@ -63,7 +63,7 @@ const OrderTopics = async (
       result: topics.map((t) => t.toJSON()),
     });
   } catch (err) {
-    return next(new AppError(err));
+    return next(new ServerError(err));
   }
 };
 

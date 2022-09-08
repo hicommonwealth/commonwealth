@@ -26,10 +26,10 @@ const sendFeedback = async (models: DB, req: Request, res: Response, next: NextF
   request
     .post(SLACK_FEEDBACK_WEBHOOK)
     .send(data)
-    .end((err, res2) => {
+    .end((err) => {
       if (err) {
         // TODO: handle 401 unauthorized
-        return next(new AppError(err));
+        return next(new ServerError(err));
       }
       return res.json({ status: 'Success' });
     });
