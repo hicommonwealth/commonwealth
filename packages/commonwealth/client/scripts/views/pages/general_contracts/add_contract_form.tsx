@@ -11,7 +11,7 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType, ContractType } from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
 
 import { notifyError } from 'controllers/app/notifications';
@@ -40,17 +40,19 @@ EthChainAttrs,
 EthFormFields,
 } from '../create_community/types';
 
-type EthDaoFormFields = {
-  network: ChainNetwork.Aave | ChainNetwork.Compound;
+type ContractFormFields = {
+  abi: JSON,
+  contractType: ContractType.DaoFactory | ContractType.Aave |ContractType.Compound |
+  ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
   tokenName: string;
 };
 
-type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
+type CreateContractForm = ChainFormFields & EthFormFields & ContractFormFields;
 
-type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
+type CreateContractState = ChainFormState & { form: CreateContractForm };
 
 export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
-  private state: CreateEthDaoState = {
+  private state: CreateContractState = {
     message: '',
     loaded: false,
     loading: false,
@@ -62,7 +64,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       ethChainId: 1,
       id: '',
       name: '',
-      network: ChainNetwork.Compound,
+      abi: JSON.parse('[]'),
+      contractType: ContractType.DaoFactory,
       nodeUrl: '',
       symbol: '',
       tokenName: 'token',
@@ -78,7 +81,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
-    const updateDAO = async () => {
+    const generateABIUI = async () => {
       if (
         !this.state.form.address ||
         !this.state.form.ethChainId ||
@@ -89,24 +92,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       this.state.status = undefined;
       this.state.message = '';
       try {
-        const provider = new Web3.providers.WebsocketProvider(
-          this.state.form.nodeUrl
-        );
-        const compoundApi = new CompoundAPI(
-          null,
-          this.state.form.address,
-          provider
-        );
-        await compoundApi.init(this.state.form.tokenName);
-        if (!compoundApi.Token) {
-          throw new Error(
-            'Could not find governance token. Is "Token Name" field valid?'
-          );
-        }
-        const govType = GovernorType[compoundApi.govType];
-        const tokenType = GovernorTokenType[compoundApi.tokenType];
         this.state.status = 'success';
-        this.state.message = `Found ${govType} with token type ${tokenType}`;
       } catch (e) {
         this.state.status = 'failure';
         this.state.message = e.message;
@@ -122,18 +108,47 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     return (
       <div class="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
-        {this.state.form.network === ChainNetwork.Compound && (
-          <InputRow
-            title="Token Name (Case Sensitive)"
-            value={this.state.form.tokenName}
-            onChangeHandler={(v) => {
-              this.state.form.tokenName = v;
-              this.state.loaded = false;
-            }}
-          />
-        )}
+        <InputRow
+          title="Abi"
+          value={this.state.form.abi}
+          placeholder="Optional: Paste ABI here"
+          onChangeHandler={(value) => {
+            this.state.form.abi = value;
+            this.state.loaded = false;
+          }}
+        />,
+        <SelectRow
+          title="Contract Type"
+          options={[
+            ContractType.DaoFactory, ContractType.ERC20,
+            ContractType.ERC721, ContractType.SPL,
+            ContractType.Aave, ContractType.Compound
+          ]}
+          value={this.state.form.contractType}
+          onchange={(value) => {
+            this.state.form.contractType = value;
+            this.state.loaded = false;
+          }}
+        />
+        <InputRow
+          title="Name"
+          value={this.state.form.name}
+          placeholder="Optional: Enter a name for this contract"
+          onChangeHandler={(v) => {
+            this.state.form.name = v;
+            this.state.form.id = slugifyPreserveDashes(v);
+          }}
+        />
+        <InputRow
+          title="Symbol"
+          value={this.state.form.symbol}
+          placeholder="Optional: Enter token symbol"
+          onChangeHandler={(v) => {
+            this.state.form.symbol = v;
+          }}
+        />
         <CWButton
-          label="Test contract"
+          label="Save Contract"
           disabled={
             this.state.saving ||
             !validAddress ||
@@ -141,47 +156,20 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loading
           }
           onclick={async () => {
-            await updateDAO();
-          }}
-        />
-        {this.state.message && (
-          <CWValidationText
-            message={this.state.message}
-            status={this.state.status}
-          />
-        )}
-        <InputRow
-          title="Name"
-          value={this.state.form.name}
-          disabled={disableField}
-          onChangeHandler={(v) => {
-            this.state.form.name = v;
-            this.state.form.id = slugifyPreserveDashes(v);
-          }}
-        />
-        {...defaultChainRows(this.state.form, disableField)}
-        <CWButton
-          label="Save changes"
-          disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onclick={async () => {
-            const { chainString, ethChainId, nodeUrl, tokenName } =
+            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
-            mixpanelBrowserTrack({
-              event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
-              chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
-              communityType: null,
-            });
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${app.serverUrl()}/createContract`, {
+                alt_wallet_url: altWalletUrl,
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
+                network: ChainNetwork.ERC20,
                 node_url: nodeUrl,
-                token_name: tokenName,
-                type: ChainType.DAO,
+                type: ChainType.Token,
+                default_symbol: symbol,
                 ...this.state.form,
               });
               if (res.result.admin_address) {
@@ -191,19 +179,36 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                   res.result.role.chain_id
                 );
               }
-              await initAppState(false);
-              // TODO: notify about needing to run event migration
-              m.route.set(`/${res.result.chain?.id}`);
+              // await initAppState(false);
+              // m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
-                err.responseJSON?.error ||
-                  'Creating new ETH DAO community failed'
+                err.responseJSON?.error || 'Creating new ERC20 community failed'
               );
             } finally {
               this.state.saving = false;
             }
           }}
         />
+
+        <CWButton
+          label="Generate UI for ABI"
+          disabled={
+            this.state.saving ||
+            !validAddress ||
+            !this.state.form.ethChainId ||
+            this.state.loading
+          }
+          onclick={async () => {
+            await generateABIUI();
+          }}
+        />
+        {this.state.message && (
+          <CWValidationText
+            message={this.state.message}
+            status={this.state.status}
+          />
+        )}
       </div>
     );
   }
