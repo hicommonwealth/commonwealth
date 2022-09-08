@@ -28,32 +28,6 @@ import {
 import { bundleSubs } from './helpers';
 
 class NotificationSettingsPage implements m.ClassComponent {
-  // private subscriptions: NotificationSubscription[];
-
-  // async oninit() {
-  //   if (!app.isLoggedIn()) {
-  //     notifyError('Must be logged in to configure notifications');
-  //     m.route.set('/');
-  //   }
-
-  //   this.subscriptions = [];
-
-  //   $.get(`${app.serverUrl()}/viewSubscriptions`, {
-  //     jwt: app.user.jwt,
-  //   }).then(
-  //     (result) => {
-  //       result.result.forEach((sub) =>
-  //         this.subscriptions.push(modelFromServer(sub))
-  //       );
-  //       m.redraw();
-  //     },
-  //     () => {
-  //       notifyError('Could not load notification settings');
-  //       m.route.set('/');
-  //   }
-  //   );
-  // }
-
   view() {
     if (!app.loginStatusLoaded()) {
       return (
