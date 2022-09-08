@@ -1,15 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
-import $ from 'jquery';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
 
 import app from 'state';
-import { modelFromServer } from 'models/NotificationSubscription';
-import { AddressInfo, NotificationSubscription } from 'models';
-import { notifyError } from 'controllers/app/notifications';
+import { AddressInfo } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
 import ErrorPage from '../error';
