@@ -655,7 +655,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Notifications
             '/notification-settings': importRoute(
-              'views/pages/notification_settings/index',
+              'views/pages/notification_settings',
               { scoped: true, deferChain: true }
             ),
             '/notifications': importRoute('views/pages/notifications_page', {
