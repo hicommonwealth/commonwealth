@@ -38,7 +38,7 @@ export const Errors = {
 type CreateContractReq = ContractAttributes & Omit<ChainNodeAttributes, 'id'> & {
   node_url: string;
   address: string;
-  abi: JSON,
+  abi: string,
   contractType: ContractType;
 };
 
@@ -70,9 +70,9 @@ const createContract = async (
     }
 
     const {
-        id,
         address,
         contractType,
+        abi,
         symbol,
         token_name,
         decimals
@@ -92,9 +92,14 @@ const createContract = async (
         eth_chain_id,
     }});
 
+    const contract_abi = await models.ContractAbi.create({
+        abi,
+    })
+
     const contract = await models.Contract.create({
         address,
         token_name,
+        abi_id: contract_abi.id,
         symbol,
         decimals,
         type: contractType,

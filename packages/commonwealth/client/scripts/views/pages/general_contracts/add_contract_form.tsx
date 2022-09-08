@@ -70,7 +70,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       nodeUrl: '',
       symbol: '',
       token_name: '',
-      decimals: null,
+      decimals: 0,
       ...initChainForm(),
     },
   };
@@ -134,11 +134,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           }}
         />
         <InputRow
-          title="Name"
-          value={this.state.form.name}
-          placeholder="Optional: Enter a name for this contract"
+          title="Token Name"
+          value={this.state.form.token_name}
+          placeholder="Optional: Enter a token name for this contract"
           onChangeHandler={(v) => {
-            this.state.form.name = v;
+            this.state.form.token_name = v;
           }}
         />
         <InputRow
