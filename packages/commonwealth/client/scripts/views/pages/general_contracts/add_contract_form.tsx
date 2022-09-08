@@ -14,7 +14,6 @@ import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
 
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import CompoundAPI, {
@@ -123,15 +122,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     return (
       <div class="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
-        <SelectRow
-          title="DAO Type"
-          options={[ChainNetwork.Aave, ChainNetwork.Compound]}
-          value={this.state.form.network}
-          onchange={(value) => {
-            this.state.form.network = value;
-            this.state.loaded = false;
-          }}
-        />
         {this.state.form.network === ChainNetwork.Compound && (
           <InputRow
             title="Token Name (Case Sensitive)"
@@ -169,7 +159,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.form.id = slugifyPreserveDashes(v);
           }}
         />
-        <IdRow id={this.state.form.id} />
         {...defaultChainRows(this.state.form, disableField)}
         <CWButton
           label="Save changes"
