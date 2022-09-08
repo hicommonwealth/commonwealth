@@ -16,6 +16,7 @@ import {
   Account,
   AddressInfo,
   ITokenAdapter,
+  BlockInfo,
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
@@ -120,7 +121,6 @@ export async function completeClientLogin(account: Account) {
 
     // set the address as active
     await setActiveAccount(account);
-
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
@@ -246,13 +246,15 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  chain: string
+  chain: string,
+  validationBlockInfo?: BlockInfo,
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
+    block_info: JSON.stringify(validationBlockInfo)
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
@@ -262,6 +264,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };
 }

@@ -2,6 +2,7 @@
 import chai from 'chai';
 import 'chai/register-should';
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 import BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
@@ -12,7 +13,7 @@ import TokenBalanceProvider from 'token-balance-cache/src/provider';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -31,18 +32,26 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/createAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, wallet_id });
+      .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
-    const data = constructTypedMessage(chain_id, token);
+    const sessionWallet = ethers.Wallet.createRandom()
+    const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id });
+      .send({
+        address,
+        chain,
+        signature,
+        wallet_id,
+        session_public_address: sessionWallet.address,
+        session_block_data: TEST_BLOCK_INFO_STRING,
+      });
     console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;

@@ -52,6 +52,10 @@ class PolkadotWebWalletController
     return injector.signer;
   }
 
+  public async getRecentBlock() {
+    return null;
+  }
+
   // ACTIONS
   public async signWithAccount(account: Account): Promise<string> {
     const signer = await this.getSigner(account.address);
