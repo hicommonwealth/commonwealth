@@ -26,12 +26,12 @@ type UpdateContractResp = ContractAttributes;
 
 const updateContract = async (
   models: DB,
-  req: any,  // TODO use explicit type instead
+  req: TypedRequestBody<UpdateContractReq>,  // TODO use explicit type instead
   res: TypedResponse<UpdateContractResp>,
   next: NextFunction
 ) => {
   if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.id) return next(new Error(Errors.NoContractFound));
+  if (!req.body?.id) return next(new Error(Errors.NoContractFound));
 
   const contract = await models.Contract.findOne({ where: { address: req.body.id } });
   if (!contract) return next(new Error(Errors.NoContractFound));
@@ -52,9 +52,9 @@ const updateContract = async (
 
   if (abi) {
     const contractAbi = await models.ContractAbi.findOrCreate({ where: { abi } });
-    
+    const abi_id = contractAbi[0].id;
+    contract.abi_id = abi_id;
   }
-
   if (address) contract.address = address;
   if (contractType) contract.type = contractType;
   if (symbol) contract.symbol = symbol;
@@ -62,7 +62,6 @@ const updateContract = async (
   if (decimals) contract.decimals = decimals;
 
   await contract.save();
-
   return success(res, contract.toJSON());
 };
 
