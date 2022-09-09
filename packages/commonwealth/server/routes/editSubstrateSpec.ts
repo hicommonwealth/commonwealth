@@ -4,8 +4,13 @@ import { DB } from '../database';
 import { ChainBase } from 'common-common/src/types';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import {
+  IRmqMsgUpdateChainCUD,
+  RabbitMQController,
+  RascalPublications
+} from "common-common/src/rabbitmq";
 
-const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editSubstrateSpec = async (models: DB, rabbitMQController: RabbitMQController, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new Error(error));
   if (!chain) return next(new Error('Unknown chain.'));
@@ -38,7 +43,24 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
 
   // write back to database
   chain.substrate_spec = sanitizedSpec;
-  await chain.save();
+
+  const publishData: IRmqMsgUpdateChainCUD = {
+    chain_id: chain.id,
+    base: chain.base,
+    network: chain.network,
+    verbose_logging: chain.ce_verbose,
+    active: chain.active,
+    chain_node_url: node.private_url || node.url,
+    contract_address: chain.address,
+    substrate_spec: sanitizedSpec || '',
+    cud: 'update-chain'
+  }
+
+  await models.sequelize.transaction(async (t) => {
+    await chain.save({ transaction: t });
+
+    await rabbitMQController.publish(publishData, RascalPublications.ChainCUDChainEvents);
+  });
 
   return res.json({ status: 'Success', result: chain.toJSON() });
 };
