@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../../util/validateChain';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from '../../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -16,13 +17,13 @@ const createDraft = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
   const { title, body, topic } = req.body;
 
   if (!title && !body && !req.body['attachments[]']?.length) {
-    return next(new Error(Errors.InsufficientData));
+    return next(new AppError(Errors.InsufficientData));
   }
 
   const draftContent = {

@@ -11,7 +11,7 @@ import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
-import { CWTooltip } from './component_kit/cw_tooltip';
+import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
 const LIVE_PREVIEW_MAX = 3;
@@ -96,7 +96,7 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
         {disableVoteButton ? (
           <CWTooltip
             interactionType="hover"
-            tooltipContents={tooltipErrorMessage ?? 'Select an option to vote.'}
+            tooltipContent={tooltipErrorMessage ?? 'Select an option to vote.'}
             tooltipType="solidNoArrow"
             hoverCloseDelay={300}
             trigger={

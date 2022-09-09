@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { sequelize } from '../../database';
+import { AppError, ServerError } from '../../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const Op = Sequelize.Op;
@@ -9,10 +10,10 @@ const log = factory.getLogger(formatFilename(__filename));
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body['subscription_ids[]']) {
-    return next(new Error(Errors.NoSubscriptionId));
+    return next(new AppError(Errors.NoSubscriptionId));
   }
 
   // subscription_ids[] comes either as a single string if there's one element, or as an array.
@@ -30,7 +31,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   });
 
   if (subscriptions.find((s) => s.subscriber_id !== req.user.id)) {
-    return next(new Error(Errors.NotUsersSubscription));
+    return next(new AppError(Errors.NotUsersSubscription));
   }
 
   await sequelize.transaction(async (t) => {

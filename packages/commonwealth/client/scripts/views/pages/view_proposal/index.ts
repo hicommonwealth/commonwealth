@@ -810,15 +810,15 @@ const ViewProposalPage: m.Component<
         );
       }).length > 0;
     const isAdminOrMod =
-      app.user.isRoleOfCommunity({
+      app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
       }) ||
-      app.user.isRoleOfCommunity({
+      app.roles.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
       });
-    const isAdmin = app.user.isRoleOfCommunity({
+    const isAdmin = app.roles.isRoleOfCommunity({
       role: 'admin',
       chain: app.activeChainId(),
     });
