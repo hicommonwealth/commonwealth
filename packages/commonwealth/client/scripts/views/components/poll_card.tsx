@@ -327,7 +327,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       votedFor,
       voteInformation,
       tooltipErrorMessage,
-      isPreview,
+      isPreview = false,
     } = vnode.attrs;
 
     const resultString = 'Results';
