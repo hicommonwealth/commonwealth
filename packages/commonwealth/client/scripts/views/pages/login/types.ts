@@ -24,6 +24,7 @@ export type LoginAttrs = {
   setBodyType: (bodyType: string) => void;
   handleSetAvatar: () => void;
   handleSetUsername: () => void;
+  handleSetEmail: () => void;
   profiles: Array<ProfileRowAttrs>;
   setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
   sidebarType?: string;

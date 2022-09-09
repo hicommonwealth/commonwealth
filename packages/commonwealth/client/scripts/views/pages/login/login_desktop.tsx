@@ -44,6 +44,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       handleSetUsername,
       profiles,
       setProfiles,
+      handleSetEmail,
       sidebarType,
       setSidebarType,
       username,
@@ -123,9 +124,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
               <CWTextInput
                 label="email address"
                 placeholder="your-email@email.com"
-                oninput={(e) => {
-                  this.email = e.target.value;
-                }}
+                oninput={handleSetEmail}
               />
               <div class="buttons-row">
                 <CWButton

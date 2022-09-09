@@ -56,6 +56,31 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
                   if (wallet.chain === 'near') {
                     // do something
+                    const WalletAccount = (await import('near-api-js'))
+                      .WalletAccount;
+                    if (!app.chain.apiInitialized) {
+                      await app.chain.initApi();
+                    }
+                    const nearWallet = new WalletAccount(
+                      (app.chain as Near).chain.api,
+                      'commonwealth_near'
+                    );
+                    if (nearWallet.isSignedIn()) {
+                      // get rid of pre-existing wallet info to make way for new account
+                      nearWallet.signOut();
+                    }
+                    const redirectUrl = !app.isCustomDomain()
+                      ? `${
+                          window.location.origin
+                        }/${app.activeChainId()}/finishNearLogin`
+                      : `${window.location.origin}/finishNearLogin`;
+                    nearWallet.requestSignIn({
+                      contractId: (app.chain as Near).chain.isMainnet
+                        ? 'commonwealth-login.near'
+                        : 'commonwealth-login.testnet',
+                      successUrl: redirectUrl,
+                      failureUrl: redirectUrl,
+                    });
                   } else if (wallet.chain === 'substrate') {
                     // do something
                   } else {

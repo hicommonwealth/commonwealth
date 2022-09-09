@@ -36,9 +36,13 @@ export class LoginModal implements m.ClassComponent {
   }
 }
 
-const dummyAddress = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq';
+type LoginModalAttrs = {
+  initialBody?: LoginBodyType;
+  initialSidebar?: LoginSidebarType;
+  initialAccount?: Account;
+};
 
-export class NewLoginModal implements m.ClassComponent {
+export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
@@ -52,7 +56,7 @@ export class NewLoginModal implements m.ClassComponent {
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
 
-  oninit() {
+  oninit(vnode) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -78,10 +82,23 @@ export class NewLoginModal implements m.ClassComponent {
       this.sidebarType = 'connectWallet';
       this.bodyType = 'walletList';
     }
+
+    // Override if initial data is provided (for redirecting wallets)
+    if (vnode.attrs.initialBody) {
+      this.bodyType = vnode.attrs.initialBody;
+    }
+    if (vnode.attrs.initialSidebar) {
+      this.sidebarType = vnode.attrs.initialSidebar;
+    }
+    if (vnode.attrs.initialAccount) {
+      this.primaryAccount = vnode.attrs.initialAccount;
+      this.address = vnode.attrs.initialAccount.address;
+    }
   }
 
   view() {
     const handleEmailLoginCallback = async () => {
+      console.log('helloo', this.email);
       if (!this.email) return;
 
       try {
@@ -285,6 +302,9 @@ export class NewLoginModal implements m.ClassComponent {
         setProfiles={(profiles: Array<ProfileRowAttrs>) => {
           this.profiles = profiles;
         }}
+        handleSetEmail={(e) => {
+          this.email = e.target.value;
+        }}
         sidebarType={this.sidebarType}
         setSidebarType={(sidebarType: LoginSidebarType) => {
           this.sidebarType = sidebarType;
@@ -316,6 +336,9 @@ export class NewLoginModal implements m.ClassComponent {
         }}
         handleSetUsername={(u) => {
           this.username = u;
+        }}
+        handleSetEmail={(e) => {
+          this.email = e.target.value;
         }}
         profiles={this.profiles}
         setProfiles={(profiles: Array<ProfileRowAttrs>) => {

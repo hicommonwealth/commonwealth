@@ -12,6 +12,7 @@ import {
   createUserWithAddress,
   setActiveAccount,
 } from 'controllers/app/login';
+import { Account } from 'models';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -19,6 +20,7 @@ import Sublayout from 'views/sublayout';
 import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
+import { NewLoginModal } from '../modals/login_modal';
 
 interface IState {
   validating: boolean;
@@ -26,6 +28,8 @@ interface IState {
   validatedAccount: NearAccount | null;
   validationError: string;
   exitActionSelected: boolean;
+  isNewAccount: boolean;
+  account: Account;
 }
 
 // TODO:
@@ -68,11 +72,18 @@ const validate = async (
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
-    const newAcct = await createUserWithAddress(acct.address, WalletId.NearWallet, chain.id);
-    acct.setValidationToken(newAcct.validationToken);
+    const chain =
+      app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+    const newAcct = await createUserWithAddress(
+      acct.address,
+      WalletId.NearWallet,
+      chain.id
+    );
+    vnode.state.isNewAccount = newAcct.newlyCreated;
+    // vnode.state.account = newAcct.account;
+    acct.setValidationToken(newAcct.account.validationToken);
     acct.setWalletId(WalletId.NearWallet);
-    acct.setAddressId(newAcct.addressId);
+    acct.setAddressId(newAcct.account.addressId);
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
@@ -176,15 +187,21 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
             if (vnode.state.validatedAccount.profile.name) {
               redirectToNextPage();
             } else {
-              app.modals.create({
-                modal: LinkNewAddressModal,
-                data: {
-                  alreadyInitializedAccount: vnode.state.validatedAccount,
-                },
-                exitCallback: () => {
-                  redirectToNextPage();
-                },
-              });
+              if (vnode.state.isNewAccount) {
+                app.modals.create({
+                  modal: NewLoginModal,
+                  data: {
+                    initialBody: 'welcome',
+                    initialSidebar: 'newOrReturning',
+                    initialAccount: vnode.state.validatedAccount,
+                  },
+                  exitCallback: () => {
+                    redirectToNextPage();
+                  },
+                });
+              } else {
+                redirectToNextPage();
+              }
             }
           },
         }),
