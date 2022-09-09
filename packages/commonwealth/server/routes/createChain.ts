@@ -302,6 +302,7 @@ const createChain = async (
     chain_node_id: node.id,
     address,
     token_name,
+    has_chain_events_listener: network === 'aave' || network === 'compound'
   });
 
   const nodeJSON = node.toJSON();
