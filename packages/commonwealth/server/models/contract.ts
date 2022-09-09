@@ -9,7 +9,7 @@ export type ContractAttributes = {
   id: number;
   address: string;
   chain_node_id: number;
-  abi_id: number;
+  abi_id?: number;
   decimals?: number;
   token_name?: string;
   symbol?: string;
