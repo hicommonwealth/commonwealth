@@ -48,7 +48,6 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       setSidebarType,
       username,
       wallets,
-      setWallets,
       createNewAccountCallback,
       linkExistingAccountCallback,
       accountVerifiedCallback,
@@ -63,6 +62,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
           sidebarType={sidebarType}
           createNewAccountCallback={createNewAccountCallback}
           linkExistingAccountCallback={linkExistingAccountCallback}
+          wallets={wallets}
         />
         <div class="body">
           <ModalExitButton />

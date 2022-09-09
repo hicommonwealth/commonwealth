@@ -50,16 +50,16 @@ export class NewLoginModal implements m.ClassComponent {
   private loggedInProfile: Profile;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
+  private currentlyInCommunityPage: boolean;
 
   oninit() {
     // Determine if in a community
-    const currentlyInCommunityPage = app.activeChainId() !== undefined;
+    this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
-    if (currentlyInCommunityPage) {
+    if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
       this.wallets = app.wallets.availableWallets(chainbase);
-
-      this.sidebarType = 'ethWallet'; // TODO: This needs to be changed
+      this.sidebarType = 'communityWalletOptions';
       this.bodyType = 'walletList';
     } else {
       const allChains = app.config.chains.getAll();
@@ -184,8 +184,6 @@ export class NewLoginModal implements m.ClassComponent {
       newlyCreated: boolean,
       linking: boolean
     ) => {
-      console.log('linking', linking);
-
       if (!linking) {
         this.primaryAccount = account;
         this.address = account.address;
@@ -202,7 +200,7 @@ export class NewLoginModal implements m.ClassComponent {
         this.profiles = [account.profile];
       }
 
-      if (newlyCreated) {
+      if (!newlyCreated) {
         await logInWithAccount(account, true);
       } else {
         if (!linking) {
@@ -230,6 +228,8 @@ export class NewLoginModal implements m.ClassComponent {
 
     const performLinkingCallback = async () => {
       try {
+        // BIG TODO: New Profile stuff needs to be merged in so we can do the following
+
         // update loggedInProfile to include primaryAccount
 
         // Remove orphaned address, profile, and User

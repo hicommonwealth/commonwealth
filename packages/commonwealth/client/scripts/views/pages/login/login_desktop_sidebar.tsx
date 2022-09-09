@@ -4,18 +4,27 @@ import m from 'mithril';
 
 import 'pages/login/login_desktop_sidebar.scss';
 
+import { IWebWallet } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
 
+function generateText(wallet: IWebWallet<any>) {
+  const startsWithVowel = wallet.chain === 'ethereum';
+
+  return `This Community requires a${startsWithVowel ? 'n' : ''} ${
+    wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
+  } Wallet`;
+}
 export class LoginDesktopSidebar
   implements
     m.ClassComponent<{
       sidebarType: LoginSidebarType;
       createNewAccountCallback: () => void;
       linkExistingAccountCallback: () => void;
+      wallets: Array<IWebWallet<any>>;
     }>
 {
   view(vnode) {
@@ -23,6 +32,7 @@ export class LoginDesktopSidebar
       sidebarType,
       createNewAccountCallback,
       linkExistingAccountCallback,
+      wallets,
     } = vnode.attrs;
     return (
       <div class="LoginDesktopSidebar">
@@ -50,10 +60,10 @@ export class LoginDesktopSidebar
             />
           </div>
         )}
-        {sidebarType === 'ethWallet' && (
+        {sidebarType === 'communityWalletOptions' && (
           <div class="eth-wallet">
             <CWText type="h4" fontWeight="semiBold" className="header-text">
-              This Community requires an Ethereum Wallet
+              {generateText(wallets[0])}
             </CWText>
             <CWText type="b2" className="sidebar-body-text">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut

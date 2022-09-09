@@ -70,7 +70,6 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                     }
 
                     if (app.isLoggedIn()) {
-                      console.log('logged in already');
                       const { result } = await $.post(
                         `${app.serverUrl()}/getAddressStatus`,
                         {

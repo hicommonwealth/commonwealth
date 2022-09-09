@@ -3,7 +3,7 @@ import { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list
 
 export type LoginSidebarType =
   | 'connectWallet'
-  | 'ethWallet'
+  | 'communityWalletOptions'
   | 'newAddressLinked'
   | 'newOrReturning';
 
