@@ -299,7 +299,7 @@ class ChainInfo {
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      : m(CWJdenticon, { address: undefined, size });
   }
 }
 
