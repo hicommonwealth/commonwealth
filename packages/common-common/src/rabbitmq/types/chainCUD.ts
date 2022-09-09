@@ -56,12 +56,14 @@ export interface IRmqMsgUpdateChainCUD {
 export function isRmqMsgUpdateChainCUD(data: any): data is IRmqMsgUpdateChainCUD {
   return (
     data.chain_id && typeof data.chain_id === 'string'
-    && Object.values(ChainBase).includes(data.base)
-    && Object.values(ChainNetwork).includes(data.network)
-    && typeof data.chain_node_id === "number"
-    && typeof data.verbose_logging === 'boolean'
-    && typeof data.active === 'boolean'
-    && data.chain_node_url && typeof data.chain_node_url === 'string'
-    && data.cud === 'create-chain'
+    && (
+      Object.values(ChainBase).includes(data.base)
+      || Object.values(ChainNetwork).includes(data.network)
+      || typeof data.chain_node_id === "number"
+      || typeof data.verbose_logging === 'boolean'
+      || typeof data.active === 'boolean'
+      || data.chain_node_url && typeof data.chain_node_url === 'string'
+    )
+    && data.cud === 'update-chain'
   );
 }

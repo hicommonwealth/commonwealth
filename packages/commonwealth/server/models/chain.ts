@@ -47,6 +47,7 @@ export type ChainAttributes = {
   address?: string;
   token_name?: string;
   ce_verbose?: boolean;
+  queued: boolean;
 
   // associations
   ChainNode?: ChainNodeAttributes;

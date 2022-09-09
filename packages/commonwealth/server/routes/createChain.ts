@@ -1,23 +1,24 @@
-import { NextFunction } from 'express';
+import {NextFunction} from 'express';
 import Web3 from 'web3';
 import * as solw3 from '@solana/web3.js';
-import { Cluster } from '@solana/web3.js';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import {Cluster} from '@solana/web3.js';
+import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
-import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
-import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import { ChainAttributes } from '../models/chain';
-import { ChainNodeAttributes } from '../models/chain_node';
+import {Op} from 'sequelize';
+import {factory, formatFilename} from 'common-common/src/logging';
+import {ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
+import {urlHasValidHTTPPrefix} from '../../shared/utils';
+import {ChainAttributes} from '../models/chain';
+import {ChainNodeAttributes} from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import { DB } from '../database';
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import {DB} from '../database';
+import {TypedRequestBody, TypedResponse, success} from '../types';
 
-import { AddressInstance } from '../models/address';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
-import { RoleAttributes, RoleInstance } from '../models/role';
+import {AddressInstance} from '../models/address';
+import {mixpanelTrack} from '../util/mixpanelUtil';
+import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
+import {RoleAttributes, RoleInstance} from '../models/role';
+import {IRmqMsgCreateChainCUD, RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -67,6 +68,7 @@ type CreateChainResp = {
 
 const createChain = async (
   models: DB,
+  rabbitMQController: RabbitMQController,
   req: TypedRequestBody<CreateChainReq>,
   res: TypedResponse<CreateChainResp>,
   next: NextFunction
@@ -106,7 +108,7 @@ const createChain = async (
   }
 
   const existingBaseChain = await models.Chain.findOne({
-    where: { base: req.body.base },
+    where: {base: req.body.base},
   });
   if (!existingBaseChain) {
     return next(new Error(Errors.InvalidBase));
@@ -138,9 +140,11 @@ const createChain = async (
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const node = await models.ChainNode.scope('withPrivateData').findOne({ where: {
-      eth_chain_id,
-    }});
+    const node = await models.ChainNode.scope('withPrivateData').findOne({
+      where: {
+        eth_chain_id,
+      }
+    });
     if (!node && !req.user.isAdmin) {
       // if creating a new ETH node, must be admin -- users cannot submit custom URLs
       return next(new Error(Errors.NotAdmin));
@@ -156,7 +160,7 @@ const createChain = async (
     }
 
     const existingChain = await models.Chain.findOne({
-      where: { address: req.body.address, chain_node_id: node.id }
+      where: {address: req.body.address, chain_node_id: node.id}
     });
     if (existingChain) {
       return next(new Error(Errors.ChainAddressExists));
@@ -185,7 +189,7 @@ const createChain = async (
       const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
-      const { decimals, amount } = supply.value;
+      const {decimals, amount} = supply.value;
       req.body.decimals = decimals;
       if (new BN(amount, 10).isZero()) {
         throw new Error('Invalid supply amount');
@@ -203,7 +207,7 @@ const createChain = async (
     }
     try {
       const tmClient = await Tendermint34Client.connect(url);
-      const { block } = await tmClient.block();
+      const {block} = await tmClient.block();
     } catch (err) {
       return next(new Error(Errors.InvalidNode));
     }
@@ -262,7 +266,7 @@ const createChain = async (
   }
 
   const oldChain = await models.Chain.findOne({
-    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
+    where: {[Op.or]: [{name: req.body.name}, {id: req.body.id}]},
   });
   if (oldChain && oldChain.id === req.body.id) {
     return next(new Error(Errors.ChainIDExists));
@@ -272,7 +276,7 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: { url },
+    where: {url},
     defaults: {
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
@@ -303,6 +307,33 @@ const createChain = async (
     token_name,
   });
 
+  const publishData: IRmqMsgCreateChainCUD = {
+    chain_id: chain.id,
+    base,
+    network,
+    verbose_logging: false,
+    active: true,
+    chain_node_url: node.private_url || node.url,
+    contract_address: address,
+    substrate_spec: sanitizedSpec || '',
+    cud: 'create-chain'
+  }
+  try {
+    // attempt to publish - if the publish fails then don't update the db
+    await rabbitMQController.publish(publishData, RascalPublications.ChainCUDChainEvents);
+    // if publish succeeds attempt to update the database - if the update fails then log and move on
+    // a background job will re-queue the message and update the db if successful
+    models.Chain.update({
+      queued: true
+    }, {
+      where: {id: chain.id}
+    }).catch((error) => {
+      log.error(`Failed to ack queued message for chain_id: ${chain.id}`, error);
+    });
+  } catch (e) {
+    log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
+  }
+
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
@@ -327,7 +358,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: { base: chain.base },
+        where: {base: chain.base},
         required: true,
       }]
     });
@@ -341,7 +372,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: { base: chain.base },
+        where: {base: chain.base},
         required: true,
       }]
     });
@@ -356,7 +387,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: { base: chain.base },
+        where: {base: chain.base},
         required: true,
       }]
     });
@@ -370,7 +401,7 @@ const createChain = async (
       is_user_default: true,
     });
 
-    const [ subscription ] = await models.Subscription.findOrCreate({
+    const [subscription] = await models.Subscription.findOrCreate({
       where: {
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,
