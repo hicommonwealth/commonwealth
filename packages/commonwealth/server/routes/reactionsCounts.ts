@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { ReactionInstance } from '../models/reaction';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -104,7 +105,7 @@ const reactionsCounts = async (
       return res.json({ result: [] });
     }
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 };
 
