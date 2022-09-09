@@ -213,7 +213,7 @@ function setupRouter(
   router.post(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
+    createChain.bind(this, models, rabbitMQController)
   );
   router.post(
     '/deleteChain',
