@@ -4,14 +4,10 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainType, ContractType, NotificationCategories } from 'common-common/src/types';
-import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ContractAttributes } from '../models/contract';
 import { ChainNodeAttributes } from '../models/chain_node';
-import testSubstrateSpec from '../util/testSubstrateSpec';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-
-import { AddressInstance } from '../models/address';
 
 const log = factory.getLogger(formatFilename(__filename));
 

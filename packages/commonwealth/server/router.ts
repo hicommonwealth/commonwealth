@@ -231,6 +231,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
   );
+  router.post(
+    '/updateContract',
+    passport.authenticate('jwt', { session: false }),
+    updateChain.bind(this, models)
+  );
 
   router.post(
     '/starCommunity',
