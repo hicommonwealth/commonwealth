@@ -37,7 +37,13 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'type': 'fanout',
             'options': {
               'durable': true,
-            }
+            },
+          'DeadLetterExchange': {
+              'assert': true,
+              'options': {
+                'durable': true
+              }
+          }
           },
           'CreateUpdateDeleteExchange': {
             'assert': true,
@@ -58,22 +64,42 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           'ChainEventsQueue': {
             'assert': true,
             'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
           },
           'ChainCUDChainEventsQueue': {
             'assert': true,
             'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
           },
           'ChainEntityCUDMainQueue': {
             'assert': true,
             'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
           },
           'ChainEventNotificationsCUDMainQueue': {
             'assert': true,
             'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
           },
           'ChainEventNotificationsQueue': {
             'assert': true,
             'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
           }
         },
         'bindings': {
@@ -107,6 +133,12 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destinationType': 'queue',
             'bindingKey': 'ChainEventNotifications'
           },
+          'DeadLetterBinding': {
+            'source': 'DeadLetterExchange',
+            'destination': 'DeadLetterQueue',
+            'destinationType': 'queue',
+            'bindingKey': 'dlQueue'
+          }
         },
         'publications': {
           [RascalPublications.ChainEvents]: {
