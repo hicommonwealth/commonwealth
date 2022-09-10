@@ -16,7 +16,6 @@ export interface IRmqMsgCreateChainCUD {
   chain_id: string;
   base: ChainBase;
   network: ChainNetwork;
-  verbose_logging: boolean;
   active: boolean;
   chain_node_url: string;
 
@@ -32,7 +31,6 @@ export function isRmqMsgCreateChainCUD(data: any): data is IRmqMsgCreateChainCUD
     && Object.values(ChainBase).includes(data.base)
     && Object.values(ChainNetwork).includes(data.network)
     && typeof data.chain_node_id === "number"
-    && typeof data.verbose_logging === 'boolean'
     && typeof data.active === 'boolean'
     && data.chain_node_url && typeof data.chain_node_url === 'string'
     && data.cud === 'create-chain'
@@ -43,7 +41,6 @@ export interface IRmqMsgUpdateChainCUD {
   chain_id: string;
   base: ChainBase;
   network: ChainNetwork;
-  verbose_logging: boolean;
   active: boolean;
   chain_node_url: string;
 
@@ -59,7 +56,6 @@ export function isRmqMsgUpdateChainCUD(data: any): data is IRmqMsgUpdateChainCUD
     && Object.values(ChainBase).includes(data.base)
     && Object.values(ChainNetwork).includes(data.network)
     && typeof data.chain_node_id === "number"
-    && typeof data.verbose_logging === 'boolean'
     && typeof data.active === 'boolean'
     && data.chain_node_url && typeof data.chain_node_url === 'string'
     && data.cud === 'update-chain'

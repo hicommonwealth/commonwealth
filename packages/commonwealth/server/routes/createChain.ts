@@ -311,7 +311,6 @@ const createChain = async (
     chain_id: chain.id,
     base,
     network,
-    verbose_logging: false,
     active: true,
     chain_node_url: node.private_url || node.url,
     contract_address: address,

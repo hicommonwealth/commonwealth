@@ -48,7 +48,6 @@ const editSubstrateSpec = async (models: DB, rabbitMQController: RabbitMQControl
     chain_id: chain.id,
     base: chain.base,
     network: chain.network,
-    verbose_logging: chain.ce_verbose,
     active: chain.active,
     chain_node_url: node.private_url || node.url,
     contract_address: chain.address,
