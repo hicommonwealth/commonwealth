@@ -51,7 +51,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateAbiUIState = ChainFormState & { form: CreateEthDaoForm };
 
-export class GenerateUIFromAbi implements m.ClassComponent<EthChainAttrs> {
+export class GenerateUIFromABIForm implements m.ClassComponent<EthChainAttrs> {
   private state: CreateAbiUIState = {
     message: '',
     loaded: false,
