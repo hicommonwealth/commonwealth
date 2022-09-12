@@ -217,7 +217,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         this.profiles = [account.profile];
       }
 
-      if (!newlyCreated) {
+      if (!newlyCreated && !linking) {
+        // TODO: Switch back
         await logInWithAccount(account, true);
       } else {
         if (!linking) {
@@ -245,13 +246,19 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
     const performLinkingCallback = async () => {
       try {
-        // BIG TODO: New Profile stuff needs to be merged in so we can do the following
+        // Profile is already set correctly
+        // Add primary linked account to this profile
+        console.log(
+          this.primaryAccount.address,
+          this.secondaryLinkAccount.address
+        );
+        console.log('account profile 1: ', this.primaryAccount.profile);
 
-        // update loggedInProfile to include primaryAccount
+        await this.primaryAccount.updateProfile(
+          this.secondaryLinkAccount.address
+        );
 
-        // Remove orphaned address, profile, and User
-
-        // hit /updateAddressOwnerProfile endpoint (not yet written)
+        console.log('account profile: ', this.primaryAccount.profile);
 
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {

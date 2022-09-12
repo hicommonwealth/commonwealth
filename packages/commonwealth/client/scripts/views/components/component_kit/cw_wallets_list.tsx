@@ -10,6 +10,8 @@ import { Account, IWebWallet } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
+import Substrate from 'controllers/chain/substrate/main';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
@@ -81,8 +83,19 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       successUrl: redirectUrl,
                       failureUrl: redirectUrl,
                     });
-                  } else if (wallet.chain === 'substrate') {
-                    // do something
+                  } else if (wallet.defaultNetwork === 'axie-infinity') {
+                    console.log('axie');
+                    const result = await $.post(`${app.serverUrl()}/auth/sso`, {
+                      issuer: 'AxieInfinity',
+                    });
+                    if (result.status === 'Success' && result.result.stateId) {
+                      const stateId = result.result.stateId;
+
+                      // redirect to axie page for login
+                      window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                    } else {
+                      vnode.state.error(result.error || 'Could not login');
+                    }
                   } else {
                     let address;
                     if (
@@ -92,6 +105,12 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       address = wallet.accounts[0];
                     } else if (wallet.chain === 'cosmos') {
                       address = wallet.accounts[0].address;
+                    } else if (wallet.chain === 'substrate') {
+                      address = addressSwapper({
+                        address: wallet.accounts[0].address,
+                        currentPrefix: (app.chain as Substrate).chain
+                          .ss58Format,
+                      });
                     }
 
                     if (app.isLoggedIn()) {
