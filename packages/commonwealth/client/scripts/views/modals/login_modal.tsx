@@ -248,19 +248,15 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       try {
         // Profile is already set correctly
         // Add primary linked account to this profile
-        console.log(
-          this.primaryAccount.address,
-          this.secondaryLinkAccount.address
-        );
-        console.log('account profile 1: ', this.primaryAccount.profile);
+
+        console.log('primary Profile', this.primaryAccount.profile);
+        console.log('secondary Profile', this.secondaryLinkAccount.profile);
 
         await this.primaryAccount.updateProfile(
           this.secondaryLinkAccount.address
         );
 
-        console.log('account profile: ', this.primaryAccount.profile);
-
-        await logInWithAccount(this.primaryAccount, true);
+        // await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
         notifyError('Unable to link account');

@@ -122,23 +122,14 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           jwt: app.user.jwt,
                         }
                       );
+
+                      console.log('result', result);
                       if (result.exists) {
                         if (result.belongsToUser) {
                           notifyInfo(
                             'This address is already linked to your current account.'
                           );
                           return;
-                        } else {
-                          // const modalMsg =
-                          //   'This address is currently linked to another account. ' +
-                          //   'Remove it from that account and transfer to yours?';
-                          // const confirmed = await confirmationModalWithText(
-                          //   modalMsg
-                          // )();
-                          // if (!confirmed) {
-                          //   vnode.state.linking = false;
-                          //   return;
-                          // }
                         }
                       }
                     }
@@ -162,14 +153,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         newlyCreated,
                         linking
                       );
-
-                      // setBodyType('selectAccountType');
-                      // setSidebarType('newOrReturning');
                     } catch (err) {
                       // catch when the user rejects the sign message prompt
-                      // vnode.state.linking = false;
-                      // errorCallback('Verification failed');
-                      //  m.redraw();
                       console.log(err);
                     }
                   }

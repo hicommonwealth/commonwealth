@@ -161,6 +161,7 @@ const createAddress = async (
       const last_active = new Date();
       let profile_id: number;
       const user_id = req.user ? req.user.id : null;
+      console.log('userId', user_id);
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],

@@ -123,15 +123,18 @@ class Account {
     }
   }
 
-  public async updateProfile(otherAddress: string) {
+  public async updateProfile(targetProfileAddress: string) {
     const result = await $.post(`${app.serverUrl()}/updateAddressProfile`, {
       address: this.address,
-      targetProfileAddress: otherAddress,
+      targetProfileAddress,
       jwt: app.user.jwt,
     });
 
     if (result.status === 'Success') {
-      this._profile = app.profiles.getProfile(this.chain.id, otherAddress);
+      this._profile = app.profiles.getProfile(
+        this.chain.id,
+        targetProfileAddress
+      );
     }
   }
 }
