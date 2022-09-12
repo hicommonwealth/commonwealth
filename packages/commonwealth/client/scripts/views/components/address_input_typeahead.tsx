@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { InputSelect, ListItem } from 'construct-ui';
 
-import 'components/addresses/address_input_typeahead.scss';
+import 'components/address_input_typeahead.scss';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
