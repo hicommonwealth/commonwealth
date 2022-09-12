@@ -10,7 +10,7 @@ export const Errors = {
   // TODO: populate & write unit tests
 };
 
-type AuthCallbackReq = { token: string, profile_id: number };
+type AuthCallbackReq = { token: string /* , profile_id: number */ };
 type AuthCallbackResp = string;
 
 const TOKEN_EXPIRATION = 5 * 60 * 1000; // 5 minutes
@@ -24,12 +24,14 @@ const authCallback = async (
   if (!req.user?.id) {
     throw new AppError('User must be logged in');
   }
-  if (!req.query || !req.query.token || !req.query.profile_id) {
+  if (!req.query || !req.query.token) {
     throw new AppError('Invalid querystring');
   }
+
+  // TODO: selectable profile -- currently user only has one
   const profile = await models.Profile.findOne({
     where: {
-      id: req.query.profile_id,
+      // id: req.query.profile_id,
       user_id: req.user.id,
     }
   })
@@ -43,7 +45,7 @@ const authCallback = async (
   try {
     const decryptedToken = await decryptWithJWE(req.query.token);
     const tokenObj = JSON.parse(decryptedToken);
-    stateToken = tokenObj.stateToken;
+    stateToken = tokenObj.token;
     iat = +tokenObj.iat;
   } catch (err) {
     log.info(`Failed to decrypt JWE: ${err.message}`);
@@ -68,6 +70,7 @@ const authCallback = async (
   const responseObject = {
     // TODO: filter duplicates
     addresses: allAddresses.map((a) => a.address),
+    // TODO: pass profile id?
     stateToken,
   };
 

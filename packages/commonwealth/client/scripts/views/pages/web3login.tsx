@@ -13,9 +13,8 @@ import { PageNotFound } from './404';
 
 class Web3LoginPage implements m.ClassComponent {
   view() {
-    const token = m.route.param('token');
-    const profile_id = m.route.param('profile_id');
-    if (app.isCustomDomain() || !token || !profile_id) {
+    const token = m.route.param('connect');
+    if (app.isCustomDomain() || !token) {
       // hide page if invalid arguments or via custom domain
       return (
         <PageNotFound />
@@ -26,19 +25,20 @@ class Web3LoginPage implements m.ClassComponent {
     const onSuccess = async () => {
       if (!app.isLoggedIn()) {
         // TODO: fail
+        return;
       }
       const { status, result } = await $.get(
         `${app.serverUrl()}/auth/callback`,
         {
           jwt: app.user.jwt,
           token,
-          profile_id,
+          // profile_id,
         }
       );
       if (status === 'Success') {
         const responseToken = result;
         // REDIRECT TO CMNBOT
-        window.location.href = `http://commonbot.domain?token=${responseToken}`;
+        window.location.href = `http://localhost:3000?token=${responseToken}`;
       } else {
         // TODO: display error
       }
