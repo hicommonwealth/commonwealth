@@ -35,10 +35,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
           className="thread-title-text"
           onclick={() => m.route.set(threadUrl)}
         >
-          {renderQuillTextBody(subscription.Thread.title, {
-            collapse: true,
-            hideFormatting: true,
-          })}
+          {subscription.Thread.title}
         </CWText>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
