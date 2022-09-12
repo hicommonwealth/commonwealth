@@ -3,7 +3,7 @@ import { Logger } from "typescript-logging";
 import {
   isRmqMsgCreateChainCUD,
   isRmqMsgDeleteChainCUD,
-  isRmqMsgUpdateChainCUD,
+  isRmqMsgUpdateChainCUD, isRmqMsgUpdateChainNodeCUD,
   TRmqMsgChainCUD
 } from 'common-common/src/rabbitmq'
 
@@ -34,7 +34,7 @@ export async function processChainCUD(
       chain_node_id: chainNode.id,
       contract_address: data.contract_address,
       substrate_spec: data.substrate_spec,
-      verbose_logging: data.verbose_logging,
+      verbose_logging: false,
       active: data.active,
     });
   } else if (isRmqMsgUpdateChainCUD(data)) {
@@ -66,7 +66,6 @@ export async function processChainCUD(
     chain.network = data.network;
     chain.contract_address = data.contract_address;
     chain.substrate_spec = data.substrate_spec;
-    chain.verbose_logging = data.verbose_logging;
     chain.active = data.active;
 
     await chain.save();
@@ -75,5 +74,11 @@ export async function processChainCUD(
       where: { id: data.chain_id },
     });
     // TODO: delete dependencies
+  } else if (isRmqMsgUpdateChainNodeCUD(data)) {
+    await this.models.ChainNode.update({
+      url: data.new_url
+    }, {
+      where: { url: data.old_url }
+    })
   }
 }

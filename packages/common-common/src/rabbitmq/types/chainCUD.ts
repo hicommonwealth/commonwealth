@@ -1,7 +1,7 @@
 import {ChainBase, ChainNetwork} from "../../types";
 import {RegisteredTypes} from "@polkadot/types/types";
 
-export type TRmqMsgChainCUD = IRmqMsgCreateChainCUD | IRmqMsgDeleteChainCUD | IRmqMsgUpdateChainCUD;
+export type TRmqMsgChainCUD = IRmqMsgCreateChainCUD | IRmqMsgDeleteChainCUD | IRmqMsgUpdateChainCUD | IRmqMsgUpdateChainNodeCUD;
 
 export interface IRmqMsgDeleteChainCUD {
   chain_id: string;
@@ -61,3 +61,19 @@ export function isRmqMsgUpdateChainCUD(data: any): data is IRmqMsgUpdateChainCUD
     && data.cud === 'update-chain'
   );
 }
+
+export interface IRmqMsgUpdateChainNodeCUD {
+  new_url: string;
+  old_url: string;
+  cud: 'update-chainNode';
+}
+
+export function isRmqMsgUpdateChainNodeCUD(data: any): data is IRmqMsgUpdateChainNodeCUD {
+  return (
+    data.new_url && typeof data.new_url === 'string'
+    && data.old_url && typeof data.old_url === 'string'
+    && data.cud === 'update-chainNode'
+  );
+}
+
+

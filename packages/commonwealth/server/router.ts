@@ -146,6 +146,7 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import {RabbitMQController} from "common-common/src/rabbitmq";
+import updateChainNode from "./routes/updateChainNode";
 
 function setupRouter(
   app: Express,
@@ -224,6 +225,12 @@ function setupRouter(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
+  );
+
+  router.post(
+    '/updateChainNode',
+    passport.authenticate('jwt', { session: false }),
+    updateChainNode.bind(this, models, rabbitMQController)
   );
 
   router.post(
