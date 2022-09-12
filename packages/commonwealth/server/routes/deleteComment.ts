@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,10 +15,10 @@ export const Errors = {
 
 const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.comment_id) {
-    return next(new Error(Errors.NoCommentId));
+    return next(new AppError(Errors.NoCommentId));
   }
 
   try {
@@ -37,7 +38,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
         address: comment.Address.address
       });
       if (!canInteract) {
-        return next(new Error(error));
+        return next(new AppError(error));
       }
     }
 
@@ -57,7 +58,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
         where: roleWhere
       });
       if (!requesterIsAdminOrMod) {
-        return next(new Error(Errors.NotOwned));
+        return next(new AppError(Errors.NotOwned));
       }
     }
     // find and delete all associated subscriptions

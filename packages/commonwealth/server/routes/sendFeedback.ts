@@ -3,6 +3,7 @@ import request from 'superagent';
 import { SLACK_FEEDBACK_WEBHOOK } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,7 +13,7 @@ export const Errors = {
 
 const sendFeedback = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.text) {
-    return next(new Error(Errors.NotSent));
+    return next(new AppError(Errors.NotSent));
   }
 
   const userText = !req.user ? '<Anonymous>'
@@ -25,10 +26,10 @@ const sendFeedback = async (models: DB, req: Request, res: Response, next: NextF
   request
     .post(SLACK_FEEDBACK_WEBHOOK)
     .send(data)
-    .end((err, res2) => {
+    .end((err) => {
       if (err) {
         // TODO: handle 401 unauthorized
-        return next(new Error(err));
+        return next(new ServerError(err));
       }
       return res.json({ status: 'Success' });
     });
