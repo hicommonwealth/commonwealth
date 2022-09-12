@@ -95,7 +95,6 @@ class BountyDetail implements m.ClassComponent {
             <div class="b-col">Payout pending</div>
           </div>
         </div>
-        ,
         <div class="action">
           {bounty.isProposed ? (
             <CWButton
