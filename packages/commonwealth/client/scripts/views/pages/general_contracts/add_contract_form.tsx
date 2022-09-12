@@ -16,11 +16,6 @@ import { isAddress } from 'web3-utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
-import CompoundAPI, {
-  GovernorTokenType,
-  GovernorType,
-} from 'controllers/chain/ethereum/compound/api';
-import AaveApi from 'controllers/chain/ethereum/aave/api';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';

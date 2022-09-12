@@ -25,6 +25,14 @@ export type ChainFormState = {
   saving?: boolean;
 } & ValidationTextAttrs;
 
+export type FunctionInfoState = {
+  selectedFnIdx: number;
+}
+
+export type ContractAttrs = {
+  contract: { address: string, abi: string };
+}
+
 export type EthChainAttrs = {
   ethChains: { [id: number]: { url: string; alt_wallet_url: string } };
   ethChainNames: { [id: number]: string };
