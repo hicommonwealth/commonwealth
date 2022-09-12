@@ -100,6 +100,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'x-dead-letter-exchange': 'DeadLetterExchange',
               'dead-letter-routing-key': 'dlQueue'
             }
+          },
+          'DeadLetterQueue': {
+            'assert': true,
+            'purge': purge
           }
         },
         'bindings': {
