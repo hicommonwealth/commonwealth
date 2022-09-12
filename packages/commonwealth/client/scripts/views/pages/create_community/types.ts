@@ -27,6 +27,14 @@ export type ChainFormState = {
 
 export type FunctionInfoState = {
   selectedFnIdx: number;
+  fns: [];
+  selectedFn: any;
+}
+
+export type FunctionListAttrs = {
+  selectedFnIdx: number;
+  fns: [];
+  selectedFn: any;
 }
 
 export type ContractAttrs = {

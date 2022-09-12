@@ -3,12 +3,14 @@ import $ from 'jquery';
 
 import { ContractAttrs, FunctionInfoState } from 'views/pages/create_community/types';
 import FunctionDetails from "./FunctionDetails";
-import FunctionList from "./FunctionList";
+import { FunctionList } from "./function_list";
 import FunctionCall from "../function-call/FunctionCall";
 
 export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
     private state: FunctionInfoState = {
         selectedFnIdx: null,
+        fns: [],
+        selectedFn: undefined
     };
 
     //   const { shiftUp, shiftDown } = Contracts.useContainer();
@@ -44,15 +46,14 @@ export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
     oninit(vnode) {
         this.state.selectedFnIdx = 0;
         // grab only functions from ABI and sort alphabetically
-        let fns, selectedFn;
         if (vnode.attrs.contract) {
-            fns = JSON.parse(vnode.attrs.contract.abi)
+            this.state.fns = JSON.parse(vnode.attrs.contract.abi)
             .filter((x) => x.type === "function")
             .sort((a, b) => a.name.localeCompare(b.name));
-            selectedFn = fns[selectedIdx];
+            this.state.selectedFn = this.state.fns[this.state.selectedFnIdx];
         } else {
-            fns = [];
-            selectedFn = null;
+            this.state.fns = [];
+            this.state.selectedFn = null;
         }
     }
 
@@ -61,15 +62,12 @@ export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
         return (
             <div>
                 <FunctionList
-                    selectedIdx={selectedIdx}
-                    setSelectedIdx={setSelectedIdx}
-                    fns={fns}
+                    selectedIdx={this.state.selectedFnIdx}
+                    fns={this.state.fns}
                 />
-                <FunctionDetails fn={selectedFn} />
-                <FunctionCall fn={selectedFn} />
+                <FunctionDetails fn={this.state.selectedFn} />
+                <FunctionCall fn={this.state.selectedFn} />
             </div>
         );
     }
 }
-
-export default FunctionInfo;
