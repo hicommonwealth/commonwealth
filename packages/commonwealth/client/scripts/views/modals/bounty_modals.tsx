@@ -1,21 +1,24 @@
-import 'modals/bounty_modals.scss';
+/* @jsx m */
 
 import $ from 'jquery';
 import m from 'mithril';
 import { Button, Input } from 'construct-ui';
+
+import 'modals/bounty_modals.scss';
+
+import app from 'state';
 import Substrate from 'controllers/chain/substrate/main';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import AddressInputTypeahead from 'views/components/addresses/address_input_typeahead';
+import { AddressInputTypeahead } from 'views/components/address_input_typeahead';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 
-import app from 'state';
+export class ApproveBountyModal
+  implements m.ClassComponent<{ bountyId: number }>
+{
+  private approvals: number;
 
-export const ApproveBountyModal: m.Component<
-  { bountyId: number },
-  { approvals: number }
-> = {
-  view: (vnode) => {
+  view(vnode) {
     const { bountyId } = vnode.attrs;
 
     return m('.ApproveBountyModal', [
@@ -29,7 +32,7 @@ export const ApproveBountyModal: m.Component<
           fluid: true,
           oninput: (e) => {
             const approvals = +(e.target as any).value;
-            vnode.state.approvals = approvals;
+            this.approvals = approvals;
           },
           placeholder: 'Number of approvals',
         }),
@@ -40,12 +43,12 @@ export const ApproveBountyModal: m.Component<
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            if (isNaN(vnode.state.approvals)) return;
+            if (Number.isNaN(this.approvals)) return;
             await createTXModal(
               (app.chain as Substrate).bounties.createBountyApprovalMotionTx(
                 app.user?.activeAccount as SubstrateAccount,
                 bountyId,
-                vnode.state.approvals
+                this.approvals
               )
             );
 
@@ -62,20 +65,19 @@ export const ApproveBountyModal: m.Component<
         }),
       ]),
     ]);
-  },
-};
-
-export const ProposeCuratorModal: m.Component<
-  { bountyId: number },
-  {
-    approvals: number;
-    curator: string;
-    fee: number;
   }
-> = {
-  view: (vnode) => {
+}
+
+export class ProposeCuratorModal
+  implements m.ClassComponent<{ bountyId: number }>
+{
+  private approvals: number;
+  private curator: string;
+  private fee: number;
+
+  view(vnode) {
     const { bountyId } = vnode.attrs;
-    const { curator, fee, approvals } = vnode.state;
+    const { curator, fee, approvals } = this;
     const feeCoins = app.chain.chain.coins(fee, true);
 
     return m('.ProposeCuratorModal', [
@@ -91,13 +93,13 @@ export const ProposeCuratorModal: m.Component<
             placeholder: 'Curator address',
           },
           oninput: (result) => {
-            vnode.state.curator = result.address;
+            this.curator = result.address;
           },
         }),
         m(Input, {
           fluid: true,
           oninput: (e) => {
-            vnode.state.fee = +(e.target as any).value;
+            this.fee = +(e.target as any).value;
           },
           placeholder: `Fee (${app.chain?.chain?.denom})`,
         }),
@@ -107,8 +109,7 @@ export const ProposeCuratorModal: m.Component<
         m(Input, {
           fluid: true,
           oninput: (e) => {
-            const approvals = +(e.target as any).value;
-            vnode.state.approvals = approvals;
+            this.approvals = +(e.target as any).value;
           },
           placeholder: 'Approvals required',
         }),
@@ -119,7 +120,7 @@ export const ProposeCuratorModal: m.Component<
           rounded: true,
           onclick: async (e) => {
             e.preventDefault();
-            if (isNaN(vnode.state.approvals)) return;
+            if (Number.isNaN(this.approvals)) return;
             await createTXModal(
               (app.chain as Substrate).bounties.proposeCuratorTx(
                 app.user?.activeAccount as SubstrateAccount,
@@ -143,16 +144,18 @@ export const ProposeCuratorModal: m.Component<
         }),
       ]),
     ]);
-  },
-};
+  }
+}
 
-export const AwardBountyModal: m.Component<
-  { bountyId: number },
-  { approvals: number; recipient: string }
-> = {
-  view: (vnode) => {
+export class AwardBountyModal
+  implements m.ClassComponent<{ bountyId: number }>
+{
+  private approvals: number;
+  private recipient: string;
+
+  view(vnode) {
     const { bountyId } = vnode.attrs;
-    const { recipient } = vnode.state;
+    const { recipient } = this;
 
     return m('.AwardBountyModal', [
       m('.compact-modal-title', [m('h3', 'Approve bounty')]),
@@ -166,7 +169,7 @@ export const AwardBountyModal: m.Component<
             placeholder: 'Recipient address',
           },
           oninput: (result) => {
-            vnode.state.recipient = result.address;
+            this.recipient = result.address;
           },
         }),
       ]),
@@ -197,16 +200,18 @@ export const AwardBountyModal: m.Component<
         }),
       ]),
     ]);
-  },
-};
+  }
+}
 
-export const ExtendExpiryModal: m.Component<
-  { bountyId: number },
-  { approvals: number; remark: string }
-> = {
-  view: (vnode) => {
+export class ExtendExpiryModal
+  implements m.ClassComponent<{ bountyId: number }>
+{
+  approvals: number;
+  remark: string;
+
+  view(vnode) {
     const { bountyId } = vnode.attrs;
-    const { remark } = vnode.state;
+    const { remark } = this;
 
     return m('.ExtendExpiryModal', [
       m('.compact-modal-title', [m('h3', 'Approve bounty')]),
@@ -217,7 +222,7 @@ export const ExtendExpiryModal: m.Component<
         m(Input, {
           fluid: true,
           oninput: (e) => {
-            vnode.state.remark = (e.target as any).value;
+            this.remark = (e.target as any).value;
           },
           placeholder: 'Remark',
         }),
@@ -246,5 +251,5 @@ export const ExtendExpiryModal: m.Component<
         }),
       ]),
     ]);
-  },
-};
+  }
+}

@@ -1,20 +1,24 @@
+@import 'shared';
+
 .ApproveBountyModal,
 .ProposeCuratorModal,
 .AwardBountyModal,
 .ExtendExpiryModal {
-    p {
-        max-width: 360px;
-        margin-bottom: 10px;
-    }
-    .cui-input {
-        margin: 6px 0;
-    }
-    .cui-input:last-child {
-        margin-bottom: 20px;
-    }
+  p {
+    max-width: 360px;
+    margin-bottom: 10px;
+  }
+
+  .cui-input {
+    margin: 6px 0;
+  }
+
+  .cui-input:last-child {
+    margin-bottom: 20px;
+  }
 }
 
 .ProposeCuratorModal .cui-input + p {
-    margin-top: 16px;
-    margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
