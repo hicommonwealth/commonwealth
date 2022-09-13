@@ -2,9 +2,9 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import { ContractAttrs, FunctionInfoState } from 'views/pages/create_community/types';
-import FunctionDetails from "./FunctionDetails";
+// import FunctionDetails from "./FunctionDetails";
 import { FunctionList } from "./function_list";
-import FunctionCall from "../function-call/FunctionCall";
+// import FunctionCall from "../function-call/FunctionCall";
 
 export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
     private state: FunctionInfoState = {
@@ -45,7 +45,7 @@ export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
 
     oninit(vnode) {
         this.state.selectedFnIdx = 0;
-        // grab only functions from ABI and sort alphabetically
+        // grab only functions from ABI JSON and sort alphabetically
         if (vnode.attrs.contract) {
             this.state.fns = JSON.parse(vnode.attrs.contract.abi)
             .filter((x) => x.type === "function")
