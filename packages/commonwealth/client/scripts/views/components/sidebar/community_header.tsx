@@ -14,10 +14,12 @@ export class CommunityHeader implements m.ClassComponent<{ meta: ChainInfo }> {
 
     return (
       <div class="CommunityHeader">
-        <CWCommunityAvatar size="large" community={meta} />
-        <CWText type="h5" fontStyle="medium">
-          {meta.name}
-        </CWText>
+        <div class="inner-container">
+          <CWCommunityAvatar size="large" community={meta} />
+          <CWText type="h5" fontStyle="medium">
+            {meta.name}
+          </CWText>
+        </div>
       </div>
     );
   }
