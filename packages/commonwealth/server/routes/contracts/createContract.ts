@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainType, ContractType, NotificationCategories } from 'common-common/src/types';
+import { ContractType } from 'common-common/src/types';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { DB } from '../../database';

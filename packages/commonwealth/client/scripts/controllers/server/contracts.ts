@@ -45,18 +45,18 @@ class ContractsController {
     //         abi,
     //         type
     //       });
-    //       const result = new Contract(response.result);
+    //       const result = new Contract(response.contract);
     //       if (this._store.getById(result.id)) {
     //         this._store.remove(this._store.getById(result.id));
     //       }
     //       this._store.add(result);
     //       return result;
     //     } catch (err) {
-    //       console.log('Failed to edit topic');
+    //       console.log('Failed to create contract');
     //       throw new Error(
     //         err.responseJSON && err.responseJSON.error
     //           ? err.responseJSON.error
-    //           : 'Failed to edit topic'
+    //           : 'Failed to create contract'
     //       );
     //     }
     // }

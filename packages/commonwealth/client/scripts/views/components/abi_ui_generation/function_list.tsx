@@ -25,18 +25,6 @@ export class FunctionList implements m.ClassComponent<FunctionListAttrs> {
                 <h1>Functions (arity):</h1>
                 <div shadow={false}>
                     <CWCard>
-                    {vnode.attrs.fns.map((fn, i) => (
-                        <FunctionItem
-                        fn={fn}
-                        key={i + fn.name}
-                        isActive={this.state.selectedFnIdx === i}
-                        onclick={async () => {
-                            this.state.selectedFnIdx = i;
-                        }}
-                        />
-                    ))}
-                    </CWCard>
-                    <div class="members-container">
                         <CWRadioGroup
                             name="members/mods"
                             options={vnode.attrs.fns.map((fn, i) => ({ label: fn.name, value: fn }))}
@@ -45,7 +33,7 @@ export class FunctionList implements m.ClassComponent<FunctionListAttrs> {
                                 this.state.selectedFnIdx = e.target;
                             }}
                         />
-                    </div>
+                    </CWCard>
                 </div>
             </div>
         );

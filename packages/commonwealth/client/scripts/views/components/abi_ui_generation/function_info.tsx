@@ -46,15 +46,6 @@ export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
     oninit(vnode) {
         this.state.selectedFnIdx = 0;
         // grab only functions from ABI JSON and sort alphabetically
-        if (vnode.attrs.contract) {
-            this.state.fns = JSON.parse(vnode.attrs.contract.abi)
-            .filter((x) => x.type === "function")
-            .sort((a, b) => a.name.localeCompare(b.name));
-            this.state.selectedFn = this.state.fns[this.state.selectedFnIdx];
-        } else {
-            this.state.fns = [];
-            this.state.selectedFn = null;
-        }
     }
 
     view(vnode) {

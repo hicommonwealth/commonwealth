@@ -1,17 +1,33 @@
-// import { QueryTypes, Op }  from 'sequelize';
-// import { DB } from 'server/database';
+import { Contract }from '../models';
+import { Network } from './types';
 
-// const getContractAbi = async (models: DB, contractAddress: string) => {
+export const parseFunctionsFromABI = (contract: Contract) => {
+    let fns = [];
+    if (contract) {
+        fns = JSON.parse(contract.abi).filter((x) => x.type === "function")
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return fns;
+};
 
-//   // get new objects created over the last 14 days
-//   const abiQuery = async (address: string) => {
-//     return models.sequelize.query(`SELECT abi FROM Contracts WHERE 'address' = ${address};`, {
-//       type: QueryTypes.SELECT,
-//     });
-//   };
-//   const abi = await abiQuery(contractAddress);
+function getSourceCodeEnpoint(network: Network, address: string): string {
+  // Ethers JS default API key
+  const apiKey = "8FG3JMZ9USS4NTA6YKEKHINU56SEPPVBJR";
 
-//   return abi;
-// };
+  const fqdn =
+    network === Network.Mainnet ? "api" : `api-${network.toLowerCase()}`;
 
-// export default getContractAbi;
+  return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
+}
+
+export const getEtherscanABI = async (network: Network, address: string) => {
+  try {
+    const resp = await fetch(getSourceCodeEnpoint(network, address));
+    const data = await resp.json();
+    const respResult = data.result[0];
+    const respABI = JSON.parse(respResult.ABI);
+    return respABI;
+  } catch (e) {
+    console.log("error", e);
+  }
+};

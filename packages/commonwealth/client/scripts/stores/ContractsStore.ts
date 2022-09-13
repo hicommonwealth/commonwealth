@@ -9,6 +9,11 @@ class ContractsStore extends IdStore<Contract> {
         return this.getAll().filter((c) => c.type === type);
     }
 
+    public getContractByAddress(address: string): Contract {
+        // filter through the _storeId map for a contract with a specified address
+        return this.getAll().filter((c) => c.address === address)[0];
+    }
+
 }
 
 export default ContractsStore;
