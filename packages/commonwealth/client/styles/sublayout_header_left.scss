@@ -3,42 +3,7 @@
 .SublayoutHeaderLeft {
   align-items: center;
   display: flex;
-  gap: 8px;
   flex-direction: row;
+  gap: 8px;
   height: $global-header-height;
-
-  .Icon.commonLogo {
-    cursor: pointer;
-    @include mediumSmallInclusive {
-      padding-right: 8px;
-      border-right: 1px solid $neutral-100;
-      height: $global-header-height;
-    }
-  }
-
-  .Icon.sidebarCollapse,
-  .Icon.sidebarExpand {
-    cursor: pointer;
-    display: none;
-    @include mediumSmallInclusive {
-      display: block;
-    }
-  }
-
-  .Icon.sidebarExpand {
-    fill: $neutral-600;
-  }
-
-  h4 {
-    margin-right: 4px;
-
-    a {
-      color: $neutral-800;
-    }
-  }
-
-  .slash {
-    color: $neutral-400;
-    margin: 0 8px;
-  }
 }

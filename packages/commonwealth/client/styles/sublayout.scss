@@ -32,15 +32,17 @@
 
     .sidebar-container {
       display: flex;
+
       @include mediumSmallInclusive {
         display: none;
 
-        &.toggled {
-          display: flex !important;
+        &.isSidebarToggled {
+          display: flex;
         }
       }
+
       @include smallInclusive {
-        min-width: 100%;
+        width: 100%;
       }
     }
 
@@ -48,6 +50,14 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+
+      @include smallInclusive {
+        display: flex;
+
+        &.isSidebarToggled {
+          display: none;
+        }
+      }
 
       .Body {
         display: flex;

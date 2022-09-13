@@ -13,11 +13,13 @@ import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import {
+  getClasses,
+  isWindowMediumSmallInclusive,
+} from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
 
 type SublayoutAttrs = {
-  alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
   hideFooter?: boolean;
   hideSearch?: boolean;
   onscroll: () => null; // lazy loading for page content
@@ -50,16 +52,15 @@ const footercontents = [
 ];
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  private sidebarToggled: boolean;
+  private isSidebarToggled: boolean;
 
   view(vnode) {
     const {
-      alwaysShowTitle,
       hideFooter = false,
       hideSearch,
       onscroll,
       showNewProposalButton,
-      title,
+      // title, are there plans for title?
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
@@ -68,13 +69,12 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
-    const largeBrowserSize = !isWindowMediumSmallInclusive(window.innerWidth);
-    const localStorageToggle =
-      localStorage.getItem('sidebar-toggle') === 'true';
-    if (largeBrowserSize || localStorageToggle) {
-      this.sidebarToggled = true;
+    if (
+      !isWindowMediumSmallInclusive(window.innerWidth) ||
+      localStorage.getItem('sidebar-toggle') === 'true'
+    ) {
+      this.isSidebarToggled = true;
     }
-    const { sidebarToggled } = this;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
@@ -84,20 +84,35 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       <div class="Sublayout">
         <div class="header-and-body-container">
           <div class="header-container">
-            <SublayoutHeaderLeft parentState={this} />
-            {!hideSearch && m(SearchBar)}
+            <SublayoutHeaderLeft
+              isSidebarToggled={this.isSidebarToggled}
+              toggleSidebar={() => {
+                this.isSidebarToggled = !this.isSidebarToggled;
+              }}
+            />
+            {!hideSearch && <SearchBar />}
             <SublayoutHeaderRight
               chain={chain}
               showNewProposalButton={showNewProposalButton}
             />
           </div>
           <div class="sidebar-and-body-container">
-            <div class={`sidebar-container ${sidebarToggled ? 'toggled' : ''}`}>
-              <CommunityHeader />
+            <div
+              class={getClasses<{ isSidebarToggled: boolean }>(
+                { isSidebarToggled: this.isSidebarToggled },
+                'sidebar-container'
+              )}
+            >
+              {app.chain && <CommunityHeader meta={app.chain.meta} />}
               {!app.isCustomDomain() && <SidebarQuickSwitcher />}
               <Sidebar />
             </div>
-            <div class="body-and-sticky-headers-container">
+            <div
+              class={getClasses<{ isSidebarToggled: boolean }>(
+                { isSidebarToggled: this.isSidebarToggled },
+                'body-and-sticky-headers-container'
+              )}
+            >
               <SublayoutBanners
                 banner={banner}
                 chain={chain}
