@@ -118,7 +118,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         <SelectRow
           title="Contract Type"
           options={[
-            ContractType.DaoFactory, ContractType.ERC20,
+            ContractType.ERC20,
             ContractType.ERC721, ContractType.SPL,
             ContractType.Aave, ContractType.Compound
           ]}
@@ -167,7 +167,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             try {
               const res = await $.post(`${app.serverUrl()}/createContract`, {
                 alt_wallet_url: altWalletUrl,
-                base: ChainBase.Ethereum,
+                chain_base: ChainBase.Ethereum,
                 chain_string: chainString,
                 eth_chain_id,
                 jwt: app.user.jwt,

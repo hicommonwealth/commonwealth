@@ -22,6 +22,7 @@ function getSourceCodeEnpoint(network: Network, address: string): string {
 
 export const getEtherscanABI = async (network: Network, address: string) => {
   try {
+    console.log("fetching from etherscan...");
     const resp = await fetch(getSourceCodeEnpoint(network, address));
     const data = await resp.json();
     const respResult = data.result[0];

@@ -114,7 +114,6 @@ export enum ChainNetwork {
 }
 
 export enum ContractType {
-  DaoFactory = 'Dao Factory',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   SPL = 'spl', // solana token

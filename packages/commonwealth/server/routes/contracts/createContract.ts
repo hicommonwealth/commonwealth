@@ -82,10 +82,12 @@ const createContract = async (
     }
 
     const eth_chain_id: number = req.body.eth_chain_id;
+    const chain_base: string = req.body.chain_base;
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const node = await models.ChainNode.scope('withPrivateData').findOne({ where: {
         eth_chain_id,
+        chain_base
     }});
 
     const contract_abi = await models.ContractAbi.create({
