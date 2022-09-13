@@ -5,6 +5,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -20,19 +21,19 @@ const addEditors = async (
   next: NextFunction
 ) => {
   if (!req.body?.thread_id) {
-    return next(new Error(Errors.InvalidThread));
+    return next(new AppError(Errors.InvalidThread));
   }
   const { thread_id } = req.body;
   let editors;
   try {
     editors = JSON.parse(req.body.editors);
   } catch (e) {
-    return next(new Error(Errors.InvalidEditorFormat));
+    return next(new AppError(Errors.InvalidEditorFormat));
   }
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -43,7 +44,7 @@ const addEditors = async (
       address_id: { [Op.in]: userOwnedAddressIds },
     },
   });
-  if (!thread) return next(new Error(Errors.InvalidThread));
+  if (!thread) return next(new AppError(Errors.InvalidThread));
 
   const collaborators = await Promise.all(
     Object.values(editors).map((editor: any) => {
@@ -55,7 +56,7 @@ const addEditors = async (
   );
 
   if (collaborators.includes(null)) {
-    return next(new Error(Errors.InvalidEditor));
+    return next(new AppError(Errors.InvalidEditor));
   }
 
   // Ensure collaborators have community permissions
@@ -76,7 +77,7 @@ const addEditors = async (
         const isMember = collaborator.Roles.find(
           (role) => role.chain_id === chain.id
         );
-        if (!isMember) throw new Error(Errors.InvalidEditor);
+        if (!isMember) throw new AppError(Errors.InvalidEditor);
 
         await models.Collaboration.findOrCreate({
           where: {
@@ -109,10 +110,10 @@ const addEditors = async (
         });
       })
     ).catch((e) => {
-      return next(new Error(e));
+      return next(new AppError(e));
     });
   } else {
-    return next(new Error(Errors.InvalidEditor));
+    return next(new AppError(Errors.InvalidEditor));
   }
 
   await thread.save();

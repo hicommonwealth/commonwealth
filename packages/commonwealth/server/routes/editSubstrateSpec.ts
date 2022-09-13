@@ -2,14 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { ChainBase } from 'common-common/src/types';
+import { AppError, ServerError } from '../util/errors';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
-  if (!chain) return next(new Error('Unknown chain.'));
-  if (chain.base !== ChainBase.Substrate) return next(new Error('Chain must be substrate'));
+  if (error) return next(new AppError(error));
+  if (!chain) return next(new AppError('Unknown chain.'));
+  if (chain.base !== ChainBase.Substrate) return next(new AppError('Chain must be substrate'));
 
   const adminAddress = await models.Address.findOne({
     where: {
@@ -24,16 +25,16 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
       permission: ['admin'],
     },
   });
-  if (!requesterIsAdmin && !req.user.isAdmin) return next(new Error('Must be admin to edit'));
+  if (!requesterIsAdmin && !req.user.isAdmin) return next(new AppError('Must be admin to edit'));
 
   const node = await chain.getChainNode();
-  if (!node) return next(new Error('no chain nodes found'));
+  if (!node) return next(new AppError('no chain nodes found'));
 
   let sanitizedSpec;
   try {
     sanitizedSpec = await testSubstrateSpec(req.body.spec, node.url);
   } catch (e) {
-    return next(new Error('Failed to validate Substrate Spec'));
+    return next(new AppError('Failed to validate Substrate Spec'));
   }
 
   // write back to database
