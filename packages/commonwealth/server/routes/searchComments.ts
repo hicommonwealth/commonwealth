@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -20,17 +21,17 @@ const searchComments = async (
   let bind = {};
 
   if (!req.query.search) {
-    return next(new Error(Errors.QueryMissing));
+    return next(new AppError(Errors.QueryMissing));
   }
   if (req.query.search.length < 4) {
-    return next(new Error(Errors.QueryTooShort));
+    return next(new AppError(Errors.QueryTooShort));
   }
 
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
 
     // set up query parameters
     communityOptions = `AND "Comments".chain = $chain `;
@@ -78,7 +79,7 @@ const searchComments = async (
     );
   } catch (e) {
     console.log(e);
-    return next(new Error(Errors.UnexpectedError));
+    return next(new ServerError(Errors.UnexpectedError));
   }
 
   return res.json({
