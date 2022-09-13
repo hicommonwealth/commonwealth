@@ -65,8 +65,8 @@ export class FunctionInfo implements m.ClassComponent<ContractAttrs> {
                     selectedIdx={this.state.selectedFnIdx}
                     fns={this.state.fns}
                 />
-                <FunctionDetails fn={this.state.selectedFn} />
-                <FunctionCall fn={this.state.selectedFn} />
+                {/* <FunctionDetails fn={this.state.selectedFn} />
+                <FunctionCall fn={this.state.selectedFn} /> */}
             </div>
         );
     }
