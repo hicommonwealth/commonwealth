@@ -27,30 +27,6 @@ type SublayoutAttrs = {
   title?: string; // displayed at the top of the layout
 };
 
-const footercontents = [
-  { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-  {
-    text: 'Jobs',
-    externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
-  },
-  { text: 'Terms', redirectTo: '/terms' },
-  { text: 'Privacy', redirectTo: '/privacy' },
-  { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-  {
-    text: 'Discord',
-    externalLink: 'https://discord.gg/t9XscHdZrG',
-  },
-  {
-    text: 'Telegram',
-    externalLink: 'https://t.me/HiCommonwealth',
-  },
-  // { text:  'Use Cases' },
-  // { text:  'Crowdfunding' },
-  // { text:  'Developers' },
-  // { text:  'About us' },
-  // { text:  'Careers' }
-];
-
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
 
@@ -60,7 +36,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       hideSearch,
       onscroll,
       showNewProposalButton,
-      // title, are there plans for title?
+      // title,
     } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
@@ -104,8 +80,10 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               )}
             >
               {app.chain && <CommunityHeader meta={app.chain.meta} />}
-              {!app.isCustomDomain() && <SidebarQuickSwitcher />}
-              <Sidebar />
+              <div class="sidebar-inner-container">
+                {!app.isCustomDomain() && <SidebarQuickSwitcher />}
+                {app.chain && <Sidebar />}
+              </div>
             </div>
             <div
               class={getClasses<{ isSidebarToggled: boolean }>(
@@ -122,9 +100,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               />
               <div class="Body" onscroll={onscroll}>
                 {vnode.children}
-                {!app.isCustomDomain() && !hideFooter && (
-                  <Footer list={footercontents} />
-                )}
+                {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
             </div>
           </div>

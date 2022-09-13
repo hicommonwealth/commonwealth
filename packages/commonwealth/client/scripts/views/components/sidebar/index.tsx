@@ -5,19 +5,17 @@ import m from 'mithril';
 import 'components/sidebar/index.scss';
 
 import app from 'state';
-import { link } from 'helpers';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
-import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
-import { CWText } from '../component_kit/cw_text';
 
 export class Sidebar implements m.ClassComponent {
   view() {
     const hideChat = ['terra', 'axie-infinity'].includes(app.activeChainId());
-    return app.chain ? (
+
+    return (
       <div class="Sidebar">
         <DiscussionSection />
         <GovernanceSection />
@@ -39,6 +37,6 @@ export class Sidebar implements m.ClassComponent {
           )}
         </div>
       </div>
-    ) : null;
+    );
   }
 }

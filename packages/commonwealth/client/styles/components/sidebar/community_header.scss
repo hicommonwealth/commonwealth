@@ -2,22 +2,16 @@
 
 .CommunityHeader {
   align-items: center;
-  background: $white;
-  border: 1px solid #e6e5e7;
+  background-color: $neutral-25;
+  border: 1px solid $neutral-200;
   border-radius: 30px 0px 0px 30px;
   display: flex;
   gap: 8px;
-  left: 0px;
-  padding: 11px 10.5px; // We break from our 8px grid system here to accomodate the 1px border
-  position: absolute;
-  top: calc(#{$global-header-height} - 1px);
+  margin-top: -1px;
+  padding: 12px;
   width: calc(#{$sidebar-width} + #{$quick-switcher-width});
 
   @include smallInclusive {
-    min-width: 100%;
+    width: 100%;
   }
-
-  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-  -moz-box-sizing: border-box; /* Firefox, other Gecko */
-  box-sizing: border-box; /* Opera/IE 8+ */
 }

@@ -12,24 +12,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-
-class SidebarQuickSwitcherItem
-  implements m.ClassComponent<{ item: ChainInfo }>
-{
-  view(vnode) {
-    const { item } = vnode.attrs;
-
-    return (
-      <div class="SidebarQuickSwitcherItem" key={`chain-${item.id}`}>
-        <CWCommunityAvatar
-          size="large"
-          community={item}
-          onclick={link ? () => m.route.set(`/${item.id}`) : null}
-        />
-      </div>
-    );
-  }
-}
+import { CWDivider } from '../component_kit/cw_divider';
 
 export class SidebarQuickSwitcher implements m.ClassComponent {
   view() {
@@ -48,9 +31,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     });
 
     return (
-      <div
-        class={`SidebarQuickSwitcher ${app.chain ? 'chain-scoped' : 'global'}`}
-      >
+      <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
           {app.isLoggedIn() && (
             <CWIconButton
@@ -70,9 +51,14 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
           )}
           <CommunitySelector />
         </div>
+        <CWDivider />
         <div class="scrollable-community-bar">
           {starredCommunities.map((item) => (
-            <SidebarQuickSwitcherItem item={item} />
+            <CWCommunityAvatar
+              size="large"
+              community={item}
+              onclick={link ? () => m.route.set(`/${item.id}`) : undefined}
+            />
           ))}
         </div>
       </div>
