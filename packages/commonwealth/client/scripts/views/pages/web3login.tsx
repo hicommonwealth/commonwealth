@@ -38,7 +38,7 @@ class Web3LoginPage implements m.ClassComponent {
       if (status === 'Success') {
         const responseToken = result;
         // REDIRECT TO CMNBOT
-        window.location.href = `http://localhost:3000?token=${responseToken}`;
+        window.location.href = `http://localhost:3000/success/${responseToken}`;
       } else {
         // TODO: display error
       }

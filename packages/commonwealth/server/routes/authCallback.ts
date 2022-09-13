@@ -70,7 +70,7 @@ const authCallback = async (
   const responseObject = {
     // TODO: filter duplicates
     addresses: allAddresses.map((a) => a.address),
-    // TODO: pass profile id?
+    profileId: profile.id,
     stateToken,
   };
 
