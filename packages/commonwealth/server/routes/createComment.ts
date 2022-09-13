@@ -27,6 +27,7 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -55,20 +56,20 @@ const createComment = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const { parent_id, root_id, chain_entity_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
-    return next(new Error(Errors.MissingRootId));
+    return next(new AppError(Errors.MissingRootId));
   }
   if (
     (!text || !text.trim()) &&
     (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
   ) {
-    return next(new Error(Errors.MissingTextOrAttachment));
+    return next(new AppError(Errors.MissingTextOrAttachment));
   }
 
   // check if banned
@@ -77,7 +78,7 @@ const createComment = async (
     address: author.address,
   });
   if (!canInteract) {
-    return next(new Error(banError));
+    return next(new AppError(banError));
   }
 
   let parentComment;
@@ -89,7 +90,7 @@ const createComment = async (
         chain: chain.id,
       },
     });
-    if (!parentComment) return next(new Error(Errors.InvalidParent));
+    if (!parentComment) return next(new AppError(Errors.InvalidParent));
 
     // Backend check to ensure comments are never nested more than three levels deep:
     // top-level, child, and grandchild
@@ -101,7 +102,7 @@ const createComment = async (
         },
       });
       if (grandparentComment?.parent_id) {
-        return next(new Error(Errors.NestingTooDeep));
+        return next(new AppError(Errors.NestingTooDeep));
       }
     }
   }
@@ -124,7 +125,7 @@ const createComment = async (
     if (topic?.rule_id) {
       const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
       if (!passesRules) {
-        return next(new Error(Errors.RuleCheckFailed));
+        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
   }
@@ -147,11 +148,11 @@ const createComment = async (
           req.body.address
         );
         if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
+          return next(new AppError(Errors.BalanceCheckFailed));
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -171,7 +172,7 @@ const createComment = async (
       quillDoc.ops[0].insert.trim() === '' &&
       (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
     ) {
-      return next(new Error(Errors.MissingTextOrAttachment));
+      return next(new AppError(Errors.MissingTextOrAttachment));
     }
   } catch (e) {
     // check always passes if the comment text isn't a Quill document
@@ -263,11 +264,11 @@ const createComment = async (
 
   if (!proposal) {
     await finalComment.destroy();
-    return next(new Error(Errors.ThreadNotFound));
+    return next(new AppError(Errors.ThreadNotFound));
   }
   if (typeof proposal !== 'string' && proposal.read_only) {
     await finalComment.destroy();
-    return next(new Error(Errors.CantCommentOnReadOnly));
+    return next(new AppError(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
@@ -322,7 +323,7 @@ const createComment = async (
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
   } catch (e) {
-    return next(new Error('Failed to parse mentions'));
+    return next(new AppError('Failed to parse mentions'));
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

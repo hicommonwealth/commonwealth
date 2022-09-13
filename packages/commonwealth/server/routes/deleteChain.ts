@@ -3,6 +3,7 @@ import { QueryTypes } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import {RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,16 +18,16 @@ export const Errors = {
 
 const deleteChain = async (models: DB, rabbitMQController: RabbitMQController, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.user.isAdmin) {
-    return next(new Error(Errors.NotAdmin));
+    return next(new AppError(Errors.NotAdmin));
   }
   if (!req.body.id) {
-    return next(new Error(Errors.NeedChainId));
+    return next(new AppError(Errors.NeedChainId));
   }
   if (!['george@commonwealth.im', 'zak@commonwealth.im', 'jake@commonwealth.im'].includes(req.user.email)) {
-    return next(new Error(Errors.NotAcceptableAdmin));
+    return next(new AppError(Errors.NotAcceptableAdmin));
   }
 
   await models.sequelize.transaction(async (t) => {
@@ -36,7 +37,7 @@ const deleteChain = async (models: DB, rabbitMQController: RabbitMQController, r
       }
     });
     if (!chain) {
-      return next(new Error(Errors.NoChain));
+      return next(new AppError(Errors.NoChain));
     }
 
     await models.sequelize.query(`DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`, {

@@ -129,7 +129,7 @@ export class RabbitMQController {
       });
     } catch (err) {
       if (err instanceof PublishError) throw new Error(`Publish error: ${err.message}`);
-      else throw new Error(`Rascal config error: ${err.message}`);
+      else throw new Error(`Rascal config error: ${err.message}`)
     }
 
 

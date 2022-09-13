@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,7 +13,7 @@ export const Errors = {
 
 const updateThreadPinned = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { thread_id } = req.body;
-  if (!thread_id) return next(new Error(Errors.NoThread));
+  if (!thread_id) return next(new AppError(Errors.NoThread));
 
   try {
     const thread = await models.Thread.findOne({
@@ -32,7 +33,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
     });
-    if (!role) return next(new Error(Errors.NotAdmin));
+    if (!role) return next(new AppError(Errors.NotAdmin));
 
     await thread.update({ pinned: !thread.pinned });
 
@@ -58,7 +59,7 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

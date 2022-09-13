@@ -20,6 +20,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -44,16 +45,16 @@ const createReaction = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
   const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
-    return next(new Error(Errors.NoPostId));
+    return next(new AppError(Errors.NoPostId));
   }
   if (!reaction) {
-    return next(new Error(Errors.NoReaction));
+    return next(new AppError(Errors.NoReaction));
   }
 
   let thread;
@@ -84,7 +85,7 @@ const createReaction = async (
     if (topic?.rule_id) {
       const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
       if (!passesRules) {
-        return next(new Error(Errors.RuleCheckFailed));
+        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
   }
@@ -96,7 +97,7 @@ const createReaction = async (
       address: req.body.address
     });
     if (!canInteract) {
-      return next(new Error(banError));
+      return next(new AppError(banError));
     }
   }
 
@@ -118,11 +119,11 @@ const createReaction = async (
           req.body.address
         );
         if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
+          return next(new AppError(Errors.BalanceCheckFailed));
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -138,7 +139,7 @@ const createReaction = async (
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
-    if (!chain_entity_id) return next(new Error(Errors.NoProposalMatch));
+    if (!chain_entity_id) return next(new AppError(Errors.NoProposalMatch));
     const [prefix, id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];
@@ -161,14 +162,14 @@ const createReaction = async (
         include: [models.Address],
       });
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 
   let comment;
   let cwUrl;
   if (comment_id) {
     comment = await models.Comment.findByPk(Number(comment_id));
-    if (!comment) return next(new Error(Errors.NoCommentMatch));
+    if (!comment) return next(new AppError(Errors.NoCommentMatch));
 
     // Test on variety of comments to ensure root relation + type
     const [prefix, id] = comment.root_id.split('_');
@@ -190,7 +191,7 @@ const createReaction = async (
     root_type = prefix;
   } else if (thread_id) {
     proposal = await models.Thread.findByPk(Number(thread_id));
-    if (!proposal) return next(new Error(Errors.NoProposalMatch));
+    if (!proposal) return next(new AppError(Errors.NoProposalMatch));
     cwUrl = getProposalUrl('discussion', proposal, comment);
     root_type = 'discussion';
   }

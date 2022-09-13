@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { DB, sequelize } from '../database';
 import { performance, PerformanceObserver } from 'perf_hooks';
+import { AppError, ServerError } from '../util/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
@@ -23,7 +24,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
 
   // locate active subscriptions, filter by category if specified
