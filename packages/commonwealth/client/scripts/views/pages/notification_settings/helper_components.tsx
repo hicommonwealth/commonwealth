@@ -28,15 +28,23 @@ const getTextRows = (subscription: NotificationSubscription) => {
 
     return (
       <>
-        <CWText
-          type="b2"
-          fontWeight="bold"
-          noWrap
-          className="thread-title-text"
-          onclick={() => m.route.set(threadUrl)}
-        >
-          {subscription.Thread.title}
-        </CWText>
+        <div class="header-row" onclick={() => m.route.set(threadUrl)}>
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+            className="attribution-text"
+            noWrap
+          >
+            {getNotificationTypeText(subscription.category)}
+          </CWText>
+          <CWText
+            type="b2"
+            fontWeight="bold"
+            noWrap
+            className="thread-title-text"
+          >
+            {subscription.Thread.title}
+          </CWText>
+        </div>
         <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
             collapse: true,
@@ -60,7 +68,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     // );
     return (
       <>
-        <div class="comment-header-row">
+        <div class="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -134,7 +142,14 @@ export class SubscriptionRowTextContainer
 
     return (
       <div class="SubscriptionRowTextContainer">
-        <CWIcon iconName="feedback" iconSize="small" />
+        <CWIcon
+          iconName={
+            subscription.category === 'new-reaction'
+              ? 'democraticProposal'
+              : 'feedback'
+          }
+          iconSize="small"
+        />
         <div class="title-and-body-container">{getTextRows(subscription)}</div>
       </div>
     );

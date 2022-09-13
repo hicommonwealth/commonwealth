@@ -41,9 +41,7 @@ class NotificationSettingsPage implements m.ClassComponent {
       );
     }
 
-    const { subscriptions } = app.user.notifications;
-
-    const bundledSubs = bundleSubs(subscriptions);
+    const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>

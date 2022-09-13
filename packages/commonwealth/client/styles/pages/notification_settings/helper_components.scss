@@ -16,15 +16,19 @@
       padding: 0 16px;
     }
 
-    .thread-title-text.Text:hover {
-      text-decoration: underline;
+    .thread-title-text.Text {
+      width: 320px;
+
+      @include mediumSmallInclusive {
+        width: 200px;
+      }
+
+      @include extraSmall {
+        width: 120px;
+      }
     }
 
-    .subscription-body-text.Text {
-      color: $neutral-600;
-    }
-
-    .comment-header-row {
+    .header-row {
       align-items: baseline;
       cursor: pointer;
       display: flex;
@@ -37,6 +41,10 @@
       .attribution-text.Text {
         color: $neutral-600;
       }
+    }
+
+    .subscription-body-text.Text {
+      color: $neutral-600;
     }
   }
 }
