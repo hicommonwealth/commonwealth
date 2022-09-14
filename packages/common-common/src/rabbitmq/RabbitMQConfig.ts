@@ -101,6 +101,14 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'dead-letter-routing-key': 'dlQueue'
             }
           },
+          'ChainEventTypeCUDMainQueue': {
+            'assert': true,
+            'purge': purge,
+            'options': {
+              'x-dead-letter-exchange': 'DeadLetterExchange',
+              'dead-letter-routing-key': 'dlQueue'
+            }
+          },
           'DeadLetterQueue': {
             'assert': true,
             'purge': purge
@@ -136,6 +144,12 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destination': 'ChainEventNotificationsQueue',
             'destinationType': 'queue',
             'bindingKey': 'ChainEventNotifications'
+          },
+          'ChainEventTypeBinding': {
+            'source': 'CreateUpdateDeleteExchange',
+            'destination': 'ChainEventTypeCUDMainQueue',
+            'destinationType': 'queue',
+            'bindingKey': 'ChainEventTypeCUD'
           },
           'DeadLetterBinding': {
             'source': 'DeadLetterExchange',
@@ -190,6 +204,15 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               'persistent': true
             },
           },
+          [RascalPublications.ChainEventTypeCUDMain]: {
+            'exchange': 'CreateUpdateDeleteExchange',
+            'routingKey': 'ChainEventTypeCUD',
+            'confirm': true,
+            'timeout': 10000,
+            'options': {
+              'persistent': true
+            },
+          }
         },
         'subscriptions': {
           [RascalSubscriptions.ChainEvents]: {
@@ -226,6 +249,14 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEventNotifications]: {
             'queue': 'ChainEventNotificationsQueue',
+            'contentType': 'application/json',
+            'retry': {
+              'delay': 1000
+            },
+            'prefetch': 10,
+          },
+          [RascalSubscriptions.ChainEventTypeCUDMain]: {
+            'queue': 'ChainEventTypeCUDQueue',
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
