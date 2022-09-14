@@ -9,6 +9,7 @@ import 'components/address_input_typeahead.scss';
 import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
+import { CWText } from './component_kit/cw_text';
 
 type AddressInputTypeaheadItem = {
   address: string;
@@ -66,28 +67,34 @@ export class AddressInputTypeahead
 
     return (
       <InputSelect
-        class={`AddressInputTypeahead ${options.class}`}
+        class="AddressInputTypeahead"
         cacheItems
         checkmark={false}
         closeOnSelect
         itemRender={(item: AddressInputTypeaheadItem) => (
           <ListItem
             label={
-              <>
+              <div class="item-container">
                 {m(User, {
                   user: new AddressInfo(null, item.address, item.chain, null),
                   avatarOnly: true,
                   avatarSize: 18,
                 })}
                 {item.name ? (
-                  <div>
-                    <strong>{item.name}</strong>{' '}
-                    <span class="lighter">{item.address}</span>
+                  <div class="item-and-address">
+                    <CWText noWrap type="caption" fontWeight="medium">
+                      {item.name}
+                    </CWText>
+                    <CWText noWrap type="caption" className="address-text">
+                      {item.address}
+                    </CWText>
                   </div>
                 ) : (
-                  item.address
+                  <CWText noWrap type="caption" fontWeight="medium">
+                    {item.address}
+                  </CWText>
                 )}
-              </>
+              </div>
             }
             selected={
               this.selectedItem && this.selectedItem.address === item.address

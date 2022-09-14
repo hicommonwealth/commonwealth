@@ -14,6 +14,7 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 export class ApproveBountyModal
   implements m.ClassComponent<{ bountyId: number }>
@@ -27,6 +28,7 @@ export class ApproveBountyModal
       <div class="ApproveBountyModal">
         <div class="compact-modal-title">
           <h3>Approve bounty</h3>
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
           <CWText>Create a council motion to approve this bounty?</CWText>
@@ -88,11 +90,12 @@ export class ProposeCuratorModal
       <div class="ProposeCuratorModal">
         <div class="compact-modal-title">
           <h3>Propose curator</h3>
+          <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          <CWText>Propose a curator and fee to manage this bounty.</CWText>,
+          <CWText>Propose a curator and fee to manage this bounty.</CWText>
           <CWText>
-            The fee should be a portion of the bounty, that will go to the
+            The fee should be a portion of the bounty that will go to the
             curator once the bounty is completed.
           </CWText>
           <AddressInputTypeahead

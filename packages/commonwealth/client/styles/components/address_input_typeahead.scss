@@ -1,28 +1,35 @@
 @import 'shared';
 
 .AddressInputTypeahead {
-  .User {
-    position: relative;
-    top: -3px;
-    margin-right: 10px;
-  }
+  .item-container {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    width: 328px;
 
-  .lighter {
-    margin-left: 6px;
-    color: $neutral-300;
+    .item-and-address {
+      display: flex;
+      flex-direction: column;
+      width: 312px;
+
+      .address-text.Text {
+        color: $neutral-500;
+      }
+    }
   }
 }
 
 .AddressInputTypeaheadPopoverPortal {
-  margin-top: 1px;
-
   .cui-popover-content {
     .cui-list {
-      max-height: 200px !important;
-      overscroll-behavior: none;
+      height: 200px;
+      width: 368px;
+
+      @include extraSmall {
+        width: 100%;
+      }
     }
 
-    padding: 10px;
-    padding-right: 0;
+    padding: 0;
   }
 }
