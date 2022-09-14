@@ -46,10 +46,10 @@ export const getActionSection = (
     return (
       <CWButton
         label="Motion to approve"
-        // disabled={!isCouncillor}
+        disabled={!isCouncillor}
         onclick={() => {
           app.modals.create({
-            modal: ExtendExpiryModal,
+            modal: ApproveBountyModal,
             data: { bountyId: bounty.identifier },
           });
         }}
