@@ -20,27 +20,34 @@ const updateAddressProfile = async (
 
   if (!address) throw new AppError('Must supply an address');
 
-  const profileAddress = await models.Address.findOne({
+  const targetProfileAccount = await models.Address.findOne({
     where: { address: targetProfileAddress },
   });
 
-  const profile = await profileAddress.getProfile();
-  if (!profile) throw new AppError('Profile not found');
+  const targetProfile = await targetProfileAccount.getProfile();
+  if (!targetProfile) throw new AppError('Profile not found');
 
-  console.log('profile id of secondary linked', profile.id);
+  const currentAccount = await models.Address.findOne({ where: { address } });
+  if (!currentAccount) throw new AppError('Address not found');
 
-  const account = await models.Address.findOne({ where: { address } });
-  if (!account) throw new AppError('Address not found');
-
-  const currentProfile = await account.getProfile();
-  console.log('profile id of original signed in: ', currentProfile.id);
+  const currentProfile = await currentAccount.getProfile();
 
   try {
-    account.profile_id = profile.id;
-    account.save();
+    currentAccount.profile_id = targetProfile.id;
+    currentAccount.user_id = targetProfile.user_id;
+    currentAccount.save();
   } catch (e) {
     throw new AppError('Error updating address profile');
   }
+
+  // Check for targetProfile address saved with currentProfile (quirk of new login flow)
+  // const targetProfileAddressWithCurrentProfile = await models.Address.findOne({
+  //   where: { address: targetProfileAddress, profile_id: originalProfileId },
+  // });
+  // if (targetProfileAddressWithCurrentProfile) {
+  //   targetProfileAddressWithCurrentProfile.profile_id = targetProfile.id;
+  //   targetProfileAddressWithCurrentProfile.save();
+  // }
 
   // Check for orphan addresses
   // try {

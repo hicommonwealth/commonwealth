@@ -80,7 +80,7 @@ class Account {
     this._validationToken = token;
   }
 
-  public async validate(signature: string) {
+  public async validate(signature: string, withSignedInUser: boolean) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
     }
@@ -95,6 +95,7 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      withSignedInUser,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {

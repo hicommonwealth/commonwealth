@@ -28,6 +28,7 @@ type WalletsListAttrs = {
   setSidebarType: (sidebarType: string) => void;
   setBodyType: (bodyType: string) => void;
   accountVerifiedCallback: (account: Account) => void;
+  setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking: boolean;
 };
 
@@ -40,6 +41,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       wallets,
       setBodyType,
       setSidebarType,
+      setSelectedWallet,
       accountVerifiedCallback,
       linking,
     } = vnode.attrs;
@@ -55,6 +57,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                 darkMode={darkMode}
                 onclick={async () => {
                   await wallet.enable();
+                  setSelectedWallet(wallet);
 
                   if (wallet.chain === 'near') {
                     // do something
@@ -141,8 +144,6 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           wallet.name,
                           app.chain?.id || wallet.defaultNetwork
                         );
-
-                      await wallet.validateWithAccount(signerAccount);
 
                       // return if user signs for two addresses
                       // if (linkNewAddressModalVnode.state.linkingComplete)

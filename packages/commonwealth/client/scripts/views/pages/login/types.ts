@@ -31,7 +31,7 @@ export type LoginAttrs = {
   setSidebarType: (sidebarType: string) => void;
   username: string;
   wallets: Array<IWebWallet<any>>;
-  setWallets: (wallets: Array<string>) => void;
+  setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linkExistingAccountCallback: () => void;
   createNewAccountCallback: () => void;
   accountVerifiedCallback: () => void;

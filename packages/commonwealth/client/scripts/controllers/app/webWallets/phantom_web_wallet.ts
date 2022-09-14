@@ -30,11 +30,19 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async validateWithAccount(
+    account: Account,
+    withSignedInUser: boolean
+  ): Promise<void> {
     const encodedMessage = new TextEncoder().encode(account.validationToken);
-    const { signature } = await window.solana.signMessage(encodedMessage, 'utf8');
-    const signedMessage = Buffer.from(signature as Uint8Array).toString('base64');
-    return account.validate(signedMessage);
+    const { signature } = await window.solana.signMessage(
+      encodedMessage,
+      'utf8'
+    );
+    const signedMessage = Buffer.from(signature as Uint8Array).toString(
+      'base64'
+    );
+    return account.validate(signedMessage, withSignedInUser);
   }
 
   // ACTIONS

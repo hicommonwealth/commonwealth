@@ -49,6 +49,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       setSidebarType,
       username,
       wallets,
+      setSelectedWallet,
       createNewAccountCallback,
       linkExistingAccountCallback,
       accountVerifiedCallback,
@@ -75,6 +76,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
+                setSelectedWallet={setSelectedWallet}
                 setProfiles={setProfiles}
                 setSidebarType={setSidebarType}
                 setBodyType={setBodyType}
@@ -187,6 +189,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                   // sidebarType = 'ethWallet';
                   // bodyType = 'connectWithEmail';
                 }}
+                setSelectedWallet={setSelectedWallet}
                 hasNoWalletsLink={false}
                 wallets={wallets}
               />
@@ -215,6 +218,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 wallets={wallets}
                 setProfiles={setProfiles}
                 setSidebarType={setSidebarType}
+                setSelectedWallet={setSelectedWallet}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={true}

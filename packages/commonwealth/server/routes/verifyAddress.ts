@@ -24,7 +24,6 @@ import {
 
 import nacl from 'tweetnacl';
 
-
 import {
   ChainBase,
   NotificationCategories,
@@ -67,12 +66,14 @@ const verifySignature = async (
   chain: ChainInstance,
   addressModel: AddressInstance,
   user_id: number,
-  signatureString: string
+  signatureString: string,
+  withSignedInUser: boolean
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
     return false;
   }
+  console.log('withSignedInUser', withSignedInUser);
 
   let isValid: boolean;
   if (chain.base === ChainBase.Substrate) {
@@ -110,7 +111,8 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    (addressModel.wallet_id === WalletId.CosmosEvmMetamask || addressModel.wallet_id === WalletId.KeplrEthereum)
+    (addressModel.wallet_id === WalletId.CosmosEvmMetamask ||
+      addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
     //
     // ethereum address handling on cosmos chains via metamask
@@ -344,9 +346,12 @@ const verifySignature = async (
     // mark the address as verified
     addressModel.verification_token_expires = null;
     addressModel.verified = new Date();
-    addressModel.user_id = user_id;
-    const profile = await models.Profile.findOne({ where: { user_id } });
-    addressModel.profile_id = profile.id;
+    if (withSignedInUser === true) {
+      console.log('doing signint shit');
+      addressModel.user_id = user_id;
+      const profile = await models.Profile.findOne({ where: { user_id } });
+      addressModel.profile_id = profile.id;
+    }
   }
   await addressModel.save();
   return isValid;
@@ -357,6 +362,7 @@ const processAddress = async (
   chain: ChainInstance,
   address: string,
   wallet_id: WalletId,
+  withSignedInUser: boolean,
   signature?: string,
   user?: Express.User
 ): Promise<void> => {
@@ -388,7 +394,8 @@ const processAddress = async (
       chain,
       existingAddress,
       user ? user.id : null,
-      signature
+      signature,
+      withSignedInUser
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -455,11 +462,13 @@ const verifyAddress = async (
           currentPrefix: chain.ss58_prefix,
         })
       : req.body.address;
+
   await processAddress(
     models,
     chain,
     address,
     req.body.wallet_id,
+    req.body.withSignedInUser,
     req.body.signature,
     req.user
   );

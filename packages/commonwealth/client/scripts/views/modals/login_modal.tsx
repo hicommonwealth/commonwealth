@@ -51,6 +51,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private username: string;
   private email: string;
   private wallets: Array<IWebWallet<any>>;
+  private selectedWallet: IWebWallet<any>;
   private loggedInProfile: Profile;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
@@ -83,7 +84,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.bodyType = 'walletList';
     }
 
-    // Override if initial data is provided (for redirecting wallets)
+    // Override if initial data is provided (needed for redirecting wallets)
     if (vnode.attrs.initialBody) {
       this.bodyType = vnode.attrs.initialBody;
     }
@@ -218,10 +219,19 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
 
       if (!newlyCreated && !linking) {
-        // TODO: Switch back
-        await logInWithAccount(account, true);
+        try {
+          await this.selectedWallet.validateWithAccount(account, true);
+          await logInWithAccount(account, true);
+        } catch (e) {
+          console.log(e);
+        }
       } else {
         if (!linking) {
+          try {
+            await this.selectedWallet.validateWithAccount(account, true);
+          } catch (e) {
+            console.log(e);
+          }
           this.sidebarType = 'newOrReturning';
           this.bodyType = 'selectAccountType';
         } else {
@@ -234,7 +244,12 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     };
 
     const createNewAccountCallback = async () => {
-      await logInWithAccount(this.primaryAccount, false);
+      try {
+        //  await this.selectedWallet.validateWithAccount(this.primaryAccount);
+        await logInWithAccount(this.primaryAccount, false);
+      } catch (e) {
+        console.log(e);
+      }
       this.bodyType = 'welcome';
       m.redraw();
     };
@@ -251,12 +266,16 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
         console.log('primary Profile', this.primaryAccount.profile);
         console.log('secondary Profile', this.secondaryLinkAccount.profile);
+        await this.selectedWallet.validateWithAccount(
+          this.secondaryLinkAccount,
+          false
+        );
 
         await this.primaryAccount.updateProfile(
           this.secondaryLinkAccount.address
         );
 
-        // await logInWithAccount(this.primaryAccount, true);
+        await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
         notifyError('Unable to link account');
@@ -314,8 +333,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         }}
         username={this.username}
         wallets={this.wallets}
-        setWallets={(wallets: Array<IWebWallet<any>>) => {
-          this.wallets = wallets;
+        setSelectedWallet={(wallet: IWebWallet<any>) => {
+          this.selectedWallet = wallet;
         }}
         createNewAccountCallback={createNewAccountCallback}
         linkExistingAccountCallback={linkExistingAccountCallback}
@@ -353,8 +372,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         }}
         username={this.username}
         wallets={this.wallets}
-        setWallets={(wallets: Array<IWebWallet<any>>) => {
-          this.wallets = wallets;
+        setSelectedWallet={(wallet: IWebWallet<any>) => {
+          this.selectedWallet = wallet;
         }}
         createNewAccountCallback={createNewAccountCallback}
         linkExistingAccountCallback={linkExistingAccountCallback}
