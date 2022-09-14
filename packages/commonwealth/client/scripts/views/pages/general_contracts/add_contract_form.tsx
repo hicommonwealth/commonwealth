@@ -38,7 +38,7 @@ EthFormFields,
 type ContractFormFields = {
   eth_chain_id: number,
   abi: JSON,
-  contractType: ContractType.DaoFactory | ContractType.Aave |ContractType.Compound |
+  contractType: ContractType.Aave |ContractType.Compound |
   ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
   decimals: number;
   token_name: string;
