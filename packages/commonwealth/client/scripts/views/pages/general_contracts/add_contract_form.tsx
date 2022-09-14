@@ -61,7 +61,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       eth_chain_id: 1,
       name: '',
       abi: JSON.parse('[]'),
-      contractType: ContractType.DaoFactory,
+      contractType: ContractType.ERC20,
       nodeUrl: '',
       symbol: '',
       token_name: '',
