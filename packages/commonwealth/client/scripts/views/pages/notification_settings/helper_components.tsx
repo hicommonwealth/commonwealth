@@ -125,7 +125,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
-          {subscription.Chain.name}
+          {subscription.Chain?.name}
         </CWText>
       </div>
     );

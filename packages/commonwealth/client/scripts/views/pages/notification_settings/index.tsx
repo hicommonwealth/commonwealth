@@ -93,7 +93,7 @@ class NotificationSettingsPage implements m.ClassComponent {
                             community={chainInfo}
                           />
                           <CWText type="h5" fontWeight="medium">
-                            {chainInfo.name}
+                            {chainInfo?.name}
                           </CWText>
                         </div>
                         <CWText type="b2" className="subscriptions-count-text">
