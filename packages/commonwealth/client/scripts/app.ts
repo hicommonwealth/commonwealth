@@ -69,10 +69,11 @@ export async function initAppState(
           .map((chain) => {
             delete chain.ChainNode;
             chain.Contracts.map((contract) => {
+              // TODO Type checking the contract abi
               return app.contracts.addToStore(
                 Contract.fromJSON({
                 ...contract,
-                contract_abi: contract.ContractAbi
+                contract_abi: contract?.ContractAbi?.abi
               }));
             });
             // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)

@@ -1,17 +1,15 @@
-import { Contract }from '../models';
-import { Network } from './types';
+import { AbiFunction, Network } from './types';
 
-export const parseFunctionsFromABI = (abiString: string) => {
+export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunction[]> {
   console.log("Parsing functions from ABI");
-  let fns = [];
+  let fns: AbiFunction[] = [];
   if (abiString) {
-    console.log("Attempting JSON parse functions from ABI");
     const abi = JSON.parse(abiString);
     fns = abi.filter((x) => x.type === "function")
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return fns;
-};
+}
 
 function getSourceCodeEnpoint(network: Network, address: string): string {
   // Ethers JS default API key
@@ -23,7 +21,7 @@ function getSourceCodeEnpoint(network: Network, address: string): string {
   return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
 }
 
-export const getEtherscanABI = async (network: Network, address: string) => {
+export async function getEtherscanABI(network: Network, address: string): Promise<AbiFunction[]> {
   try {
     console.log("fetching from etherscan...");
     const resp = await fetch(getSourceCodeEnpoint(network, address));
@@ -34,4 +32,4 @@ export const getEtherscanABI = async (network: Network, address: string) => {
   } catch (e) {
     console.log("error", e);
   }
-};
+}
