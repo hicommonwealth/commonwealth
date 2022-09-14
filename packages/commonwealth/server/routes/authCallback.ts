@@ -1,16 +1,17 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
-import { AppError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  // TODO: populate & write unit tests
+  // TODO: write unit tests
+  RegistrationError: 'Registration error, please try again.',
 };
 
-type AuthCallbackReq = { token: string /* , profile_id: number */ };
+type AuthCallbackReq = { token: string };
 type AuthCallbackResp = string;
 
 const TOKEN_EXPIRATION = 5 * 60 * 1000; // 5 minutes
@@ -36,7 +37,7 @@ const authCallback = async (
     }
   })
   if (!profile) {
-    throw new AppError('Profile does not exist');
+    throw new ServerError('User profile should exist but missing');
   }
 
   // 2. decode request
@@ -49,18 +50,31 @@ const authCallback = async (
     iat = +tokenObj.iat;
   } catch (err) {
     log.info(`Failed to decrypt JWE: ${err.message}`);
-    throw new AppError('Could not decrypt token');
+    throw new AppError(Errors.RegistrationError);
   }
 
   // 3. persist token & reject if replay or if expired
   // TODO: persist stateToken with profile / handle replays
   if (Date.now() > (iat + TOKEN_EXPIRATION)) {
     log.info(`Token issued at ${iat} expired.`);
-    throw new AppError('Registration error, please try again.');
+    throw new AppError(Errors.RegistrationError);
+  }
+  const [ssoToken, created] = await models.SsoToken.findOrCreate({
+    where: {
+      state_id: stateToken,
+    },
+    defaults: {
+      profile_id: profile.id,
+      issued_at: iat,
+    }
+  });
+  if (!created) {
+    log.warn(`Replay attack detected for SsoToken id ${ssoToken.id}!`);
+    throw new AppError(Errors.RegistrationError);
   }
 
   // 4. construct object containing CB data
-  // TODO: filter addresses by base/chain/etc
+  // TODO: filter addresses by base/chain/etc, if provided by CMN Bot
   const allAddresses = await models.Address.findAll({
     where: {
       profile_id: profile.id,
@@ -77,7 +91,7 @@ const authCallback = async (
   // 5. encrypt response object & respond
   const encryptedResponse = await encryptWithJWE(responseObject);
 
-  // TODO: should we redirect here, or on client?
+  // redirect once response received on client
   return success(res, encryptedResponse);
 };
 
