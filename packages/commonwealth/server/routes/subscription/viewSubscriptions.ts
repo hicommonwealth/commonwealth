@@ -39,6 +39,7 @@ export default async (
     {
       model: models.Chain,
       as: 'Chain',
+      required: true,
     },
   ];
 
