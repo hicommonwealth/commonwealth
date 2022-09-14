@@ -112,7 +112,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
   ) {
     return (
       <div
-        class="comment-header-row"
+        class="header-row"
         onclick={() => m.route.set(subscription.Chain.id)}
       >
         <CWText
