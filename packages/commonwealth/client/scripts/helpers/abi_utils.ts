@@ -1,4 +1,4 @@
-import { AbiFunction, Network } from './types';
+import { AbiFunction, AbiEvent, Network } from './types';
 
 export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunction[]> {
   console.log("Parsing functions from ABI");
@@ -9,6 +9,17 @@ export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunct
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return fns;
+}
+
+export async function parseEventsFromABI(abiString: string): Promise<AbiEvent[]> {
+  console.log("Parsing functions from ABI");
+  let events: AbiEvent[] = [];
+  if (abiString) {
+    const abi = JSON.parse(abiString);
+    events = abi.filter((x) => x.type === "event")
+    .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return events;
 }
 
 function getSourceCodeEnpoint(network: Network, address: string): string {
