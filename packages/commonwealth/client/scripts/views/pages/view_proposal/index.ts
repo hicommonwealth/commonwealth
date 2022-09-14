@@ -1092,6 +1092,7 @@ const ViewProposalPage: m.Component<
                         };
                       }),
                       incrementalVoteCast: 1,
+                      isPreview: false,
                       tooltipErrorMessage: app.user.activeAccount
                         ? null
                         : 'You must join this community to vote.',
