@@ -72,11 +72,11 @@ export class GenerateUIFromABIForm implements m.ClassComponent<EthChainAttrs> {
         console.log(contractAddr)
         const contract: Contract = app.contracts.store.getContractByAddress(contractAddr);
         console.log(contract);
-        console.log(parseFunctionsFromABI(contract));
         const network = Network.Mainnet;
         console.log("Network: ", network)
         const etherscanAbi = await getEtherscanABI(network, contractAddr);
         console.log("Etherscan Abi", etherscanAbi);
+        console.log(parseFunctionsFromABI(etherscanAbi));
       } catch (e) {
         this.state.status = 'failure';
         this.state.message = e.message;

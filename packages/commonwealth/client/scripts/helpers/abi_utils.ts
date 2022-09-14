@@ -1,13 +1,16 @@
 import { Contract }from '../models';
 import { Network } from './types';
 
-export const parseFunctionsFromABI = (contract: Contract) => {
-    let fns = [];
-    if (contract) {
-        fns = JSON.parse(contract.abi).filter((x) => x.type === "function")
-        .sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return fns;
+export const parseFunctionsFromABI = (abiString: string) => {
+  console.log("Parsing functions from ABI");
+  let fns = [];
+  if (abiString) {
+    console.log("Attempting JSON parse functions from ABI");
+    const abi = JSON.parse(abiString);
+    fns = abi.filter((x) => x.type === "function")
+    .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return fns;
 };
 
 function getSourceCodeEnpoint(network: Network, address: string): string {
