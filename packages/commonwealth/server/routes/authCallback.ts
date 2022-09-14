@@ -54,7 +54,6 @@ const authCallback = async (
   }
 
   // 3. persist token & reject if replay or if expired
-  // TODO: persist stateToken with profile / handle replays
   if (Date.now() > (iat + TOKEN_EXPIRATION)) {
     log.info(`Token issued at ${iat} expired.`);
     throw new AppError(Errors.RegistrationError);
