@@ -32,7 +32,7 @@ import {
 
 import { Contract } from 'client/scripts/models';
 import { Network } from '../../../helpers/types';
-import { parseFunctionsFromABI, getEtherscanABI } from '../../../helpers/abi_utils'
+import { parseFunctionsFromABI, getEtherscanABI, parseEventsFromABI } from '../../../helpers/abi_utils'
 
 type GenerateABIUIState = EthFormFields;
 
@@ -74,6 +74,7 @@ export class GenerateUIFromABIForm implements m.ClassComponent<EthChainAttrs> {
         console.log(contract);
         if (contract) {
           console.log(await parseFunctionsFromABI(contract.abi));
+          console.log(await parseEventsFromABI(contract.abi));
         } else {
           const network = Network.Mainnet;
           console.log("Network: ", network)

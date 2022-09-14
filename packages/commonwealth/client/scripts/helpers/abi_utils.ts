@@ -12,7 +12,7 @@ export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunct
 }
 
 export async function parseEventsFromABI(abiString: string): Promise<AbiEvent[]> {
-  console.log("Parsing functions from ABI");
+  console.log("Parsing Events from ABI");
   let events: AbiEvent[] = [];
   if (abiString) {
     const abi = JSON.parse(abiString);
