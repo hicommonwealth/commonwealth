@@ -80,7 +80,7 @@ class Account {
     this._validationToken = token;
   }
 
-  public async validate(signature: string, withSignedInUser: boolean) {
+  public async validate(signature: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
     }
@@ -95,7 +95,6 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      withSignedInUser,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
@@ -121,21 +120,6 @@ class Account {
           app.user.setActiveAccounts([]);
         }
       }
-    }
-  }
-
-  public async updateProfile(targetProfileAddress: string) {
-    const result = await $.post(`${app.serverUrl()}/updateAddressProfile`, {
-      address: this.address,
-      targetProfileAddress,
-      jwt: app.user.jwt,
-    });
-
-    if (result.status === 'Success') {
-      this._profile = app.profiles.getProfile(
-        this.chain.id,
-        targetProfileAddress
-      );
     }
   }
 }

@@ -62,15 +62,18 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(
-    account: Account,
-    withSignedInUser: boolean
-  ): Promise<void> {
-    // Sign with the method on eth_webwallet, because we don't have access to the private key
+  public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signLoginToken(
       account.validationToken
     );
-    return account.validate(webWalletSignature, withSignedInUser);
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS

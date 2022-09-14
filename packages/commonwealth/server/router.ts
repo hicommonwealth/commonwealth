@@ -113,7 +113,6 @@ import deleteChatChannel from './routes/chat/deleteChatChannel';
 import deleteChatCategory from './routes/chat/deleteChatCategory';
 import editChatChannel from './routes/chat/editChatChannel';
 import editChatCategory from './routes/chat/editChatCategory';
-import updateAddressProfile from './routes/updateAddressProfile';
 
 import createRule from './routes/rules/createRule';
 import deleteRule from './routes/rules/deleteRule';
@@ -703,7 +702,6 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
-  router.post('/updateAddressProfile', updateAddressProfile.bind(this, models));
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
 
   // login

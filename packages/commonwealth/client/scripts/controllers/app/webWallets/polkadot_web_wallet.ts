@@ -53,7 +53,7 @@ class PolkadotWebWalletController
   }
 
   // ACTIONS
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     const signer = await this.getSigner(account.address);
     const token = account.validationToken;
     const payload: SignerPayloadRaw = {
@@ -62,7 +62,14 @@ class PolkadotWebWalletController
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;
-    return account.validate(signature);
+    return signature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   public async enable() {

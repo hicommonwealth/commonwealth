@@ -53,10 +53,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async validateWithAccount(
-    account: Account,
-    withSignedInUser: boolean
-  ): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
@@ -81,7 +78,14 @@ class TerraStationWebWalletController implements IWebWallet<string> {
         signature: result.signature,
       },
     };
-    return account.validate(JSON.stringify(signature), withSignedInUser);
+    return JSON.stringify(signature);
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 }
 

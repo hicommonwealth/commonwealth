@@ -53,15 +53,12 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(
-    account: Account,
-    withSignedInUser: boolean
-  ): Promise<void> {
+  public async validateWithAccount(account: Account): Promise<void> {
     // TODO: test whether signTypedData works on WC
     const webWalletSignature = await this.signLoginToken(
       account.validationToken
     );
-    return account.validate(webWalletSignature, withSignedInUser);
+    return account.validate(webWalletSignature);
   }
 
   public async enable() {

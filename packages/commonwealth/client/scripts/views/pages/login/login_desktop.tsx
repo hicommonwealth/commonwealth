@@ -37,7 +37,6 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
   view(vnode) {
     const {
       address,
-      setAddress,
       bodyType,
       setBodyType,
       handleSetAvatar,
@@ -56,6 +55,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       handleEmailLoginCallback,
       saveProfileInfoCallback,
       performLinkingCallback,
+      setSelectedLinkingWallet,
     } = vnode.attrs;
 
     return (
@@ -218,7 +218,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 wallets={wallets}
                 setProfiles={setProfiles}
                 setSidebarType={setSidebarType}
-                setSelectedWallet={setSelectedWallet}
+                setSelectedWallet={setSelectedLinkingWallet}
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={true}
