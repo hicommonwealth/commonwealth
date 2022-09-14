@@ -87,19 +87,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               chain={chain}
               showNewProposalButton={showNewProposalButton}
             />
-            <CWButton
-              label="test"
-              onclick={() =>
-                app.modals.create({
-                  modal: NewLoginModal,
-                  data: {
-                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                      ? 'fullScreen'
-                      : 'centered',
-                  },
-                })
-              }
-            />
           </div>
           <div class="sidebar-and-body-container">
             {!app.isCustomDomain() &&

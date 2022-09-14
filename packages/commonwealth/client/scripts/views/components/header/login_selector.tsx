@@ -19,10 +19,11 @@ import {
 import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { LoginModal, NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -219,7 +220,16 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               label="Log in"
               compact={true}
               size={small ? 'sm' : 'default'}
-              onclick={() => app.modals.create({ modal: LoginModal })}
+              onclick={() =>
+                app.modals.create({
+                  modal: NewLoginModal,
+                  data: {
+                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                      ? 'fullScreen'
+                      : 'centered',
+                  },
+                })
+              }
             />
           </div>
         </div>
@@ -262,7 +272,8 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       const addressExists = !!app.user.addresses.find(
         (prev) =>
           activeBase === ChainBase.Substrate &&
-          (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+          (app.config.chains.getById(prev.chain.id)?.base ===
+          ChainBase.Substrate
             ? addressSwapper({
                 address: prev.address,
                 currentPrefix: 42,

@@ -97,6 +97,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.primaryAccount = vnode.attrs.initialAccount;
       this.address = vnode.attrs.initialAccount.address;
     }
+    if (vnode.attrs.initialWebWallet) {
+      this.selectedWallet = vnode.attrs.initialWebWallet;
+    }
   }
 
   view() {
@@ -214,6 +217,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           notifyError("This account doesn't exist");
           return;
         }
+
+        if (account.address === this.primaryAccount.address) {
+          notifyError("You can't link to the same account");
+          return;
+        }
         this.secondaryLinkAccount = account;
         this.loggedInProfile = account.profile;
         // TODO: Should get all profiles associated with the secondaryLinkAccount's User- not merged yet??
@@ -258,6 +266,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
         console.log(e);
+        notifyError('Failed to create account. Please try again.');
+        $('.LoginDesktop').trigger('modalexit');
       }
       this.bodyType = 'welcome';
       m.redraw();
@@ -296,19 +306,16 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         avatar_url: this.avatarUrl,
       };
       try {
-        // TODO: Add in new updateProfile route (dexters PR)
-
-        // await app.profiles.updateProfileForAccount(
-        //   app.user.activeAccount,
-        //   data
-        // );
-
+        // TODO: Should this be modifying the profile, as opposed to the account?
+        // Currently we only have ability to modify account, will need new route I think
+        await app.profiles.updateProfileForAccount(this.primaryAccount, data);
         // Close Modal
         $('.LoginDesktop').trigger('modalexit');
         m.redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');
+        $('.LoginDesktop').trigger('modalexit');
       }
     };
 
