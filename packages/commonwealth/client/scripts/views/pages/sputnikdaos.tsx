@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Tag, Table } from 'construct-ui';
+import { Table } from 'construct-ui';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -140,73 +140,62 @@ class SputnikDAOsPage implements m.ClassComponent {
       } else return <PageLoading message="Redirecting..." />;
     }
 
-    // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-
-    return m(
-      Sublayout,
-      {
-        title: [
-          'Sputnik DAOs',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-        showNewProposalButton: true,
-      },
-      m('.SputnikDAOsPage', [
-        m('.title', 'Sputnik DAOs'),
-        m(Table, [
-          m('tr', [
-            m(
-              'th',
-              {
-                style: { width: '27%' },
-              },
-              'Name'
-            ),
-            m(
-              'th',
-              {
-                style: { width: '20%' },
-              },
-              'Dao Funds ',
-              [m('span.nearBadge', 'Ⓝ')]
-            ),
-            m(
-              'th',
-              {
-                style: { width: '17%' },
-              },
-              'Council Size'
-            ),
-            m(
-              'th',
-              {
-                style: { width: '19%' },
-              },
-              'Bond ',
-              [m('span.nearBadge', 'Ⓝ')]
-            ),
-            m(
-              'th',
-              {
-                style: { width: '17%' },
-              },
-              'Vote Period'
-            ),
-          ]),
-          this.daosList.map((dao) => {
-            return (
+    return (
+      <Sublayout
+        title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
+        showNewProposalButton
+      >
+        <div class="SputnikDAOsPage">
+          <div class="title">Sputnik DAOs</div>
+          {m(Table, [
+            m('tr', [
+              m(
+                'th',
+                {
+                  style: { width: '27%' },
+                },
+                'Name'
+              ),
+              m(
+                'th',
+                {
+                  style: { width: '20%' },
+                },
+                'Dao Funds ',
+                [m('span.nearBadge', 'Ⓝ')]
+              ),
+              m(
+                'th',
+                {
+                  style: { width: '17%' },
+                },
+                'Council Size'
+              ),
+              m(
+                'th',
+                {
+                  style: { width: '19%' },
+                },
+                'Bond ',
+                [m('span.nearBadge', 'Ⓝ')]
+              ),
+              m(
+                'th',
+                {
+                  style: { width: '17%' },
+                },
+                'Vote Period'
+              ),
+            ]),
+            this.daosList.map((dao) => (
               <SputnikDaoRow
                 dao={dao}
                 clickable={allCommunities.some((c) => c.id === dao.contractId)}
               />
-            );
-          }),
-        ]),
-      ])
+            )),
+          ])}
+        </div>
+      </Sublayout>
     );
   }
 }
