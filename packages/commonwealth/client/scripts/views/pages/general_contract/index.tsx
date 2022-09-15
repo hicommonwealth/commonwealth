@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 import m from 'mithril';
 // import { FunctionInfo } from 'views/components/abi_ui_generation'
 import { chain } from 'web3-core/types';
+import { PageNotFound } from 'views/pages/404';
 import { parseFunctionsFromABI, getEtherscanABI, parseEventsFromABI } from '../../../helpers/abi_utils'
 import { AbiFunction, AbiEvent } from '../../../helpers/types';
 import { PageLoading } from '../loading';
@@ -67,17 +68,28 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
 
   view(vnode) {
     const { contract_address } = vnode.attrs;
-
-    return (
-      <Sublayout>
-        <div class="GeneralContractPage">
-          <div class="container">
-            <h1>General Contract</h1>
-            <h2>Contract Address: {contract_address}</h2>
-          </div>
-        </div>
-      </Sublayout>
-    );
+    if (this.contract == null) {
+        // If /api/status has returned, then app.config.nodes and app.config.communities
+        // should both be loaded. If we match neither of them, then we can safely 404
+        return (
+            <Sublayout>
+                <PageNotFound />
+            </Sublayout>
+        );
+    }
+    else {
+        return (
+            <Sublayout>
+              <div class="GeneralContractPage">
+                <div class="container">
+                  <h1>General Contract</h1>
+                  <h2>Contract Address: {contract_address}</h2>
+                  <h2>Contract ABI: {this.contract.abi}</h2>
+                </div>
+              </div>
+            </Sublayout>
+        );
+    }
   }
 }
 
