@@ -8,7 +8,8 @@ import {
   ITXModalData,
   ITXData,
   IChainModule,
-  ChainInfo
+  ChainInfo,
+  IWebWallet
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
@@ -35,6 +36,22 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       this._instance = new EthereumChain(null);
     }
     return this._instance;
+  }
+
+  public async makeContractCall(to: string, data: string) {
+    // encoding + decoding require ABI + happen inside contracts controller
+    const result = await this.api.eth.call({ to, data });
+    return result;
+  }
+  /*
+  Writing to contract data, aka creating transaction
+  */
+  public async makeContractTx(to: string, data: string, wallet: IWebWallet<any>) {
+    // Not using contractApi because it's ethers-dependent
+    // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
+    const signedData = await wallet.signTransaction({ to, data });
+    const hash = await this.api.eth.sendSignedTransaction(signedData);
+    // TODO: get receipt, status, etc
   }
 
   public get denom() {

@@ -943,6 +943,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/:scope/contract/:contract_address': importRoute(
+              'views/pages/general_contract',
+              { scoped: true, deferChain: true }
+            ),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
               { scoped: true, deferChain: true }
