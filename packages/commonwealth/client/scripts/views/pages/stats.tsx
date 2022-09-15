@@ -3,13 +3,14 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Table, Tag } from 'construct-ui';
+import { Table } from 'construct-ui';
 
 import app from 'state';
 
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
+import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 class StatsPage implements m.Component {
   private data: any;
@@ -92,46 +93,26 @@ class StatsPage implements m.Component {
     }
 
     if (!this.requested || (!this.error && !this.data))
-      return m(PageLoading, {
-        message: 'Loading analytics',
-        title: [
-          'Analytics',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-      });
+      return (
+        <PageLoading
+          message="Loading analytics"
+          title={<BreadcrumbsTitleTag title="Analytics" />}
+          showNewProposalButton
+        />
+      );
 
     if (this.error)
-      return m(ErrorPage, {
-        message: this.error,
-        title: [
-          'Analytics',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-      });
+      return (
+        <ErrorPage
+          message={this.error}
+          title={<BreadcrumbsTitleTag title="Analytics" />}
+        />
+      );
 
-    return m(
-      Sublayout,
-      {
-        title: [
-          'Analytics',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-      },
-      [
-        m('.stats-data', [
-          m(
+    return (
+      <Sublayout title={<BreadcrumbsTitleTag title="Analytics" />}>
+        <div class="stats-data">
+          {m(
             Table,
             {
               class: 'StatsTable',
@@ -172,9 +153,9 @@ class StatsPage implements m.Component {
                   ])
                 ),
             ]
-          ),
-        ]),
-      ]
+          )}
+        </div>
+      </Sublayout>
     );
   }
 }
