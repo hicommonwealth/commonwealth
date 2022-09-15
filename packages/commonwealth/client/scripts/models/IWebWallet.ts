@@ -1,4 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { RLPEncodedTransaction, TransactionConfig } from 'web3-core/types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
@@ -10,7 +11,8 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   accounts: readonly AccountT[];
   enable: () => Promise<void>;
   validateWithAccount: (account: Account) => Promise<void>;
-
+  // TODO add optional parameter: Function Callback
+  signTransaction: (tx: TransactionConfig, signerAddress: string) => Promise<RLPEncodedTransaction>;
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
 

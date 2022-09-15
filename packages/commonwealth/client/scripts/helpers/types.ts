@@ -1,5 +1,6 @@
 import { BigNumber } from "ethers";
 import * as _ from "lodash";
+import { Transaction } from "web3/eth/types";
 
 export enum SolidityType {
   address = "address",
@@ -147,18 +148,6 @@ export const networkNameToId = {
     [Network.Kovan]: 42,
 };
 
-
-export interface TxData {
-    from?: string;
-    gas?: BigNumber;
-    gasPrice?: BigNumber;
-    nonce?: BigNumber;
-}
-
-export interface TxDataPayable extends TxData {
-    value?: BigNumber;
-}
-
 export interface ReceiptLog {
     name: string;
     events: any[];
@@ -197,3 +186,4 @@ export interface Log {
   address: Address;
   args: any;
 }
+
