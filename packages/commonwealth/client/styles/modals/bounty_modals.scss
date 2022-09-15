@@ -1,20 +1,19 @@
+@import 'shared';
+
 .ApproveBountyModal,
 .ProposeCuratorModal,
 .AwardBountyModal,
 .ExtendExpiryModal {
-    p {
-        max-width: 360px;
-        margin-bottom: 10px;
-    }
-    .cui-input {
-        margin: 6px 0;
-    }
-    .cui-input:last-child {
-        margin-bottom: 20px;
-    }
-}
+  width: 400px;
 
-.ProposeCuratorModal .cui-input + p {
-    margin-top: 16px;
-    margin-bottom: 16px;
+  @include extraSmall {
+    width: 100%;
+  }
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 16px 0;
+  }
 }
