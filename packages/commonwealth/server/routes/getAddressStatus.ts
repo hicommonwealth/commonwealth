@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const Op = Sequelize.Op;
 
@@ -12,17 +13,17 @@ export const Errors = {
 
 const getAddressStatus = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.address) {
-    return next(new Error(Errors.NeedAddress));
+    return next(new AppError(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
 
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain }
   });
   if (!chain) {
-    return next(new Error(Errors.InvalidChain));
+    return next(new AppError(Errors.InvalidChain));
   }
 
   const existingAddress = await models.Address.findOne({

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { AppError, ServerError } from '../../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -7,7 +8,7 @@ export const Errors = {
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
 
   const associationParams: any = [

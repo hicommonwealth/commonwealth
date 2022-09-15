@@ -4,6 +4,7 @@ import validateChain from '../util/validateChain';
 const { Op } = Sequelize;
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -24,7 +25,7 @@ const bulkAddresses = async (models: DB, req, res, next) => {
   let chain; let error;
   if (req.query.chain) {
     [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
     options['where'] = { chain: req.query.chain };
   }
 

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,23 +16,23 @@ export const Errors = {
 
 const deleteAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.address) {
-    return next(new Error(Errors.NeedAddress));
+    return next(new AppError(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
 
   const addressObj = await models.Address.findOne({
     where: { chain: req.body.chain, address: req.body.address }
   });
   if (!addressObj || addressObj.user_id !== req.user.id) {
-    return next(new Error(Errors.AddressNotFound));
+    return next(new AppError(Errors.AddressNotFound));
   }
   if (addressObj.wallet_id === WalletId.Magic) {
-    return next(new Error(Errors.CannotDeleteMagic));
+    return next(new AppError(Errors.CannotDeleteMagic));
   }
 
   try {
@@ -40,7 +41,7 @@ const deleteAddress = async (models: DB, req: Request, res: Response, next: Next
     const result = await addressObj.save();
     return res.json({ status: 'Success', response: 'Deleted address' });
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 };
 
