@@ -3,7 +3,6 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
-import { Table } from 'construct-ui';
 
 import app from 'state';
 
@@ -11,6 +10,7 @@ import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CWText } from '../components/component_kit/cw_text';
 
 class StatsPage implements m.Component {
   private data: any;
@@ -112,48 +112,23 @@ class StatsPage implements m.Component {
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Analytics" />}>
         <div class="stats-data">
-          {m(
-            Table,
-            {
-              class: 'StatsTable',
-              style: 'margin: 30px 0 50px;',
-            },
-            [
-              m('tr', [
-                m('th', ''),
-                m('th', { colspan: 2 }, 'New Addresses'),
-                m('th', { colspan: 2 }, 'New Comments'),
-                m('th', { colspan: 2 }, 'New Threads'),
-                m('th', 'Active Addresses'),
-              ]),
-              _.orderBy(Object.entries(this.data), (o) => o[0])
-                .reverse()
-                .map(([date, row]: [any, any]) =>
-                  m('tr', [
-                    m('td', date),
-                    m('td', row.comments || '0'),
-                    m(
-                      'td',
-                      { style: 'color: #999;' },
-                      row.totalComments && `${row.totalComments}`
-                    ),
-                    m('td', row.roles || '0'),
-                    m(
-                      'td',
-                      { style: 'color: #999;' },
-                      row.totalRoles && `${row.totalRoles}`
-                    ),
-                    m('td', row.threads || '0'),
-                    m(
-                      'td',
-                      { style: 'color: #999;' },
-                      row.totalThreads && `${row.totalThreads}`
-                    ),
-                    m('td', row.activeAccounts),
-                  ])
-                ),
-            ]
-          )}
+          <div>
+            <CWText>New Addresses</CWText>
+            <CWText>New Comments</CWText>
+            <CWText>New Threads</CWText>
+            <CWText>Active Addresses</CWText>
+          </div>
+          {_.orderBy(Object.entries(this.data), (o) => o[0])
+            .reverse()
+            .map(([date, row]: [any, any]) => (
+              <div>
+                <CWText>{date}</CWText>
+                <CWText>{row.comments || 0}</CWText>
+                <CWText>{row.roles || 0}</CWText>
+                <CWText>{row.threads || 0}</CWText>
+                <CWText>{row.activeAccounts}</CWText>
+              </div>
+            ))}
         </div>
       </Sublayout>
     );
