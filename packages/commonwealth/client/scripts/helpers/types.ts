@@ -1,6 +1,5 @@
 import { BigNumber } from "ethers";
 import * as _ from "lodash";
-import { Transaction } from "web3/eth/types";
 
 export enum SolidityType {
   address = "address",
