@@ -1,6 +1,6 @@
 import { AbiFunction, AbiEvent, Network } from './types';
 
-export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunction[]> {
+export function parseFunctionsFromABI(abiString: string): AbiFunction[] {
   console.log("Parsing functions from ABI");
   let fns: AbiFunction[] = [];
   if (abiString) {
@@ -11,7 +11,7 @@ export async function parseFunctionsFromABI(abiString: string): Promise<AbiFunct
   return fns;
 }
 
-export async function parseEventsFromABI(abiString: string): Promise<AbiEvent[]> {
+export function parseEventsFromABI(abiString: string): AbiEvent[] {
   console.log("Parsing Events from ABI");
   let events: AbiEvent[] = [];
   if (abiString) {

@@ -6,7 +6,7 @@ import { Contract } from 'client/scripts/models';
 import { debounce } from 'lodash';
 import m from 'mithril';
 import { parseFunctionsFromABI, getEtherscanABI, parseEventsFromABI } from '../../../helpers/abi_utils'
-import { Network } from '../../../helpers/types';
+import { Network, AbiFunction, AbiEvent } from '../../../helpers/types';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
@@ -14,6 +14,8 @@ import Sublayout from '../../sublayout';
 class GeneralContractPage implements m.ClassComponent<{ contract_address?: string }> {
   private hasContract: boolean;
   private contract: Contract;
+  private abi_functions: Array<AbiFunction>;
+  private abi_events: Array<AbiEvent>;
   private status= undefined;
   private message = '';
   private loaded = false;
@@ -37,35 +39,28 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
     );
   }
 
-  oninit(vnode) {
+  async oninit(vnode) {
     const { contract_address } = vnode.attrs;
     const _contract: Contract = app.contracts.store.getContractByAddress(contract_address);
     this.contract = _contract;
     console.log(_contract)
-  }
+
+    console.log("generateui")
+    if (this.contract) {
+        this.abi_functions = parseFunctionsFromABI(this.contract.abi);
+        this.abi_events = parseEventsFromABI(this.contract.abi);
+        console.log(this.abi_functions);
+        console.log(this.abi_events);
+    } else {
+        const network = Network.Mainnet;
+        console.log("Network: ", network)
+        const etherscanAbi = await getEtherscanABI(network, contract_address);
+        console.log("Etherscan Abi", etherscanAbi);
+    }
+}
 
   view(vnode) {
     const { contract_address } = vnode.attrs;
-
-    const generateUI = async () => {
-        try {
-          console.log("generateui")
-          if (this.contract) {
-            console.log(await parseFunctionsFromABI(this.contract.abi));
-            console.log(await parseEventsFromABI(this.contract.abi));
-          } else {
-            const network = Network.Mainnet;
-            console.log("Network: ", network)
-            const etherscanAbi = await getEtherscanABI(network, contract_address);
-            console.log("Etherscan Abi", etherscanAbi);
-          }
-        } catch (e) {
-          this.status = 'failure';
-          this.message = e.message;
-          this.loading = false;
-          m.redraw();
-        }
-    };
 
     return (
       <Sublayout>
