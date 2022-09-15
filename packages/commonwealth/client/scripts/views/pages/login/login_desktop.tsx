@@ -6,20 +6,12 @@ import $ from 'jquery';
 import { Spinner } from 'construct-ui';
 
 import 'pages/login/login_desktop.scss';
-import {
-  loginWithMagicLink,
-  setActiveAccount,
-  updateActiveAddresses,
-} from 'controllers/app/login';
-import { Account, AddressInfo } from 'models';
-import { isSameAccount } from 'helpers';
-import { initAppState } from 'app';
+
 import { CWAddress } from '../../components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_username_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ModalExitButton } from '../../components/component_kit/cw_modal';
-
 import {
   CWProfilesList,
   CWProfileRow,
@@ -29,7 +21,6 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
-
 import { LoginAttrs } from './types';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
@@ -140,12 +131,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                     setBodyType('walletList');
                   }}
                 />
-                <CWButton
-                  label="Connect"
-                  onclick={async () => {
-                    await handleEmailLoginCallback();
-                  }}
-                />
+                <CWButton label="Connect" onclick={handleEmailLoginCallback} />
               </div>
             </div>
           )}

@@ -19,7 +19,6 @@ import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { NewLoginModal } from '../modals/login_modal';

@@ -20,19 +20,19 @@ export type LoginBodyType =
 export type LoginAttrs = {
   address: string;
   currentlyInCommunityPage: boolean;
-  setAddress: (address: string) => void;
   bodyType: string;
+  profiles: Array<ProfileRowAttrs>;
+  sidebarType: string;
+  username: string;
+  wallets: Array<IWebWallet<any>>;
+  magicLoading: boolean;
+  setAddress: (address: string) => void;
   setBodyType: (bodyType: string) => void;
   handleSetAvatar: () => void;
   handleSetUsername: () => void;
   handleSetEmail: () => void;
-  profiles: Array<ProfileRowAttrs>;
   setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
-  sidebarType?: string;
   setSidebarType: (sidebarType: string) => void;
-  username: string;
-  wallets: Array<IWebWallet<any>>;
-  magicLoading: boolean;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;
   linkExistingAccountCallback: () => void;

@@ -55,7 +55,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                   setSelectedWallet(wallet);
 
                   if (wallet.chain === 'near') {
-                    // do something
+                    // Near Redirect Flow
                     const WalletAccount = (await import('near-api-js'))
                       .WalletAccount;
                     if (!app.chain.apiInitialized) {
@@ -66,7 +66,6 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       'commonwealth_near'
                     );
                     if (nearWallet.isSignedIn()) {
-                      // get rid of pre-existing wallet info to make way for new account
                       nearWallet.signOut();
                     }
                     const redirectUrl = !app.isCustomDomain()
@@ -82,7 +81,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       failureUrl: redirectUrl,
                     });
                   } else if (wallet.defaultNetwork === 'axie-infinity') {
-                    // TODO: Does this work??
+                    // Axie Redirect Flow
                     const result = await $.post(`${app.serverUrl()}/auth/sso`, {
                       issuer: 'AxieInfinity',
                     });
@@ -96,6 +95,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       vnode.state.error(result.error || 'Could not login');
                     }
                   } else {
+                    // Normal Wallet Flow
                     let address;
                     if (
                       wallet.chain === 'ethereum' ||
@@ -122,15 +122,11 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           jwt: app.user.jwt,
                         }
                       );
-
-                      console.log('result', result);
-                      if (result.exists) {
-                        if (result.belongsToUser) {
-                          notifyInfo(
-                            'This address is already linked to your current account.'
-                          );
-                          return;
-                        }
+                      if (result.exists && result.belongsToUser) {
+                        notifyInfo(
+                          'This address is already linked to your current account.'
+                        );
+                        return;
                       }
                     }
 
@@ -141,18 +137,12 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           wallet.name,
                           app.chain?.id || wallet.defaultNetwork
                         );
-
-                      // return if user signs for two addresses
-                      // if (linkNewAddressModalVnode.state.linkingComplete)
-                      //   return;
-                      // linkNewAddressModalVnode.state.linkingComplete = true;
                       accountVerifiedCallback(
                         signerAccount,
                         newlyCreated,
                         linking
                       );
                     } catch (err) {
-                      // catch when the user rejects the sign message prompt
                       console.log(err);
                     }
                   }

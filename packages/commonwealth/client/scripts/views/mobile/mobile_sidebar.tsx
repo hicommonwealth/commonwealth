@@ -14,11 +14,12 @@ import {
   LoginSelectorMenuRight,
 } from 'views/components/header/login_selector';
 import { NewProposalMenu } from 'views/components/new_proposal_button';
-import { LoginModal } from '../modals/login_modal';
+import { NewLoginModal } from '../modals/login_modal';
 import { ExternalLinksModule } from '../components/sidebar/external_links_module';
 import { CommunitySelector } from '../components/sidebar/community_selector';
 import { ChatSection } from '../components/chat/chat_section';
 import { CWTabBar, CWTab } from '../components/component_kit/cw_tabs';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
 enum MenuTabs {
   CurrentCommunity = 'currentCommunity',
@@ -62,7 +63,14 @@ class MobileAccountMenu implements m.ClassComponent {
             label="Login"
             iconLeft={Icons.LOG_IN}
             onclick={() => {
-              app.modals.create({ modal: LoginModal });
+              app.modals.create({
+                modal: NewLoginModal,
+                data: {
+                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                    ? 'fullScreen'
+                    : 'centered',
+                },
+              });
             }}
           />
         )}
@@ -107,7 +115,7 @@ export class MobileSidebar implements m.ClassComponent {
             label="Login"
             iconLeft={Icons.LOG_IN}
             onclick={() => {
-              app.modals.create({ modal: LoginModal });
+              app.modals.create({ modal: NewLoginModal });
             }}
           />
         )}

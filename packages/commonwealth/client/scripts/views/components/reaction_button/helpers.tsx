@@ -5,14 +5,9 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import {
-  Comment,
-  Thread,
-  AddressInfo,
-  ChainInfo,
-} from 'models';
+import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { LoginModal } from '../../modals/login_modal';
+import { NewLoginModal } from '../../modals/login_modal';
 import SelectAddressModal from '../../modals/select_address_modal';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -79,7 +74,7 @@ export const onReactionClick = (
 
   if (!app.isLoggedIn()) {
     app.modals.create({
-      modal: LoginModal,
+      modal: NewLoginModal,
     });
   } else if (!app.user.activeAccount) {
     app.modals.create({

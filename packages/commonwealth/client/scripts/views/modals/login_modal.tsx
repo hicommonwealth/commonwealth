@@ -9,33 +9,17 @@ import { initAppState } from 'app';
 import {
   completeClientLogin,
   loginWithMagicLink,
-  setActiveAccount,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import { isSameAccount } from 'helpers';
 
 import { notifyError } from 'controllers/app/notifications';
-import { Account, AddressInfo, IWebWallet, Profile } from 'models';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import Login from 'views/components/login';
+import { Account, IWebWallet } from 'models';
+import { ChainBase } from 'common-common/src/types';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-
-export class LoginModal implements m.ClassComponent {
-  view() {
-    return (
-      <>
-        <div class="compact-modal-title">
-          <h3>Log in or create account</h3>
-        </div>
-        <div class="compact-modal-body">{m(Login)}</div>
-      </>
-    );
-  }
-}
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -54,7 +38,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private wallets: Array<IWebWallet<any>>;
   private selectedWallet: IWebWallet<any>;
   private selectedLinkingWallet: IWebWallet<any>;
-  private loggedInProfile: Profile;
   private cashedWalletSignature: string;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
@@ -114,7 +97,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
       try {
         await loginWithMagicLink(this.email);
-        // TODO: Understand the context of where we are coming from
         this.magicLoading = false;
         $('.LoginDesktop').trigger('modalexit');
       } catch (e) {
@@ -136,22 +118,29 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       if (app.isLoggedIn()) {
         // Already logged in with another account
         completeClientLogin(account);
+        if (exitOnComplete)
+          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+            $('.LoginMobile').trigger('modalexit');
+          } else {
+            $('.LoginDesktop').trigger('modalexit');
+          }
 
-        if (exitOnComplete) $('.LoginDesktop').trigger('modalexit');
         m.redraw();
       } else {
         // log in as the new user
         await initAppState(false);
-
-        // load addresses for the current chain/community
         if (app.chain) {
-          // TODO: this breaks when the user action creates a new token forum
           const chain =
             app.user.selectedChain ||
             app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         }
-        if (exitOnComplete) $('.LoginDesktop').trigger('modalexit');
+        if (exitOnComplete)
+          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+            $('.LoginMobile').trigger('modalexit');
+          } else {
+            $('.LoginDesktop').trigger('modalexit');
+          }
         m.redraw();
       }
     };
@@ -172,22 +161,18 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       if (!linking) {
         this.primaryAccount = account;
         this.address = account.address;
-        this.loggedInProfile = account.profile;
         this.profiles = [account.profile];
       } else {
         if (newlyCreated) {
           notifyError("This account doesn't exist");
           return;
         }
-
         if (account.address === this.primaryAccount.address) {
           notifyError("You can't link to the same account");
           return;
         }
         this.secondaryLinkAccount = account;
-        this.loggedInProfile = account.profile;
-        // TODO: Should get all profiles associated with the secondaryLinkAccount's User- not merged yet??
-        this.profiles = [account.profile];
+        this.profiles = [account.profile]; // TODO: Update when User -> Many Profiles goes in
       }
 
       if (!newlyCreated && !linking) {
@@ -214,7 +199,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           this.sidebarType = 'newAddressLinked';
           this.bodyType = 'selectProfile';
         }
-
         m.redraw();
       }
     };
@@ -231,7 +215,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');
-        $('.LoginDesktop').trigger('modalexit');
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          $('.LoginMobile').trigger('modalexit');
+        } else {
+          $('.LoginDesktop').trigger('modalexit');
+        }
       }
       this.bodyType = 'welcome';
       m.redraw();
@@ -251,12 +239,10 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           this.secondaryLinkAccount,
           signature
         );
-
         await this.selectedWallet.validateWithAccount(
           this.primaryAccount,
           this.cashedWalletSignature
         );
-
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
@@ -270,16 +256,21 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         avatar_url: this.avatarUrl,
       };
       try {
-        // TODO: Should this be modifying the profile, as opposed to the account?
-        // Currently we only have ability to modify account, will need new route I think
         await app.profiles.updateProfileForAccount(this.primaryAccount, data);
-        // Close Modal
-        $('.LoginDesktop').trigger('modalexit');
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          $('.LoginMobile').trigger('modalexit');
+        } else {
+          $('.LoginDesktop').trigger('modalexit');
+        }
         m.redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');
-        $('.LoginDesktop').trigger('modalexit');
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          $('.LoginMobile').trigger('modalexit');
+        } else {
+          $('.LoginDesktop').trigger('modalexit');
+        }
       }
     };
 
@@ -287,10 +278,15 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       <LoginMobile
         address={this.address}
         currentlyInCommunityPage={this.currentlyInCommunityPage}
+        bodyType={this.bodyType}
+        profiles={this.profiles}
+        sidebarType={this.sidebarType}
+        username={this.username}
+        wallets={this.wallets}
+        magicLoading={this.magicLoading}
         setAddress={(address: string) => {
           this.address = address;
         }}
-        bodyType={this.bodyType}
         setBodyType={(bodyType: LoginBodyType) => {
           this.bodyType = bodyType;
         }}
@@ -300,26 +296,21 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         handleSetUsername={(u) => {
           this.username = u;
         }}
-        profiles={this.profiles}
-        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
-          this.profiles = profiles;
-        }}
         handleSetEmail={(e) => {
           this.email = e.target.value;
         }}
-        sidebarType={this.sidebarType}
+        setProfiles={(profiles: Array<ProfileRowAttrs>) => {
+          this.profiles = profiles;
+        }}
         setSidebarType={(sidebarType: LoginSidebarType) => {
           this.sidebarType = sidebarType;
         }}
-        username={this.username}
-        wallets={this.wallets}
         setSelectedWallet={(wallet: IWebWallet<any>) => {
           this.selectedWallet = wallet;
         }}
         setSelectedLinkingWallet={(wallet: IWebWallet<any>) => {
           this.selectedLinkingWallet = wallet;
         }}
-        magicLoading={this.magicLoading}
         createNewAccountCallback={createNewAccountCallback}
         linkExistingAccountCallback={linkExistingAccountCallback}
         accountVerifiedCallback={accountVerifiedCallback}
@@ -331,10 +322,15 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       <LoginDesktop
         address={this.address}
         currentlyInCommunityPage={this.currentlyInCommunityPage}
+        bodyType={this.bodyType}
+        profiles={this.profiles}
+        sidebarType={this.sidebarType}
+        username={this.username}
+        wallets={this.wallets}
+        magicLoading={this.magicLoading}
         setAddress={(address: string) => {
           this.address = address;
         }}
-        bodyType={this.bodyType}
         setBodyType={(bodyType: LoginBodyType) => {
           this.bodyType = bodyType;
         }}
@@ -345,20 +341,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           this.username = u;
         }}
         handleSetEmail={(e) => {
-          console.log('this.email', this.email);
           this.email = e.target.value;
         }}
-        profiles={this.profiles}
         setProfiles={(profiles: Array<ProfileRowAttrs>) => {
           this.profiles = profiles;
         }}
-        sidebarType={this.sidebarType}
         setSidebarType={(sidebarType: LoginSidebarType) => {
           this.sidebarType = sidebarType;
         }}
-        username={this.username}
-        wallets={this.wallets}
-        magicLoading={this.magicLoading}
         setSelectedWallet={(wallet: IWebWallet<any>) => {
           this.selectedWallet = wallet;
         }}
