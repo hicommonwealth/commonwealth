@@ -3,7 +3,7 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
-import { provider } from 'web3-core';
+import { provider, RLPEncodedTransaction, TransactionConfig } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
@@ -40,6 +40,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public get accounts() {
     return this._accounts || [];
+  }
+
+  public async signTransaction(tx: TransactionConfig): Promise<RLPEncodedTransaction> {
+    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
+    return rlpEncodedTx;
   }
 
   public async signMessage(message: string): Promise<string> {

@@ -124,29 +124,23 @@ export class AbiEvent {
   }
 }
 
-export enum Network {
-    Mainnet = "Mainnet",
-    Rinkeby = "Rinkeby",
-    Ropsten = "Ropsten",
-    Kovan = "Kovan",
-    Goerli = "Goerli",
-  }
-
 export const networkIdToName = {
-    1: Network.Mainnet,
-    3: Network.Ropsten,
-    4: Network.Rinkeby,
-    5: Network.Goerli,
-    42: Network.Kovan,
+    1: "mainnet",
+    3: "ropsten",
+    4: "rinkeby",
+    5: "goerli",
+    42: "kovan",
 };
 
 export const networkNameToId = {
-    [Network.Mainnet]: 1,
-    [Network.Ropsten]: 3,
-    [Network.Rinkeby]: 4,
-    [Network.Goerli]: 5,
-    [Network.Kovan]: 42,
+    "mainnet": 1,
+    "ropsten": 3,
+    "rinkeby": 4,
+    "goerli": 5,
+    "kovan": 42,
 };
+
+// Use Web3-Core Types For Most Things
 
 
 

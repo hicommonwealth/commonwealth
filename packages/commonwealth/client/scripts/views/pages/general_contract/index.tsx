@@ -6,8 +6,9 @@ import { Contract } from 'client/scripts/models';
 import { debounce } from 'lodash';
 import m from 'mithril';
 // import { FunctionInfo } from 'views/components/abi_ui_generation'
+import { chain } from 'web3-core/types';
 import { parseFunctionsFromABI, getEtherscanABI, parseEventsFromABI } from '../../../helpers/abi_utils'
-import { Network, AbiFunction, AbiEvent } from '../../../helpers/types';
+import { AbiFunction, AbiEvent } from '../../../helpers/types';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
@@ -52,7 +53,7 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
         console.log(this.abi_functions);
         console.log(this.abi_events);
     } else {
-        const network = Network.Mainnet;
+        const network: chain = "mainnet";
         console.log("Network: ", network)
         const etherscanAbi = await getEtherscanABI(network, contract_address);
         console.log("Etherscan Abi", etherscanAbi);

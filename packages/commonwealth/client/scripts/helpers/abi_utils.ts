@@ -1,4 +1,5 @@
-import { AbiFunction, AbiEvent, Network } from './types';
+import { chain } from 'web3-core/types';
+import { AbiFunction, AbiEvent } from './types';
 
 export function parseFunctionsFromABI(abiString: string): AbiFunction[] {
   console.log("Parsing functions from ABI");
@@ -22,17 +23,17 @@ export function parseEventsFromABI(abiString: string): AbiEvent[] {
   return events;
 }
 
-function getSourceCodeEnpoint(network: Network, address: string): string {
+function getSourceCodeEnpoint(network: chain, address: string): string {
   // Ethers JS default API key
   const apiKey = "8FG3JMZ9USS4NTA6YKEKHINU56SEPPVBJR";
 
   const fqdn =
-    network === Network.Mainnet ? "api" : `api-${network.toLowerCase()}`;
+    network === "mainnet" ? "api" : `api-${network.toLowerCase()}`;
 
   return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
 }
 
-export async function getEtherscanABI(network: Network, address: string): Promise<AbiFunction[]> {
+export async function getEtherscanABI(network: chain, address: string): Promise<AbiFunction[]> {
   try {
     console.log("fetching from etherscan...");
     const resp = await fetch(getSourceCodeEnpoint(network, address));
