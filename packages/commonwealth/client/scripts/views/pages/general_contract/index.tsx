@@ -64,7 +64,7 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
         console.log(this.abi_functions);
         console.log(this.abi_events);
     }
-}
+  }
 
   view(vnode) {
     const { contract_address } = vnode.attrs;
@@ -82,8 +82,11 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
                 <div class="container">
                   <h1>General Contract</h1>
                   <h2>Contract Address: {contract_address}</h2>
+                  {this.abi_functions && (
+                    <h2>Abi Functions: {this.abi_functions}</h2>
+                  )}
                 </div>
-                <FunctionInfo fns={this.abi_functions}/>
+                {/* <FunctionInfo fns={this.abi_functions}/> */}
               </div>
             </Sublayout>
         );

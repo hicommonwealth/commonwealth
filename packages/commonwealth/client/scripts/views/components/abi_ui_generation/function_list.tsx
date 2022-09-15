@@ -1,10 +1,15 @@
 import m from 'mithril';
 import $ from 'jquery';
 
+import { AbiFunction } from 'client/scripts/helpers/types';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWRadioGroup } from '../component_kit/cw_radio_group';
 
-const displayFunctions = (fns) => {
+type FunctionListAttrs = {
+  abi_functions: AbiFunction[];
+}
+
+const displayFunctions = (fns: AbiFunction[]) => {
     return fns.map((fn, i) => {
       return (
         <div class="function-container">
@@ -14,7 +19,7 @@ const displayFunctions = (fns) => {
     });
   };
 
-export class FunctionList implements m.ClassComponent<{fns: []}> {
+export class FunctionList implements m.ClassComponent<FunctionListAttrs> {
     oninit(vnode) {
         return null;
     }
@@ -23,7 +28,7 @@ export class FunctionList implements m.ClassComponent<{fns: []}> {
         return (
             <div>
                 <h1>Functions (arity):</h1>
-                {displayFunctions(vnode.attrs.fns)}
+                {displayFunctions(vnode.attrs.abi_functions)}
             </div>
         );
     }
