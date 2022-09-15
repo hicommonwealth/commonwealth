@@ -252,7 +252,7 @@ const verifySignature = async (
     //
     try {
       const node = await chain.getChainNode();
-      const typedMessage = await constructTypedMessage(
+      const { msgParams, sessionPayload } = await constructTypedMessage(
         addressModel.address,
         node.eth_chain_id || 1,
         sessionPublicAddress,
@@ -262,7 +262,7 @@ const verifySignature = async (
         throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
       }
       const address = recoverTypedSignature({
-        data: typedMessage,
+        data: msgParams,
         signature: signatureString.trim(),
         version: SignTypedDataVersion.V4,
       });
@@ -391,6 +391,7 @@ const processAddress = async (
     !!existingAddress.verified && user && existingAddress.user_id !== user.id;
   const oldId = existingAddress.user_id;
   try {
+    console.log(models, chain, existingAddress, signature, sessionPublicAddress, sessionBlockInfo)
     const valid = await verifySignature(
       models,
       chain,

@@ -9,9 +9,12 @@ class Reaction<T extends IUniqueId> {
   public readonly commentId: number | string;
   public readonly proposalId: number | string;
   public readonly author_chain: string;
+  public readonly signature: string;
+  public readonly signedData: string;
+  public readonly signedHash: string;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
-  constructor(
+  constructor({
     id,
     author,
     chain,
@@ -19,8 +22,11 @@ class Reaction<T extends IUniqueId> {
     threadId,
     proposalId,
     commentId,
-    author_chain
-  ) {
+    author_chain,
+    signature,
+    signedData,
+    signedHash,
+  }) {
     this.id = id;
     this.author = author;
     this.chain = chain;
@@ -29,6 +35,9 @@ class Reaction<T extends IUniqueId> {
     this.commentId = commentId;
     this.proposalId = proposalId;
     this.author_chain = author_chain;
+    this.signature = signature;
+    this.signedData = signedData;
+    this.signedHash = signedHash;
   }
 }
 

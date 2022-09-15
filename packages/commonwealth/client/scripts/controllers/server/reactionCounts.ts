@@ -37,12 +37,26 @@ class ReactionCountController {
     reaction: string,
     chainId: string
   ) {
+    // TODO: use canvas id
+    const like = reaction === "like";
+    const { signature, sessionData, actionData, signedHash } =
+      post instanceof Thread
+      ? await app.sessions.signThreadReaction({ threadId: (post as Thread).id, like })
+      : post instanceof Proposal
+      ? {}
+      : post instanceof Comment
+      ? await app.sessions.signCommentReaction({ threadId: (post as Comment<any>).id, like }) : {};
+    const signedData = JSON.stringify({ sessionData, actionData })
+
     const options = {
       author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
       address,
       reaction,
       jwt: app.user.jwt,
+      signature,
+      signedData,
+      signedHash,
     };
     if (post instanceof Thread) {
       options['thread_id'] = (post as Thread).id;
@@ -74,6 +88,9 @@ class ReactionCountController {
           comment_id,
           has_reacted: true,
           like: 1,
+          signature,
+          signedData,
+          signedHash,
         };
         this.store.add(modelFromServer(rc));
       } else {
@@ -89,6 +106,8 @@ class ReactionCountController {
   }
 
   public async delete(reaction, reactionCount: ReactionCount<any>) {
+    const { signature } = await app.sessions.signDeleteReaction({ reaction: reaction.reaction, signedHash: reaction.signedHash });
+
     // TODO Graham 4/24/22: Investigate necessity of this duplication
     const _this = this;
     try {

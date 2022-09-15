@@ -20,6 +20,10 @@ class Comment<T extends IUniqueId> {
   public readonly lastEdited: moment.Moment;
   public readonly deleted: boolean;
 
+  public readonly signature: string;
+  public readonly signedData: string;
+  public readonly signedHash: string;
+
   constructor({
     chain,
     author,
@@ -36,6 +40,9 @@ class Comment<T extends IUniqueId> {
     authorChain,
     lastEdited, // moment.Moment
     deleted,
+    signature,
+    signedData,
+    signedHash,
   }) {
     this.chain = chain;
     this.author = author;
@@ -51,6 +58,9 @@ class Comment<T extends IUniqueId> {
     this.authorChain = authorChain;
     this.lastEdited = lastEdited;
     this.deleted = deleted;
+    this.signature = signature;
+    this.signedData = signedData;
+    this.signedHash = signedHash;
   }
 }
 

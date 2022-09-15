@@ -10,6 +10,7 @@ import app from 'state';
 import { Thread, AnyProposal } from 'models';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ContentType } from 'types';
+import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
@@ -62,14 +63,15 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       }
 
       const commentText = this.quillEditorState.textContentsAsString;
+      const chainId = app.activeChainId();
+
+      await app.sessions.ensureSessionIsValid();
 
       this.error = null;
 
       this.sendingComment = true;
 
       this.quillEditorState.disable();
-
-      const chainId = app.activeChainId();
 
       try {
         const res = await app.comments.create(

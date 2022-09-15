@@ -12,8 +12,14 @@ export type ReactionAttributes = {
   thread_id?: number;
   proposal_id?: number;
   comment_id?: number;
+
+  signature: string;
+  signed_data: string;
+  signed_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
+
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
 }
@@ -34,6 +40,10 @@ export default (
     comment_id: { type: dataTypes.INTEGER, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: false },
     reaction: { type: dataTypes.STRING, allowNull: false },
+    // signed data
+    signature: { type: dataTypes.STRING, allowNull: true },
+    signed_data: { type: dataTypes.TEXT, allowNull: true },
+    signed_hash: { type: dataTypes.STRING, allowNull: true },
   }, {
     tableName: 'Reactions',
     underscored: true,
@@ -46,6 +56,7 @@ export default (
       { fields: ['chain', 'address_id', 'thread_id', 'proposal_id', 'comment_id', 'reaction'], unique: true },
       { fields: ['chain', 'thread_id'] },
       { fields: ['chain', 'comment_id'] },
+      { fields: ['signed_hash'] },
     ],
   });
 

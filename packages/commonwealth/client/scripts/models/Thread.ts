@@ -43,6 +43,10 @@ class Thread implements IUniqueId {
   public readonly attachments: Attachment[];
   public readonly readOnly: boolean;
 
+  public readonly signature: string;
+  public readonly signedData: string;
+  public readonly signedHash: string;
+
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
   public readonly identifier: string;
@@ -89,6 +93,9 @@ class Thread implements IUniqueId {
     hasPoll,
     lastCommentedOn,
     linkedThreads,
+    signature,
+    signedData,
+    signedHash,
   }: {
     author: string;
     title: string;
@@ -114,6 +121,9 @@ class Thread implements IUniqueId {
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
+    signature?: string;
+    signedData?: string;
+    signedHash?: string;
   }) {
     this.author = author;
     this.title = title;
@@ -150,6 +160,9 @@ class Thread implements IUniqueId {
     this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
+    this.signature = signature;
+    this.signedData = signedData;
+    this.signedHash = signedHash;
   }
 }
 

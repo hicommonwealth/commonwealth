@@ -63,13 +63,9 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom()
-    const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const { msgParams, sessionPayload } = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
     const privateKey = keypair.getPrivateKey();
-    const signature = signTypedData({
-      privateKey,
-      data,
-      version: SignTypedDataVersion.V4,
-    });
+    const signature = signTypedData({ privateKey, data: msgParams, version: SignTypedDataVersion.V4 });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')

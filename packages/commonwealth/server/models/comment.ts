@@ -15,6 +15,11 @@ export type CommentAttributes = {
   chain: string;
   parent_id?: string;
   version_history?: string[];
+
+  signature: string;
+  signed_data: string;
+  signed_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -44,6 +49,11 @@ export default (
     text: { type: dataTypes.TEXT, allowNull: false },
     plaintext: { type: dataTypes.TEXT, allowNull: true },
     version_history: { type: dataTypes.ARRAY(dataTypes.TEXT), defaultValue: [], allowNull: false },
+    // signed data
+    signature: { type: dataTypes.STRING, allowNull: true },
+    signed_data: { type: dataTypes.TEXT, allowNull: true },
+    signed_hash: { type: dataTypes.STRING, allowNull: true },
+    // timestamps
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -62,6 +72,7 @@ export default (
       { fields: ['chain', 'created_at'] },
       { fields: ['chain', 'updated_at'] },
       { fields: ['root_id'] },
+      { fields: ['signed_hash'] },
     ],
   });
 

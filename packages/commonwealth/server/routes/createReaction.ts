@@ -50,7 +50,7 @@ const createReaction = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id, signature, signedData, signedHash } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -141,6 +141,9 @@ const createReaction = async (
     reaction,
     address_id: author.id,
     chain: chain.id,
+    signature,
+    signed_data: signedData,
+    signed_hash: signedHash
   };
 
   if (thread_id) options['thread_id'] = thread_id;

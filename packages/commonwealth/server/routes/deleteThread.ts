@@ -21,7 +21,7 @@ const deleteThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { thread_id, chain_id } = req.body;
+  const { thread_id, chain_id, signature, signedData, signedHash } = req.body;
   if (!req.user) {
     throw new AppError(DeleteThreadErrors.NoUser);
   }

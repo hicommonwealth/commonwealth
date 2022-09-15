@@ -230,7 +230,7 @@ const createThread = async (
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
+  const { topic_name, title, body, kind, stage, url, readOnly, signature, signedData, signedHash } = req.body;
   let { topic_id } = req.body;
 
   if (kind === 'discussion') {
@@ -301,7 +301,11 @@ const createThread = async (
     stage,
     url,
     read_only: readOnly || false,
+    signature,
+    signed_data: signedData,
+    signed_hash: signedHash,
   };
+  // TODO: validate signedData against { title, body }, etc.
 
   // begin essential database changes within transaction
   const finalThread = await sequelize.transaction(async (transaction) => {

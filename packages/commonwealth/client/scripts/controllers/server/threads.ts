@@ -55,6 +55,9 @@ export const modelFromServer = (thread) => {
     reactions,
     last_commented_on,
     linked_threads,
+    signature,
+    signedData,
+    signedHash,
   } = thread;
 
   const attachments = Attachments
@@ -159,6 +162,9 @@ export const modelFromServer = (thread) => {
     polls: polls.map((p) => new Poll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
+    signature,
+    signedData,
+    signedHash,
   });
 };
 
@@ -249,6 +255,11 @@ class ThreadsController {
   ) {
     try {
       // TODO: Change to POST /thread
+      const { signature, signedData, signedHash } = app.sessions.signThread({
+        title,
+        body,
+        link: url
+      });
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
@@ -264,6 +275,9 @@ class ThreadsController {
         url,
         readOnly,
         jwt: app.user.jwt,
+        signature,
+        signedData,
+        signedHash,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
@@ -296,7 +310,7 @@ class ThreadsController {
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
-          : 'Failed to create thread'
+          : err.message ? err.message : 'Failed to create thread'
       );
     }
   }
@@ -310,6 +324,12 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
+    const { signature, signedData, signedHash } = app.sessions.signThread({
+      title: newTitle,
+      body: newBody,
+      link: url
+    });
+
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
@@ -326,6 +346,9 @@ class ThreadsController {
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        signature,
+        signedData,
+        signedHash,
       },
       success: (response) => {
         const result = modelFromServer(response.result);
@@ -349,6 +372,10 @@ class ThreadsController {
   }
 
   public async delete(proposal) {
+    const { signature } = await app.sessions.signDeleteThread({
+      signedHash: proposal.signedHash
+    });
+
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {

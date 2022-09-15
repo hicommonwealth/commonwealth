@@ -28,7 +28,7 @@ const editThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { body, title, kind, stage, thread_id, version_history, url } =
+  const { body, title, kind, stage, thread_id, version_history, url, signature, signedData, signedHash } =
     req.body;
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));

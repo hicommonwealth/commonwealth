@@ -17,18 +17,23 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 
 export const modelFromServer = (reaction) => {
-  return new Reaction(
-    reaction.id,
-    reaction.Address.address,
-    reaction.chain,
-    reaction.reaction,
-    reaction.thread_id,
-    reaction.proposal_id,
-    reaction.comment_id,
-    reaction.Address.chain
-  );
+  return new Reaction({
+    id: reaction.id,
+    author: reaction.Address.address,
+    author_chain: reaction.Address.chain,
+    chain: reaction.chain,
+    reaction: reaction.reaction,
+    threadId: reaction.thread_id,
+    proposalId: reaction.proposal_id,
+    commentId: reaction.comment_id,
+    signature: reaction.signature,
+    signedData: reaction.signed_data,
+    signedHash: reaction.signed_hash,
+  });
 };
 
+// Most of the reactions-related logic is handled directly in ThreadsController, CommentsController,
+// or ReactionCountController
 class ReactionsController {
   private _store: ReactionStore = new ReactionStore();
   public get store() {
@@ -39,100 +44,6 @@ class ReactionsController {
     post: Thread | AbridgedThread | AnyProposal | Comment<any>
   ) {
     return this._store.getByPost(post);
-  }
-
-  public async create(
-    address: string,
-    post: any,
-    reaction: string,
-    chainId: string
-  ) {
-    const options = {
-      author_chain: app.user.activeAccount.chain.id,
-      chain: chainId,
-      address,
-      reaction,
-      jwt: app.user.jwt,
-    };
-    if (post instanceof Thread) {
-      options['thread_id'] = (post as Thread).id;
-    } else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}_${
-        (post as AnyProposal).identifier
-      }`;
-    } else if (post instanceof Comment) {
-      options['comment_id'] = (post as Comment<any>).id;
-    }
-    try {
-      // TODO: Change to POST /reaction
-      const response = await $.post(
-        `${app.serverUrl()}/createReaction`,
-        options
-      );
-      const { result } = response;
-      this._store.add(modelFromServer(result));
-    } catch (err) {
-      notifyError('Failed to save reaction');
-    }
-  }
-
-  public async refresh(post: any, chainId: string) {
-    const options = { chain: chainId };
-    // TODO: ensure identifier vs id use is correct; see also create method
-    if (post instanceof Thread)
-      options['thread_id'] = (post as Thread).id;
-    else if (post instanceof Proposal) {
-      options['proposal_id'] = `${(post as AnyProposal).slug}_${
-        (post as AnyProposal).identifier
-      }`;
-    } else if (post instanceof Comment)
-      options['comment_id'] = (post as Comment<any>).id;
-
-    try {
-      // TODO: Remove any verbs from these route names '/reactions'
-      const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
-      if (response.status !== 'Success') {
-        throw new Error(`got unsuccessful status: ${response.status}`);
-      }
-      const identifier = this._store.getPostIdentifier(response.result[0]);
-      this._store.clearPost(identifier);
-      for (const reaction of response.result) {
-        // TODO: Reactions should always have a linked Address
-        if (!reaction.Address) console.error('Reaction missing linked address');
-        try {
-          this._store.add(modelFromServer(reaction));
-        } catch (e) {
-          // console.error(e.message);
-        }
-      }
-    } catch (err) {
-      console.log('Failed to load reactions');
-      throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Error loading reactions'
-      );
-    }
-  }
-
-  public async delete(reaction) {
-    const _this = this;
-    return new Promise((resolve, reject) => {
-      // TODO: Change to DELETE /reaction
-      $.post(`${app.serverUrl()}/deleteReaction`, {
-        jwt: app.user.jwt,
-        reaction_id: reaction.id,
-      })
-        .then((result) => {
-          _this.store.remove(reaction);
-          resolve(result);
-        })
-        .catch((e) => {
-          console.error(e);
-          notifyError('Failed to save reaction');
-          reject(e);
-        });
-    });
   }
 
   public initialize(initialReactions, reset = true) {

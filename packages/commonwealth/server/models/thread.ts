@@ -27,6 +27,10 @@ export type ThreadAttributes = {
 
   has_poll?: boolean;
 
+  signature: string;
+  signed_data: string;
+  signed_hash: string;
+
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
@@ -90,6 +94,11 @@ export default (
 
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
+      // signed data
+      signature: { type: dataTypes.STRING, allowNull: true },
+      signed_data: { type: dataTypes.TEXT, allowNull: true },
+      signed_hash: { type: dataTypes.STRING, allowNull: true },
+      // timestamps
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -110,6 +119,7 @@ export default (
         { fields: ['chain', 'updated_at'] },
         { fields: ['chain', 'pinned'] },
         { fields: ['chain', 'has_poll'] },
+        { fields: ['signed_hash'] },
       ],
     }
   );

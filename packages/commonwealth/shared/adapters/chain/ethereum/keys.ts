@@ -54,5 +54,9 @@ export const constructTypedMessage = async (fromAddress: string, fromChainId: nu
 
   // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's
   // so we have to coerce the types here
-  return { types, primaryType: 'Message', domain, message } as any;
+  return {
+    msgParams: { types, primaryType: 'Message', domain, message } as any,
+    sessionPayload: payload,
+    blockInfo: validationBlockInfo,
+  };
 };

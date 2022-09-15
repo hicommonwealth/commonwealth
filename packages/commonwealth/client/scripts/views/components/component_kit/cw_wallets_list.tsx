@@ -161,6 +161,8 @@ type WalletsListAttrs = {
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   linking?: boolean;
+  useSessionKeyLoginFlow: boolean;
+  hideConnectAnotherWayLink: boolean;
 };
 
 export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
@@ -174,7 +176,25 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       setSelectedWallet,
       accountVerifiedCallback,
       linking,
+      useSessionKeyLoginFlow,
+      hideConnectAnotherWayLink,
     } = vnode.attrs;
+
+    // We call handleNormalWalletLogin if we're using connecting a new wallet, and
+    // handleSessionKeyRevalidation if we're regenerating a session key.
+    async function handleSessionKeyRevalidation(wallet, address) {
+      const validationBlockInfo = await wallet.getRecentBlock();
+      const { account, newlyCreated } =
+        await createUserWithAddress(
+          address,
+          wallet.name,
+          app.chain?.id || wallet.defaultNetwork,
+          validationBlockInfo
+        );
+      const signature = await wallet.signWithAccount(account);
+      await wallet.validateWithAccount(account, signature);
+      accountVerifiedCallback(account);
+    }
 
     async function handleNormalWalletLogin(
       wallet: IWebWallet<any>,
@@ -345,7 +365,11 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                         }
                       }
 
-                      await handleNormalWalletLogin(wallet, address);
+                      if (useSessionKeyLoginFlow) {
+                        await handleSessionKeyRevalidation(wallet, address);
+                      } else {
+                        await handleNormalWalletLogin(wallet, address);
+                      }
                     }
                   }
                 }}
@@ -401,7 +425,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             )}
           </div>
         </div>
-        <CWText
+        {!hideConnectAnotherWayLink && <CWText
           type="b2"
           className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
@@ -409,7 +433,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
           )}
         >
           <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
-        </CWText>
+        </CWText>}
       </div>
     );
   }
