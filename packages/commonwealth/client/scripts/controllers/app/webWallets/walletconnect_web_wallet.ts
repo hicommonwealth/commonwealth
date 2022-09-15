@@ -56,6 +56,13 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return account.validate(webWalletSignature);
   }
 
+    public async reset() {
+    console.log('Attempting to reset WalletConnect');
+    const ks = await this._provider.wc.killSession();
+    this._provider.disconnect();
+    this._enabled = false;
+  }
+
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
@@ -93,8 +100,6 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     });
     // TODO: chainChanged, disconnect events
   }
-
-  // TODO: disconnect
 }
 
 export default WalletConnectWebWalletController;

@@ -9,6 +9,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabling: boolean;
   accounts: readonly AccountT[];
   enable: () => Promise<void>;
+  reset?: () => Promise<void>;
   validateWithAccount: (account: Account) => Promise<void>;
 
   chain: ChainBase;
