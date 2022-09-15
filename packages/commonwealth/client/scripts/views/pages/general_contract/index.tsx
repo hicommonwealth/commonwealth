@@ -14,83 +14,82 @@ import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
 class GeneralContractPage implements m.ClassComponent<{ contract_address?: string }> {
-  private hasContract: boolean;
-  private contract: Contract;
-  private abi_functions: Array<AbiFunction>;
-  private abi_events: Array<AbiEvent>;
-  private status= undefined;
-  private message = '';
-  private loaded = false;
-  private loading = false;
-  private saving = false;
 
-  // Helpers
-  getLastSeenDivider(hasText = true) {
-    return (
-      <div class="LastSeenDivider">
-        {hasText ? (
-          <>
-            <hr />
-            <span>Last visit</span>
-            <hr />
-          </>
-        ) : (
-          <hr />
-        )}
-      </div>
-    );
-  }
-
-  async oninit(vnode) {
-    const { contract_address } = vnode.attrs;
-    const _contract: Contract = app.contracts.store.getContractByAddress(contract_address);
-    this.contract = _contract;
-    console.log(_contract)
-
+  loadContractAbi = (address: string) => {
+    const _contract: Contract = app.contracts.store.getContractByAddress(address);
+    const abi_functions = parseFunctionsFromABI(_contract.abi);
+    // this.abi_events = parseEventsFromABI(_contract.abi);
+    console.log(abi_functions);
+    // console.log(this.abi_events);
     console.log("generateui")
-    if (this.contract && this.contract.abi) {
-        this.abi_functions = parseFunctionsFromABI(this.contract.abi);
-        this.abi_events = parseEventsFromABI(this.contract.abi);
-        console.log(this.abi_functions);
-        console.log(this.abi_events);
-    } else {
-        const network: chain = "mainnet";
-        console.log("Network: ", network)
-        const etherscanAbi = await getEtherscanABI(network, contract_address);
-        console.log("Etherscan Abi", etherscanAbi);
-        const abiString = JSON.stringify(etherscanAbi);
-        this.abi_functions = parseFunctionsFromABI(abiString);
-        this.abi_events = parseEventsFromABI(abiString);
-        console.log(this.abi_functions);
-        console.log(this.abi_events);
-    }
+    // return abi_functions;
   }
+
+  loadAbiFromEtherscan = async (address: string) => {
+    const network: chain = "mainnet";
+    console.log("Network: ", network)
+    const etherscanAbi = await getEtherscanABI(network, address);
+    console.log("Etherscan Abi", etherscanAbi);
+    const abiString = JSON.stringify(etherscanAbi);
+    const abi_functions = parseFunctionsFromABI(abiString);
+    // this.abi_events = parseEventsFromABI(abiString);
+    console.log(abi_functions);
+    // console.log(this.abi_events);
+  }
+
+  // oninit(vnode) {
+  //   const { contract_address } = vnode.attrs;
+
+  //   const loadContractAbi = async () =>{
+  //     const _contract: Contract = app.contracts.store.getContractByAddress(contract_address);
+  //     this.contract = _contract;
+  //     this.abi_functions = parseFunctionsFromABI(this.contract.abi);
+  //     // this.abi_events = parseEventsFromABI(this.contract.abi);
+  //     console.log(this.abi_functions);
+  //     // console.log(this.abi_events);
+  //     console.log("generateui")
+  //     m.redraw();
+  //   }
+
+  //   if (this.contract) {
+  //     console.log("got here")
+  //   }
+  //   if (this.abi_functions) {
+  //     console.log("got here")
+  //   }
+
+  //   loadContractAbi();
+
+  //   if (this.contract) {
+  //     console.log("got here")
+  //   }
+  //   if (this.abi_functions) {
+  //     console.log("got here")
+  //   }
+  // }
 
   view(vnode) {
-    const { contract_address } = vnode.attrs;
-    if (this.contract == null) {
-        // If /api/status has returned, then app.config.nodes and app.config.communities
-        // should both be loaded. If we match neither of them, then we can safely 404
-        return (
-            <PageNotFound />
-        );
-    }
-    else {
-        return (
-            <Sublayout>
-              <div class="GeneralContractPage">
-                <div class="container">
-                  <h1>General Contract</h1>
-                  <h2>Contract Address: {contract_address}</h2>
-                  {this.abi_functions && (
-                    <h2>Abi Functions: {this.abi_functions}</h2>
-                  )}
-                </div>
-                {/* <FunctionInfo fns={this.abi_functions}/> */}
+      const { contract_address } = vnode.attrs;
+
+      if (!app.contracts) {
+        return m(PageLoading, {
+          title: 'General Contract'
+        });
+      }
+
+      return (
+          <Sublayout>
+            <div class="General Contract Page">
+              <div class="container">
+                <h1>General Contract</h1>
+                <h2>Contract Address: {contract_address}</h2>
+                <h2>Abi Functions: {this.loadContractAbi(contract_address)}</h2>
               </div>
-            </Sublayout>
-        );
-    }
+              {/* <FunctionInfo fns={this.abi_functions}/> */}
+            </div>
+          </Sublayout>
+      );
+    // }
   }
 }
 
