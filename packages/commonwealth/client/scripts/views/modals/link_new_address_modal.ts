@@ -444,6 +444,14 @@ const LinkNewAddressModal: m.Component<
                           'p.small-text',
                           'Use your wallet to switch between accounts.'
                         ),
+                        webWallet.reset && m('p.small-text', [
+                          m('a', {
+                            href: '#',
+                            onclick: async () => {
+                              await webWallet.reset();
+                            }
+                          }, `Reset ${webWallet.label}`),
+                        ]),
                       ];
                     } else {
                       return [
