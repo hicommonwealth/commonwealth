@@ -46,7 +46,7 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
     console.log(_contract)
 
     console.log("generateui")
-    if (this.contract) {
+    if (this.contract && this.contract.abi) {
         this.abi_functions = parseFunctionsFromABI(this.contract.abi);
         this.abi_events = parseEventsFromABI(this.contract.abi);
         console.log(this.abi_functions);
@@ -56,6 +56,11 @@ class GeneralContractPage implements m.ClassComponent<{ contract_address?: strin
         console.log("Network: ", network)
         const etherscanAbi = await getEtherscanABI(network, contract_address);
         console.log("Etherscan Abi", etherscanAbi);
+        const abiString = JSON.stringify(etherscanAbi);
+        this.abi_functions = parseFunctionsFromABI(abiString);
+        this.abi_events = parseEventsFromABI(abiString);
+        console.log(this.abi_functions);
+        console.log(this.abi_events);
     }
 }
 
