@@ -1,41 +1,56 @@
 import { BigNumber } from "ethers";
 import * as _ from "lodash";
 
-export class AbiInput {
-  public readonly internalType: string;
+export enum SolidityType {
+  address = "address",
+  uint256 = "uint256",
+  uint8 = "uint8",
+  uint = "uint",
+  bytes32 = "bytes32",
+  boolean = "bool",
+  string = "string",
+}
+
+export type Address = string;
+export type UInt = BigNumber;
+export type Bytes32 = string;
+export type TxHash = string;
+
+export class AbiFunctionInput {
+  public readonly internalType: SolidityType;
   public readonly name: string;
   public readonly type: string;
-  constructor(internalType: string, name: string, type: string) {
+  constructor(internalType: SolidityType, name: string, type: string) {
       this.name = name;
       this.type = type;
       this.internalType = internalType;
   }
   static fromJSON(json) {
-      return new AbiInput(json.internalType, json.name, json.type);
+      return new AbiFunctionInput(json.internalType, json.name, json.type);
   }
 }
 
-export class AbiOutput {
-    public readonly internalType: string;
+export class AbiFunctionOutput {
+    public readonly internalType: SolidityType;
     public readonly name: string;
     public readonly type: string;
-    constructor(internalType: string, name: string, type: string) {
+    constructor(internalType: SolidityType, name: string, type: string) {
         this.name = name;
         this.type = type;
         this.internalType = internalType;
     }
     static fromJSON(json) {
-        return new AbiOutput(json.internalType, json.name, json.type);
+        return new AbiFunctionOutput(json.internalType, json.name, json.type);
     }
 }
 
 export class AbiFunction {
-    public readonly inputs: AbiInput[];
+    public readonly inputs: AbiFunctionInput[];
     public readonly name: string;
-    public readonly outputs: AbiOutput[];
+    public readonly outputs: AbiFunctionOutput[];
     public readonly stateMutability: string;
     public readonly type: string;
-    constructor(inputs: AbiInput[], name: string, outputs: AbiOutput[],
+    constructor(inputs: AbiFunctionInput[], name: string, outputs: AbiFunctionOutput[],
       stateMutability: string, type: string) {
         this.name = name;
         this.type = type;
@@ -49,12 +64,28 @@ export class AbiFunction {
     }
 }
 
+export class AbiEventInput {
+  public readonly indexed: boolean;
+  public readonly internalType: SolidityType;
+  public readonly name: string;
+  public readonly type: string;
+  constructor(indexed: boolean, internalType: SolidityType, name: string, type: string) {
+      this.indexed = indexed;
+      this.name = name;
+      this.type = type;
+      this.internalType = internalType;
+  }
+  static fromJSON(json) {
+      return new AbiFunctionInput(json.internalType, json.name, json.type);
+  }
+}
+
 export class AbiEvent {
   public anonymous: boolean;
-  public inputs: AbiInput[];
+  public inputs: AbiEventInput[];
   public name: string;
   public type: string;
-  public constructor(anonymous: boolean, inputs: AbiInput[], name: string, type: string) {
+  public constructor(anonymous: boolean, inputs: AbiEventInput[], name: string, type: string) {
     this.anonymous = anonymous;
     this.inputs = inputs;
     this.name = name;
@@ -131,23 +162,8 @@ export interface TransactionReceipt {
     logs: LogEntry[];
 }
 
-export type Address = string;
-export type UInt = BigNumber;
-export type Bytes32 = string;
-export type TxHash = string;
-
 export interface Log {
   event: string;
   address: Address;
   args: any;
-}
-
-export enum SolidityType {
-    address = "address",
-    uint256 = "uint256",
-    uint8 = "uint8",
-    uint = "uint",
-    bytes32 = "bytes32",
-    boolean = "bool",
-    string = "string",
 }
