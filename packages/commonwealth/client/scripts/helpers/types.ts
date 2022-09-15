@@ -148,42 +148,5 @@ export const networkNameToId = {
     [Network.Kovan]: 42,
 };
 
-export interface ReceiptLog {
-    name: string;
-    events: any[];
-    address: string;
-}
 
-export interface LogEntry {
-    logIndex: number | null;
-    transactionIndex: number | null;
-    transactionHash: string;
-    blockHash: string | null;
-    blockNumber: number | null;
-    address: string;
-    data: string;
-    topics: string[];
-}
-
-export declare type TransactionReceiptStatus = null | string | 0 | 1;
-
-export interface TransactionReceipt {
-    blockHash: string;
-    blockNumber: number;
-    transactionHash: string;
-    transactionIndex: number;
-    from: string;
-    to: string;
-    status: TransactionReceiptStatus;
-    cumulativeGasUsed: number;
-    gasUsed: number;
-    contractAddress: string | null;
-    logs: LogEntry[];
-}
-
-export interface Log {
-  event: string;
-  address: Address;
-  args: any;
-}
 
