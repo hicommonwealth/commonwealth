@@ -19,7 +19,7 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
+const MAGIC_PUBLISHABLE_KEY = 'pk_live_7CB694C6778D5813'; // TODO: Change it back to our proper one
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -80,6 +80,59 @@ export async function setActiveAccount(account: Account): Promise<void> {
     0
   ) {
     app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+  }
+}
+
+export async function completeClientLogin(account: Account) {
+  try {
+    let addressInfo = app.user.addresses.find(
+      (a) => a.address === account.address && a.chain.id === account.chain.id
+    );
+
+    if (!addressInfo && account.addressId) {
+      // TODO: add keytype
+      addressInfo = new AddressInfo(
+        account.addressId,
+        account.address,
+        account.chain.id,
+        account.walletId
+      );
+      app.user.addresses.push(addressInfo);
+    }
+
+    // link the address to the community
+    if (app.chain) {
+      try {
+        if (
+          !app.roles.getRoleInCommunity({
+            account,
+            chain: app.activeChainId(),
+          })
+        ) {
+          await app.roles.createRole({
+            address: addressInfo,
+            chain: app.activeChainId(),
+          });
+        }
+      } catch (e) {
+        // this may fail if the role already exists, e.g. if the address is being migrated from another user
+        console.error('Failed to create role');
+      }
+    }
+
+    // set the address as active
+    await setActiveAccount(account);
+
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
+      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+    }
+  } catch (e) {
+    console.trace(e);
+    // if the address' role wasn't initialized correctly,
+    // setActiveAccount will throw an exception but we should continue
   }
 }
 

@@ -17,15 +17,12 @@ import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses } from './helpers';
-import { ProfileRowAttrs } from './cw_profiles_list';
 
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
   darkMode?: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
-  setSidebarType: (sidebarType: string) => void;
   setBodyType: (bodyType: string) => void;
   accountVerifiedCallback: (account: Account) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
@@ -39,8 +36,6 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       darkMode,
       hasNoWalletsLink = true,
       wallets,
-      setBodyType,
-      setSidebarType,
       setSelectedWallet,
       accountVerifiedCallback,
       linking,
@@ -87,7 +82,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       failureUrl: redirectUrl,
                     });
                   } else if (wallet.defaultNetwork === 'axie-infinity') {
-                    console.log('axie');
+                    // TODO: Does this work??
                     const result = await $.post(`${app.serverUrl()}/auth/sso`, {
                       issuer: 'AxieInfinity',
                     });
@@ -95,6 +90,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       const stateId = result.result.stateId;
 
                       // redirect to axie page for login
+                      // eslint-disable-next-line max-len
                       window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
                     } else {
                       vnode.state.error(result.error || 'Could not login');
@@ -109,6 +105,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                     } else if (wallet.chain === 'cosmos') {
                       address = wallet.accounts[0].address;
                     } else if (wallet.chain === 'substrate') {
+                      // TODO: Handle them selecting their address from the options?
                       address = addressSwapper({
                         address: wallet.accounts[0].address,
                         currentPrefix: (app.chain as Substrate).chain
@@ -121,7 +118,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         `${app.serverUrl()}/getAddressStatus`,
                         {
                           address,
-                          chain: wallet.chain,
+                          chain: app.activeChainId() ?? wallet.chain,
                           jwt: app.user.jwt,
                         }
                       );

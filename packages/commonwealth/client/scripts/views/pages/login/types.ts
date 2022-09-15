@@ -19,6 +19,7 @@ export type LoginBodyType =
 
 export type LoginAttrs = {
   address: string;
+  currentlyInCommunityPage: boolean;
   setAddress: (address: string) => void;
   bodyType: string;
   setBodyType: (bodyType: string) => void;
@@ -31,6 +32,7 @@ export type LoginAttrs = {
   setSidebarType: (sidebarType: string) => void;
   username: string;
   wallets: Array<IWebWallet<any>>;
+  magicLoading: boolean;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;
   linkExistingAccountCallback: () => void;

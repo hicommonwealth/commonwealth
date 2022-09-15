@@ -11,8 +11,10 @@ import {
   updateActiveAddresses,
   createUserWithAddress,
   setActiveAccount,
+  completeClientLogin,
 } from 'controllers/app/login';
-import { Account } from 'models';
+import { isSameAccount } from 'helpers';
+import { Account, AddressInfo } from 'models';
 import Near from 'controllers/chain/near/main';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -158,7 +160,6 @@ const validate = async (
 };
 
 const FinishNearLogin: m.Component<Record<string, never>, IState> = {
-  oncreate: (vnode) => {},
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
       return m(PageLoading);
@@ -183,22 +184,27 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
     } else if (vnode.state.validationCompleted) {
       return m(Sublayout, [
         m('div', {
-          oncreate: (e) => {
+          oncreate: async (e) => {
             if (vnode.state.validatedAccount.profile.name) {
               redirectToNextPage();
             } else {
               if (vnode.state.isNewAccount) {
-                app.modals.create({
-                  modal: NewLoginModal,
-                  data: {
-                    initialBody: 'welcome',
-                    initialSidebar: 'newOrReturning',
-                    initialAccount: vnode.state.validatedAccount,
-                  },
-                  exitCallback: () => {
-                    redirectToNextPage();
-                  },
-                });
+                if (!app.isLoggedIn()) {
+                  app.modals.create({
+                    modal: NewLoginModal,
+                    data: {
+                      initialBody: 'welcome',
+                      initialSidebar: 'newOrReturning',
+                      initialAccount: vnode.state.validatedAccount,
+                    },
+                    exitCallback: () => {
+                      redirectToNextPage();
+                    },
+                  });
+                } else {
+                  await completeClientLogin(vnode.state.validatedAccount);
+                  redirectToNextPage();
+                }
               } else {
                 redirectToNextPage();
               }

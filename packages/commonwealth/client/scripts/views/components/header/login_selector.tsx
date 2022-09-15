@@ -308,7 +308,17 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           !app.user.activeAccount && (
             <Cui.Button
               onclick={async () => {
-                if (samebaseAddresses.length === 1 && !hasTermsOfService) {
+                if (hasTermsOfService) {
+                  // TODO: Open modal that shows TOS, makes them click accept
+                  // If they click accecpt then continue
+                  // Probably handle by a state flag
+                  // app.modals.create({
+                  //   modal: TOSModal
+                  // });
+                  console.log('Make them accepts TOS');
+                }
+
+                if (samebaseAddresses.length >= 1) {
                   const originAddressInfo = samebaseAddresses[0];
 
                   if (originAddressInfo) {
@@ -393,7 +403,12 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                   }
                 } else {
                   app.modals.create({
-                    modal: SelectAddressModal,
+                    modal: NewLoginModal,
+                    data: {
+                      modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                        ? 'fullScreen'
+                        : 'centered',
+                    },
                   });
                 }
               }}

@@ -7,6 +7,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import { initAppState } from 'app';
 import {
+  completeClientLogin,
   loginWithMagicLink,
   setActiveAccount,
   updateActiveAddresses,
@@ -58,6 +59,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
+  private magicLoading: boolean;
 
   oninit(vnode) {
     // Determine if in a community
@@ -104,17 +106,21 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
   view() {
     const handleEmailLoginCallback = async () => {
-      console.log('helloo', this.email);
-      if (!this.email) return;
-
+      this.magicLoading = true;
+      if (!this.email) {
+        notifyError('Please enter a valid email address.');
+        this.magicLoading = false;
+        return;
+      }
       try {
-        console.log('magic linkin');
         await loginWithMagicLink(this.email);
         // TODO: Understand the context of where we are coming from
-        this.bodyType = 'welcome';
+        this.magicLoading = false;
+        $('.LoginDesktop').trigger('modalexit');
       } catch (e) {
+        notifyError("Couldn't send magic link");
+        this.magicLoading = false;
         console.error(e);
-        // TODO: Error message display somehow
       }
     };
 
@@ -129,59 +135,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
       if (app.isLoggedIn()) {
         // Already logged in with another account
-        try {
-          let addressInfo = app.user.addresses.find(
-            (a) =>
-              a.address === account.address && a.chain.id === account.chain.id
-          );
-
-          if (!addressInfo && account.addressId) {
-            // TODO: add keytype
-            addressInfo = new AddressInfo(
-              account.addressId,
-              account.address,
-              account.chain.id,
-              account.walletId
-            );
-            app.user.addresses.push(addressInfo);
-          }
-
-          // link the address to the community
-          if (app.chain) {
-            try {
-              if (
-                !app.roles.getRoleInCommunity({
-                  account,
-                  chain: app.activeChainId(),
-                })
-              ) {
-                await app.roles.createRole({
-                  address: addressInfo,
-                  chain: app.activeChainId(),
-                });
-              }
-            } catch (e) {
-              // this may fail if the role already exists, e.g. if the address is being migrated from another user
-              console.error('Failed to create role');
-            }
-          }
-
-          // set the address as active
-          await setActiveAccount(account);
-
-          if (
-            app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-              .length === 0
-          ) {
-            app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account])
-            );
-          }
-        } catch (e) {
-          console.trace(e);
-          // if the address' role wasn't initialized correctly,
-          // setActiveAccount will throw an exception but we should continue
-        }
+        completeClientLogin(account);
 
         if (exitOnComplete) $('.LoginDesktop').trigger('modalexit');
         m.redraw();
@@ -207,6 +161,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       newlyCreated: boolean,
       linking: boolean
     ) => {
+      // Handle Logged in and joining community of different chain base
+      if (this.currentlyInCommunityPage && app.isLoggedIn()) {
+        const signature = await this.selectedWallet.signWithAccount(account);
+        await this.selectedWallet.validateWithAccount(account, signature);
+        await logInWithAccount(account, true);
+        return;
+      }
+
       if (!linking) {
         this.primaryAccount = account;
         this.address = account.address;
@@ -259,10 +221,12 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
     const createNewAccountCallback = async () => {
       try {
-        await this.selectedWallet.validateWithAccount(
-          this.primaryAccount,
-          this.cashedWalletSignature
-        );
+        if (this.selectedWallet.chain !== 'near') {
+          await this.selectedWallet.validateWithAccount(
+            this.primaryAccount,
+            this.cashedWalletSignature
+          );
+        }
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
         console.log(e);
@@ -322,6 +286,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     return isWindowMediumSmallInclusive(window.innerWidth) ? (
       <LoginMobile
         address={this.address}
+        currentlyInCommunityPage={this.currentlyInCommunityPage}
         setAddress={(address: string) => {
           this.address = address;
         }}
@@ -354,6 +319,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         setSelectedLinkingWallet={(wallet: IWebWallet<any>) => {
           this.selectedLinkingWallet = wallet;
         }}
+        magicLoading={this.magicLoading}
         createNewAccountCallback={createNewAccountCallback}
         linkExistingAccountCallback={linkExistingAccountCallback}
         accountVerifiedCallback={accountVerifiedCallback}
@@ -364,6 +330,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     ) : (
       <LoginDesktop
         address={this.address}
+        currentlyInCommunityPage={this.currentlyInCommunityPage}
         setAddress={(address: string) => {
           this.address = address;
         }}
@@ -378,6 +345,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           this.username = u;
         }}
         handleSetEmail={(e) => {
+          console.log('this.email', this.email);
           this.email = e.target.value;
         }}
         profiles={this.profiles}
@@ -390,6 +358,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         }}
         username={this.username}
         wallets={this.wallets}
+        magicLoading={this.magicLoading}
         setSelectedWallet={(wallet: IWebWallet<any>) => {
           this.selectedWallet = wallet;
         }}

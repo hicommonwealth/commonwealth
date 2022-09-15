@@ -3,6 +3,7 @@
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
+import { Spinner } from 'construct-ui';
 
 import 'pages/login/login_desktop.scss';
 import {
@@ -32,8 +33,6 @@ import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import { LoginAttrs } from './types';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
-  private email: string;
-  private account: Account;
   view(vnode) {
     const {
       address,
@@ -56,6 +55,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       saveProfileInfoCallback,
       performLinkingCallback,
       setSelectedLinkingWallet,
+      magicLoading,
     } = vnode.attrs;
 
     return (
@@ -123,11 +123,15 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 </CWText>
                 <LoginBoilerplate />
               </div>
-              <CWTextInput
-                label="email address"
-                placeholder="your-email@email.com"
-                oninput={handleSetEmail}
-              />
+              {!magicLoading ? (
+                <CWTextInput
+                  label="email address"
+                  placeholder="your-email@email.com"
+                  oninput={handleSetEmail}
+                />
+              ) : (
+                <Spinner active={true} size="xl" position="inherit" />
+              )}
               <div class="buttons-row">
                 <CWButton
                   label="Back"
@@ -136,7 +140,12 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                     setBodyType('walletList');
                   }}
                 />
-                <CWButton label="Connect" onclick={handleEmailLoginCallback} />
+                <CWButton
+                  label="Connect"
+                  onclick={async () => {
+                    await handleEmailLoginCallback();
+                  }}
+                />
               </div>
             </div>
           )}

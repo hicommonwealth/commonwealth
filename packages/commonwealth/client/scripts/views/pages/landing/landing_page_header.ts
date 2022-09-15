@@ -1,7 +1,8 @@
 import m from 'mithril';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
-import { LoginModal } from 'views/modals/login_modal';
+import { LoginModal, NewLoginModal } from 'views/modals/login_modal';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
@@ -106,7 +107,17 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                     class:
                       ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
                     style: 'padding: 8px 16px',
-                    onclick: () => app.modals.create({ modal: LoginModal }),
+                    onclick: () =>
+                      app.modals.create({
+                        modal: NewLoginModal,
+                        data: {
+                          modalType: isWindowMediumSmallInclusive(
+                            window.innerWidth
+                          )
+                            ? 'fullScreen'
+                            : 'centered',
+                        },
+                      }),
                   },
                   [
                     m('img', {

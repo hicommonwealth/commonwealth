@@ -41,9 +41,9 @@ export class LoginDesktopSidebar
             <div class="sidebar-content">
               <LoginText
                 headerText="Connect Your Wallet"
-                bodyText={`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                imperdiet velit fringilla lorem et. Integer accumsan lobortis
-                cursus amet. Dictum sit morbi elementum.`}
+                bodyText={`Many communities require different wallets 
+                            based on the chain they are built on and 
+                            the types of tokens members hold.`}
               />
             </div>
           </div>
@@ -66,9 +66,8 @@ export class LoginDesktopSidebar
               {generateText(wallets[0])}
             </CWText>
             <CWText type="b2" className="sidebar-body-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-              imperdiet velit fringilla lorem et. Integer accumsan lobortis
-              cursus amet. Dictum sit morbi elementum.
+              Many communities require different wallets based on the chain they
+              are built on and the types of tokens members hold.
             </CWText>
           </div>
         )}
