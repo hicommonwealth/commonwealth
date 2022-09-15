@@ -7,7 +7,7 @@ import { ComponentShowcase } from '../components/component_kit/cw_component_show
 const ComponentsPage: m.Component = {
   view: () => {
     return (
-      <Sublayout title="Commonwealth UI Component Kit" alwaysShowTitle={true}>
+      <Sublayout title="Commonwealth UI Component Kit">
         <ComponentShowcase />
       </Sublayout>
     );
