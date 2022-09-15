@@ -4,11 +4,41 @@ import * as _ from "lodash";
 export enum SolidityType {
   address = "address",
   uint256 = "uint256",
+  uint128 = "uint128",
+  uint64 = "uint64",
+  uint32 = "uint32",
   uint8 = "uint8",
   uint = "uint",
   bytes32 = "bytes32",
   boolean = "bool",
   string = "string",
+  bytes = "bytes",
+  tuple = "tuple",
+}
+
+export enum SolidityInternalType {
+  address_payable = "address payable",
+  contract = "contract",
+  enum = "enum",
+  struct = "struct",
+  address = "address",
+  uint256 = "uint256",
+  uint128 = "uint128",
+  uint64 = "uint64",
+  uint32 = "uint32",
+  uint8 = "uint8",
+  uint = "uint",
+  bytes32 = "bytes32",
+  boolean = "bool",
+  string = "string",
+  bytes = "bytes",
+}
+
+export enum SolidityStateMutability {
+  pure = "pure",
+  view = "view",
+  nonpayable = "nonpayable",
+  payable = "payable",
 }
 
 export type Address = string;
@@ -17,10 +47,10 @@ export type Bytes32 = string;
 export type TxHash = string;
 
 export class AbiFunctionInput {
-  public readonly internalType: SolidityType;
+  public readonly internalType: string;
   public readonly name: string;
-  public readonly type: string;
-  constructor(internalType: SolidityType, name: string, type: string) {
+  public readonly type: SolidityType;
+  constructor(internalType: string, name: string, type: SolidityType) {
       this.name = name;
       this.type = type;
       this.internalType = internalType;
@@ -31,10 +61,10 @@ export class AbiFunctionInput {
 }
 
 export class AbiFunctionOutput {
-    public readonly internalType: SolidityType;
+    public readonly internalType: string;
     public readonly name: string;
-    public readonly type: string;
-    constructor(internalType: SolidityType, name: string, type: string) {
+    public readonly type: SolidityType;
+    constructor(internalType: string, name: string, type: SolidityType) {
         this.name = name;
         this.type = type;
         this.internalType = internalType;
@@ -48,10 +78,10 @@ export class AbiFunction {
     public readonly inputs: AbiFunctionInput[];
     public readonly name: string;
     public readonly outputs: AbiFunctionOutput[];
-    public readonly stateMutability: string;
-    public readonly type: string;
+    public readonly stateMutability: SolidityStateMutability;
+    public readonly type: SolidityType;
     constructor(inputs: AbiFunctionInput[], name: string, outputs: AbiFunctionOutput[],
-      stateMutability: string, type: string) {
+      stateMutability: SolidityStateMutability, type: SolidityType) {
         this.name = name;
         this.type = type;
         this.inputs = inputs;
@@ -66,10 +96,10 @@ export class AbiFunction {
 
 export class AbiEventInput {
   public readonly indexed: boolean;
-  public readonly internalType: SolidityType;
+  public readonly internalType: string;
   public readonly name: string;
-  public readonly type: string;
-  constructor(indexed: boolean, internalType: SolidityType, name: string, type: string) {
+  public readonly type: SolidityType;
+  constructor(indexed: boolean, internalType: string, name: string, type: SolidityType) {
       this.indexed = indexed;
       this.name = name;
       this.type = type;
@@ -84,8 +114,8 @@ export class AbiEvent {
   public anonymous: boolean;
   public inputs: AbiEventInput[];
   public name: string;
-  public type: string;
-  public constructor(anonymous: boolean, inputs: AbiEventInput[], name: string, type: string) {
+  public type: SolidityType;
+  public constructor(anonymous: boolean, inputs: AbiEventInput[], name: string, type: SolidityType) {
     this.anonymous = anonymous;
     this.inputs = inputs;
     this.name = name;

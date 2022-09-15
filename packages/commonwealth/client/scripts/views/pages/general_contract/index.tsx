@@ -11,7 +11,6 @@ import { Network, AbiFunction, AbiEvent } from '../../../helpers/types';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 
-// Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class GeneralContractPage implements m.ClassComponent<{ contract_address?: string }> {
   private hasContract: boolean;
   private contract: Contract;
