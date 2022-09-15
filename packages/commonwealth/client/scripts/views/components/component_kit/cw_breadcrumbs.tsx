@@ -22,29 +22,31 @@ export class CWBreadcrumbs implements m.ClassComponent<BreadcrumbsAttrs> {
 
     return (
       <div class={ComponentType.Breadcrumbs}>
-        {breadcrumbs.map((b, k) => (
-          <>
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className={
-                k === breadcrumbs.length - 1 ? 'current-text' : 'parent-text'
-              }
-              onclick={() => m.route.set(b.path)}
-            >
-              {b.label}
-            </CWText>
-            {k !== breadcrumbs.length - 1 && (
+        {breadcrumbs.map((b, k) => {
+          const isCurrent = k === breadcrumbs.length - 1;
+
+          return (
+            <>
               <CWText
                 type="caption"
                 fontWeight="medium"
-                className="separator-text"
+                className={isCurrent ? 'current-text' : 'parent-text'}
+                onclick={isCurrent ? undefined : () => m.route.set(b.path)}
               >
-                /
+                {b.label}
               </CWText>
-            )}
-          </>
-        ))}
+              {!isCurrent && (
+                <CWText
+                  type="caption"
+                  fontWeight="medium"
+                  className="separator-text"
+                >
+                  /
+                </CWText>
+              )}
+            </>
+          );
+        })}
       </div>
     );
   }
