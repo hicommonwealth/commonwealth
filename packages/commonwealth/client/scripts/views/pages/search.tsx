@@ -341,7 +341,6 @@ class SearchPage implements m.Component<SearchPageAttrs> {
       <Sublayout
         title={['Search ', capitalize(scope) || 'Commonwealth']}
         showNewProposalButton
-        alwaysShowTitle
       >
         <div class="SearchPage">
           <>

@@ -11,6 +11,7 @@ import {
   SidebarSectionAttrs,
 } from './types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
   view(vnode) {
@@ -59,7 +60,9 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private hoverOn: boolean;
 
   oninit(vnode) {
-    this.toggled = vnode.attrs.hasDefaultToggle;
+    const localStorageToggled =
+      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
+    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
   view(vnode) {
@@ -140,9 +143,9 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
           ) : (
             <div class="no-carat" />
           )}
-          <div title={title} class={`title-text ${titleTextClass}`}>
+          <CWText type="b2" className={`title-text ${titleTextClass}`}>
             {title}
-          </div>
+          </CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
         {containsChildren && toggled && (
@@ -164,7 +167,9 @@ export class SidebarSectionGroup
   private hoverColor: string;
 
   oninit(vnode) {
-    this.toggled = vnode.attrs.hasDefaultToggle;
+    const localStorageToggled =
+      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
+    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
@@ -179,12 +184,16 @@ export class SidebarSectionGroup
     } = vnode.attrs;
     const { toggled, hoverColor } = this;
 
-    const clickHandler = (e) => {
+    const clickHandler = (e, sectionName: string) => {
       if (toggleDisabled) {
         return;
       }
 
       this.toggled = !toggled;
+      localStorage.setItem(
+        `${sectionName}-toggled`,
+        (!!this.toggled).toString()
+      );
 
       if (this.toggled) {
         this.hoverColor = 'none';
@@ -222,9 +231,9 @@ export class SidebarSectionGroup
       >
         <div
           class="section-group-title-container"
-          onclick={(e) => clickHandler(e)}
+          onclick={(e) => clickHandler(e, title)}
         >
-          <div class="title-text">{title}</div>
+          <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
           {carat}
         </div>

@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
@@ -12,25 +11,8 @@ import { CommunitySelector } from 'views/components/sidebar/community_selector';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-
-class SidebarQuickSwitcherItem
-  implements m.ClassComponent<{ item: ChainInfo }>
-{
-  view(vnode) {
-    const { item } = vnode.attrs;
-
-    return (
-      <div class="SidebarQuickSwitcherItem" key={`chain-${item.id}`}>
-        <CWCommunityAvatar
-          size="large"
-          community={item}
-          onclick={link ? () => m.route.set(`/${item.id}`) : null}
-        />
-      </div>
-    );
-  }
-}
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWDivider } from '../component_kit/cw_divider';
 
 export class SidebarQuickSwitcher implements m.ClassComponent {
   view() {
@@ -51,19 +33,10 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
     return (
       <div class="SidebarQuickSwitcher">
         <div class="community-nav-bar">
-          <Button
-            rounded={true}
-            label={<CWIcon iconName="home" iconSize="small" />}
-            onclick={(e) => {
-              e.preventDefault();
-              m.route.set(app.isLoggedIn() ? '/dashboard/for-you' : '/');
-            }}
-          />
-          <CommunitySelector />
           {app.isLoggedIn() && (
-            <Button
-              rounded={true}
-              label={<CWIcon iconName="plus" iconSize="small" />}
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
               onclick={(e) => {
                 e.preventDefault();
                 mixpanelBrowserTrack({
@@ -76,10 +49,16 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
               }}
             />
           )}
+          <CommunitySelector />
         </div>
+        <CWDivider />
         <div class="scrollable-community-bar">
           {starredCommunities.map((item) => (
-            <SidebarQuickSwitcherItem item={item} />
+            <CWCommunityAvatar
+              size="large"
+              community={item}
+              onclick={link ? () => m.route.set(`/${item.id}`) : undefined}
+            />
           ))}
         </div>
       </div>
