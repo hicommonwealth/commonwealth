@@ -1,15 +1,18 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
+import { Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
 
 import 'components/sidebar/community_selector.scss';
 
 import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import User from '../widgets/user';
 import { CommunityLabel } from '../community_label';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
@@ -131,12 +134,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
           <PopoverMenu
             transitionDuration={0}
             hasArrow={false}
-            trigger={
-              <Button
-                rounded={true}
-                label={<CWIcon iconName="hamburger" iconSize="small" />}
-              />
-            }
+            trigger={<CWIconButton iconName="gear" iconButtonTheme="black" />}
             class="CommunitySelectList"
             content={communityList}
           />
