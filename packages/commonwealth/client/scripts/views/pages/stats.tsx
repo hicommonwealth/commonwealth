@@ -3,9 +3,11 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
+import moment from 'moment';
+
+import 'pages/stats.scss';
 
 import app from 'state';
-
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import Sublayout from 'views/sublayout';
@@ -111,18 +113,19 @@ class StatsPage implements m.Component {
 
     return (
       <Sublayout title={<BreadcrumbsTitleTag title="Analytics" />}>
-        <div class="stats-data">
-          <div>
-            <CWText>New Addresses</CWText>
-            <CWText>New Comments</CWText>
-            <CWText>New Threads</CWText>
-            <CWText>Active Addresses</CWText>
+        <div class="StatsPage">
+          <div class="stat-row">
+            <CWText fontWeight="medium">Date</CWText>
+            <CWText fontWeight="medium">New Addresses</CWText>
+            <CWText fontWeight="medium">New Comments</CWText>
+            <CWText fontWeight="medium">New Threads</CWText>
+            <CWText fontWeight="medium">Active Addresses</CWText>
           </div>
           {_.orderBy(Object.entries(this.data), (o) => o[0])
             .reverse()
             .map(([date, row]: [any, any]) => (
-              <div>
-                <CWText>{date}</CWText>
+              <div class="stat-row">
+                <CWText>{moment(date).format('l')}</CWText>
                 <CWText>{row.comments || 0}</CWText>
                 <CWText>{row.roles || 0}</CWText>
                 <CWText>{row.threads || 0}</CWText>
