@@ -1,3 +1,6 @@
+import { BigNumber } from "ethers";
+import * as _ from "lodash";
+
 export class AbiInput {
   public readonly internalType: string;
   public readonly name: string;
@@ -82,3 +85,69 @@ export const networkNameToId = {
     [Network.Goerli]: 5,
     [Network.Kovan]: 42,
 };
+
+
+export interface TxData {
+    from?: string;
+    gas?: BigNumber;
+    gasPrice?: BigNumber;
+    nonce?: BigNumber;
+}
+
+export interface TxDataPayable extends TxData {
+    value?: BigNumber;
+}
+
+export interface ReceiptLog {
+    name: string;
+    events: any[];
+    address: string;
+}
+
+export interface LogEntry {
+    logIndex: number | null;
+    transactionIndex: number | null;
+    transactionHash: string;
+    blockHash: string | null;
+    blockNumber: number | null;
+    address: string;
+    data: string;
+    topics: string[];
+}
+
+export declare type TransactionReceiptStatus = null | string | 0 | 1;
+
+export interface TransactionReceipt {
+    blockHash: string;
+    blockNumber: number;
+    transactionHash: string;
+    transactionIndex: number;
+    from: string;
+    to: string;
+    status: TransactionReceiptStatus;
+    cumulativeGasUsed: number;
+    gasUsed: number;
+    contractAddress: string | null;
+    logs: LogEntry[];
+}
+
+export type Address = string;
+export type UInt = BigNumber;
+export type Bytes32 = string;
+export type TxHash = string;
+
+export interface Log {
+  event: string;
+  address: Address;
+  args: any;
+}
+
+export enum SolidityType {
+    address = "address",
+    uint256 = "uint256",
+    uint8 = "uint8",
+    uint = "uint",
+    bytes32 = "bytes32",
+    boolean = "bool",
+    string = "string",
+}

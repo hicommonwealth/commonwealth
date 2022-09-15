@@ -5,6 +5,7 @@ import app from 'state';
 import { Contract } from 'client/scripts/models';
 import { debounce } from 'lodash';
 import m from 'mithril';
+// import { FunctionInfo } from 'views/components/abi_ui_generation'
 import { parseFunctionsFromABI, getEtherscanABI, parseEventsFromABI } from '../../../helpers/abi_utils'
 import { Network, AbiFunction, AbiEvent } from '../../../helpers/types';
 import { PageLoading } from '../loading';
