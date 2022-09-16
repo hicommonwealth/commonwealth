@@ -12,8 +12,9 @@ export type ChainEventAttributes = {
   id: number;
   chain_event_type_id: string;
   block_number: number;
-  entity_id?: number;
   event_data: any;
+  queued: boolean;
+  entity_id?: number;
   created_at?: Date;
   updated_at?: Date;
 
@@ -41,6 +42,7 @@ export default (
       event_data: { type: dataTypes.JSONB, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      queued: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false }
     },
     {
       tableName: 'ChainEvents',

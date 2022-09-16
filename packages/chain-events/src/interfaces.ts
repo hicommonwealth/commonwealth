@@ -18,6 +18,7 @@ import { Api as CommonwealthApi } from './chains/commonwealth/types';
 import { Api as AaveApi } from './chains/aave/types';
 import { StorageFetcher } from "./chains/aave";
 import { Listener } from "./Listener";
+import {ChainEventInstance} from "../services/database/models/chain_event";
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -94,7 +95,7 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler<DBEventType = IChainEventData> {
+export abstract class IEventHandler<DBEventType = IChainEventData | ChainEventInstance> {
   name?: any;
 
   // throws on error, returns a db event, or void

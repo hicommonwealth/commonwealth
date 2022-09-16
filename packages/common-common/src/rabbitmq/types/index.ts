@@ -9,6 +9,7 @@ import {TRmqMsgCETypeCUD} from "./chainEventTypeCUD";
 export * from './chainCUD'
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
+export * from './chainEventTypeCUD'
 
 export type TRmqMessages =
   TRmqMsgChainCUD

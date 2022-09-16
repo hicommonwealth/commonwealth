@@ -14,13 +14,14 @@ import {
 
 import {factory, addPrefix} from 'common-common/src/logging';
 import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
-import {RascalPublications} from 'common-common/src/rabbitmq/types';
+import {IRmqMsgCreateEntityCUD, RascalPublications} from 'common-common/src/rabbitmq/types';
+import {DB} from "../../database/database";
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
 
   constructor(
-    private readonly _models,
+    private readonly _models: DB,
     private readonly _chain?: string,
     private readonly _rmqController?: RabbitMQController
   ) {
@@ -65,28 +66,35 @@ export default class extends IEventHandler {
         // which requires marking them completed.
         completed = true;
       }
-      const params = author
-        ? {type: type.toString(), type_id, chain, author, completed}
-        : {type: type.toString(), type_id, chain, completed};
 
-      // TODO: update this to record the entity but use the ACK model to ensure consistency
-      //      rather than a db transaction revert
-      // insert the new entity into the database and publish the entity CUD message
-      // if either one of these fails than the entire operation is reverted
-      const dbEntity = await this._models.sequelize.transaction(async (t) => {
-        const result = await this._models.ChainEntity.create({
-          where: params,
-        }, {transaction: t});
-
-        await this._rmqController.publish({
-          ce_id: result.id,
-          chain_id: result.chain,
-          cud: 'create'
-        }, RascalPublications.ChainEntityCUDMain)
-
-        return result;
+      const dbEntity = await this._models.ChainEntity.create({
+        type: type.toString(),
+        type_id,
+        chain,
+        author,
+        completed
       });
 
+      const publishData: IRmqMsgCreateEntityCUD = {
+        ce_id: dbEntity.id,
+        chain_id: dbEntity.chain,
+        cud: 'create'
+      }
+      try {
+        // attempt to publish - if the publish fails then don't update the db
+        await this._rmqController.publish(publishData, RascalPublications.ChainEntityCUDMain)
+        // if publish succeeds attempt to update the database - if the update fails then log and move on
+        // a background job will re-queue the message and update the db if successful
+        await this._models.ChainEventType.update({
+          queued: true
+        }, {
+          where: {id: dbEntity.id}
+        }).catch((error) => {
+          log.error(`Failed to ack queued message for chain_id: ${dbEntity.id}`, error);
+        });
+      } catch (e) {
+        log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
+      }
 
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;

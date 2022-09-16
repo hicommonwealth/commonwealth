@@ -5,14 +5,15 @@ import {
   IEventHandler,
   CWEvent,
   IChainEventKind,
-  SubstrateTypes,
+  SubstrateTypes, IChainEventData,
 } from 'chain-events/src';
 import Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { RabbitMQController, RascalPublications, IRmqMsgCreateCETypeCUD } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash'
+import {DB} from "../../database/database";
+import {ChainEventInstance} from "../../database/models/chain_event";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,7 +29,7 @@ export default class extends IEventHandler {
   public readonly ttl = 20;
 
   constructor(
-    private readonly _models,
+    private readonly _models: DB,
     private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {},
     private readonly _rmqController?: RabbitMQController
@@ -56,38 +57,14 @@ export default class extends IEventHandler {
   }
 
   private async _shouldSkip(event: CWEvent): Promise<boolean> {
-    const chain = event.chain || this._chain
-
-    if (this._filterConfig.excludedEvents?.includes(event.data.kind)) return true;
-    const addressesExist = async (addresses: string[]) => {
-      const addressModels = await this._models.Address.findAll({
-        where: {
-          address: {
-            // TODO: we need to ensure the chain prefixes are correct here
-            [Op.in]: addresses,
-          },
-          chain,
-        },
-      });
-      return !!addressModels?.length;
-    };
-
-    // if using includeAddresses, check against db to see if addresses exist
-    // TODO: we can unify this with notifications.ts to save us some fetches and filter better
-    // NOTE: this is currently only used by staking and transfer events.
-    //   DO NOT USE INCLUDE ADDRESSES FOR CHAIN ENTITY-RELATED EVENTS.
-    if (event.includeAddresses) {
-      const shouldSend = await addressesExist(event.includeAddresses);
-      if (!shouldSend) return true;
-    }
-    return false;
+    return !!this._filterConfig.excludedEvents?.includes(event.data.kind);
   }
 
   /**
    * Handles an event by creating a ChainEvent in the database.
    * NOTE: this may modify the event.
    */
-  public async handle(event: CWEvent) {
+  public async handle(event: CWEvent): Promise<ChainEventInstance> {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
     const chain = event.chain || this._chain;
@@ -110,7 +87,25 @@ export default class extends IEventHandler {
     });
 
     if (created) {
-      await this._rmqController.publish({chainEventTypeId: dbEventType.id, cud: 'create'}, RascalPublications.ChainEventTypeCUDMain);
+      const publishData: IRmqMsgCreateCETypeCUD = {
+        chainEventTypeId: dbEventType.id,
+        cud: 'create'
+      }
+      try {
+        // attempt to publish - if the publish fails then don't update the db
+        await this._rmqController.publish(publishData, RascalPublications.ChainEventTypeCUDMain);
+        // if publish succeeds attempt to update the database - if the update fails then log and move on
+        // a background job will re-queue the message and update the db if successful
+        await this._models.ChainEventType.update({
+          queued: true
+        }, {
+          where: {id: dbEventType.id}
+        }).catch((error) => {
+          log.error(`Failed to ack queued message for chain_id: ${dbEventType.id}`, error);
+        });
+      } catch (e) {
+        log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
+      }
     }
 
     if (!dbEventType) {
@@ -137,6 +132,8 @@ export default class extends IEventHandler {
 
     if (!cachedEvent) {
       const dbEvent = await this._models.ChainEvent.create(eventData);
+      // populate chainEventType, so we don't need to re-populate it in subsequence handlers
+      dbEvent.ChainEventType = dbEventType;
       // no need to save the entire event data since the key is the hash of the data
       this.eventCache.set(eventKey, true);
 

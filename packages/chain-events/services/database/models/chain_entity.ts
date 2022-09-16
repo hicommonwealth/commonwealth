@@ -9,6 +9,7 @@ export type ChainEntityAttributes = {
   chain: string;
   type: string;
   type_id: string;
+  queued: boolean;
   author?: string;
   completed?: boolean;
   created_at?: Date;
@@ -35,6 +36,7 @@ export default (
     author: { type: dataTypes.STRING, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
+    queued: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false }
   }, {
     tableName: 'ChainEntities',
     timestamps: true,

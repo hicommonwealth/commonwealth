@@ -9,6 +9,7 @@ export type ChainEventTypeAttributes = {
   chain: string;
   event_network: string;
   event_name: string;
+  queued: boolean;
   ChainEvents?: ChainEventAttributes[];
   Chain?: ChainAttributes;
 }
@@ -28,6 +29,7 @@ export default (
     // should never be null, but added here for migration purposes
     event_network: { type: dataTypes.STRING, allowNull: true },
     event_name: { type: dataTypes.STRING, allowNull: false },
+    queued: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false }
   }, {
     tableName: 'ChainEventTypes',
     timestamps: false,
