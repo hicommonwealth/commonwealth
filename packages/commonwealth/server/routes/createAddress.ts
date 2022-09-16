@@ -3,16 +3,16 @@ import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-
-import AddressSwapper from '../util/addressSwapper';
+import { addressSwapper } from '../../shared/utils';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -43,31 +43,31 @@ const createAddress = async (
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
   if (!req.body.address) {
-    return next(new Error(Errors.NeedAddress));
+    return next(new AppError(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
   if (
     !req.body.wallet_id ||
     !Object.values(WalletId).includes(req.body.wallet_id)
   ) {
-    return next(new Error(Errors.NeedWallet));
+    return next(new AppError(Errors.NeedWallet));
   }
 
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain },
   });
 
-  if (!chain) {
-    return next(new Error(Errors.InvalidChain));
+  if (!chain || chain.network === ChainNetwork.AxieInfinity) {
+    return next(new AppError(Errors.InvalidChain));
   }
 
   // test / convert address as needed
   let encodedAddress = (req.body.address as string).trim();
   try {
     if (chain.base === ChainBase.Substrate) {
-      encodedAddress = AddressSwapper({
+      encodedAddress = addressSwapper({
         address: req.body.address,
         currentPrefix: chain.ss58_prefix,
       });
@@ -77,22 +77,22 @@ const createAddress = async (
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
     } else if (chain.base === ChainBase.Ethereum) {
       if (!Web3.utils.isAddress(encodedAddress)) {
-        throw new Error('Eth address is not valid');
+        throw new AppError('Eth address is not valid');
       }
     } else if (chain.base === ChainBase.NEAR) {
       const nearRegex = /^[a-z0-9_\-.]*$/;
       if (!nearRegex.test(encodedAddress)) {
-        throw new Error('NEAR address is not valid');
+        throw new AppError('NEAR address is not valid');
       }
     } else if (chain.base === ChainBase.Solana) {
       const key = new PublicKey(encodedAddress);
       if (key.toBase58() !== encodedAddress) {
-        throw new Error(`Solana address is not valid: ${key.toBase58()}`);
+        throw new AppError(`Solana address is not valid: ${key.toBase58()}`);
       }
     }
   } catch (e) {
     log.info(`Invalid address passed: ${encodedAddress}: ${e.message}`);
-    return next(new Error(Errors.InvalidAddress));
+    return next(new AppError(Errors.InvalidAddress));
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(

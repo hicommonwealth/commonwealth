@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,16 +20,16 @@ const updateThreadPrivacy = async (
   next: NextFunction
 ) => {
   const { thread_id, read_only } = req.body;
-  if (!thread_id) return next(new Error(Errors.NoThreadId));
-  if (!read_only) return next(new Error(Errors.NoReadOnly));
+  if (!thread_id) return next(new AppError(Errors.NoThreadId));
+  if (!read_only) return next(new AppError(Errors.NoReadOnly));
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
     });
-    if (!thread) return next(new Error(Errors.NoThread));
+    if (!thread) return next(new AppError(Errors.NoThread));
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
@@ -45,12 +46,12 @@ const updateThreadPrivacy = async (
           r.chain_id === thread.chain
         );
       });
-      if (!role) return next(new Error(Errors.NotAdmin));
+      if (!role) return next(new AppError(Errors.NotAdmin));
     }
 
     await thread.update({ read_only });
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: { id: thread_id },
       include: [
         {
@@ -62,9 +63,9 @@ const updateThreadPrivacy = async (
           // through: models.Collaboration,
           as: 'collaborators',
         },
-        models.OffchainAttachment,
+        models.Attachment,
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
       ],
@@ -72,7 +73,7 @@ const updateThreadPrivacy = async (
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

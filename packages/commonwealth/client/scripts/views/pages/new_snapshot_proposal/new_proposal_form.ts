@@ -22,7 +22,7 @@ import { navigateToSubpage } from 'app';
 import { ChainBase } from 'common-common/src/types';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import QuillEditor from 'views/components/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
 import {
@@ -33,7 +33,9 @@ import {
   createProposal,
 } from 'helpers/snapshot_utils';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
+// TODO Graham 7-20-22: Reconcile against NewThreadForm
 interface IThreadForm {
   name: string;
   body: string;
@@ -42,7 +44,13 @@ interface IThreadForm {
   start: number;
   end: number;
   snapshot: number;
-  metadata: {};
+  metadata: {
+    network?: string;
+    strategies?: {
+      name: string;
+      params: any;
+    }[];
+  };
   type: string;
 }
 
@@ -55,10 +63,11 @@ enum NewThreadErrors {
   SomethingWentWrong = 'Something went wrong!',
 }
 
+// Don't call it a new thread if it ain't a new thread.
 const newThread = async (
-  form,
-  quillEditorState,
-  author: Account<any>,
+  form: IThreadForm,
+  quillEditorState: QuillEditor,
+  author: Account,
   space: SnapshotSpace,
   snapshotId: string
 ) => {
@@ -78,21 +87,13 @@ const newThread = async (
     throw new Error(NewThreadErrors.NoChoices);
   }
 
-  if (quillEditorState.editor.editor.isBlank()) {
+  if (quillEditorState.isBlank()) {
     throw new Error(NewThreadErrors.NoBody);
   }
 
-  quillEditorState.editor.enable(false);
+  quillEditorState.disable();
 
-  const mentionsEle = document.getElementsByClassName(
-    'ql-mention-list-container'
-  )[0];
-  if (mentionsEle) (mentionsEle as HTMLElement).style.visibility = 'hidden';
-  const bodyText = !quillEditorState
-    ? ''
-    : quillEditorState.markdownMode
-    ? quillEditorState.editor.getText()
-    : JSON.stringify(quillEditorState.editor.getContents());
+  const bodyText = quillEditorState.textContentsAsString;
 
   form.body = bodyText;
 
@@ -104,19 +105,6 @@ const newThread = async (
   delete form.range;
   form.start = Math.floor(form.start / 1000);
   form.end = Math.floor(form.end / 1000);
-
-  const version = await getVersion();
-
-  const msg: any = {
-    address: author.address,
-    msg: JSON.stringify({
-      version,
-      timestamp: (Date.now() / 1e3).toFixed(),
-      space: space.id,
-      type: 'proposal',
-      payload: form,
-    }),
-  };
 
   const proposalPayload = {
     space: space.id,
@@ -135,7 +123,7 @@ const newThread = async (
   };
 
   try {
-    const res = await createProposal(author.address, proposalPayload);
+    await createProposal(author.address, proposalPayload);
     await app.user.notifications.refresh();
     await app.snapshot.refreshProposals();
   } catch (e) {
@@ -145,9 +133,9 @@ const newThread = async (
 };
 
 const newLink = async (
-  form,
-  quillEditorState,
-  author: Account<any>,
+  form: IThreadForm,
+  quillEditorState: QuillEditor,
+  author: Account,
   space: SnapshotSpace,
   snapshotId: string
 ) => {
@@ -166,11 +154,11 @@ const NewProposalForm: m.Component<
   { snapshotId: string },
   {
     form: IThreadForm;
-    quillEditorState;
+    quillEditorState: QuillEditor;
     saving: boolean;
     space: SnapshotSpace;
     members: string[];
-    userScore: any;
+    userScore: number;
     isFromExistingProposal: boolean;
     initialized: boolean;
     snapshotScoresFetched: boolean;
@@ -243,9 +231,6 @@ const NewProposalForm: m.Component<
     }
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
-    if (vnode.state.quillEditorState?.container) {
-      vnode.state.quillEditorState.container.tabIndex = 8;
-    }
 
     const saveToLocalStorage = () => {
       localStorage.setItem(
@@ -413,13 +398,10 @@ const NewProposalForm: m.Component<
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(QuillEditor, {
-                  // Prevent the editor from being filled in with previous content
-                  contentsDoc: vnode.state.form.body
-                    ? vnode.state.form.body
-                    : ' ',
-                  oncreateBind: (state) => {
+              m(FormGroup, {}, [
+                m(QuillEditorComponent, {
+                  contentsDoc: vnode.state.form.body || ' ',
+                  oncreateBind: (state: QuillEditor) => {
                     vnode.state.quillEditorState = state;
                   },
                   placeholder: 'What is your proposal?',

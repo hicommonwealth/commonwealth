@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import proposalIdToEntity from '../../util/proposalIdToEntity';
 import Errors from './errors';
+import { AppError, ServerError } from '../../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,17 +13,17 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.category || req.body.object_id === undefined) {
-    return next(new Error(Errors.NoCategoryAndObjectId));
+    return next(new AppError(Errors.NoCategoryAndObjectId));
   }
 
   const category = await models.NotificationCategory.findOne({
     where: { name: req.body.category },
   });
   if (!category) {
-    return next(new Error(Errors.InvalidNotificationCategory));
+    return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
   let obj;
@@ -46,50 +47,50 @@ export default async (
     case 'new-comment-creation':
     case 'new-reaction': {
       if (p_entity === 'discussion') {
-        const thread = await models.OffchainThread.findOne({
+        const thread = await models.Thread.findOne({
           where: { id: Number(p_id) },
         });
-        if (!thread) return next(new Error(Errors.NoThread));
+        if (!thread) return next(new AppError(Errors.NoThread));
         obj = { offchain_thread_id: Number(p_id), chain_id: thread.chain };
       } else if (p_entity === 'comment') {
-        const comment = await models.OffchainComment.findOne({
+        const comment = await models.Comment.findOne({
           where: { id: Number(p_id) },
         });
-        if (!comment) return next(new Error(Errors.NoComment));
+        if (!comment) return next(new AppError(Errors.NoComment));
         obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
       } else {
         if (!req.body.chain_id)
-          return next(new Error(Errors.ChainRequiredForEntity));
+          return next(new AppError(Errors.ChainRequiredForEntity));
         const chainEntity = await proposalIdToEntity(
           models,
           req.body.chain_id,
           req.body.object_id
         );
-        if (!chainEntity) return next(new Error(Errors.NoChainEntity));
+        if (!chainEntity) return next(new AppError(Errors.NoChainEntity));
         obj = { chain_id: chainEntity.chain, chain_entity_id: chainEntity.id };
       }
       break;
     }
     case 'new-mention':
-      return next(new Error(Errors.NoMentions));
+      return next(new AppError(Errors.NoMentions));
     case 'chain-event': {
       chain = await models.Chain.findOne({
         where: {
           id: p_entity,
         },
       });
-      if (!chain) return next(new Error(Errors.InvalidChain));
+      if (!chain) return next(new AppError(Errors.InvalidChain));
       const chainEventType = await models.ChainEventType.findOne({
         where: {
           id: req.body.object_id,
         },
       });
-      if (!chainEventType) return next(new Error(Errors.InvalidChainEventId));
+      if (!chainEventType) return next(new AppError(Errors.InvalidChainEventId));
       obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
       break;
     }
     default:
-      return next(new Error(Errors.InvalidNotificationCategory));
+      return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
   const subscription = await models.Subscription.create({

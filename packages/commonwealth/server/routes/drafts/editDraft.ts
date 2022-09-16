@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
+import { AppError, ServerError } from '../../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,25 +16,25 @@ export const Errors = {
 
 const editDraft = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
   if (!req.body.id) {
-    return next(new Error(Errors.NoId));
+    return next(new AppError(Errors.NoId));
   }
 
   const { id, title, body, topic } = req.body;
 
   const attachFiles = async () => {
     if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
-      await models.OffchainAttachment.create({
+      await models.Attachment.create({
         attachable: 'draft',
         attachment_id: id,
         url: req.body['attachments[]'],
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((url) => models.OffchainAttachment.create({
+      await Promise.all(req.body['attachments[]'].map((url) => models.Attachment.create({
         attachable: 'draft',
         attachment_id: id,
         url,
@@ -51,10 +52,10 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
       },
       include: [
         models.Address,
-        models.OffchainAttachment
+        models.Attachment
       ]
     });
-    if (!draft) return next(new Error(Errors.NotFound));
+    if (!draft) return next(new AppError(Errors.NotFound));
     if (body) draft.body = body;
     if (title) draft.title = title;
     if (topic) draft.topic = topic;

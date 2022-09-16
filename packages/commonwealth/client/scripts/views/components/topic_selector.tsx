@@ -1,18 +1,19 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { SelectList, ListItem, Callout, Button, Icons } from 'construct-ui';
+import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
 
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import { isNotUndefined } from 'helpers/typeGuards';
+import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {
-  defaultTopic?: OffchainTopic | string | boolean;
+  defaultTopic?: Topic | string | boolean;
   tabindex?: number;
-  topics: OffchainTopic[];
-  updateFormData: () => void;
+  topics: Topic[];
+  updateFormData: (topic: Topic, topicId?: string) => void;
 };
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
@@ -25,7 +26,7 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       selectedTopic = undefined;
     } else if (defaultTopic && typeof defaultTopic === 'string') {
       selectedTopic = topics.find((t) => t.name === defaultTopic);
-    } else if (defaultTopic && defaultTopic instanceof OffchainTopic) {
+    } else if (defaultTopic && defaultTopic instanceof Topic) {
       selectedTopic = defaultTopic;
     }
 
@@ -37,12 +38,12 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       return (
         <ListItem
           label={topic.name}
-          selected={(selectedTopic as OffchainTopic)?.name === topic.name}
+          selected={(selectedTopic as Topic)?.name === topic.name}
         />
       );
     };
 
-    const itemPredicate = (query: string, item: OffchainTopic) => {
+    const itemPredicate = (query: string, item: Topic) => {
       return item.name.toLowerCase().includes(query.toLowerCase());
     };
 
@@ -52,12 +53,12 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       }
     };
 
-    const onSelect = (item: OffchainTopic) => {
+    const onSelect = (item: Topic) => {
       selectedTopic = item;
       updateFormData(item.name, item.id);
     };
 
-    const sortTopics = (topics_: OffchainTopic[]) => {
+    const sortTopics = (topics_: Topic[]) => {
       return topics_
         .filter((topic) => featuredTopics.includes(topic))
         .sort((a, b) => (a.name > b.name ? 1 : -1))
@@ -73,7 +74,7 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
         class="TopicSelector"
         filterable={false}
         checkmark={false}
-        closeOnSelect={true}
+        closeOnSelect
         emptyContent={
           // This appears if no topics are available because all require token thresholds
           <Callout
@@ -94,13 +95,14 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
           hasArrow: false,
         }}
         trigger={
-          <Button
-            align="left"
-            class="topic-selection-drop-menu"
-            compact={true}
-            iconRight={Icons.CHEVRON_DOWN}
-            label={isNotUndefined(selectedTopic) ? selectedTopic.name : ''}
-            sublabel={isNotUndefined(selectedTopic) ? '' : 'Select a topic'}
+          <CWButton
+            buttonType="lg-secondary-blue"
+            iconName="chevronDown"
+            label={
+              isNotUndefined(selectedTopic)
+                ? selectedTopic.name
+                : 'Select a topic'
+            }
             tabindex={tabindex}
           />
         }

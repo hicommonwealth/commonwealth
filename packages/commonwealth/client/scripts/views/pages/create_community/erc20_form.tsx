@@ -30,6 +30,7 @@ import {
 } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
@@ -164,13 +165,15 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
             await updateTokenForum();
           }}
         />
-        <CWValidationText
-          status={this.state.status}
-          message={this.state.message}
-        />
+        {this.state.message && (
+          <CWValidationText
+            message={this.state.message}
+            status={this.state.status}
+          />
+        )}
         <InputRow
           title="Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           disabled={disableField}
           onChangeHandler={(v) => {
             this.state.form.name = v;
@@ -181,7 +184,7 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
         <InputRow
           title="Symbol"
           disabled={disableField}
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
@@ -213,6 +216,13 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
                 type: ChainType.Token,
                 ...this.state.form,
               });
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {

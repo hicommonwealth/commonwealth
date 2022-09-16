@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -20,18 +21,18 @@ const searchDiscussions = async (
   let bind = {};
 
   if (!req.query.search) {
-    return next(new Error(Errors.QueryMissing));
+    return next(new AppError(Errors.QueryMissing));
   }
   if (req.query.search.length < 4) {
-    return next(new Error(Errors.QueryTooShort));
+    return next(new AppError(Errors.QueryTooShort));
   }
 
   if (req.query.thread_title_only === 'true') {
     if (!req.query.chain) {
-      return next(new Error(Errors.NoChain));
+      return next(new AppError(Errors.NoChain));
     }
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
     const params = {
       chain: chain.id,
@@ -44,7 +45,7 @@ const searchDiscussions = async (
     };
 
     try {
-      const threads = await models.OffchainThread.findAll({
+      const threads = await models.Thread.findAll({
         where: params,
         limit: req.query.results_size || 20,
         attributes: {
@@ -63,7 +64,7 @@ const searchDiscussions = async (
       });
     } catch (e) {
       console.log(e);
-      return next(new Error(Errors.UnexpectedError));
+      return next(new ServerError(Errors.UnexpectedError));
     }
   }
 
@@ -71,18 +72,18 @@ const searchDiscussions = async (
   let communityOptions = '';
   if (req.query.chain) {
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
 
     // set up query parameters
-    communityOptions = `AND "OffchainThreads".chain = $chain `;
+    communityOptions = `AND "Threads".chain = $chain `;
     bind = { chain: chain.id };
   }
 
   const sort =
     req.query.sort === 'Newest'
-      ? 'ORDER BY "OffchainThreads".created_at DESC'
+      ? 'ORDER BY "Threads".created_at DESC'
       : req.query.sort === 'Oldest'
-      ? 'ORDER BY "OffchainThreads".created_at ASC'
+      ? 'ORDER BY "Threads".created_at ASC'
       : 'ORDER BY rank DESC';
 
   bind['searchTerm'] = req.query.search;
@@ -94,20 +95,20 @@ const searchDiscussions = async (
     threadsAndComments = await models.sequelize.query(
       `
   SELECT
-      "OffchainThreads".title,
-      "OffchainThreads".body,
-      CAST("OffchainThreads".id as VARCHAR) as proposalId,
+      "Threads".title,
+      "Threads".body,
+      CAST("Threads".id as VARCHAR) as proposalId,
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
       "Addresses".chain as address_chain,
-      "OffchainThreads".created_at,
-      "OffchainThreads".chain,
-      ts_rank_cd("OffchainThreads"._search, query) as rank
-    FROM "OffchainThreads"
-    JOIN "Addresses" ON "OffchainThreads".address_id = "Addresses".id, 
+      "Threads".created_at,
+      "Threads".chain,
+      ts_rank_cd("Threads"._search, query) as rank
+    FROM "Threads"
+    JOIN "Addresses" ON "Threads".address_id = "Addresses".id, 
     websearch_to_tsquery('english', $searchTerm) as query
-    WHERE query @@ "OffchainThreads"._search ${communityOptions} AND "OffchainThreads".deleted_at IS NULL
+    WHERE query @@ "Threads"._search ${communityOptions} AND "Threads".deleted_at IS NULL
     ${sort} LIMIT $limit
 `,
       {
@@ -117,7 +118,7 @@ const searchDiscussions = async (
     );
   } catch (e) {
     console.log(e);
-    return next(new Error(Errors.UnexpectedError));
+    return next(new ServerError(Errors.UnexpectedError)); 
   }
 
   return res.json({

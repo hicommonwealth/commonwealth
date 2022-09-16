@@ -41,7 +41,9 @@ import enableSubscriptions from './routes/subscription/enableSubscriptions';
 import disableSubscriptions from './routes/subscription/disableSubscriptions';
 import enableImmediateEmails from './routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from './routes/subscription/disableImmediateEmails';
-import viewNotifications, {NotificationCategories} from './routes/viewNotifications';
+import viewNotifications, {
+  NotificationCategories,
+} from './routes/viewNotifications';
 import viewUserActivity from './routes/viewUserActivity';
 import viewChainActivity from './routes/viewChainActivity';
 import viewGlobalActivity from './routes/viewGlobalActivity';
@@ -72,8 +74,8 @@ import updateThreadPrivacy from './routes/updateThreadPrivacy';
 import updateThreadPinned from './routes/updateThreadPinned';
 import updateThreadLinkedChainEntities from './routes/updateThreadLinkedChainEntities';
 import updateThreadLinkedSnapshotProposal from './routes/updateThreadLinkedSnapshotProposal';
-import updateOffchainVote from './routes/updateOffchainVote';
-import viewOffchainVotes from './routes/viewOffchainVotes';
+import updateVote from './routes/updateVote';
+import viewVotes from './routes/viewVotes';
 import fetchEntityTitle from './routes/fetchEntityTitle';
 import fetchThreadForSnapshot from './routes/fetchThreadForSnapshot';
 import updateChainEntityTitle from './routes/updateChainEntityTitle';
@@ -123,6 +125,8 @@ import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
 import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
+import updateChainCustomDomain from './routes/updateChainCustomDomain';
+import updateChainPriority from './routes/updateChainPriority';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -150,7 +154,7 @@ function setupRouter(
   identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
-  banCache: BanCache, // TODO: where is this needed?
+  banCache: BanCache // TODO: where is this needed?
 ) {
   const router = express.Router();
 
@@ -238,7 +242,7 @@ function setupRouter(
     getSupportedEthChains.bind(this, models)
   );
 
-  // offchain threads
+  // threads
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
@@ -283,11 +287,11 @@ function setupRouter(
   );
 
   router.post(
-    '/updateOffchainVote',
+    '/updateVote',
     passport.authenticate('jwt', { session: false }),
-    updateOffchainVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
-  router.get('/viewOffchainVotes', viewOffchainVotes.bind(this, models));
+  router.get('/viewVotes', viewVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.get(
@@ -328,7 +332,7 @@ function setupRouter(
 
   router.get('/profile', getProfile.bind(this, models));
 
-  // offchain discussion drafts
+  // discussion drafts
   router.post(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
@@ -348,7 +352,7 @@ function setupRouter(
 
   router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
-  // offchain comments
+  // comments
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
@@ -367,7 +371,7 @@ function setupRouter(
   router.get('/viewComments', viewComments.bind(this, models));
   router.get('/bulkComments', bulkComments.bind(this, models));
 
-  // offchain topics
+  // topics
   router.post(
     '/createTopic',
     passport.authenticate('jwt', { session: false }),
@@ -400,7 +404,7 @@ function setupRouter(
     setTopicThreshold.bind(this, models)
   );
 
-  // offchain reactions
+  // reactions
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
@@ -498,7 +502,7 @@ function setupRouter(
     setDefaultRole.bind(this, models)
   );
 
-  // offchain profiles
+  // profiles
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
@@ -519,7 +523,7 @@ function setupRouter(
     deleteSocialAccount.bind(this, models, 'discord')
   );
 
-  // offchain viewCount
+  // viewCount
   router.post('/viewCount', viewCount.bind(this, models, viewCountCache));
 
   // attachments
@@ -557,15 +561,15 @@ function setupRouter(
   );
 
   router.post(
-      '/viewDiscussionNotifications',
-      passport.authenticate('jwt', { session: false }),
-      viewNotifications.bind(this, models, NotificationCategories.Discussion)
+    '/viewDiscussionNotifications',
+    passport.authenticate('jwt', { session: false }),
+    viewNotifications.bind(this, models, NotificationCategories.Discussion)
   );
 
   router.post(
-      '/viewChainEventNotifications',
-      passport.authenticate('jwt', { session: false }),
-      viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
+    '/viewChainEventNotifications',
+    passport.authenticate('jwt', { session: false }),
+    viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
   );
 
   router.post(
@@ -667,10 +671,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
   );
-  router.get(
-    '/getRuleTypes',
-    getRuleTypes.bind(this, models)
-  );
+  router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 
   // settings
   router.post(
@@ -695,6 +696,14 @@ function setupRouter(
     getBannedAddresses.bind(this, models)
   );
 
+  // Custom domain update route
+  router.post(
+    '/updateChainCustomDomain',
+    updateChainCustomDomain.bind(this, models)
+  );
+
+  router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -714,19 +723,33 @@ function setupRouter(
   // NOTE: if a successfulRedirect url is used in the options then there is no way to access that data.
 
   router.get('/auth/github', (req, res, next) => {
-    passport.authenticate('github', <any>{state: {hostname: req.hostname}})(req, res, next);
-  })
-  router.get('/auth/github/callback', passport.authenticate('github', {
-    failureRedirect: '/',
-  }), startOAuthLogin.bind(this, models, 'github'))
+    passport.authenticate('github', <any>{ state: { hostname: req.hostname } })(
+      req,
+      res,
+      next
+    );
+  });
+  router.get(
+    '/auth/github/callback',
+    passport.authenticate('github', {
+      failureRedirect: '/',
+    }),
+    startOAuthLogin.bind(this, models, 'github')
+  );
 
   router.get('/auth/discord', (req, res, next) => {
-    passport.authenticate('discord', <any>{state: {hostname: req.hostname}})(req, res, next);
+    passport.authenticate('discord', <any>{
+      state: { hostname: req.hostname },
+    })(req, res, next);
   });
 
-  router.get('/auth/discord/callback', passport.authenticate('discord', {
-    failureRedirect: '/',
-  }), startOAuthLogin.bind(this, models, 'discord'));
+  router.get(
+    '/auth/discord/callback',
+    passport.authenticate('discord', {
+      failureRedirect: '/',
+    }),
+    startOAuthLogin.bind(this, models, 'discord')
+  );
 
   router.post(
     '/auth/magic',

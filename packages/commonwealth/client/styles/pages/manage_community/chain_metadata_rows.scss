@@ -3,7 +3,7 @@
 .ChainMetadataRows {
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  gap: 16px;
   width: 100%;
 
   .InputRow {
@@ -19,7 +19,6 @@
   .ToggleRow {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
 
     .toggle-and-label {
       display: flex;
@@ -27,10 +26,17 @@
     }
   }
 
+  .ToggleRow {
+    .toggle-and-caption {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+    }
+  }
+
   .tag-row {
     display: flex;
     flex-direction: column;
-    margin-bottom: 24px;
 
     .tag-group {
       display: flex;

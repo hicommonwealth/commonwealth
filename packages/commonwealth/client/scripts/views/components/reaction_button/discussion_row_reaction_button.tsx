@@ -7,7 +7,7 @@ import 'components/reaction_button/discussion_row_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainThread, ChainInfo } from 'models';
+import { Thread, ChainInfo } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,
@@ -16,7 +16,7 @@ import {
 } from './helpers';
 
 type DiscussionRowReactionButtonAttrs = {
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 export class DiscussionRowReactionButton
@@ -37,11 +37,11 @@ export class DiscussionRowReactionButton
     // token balance check if needed
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
     let topicName = '';
 
-    if (thread instanceof OffchainThread && thread.topic && app.topics) {
+    if (thread instanceof Thread && thread.topic && app.topics) {
       topicName = thread.topic.name;
     }
 

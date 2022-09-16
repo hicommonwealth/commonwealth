@@ -7,7 +7,7 @@ import SolanaChain from './chain';
 import SolanaAccounts from './accounts';
 import { SolanaToken } from './types';
 
-export default class SolanaAccount extends Account<SolanaToken> {
+export default class SolanaAccount extends Account {
   private _Chain: SolanaChain;
   private _Accounts: SolanaAccounts;
 
@@ -31,7 +31,7 @@ export default class SolanaAccount extends Account<SolanaToken> {
   });
 
   constructor(app: IApp, ChainInfo: SolanaChain, Accounts: SolanaAccounts, address: string) {
-    super(app, app.chain.meta, address);
+    super({ chain: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

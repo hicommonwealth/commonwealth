@@ -17,13 +17,14 @@ import {
   link,
   externalLink,
   extractDomain,
-  offchainThreadStageToLabel,
+  threadStageToLabel,
+  isCommandClick,
 } from 'helpers';
 import {
-  OffchainThread,
-  OffchainThreadKind,
-  OffchainThreadStage,
+  Thread,
+  ThreadStage,
   AddressInfo,
+  ThreadKind,
 } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
@@ -34,7 +35,7 @@ import { DiscussionRowReactionButton } from '../../components/reaction_button/di
 
 type DiscussionRowAttrs = {
   onSelect?: any;
-  proposal: OffchainThread;
+  proposal: Thread;
 };
 
 export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
@@ -53,7 +54,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             return vnode.attrs.onSelect();
           }
           if ($(e.target).hasClass('cui-tag')) return;
-          if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) {
+          if (isCommandClick(e)) {
             window.open(discussionLink, '_blank');
             return;
           }
@@ -117,25 +118,25 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 compact={true}
               />
             )}
-            {proposal.stage !== OffchainThreadStage.Discussion && (
+            {proposal.stage !== ThreadStage.Discussion && (
               <Button
                 intent={
-                  proposal.stage === OffchainThreadStage.ProposalInReview
+                  proposal.stage === ThreadStage.ProposalInReview
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Voting
+                    : proposal.stage === ThreadStage.Voting
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Passed
+                    : proposal.stage === ThreadStage.Passed
                     ? 'positive'
-                    : proposal.stage === OffchainThreadStage.Failed
+                    : proposal.stage === ThreadStage.Failed
                     ? 'negative'
                     : 'positive'
                 }
                 size="xs"
                 compact={true}
-                label={offchainThreadStageToLabel(proposal.stage)}
+                label={threadStageToLabel(proposal.stage)}
               />
             )}
-            {proposal.kind === OffchainThreadKind.Link &&
+            {proposal.kind === ThreadKind.Link &&
               proposal.url &&
               externalLink(
                 'a.external-discussion-link',

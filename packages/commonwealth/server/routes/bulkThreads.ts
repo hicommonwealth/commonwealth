@@ -5,7 +5,8 @@ import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../database';
-import { OffchainThreadInstance } from '../models/offchain_thread';
+import { ThreadInstance } from '../models/thread';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -16,7 +17,7 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
@@ -71,11 +72,11 @@ const bulkThreads = async (
                   "linking_thread": "', linked_threads.linking_thread, '" }'
             )
           ) AS linked_threads 
-        FROM "OffchainThreads" t
+        FROM "Threads" t
         LEFT JOIN "LinkedThreads" AS linked_threads
         ON t.id = linked_threads.linking_thread
         LEFT JOIN "Collaborations" AS collaborations
-        ON t.id = collaborations.offchain_thread_id
+        ON t.id = collaborations.thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN "ChainEntities" AS chain_entities
@@ -89,7 +90,7 @@ const bulkThreads = async (
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
-      LEFT JOIN "OffchainTopics" topics
+      LEFT JOIN "Topics" topics
       ON threads.topic_id = topics.id`;
     let preprocessedThreads;
     try {
@@ -99,7 +100,7 @@ const bulkThreads = async (
       });
     } catch (e) {
       console.log(e);
-      return next(new Error('Could not fetch threads'));
+      return next(new ServerError('Could not fetch threads'));
     }
 
     const root_ids = [];
@@ -156,7 +157,7 @@ const bulkThreads = async (
     threads =
       // TODO: May need to include last_commented_on in order, if this else is used
       (
-        await models.OffchainThread.findAll({
+        await models.Thread.findAll({
           where: { chain: chain.id },
           include: [
             {
@@ -168,7 +169,7 @@ const bulkThreads = async (
               as: 'collaborators',
             },
             {
-              model: models.OffchainTopic,
+              model: models.Topic,
               as: 'topic',
             },
             {
@@ -191,10 +192,10 @@ const bulkThreads = async (
   }
 
   const countsQuery = `
-     SELECT id, title, stage FROM "OffchainThreads"
+     SELECT id, title, stage FROM "Threads"
      WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: OffchainThreadInstance[] =
+  const threadsInVoting: ThreadInstance[] =
     await models.sequelize.query(countsQuery, {
       bind,
       type: QueryTypes.SELECT,

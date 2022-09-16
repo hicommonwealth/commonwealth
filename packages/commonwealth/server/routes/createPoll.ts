@@ -1,10 +1,11 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
+import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { getNextOffchainPollEndingTime } from '../../shared/utils';
+import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,13 +27,13 @@ const createPoll = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const { thread_id, prompt, options } = req.body;
   let { custom_duration } = req.body;
-  if (!thread_id) return next(new Error(Errors.NoThreadId));
+  if (!thread_id) return next(new AppError(Errors.NoThreadId));
 
   if (custom_duration && custom_duration !== 'Infinite') {
     custom_duration = Number(custom_duration);
@@ -41,7 +42,7 @@ const createPoll = async (
       custom_duration < 0 ||
       custom_duration > 31
     ) {
-      return next(new Error(Errors.InvalidDuration));
+      return next(new AppError(Errors.InvalidDuration));
     }
   }
   const ends_at =
@@ -49,21 +50,21 @@ const createPoll = async (
       ? null
       : custom_duration
       ? moment().add(custom_duration, 'days')
-      : getNextOffchainPollEndingTime(moment());
+      : getNextPollEndingTime(moment());
 
   try {
-    const thread = await models.OffchainThread.findOne({
+    const thread = await models.Thread.findOne({
       where: {
         id: thread_id,
       },
     });
-    if (!thread) return next(new Error(Errors.NoThread));
+    if (!thread) return next(new AppError(Errors.NoThread));
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
     // TODO Graham 22-05-02: We should allow collaborators to start polling too
     if (!req.user || !userOwnedAddressIds.includes(thread.address_id)) {
-      return next(new Error(Errors.NotAuthor));
+      return next(new AppError(Errors.NotAuthor));
     }
 
     // check if admin_only flag is set
@@ -75,14 +76,14 @@ const createPoll = async (
         },
       });
       if (role?.permission !== 'admin' && !req.user.isAdmin) {
-        return next(new Error(Errors.MustBeAdmin));
+        return next(new AppError(Errors.MustBeAdmin));
       }
     }
 
     thread.has_poll = true;
     await thread.save();
 
-    const finalPoll = await models.OffchainPoll.create({
+    const finalPoll = await models.Poll.create({
       thread_id,
       chain_id: chain.id,
       prompt,
@@ -92,7 +93,7 @@ const createPoll = async (
 
     return res.json({ status: 'Success', result: finalPoll.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

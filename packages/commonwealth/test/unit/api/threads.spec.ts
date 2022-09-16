@@ -32,7 +32,7 @@ describe('Thread Tests', () => {
   const bodyWithMentions = 'test body [@Tagged Member](/edgeware/npRis4Nb)';
   const topicName = 'test topic';
   const topicId = undefined;
-  const kind = 'forum';
+  const kind = 'discussion';
   const stage = 'discussion';
 
   const markdownThread = require('../../util/fixtures/markdownThread');
@@ -103,41 +103,7 @@ describe('Thread Tests', () => {
       });
       expect(tRes).to.not.be.null;
       expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.ForumMissingTitle);
-    });
-
-    it('should fail to create a question thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
-        address: userAddress,
-        kind: 'question',
-        stage,
-        chainId: chain,
-        title: '',
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.QuestionMissingTitle);
-    });
-
-    it('should fail to create a request thread with an empty title', async () => {
-      const tRes = await modelUtils.createThread({
-        address: userAddress,
-        kind: 'request',
-        stage,
-        chainId: chain,
-        title: '',
-        topicName,
-        topicId,
-        body,
-        jwt: userJWT,
-      });
-      expect(tRes).to.not.be.null;
-      expect(tRes.error).to.not.be.null;
-      expect(tRes.error).to.be.equal(ThreadErrors.RequestMissingTitle);
+      expect(tRes.error).to.be.equal(ThreadErrors.DiscussionMissingTitle);
     });
 
     it('should fail to create a link thread with an empty title', async () => {
@@ -492,7 +458,7 @@ describe('Thread Tests', () => {
           jwt: userJWT,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
     });
 
     it('should fail to edit a thread without passing a thread id', async () => {
@@ -518,7 +484,7 @@ describe('Thread Tests', () => {
           jwt: adminJWT,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(EditThreadErrors.NoThreadId);
     });
 
@@ -546,7 +512,7 @@ describe('Thread Tests', () => {
           jwt: adminJWT,
         });
       expect(res.body.error).to.not.be.null;
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
     });
 
@@ -676,7 +642,7 @@ describe('Thread Tests', () => {
           thread_id: tempThread.id,
           jwt: adminJWT,
         });
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoReadOnly);
     });
 
@@ -689,7 +655,7 @@ describe('Thread Tests', () => {
           read_only: 'true',
           jwt: adminJWT,
         });
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoThreadId);
     });
 
@@ -703,7 +669,7 @@ describe('Thread Tests', () => {
           read_only: 'true',
           jwt: adminJWT,
         });
-      expect(res.status).to.be.equal(500);
+      expect(res.status).to.be.equal(400);
       expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoThread);
     });
 
@@ -723,7 +689,7 @@ describe('Thread Tests', () => {
           read_only: 'true',
           jwt: newUserJWT,
         });
-      expect(res2.status).to.be.equal(500);
+      expect(res2.status).to.be.equal(400);
       expect(res2.body.error).to.be.equal(updateThreadPrivacyErrors.NotAdmin);
     });
   });
@@ -850,7 +816,7 @@ describe('Thread Tests', () => {
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain });
-      expect(res.status).to.equal(500);
+      expect(res.status).to.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.equal(ViewCountErrors.NoObjectId);
     });
@@ -861,7 +827,7 @@ describe('Thread Tests', () => {
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ object_id: '9999' });
-      expect(res.status).to.equal(500);
+      expect(res.status).to.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.equal(ViewCountErrors.NoChainOrComm);
     });
@@ -872,7 +838,7 @@ describe('Thread Tests', () => {
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain: 'adkgjkjgda', object_id: '9999' });
-      expect(res.status).to.equal(500);
+      expect(res.status).to.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.equal(ViewCountErrors.InvalidChainOrComm);
     });
@@ -883,7 +849,7 @@ describe('Thread Tests', () => {
         .post('/api/viewCount')
         .set('Accept', 'application/json')
         .send({ chain, object_id: '9999' });
-      expect(res.status).to.equal(500);
+      expect(res.status).to.equal(400);
       expect(res.body).to.not.be.null;
       expect(res.body.error).to.equal(ViewCountErrors.InvalidThread);
     });

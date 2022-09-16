@@ -6,6 +6,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DynamicTemplate } from '../../shared/types';
 import { WalletId } from 'common-common/src/types';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -21,13 +22,13 @@ export const Errors = {
 };
 
 const updateEmail = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  if (!req.body.email) return next(new Error(Errors.NoEmail));
+  if (!req.body.email) return next(new AppError(Errors.NoEmail));
   const { email } = req.body;
 
   // validate the email
   const validEmailRegex = /\S+@\S+\.\S+/;
   if (!validEmailRegex.test(email)) {
-    return next(new Error(Errors.InvalidEmail));
+    return next(new AppError(Errors.InvalidEmail));
   }
 
   // check if email is already in use
@@ -37,7 +38,7 @@ const updateEmail = async (models: DB, req: Request, res: Response, next: NextFu
       id: { [Sequelize.Op.ne]: req.user.id }
     }
   });
-  if (existingUser) return next(new Error(Errors.EmailInUse));
+  if (existingUser) return next(new AppError(Errors.EmailInUse));
 
   const user = await models.User.scope('withPrivateData').findOne({
     where: {
@@ -49,8 +50,8 @@ const updateEmail = async (models: DB, req: Request, res: Response, next: NextFu
       required: false,
     }],
   });
-  if (!user) return next(new Error(Errors.NoUser));
-  if (user.Addresses?.length > 0) return next(new Error(Errors.NoUpdateForMagic));
+  if (!user) return next(new AppError(Errors.NoUser));
+  if (user.Addresses?.length > 0) return next(new AppError(Errors.NoUpdateForMagic));
   // ensure no more than 3 tokens have been created in the last 5 minutes
   const recentTokens = await models.LoginToken.findAndCountAll({
     where: {

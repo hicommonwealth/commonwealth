@@ -15,6 +15,10 @@
     white-space: nowrap;
   }
 
+  &.onclick {
+    cursor: pointer;
+  }
+
   &.b1 {
     font-family: $font-family-neue-haas-unica;
     font-size: 16px;
@@ -78,14 +82,19 @@
   }
 
   &.caption {
-    font-family: $font-family-neue-haas-unica;
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    line-height: 16px;
+    @include caption;
 
     &.uppercase {
       font-weight: 500;
     }
+  }
+
+  &.buttonMini {
+    font-family: $font-family-neue-haas-unica;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 16px;
   }
 
   &.buttonSm {

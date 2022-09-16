@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',
@@ -16,11 +17,11 @@ const updateChainEntityTitle = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const { unique_id, title } = req.body;
 
   const entity = await proposalIdToEntity(models, chain.id, unique_id);
-  if (!entity) return next(new Error(Errors.NoEntity));
+  if (!entity) return next(new AppError(Errors.NoEntity));
   const userOwnedAddressObjects = (await req.user.getAddresses()).filter(
     (addr) => !!addr.verified
   );
@@ -40,7 +41,7 @@ const updateChainEntityTitle = async (
     const role = roles.find((r) => {
       return r.chain_id === entity.chain;
     });
-    if (!role) return next(new Error(Errors.NotAdminOrOwner));
+    if (!role) return next(new AppError(Errors.NotAdminOrOwner));
   }
 
   entity.title = title;

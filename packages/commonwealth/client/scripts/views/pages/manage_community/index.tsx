@@ -28,7 +28,7 @@ class ManageCommunityPage implements m.ClassComponent {
     }
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
@@ -90,8 +90,8 @@ class ManageCommunityPage implements m.ClassComponent {
         return r.id === oldRole.id;
       };
       this.roleData.splice(this.roleData.indexOf(oldRole), 1, newRole);
-      app.user.addRole(newRole);
-      app.user.removeRole(predicate);
+      app.roles.addRole(newRole);
+      app.roles.removeRole(predicate);
       const { adminsAndMods } = app.chain.meta;
       if (
         oldRole.permission === 'admin' ||
@@ -121,6 +121,10 @@ class ManageCommunityPage implements m.ClassComponent {
       m.redraw();
     };
 
+    const onSave = () => {
+      m.redraw();
+    };
+
     return !this.loadingFinished ? (
       <PageLoading />
     ) : (
@@ -131,6 +135,7 @@ class ManageCommunityPage implements m.ClassComponent {
             chain={app.config.chains.getById(app.activeChainId())}
             mods={mods}
             onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
+            onSave={() => onSave()}
           />
           <AdminPanelTabs
             defaultTab={1}

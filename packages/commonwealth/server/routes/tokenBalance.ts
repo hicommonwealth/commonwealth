@@ -2,7 +2,7 @@ import TokenBalanceCache from 'token-balance-cache/src/cache';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -34,13 +34,13 @@ const tokenBalance = async (
   let error: string;
   try {
     [chain, error] = await validateChain(models, req.body);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err);
   }
   try {
     [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err)
   }
@@ -58,7 +58,7 @@ const tokenBalance = async (
     return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
-    throw new Error(Errors.QueryFailed);
+    throw new ServerError(Errors.QueryFailed);
   }
 };
 

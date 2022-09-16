@@ -75,7 +75,7 @@ export async function initAppState(
               })
             );
           });
-        app.user.setRoles(data.roles);
+        app.roles.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
         );
@@ -460,7 +460,7 @@ m.route.set = (...args) => {
 };
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain()) {
+  if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
@@ -608,7 +608,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         }
 
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
-        // a special case because OffchainThreads and on-chain proposals are all viewed through the
+        // a special case because Threads and on-chain proposals are all viewed through the
         // same "/:scope/proposal/:type/:id" route.
         let deferChain = attrs.deferChain;
         const isDiscussion =
@@ -751,10 +751,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/web3login': importRoute('views/pages/web3login', {
-              scoped: true,
-              deferChain: true,
-            }),
             // Admin
             '/admin': importRoute('views/pages/admin', { scoped: true }),
             '/manage': importRoute('views/pages/manage_community/index', {
@@ -839,7 +835,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/tips': redirectRoute(() => '/tips'),
             '/:scope/validators': redirectRoute(() => '/validators'),
             '/:scope/login': redirectRoute(() => '/login'),
-            '/:scope/web3login': redirectRoute(() => '/web3login'),
             '/:scope/settings': redirectRoute(() => '/settings'),
             '/:scope/admin': redirectRoute(() => '/admin'),
             '/:scope/manage': redirectRoute(() => '/manage'),
@@ -898,12 +893,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
             '/:scope/projects': importRoute(
@@ -1022,10 +1014,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             // Settings
             '/login': importRoute('views/pages/login', { scoped: false }),
             '/:scope/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/web3login': importRoute('views/pages/web3login', {
               scoped: true,
               deferChain: true,
             }),

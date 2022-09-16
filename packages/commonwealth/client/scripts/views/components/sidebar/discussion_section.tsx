@@ -4,8 +4,8 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
-import { navigateToSubpage } from 'app';
 import app from 'state';
+import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   MobileSidebarSectionAttrs,
@@ -53,12 +53,6 @@ export class DiscussionSection
         p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`
       );
     };
-    const onDiscussionsPage = (p) =>
-      p === `/${app.activeChainId()}` ||
-      p === `/${app.activeChainId()}/` ||
-      p.startsWith(`/${app.activeChainId()}/discussions/`) ||
-      p.startsWith(`/${app.activeChainId()}/proposal/discussion/`) ||
-      p.startsWith(`/${app.activeChainId()}?`);
 
     const onFeaturedDiscussionPage = (p, topic) => {
       const identifier = m.route.param('identifier');
@@ -72,9 +66,7 @@ export class DiscussionSection
       }
       return decodeURI(p).endsWith(`/discussions/${topic}`);
     };
-    const onMembersPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/members`) ||
-      p.startsWith(`/${app.activeChainId()}/account/`);
+
     const onSputnikDaosPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
@@ -87,12 +79,12 @@ export class DiscussionSection
     const discussionsLabel = ['vesuvius', 'olympus'].includes(
       app.activeChainId()
     )
-      ? 'FORUMS'
-      : 'DISCUSSIONS';
+      ? 'Forum'
+      : 'Discussion';
 
     // Build Toggle Tree
     const discussionsDefaultToggleTree: ToggleTree = {
-      toggledState: true,
+      toggledState: false,
       children: {},
     };
 
@@ -116,15 +108,11 @@ export class DiscussionSection
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
-      console.log("setting discussions toggle tree since it doesn't exist");
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
         JSON.stringify(discussionsDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
     ) {
-      console.log(
-        'setting discussions toggle tree since the cached version differs from the updated version'
-      );
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
         JSON.stringify(discussionsDefaultToggleTree);
     }
@@ -145,8 +133,9 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-          navigateToSubpage('/');
+          handleRedirectClicks(e, `/`, app.activeChainId(), () => {
+            setDiscussionsToggleTree(`children.All.toggledState`, toggle);
+          });
         },
         displayData: null,
       },
@@ -161,8 +150,12 @@ export class DiscussionSection
           (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
-          navigateToSubpage('/sputnik-daos');
+          handleRedirectClicks(e, `/sputnik-daos`, app.activeChainId(), () => {
+            setDiscussionsToggleTree(
+              `children.SputnikDAOs.toggledState`,
+              toggle
+            );
+          });
         },
         displayData: null,
       },
@@ -177,13 +170,20 @@ export class DiscussionSection
           isVisible: true,
           isUpdated: true,
           isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
+          // eslint-disable-next-line no-loop-func
           onclick: (e, toggle: boolean) => {
             e.preventDefault();
-            setDiscussionsToggleTree(
-              `children.${topic.name}.toggledState`,
-              toggle
+            handleRedirectClicks(
+              e,
+              `/discussions/${encodeURI(topic.name)}`,
+              app.activeChainId(),
+              () => {
+                setDiscussionsToggleTree(
+                  `children.${topic.name}.toggledState`,
+                  toggle
+                );
+              }
             );
-            navigateToSubpage(`/discussions/${encodeURI(topic.name)}`);
           },
           displayData: null,
         };

@@ -6,11 +6,15 @@ import m from 'mithril';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainCategoryType,
+  ChainNetwork,
+} from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'client/scripts/models';
+import { ChainInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -25,6 +29,7 @@ type ChainMetadataRowsAttrs = {
   chain?: ChainInfo;
   mods: any;
   onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onSave: () => void;
 };
 
 export class ChainMetadataRows
@@ -53,6 +58,8 @@ export class ChainMetadataRows
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
   communityBanner: string;
+  quillBanner: any;
+  bannerStateUpdated: boolean;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -100,22 +107,22 @@ export class ChainMetadataRows
         </div>
         <InputRow
           title="Name"
-          defaultValue={this.name}
+          value={this.name}
           onChangeHandler={(v) => {
             this.name = v;
           }}
         />
         <InputRow
           title="Description"
-          defaultValue={this.description}
+          value={this.description}
           onChangeHandler={(v) => {
             this.description = v;
           }}
-          textarea={true}
+          textarea
         />
         <InputRow
           title="Website"
-          defaultValue={this.website}
+          value={this.website}
           placeholder="https://example.com"
           onChangeHandler={(v) => {
             this.website = v;
@@ -123,7 +130,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Discord"
-          defaultValue={this.discord}
+          value={this.discord}
           placeholder="https://discord.com/invite"
           onChangeHandler={(v) => {
             this.discord = v;
@@ -131,7 +138,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Element"
-          defaultValue={this.element}
+          value={this.element}
           placeholder="https://matrix.to/#"
           onChangeHandler={(v) => {
             this.element = v;
@@ -139,7 +146,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Telegram"
-          defaultValue={this.telegram}
+          value={this.telegram}
           placeholder="https://t.me"
           onChangeHandler={(v) => {
             this.telegram = v;
@@ -147,7 +154,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Github"
-          defaultValue={this.github}
+          value={this.github}
           placeholder="https://github.com"
           onChangeHandler={(v) => {
             this.github = v;
@@ -179,7 +186,7 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Custom Stages"
-          defaultValue={this.customStages}
+          value={this.customStages}
           placeholder='["Temperature Check", "Consensus Check"]'
           onChangeHandler={(v) => {
             this.customStages = v;
@@ -187,17 +194,17 @@ export class ChainMetadataRows
         />
         <InputRow
           title="Domain"
-          defaultValue={this.customDomain}
+          value={this.customDomain}
           placeholder="Contact support" // gov.edgewa.re
           onChangeHandler={(v) => {
             this.customDomain = v;
           }}
-          disabled={true} // Custom domains should be admin configurable only
+          disabled // Custom domains should be admin configurable only
         />
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            defaultValue={this.snapshot}
+            value={this.snapshot}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -216,7 +223,7 @@ export class ChainMetadataRows
         )}
         <InputRow
           title="Terms of Service"
-          defaultValue={this.terms}
+          value={this.terms}
           placeholder="Url that new users see"
           onChangeHandler={(v) => {
             this.terms = v;
@@ -226,11 +233,14 @@ export class ChainMetadataRows
           title="Banner"
           name="Banner Text"
           label="Banner"
+          maxlength={512}
           placeholder="Text for across the top of your community"
-          defaultValue={this.communityBanner}
+          value={this.communityBanner}
           onChangeHandler={(v) => {
             this.communityBanner = v;
           }}
+          tabindex={1}
+          editorNamespace="new-banner"
         />
         <div class="tag-row">
           <CWLabel label="Community Tags" />
@@ -286,6 +296,7 @@ export class ChainMetadataRows
               iconUrl,
               defaultSummaryView,
             } = this;
+
             for (const space of snapshot) {
               if (space !== '') {
                 if (space.slice(space.length - 4) !== '.eth') {
@@ -294,6 +305,7 @@ export class ChainMetadataRows
                 }
               }
             }
+
             // Update ChainCategories
             try {
               for (const category of Object.keys(this.selectedTags)) {
@@ -306,15 +318,22 @@ export class ChainMetadataRows
             } catch (err) {
               console.log(err);
             }
+
             try {
-              // if (!!this.communityBanner) {
               $.post(`${app.serverUrl()}/updateBanner`, {
                 chain_id: vnode.attrs.chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
-              }).then(({ result }) => {
+              }).then(() => {
                 app.chain.meta.setBanner(this.communityBanner);
+
+                if (
+                  localStorage.getItem(`${app.activeChainId()}-banner`) ===
+                  'off'
+                ) {
+                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+                }
               });
             } catch (err) {
               console.log(err);
@@ -337,10 +356,13 @@ export class ChainMetadataRows
                 iconUrl,
                 defaultSummaryView,
               });
+              vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Chain update failed');
             }
+
+            m.redraw();
           }}
         />
       </div>

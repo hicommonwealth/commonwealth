@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,15 +15,15 @@ export const Errors = {
 
 const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body.comment_id) {
-    return next(new Error(Errors.NoCommentId));
+    return next(new AppError(Errors.NoCommentId));
   }
 
   try {
     const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
-    let comment = await models.OffchainComment.findOne({
+    let comment = await models.Comment.findOne({
       where: {
         id: req.body.comment_id,
         address_id: { [Op.in]: userOwnedAddressIds },
@@ -37,12 +38,12 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
         address: comment.Address.address
       });
       if (!canInteract) {
-        return next(new Error(error));
+        return next(new AppError(error));
       }
     }
 
     if (!comment) {
-      comment = await models.OffchainComment.findOne({
+      comment = await models.Comment.findOne({
         where: {
           id: req.body.comment_id,
         },
@@ -57,7 +58,7 @@ const deleteComment = async (models: DB, banCache: BanCache, req: Request, res: 
         where: roleWhere
       });
       if (!requesterIsAdminOrMod) {
-        return next(new Error(Errors.NotOwned));
+        return next(new AppError(Errors.NotOwned));
       }
     }
     // find and delete all associated subscriptions

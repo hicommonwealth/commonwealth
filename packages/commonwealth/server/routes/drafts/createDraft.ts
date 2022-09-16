@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../../util/validateChain';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from '../../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -16,13 +17,13 @@ const createDraft = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
   const { title, body, topic } = req.body;
 
   if (!title && !body && !req.body['attachments[]']?.length) {
-    return next(new Error(Errors.InsufficientData));
+    return next(new AppError(Errors.InsufficientData));
   }
 
   const draftContent = {
@@ -40,7 +41,7 @@ const createDraft = async (
     req.body['attachments[]'] &&
     typeof req.body['attachments[]'] === 'string'
   ) {
-    await models.OffchainAttachment.create({
+    await models.Attachment.create({
       attachable: 'draft',
       attachment_id: draft.id,
       url: req.body['attachments[]'],
@@ -49,7 +50,7 @@ const createDraft = async (
   } else if (req.body['attachments[]']) {
     await Promise.all(
       req.body['attachments[]'].map((u) =>
-        models.OffchainAttachment.create({
+        models.Attachment.create({
           attachable: 'draft',
           attachment_id: draft.id,
           url: u,
@@ -63,7 +64,7 @@ const createDraft = async (
   try {
     finalDraft = await models.DiscussionDraft.findOne({
       where: { id: draft.id },
-      include: [models.Address, models.OffchainAttachment],
+      include: [models.Address, models.Attachment],
     });
   } catch (err) {
     return next(err);

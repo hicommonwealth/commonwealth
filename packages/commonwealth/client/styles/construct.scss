@@ -77,11 +77,6 @@ $cui-base-height: floor($cui-base-size * 2.8);
   font-weight: $cui-font-weight-bold; // fix weight
 }
 
-.cui-tabs .cui-tabs-item {
-  font-weight: $cui-font-weight-bold; // fix weight
-  padding: 8px;
-}
-
 .cui-card h4 {
   font-weight: $cui-font-weight-bold; // fix weight
 }
@@ -123,19 +118,6 @@ button,
   a:hover {
     text-decoration: inherit;
   }
-}
-
-.cui-tabs-item {
-  color: $neutral-400;
-}
-
-.cui-tabs-item.cui-active {
-  color: $neutral-500;
-  border-color: $neutral-500;
-}
-
-.cui-tabs-item:hover {
-  color: $neutral-600;
 }
 
 // button color fixes
@@ -330,28 +312,6 @@ button,
   }
 }
 
-// reduce tab padding
-.cui-tabs {
-  .cui-tabs-item {
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-
-  @each $size in $cui-sizes {
-    &.cui-#{$size} {
-      @include cui-tabs-size(
-        map-get($cui-padding-map, $size),
-        map-get($cui-font-size-map, $size)
-      );
-    }
-  }
-}
-
 .cui-icon {
   color: $neutral-800;
 }
@@ -465,61 +425,4 @@ $spinner-animation-duration: 1700ms;
 // prevent overlay from breaking inline text
 .cui-overlay-inline {
   display: inline-block;
-}
-
-// dialog headers
-.cui-dialog-header {
-  padding: 16px;
-
-  h3 {
-    margin: 6px 0 0;
-    font-weight: 600;
-  }
-}
-
-// dialog entry animation
-.cui-overlay-backdrop {
-  background: rgba(0, 0, 0, 0.2);
-
-  .fade-enter & {
-    opacity: 0.01;
-    transition: opacity 0.05s ease;
-  }
-
-  .fade-enter-active & {
-    opacity: 1;
-  }
-
-  .fade-exit & {
-    opacity: 0.01;
-    transition: opacity 0.05s ease;
-  }
-
-  .fade-exit-active & {
-    opacity: 0;
-  }
-}
-
-.cui-dialog-content {
-  .fade-enter & {
-    opacity: 0.01;
-    transform: scale(0.95);
-    transition: opacity 0.05s ease, popout 0.05s ease,
-      transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
-  }
-
-  .fade-enter-active & {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .fade-exit & {
-    transition: opacity 0.05s ease, popout 0.05s ease,
-      transform 0.05s cubic-bezier(0.54, 1.12, 0.38, 1.11);
-  }
-
-  .fade-exit-active & {
-    opacity: 0;
-    transform: scale(0.95);
-  }
 }

@@ -3,6 +3,7 @@ import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { getLastEdited } from '../util/getLastEdited';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,19 +18,19 @@ const viewComments = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   if (!req.query.root_id) {
-    return next(new Error(Errors.NoRootId));
+    return next(new AppError(Errors.NoRootId));
   }
 
-  const comments = await models.OffchainComment.findAll({
+  const comments = await models.Comment.findAll({
     where: { chain: chain.id, root_id: req.query.root_id },
     include: [
       models.Address,
-      models.OffchainAttachment,
+      models.Attachment,
       {
-        model: models.OffchainReaction,
+        model: models.Reaction,
         as: 'reactions',
         include: [
           {

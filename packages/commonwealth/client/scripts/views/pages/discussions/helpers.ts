@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { OffchainThread } from 'client/scripts/models';
+import { Thread } from 'models';
 
 export const getLastUpdated = (proposal) => {
   const { lastCommentedOn } = proposal;
@@ -17,7 +17,7 @@ export const isHot = (proposal) => {
   );
 };
 
-export const getLastUpdate = (proposal: OffchainThread): number => {
+export const getLastUpdate = (proposal: Thread): number => {
   const lastComment = proposal.lastCommentedOn?.unix() || 0;
   const createdAt = proposal.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);

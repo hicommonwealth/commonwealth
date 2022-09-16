@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { ServerError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 
@@ -11,11 +11,11 @@ const getThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   let threads;
   try {
-    threads = await models.OffchainThread.findAll({
+    threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
         chain: chain.id
@@ -31,14 +31,14 @@ const getThreads = async (
           as: 'collaborators',
         },
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
         {
           model: models.ChainEntity,
         },
         {
-          model: models.OffchainReaction,
+          model: models.Reaction,
           as: 'reactions',
           include: [
             {

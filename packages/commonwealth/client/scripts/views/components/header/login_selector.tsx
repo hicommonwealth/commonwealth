@@ -16,13 +16,12 @@ import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
-
+import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
-import FeedbackModal from 'views/modals/feedback_modal';
+import { FeedbackModal } from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
-import AddressSwapper from 'views/components/addresses/address_swapper';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 const CHAINBASE_SHORT = {
@@ -142,11 +141,7 @@ export class LoginSelectorMenuRight
     return (
       <>
         <Cui.MenuItem
-          onclick={() =>
-            app.activeChainId()
-              ? navigateToSubpage('/notification-settings')
-              : m.route.set('/notification-settings')
-          }
+          onclick={() => m.route.set('/notification-settings')}
           label={
             <div class="label-wrap">
               {mobile && <CWIcon iconName="bell" />}
@@ -228,14 +223,14 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
 
     const activeAddressesWithRole = app.user.activeAccounts.filter(
       (account) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account,
           chain: app.activeChainId(),
         });
       }
     );
 
-    const activeAccountsByRole = app.user.getActiveAccountsByRole();
+    const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
     const nAccountsWithoutRole = activeAccountsByRole.filter(
       ([account, role], index) => !role
@@ -256,23 +251,24 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       if (!activeBase) return true;
 
       // add all items on same base as active chain
-      const addressChainInfo = app.config.chains.getById(a.chain);
+      const addressChainInfo = app.config.chains.getById(a.chain.id);
       if (addressChainInfo?.base !== activeBase) return false;
 
       // // ensure doesn't already exist
-      const addressExists = !!app.user.addresses.find((prev) =>
-        activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.chain)?.base === ChainBase.Substrate
-          ? AddressSwapper({
-              address: prev.address,
-              currentPrefix: 42,
-            }) ===
-            AddressSwapper({
-              address: a.address,
-              currentPrefix: 42,
-            })
-          : prev.address === a.address
-      ));
+      const addressExists = !!app.user.addresses.find(
+        (prev) =>
+          activeBase === ChainBase.Substrate &&
+          (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+            ? addressSwapper({
+                address: prev.address,
+                currentPrefix: 42,
+              }) ===
+              addressSwapper({
+                address: a.address,
+                currentPrefix: 42,
+              })
+            : prev.address === a.address)
+      );
       if (addressExists) return false;
 
       // filter additionally by chain network if in list of non-interop, unless we are on that chain
@@ -303,14 +299,14 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                   if (originAddressInfo) {
                     try {
                       const targetChain =
-                        activeChainId || originAddressInfo.chain;
+                        activeChainId || originAddressInfo.chain.id;
 
                       const address = originAddressInfo.address;
 
                       const res = await linkExistingAddressToChainOrCommunity(
                         address,
                         targetChain,
-                        originAddressInfo.chain
+                        originAddressInfo.chain.id
                       );
 
                       if (res && res.result) {
@@ -333,7 +329,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                         const addressInfo = app.user.addresses.find(
                           (a) =>
                             a.address === encodedAddress &&
-                            a.chain === targetChain
+                            a.chain.id === targetChain
                         );
 
                         const account = app.chain.accounts.get(
@@ -345,12 +341,12 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
                         }
                         if (
                           activeChainId &&
-                          !app.user.getRoleInCommunity({
+                          !app.roles.getRoleInCommunity({
                             account,
                             chain: activeChainId,
                           })
                         ) {
-                          await app.user.createRole({
+                          await app.roles.createRole({
                             address: addressInfo,
                             chain: activeChainId,
                           });

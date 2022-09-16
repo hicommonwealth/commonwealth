@@ -1,47 +1,60 @@
 import $ from 'jquery';
-import app, { IApp } from 'state';
-import { Coin } from 'adapters/currency';
-import { ChainBase, ChainType, WalletId } from 'common-common/src/types';
+import app from 'state';
+import { ChainType, WalletId } from 'common-common/src/types';
 
 import ChainInfo from './ChainInfo';
 import Profile from './Profile';
 
-abstract class Account<C extends Coin> {
-  public readonly serverUrl : string;
+class Account {
   public readonly address: string;
   public readonly chain: ChainInfo;
-  public readonly chainBase: ChainBase;
-  public readonly ghost_address: ChainBase;
-  public get freeBalance() { return this.balance; }
-  public abstract balance: Promise<C>;
+  public readonly ghostAddress: boolean;
 
   // validation token sent by server
   private _validationToken?: string;
   private _addressId?: number;
   private _walletId?: WalletId;
 
-  // A helper for encoding
-  private _encoding: number;
-  public get encoding() { return this._encoding; }
-
-  private _profile: Profile;
+  private _profile?: Profile;
   public get profile() { return this._profile; }
 
-  public app: IApp;
+  constructor({
+    chain,
+    address,
+    ghostAddress,
+    addressId,
+    walletId,
+    validationToken,
+    profile,
+    ignoreProfile,
+  }: {
+    // required args
+    chain: ChainInfo,
+    address: string,
 
-  constructor(_app: IApp, chain: ChainInfo, address: string, encoding?: number) {
-    // Check if the account is being initialized from an offchain Community
+    // optional args
+    addressId?: number,
+    walletId?: WalletId,
+    validationToken?: string,
+    profile?: Profile,
+
+    // flags
+    ghostAddress?: boolean,
+    ignoreProfile?: boolean,
+  }) {
+    // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
-    this.app = _app;
     this.chain = chain;
-    this.chainBase = (_app.chain) ? _app.chain.base : null;
     this.address = address;
-    this._profile = _app.profiles.getProfile(chain.id, address);
-    this._encoding = encoding;
-  }
-
-  public setEncoding(encoding: number) {
-    this._encoding = encoding;
+    this._addressId = addressId;
+    this._walletId = walletId;
+    this._validationToken = validationToken;
+    this.ghostAddress = !!ghostAddress;
+    if (profile) {
+      this._profile = profile;
+    } else if (!ignoreProfile && chain?.id) {
+      this._profile = app.profiles.getProfile(chain.id, address);
+    }
   }
 
   get addressId() {
@@ -62,6 +75,7 @@ abstract class Account<C extends Coin> {
   public setValidationToken(token: string) {
     this._validationToken = token;
   }
+
   public async validate(signature: string) {
     if (!this._validationToken) {
       throw new Error('no validation token found');
@@ -70,23 +84,23 @@ abstract class Account<C extends Coin> {
       throw new Error('signature required for validation');
     }
 
-    const params : any = {
+    const params = {
       address: this.address,
       chain: this.chain.id,
       isToken: this.chain.type === ChainType.Token,
-      jwt: this.app.user.jwt,
+      jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
     };
-    const result = await $.post(`${this.app.serverUrl()}/verifyAddress`, params);
+    const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
-          ghostAddress && this.chain.id === chain &&
+          ghostAddress && this.chain.id === chain.id &&
           app.user.activeAccounts.some((account) => account.address === address)
       ))
       if (hasGhostAddress) {
-        const { success, ghostAddressId } = await $.post(`${this.app.serverUrl()}/updateAddress`, params);
+        const { success, ghostAddressId } = await $.post(`${app.serverUrl()}/updateAddress`, params);
         if (success && ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {

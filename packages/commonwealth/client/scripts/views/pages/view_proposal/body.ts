@@ -2,50 +2,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-restricted-globals */
-import 'pages/view_proposal/editor_permissions.scss';
 
 import m from 'mithril';
 import lity from 'lity';
-import $ from 'jquery';
 import _ from 'lodash';
 
-import { updateRoute, navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'app';
 import app from 'state';
 import { pluralize } from 'helpers';
-import {
-  OffchainThread,
-  OffchainComment,
-  AnyProposal,
-  Account,
-  Profile,
-  AddressInfo,
-} from 'models';
+import { Thread, Comment, AnyProposal, Account, AddressInfo } from 'models';
 
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import QuillEditor from 'views/components/quill_editor';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import VersionHistoryModal from 'views/modals/version_history_modal';
-import {
-  MenuItem,
-  Button,
-  Dialog,
-  QueryList,
-  Classes,
-  ListItem,
-  Popover,
-} from 'construct-ui';
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import { MenuItem, Button, Popover } from 'construct-ui';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainType } from 'common-common/src/types';
 import { validURL } from '../../../../../shared/utils';
 import { IProposalPageState } from '.';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { jumpHighlightComment } from './helpers';
+import {
+  countLinesMarkdown,
+  countLinesQuill,
+} from '../../components/quill/helpers';
+import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
@@ -78,14 +61,14 @@ export const activeQuillEditorHasText = () => {
 };
 
 export const ProposalBodyAvatar: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
     if (!item.author) return;
 
-    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Check for accounts on forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
 
     if (
@@ -102,10 +85,10 @@ export const ProposalBodyAvatar: m.Component<{
       ]);
     }
 
-    const author: Account<any> = app.chain.accounts.get(item.author);
+    const author: Account = app.chain.accounts.get(item.author);
 
     return m('.ProposalBodyAvatar', [
-      (item as OffchainComment<any>).deleted
+      (item as Comment<any>).deleted
         ? m(AnonymousUser, {
             avatarOnly: true,
             avatarSize: 40,
@@ -123,17 +106,17 @@ export const ProposalBodyAvatar: m.Component<{
 };
 
 export const ProposalBodyAuthor: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
+  item: AnyProposal | Thread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
     if (!item.author) return;
 
-    // Check for accounts on offchain forums that originally signed up on a different base chain,
+    // Check for accounts on forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
     if (
-      (item instanceof OffchainComment || item instanceof OffchainComment) &&
+      (item instanceof Comment || item instanceof Comment) &&
       app.chain.meta.type === ChainType.Offchain
     ) {
       if (
@@ -149,13 +132,13 @@ export const ProposalBodyAuthor: m.Component<{
       }
     }
 
-    const author: Account<any> =
-      item instanceof OffchainThread || item instanceof OffchainComment
+    const author: Account =
+      item instanceof Thread || item instanceof Comment
         ? app.chain.accounts.get(item.author)
         : item.author;
 
     return m('.ProposalBodyAuthor', [
-      (item as OffchainComment<any>).deleted
+      (item as Comment<any>).deleted
         ? m('span', '[deleted]')
         : m(User, {
             user: author,
@@ -164,7 +147,7 @@ export const ProposalBodyAuthor: m.Component<{
             hideAvatar: true,
             showAddressWithDisplayName: true,
           }),
-      item instanceof OffchainThread &&
+      item instanceof Thread &&
         item.collaborators &&
         item.collaborators.length > 0 &&
         m('span.proposal-collaborators', [
@@ -194,16 +177,16 @@ export const ProposalBodyAuthor: m.Component<{
 };
 
 export const ProposalBodyCreated: m.Component<{
-  item: AnyProposal | OffchainThread | OffchainComment<any>;
+  item: AnyProposal | Thread | Comment<any>;
   link: string;
 }> = {
   view: (vnode) => {
     const { item, link } = vnode.attrs;
     if (!item) return;
     if (!item.createdAt) return;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
 
-    if (item instanceof OffchainThread || item instanceof OffchainComment) {
+    if (item instanceof Thread || item instanceof Comment) {
       return m('.ProposalBodyCreated', [
         m(
           'a',
@@ -227,12 +210,12 @@ export const ProposalBodyCreated: m.Component<{
 };
 
 export const ProposalBodyLastEdited: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
     if (!item.lastEdited) {
       return;
     }
@@ -271,7 +254,7 @@ export const ProposalBodyLastEdited: m.Component<{
 };
 
 export const ProposalBodyEditMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
   parentState;
   proposalPageState: IProposalPageState;
   getSetGlobalEditingStatus;
@@ -280,8 +263,8 @@ export const ProposalBodyEditMenuItem: m.Component<{
     const { item, getSetGlobalEditingStatus, proposalPageState, parentState } =
       vnode.attrs;
     if (!item) return;
-    if (item instanceof OffchainThread && item.readOnly) return;
-    const isThread = item instanceof OffchainThread;
+    if (item instanceof Thread && item.readOnly) return;
+    const isThread = item instanceof Thread;
 
     return m(MenuItem, {
       label: 'Edit',
@@ -289,7 +272,7 @@ export const ProposalBodyEditMenuItem: m.Component<{
       onclick: async (e) => {
         e.preventDefault();
         parentState.currentText =
-          item instanceof OffchainThread ? item.body : item.text;
+          item instanceof Thread ? item.body : item.text;
         if (proposalPageState.replying) {
           if (activeQuillEditorHasText()) {
             const confirmed = await confirmationModalWithText(
@@ -308,13 +291,13 @@ export const ProposalBodyEditMenuItem: m.Component<{
 };
 
 export const ProposalBodyDeleteMenuItem: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
   refresh?: Function;
 }> = {
   view: (vnode) => {
     const { item, refresh } = vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
 
     return m(MenuItem, {
       label: 'Delete',
@@ -335,251 +318,23 @@ export const ProposalBodyDeleteMenuItem: m.Component<{
   },
 };
 
-export const EditPermissionsButton: m.Component<{
-  openEditPermissions: Function;
+export const EditCollaboratorsButton: m.Component<{
+  proposal: Thread;
 }> = {
   view: (vnode) => {
-    const { openEditPermissions } = vnode.attrs;
+    const { proposal } = vnode.attrs;
+
     return m(MenuItem, {
       label: 'Edit collaborators',
       onclick: async (e) => {
         e.preventDefault();
-        openEditPermissions();
-      },
-    });
-  },
-};
-
-export const ProposalEditorPermissions: m.Component<
-  {
-    thread: OffchainThread;
-    popoverMenu: boolean;
-    onChangeHandler: any;
-    openStateHandler: any;
-  },
-  {
-    membersFetched: boolean;
-    items: any[];
-    addedEditors: any;
-    removedEditors: any;
-    isOpen: boolean;
-  }
-> = {
-  view: (vnode) => {
-    const { thread } = vnode.attrs;
-    // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
-    if (!vnode.state.membersFetched) {
-      vnode.state.membersFetched = true;
-      const chainOrCommObj = { chain: app.activeChainId() };
-      // TODO Graham 4/4/21: This needs pagination, search, or serializing.
-      // The fetch time for large communities is getting unwieldy.
-      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
-        .then((response) => {
-          if (response.status !== 'Success')
-            throw new Error('Could not fetch members');
-          vnode.state.items = response.result.filter((role) => {
-            return role.Address.address !== app.user.activeAccount?.address;
-          });
-          m.redraw();
-        })
-        .catch((err) => {
-          m.redraw();
-          console.error(err);
+        app.modals.create({
+          modal: EditCollaboratorsModal,
+          data: {
+            thread: proposal,
+          },
         });
-    }
-    if (!vnode.state.items?.length) return;
-    if (!vnode.state.addedEditors) {
-      vnode.state.addedEditors = {};
-    }
-    if (!vnode.state.removedEditors) {
-      vnode.state.removedEditors = {};
-    }
-    const { items } = vnode.state;
-    const allCollaborators = thread.collaborators
-      .concat(Object.values(vnode.state.addedEditors))
-      .filter(
-        (c) => !Object.keys(vnode.state.removedEditors).includes(c.address)
-      );
-    const existingCollaborators = m('.existing-collaborators', [
-      m('span', 'Selected collaborators'),
-      m(
-        '.collaborator-listing',
-        allCollaborators.map((c) => {
-          const user: Profile = app.profiles.getProfile(c.chain, c.address);
-          return m('.user-wrap', [
-            m(User, { user }),
-            m(CWIcon, {
-              iconName: 'close',
-              size: 'small',
-              class: 'role-x-icon',
-              onclick: async () => {
-                // If already scheduled for addition, un-schedule
-                if (vnode.state.addedEditors[c.address]) {
-                  delete vnode.state.addedEditors[c.address];
-                } else {
-                  // If already an existing editor, schedule for removal
-                  vnode.state.removedEditors[c.address] = c;
-                }
-              },
-            }),
-          ]);
-        })
-      ),
-    ]);
-
-    return m(Dialog, {
-      basic: false,
-      class: 'ProposalEditorPermissions',
-      closeOnEscapeKey: true,
-      closeOnOutsideClick: true,
-      content: m('.proposal-editor-permissions-wrap', [
-        m(QueryList, {
-          checkmark: true,
-          items,
-          inputAttrs: {
-            placeholder: 'Enter username or address...',
-          },
-          itemRender: (role: any, idx: number) => {
-            const user: Profile = app.profiles.getProfile(
-              role.Address.chain,
-              role.Address.address
-            );
-            const recentlyAdded = !$.isEmptyObject(
-              vnode.state.addedEditors[role.Address.address]
-            );
-            return m(ListItem, {
-              label: [m(User, { user })],
-              selected: recentlyAdded,
-              key: role.Address.address,
-            });
-          },
-          itemPredicate: (query, item, idx) => {
-            const address = (item as any).Address;
-            return address.name
-              ? address.name.toLowerCase().includes(query.toLowerCase())
-              : address.address.toLowerCase().includes(query.toLowerCase());
-          },
-          onSelect: (item) => {
-            const addrItem = (item as any).Address;
-            // If already scheduled for removal, un-schedule
-            if (vnode.state.removedEditors[addrItem.address]) {
-              delete vnode.state.removedEditors[addrItem.address];
-            }
-            // If already scheduled for addition, un-schedule
-            if (vnode.state.addedEditors[addrItem.address]) {
-              delete vnode.state.addedEditors[addrItem.address];
-            } else if (
-              thread.collaborators.filter((c) => {
-                return (
-                  c.address === addrItem.address && c.chain === addrItem.chain
-                );
-              }).length === 0
-            ) {
-              // If unscheduled for addition, and not an existing editor, schedule
-              vnode.state.addedEditors[addrItem.address] = addrItem;
-            } else {
-              notifyInfo('Already an editor');
-            }
-          },
-        }),
-        allCollaborators.length > 0 && existingCollaborators,
-      ]),
-      hasBackdrop: true,
-      isOpen: vnode.attrs.popoverMenu ? true : vnode.state.isOpen,
-      inline: false,
-      onClose: () => {
-        if (vnode.attrs.popoverMenu) {
-          vnode.attrs.openStateHandler(false);
-          m.redraw();
-        } else {
-          vnode.state.isOpen = false;
-        }
       },
-      title: 'Edit collaborators',
-      transitionDuration: 200,
-      footer: m(`.${Classes.ALIGN_RIGHT}`, [
-        m(Button, {
-          label: 'Cancel',
-          rounded: true,
-          onclick: async () => {
-            if (vnode.attrs.popoverMenu) {
-              vnode.attrs.openStateHandler(false);
-              m.redraw();
-            } else {
-              vnode.state.isOpen = false;
-            }
-          },
-        }),
-        m(Button, {
-          disabled:
-            $.isEmptyObject(vnode.state.addedEditors) &&
-            $.isEmptyObject(vnode.state.removedEditors),
-          label: 'Save changes',
-          intent: 'primary',
-          rounded: true,
-          onclick: async () => {
-            if (!$.isEmptyObject(vnode.state.addedEditors)) {
-              try {
-                // TODO Graham 4/4/22: Break off into proper controller methods
-                const response = await $.post(`${app.serverUrl()}/addEditors`, {
-                  address: app.user.activeAccount.address,
-                  author_chain: app.user.activeAccount.chain.id,
-                  chain: app.activeChainId(),
-                  thread_id: thread.id,
-                  editors: JSON.stringify(vnode.state.addedEditors),
-                  jwt: app.user.jwt,
-                });
-                const { status, result } = response;
-                if (status === 'Success') {
-                  thread.collaborators = result.collaborators;
-                  notifySuccess('Collaborators added');
-                } else {
-                  notifyError('Failed to add collaborators');
-                }
-              } catch (err) {
-                throw new Error(
-                  err.responseJSON && err.responseJSON.error
-                    ? err.responseJSON.error
-                    : 'Failed to add collaborators'
-                );
-              }
-            }
-            if (!$.isEmptyObject(vnode.state.removedEditors)) {
-              try {
-                const response = await $.post(
-                  `${app.serverUrl()}/deleteEditors`,
-                  {
-                    address: app.user.activeAccount.address,
-                    author_chain: app.user.activeAccount.chain.id,
-                    chain: app.activeChainId(),
-                    thread_id: thread.id,
-                    editors: JSON.stringify(vnode.state.removedEditors),
-                    jwt: app.user.jwt,
-                  }
-                );
-                const { status, result } = response;
-                if (status === 'Success') {
-                  thread.collaborators = result.collaborators;
-                  notifySuccess('Collaborators removed');
-                } else {
-                  throw new Error('Failed to remove collaborators');
-                }
-                m.redraw();
-              } catch (err) {
-                const errMsg =
-                  err.responseJSON?.error || 'Failed to remove collaborators';
-                notifyError(errMsg);
-              }
-            }
-            if (vnode.attrs.popoverMenu) {
-              vnode.attrs.openStateHandler(false);
-              m.redraw();
-            } else {
-              vnode.state.isOpen = false;
-            }
-          },
-        }),
-      ]),
     });
   },
 };
@@ -604,11 +359,8 @@ export const ProposalBodyCancelEdit: m.Component<{
           onclick: async (e) => {
             e.preventDefault();
             let confirmed = true;
-            const threadText = parentState.quillEditorState.markdownMode
-              ? parentState.quillEditorState.editor.getText()
-              : JSON.stringify(
-                  parentState.quillEditorState.editor.getContents()
-                );
+            const threadText =
+              parentState.quillEditorState.textContentsAsString;
             if (threadText !== parentState.currentText) {
               confirmed = await confirmationModalWithText(
                 'Cancel editing? Changes will not be saved.'
@@ -617,7 +369,7 @@ export const ProposalBodyCancelEdit: m.Component<{
             if (!confirmed) return;
             parentState.editing = false;
             getSetGlobalEditingStatus(GlobalStatus.Set, false);
-            clearEditingLocalStorage(item, item instanceof OffchainThread);
+            clearEditingLocalStorage(item, item instanceof Thread);
             m.redraw();
           },
         },
@@ -628,17 +380,17 @@ export const ProposalBodyCancelEdit: m.Component<{
 };
 
 export const ProposalBodySaveEdit: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
   getSetGlobalEditingStatus;
   parentState;
-  callback?: Function; // required for OffchainComments
+  callback?: Function; // required for Comments
 }> = {
   view: (vnode) => {
     const { item, getSetGlobalEditingStatus, parentState, callback } =
       vnode.attrs;
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
-    const isComment = item instanceof OffchainComment;
+    const isThread = item instanceof Thread;
+    const isComment = item instanceof Comment;
 
     return m('.ProposalBodySaveEdit', [
       m(
@@ -658,12 +410,9 @@ export const ProposalBodySaveEdit: m.Component<{
               }
             }
             parentState.saving = true;
-            parentState.quillEditorState.editor.enable(false);
-            const { quillEditorState } = parentState;
-            const itemText = quillEditorState.markdownMode
-              ? quillEditorState.editor.getText()
-              : JSON.stringify(quillEditorState.editor.getContents());
-            if (item instanceof OffchainThread) {
+            parentState.quillEditorState.disable();
+            const itemText = parentState.quillEditorState.textContentsAsString;
+            if (item instanceof Thread) {
               app.threads
                 .edit(
                   item,
@@ -680,7 +429,7 @@ export const ProposalBodySaveEdit: m.Component<{
                   m.redraw();
                   notifySuccess('Thread successfully edited');
                 });
-            } else if (item instanceof OffchainComment) {
+            } else if (item instanceof Comment) {
               app.comments.edit(item, itemText).then((c) => {
                 parentState.editing = false;
                 parentState.saving = false;
@@ -703,28 +452,14 @@ export const ProposalBodySpacer: m.Component<{}> = {
   },
 };
 
-const countLinesQuill = (ops) => {
-  let count = 0;
-  for (const op of ops) {
-    try {
-      count += op.insert.split('\n').length - 1;
-    } catch (e) {}
-  }
-  return count;
-};
-
-const countLinesMarkdown = (text) => {
-  return text.split('\n').length - 1;
-};
-
 const formatBody = (vnode, updateCollapse) => {
   const { item } = vnode.attrs;
   if (!item) return;
 
   const body =
-    item instanceof OffchainComment
+    item instanceof Comment
       ? item.text
-      : item instanceof OffchainThread
+      : item instanceof Thread
       ? item.body
       : item.description;
   if (!body) return;
@@ -746,7 +481,7 @@ const formatBody = (vnode, updateCollapse) => {
 
 export const ProposalBodyText: m.Component<
   {
-    item: AnyProposal | OffchainThread | OffchainComment<any>;
+    item: AnyProposal | Thread | Comment<any>;
   },
   { collapsed: boolean; body: any }
 > = {
@@ -762,8 +497,8 @@ export const ProposalBodyText: m.Component<
     if (!body) return;
 
     const getPlaceholder = () => {
-      if (!(vnode.attrs.item instanceof OffchainThread)) return;
-      const author: Account<any> = app.chain
+      if (!(vnode.attrs.item instanceof Thread)) return;
+      const author: Account = app.chain
         ? app.chain.accounts.get(vnode.attrs.item.author)
         : null;
 
@@ -781,11 +516,6 @@ export const ProposalBodyText: m.Component<
       ]);
     };
 
-    const toggleDisplay = () => {
-      vnode.state.collapsed = !vnode.state.collapsed;
-      m.redraw();
-    };
-
     return m(
       '.ProposalBodyText',
       (() => {
@@ -801,40 +531,20 @@ export const ProposalBodyText: m.Component<
             return getPlaceholder();
           }
 
-          return m('.show-more-wrap', [
-            m(QuillFormattedText, {
-              doc,
-              cutoffText: vnode.state.collapsed
-                ? QUILL_PROPOSAL_LINES_CUTOFF_LENGTH
-                : doc.ops.length,
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(QuillFormattedText, {
+            doc,
+            cutoffLines: QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
+            collapse: false,
+            hideFormatting: false,
+          });
         } catch (e) {
           if (body?.toString().trim() === '') {
             return getPlaceholder();
           }
-          return m('.show-more-wrap', [
-            m(MarkdownFormattedText, {
-              doc: body,
-              cutoffText: vnode.state.collapsed
-                ? MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
-                : countLinesMarkdown(body),
-            }),
-            vnode.state.collapsed &&
-              m('.show-more-button-wrapper', [
-                m('.show-more-button', { onclick: toggleDisplay }, [
-                  m(CWIcon, { iconName: 'plus', iconSize: 'small' }),
-                  m('.show-more-text', ['Show More']),
-                ]),
-              ]),
-          ]);
+          return m(MarkdownFormattedText, {
+            doc: body,
+            cutoffLines: MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
+          });
         }
       })()
     );
@@ -842,7 +552,7 @@ export const ProposalBodyText: m.Component<
 };
 
 export const ProposalBodyAttachments: m.Component<{
-  item: OffchainThread | OffchainComment<any>;
+  item: Thread | Comment<any>;
 }> = {
   view: (vnode) => {
     const { item } = vnode.attrs;
@@ -877,7 +587,7 @@ export const ProposalBodyAttachments: m.Component<{
 
 export const ProposalBodyEditor: m.Component<
   {
-    item: OffchainThread | OffchainComment<any>;
+    item: Thread | Comment<any>;
     parentState;
   },
   {
@@ -887,7 +597,7 @@ export const ProposalBodyEditor: m.Component<
 > = {
   oninit: async (vnode) => {
     const { item } = vnode.attrs;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
     vnode.state.savedEdits = isThread
       ? localStorage.getItem(
           `${app.activeChainId()}-edit-thread-${item.id}-storedText`
@@ -911,23 +621,23 @@ export const ProposalBodyEditor: m.Component<
     const { restoreEdits, savedEdits } = vnode.state;
 
     if (!item) return;
-    const isThread = item instanceof OffchainThread;
+    const isThread = item instanceof Thread;
     const body =
       restoreEdits && savedEdits
         ? savedEdits
-        : item instanceof OffchainComment
-        ? (item as OffchainComment<any>).text
-        : item instanceof OffchainThread
-        ? (item as OffchainThread).body
+        : item instanceof Comment
+        ? (item as Comment<any>).text
+        : item instanceof Thread
+        ? (item as Thread).body
         : null;
 
     if (!body) return;
     if (savedEdits && restoreEdits === undefined) {
-      return m(QuillEditor);
+      return m(QuillEditorComponent);
     }
 
     return m('.ProposalBodyEditor', [
-      m(QuillEditor, {
+      m(QuillEditorComponent, {
         contentsDoc: (() => {
           try {
             const doc = JSON.parse(body);

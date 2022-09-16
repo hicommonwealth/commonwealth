@@ -19,6 +19,8 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
 import { CommunityType } from '.';
 
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+
 // TODO: ChainFormState contains "uploadInProgress" which is technically
 // not part of the form (what we pass to /createChain), but of the general view's state,
 // and should be located elsewhere.
@@ -47,7 +49,7 @@ export class StarterCommunityForm implements m.ClassComponent {
         <InputRow
           title="Name"
           placeholder="Enter the name of your community"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v;
             this.state.form.id = slugifyPreserveDashes(v);
@@ -56,7 +58,7 @@ export class StarterCommunityForm implements m.ClassComponent {
         <IdRow id={this.state.form.id} />
         <InputRow
           title="Symbol"
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
           }}
@@ -157,6 +159,13 @@ export class StarterCommunityForm implements m.ClassComponent {
                 website,
                 ...additionalArgs,
               });
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id
+                );
+              }
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {

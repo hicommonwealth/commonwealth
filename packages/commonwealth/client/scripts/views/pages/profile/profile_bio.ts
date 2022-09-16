@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
-import MarkdownFormattedText from '../../components/markdown_formatted_text';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
 import SubstrateIdentity from '../../../controllers/chain/substrate/identity';
@@ -17,17 +17,17 @@ import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (
-  account,
+  account: Account,
   currentIdentity: SubstrateIdentity,
   vnode
 ) => {
-  const chainObj = app.config.chains.getById(account.chain);
+  const chainObj = app.config.chains.getById(account.chain.id);
   if (!chainObj) return;
 
   // TODO: look up the chainObj's chain base
   return (
-    (account.chain.indexOf('edgeware') !== -1 ||
-      account.chain.indexOf('kusama') !== -1) &&
+    (account.chain.id.indexOf('edgeware') !== -1 ||
+      account.chain.id.indexOf('kusama') !== -1) &&
     m(Button, {
       intent: 'primary',
       // wait for info to load before making it clickable
@@ -68,7 +68,7 @@ const editIdentityAction = (
   );
 };
 export interface IProfileHeaderAttrs {
-  account: Account<any>;
+  account: Account;
   setIdentity: boolean;
   refreshCallback: Function;
   onLinkedProfile: boolean;
@@ -113,10 +113,10 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain === app.activeChainId()
+        (a) => a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
-        await app.user.createRole({
+        await app.roles.createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         });
@@ -163,15 +163,15 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   )}`
                 ),
                 m('img', {
-                  src: !account.ghost_address
+                  src: !account.ghostAddress
                     ? '/static/img/copy_default.svg'
                     : '/static/img/ghost.svg',
                   alt: '',
                   width: '20px',
 
-                  class: !account.ghost_address ? 'cursor-pointer' : '',
+                  class: !account.ghostAddress ? 'cursor-pointer' : '',
                   onclick: (e) => {
-                    if (!account.ghost_address) {
+                    if (!account.ghostAddress) {
                       window.navigator.clipboard
                         .writeText(account.address)
                         .then(() =>
@@ -247,14 +247,14 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             )}`
           ),
           m('img', {
-            src: !account.ghost_address
+            src: !account.ghostAddress
               ? '/static/img/copy_default.svg'
               : '/static/img/ghost.svg',
             alt: '',
             width: '20px',
-            class: !account.ghost_address ? 'cursor-pointer' : '',
+            class: !account.ghostAddress ? 'cursor-pointer' : '',
             onclick: (e) => {
-              if (!account.ghost_address) {
+              if (!account.ghostAddress) {
                 window.navigator.clipboard
                   .writeText(account.address)
                   .then(() => notifySuccess('Copied address to clipboard'));
@@ -263,7 +263,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         ]
       ),
-      account.ghost_address
+      account.ghostAddress
         ? m(
             'div',
             {

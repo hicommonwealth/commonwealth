@@ -13,8 +13,6 @@ import {
   Grid,
   Col,
   Spinner,
-  Tabs,
-  TabItem,
   PopoverMenu,
   Icons,
   MenuItem,
@@ -25,12 +23,7 @@ import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import {
-  ITXModalData,
-  ProposalModule,
-  OffchainThreadKind,
-  OffchainThreadStage,
-} from 'models';
+import { ITXModalData, ProposalModule, ThreadStage, ThreadKind } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -58,8 +51,9 @@ import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
-import { NearSputnikProposalKind } from 'client/scripts/controllers/chain/near/sputnik/types';
+import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -165,7 +159,7 @@ const NewProposalForm = {
       hasThreshold = vnode.state.councilMotionType !== 'vetoNextExternal';
       if (hasExternalProposalSelector)
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
-    } else if (proposalTypeEnum === ProposalType.OffchainThread) {
+    } else if (proposalTypeEnum === ProposalType.Thread) {
       hasTitleAndDescription = true;
       hasTopics = true;
     } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
@@ -228,12 +222,12 @@ const NewProposalForm = {
         ).createTx(...a);
       };
       let args = [];
-      if (proposalTypeEnum === ProposalType.OffchainThread) {
+      if (proposalTypeEnum === ProposalType.Thread) {
         app.threads
           .create(
             author.address,
-            OffchainThreadKind.Forum,
-            OffchainThreadStage.Discussion,
+            ThreadKind.Discussion,
+            ThreadStage.Discussion,
             app.activeChainId(),
             vnode.state.form.title,
             vnode.state.form.topicName,
@@ -716,7 +710,7 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics &&
             m(TopicSelector, {
-              topics: app.chain.meta.topics,
+              topics: app.topics.getByCommunity(app.chain.id),
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;
@@ -1104,25 +1098,17 @@ const NewProposalForm = {
                 }),
               ]),
               m('.tab-selector', [
-                m(
-                  Tabs,
-                  {
-                    align: 'left',
-                    class: 'tabs',
-                  },
-                  [
-                    aaveProposalState.map((_, index) =>
-                      m(TabItem, {
-                        key: index,
-                        label: `Call ${index + 1}`,
-                        active: activeAaveTabIndex === index,
-                        onclick: () => {
-                          vnode.state.activeAaveTabIndex = index;
-                        },
-                      })
-                    ),
-                  ]
-                ),
+                m(CWTabBar, [
+                  aaveProposalState.map((_, index) =>
+                    m(CWTab, {
+                      label: `Call ${index + 1}`,
+                      isSelected: activeAaveTabIndex === index,
+                      onclick: () => {
+                        vnode.state.activeAaveTabIndex = index;
+                      },
+                    })
+                  ),
+                ]),
                 m(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
@@ -1268,27 +1254,19 @@ const NewProposalForm = {
                   )
                 ),
               ]),
-              // TODO: display offchain copy re AIPs and ARCs from https://docs.aave.com/governance/
+              // TODO: display copy re AIPs and ARCs from https://docs.aave.com/governance/
               m('.tab-selector', [
-                m(
-                  Tabs,
-                  {
-                    align: 'left',
-                    class: 'tabs',
-                  },
-                  [
-                    aaveProposalState.map((_, index) =>
-                      m(TabItem, {
-                        key: index,
-                        label: `Call ${index + 1}`,
-                        active: activeAaveTabIndex === index,
-                        onclick: () => {
-                          vnode.state.activeAaveTabIndex = index;
-                        },
-                      })
-                    ),
-                  ]
-                ),
+                m(CWTabBar, [
+                  aaveProposalState.map((_, index) =>
+                    m(CWTab, {
+                      label: `Call ${index + 1}`,
+                      isSelected: activeAaveTabIndex === index,
+                      onclick: () => {
+                        vnode.state.activeAaveTabIndex = index;
+                      },
+                    })
+                  ),
+                ]),
                 m(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
@@ -1651,7 +1629,7 @@ const NewProposalForm = {
               intent: 'primary',
               rounded: true,
               label:
-                proposalTypeEnum === ProposalType.OffchainThread
+                proposalTypeEnum === ProposalType.Thread
                   ? 'Create thread'
                   : 'Send transaction',
               onclick: (e) => {

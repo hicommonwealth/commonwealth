@@ -11,7 +11,7 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
-import { OffchainThread } from 'client/scripts/models';
+import { Thread } from 'models';
 import { SnapshotSpaceCard } from './snapshot_space_card';
 import { PageLoading } from '../loading';
 import { CardsCollection } from '../../components/cards_collection';
@@ -29,11 +29,11 @@ export enum REDIRECT_ACTIONS {
 
 function redirectHandler(
   action: string,
-  proposal: null | OffchainThread
+  proposal: null | Thread
 ): {
   header_message: string;
   redirect_option: string;
-  proposal: null | OffchainThread;
+  proposal: null | Thread;
 } {
   // Default to Enter Snapshot Space View
   let header = SPACES_HEADER_MESSAGES.ENTER_SPACES;
@@ -60,7 +60,7 @@ class MultipleSnapshotsPage
   implements
     m.ClassComponent<{
       action?: string;
-      proposal?: OffchainThread;
+      proposal?: Thread;
     }>
 {
   private snapshot_spaces: string[];

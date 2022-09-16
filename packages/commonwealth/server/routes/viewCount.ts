@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import ViewCountCache from '../util/viewCountCache';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { sequelize, DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -9,32 +10,32 @@ export const Errors = {
   NoObjectId: 'Must provide object ID',
   NoChainOrComm: 'Must provide chain or community',
   InvalidChainOrComm: 'Invalid chain or community',
-  InvalidThread: 'Invalid offchain thread',
+  InvalidThread: 'Invalid thread',
 };
 
 const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
   if (!req.body.object_id) {
-    return next(new Error(Errors.NoObjectId));
+    return next(new AppError(Errors.NoObjectId));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NoChainOrComm));
+    return next(new AppError(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
     where: { id: req.body.chain || null }
   });
   if (!chain) {
-    return next(new Error(Errors.InvalidChainOrComm));
+    return next(new AppError(Errors.InvalidChainOrComm));
   }
 
   // verify count exists before querying
-  let count = await models.OffchainViewCount.findOne({
+  let count = await models.ViewCount.findOne({
     where: {
       chain: req.body.chain,
       object_id: req.body.object_id,
     }
   });
   if (!count) {
-    return next(new Error(Errors.InvalidThread));
+    return next(new AppError(Errors.InvalidThread));
   }
 
   // hit cache to decide whether to add to count

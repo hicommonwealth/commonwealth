@@ -13,14 +13,15 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import { constructSubstrateUrl } from 'substrate';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow } from 'views/components/metadata_rows';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { initChainForm, defaultChainRows } from './chain_input_rows';
+import { ChainFormFields, ChainFormState } from './types';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 type SubstrateFormFields = {
   nodeUrl: string;
@@ -48,14 +49,14 @@ export class SubstrateForm implements m.ClassComponent {
       <div class="CreateCommunityForm">
         <InputRow
           title="Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v;
           }}
         />
         <InputRow
           title="Node URL"
-          defaultValue={this.state.form.nodeUrl}
+          value={this.state.form.nodeUrl}
           placeholder="wss://"
           onChangeHandler={(v) => {
             this.state.form.nodeUrl = v;
@@ -63,7 +64,7 @@ export class SubstrateForm implements m.ClassComponent {
         />
         <InputRow
           title="Symbol"
-          defaultValue={this.state.form.symbol}
+          value={this.state.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {
             this.state.form.symbol = v;
@@ -71,7 +72,7 @@ export class SubstrateForm implements m.ClassComponent {
         />
         <InputRow
           title="Spec (JSON)"
-          defaultValue={this.state.form.substrateSpec}
+          value={this.state.form.substrateSpec}
           // TODO: how to make this resizable vertically?
           //   looks like CUI specifies an !important height tag, which prevents this
           textarea={true}
@@ -140,6 +141,13 @@ export class SubstrateForm implements m.ClassComponent {
               ...this.state.form,
             })
               .then(async (res) => {
+                if (res.result.admin_address) {
+                  await linkExistingAddressToChainOrCommunity(
+                    res.result.admin_address,
+                    res.result.role.chain_id,
+                    res.result.role.chain_id
+                  );
+                }
                 await initAppState(false);
                 m.route.set(`/${res.result.chain.id}`);
               })

@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
-import { OffchainReactionInstance } from '../models/offchain_reaction';
+import { ReactionInstance } from '../models/reaction';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,9 +33,9 @@ const reactionsCounts = async (
         countField = 'proposal_id';
       }
       const [reacCounts = [], myReactions = []] = await (<
-        Promise<[OffchainReactionInstance[], OffchainReactionInstance[]]>
+        Promise<[ReactionInstance[], ReactionInstance[]]>
       >Promise.all([
-        models.OffchainReaction.findAll({
+        models.Reaction.findAll({
           group: ['thread_id', 'comment_id', 'proposal_id', 'reaction'],
           attributes: [
             'thread_id',
@@ -50,7 +51,7 @@ const reactionsCounts = async (
           ),
         }),
         active_address
-          ? models.OffchainReaction.findAll({
+          ? models.Reaction.findAll({
               attributes: ['thread_id', 'comment_id', 'proposal_id'],
               where: Sequelize.or(
                 { thread_id: thread_ids || [] },
@@ -104,7 +105,7 @@ const reactionsCounts = async (
       return res.json({ result: [] });
     }
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 };
 

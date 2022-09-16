@@ -3,17 +3,14 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { OffchainThread, OffchainComment, AddressInfo, Account } from 'models';
+import { Thread, Comment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-
-import User from 'views/components/widgets/user';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {
-  proposal: OffchainThread | any;
-  comments: Array<OffchainComment<any>>;
-  account: Account<any>;
+  proposal: Thread | any;
+  comments: Array<Comment<any>>;
+  account: Account;
 }
 
 const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
@@ -35,9 +32,9 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
             link(
               'a.link-bold',
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
-              proposal instanceof OffchainThread ? 'thread' : 'proposal',
+              proposal instanceof Thread ? 'thread' : 'proposal',
               {},
-              `profile-${account.address}-${account.chain}-${proposal.chain}-scrollY`
+              `profile-${account.address}-${account.chain.id}-${proposal.chain}-scrollY`
             ),
             ' in ',
             link('a.link-bold', `/${proposal.chain}`, ` ${proposal.chain}`),
@@ -52,18 +49,9 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
           m('.proposal-comment', [
             m(
               '.comment-text',
-              (() => {
-                try {
-                  const doc = JSON.parse(comment.text);
-                  if (!doc.ops) throw new Error();
-                  return m(QuillFormattedText, { doc, collapse: true });
-                } catch (e) {
-                  return m(MarkdownFormattedText, {
-                    doc: comment.text,
-                    collapse: true,
-                  });
-                }
-              })()
+              renderQuillTextBody(comment.text, {
+                collapse: true,
+              })
             ),
           ])
         ),

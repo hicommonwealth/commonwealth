@@ -6,7 +6,7 @@ import { Button } from 'construct-ui';
 import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
@@ -15,7 +15,7 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 class EditTopicThresholdsRow
   implements
     m.ClassComponent<{
-      topic: OffchainTopic;
+      topic: Topic;
     }>
 {
   private newTokenThresholdInWei: string;
@@ -93,7 +93,7 @@ export class EditTopicThresholdsModal
   view(vnode) {
     if (
       !app.user.isSiteAdmin &&
-      !app.user.isAdminOfEntity({ chain: app.activeChainId() })
+      !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
     )
       return null;
     const { id, name, description, tokenThreshold } = vnode.attrs;

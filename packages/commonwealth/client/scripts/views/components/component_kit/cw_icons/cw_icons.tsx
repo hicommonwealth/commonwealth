@@ -29,17 +29,27 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // ICON TEMPLATE
 // export const CWIconName: m.Component<IconAttrs> = {
 //   view: (vnode) => {
-//     const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
-//     return (
-//       <svg
-//         class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
-//         xmlns="http://www.w3.org/2000/svg"
-//         width="32"
-//         height="32"
-//         fill="none"
-//         viewBox="0 0 32 32"
-//         onclick={onclick}
-//       >
+// const {
+//   className,
+//   componentType,
+//   disabled,
+//   iconButtonTheme,
+//   iconSize,
+//   selected,
+//   ...domAttrs
+// } = vnode.attrs;
+// return (
+//   <svg
+//     class={getClasses<IconStyleAttrs>(
+//       { className, disabled, iconButtonTheme, iconSize, selected },
+//       componentType
+//     )}
+//     xmlns="http://www.w3.org/2000/svg"
+//     width="32"
+//     height="32"
+//     fill="none"
+//     viewBox="0 0 32 32"
+//     {...domAttrs}
 //       {/* INSERT PATH HERE */}
 //       </svg>
 //     );
@@ -48,16 +58,27 @@ import { IconAttrs, IconStyleAttrs } from './types';
 
 export const CWArrowLeft: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -71,16 +92,27 @@ export const CWArrowLeft: m.Component<IconAttrs> = {
 
 export const CWArrowRight: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -94,16 +126,27 @@ export const CWArrowRight: m.Component<IconAttrs> = {
 
 export const CWBacker: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
-        viewBox="0 0 32 32"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        onclick={onclick}
+        viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -124,16 +167,27 @@ export const CWBacker: m.Component<IconAttrs> = {
 
 export const CWBadge: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M15.56 5.391a.5.5 0 01.88 0l2.75 5.06a.5.5 0 00.453.262l5.758-.148a.5.5 0 01.439.761l-3.007 4.913a.5.5 0 000 .522l3.007 4.913a.5.5 0 01-.44.76l-5.757-.147a.5.5 0 00-.453.261l-2.75 5.06a.5.5 0 01-.88 0l-2.75-5.06a.5.5 0 00-.453-.26l-5.758.147a.5.5 0 01-.439-.761l3.007-4.913a.5.5 0 000-.522L6.16 11.326a.5.5 0 01.44-.76l5.757.147a.5.5 0 00.453-.261l2.75-5.06z"></path>
         <path d="M17.083 4.583a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM17.083 28.417a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM27.183 22.458a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM6.882 22.458a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM6.882 10.64a1.083 1.083 0 11-2.167 0 1.083 1.083 0 012.167 0zM27.183 10.64a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0z"></path>
@@ -144,16 +198,27 @@ export const CWBadge: m.Component<IconAttrs> = {
 
 export const CWBell: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M19.456 27.043a3.456 3.456 0 11-6.913.001 3.456 3.456 0 016.913 0zM18.42 4.747a2.247 2.247 0 11-4.494 0 2.247 2.247 0 014.493 0z"></path>
         <path
@@ -168,16 +233,27 @@ export const CWBell: m.Component<IconAttrs> = {
 
 export const CWCautionCircle: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M15.333 9.75a.75.75 0 01.75-.75h.5a.75.75 0 01.75.75v8.502a.75.75 0 01-.75.75h-.5a.75.75 0 01-.75-.75V9.75zM17.667 21.836a1.334 1.334 0 11-2.667 0 1.334 1.334 0 012.667 0z"></path>
         <path d="M15.333 9.75a.75.75 0 01.75-.75h.5a.75.75 0 01.75.75v8.502a.75.75 0 01-.75.75h-.5a.75.75 0 01-.75-.75V9.75zM17.667 21.836a1.334 1.334 0 11-2.667 0 1.334 1.334 0 012.667 0z"></path>
@@ -193,16 +269,27 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
 
 export const CWCautionTriangle: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -218,16 +305,27 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
 
 export const CWCheck: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -241,16 +339,27 @@ export const CWCheck: m.Component<IconAttrs> = {
 
 export const CWChevronDown: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -264,16 +373,27 @@ export const CWChevronDown: m.Component<IconAttrs> = {
 
 export const CWChevronLeft: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -287,16 +407,27 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
 
 export const CWChevronRight: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -310,16 +441,27 @@ export const CWChevronRight: m.Component<IconAttrs> = {
 
 export const CWChevronUp: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -333,17 +475,27 @@ export const CWChevronUp: m.Component<IconAttrs> = {
 
 export const CWClock: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
-
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
-        viewBox="0 0 32 32"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        onclick={onclick}
+        viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -358,16 +510,27 @@ export const CWClock: m.Component<IconAttrs> = {
 
 export const CWClose: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <g clip-path="url(#clip0_402_12158)">
           <path d="M6.454 6.247c.195-.195.6-.107.904.196l18.699 18.7c.303.303.391.708.196.903l-.707.707c-.195.195-.6.107-.904-.197L5.943 7.858c-.303-.304-.391-.709-.196-.904l.707-.707z"></path>
@@ -385,16 +548,27 @@ export const CWClose: m.Component<IconAttrs> = {
 
 export const CWCloud: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <circle cx="16.069" cy="9.273" r="7.273"></circle>
         <circle cx="16.069" cy="9.273" r="7.273"></circle>
@@ -412,16 +586,27 @@ export const CWCloud: m.Component<IconAttrs> = {
 
 export const CWCollapse: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -433,18 +618,59 @@ export const CWCollapse: m.Component<IconAttrs> = {
   },
 };
 
-export const CWCopy: m.Component<IconAttrs> = {
+export const CWCommonLogo: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        xmlns="http://www.w3.org/2000/svg"
+        {...domAttrs}
+      >
+        <path d="M11.0929 16.1265C11.0999 14.7619 11.4109 13.416 12.0029 12.1872C12.5951 10.9584 13.4533 9.87773 14.5152 9.02407L12.4159 6.919C12.1133 6.6157 11.7029 6.44531 11.2751 6.44531C10.8473 6.44531 10.4369 6.6157 10.1343 6.919L2.21849 14.8565C1.91601 15.1599 1.74609 15.5714 1.74609 16.0004C1.74609 16.4294 1.91601 16.8409 2.21849 17.1443L10.1343 25.0818C10.4369 25.3851 10.8473 25.5555 11.2751 25.5555C11.7029 25.5555 12.1133 25.3851 12.4159 25.0818L14.3547 23.1333C13.3342 22.2747 12.5134 21.2026 11.9499 19.9922C11.3865 18.7817 11.0939 17.4623 11.0929 16.1265Z" />
+        <path d="M20.6647 6.81642C18.4119 6.81295 16.2273 7.59355 14.482 9.02568L20.2675 14.8461C20.4171 14.9957 20.5358 15.1736 20.6168 15.3695C20.6978 15.5654 20.7395 15.7754 20.7395 15.9876C20.7395 16.1998 20.6978 16.4098 20.6168 16.6057C20.5358 16.8016 20.4171 16.9795 20.2675 17.1291L14.3223 23.1058C16.0939 24.6149 18.3426 25.4398 20.6647 25.4322C25.958 25.4322 30.2539 21.2697 30.2539 16.1308C30.2539 10.9918 25.9493 6.81642 20.6647 6.81642Z" />
+      </svg>
+    );
+  },
+};
+
+export const CWCopy: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -459,16 +685,27 @@ export const CWCopy: m.Component<IconAttrs> = {
 
 export const CWCouncilProposal: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M14.586 8.914a2 2 0 012.828 0l6.364 6.364a2 2 0 010 2.829l-6.364 6.364a2 2 0 01-2.828 0l-6.364-6.364a2 2 0 010-2.829l6.364-6.364zM11 8.5a3 3 0 11-6 0 3 3 0 016 0zM27 8.5a3 3 0 11-6 0 3 3 0 016 0zM11 24.5a3 3 0 11-6 0 3 3 0 016 0zM27 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
       </svg>
@@ -478,16 +715,27 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
 
 export const CWCow: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -501,16 +749,27 @@ export const CWCow: m.Component<IconAttrs> = {
 
 export const CWCurator: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -526,16 +785,27 @@ export const CWCurator: m.Component<IconAttrs> = {
 
 export const CWDemocraticProposal: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -549,16 +819,27 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
 
 export const CWDiscord: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M26.182 8.864s-2.918-2.285-6.364-2.546l-.31.622c3.114.763 4.543 1.854 6.037 3.196C22.97 8.822 20.43 7.591 16 7.591c-4.43 0-6.97 1.23-9.545 2.545 1.494-1.342 3.194-2.555 6.037-3.196l-.31-.622c-3.615.34-6.364 2.546-6.364 2.546S2.56 13.589 2 22.864c3.284 3.788 8.273 3.818 8.273 3.818l1.043-1.39a12.748 12.748 0 01-5.498-3.701c2.06 1.559 5.17 3.182 10.182 3.182 5.011 0 8.121-1.623 10.182-3.182a12.74 12.74 0 01-5.498 3.701l1.043 1.39s4.99-.03 8.273-3.818c-.56-9.275-3.818-14-3.818-14zM11.864 20.318c-1.231 0-2.228-1.139-2.228-2.545 0-1.407.997-2.546 2.228-2.546 1.23 0 2.227 1.14 2.227 2.546s-.997 2.545-2.227 2.545zm8.272 0c-1.23 0-2.227-1.139-2.227-2.545 0-1.407.997-2.546 2.227-2.546 1.231 0 2.228 1.14 2.228 2.546s-.997 2.545-2.228 2.545z"></path>
       </svg>
@@ -568,16 +849,27 @@ export const CWDiscord: m.Component<IconAttrs> = {
 
 export const CWDots: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M8.059 16a3 3 0 11-6 0 3 3 0 016 0zM18.858 16a3 3 0 11-6 0 3 3 0 016 0zM30.058 16c0 1.657-1.432 3-3.2 3-1.767 0-3.2-1.343-3.2-3s1.433-3 3.2-3c1.768 0 3.2 1.343 3.2 3z"></path>
       </svg>
@@ -585,18 +877,59 @@ export const CWDots: m.Component<IconAttrs> = {
   },
 };
 
-export const CWDownvote: m.Component<IconAttrs> = {
+export const CWDotsVertical: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
+      >
+        <path d="M16 8.059a3 3 0 110-6 3 3 0 010 6zM16 18.858a3 3 0 110-6 3 3 0 010 6zM16 30.058c-1.657 0-3-1.432-3-3.2 0-1.767 1.343-3.2 3-3.2s3 1.433 3 3.2c0 1.768-1.343 3.2-3 3.2z"></path>
+      </svg>
+    );
+  },
+};
+
+export const CWDownvote: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path d="M16.73 27.828a.843.843 0 01-1.46 0L2.113 5.018a.845.845 0 01.731-1.268h26.31c.65 0 1.055.704.73 1.267l-13.154 22.81z"></path>
       </svg>
@@ -606,16 +939,27 @@ export const CWDownvote: m.Component<IconAttrs> = {
 
 export const CWEdit: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -629,16 +973,27 @@ export const CWEdit: m.Component<IconAttrs> = {
 
 export const CWElement: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -652,16 +1007,27 @@ export const CWElement: m.Component<IconAttrs> = {
 
 export const CWExpand: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -675,16 +1041,27 @@ export const CWExpand: m.Component<IconAttrs> = {
 
 export const CWExternalLink: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -698,16 +1075,27 @@ export const CWExternalLink: m.Component<IconAttrs> = {
 
 export const CWFeedback: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -721,16 +1109,27 @@ export const CWFeedback: m.Component<IconAttrs> = {
 
 export const CWFilter: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -744,16 +1143,27 @@ export const CWFilter: m.Component<IconAttrs> = {
 
 export const CWFlag: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -767,16 +1177,27 @@ export const CWFlag: m.Component<IconAttrs> = {
 
 export const CWFlame: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M19.909 30.332c-.215.043-.378-.314-.244-.487 1.575-2.034-.621-6.082-2.787-8.747a1.122 1.122 0 00-1.756 0c-2.166 2.665-4.362 6.713-2.787 8.747.134.173-.029.53-.244.487C-.757 27.749 7.91 11.445 15.085 2.93a1.189 1.189 0 011.83 0c7.176 8.515 15.842 24.82 2.994 27.402z"></path>
       </svg>
@@ -786,16 +1207,27 @@ export const CWFlame: m.Component<IconAttrs> = {
 
 export const CWGear: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <rect width="4" height="6" x="14" y="2.5" rx="0.5"></rect>
         <rect width="4" height="6" x="14" y="24.5" rx="0.5"></rect>
@@ -859,16 +1291,27 @@ export const CWGear: m.Component<IconAttrs> = {
 
 export const CWGithub: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -882,16 +1325,26 @@ export const CWGithub: m.Component<IconAttrs> = {
 
 export const CWHamburger: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
-        fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M2 20c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1zM30 13c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1z"></path>
       </svg>
@@ -901,16 +1354,27 @@ export const CWHamburger: m.Component<IconAttrs> = {
 
 export const CWHash: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -924,16 +1388,27 @@ export const CWHash: m.Component<IconAttrs> = {
 
 export const CWHeartEmpty: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -947,16 +1422,27 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
 
 export const CWHeartFilled: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -970,16 +1456,27 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
 
 export const CWHelp: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -993,16 +1490,27 @@ export const CWHelp: m.Component<IconAttrs> = {
 
 export const CWHome: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1016,16 +1524,27 @@ export const CWHome: m.Component<IconAttrs> = {
 
 export const CWInfoEmpty: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M17 21.61c0 .343-.336.621-.75.621h-.5c-.415 0-.75-.278-.75-.622v-7.05c0-.344.335-.623.75-.623h.5c.414 0 .75.279.75.622v7.051zM14.667 11.102a1.334 1.334 0 112.667 0 1.334 1.334 0 01-2.667 0z"></path>
         <path
@@ -1040,16 +1559,27 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
 
 export const CWInfoFilled: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1063,16 +1593,27 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
 
 export const CWJar: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1087,16 +1628,27 @@ export const CWJar: m.Component<IconAttrs> = {
 
 export const CWLink: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1110,16 +1662,27 @@ export const CWLink: m.Component<IconAttrs> = {
 
 export const CWLock: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1133,16 +1696,27 @@ export const CWLock: m.Component<IconAttrs> = {
 
 export const CWLogout: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1161,16 +1735,27 @@ export const CWLogout: m.Component<IconAttrs> = {
 
 export const CWMail: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1182,18 +1767,64 @@ export const CWMail: m.Component<IconAttrs> = {
   },
 };
 
-export const CWPeople: m.Component<IconAttrs> = {
+export const CWMute: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
+      >
+        <path d="M25.92 4.707a1 1 0 111.415 1.414L6.12 27.335a1 1 0 01-1.414-1.415L25.92 4.707z"></path>
+        <path
+          fillRule="evenodd"
+          d="M17.926 5.644a2.249 2.249 0 10-3.552-.057c-4.42.765-7.782 4.594-7.782 9.203v6.422a.586.586 0 01-.588.583H4.828a.586.586 0 00-.588.584v1.168c0 .322.263.584.588.584h.255L21.788 7.425a9.398 9.398 0 00-3.862-1.78zm1.533 20.909a3.46 3.46 0 11-5.93-2.422h-2.79l13.624-13.624a9.247 9.247 0 011.045 4.283v6.422c0 .322.263.583.588.583h1.176c.325 0 .588.262.588.584v1.168a.586.586 0 01-.588.584H18.47c.612.624.989 1.479.989 2.422zM7.316 24.13h2.01l14.51-14.512a9.397 9.397 0 00-1.29-1.538L6.497 24.13h.82z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWPeople: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
       >
         <path d="M17.18 18.244a3.998 3.998 0 00-1.555-7.68 3.997 3.997 0 00-1.552 7.68 6.501 6.501 0 00-4.926 5.81c-.021.275.204.5.48.5h12a.472.472 0 00.482-.5 6.501 6.501 0 00-4.93-5.81z"></path>
         <path
@@ -1208,16 +1839,27 @@ export const CWPeople: m.Component<IconAttrs> = {
 
 export const CWPerson: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1231,16 +1873,27 @@ export const CWPerson: m.Component<IconAttrs> = {
 
 export const CWPin: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M7 18a.5.5 0 01.5-.5h17a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-17A.5.5 0 017 19v-1z"></path>
         <path d="M16.5 7.5c.276 0 .5.275.5.615v20.902c0 .615-.724 1.483-1 1.483s-1-.868-1-1.483V8.115c0-.34.224-.615.5-.615h1zM9 3c0-.276.174-.5.389-.5H22.61c.215 0 .389.224.389.5v1c0 .276-.174.5-.389.5H9.39C9.174 4.5 9 4.276 9 4V3z"></path>
@@ -1252,16 +1905,27 @@ export const CWPin: m.Component<IconAttrs> = {
 
 export const CWPlus: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M2 16c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1z"></path>
         <path d="M16.5 2.5c.276 0 .5.348.5.778v26.444c0 .43-.224.778-.5.778h-1c-.276 0-.5-.348-.5-.778V3.278c0-.43.224-.778.5-.778h1z"></path>
@@ -1272,16 +1936,27 @@ export const CWPlus: m.Component<IconAttrs> = {
 
 export const CWPlusCircle: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1295,16 +1970,27 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
 
 export const CWSearch: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1318,16 +2004,27 @@ export const CWSearch: m.Component<IconAttrs> = {
 
 export const CWSend: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1341,16 +2038,27 @@ export const CWSend: m.Component<IconAttrs> = {
 
 export const CWShare: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1364,16 +2072,27 @@ export const CWShare: m.Component<IconAttrs> = {
 
 export const CWShare2: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1385,18 +2104,97 @@ export const CWShare2: m.Component<IconAttrs> = {
   },
 };
 
-export const CWStar: m.Component<IconAttrs> = {
+export const CWSidebarCollapse: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path d="M29.604 15.666c0-.276-.242-.5-.54-.5H10.172v2h18.892c.298 0 .54-.224.54-.5v-1zM29.828 23.334c0-.276-.223-.5-.498-.5H12.396a.5.5 0 00-.498.5v1a.5.5 0 00.498.5H29.33a.499.499 0 00.498-.5v-1zM11.69 8.666c0 .276.224.5.499.5h16.934a.499.499 0 00.498-.5v-1c0-.276-.223-.5-.498-.5H12.19a.499.499 0 00-.498.5v1z"></path>
+        <path
+          fill-rule="evenodd"
+          d="M2.31 16.405a.275.275 0 010-.477l7.449-4.295a.276.276 0 01.413.239v3.723h7.653c.192 0 .347.156.347.347v.45a.347.347 0 01-.347.346h-7.653v3.724c0 .212-.23.344-.413.238l-7.45-4.295z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWSidebarExpand: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path d="M2.396 15.666c0-.276.242-.5.54-.5h18.892v2H2.936c-.298 0-.54-.224-.54-.5v-1zM2.172 23.334a.5.5 0 01.498-.5h16.934c.275 0 .498.224.498.5v1c0 .276-.223.5-.498.5H2.67a.5.5 0 01-.498-.5v-1zM20.31 8.666c0 .276-.224.5-.499.5H2.877a.499.499 0 01-.498-.5v-1c0-.276.223-.5.498-.5h16.934c.275 0 .498.224.498.5v1z"></path>
+        <path
+          fill-rule="evenodd"
+          d="M29.69 16.405a.275.275 0 000-.477l-7.449-4.295a.276.276 0 00-.413.239v3.723h-7.653a.347.347 0 00-.347.347v.45c0 .191.155.346.347.346h7.652v3.724c0 .212.23.344.414.238l7.45-4.295z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWStar: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M13.065 1.469c.326-.861 1.544-.861 1.87 0l1.422 3.753a1 1 0 001.483.482l3.357-2.2c.77-.506 1.755.21 1.513 1.099l-1.056 3.872a1 1 0 00.917 1.262l4.01.192c.919.044 1.295 1.203.577 1.779l-3.13 2.512a1 1 0 000 1.56l3.13 2.512c.718.576.342 1.735-.578 1.779l-4.009.192a1 1 0 00-.917 1.262l1.056 3.873c.242.888-.743 1.604-1.513 1.099l-3.357-2.201a1 1 0 00-1.483.482l-1.422 3.753c-.326.861-1.544.861-1.87 0l-1.422-3.753a1 1 0 00-1.484-.482l-3.356 2.2c-.77.506-1.755-.21-1.513-1.098l1.056-3.873a1 1 0 00-.917-1.262l-4.01-.192C.5 20.027.125 18.868.843 18.292l3.13-2.512a1 1 0 000-1.56l-3.13-2.512C.124 11.132.5 9.973 1.42 9.929l4.009-.192a1 1 0 00.917-1.262L5.29 4.603c-.242-.889.743-1.605 1.513-1.1l3.356 2.201a1 1 0 001.484-.482l1.422-3.753z"></path>
       </svg>
@@ -1406,16 +2204,27 @@ export const CWStar: m.Component<IconAttrs> = {
 
 export const CWSun: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <circle cx="16" cy="16" r="8"></circle>
         <rect width="2" height="5" x="15" y="2" rx="0.5"></rect>
@@ -1475,16 +2284,27 @@ export const CWSun: m.Component<IconAttrs> = {
 
 export const CWTelegram: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1498,16 +2318,27 @@ export const CWTelegram: m.Component<IconAttrs> = {
 
 export const CWTrash: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M7.119 11.612A2 2 0 019.116 9.5h13.768a2 2 0 011.997 2.112l-.9 16a2 2 0 01-1.997 1.888H10.016a2 2 0 01-1.997-1.888l-.9-16z"></path>
         <path
@@ -1522,16 +2353,27 @@ export const CWTrash: m.Component<IconAttrs> = {
 
 export const CWTreasuryProposal: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1545,16 +2387,27 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
 
 export const CWTwitter: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M28.553 8.978c.02.306.02.613.02.919 0 9.34-6.517 20.103-18.428 20.103-3.67 0-7.078-1.16-9.946-3.172.522.066 1.023.088 1.564.088 3.028 0 5.815-1.116 8.041-3.02-2.847-.065-5.233-2.1-6.056-4.9.401.067.803.11 1.224.11.581 0 1.163-.087 1.704-.24-2.968-.657-5.194-3.5-5.194-6.935v-.087a6.119 6.119 0 002.928.897c-1.744-1.27-2.887-3.435-2.887-5.885 0-1.312.32-2.515.882-3.565 3.188 4.287 7.98 7.087 13.355 7.393a8.668 8.668 0 01-.16-1.618C15.6 5.172 18.486 2 22.075 2c1.865 0 3.55.853 4.732 2.231a12.125 12.125 0 004.11-1.706c-.48 1.64-1.503 3.019-2.846 3.894 1.303-.153 2.566-.547 3.73-1.094a14.679 14.679 0 01-3.25 3.653z"></path>
       </svg>
@@ -1564,16 +2417,27 @@ export const CWTwitter: m.Component<IconAttrs> = {
 
 export const CWUpvote: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M15.27 4.172a.843.843 0 011.46 0l13.156 22.81a.845.845 0 01-.731 1.268H2.845a.845.845 0 01-.73-1.267l13.154-22.81z"></path>
       </svg>
@@ -1583,16 +2447,27 @@ export const CWUpvote: m.Component<IconAttrs> = {
 
 export const CWViews: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path d="M22 16a6 6 0 11-12 0 6 6 0 0112 0z"></path>
         <path
@@ -1607,16 +2482,27 @@ export const CWViews: m.Component<IconAttrs> = {
 
 export const CWWallet: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"
@@ -1636,16 +2522,27 @@ export const CWWallet: m.Component<IconAttrs> = {
 
 export const CWWebsite: m.Component<IconAttrs> = {
   view: (vnode) => {
-    const { componentType, onclick, ...iconStyleAttrs } = vnode.attrs;
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>({ ...iconStyleAttrs }, componentType)}
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        onclick={onclick}
+        {...domAttrs}
       >
         <path
           fill-rule="evenodd"

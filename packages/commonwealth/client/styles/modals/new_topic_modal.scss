@@ -1,5 +1,21 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .NewTopicModal {
-    max-width: 680px;
+  width: 420px;
+
+  .compact-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .QuillEditor {
+      margin-bottom: 16px;
+    }
+  }
 }

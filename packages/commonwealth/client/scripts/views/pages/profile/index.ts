@@ -9,7 +9,7 @@ import bs58 from 'bs58';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ChainBase } from 'common-common/src/types';
-import { OffchainThread, OffchainComment, Profile } from 'models';
+import { Thread, Comment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
 import { PageNotFound } from 'views/pages/404';
@@ -31,18 +31,14 @@ import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
 const getProfileStatus = (account) => {
-  const onOwnProfile =
-    typeof app.user.activeAccount?.chain === 'string'
-      ? account.chain === app.user.activeAccount?.chain &&
-        account.address === app.user.activeAccount?.address
-      : account.chain === app.user.activeAccount?.chain?.id &&
+  const onOwnProfile = account.chain.id === app.user.activeAccount?.chain?.id &&
         account.address === app.user.activeAccount?.address;
   const onLinkedProfile =
     !onOwnProfile &&
     app.user.activeAccounts.length > 0 &&
     app.user.activeAccounts
       .filter((account_) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account: account_,
           chain: app.activeChainId(),
         });
@@ -59,8 +55,8 @@ const getProfileStatus = (account) => {
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId() };
-    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
-    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const communityRoles = app.roles.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.roles.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses =
       joinableAddresses.length > communityRoles.length
         ? joinableAddresses.filter((addr) => {
@@ -100,8 +96,8 @@ interface IProfilePageAttrs {
 }
 interface IProfilePageState {
   account;
-  threads: OffchainThread[];
-  comments: OffchainComment<any>[];
+  threads: Thread[];
+  comments: Comment<any>[];
   initialized: boolean;
   loaded: boolean;
   loading: boolean;

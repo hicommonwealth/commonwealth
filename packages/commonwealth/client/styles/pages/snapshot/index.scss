@@ -1,0 +1,29 @@
+@import 'shared';
+
+.SnapshotViewProposalPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
+  .proposal-body-with-tabs {
+    @include medium {
+      display: none;
+    }
+
+    @include large {
+      display: none;
+    }
+  }
+
+  .proposal-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+
+    @include mediumSmallInclusive {
+      display: none;
+    }
+  }
+}

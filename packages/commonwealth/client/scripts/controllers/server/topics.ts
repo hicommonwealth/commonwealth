@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 import { TopicStore } from 'stores';
-import { OffchainTopic } from 'models';
+import { Topic } from 'models';
 import app from 'state';
 import BN from 'bn.js';
 
@@ -24,11 +24,11 @@ class TopicsController {
   public getByName(name, communityId) {
     return this._store.getByName(name, communityId);
   }
-  public addToStore(topic: OffchainTopic) {
+  public addToStore(topic: Topic) {
     return this._store.add(topic);
   }
 
-  public async edit(topic: OffchainTopic, featuredOrder?: number) {
+  public async edit(topic: Topic, featuredOrder?: number) {
     try {
       // TODO: Change to PUT /topic
       const response = await $.post(`${app.serverUrl()}/editTopic`, {
@@ -44,7 +44,7 @@ class TopicsController {
         address: app.user.activeAccount.address,
         jwt: app.user.jwt,
       });
-      const result = new OffchainTopic(response.result);
+      const result = new Topic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -60,10 +60,7 @@ class TopicsController {
     }
   }
 
-  public async setTopicThreshold(
-    topic: OffchainTopic,
-    token_threshold: string
-  ) {
+  public async setTopicThreshold(topic: Topic, token_threshold: string) {
     try {
       const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
         topic_id: topic.id,
@@ -94,7 +91,7 @@ class TopicsController {
         topic_name: topicName,
         address: app.user.activeAccount.address,
       });
-      const result = new OffchainTopic(response.result);
+      const result = new Topic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -132,7 +129,7 @@ class TopicsController {
         jwt: app.user.jwt,
         token_threshold: tokenThreshold,
       });
-      const result = new OffchainTopic(response.result);
+      const result = new Topic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -184,14 +181,14 @@ class TopicsController {
       const topics = app.chain
         ? response.result.filter((topic) => !topic.communityId)
         : response.result;
-      topics.forEach((t) => this._store.add(new OffchainTopic(t)));
+      topics.forEach((t) => this._store.add(new Topic(t)));
       this._initialized = true;
     } catch (err) {
-      console.log('Failed to load offchain topics');
+      console.log('Failed to load topics');
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
-          : 'Error loading offchain topics'
+          : 'Error loading topics'
       );
     }
   }
@@ -202,7 +199,7 @@ class TopicsController {
     }
     initialTopics.forEach((t) => {
       try {
-        this._store.add(new OffchainTopic(t));
+        this._store.add(new Topic(t));
       } catch (e) {
         console.error(e);
       }
@@ -210,7 +207,7 @@ class TopicsController {
     this._initialized = true;
   }
 
-  public getTopicListing = (topic: OffchainTopic, activeTopic: string) => {
+  public getTopicListing = (topic: Topic, activeTopic: string) => {
     // Iff a topic is already in the TopicStore, e.g. due to app.topics.edit, it will be excluded from
     // addition to the TopicStore, since said store will be more up-to-date
     const existing = this.getByIdentifier(topic.id);
@@ -220,14 +217,8 @@ class TopicsController {
     return { id, name, description, telegram, selected };
   };
 
-  public updateFeaturedOrder = async (featuredTopics: OffchainTopic[]) => {
-    // Only topics which have had their order altered are passed to the backend
-    const reorderedTopics = featuredTopics.filter((t) => {
-      const newPosition = +t.order;
-      const previousPosition = +this.getByIdentifier(t.id).order;
-      return newPosition !== previousPosition;
-    });
-    const orderedIds = reorderedTopics
+  public updateFeaturedOrder = async (featuredTopics: Topic[]) => {
+    const orderedIds = featuredTopics
       .sort((a, b) => a.order - b.order)
       .map((t) => t.id);
     const response = await $.post(`${app.serverUrl()}/orderTopics`, {
@@ -236,10 +227,10 @@ class TopicsController {
       jwt: app.user.jwt,
     });
 
-    response.result.forEach((t) => {
+    (response.result || []).forEach((t) => {
       // TODO Graham 3/29/22: Add 'update' method to TopicStore,
-      // consolidate methods
-      const modeledTopic = new OffchainTopic(t);
+      // consolidate add/remove methods
+      const modeledTopic = new Topic(t);
       this.store.remove(modeledTopic);
       this.store.add(modeledTopic);
     });

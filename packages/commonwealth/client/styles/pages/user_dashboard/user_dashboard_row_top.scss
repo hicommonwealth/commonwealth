@@ -1,0 +1,16 @@
+@import 'shared';
+@import 'user_dashboard_row.scss';
+
+.UserDashboardRowTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .row-top-text {
+    @include rowTopTextStyles;
+  }
+
+  .comment-preview-container {
+    padding: 8px 24px;
+  }
+}

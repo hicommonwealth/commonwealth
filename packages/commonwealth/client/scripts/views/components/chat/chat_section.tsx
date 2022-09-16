@@ -10,6 +10,7 @@ import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
+import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -140,7 +141,9 @@ export class ChatSection
   }
 
   onbeforeupdate(vnode, old) {
-    if (!_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)) {
+    if (
+      !_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)
+    ) {
       Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
         this.channels[metadata.category]
@@ -169,7 +172,7 @@ export class ChatSection
     this.activeChannel = m.route.param()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
-    const isAdmin = app.user.isAdminOfEntity({ chain: app.activeChainId() });
+    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
     this.channels = {};
     Object.values(app.socket.chatNs.channels).forEach((c) => {
       const { ChatMessages, ...metadata } = c;
@@ -178,25 +181,23 @@ export class ChatSection
         : (this.channels[metadata.category] = [metadata]);
     });
 
-    const channelToggleTree: ToggleTree = {
-      toggledState: true,
+    const chatDefaultToggleTree: ToggleTree = {
+      toggledState: false,
       children: this.categoryToToggleTree(Object.keys(this.channels), true),
     };
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-chat-toggle-tree`]) {
-      console.log('setting toggle tree from scratch');
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
-    } else if (!verifyCachedToggleTree('chat', channelToggleTree)) {
-      console.log(
-        'setting chat toggle tree since the cached version differs from the updated version'
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
       );
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
+    } else if (!verifyCachedToggleTree('chat', chatDefaultToggleTree)) {
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
+      );
     }
     const toggleTreeState = vnode.attrs.mobile
-      ? channelToggleTree
+      ? chatDefaultToggleTree
       : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
 
     // ---------- Build Section Props ---------- //
@@ -362,10 +363,16 @@ export class ChatSection
         isVisible: true,
         isActive: onChannelPage(m.route.get()),
         isUpdated: channel.unread > 0,
-        onclick: () => {
-          navigateToSubpage(`/chat/${channel.id}`);
-          this.activeChannel = channel.id;
-          app.socket.chatNs.activeChannel = String(channel.id);
+        onclick: (e) => {
+          handleRedirectClicks(
+            e,
+            `/chat/${channel.id}`,
+            app.activeChainId(),
+            () => {
+              this.activeChannel = channel.id;
+              app.socket.chatNs.activeChannel = String(channel.id);
+            }
+          );
         },
         rightIcon: isAdmin && channelRightIcon(channel),
       };
@@ -419,7 +426,7 @@ export class ChatSection
     ) : null;
 
     const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'CHAT',
+      title: 'Chat',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

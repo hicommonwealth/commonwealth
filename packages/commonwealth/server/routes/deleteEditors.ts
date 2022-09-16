@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -19,7 +20,7 @@ const deleteEditors = async (
   next: NextFunction
 ) => {
   if (!req.body.thread_id) {
-    return next(new Error(Errors.InvalidThread));
+    return next(new AppError(Errors.InvalidThread));
   }
   const { thread_id } = req.body;
   let editors;
@@ -27,23 +28,23 @@ const deleteEditors = async (
     const editorsObj = JSON.parse(req.body.editors);
     editors = Object.values(editorsObj);
   } catch (e) {
-    return next(new Error(Errors.InvalidEditorFormat));
+    return next(new AppError(Errors.InvalidEditorFormat));
   }
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const thread = await models.OffchainThread.findOne({
+  const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },
     },
   });
-  if (!thread) return next(new Error(Errors.InvalidThread));
+  if (!thread) return next(new AppError(Errors.InvalidThread));
 
   await Promise.all(
     editors.map(async (editor: any) => {
@@ -55,7 +56,7 @@ const deleteEditors = async (
       });
       const collaboration = await models.Collaboration.findOne({
         where: {
-          offchain_thread_id: thread.id,
+          thread_id: thread.id,
           address_id: address.id,
         },
       });
@@ -66,7 +67,7 @@ const deleteEditors = async (
   );
 
   const finalCollaborations = await models.Collaboration.findAll({
-    where: { offchain_thread_id: thread.id },
+    where: { thread_id: thread.id },
     include: [
       {
         model: models.Address,

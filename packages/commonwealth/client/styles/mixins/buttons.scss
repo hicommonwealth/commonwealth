@@ -264,3 +264,28 @@
     @include iconAndText($neutral-600);
   }
 }
+
+@mixin mini {
+  align-items: center;
+  padding: 4px 12px;
+  background: $neutral-800;
+  border-radius: $border-radius-rounded-corners;
+  box-shadow: $elevation-1;
+
+  &:hover {
+    background: $neutral-700;
+  }
+
+  &:active {
+    background: $neutral-400;
+    box-shadow: none;
+  }
+
+  &.disabled {
+    background: $neutral-200;
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  @include iconAndText(white);
+}

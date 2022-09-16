@@ -8,19 +8,16 @@ import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 import { IPostNotificationData } from 'types';
-import {
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
-import QuillFormattedText from 'views/components/quill_formatted_text';
-import MarkdownFormattedText from 'views/components/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { jumpHighlightComment } from '../pages/view_proposal/helpers';
+import { MarkdownFormattedText } from './quill/markdown_formatted_text';
+import { QuillFormattedText } from './quill/quill_formatted_text';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -33,6 +30,7 @@ const getCommentPreview = (comment_text) => {
       collapse: true,
     });
   } catch (e) {
+    // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
     let doc = decodeURIComponent(comment_text);
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
     const matches = doc['matchAll'](regexp);
@@ -72,7 +70,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
-  } else if (root_type === ProposalType.OffchainThread) {
+  } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
 
@@ -184,7 +182,7 @@ const getBatchNotificationFields = (
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
-  } else if (root_type === ProposalType.OffchainThread) {
+  } else if (root_type === ProposalType.Thread) {
     notificationBody = null;
   }
 

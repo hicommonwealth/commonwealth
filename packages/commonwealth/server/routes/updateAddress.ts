@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB, sequelize } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,10 +14,10 @@ export const Errors = {
 const updateAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { address, chain } = req.body
   if (!address) {
-    return next(new Error(Errors.NoAddress));
+    return next(new AppError(Errors.NoAddress));
   }
   if (!chain) {
-    return next(new Error(Errors.NoChain));
+    return next(new AppError(Errors.NoChain));
   }
   const transaction = await sequelize.transaction();
   try {
@@ -31,13 +32,13 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
 
       if (ghostAddressId && newAddressId) {
         // update address in comments
-        await models.OffchainComment.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
+        await models.Comment.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in reactions
-        await models.OffchainReaction.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
+        await models.Reaction.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in threads
-        await models.OffchainThread.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
+        await models.Thread.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
         // update address in roles
         await models.Role.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });

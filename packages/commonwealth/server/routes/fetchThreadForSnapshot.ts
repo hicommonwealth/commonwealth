@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -9,10 +10,10 @@ export const Errors = {
 
 const fetchThreadForSnapshot = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { snapshot, chain } = req.query;
-  if (!snapshot) return next(new Error(Errors.InvalidSnapshot));
-  if (!chain) return next(new Error(Errors.InvalidChain));
+  if (!snapshot) return next(new AppError(Errors.InvalidSnapshot));
+  if (!chain) return next(new AppError(Errors.InvalidChain));
 
-  const threads = await models.OffchainThread.findAll({
+  const threads = await models.Thread.findAll({
     where: { 
       chain: chain,
       snapshot_proposal: snapshot,

@@ -1,0 +1,26 @@
+@import 'shared';
+@import 'user_dashboard_row.scss';
+
+.UserDashboardChainEventRow {
+  @include userDashboardRowStyles;
+
+  &.isLink {
+    cursor: pointer;
+  }
+
+  .chain-event-text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    word-break: break-word;
+
+    .row-top-text.Text {
+      @include rowTopTextStyles;
+
+      .block-number {
+        color: $neutral-500;
+        margin-left: 24px;
+      }
+    }
+  }
+}

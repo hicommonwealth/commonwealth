@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import { externalLink, extractDomain, link } from 'helpers';
-import { OffchainThread, AnyProposal } from 'models';
+import { Thread, AnyProposal } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -14,7 +14,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 export class ProposalHeaderExternalLink
   implements
     m.ClassComponent<{
-      proposal: AnyProposal | OffchainThread;
+      proposal: AnyProposal | Thread;
     }>
 {
   view(vnode) {
@@ -22,10 +22,8 @@ export class ProposalHeaderExternalLink
 
     return (
       <div class="ProposalHeaderLink">
-        {externalLink('a', proposal.url, [
-          extractDomain(proposal.url),
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {externalLink('a', proposal.url, [extractDomain(proposal.url)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -46,8 +44,8 @@ export class ProposalHeaderBlockExplorerLink
         {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
-          <CWIcon iconName="externalLink" iconSize="small" />,
         ])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -68,8 +66,8 @@ export class ProposalHeaderVotingInterfaceLink
         {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
-          <CWIcon iconName="externalLink" iconSize="small" />,
         ])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -83,7 +81,7 @@ export class ProposalHeaderThreadLink
     const { proposal } = vnode.attrs;
 
     const path = getProposalUrlPath(
-      ProposalType.OffchainThread,
+      ProposalType.Thread,
       `${proposal.threadId}`,
       false,
       proposal['chain']
@@ -91,10 +89,8 @@ export class ProposalHeaderThreadLink
 
     return (
       <div class="ProposalHeaderLink">
-        {link('a', path, [
-          'Go to discussion',
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {link('a', path, ['Go to discussion'])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }
@@ -109,14 +105,12 @@ export class ProposalHeaderSnapshotThreadLink
   view(vnode) {
     const { id, title } = vnode.attrs.thread;
 
-    const proposalLink = getProposalUrlPath(ProposalType.OffchainThread, id);
+    const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
 
     return (
       <div class="ProposalHeaderLink">
-        {link('a', proposalLink, [
-          decodeURIComponent(title),
-          <CWIcon iconName="externalLink" iconSize="small" />,
-        ])}
+        {link('a', proposalLink, [decodeURIComponent(title)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
       </div>
     );
   }

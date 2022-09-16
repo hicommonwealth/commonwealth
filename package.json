@@ -3,7 +3,12 @@
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
     "build": "if [ $TBC_ENV ]; then yarn --cwd packages/token-balance-cache build; else yarn --cwd packages/commonwealth heroku-postbuild; fi",
-    "psql": "yarn --cwd packages/commonwealth psql"
+    "psql": "yarn --cwd packages/commonwealth psql",
+    "test-api": "yarn --cwd packages/commonwealth test-api",
+    "dump-db": "yarn --cwd packages/commonwealth dump-db",
+    "reset-db": "yarn --cwd packages/commonwealth reset-db",
+    "load-db": "yarn --cwd packages/commonwealth load-db",
+    "migrate-db": "yarn --cwd packages/commonwealth migrate-db"
   },
   "engines": {
     "node": "14.x"

@@ -1,22 +1,11 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .LinkedProposalsEmbed {
+  align-items: center;
   background-color: $neutral-100;
-  margin-top: 25px;
-  padding: 12px 25px 10px;
-  border-radius: 3px;
-  .treasury-embed-section {
-    margin-top: 10px;
-    margin-bottom: 14px;
-    strong {
-    }
-    p {
-      margin: 8px 0 12px;
-    }
-    .cui-button {
-    }
-  }
-  .treasury-embed-section + .treasury-embed-section {
-    margin-top: 30px;
-  }
+  border-radius: $border-radius-corners;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
 }

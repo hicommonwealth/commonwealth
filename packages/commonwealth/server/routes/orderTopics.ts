@@ -1,9 +1,10 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import { OffchainTopicInstance } from 'server/models/offchain_topic';
+import { TopicInstance } from 'server/models/topic';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',
@@ -22,31 +23,33 @@ const OrderTopics = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
-  if (!req.user) return next(new Error(OrderTopicsErrors.NoUser));
+  if (!req.user) return next(new AppError(OrderTopicsErrors.NoUser));
   const isAdminOrMod: boolean = await validateRoles(
     models,
     req.user,
     'moderator',
     chain.id
   );
-  if (!isAdminOrMod) return next(new Error(OrderTopicsErrors.NoPermission));
+  if (!isAdminOrMod) return next(new AppError(OrderTopicsErrors.NoPermission));
 
   const newTopicOrder: string[] = req.body['order[]'];
-  if (!newTopicOrder || newTopicOrder.length === 0) {
-    return next(new Error(OrderTopicsErrors.NoIds));
+  if (!newTopicOrder?.length) {
+    return res.json({
+      status: 'Success',
+    });
   }
 
   try {
-    const topics: OffchainTopicInstance[] = await Promise.all(
+    const topics: TopicInstance[] = await Promise.all(
       newTopicOrder.map((id: string, idx: number) => {
         return (async () => {
-          const topic = await models.OffchainTopic.findOne({
+          const topic = await models.Topic.findOne({
             where: { id, featured_in_sidebar: true },
           });
           if (!topic) {
-            throw new Error(OrderTopicsErrors.InvalidTopic);
+            throw new AppError(OrderTopicsErrors.InvalidTopic);
           }
           topic.order = idx + 1;
           await topic.save();
@@ -60,7 +63,7 @@ const OrderTopics = async (
       result: topics.map((t) => t.toJSON()),
     });
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 };
 

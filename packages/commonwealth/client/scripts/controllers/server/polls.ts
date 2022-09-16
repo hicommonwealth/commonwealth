@@ -5,7 +5,7 @@ import moment from 'moment';
 import app from 'state';
 
 import PollStore from 'stores/PollStore';
-import { OffchainPoll, OffchainVote } from 'models';
+import { Poll, Vote } from 'models';
 
 export const modelFromServer = (poll) => {
   const {
@@ -26,14 +26,14 @@ export const modelFromServer = (poll) => {
     pollOptions = [];
   }
 
-  return new OffchainPoll({
+  return new Poll({
     id,
     threadId: thread_id,
     chainId: chain_id,
     prompt,
     options: pollOptions,
     endsAt: moment(ends_at),
-    votes: votes.map((v) => new OffchainVote(v)),
+    votes: votes.map((v) => new Vote(v)),
     createdAt: moment(created_at),
   });
 };

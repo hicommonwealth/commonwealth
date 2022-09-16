@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InsufficientPermissions:
@@ -19,24 +20,24 @@ const updateLinkedThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
-    return next(new Error(Errors.MustHaveLinkedThreadId));
+    return next(new AppError(Errors.MustHaveLinkedThreadId));
   }
   if (!linking_thread_id) {
-    return next(new Error(Errors.MustHaveLinkingThreadId));
+    return next(new AppError(Errors.MustHaveLinkingThreadId));
   }
 
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const isAuthor = await models.OffchainThread.findOne({
+  const isAuthor = await models.Thread.findOne({
     where: {
       id: linking_thread_id,
       address_id: { [Op.in]: userOwnedAddressIds },
@@ -47,7 +48,7 @@ const updateLinkedThreads = async (
     if (!isAuthor) {
       const collaboration = await models.Collaboration.findOne({
         where: {
-          offchain_thread_id: linking_thread_id,
+          thread_id: linking_thread_id,
           address_id: { [Op.in]: userOwnedAddressIds },
         },
       });
@@ -59,7 +60,7 @@ const updateLinkedThreads = async (
           },
         });
         if (!requesterIsAdminOrMod) {
-          return next(new Error(Errors.InsufficientPermissions));
+          return next(new AppError(Errors.InsufficientPermissions));
         }
       }
     }
@@ -72,10 +73,10 @@ const updateLinkedThreads = async (
     if (remove_link === 'true') {
       await models.LinkedThread.destroy({ where: params });
     } else {
-      const linkedThread = await models.OffchainThread.findOne({
+      const linkedThread = await models.Thread.findOne({
         where: { id: linked_thread_id },
       });
-      const linkingThread = await models.OffchainThread.findOne({
+      const linkingThread = await models.Thread.findOne({
         where: { id: linking_thread_id },
       });
       const threadsShareChain =
@@ -83,11 +84,11 @@ const updateLinkedThreads = async (
       if (threadsShareChain) {
         await models.LinkedThread.findOrCreate({ where: params });
       } else {
-        return next(new Error(Errors.ThreadsMustShareCommunity));
+        return next(new AppError(Errors.ThreadsMustShareCommunity));
       }
     }
 
-    const finalThread = await models.OffchainThread.findOne({
+    const finalThread = await models.Thread.findOne({
       where: {
         id: linking_thread_id,
       },
@@ -101,14 +102,14 @@ const updateLinkedThreads = async (
           as: 'collaborators',
         },
         {
-          model: models.OffchainTopic,
+          model: models.Topic,
           as: 'topic',
         },
         {
           model: models.ChainEntity,
         },
         {
-          model: models.OffchainReaction,
+          model: models.Reaction,
           as: 'reactions',
           include: [
             {
@@ -126,7 +127,7 @@ const updateLinkedThreads = async (
     });
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

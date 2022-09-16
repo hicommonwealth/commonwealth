@@ -5,7 +5,7 @@ import 'components/reaction_button/comment_reaction_button.scss';
 import m from 'mithril';
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { OffchainThread, ChainInfo } from 'models';
+import { Thread, ChainInfo } from 'models';
 import { Popover } from 'construct-ui';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
@@ -15,7 +15,7 @@ import {
 } from './helpers';
 
 type ThreadReactionButtonAttrs = {
-  thread: OffchainThread;
+  thread: Thread;
 };
 
 export class ThreadReactionButton
@@ -36,11 +36,11 @@ export class ThreadReactionButton
     // token balance check if needed
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
     let topicName = '';
 
-    if (thread instanceof OffchainThread && thread.topic && app.topics) {
+    if (thread instanceof Thread && thread.topic && app.topics) {
       topicName = thread.topic.name;
     }
 

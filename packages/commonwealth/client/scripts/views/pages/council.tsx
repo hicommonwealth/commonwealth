@@ -14,7 +14,7 @@ import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_elect
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import CouncilVotingModal from 'views/modals/council_voting_modal';
+import { CouncilVotingModal } from 'views/modals/council_voting_modal';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
@@ -41,7 +41,7 @@ class Councillor implements m.ClassComponent<{ account }> {
       .filter((v) => v.votes.includes(account.address));
 
     return (
-      <CWCard elevation="elevation-1" className="CouncillorCard">
+      <CWCard className="CouncillorCard">
         {m(User, { user: account, popover: true, hideIdentityIcon: true })}
         <CWText className="councillor-status-text">
           {election.isMember(account)
@@ -148,7 +148,7 @@ class CouncilPage implements m.ClassComponent {
     const activeAccountIsCandidate =
       app.chain &&
       app.user.activeAccount &&
-      app.user.activeAccount.chainBase === ChainBase.Substrate &&
+      app.user.activeAccount.chain.base === ChainBase.Substrate &&
       !!candidates.find(
         ([who]) => who.address === app.user.activeAccount.address
       );
@@ -200,6 +200,7 @@ class CouncilPage implements m.ClassComponent {
             ]}
             statAction={
               app.user.activeAccount &&
+              app.user.activeAccount instanceof SubstrateAccount &&
               app.chain.networkStatus === ApiStatus.Connected && (
                 <>
                   <CWButton

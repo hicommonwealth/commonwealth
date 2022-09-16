@@ -13,7 +13,7 @@ import 'pages/discussions/topics_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import EditTopicModal from 'views/modals/edit_topic_modal';
+import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type Topic = {
@@ -120,7 +120,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                               {name}
                             </div>
                           </div>
-                          {app.user?.isAdminOfEntity({
+                          {app.roles?.isAdminOfEntity({
                             chain: app.activeChainId(),
                           }) && (
                             <Button

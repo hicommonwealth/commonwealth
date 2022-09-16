@@ -11,7 +11,7 @@ import { UserBlock } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
-import { AddressInfo } from 'client/scripts/models';
+import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
@@ -160,8 +160,7 @@ const ConfirmInviteModal: m.Component<
                           const communityName =
                             invites[location].community_name;
                           if (vnode.state.selectedAddress) {
-                            app.user
-                              .acceptInvite({
+                            app.roles.acceptInvite({
                                 address: vnode.state.selectedAddress,
                                 inviteCode: invites[location].id,
                               })
@@ -206,8 +205,7 @@ const ConfirmInviteModal: m.Component<
                             'Reject this invite? You will need to be invited again.'
                           )();
                           if (!confirmed) return;
-                          app.user
-                            .rejectInvite({ inviteCode: invites[location].id })
+                          app.roles.rejectInvite({ inviteCode: invites[location].id })
                             .then(
                               (result) => {
                                 app.config.invites = app.config.invites.filter(

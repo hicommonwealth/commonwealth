@@ -12,15 +12,19 @@ import { initAppState } from 'app';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
+
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityCreationPayload,
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+
+import { initChainForm, defaultChainRows } from './chain_input_rows';
+import { ChainFormFields, ChainFormState } from './types';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CommunityType } from '.';
+
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
@@ -41,7 +45,7 @@ export class SputnikForm implements m.ClassComponent {
       <div class="CreateCommunityForm">
         <InputRow
           title="DAO Name"
-          defaultValue={this.state.form.name}
+          value={this.state.form.name}
           onChangeHandler={(v) => {
             this.state.form.name = v.toLowerCase();
           }}
@@ -59,7 +63,7 @@ export class SputnikForm implements m.ClassComponent {
               communityType: CommunityType.SputnikDao,
             });
           }}
-          label={(checked) => {
+          caption={(checked) => {
             if (checked !== this.state.form.isMainnet) {
               return 'Unknown network!';
             }
@@ -138,6 +142,13 @@ export class SputnikForm implements m.ClassComponent {
                 `${app.serverUrl()}/createChain`,
                 createChainArgs
               );
+              if (res.result.admin_address) {
+                await linkExistingAddressToChainOrCommunity(
+                  res.result.admin_address,
+                  res.result.role.chain_id,
+                  res.result.role.chain_id
+                );
+              }
               await initAppState(false);
               m.route.set(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {

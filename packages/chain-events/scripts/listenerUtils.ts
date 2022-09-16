@@ -9,7 +9,7 @@ import { EdgewareSpec } from './specs/edgeware';
 export const networkUrls = {
   clover: 'wss://api.clover.finance',
   hydradx: 'wss://rpc-01.snakenet.hydradx.io',
-  edgeware: 'ws://mainnet2.edgewa.re:9944',
+  edgeware: 'wss://edgeware-rpc.dwellir.com',
   'edgeware-local': 'ws://localhost:9944',
   'edgeware-testnet': 'wss://beresheet1.edgewa.re',
   kusama: 'wss://kusama-rpc.polkadot.io',

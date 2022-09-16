@@ -1,30 +1,25 @@
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
+import {
+  NotificationCategories,
+  WalletId,
+} from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import { sequelize, DB } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
-import {
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
 
 import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  redirectWithLoginError,
-  redirectWithLoginSuccess,
-} from './finishEmailLogin';
+import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -60,6 +55,7 @@ const Errors = {
   NoSharedSecret: 'Missing shared secret',
   MissingToken: 'Must provide token',
   InvalidToken: 'Invalid token',
+  InvalidUser: 'Invalid user',
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
@@ -105,7 +101,7 @@ const finishSsoLogin = async (
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
-      throw new Error('Could not decode token');
+      throw new AppError('Could not decode token');
     }
   } catch (e) {
     log.info(`Axie token decoding error: ${e.message}`);
@@ -140,12 +136,15 @@ const finishSsoLogin = async (
   const reqUser = req.user;
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { address: checksumAddress },
+      where: {
+        address: checksumAddress,
+        chain: 'axie-infinity',
+      },
       include: [
         {
           model: models.SsoToken,
           where: { issuer: jwtPayload.iss },
-          required: true,
+          required: false,
         },
       ],
     }
@@ -171,18 +170,30 @@ const finishSsoLogin = async (
     // check login token, if the user has already logged in before with SSO
     const token = await existingAddress.getSsoToken();
 
-    // perform login on existing account
-    if (jwtPayload.iat <= token.issued_at) {
-      log.error('Replay attack detected.');
-      throw new AppError(Errors.ReplayAttack);
-    }
-    token.issued_at = jwtPayload.iat;
-    token.state_id = emptyTokenInstance.state_id;
-    await token.save();
+    if (token) {
+      // perform login on existing account
+      if (jwtPayload.iat <= token.issued_at) {
+        log.error('Replay attack detected.');
+        throw new AppError(Errors.ReplayAttack);
+      }
+      token.issued_at = jwtPayload.iat;
+      token.state_id = emptyTokenInstance.state_id;
+      await token.save();
 
-    // delete the empty token that was initialized on /auth/sso, because it is superceded
-    // by the existing token for this user
-    await emptyTokenInstance.destroy();
+      // delete the empty token that was initialized on /auth/sso, because it is superceded
+      // by the existing token for this user
+      await emptyTokenInstance.destroy();
+    } else {
+      // XXX: some tokens got dis-associated from accounts due to checksum migration.
+      //   To fix this, we attach new (current) tokens to them here.
+      //   The only possible vulnerability here would be a delayed replay attack using a token
+      //   issued before the migration, which will not work because those tokens would be
+      //   marked expired.
+      emptyTokenInstance.issuer = jwtPayload.iss;
+      emptyTokenInstance.issued_at = jwtPayload.iat;
+      emptyTokenInstance.address_id = existingAddress.id;
+      await emptyTokenInstance.save();
+    }
 
     if (reqUser) {
       // perform address transfer
@@ -192,7 +203,7 @@ const finishSsoLogin = async (
           where: { id: existingAddress.user_id },
         });
         if (!oldUser) {
-          throw new Error('User should exist');
+          throw new AppError('User should exist');
         }
         const msg = {
           to: oldUser.email,
@@ -223,28 +234,58 @@ const finishSsoLogin = async (
       });
       return success(res, { address: newAddress });
     } else {
-      // user is not logged in, so we log them in
-      const user = await models.User.findOne({
-        where: {
-          id: existingAddress.user_id,
-        },
-        include: [models.Address],
-      });
-      // TODO: should we req.login here, or not?
-      req.login(user, (err) => {
-        if (err)
-          return redirectWithLoginError(
-            res,
-            `Could not log in with ronin wallet`
-          );
-        if (process.env.NODE_ENV !== 'test') {
-          mixpanelTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
+      if (existingAddress.user_id) {
+        // user exists but is not logged in, so we log them in
+        const existingUser = await models.User.findOne({
+          where: {
+            id: existingAddress.user_id,
+          },
+          include: [models.Address],
+        });
+
+        if (!existingUser) {
+          // if the address has a user id but we don't have a user object,
+          // the db has gotten into a bad state -- throw a server error
+          throw new ServerError(Errors.InvalidUser);
         }
-      });
-      return success(res, { user });
+
+        req.login(existingUser, (err) => {
+          if (err)
+            return redirectWithLoginError(
+              res,
+              `Could not log in with ronin wallet`
+            );
+          if (process.env.NODE_ENV !== 'test') {
+            mixpanelTrack({
+              event: MixpanelLoginEvent.LOGIN,
+              isCustomDomain: null,
+            });
+          }
+        });
+        return success(res, { user: existingUser });
+      } else {
+        // create new user if no user exists but address exists
+        const newUser = await models.User.createWithProfile(
+          models,
+          { email: null },
+        );
+        existingAddress.user_id = newUser.id;
+        await existingAddress.save();
+        req.login(newUser, (err) => {
+          if (err)
+            return redirectWithLoginError(
+              res,
+              `Could not log in with ronin wallet`
+            );
+          if (process.env.NODE_ENV !== 'test') {
+            mixpanelTrack({
+              event: MixpanelLoginEvent.LOGIN,
+              isCustomDomain: null,
+            });
+          }
+        });
+        return success(res, { user: newUser });
+      }
     }
   }
 
