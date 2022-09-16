@@ -67,6 +67,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Filter Menu</h1>
         <div class="basic-gallery">
           <CWFilterMenu
+            header="Stages"
             trigger={
               <CWButton
                 iconName="chevronDown"

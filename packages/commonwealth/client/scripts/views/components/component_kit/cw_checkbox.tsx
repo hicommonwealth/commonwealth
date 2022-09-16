@@ -16,7 +16,6 @@ type CheckboxStyleAttrs = {
 } & StyleAttrs;
 
 type CheckboxAttrs = {
-  groupName: string;
   onchange: (e?: any) => void;
 } & Checkbox &
   CheckboxStyleAttrs;
@@ -26,7 +25,6 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
     const {
       className,
       disabled = false,
-      groupName,
       indeterminate = false,
       label,
       onchange,
@@ -36,7 +34,6 @@ export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
 
     const params = {
       disabled,
-      name: groupName,
       onchange,
       checked,
       type: 'checkbox',
