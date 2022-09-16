@@ -1767,6 +1767,41 @@ export const CWMail: m.Component<IconAttrs> = {
   },
 };
 
+export const CWMute: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path d="M25.92 4.707a1 1 0 111.415 1.414L6.12 27.335a1 1 0 01-1.414-1.415L25.92 4.707z"></path>
+        <path
+          fillRule="evenodd"
+          d="M17.926 5.644a2.249 2.249 0 10-3.552-.057c-4.42.765-7.782 4.594-7.782 9.203v6.422a.586.586 0 01-.588.583H4.828a.586.586 0 00-.588.584v1.168c0 .322.263.584.588.584h.255L21.788 7.425a9.398 9.398 0 00-3.862-1.78zm1.533 20.909a3.46 3.46 0 11-5.93-2.422h-2.79l13.624-13.624a9.247 9.247 0 011.045 4.283v6.422c0 .322.263.583.588.583h1.176c.325 0 .588.262.588.584v1.168a.586.586 0 01-.588.584H18.47c.612.624.989 1.479.989 2.422zM7.316 24.13h2.01l14.51-14.512a9.397 9.397 0 00-1.29-1.538L6.497 24.13h.82z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWPeople: m.Component<IconAttrs> = {
   view: (vnode) => {
     const {

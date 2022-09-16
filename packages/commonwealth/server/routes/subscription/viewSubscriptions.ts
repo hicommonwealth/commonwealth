@@ -6,7 +6,12 @@ export const Errors = {
   NotLoggedIn: 'Not logged in',
 };
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -15,24 +20,41 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
     {
       model: models.Thread,
       as: 'Thread',
-    }, {
+      include: [
+        {
+          model: models.Address,
+          as: 'Address',
+        },
+      ],
+    },
+    {
       model: models.Comment,
       as: 'Comment',
-    }, {
+      include: [models.Address],
+    },
+    {
       model: models.ChainEventType,
       as: 'ChainEventType',
-    }];
-
-  const searchParams: any[] = [
-    { subscriber_id: req.user.id },
+    },
+    {
+      model: models.Chain,
+      as: 'Chain',
+      required: true,
+      where: { active: true },
+    },
   ];
+
+  const searchParams: any[] = [{ subscriber_id: req.user.id }];
 
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams
+      [Op.and]: searchParams,
     },
-    include: [ ...associationParams ],
+    include: [...associationParams],
   });
 
-  return res.json({ status: 'Success', result: subscriptions.map((s) => s.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: subscriptions.map((s) => s.toJSON()),
+  });
 };
