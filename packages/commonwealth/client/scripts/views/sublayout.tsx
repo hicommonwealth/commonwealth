@@ -50,6 +50,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       localStorage.getItem('sidebar-toggle') === 'true'
     ) {
       this.isSidebarToggled = true;
+    } else {
+      this.isSidebarToggled = false;
     }
 
     if (m.route.param('triggerInvite') === 't') {
