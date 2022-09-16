@@ -14,7 +14,7 @@ const getBalance = async (
   if (!validateSecret(req.body.secret)) {
     return res.status(401).json('Not authorized');
   }
-  const { chain_node_id, addresses, contract_address, contract_type } = req.body;
+  const { chain_node_id, addresses, provider, opts } = req.body;
   if (!chain_node_id || !+chain_node_id || !addresses) {
     return res.status(400).json('Request must contain chain_node_id and addresses');
   }
@@ -22,7 +22,7 @@ const getBalance = async (
   const results = {};
   for (const address of addressArray) {
     try {
-      const balance = await cache.getBalance(chain_node_id, address, contract_address, contract_type);
+      const balance = await cache.getBalance(chain_node_id, address, provider, opts);
       results[address] = balance.toString();
     } catch (e) {
       // TODO: error handling -- should we fail if ANY fail? or return an error?

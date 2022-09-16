@@ -4,15 +4,11 @@ import BN from 'bn.js';
 import { factory, formatFilename } from 'common-common/src/logging';
 import JobRunner from 'common-common/src/cacheJobRunner';
 
-import TokenBalanceProvider from './provider';
-import { ContractType, parseContractType, ChainNodeT } from './types';
+import Providers from './providers';
+import { ChainNodeT } from './types';
 import fetchNodes from './database';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-function getKey(chainNodeId: number, address: string, contract?: string) {
-  return `${chainNodeId}-${address}-${contract}`;
-}
 
 // map of addresses to balances
 interface CacheT {
@@ -32,7 +28,6 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
-    private readonly _balanceProvider = new TokenBalanceProvider(),
   ) {
     super({}, noBalancePruneTimeS);
   }
@@ -57,29 +52,21 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
   public async getBalance(
     nodeId: number,
     address: string,
-    contractAddress?: string,
-    contractTypeString?: string
+    providerName: string,
+    opts: Record<string, unknown>,
   ): Promise<BN> {
-    if (contractAddress && !contractTypeString) {
-      throw new Error('Must specify contract type if providing contract address');
-    }
-    if (contractTypeString && !contractAddress) {
-      throw new Error('Must specify contract address if providing contract type');
-    }
-    let contractType: ContractType | undefined;
-    if (contractTypeString) {
-      contractType = parseContractType(contractTypeString);
-    }
     const node = this._nodes[nodeId];
     if (!node) {
-      throw new Error('Node ID not found!');
+      throw new Error('Node not found!');
     }
-    if (!node.balance_type) {
-      throw new Error('Node balance type not found!');
+
+    const provider = Providers[providerName];
+    if (!provider) {
+      throw new Error('Provider not found!');
     }
 
     // check the cache for the token balance
-    const cacheKey = getKey(nodeId, address, contractAddress);
+    const cacheKey = provider.getCacheKey(node, address, opts);
     const result = await this.access((async (c: CacheT): Promise<BN | undefined> => {
       if (c[cacheKey]) {
         return c[cacheKey].balance;
@@ -91,16 +78,9 @@ export default class TokenBalanceCache extends JobRunner<CacheT> {
 
     // fetch balance if not found in cache
     const fetchedAt = moment();
-    const url = node.private_url || node.url;
 
     // will throw on invalid chain / other error
-    const balance = await this._balanceProvider.getTokenBalance(
-      address,
-      node.balance_type,
-      url,
-      contractAddress,
-      contractType,
-    );
+    const balance = await provider.getBalance(node, address, opts);
 
     // write fetched balance back to cache
     await this.access((async (c: CacheT) => {

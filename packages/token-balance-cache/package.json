@@ -12,6 +12,7 @@
   "keywords": [],
   "scripts": {
     "build": "tsc",
+    "check-types": "tsc --noEmit",
     "start": "ts-node src/index.ts",
     "start-prod": "TS_NODE_BASEURL=./build node -r tsconfig-paths/register build/token-balance-cache/src/index.js"
   },

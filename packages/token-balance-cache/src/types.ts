@@ -1,4 +1,4 @@
-import { BalanceType } from 'common-common/src/types';
+import BN from 'bn.js';
 
 const ContractTypes = ['erc20', 'erc721', 'spl-token'] as const;
 export type ContractType = typeof ContractTypes[number];
@@ -14,7 +14,17 @@ export type ChainNodeT = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
-  balance_type?: BalanceType;
   name?: string;
   description?: string;
+}
+
+export type BalanceProviderT<OptsT = {}> = {
+  // unique identifier of the balance provider 
+  name: string;
+
+  // gets a cache key specific to the node/address/provider
+  getCacheKey(node: ChainNodeT, address: string, opts: OptsT): string;
+
+  // gets the token balance given provided arguments
+  getBalance(node: ChainNodeT, address: string, opts: OptsT): Promise<BN>;
 }
