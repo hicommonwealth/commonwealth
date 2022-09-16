@@ -35,7 +35,6 @@ export class SublayoutHeaderLeft
         {isWindowMediumSmallInclusive(window.innerWidth) && (
           <CWDivider isVertical />
         )}
-        {app.chain && <CommunityOptionsPopover />}
         {!isSidebarToggled && app.activeChainId() && (
           <CWCommunityAvatar size="large" community={app.chain.meta} />
         )}

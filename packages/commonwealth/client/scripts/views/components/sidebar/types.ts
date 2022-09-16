@@ -8,6 +8,7 @@ export type BaseSidebarAttrs = {
   onhover?: () => void;
   rightIcon?: m.Vnode;
   title: string;
+  className?: string;
 };
 
 export type SubSectionAttrs = {

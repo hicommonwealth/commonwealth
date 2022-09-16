@@ -427,6 +427,7 @@ export class ChatSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Chat',
+      className: 'ChatSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

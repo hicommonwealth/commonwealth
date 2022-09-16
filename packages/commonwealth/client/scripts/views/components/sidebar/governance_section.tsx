@@ -475,6 +475,7 @@ export class GovernanceSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',
+      className: 'GovernanceSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

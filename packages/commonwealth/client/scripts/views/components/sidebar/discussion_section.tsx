@@ -185,6 +185,7 @@ export class DiscussionSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: discussionsLabel,
+      className: 'DiscussionSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

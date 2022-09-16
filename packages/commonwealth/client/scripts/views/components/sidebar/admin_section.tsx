@@ -1,8 +1,8 @@
 import app from 'state';
 import m from 'mithril';
+import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs } from './types';
 import { CreateInviteModal } from '../../modals/create_invite_modal';
-import { navigateToSubpage } from 'client/scripts/app';
 import { SidebarSectionGroup } from './sidebar_section';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
@@ -23,16 +23,29 @@ function setAdminToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class DiscussionSection
-  implements m.ClassComponent<SidebarSectionAttrs>
-{
+export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
   private createInviteModalActive: boolean;
 
   view() {
+    if (!app.user) return;
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.roles.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    const isMod = app.roles.isRoleOfCommunity({
+      role: 'moderator',
+      chain: app.activeChainId(),
+    });
+    console.log({ isAdmin });
+
+    if (!isAdmin && !isMod) return null;
+
     const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
     );
-    const discussionsGroupData: SectionGroupAttrs[] = [
+    const adminGroupData: SectionGroupAttrs[] = [
       {
         title: 'Invite members',
         containsChildren: false,
@@ -41,7 +54,7 @@ export class DiscussionSection
         isActive: this.createInviteModalActive,
         isVisible: true,
         isUpdated: false,
-        onclick: (e, toggle: boolean) => {
+        onclick: (e) => {
           e.preventDefault();
           const data = { chainInfo: app.chain.meta };
           this.createInviteModalActive = true;
@@ -64,9 +77,9 @@ export class DiscussionSection
         isUpdated: false,
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          m.route.set(
-            `${app.isCustomDomain() ? '' : `/${app.activeChainId()}`}/manage`
-          );
+          handleRedirectClicks(e, `/manage`, app.activeChainId(), () => {
+            setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
+          });
         },
       },
       {
@@ -79,20 +92,23 @@ export class DiscussionSection
         isUpdated: false,
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          navigateToSubpage('/analytics');
+          handleRedirectClicks(e, `/analytics`, app.activeChainId(), () => {
+            setAdminToggleTree(`children.analytics.toggledState`, toggle);
+          });
         },
       },
     ];
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Admin Capabilities',
+      className: 'AdminSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         setAdminToggleTree('toggledState', toggle);
       },
-      displayData: discussionsGroupData,
+      displayData: adminGroupData,
       isActive: true,
-      toggleDisabled: vnode.attrs.mobile,
+      toggleDisabled: false,
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;
