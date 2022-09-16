@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Table } from 'construct-ui';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -14,6 +13,8 @@ import Sublayout from 'views/sublayout';
 import Near from 'controllers/chain/near/main';
 import { IDaoInfo } from 'controllers/chain/near/chain';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CWText } from '../components/component_kit/cw_text';
+import { getClasses } from '../components/component_kit/helpers';
 
 class SputnikDaoRow
   implements
@@ -43,30 +44,27 @@ class SputnikDaoRow
 
     const periodString = formatDuration(periodDuration);
 
-    return m(
-      'tr.nearRow',
-      {
-        class: clickable ? 'clickable' : '',
-        onclick: (e) => {
+    return (
+      <div
+        class={getClasses<{ clickable?: boolean }>(
+          { clickable },
+          'sputnik-row'
+        )}
+        onclick={(e) => {
           if (clickable) {
             e.preventDefault();
             m.route.set(`/${dao.contractId}`);
           }
-        },
-      },
-      [
-        m(
-          'td',
-          {
-            class: clickable ? 'link' : '',
-          },
-          dao.name
-        ),
-        m('td', amountString),
-        m('td', dao.council.length),
-        m('td', bondString),
-        m('td', periodString),
-      ]
+        }}
+      >
+        <CWText className={getClasses<{ clickable?: boolean }>({ clickable })}>
+          {dao.name}
+        </CWText>
+        <CWText>{amountString}</CWText>
+        <CWText>{dao.council.length}</CWText>
+        <CWText>{bondString}</CWText>
+        <CWText>{periodString}</CWText>
+      </div>
     );
   }
 }
@@ -146,54 +144,20 @@ class SputnikDAOsPage implements m.ClassComponent {
         showNewProposalButton
       >
         <div class="SputnikDAOsPage">
-          <div class="title">Sputnik DAOs</div>
-          {m(Table, [
-            m('tr', [
-              m(
-                'th',
-                {
-                  style: { width: '27%' },
-                },
-                'Name'
-              ),
-              m(
-                'th',
-                {
-                  style: { width: '20%' },
-                },
-                'Dao Funds ',
-                [m('span.nearBadge', 'Ⓝ')]
-              ),
-              m(
-                'th',
-                {
-                  style: { width: '17%' },
-                },
-                'Council Size'
-              ),
-              m(
-                'th',
-                {
-                  style: { width: '19%' },
-                },
-                'Bond ',
-                [m('span.nearBadge', 'Ⓝ')]
-              ),
-              m(
-                'th',
-                {
-                  style: { width: '17%' },
-                },
-                'Vote Period'
-              ),
-            ]),
-            this.daosList.map((dao) => (
-              <SputnikDaoRow
-                dao={dao}
-                clickable={allCommunities.some((c) => c.id === dao.contractId)}
-              />
-            )),
-          ])}
+          <CWText type="h3">Sputnik DAOs</CWText>
+          <div class="sputnik-row">
+            <CWText fontWeight="medium">Name</CWText>
+            <CWText fontWeight="medium">Dao Funds Ⓝ</CWText>
+            <CWText fontWeight="medium">Council Size</CWText>
+            <CWText fontWeight="medium">Bond Ⓝ</CWText>
+            <CWText fontWeight="medium">Vote Period</CWText>
+          </div>
+          {this.daosList.map((dao) => (
+            <SputnikDaoRow
+              dao={dao}
+              clickable={allCommunities.some((c) => c.id === dao.contractId)}
+            />
+          ))}
         </div>
       </Sublayout>
     );
