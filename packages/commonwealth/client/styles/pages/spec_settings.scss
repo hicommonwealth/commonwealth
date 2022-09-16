@@ -1,11 +1,8 @@
 @import 'shared';
 
 .SpecSettingsPage {
-  height: 100%;
-
-  @include extraSmall {
-    width: initial;
-  }
+  flex: 1;
+  padding: 24px;
 
   .cui-overlay-inline {
     display: block;
