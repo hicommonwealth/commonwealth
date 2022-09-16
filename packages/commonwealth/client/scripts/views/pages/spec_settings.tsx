@@ -19,6 +19,7 @@ import { PageNotFound } from './404';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 class SpecSettingsPage implements m.ClassComponent {
   private chain: string;
@@ -74,7 +75,7 @@ class SpecSettingsPage implements m.ClassComponent {
     return (
       <Sublayout>
         <div class="SpecSettingsPage">
-          <h3>Substrate Spec Settings</h3>
+          <CWText type="h3">Substrate Spec Settings</CWText>
           {m(DropdownFormField, {
             options: {
               disabled: this.isLoading,
@@ -97,7 +98,7 @@ class SpecSettingsPage implements m.ClassComponent {
           })}
           <CWTextArea
             disabled={this.isLoading}
-            defaultValue={JSON.stringify(this.spec, null, 2)}
+            value={JSON.stringify(this.spec, null, 2)}
             oninput={(e) => {
               // TODO: support tabs / auto-alignment / syntax highlighting
               const result = (e.target as any).value;
