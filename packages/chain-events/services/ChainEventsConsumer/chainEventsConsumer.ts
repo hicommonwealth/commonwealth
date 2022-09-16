@@ -19,6 +19,7 @@ import {
   Ithis as chainCUDContextType,
 } from './MessageProcessors/ChainCUDChainEventsQueue';
 import { SubstrateTypes } from '../../src';
+import {RepublishMessages} from "./republishMessages";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -93,6 +94,9 @@ async function setupChainEventConsumer() {
     subscriptions
   );
   await serviceConsumer.init();
+
+  const republishMessages = new RepublishMessages(rmqController, models);
+  await republishMessages.run();
 
   log.info('Consumer started');
 }
