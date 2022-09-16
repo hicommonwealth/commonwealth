@@ -943,7 +943,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/:scope/contract/:contract_address': importRoute(
+            '/:scope/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
               { scoped: true, deferChain: true }
             ),
