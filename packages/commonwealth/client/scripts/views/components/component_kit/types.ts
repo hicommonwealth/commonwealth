@@ -28,6 +28,7 @@ export enum ComponentType {
   RadioGroup = 'RadioGroup',
   Tab = 'Tab',
   TabBar = 'TabBar',
+  Tag = 'Tag',
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
