@@ -32,4 +32,4 @@ export class FunctionList implements m.ClassComponent<FunctionListAttrs> {
             </div>
         );
     }
-};
+}
