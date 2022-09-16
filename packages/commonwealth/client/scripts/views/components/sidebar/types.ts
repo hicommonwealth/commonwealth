@@ -27,8 +27,6 @@ export type SidebarSectionAttrs = {
   toggleDisabled?: boolean;
 } & BaseSidebarAttrs;
 
-export type MobileSidebarSectionAttrs = { mobile: boolean };
-
 export type ToggleTree = {
   toggledState: boolean;
   children: {

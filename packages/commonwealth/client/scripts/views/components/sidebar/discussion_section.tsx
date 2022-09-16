@@ -7,12 +7,7 @@ import 'components/sidebar/index.scss';
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import {
-  MobileSidebarSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
+import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
@@ -34,7 +29,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 }
 
 export class DiscussionSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
+  implements m.ClassComponent<SidebarSectionAttrs>
 {
   view(vnode) {
     // Conditional Render Details +
@@ -116,12 +111,9 @@ export class DiscussionSection
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
         JSON.stringify(discussionsDefaultToggleTree);
     }
-    let toggleTreeState = JSON.parse(
+    const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
     );
-    if (vnode.attrs.mobile) {
-      toggleTreeState = discussionsDefaultToggleTree;
-    }
 
     const discussionsGroupData: SectionGroupAttrs[] = [
       {
@@ -200,7 +192,6 @@ export class DiscussionSection
       },
       displayData: discussionsGroupData,
       isActive: true,
-      toggleDisabled: vnode.attrs.mobile,
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;
