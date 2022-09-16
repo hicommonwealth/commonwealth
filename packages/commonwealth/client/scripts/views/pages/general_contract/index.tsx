@@ -4,6 +4,7 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'client/scripts/models';
 import m from 'mithril';
+import { notifySuccess } from 'controllers/app/notifications';
 import {
   parseFunctionsFromABI,
   getEtherscanABI,
@@ -18,6 +19,7 @@ import Sublayout from '../../sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
@@ -48,8 +50,6 @@ class GeneralContractPage
 
     const { contractAddress } = vnode.attrs;
 
-    loadContractAbi(contractAddress);
-
     if (!app.contracts) {
       return <PageLoading title="General Contract" />;
     }
@@ -67,22 +67,67 @@ class GeneralContractPage
               <CWText>Outputs</CWText>
               <CWText>Call Function</CWText>
             </div>
-            {loadContractAbi(contractAddress).map((fn: AbiFunction, idx: number) => {
-              console.log(fn);
-              return (
+            {loadContractAbi(contractAddress).map(
+              (fn: AbiFunction, idx: number) => {
+                return (
                   <div class="function-row">
                     <CWText>{fn.name}</CWText>
                     <CWText>{fn.stateMutability}</CWText>
                     <div class="functions-input-container">
-                    {fn.inputs.map((input, i) => {
-                      return (
-                        <div class="function-inputs">
-                          <CWText>[{i}]</CWText>
-                          <CWText>{input.type}</CWText>
-                          <CWText>{input.name}</CWText>
-                        </div>
-                      );
-                    })}
+                      {fn.inputs.map((input, i) => {
+                        return (
+                          <div>
+                            <div class="function-inputs">
+                              <CWText>[{i}]</CWText>
+                              <CWText>{input.type}</CWText>
+                              <CWText>{input.name}</CWText>
+                            </div>
+                            <div>
+                              <CWTextInput
+                                name="Contract Input Field"
+                                placeholder="Insert Input Here"
+                                oninput={(e) => {
+                                  this.input = e.target.value;
+                                }}
+                                inputValidationFn={(
+                                  val: string
+                                ): [ValidationStatus, string] => {
+                                  if (input.type.substring(0, 4) === 'uint') {
+                                    if (!Number.isNaN(Number(val))) {
+                                      return ['success', ''];
+                                    } else {
+                                      return [
+                                        'failure',
+                                        'Input must be a number',
+                                      ];
+                                    }
+                                  } else if (input.type === 'bool') {
+                                    if (val === 'true' || val === 'false') {
+                                      return ['success', ''];
+                                    } else {
+                                      return [
+                                        'failure',
+                                        'Input must be a boolean',
+                                      ];
+                                    }
+                                  } else if (input.type === 'address') {
+                                    if (val.length === 42) {
+                                      return ['success', ''];
+                                    } else {
+                                      return [
+                                        'failure',
+                                        'Input must be an address',
+                                      ];
+                                    }
+                                  } else {
+                                    return ['success', ''];
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                     <div class="functions-output-container">
                       {fn.outputs.map((output, i) => {
@@ -96,17 +141,17 @@ class GeneralContractPage
                       })}
                     </div>
                     <div class="function-call">
-                      <CWButton label="Submit"/>
-                      {/* <CWTextInput
-                        placeholder="Input"
-                        oninput={(e) => {
-                          this.input = e.target.value;
-                        }}
-                      /> */}
+                      <CWButton
+                        label="Submit"
+                        onclick={() =>
+                          notifySuccess('Submit Call button clicked!')
+                        }
+                      />
                     </div>
                   </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
         </div>
       </Sublayout>
