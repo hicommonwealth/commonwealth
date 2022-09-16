@@ -40,6 +40,7 @@ export default async (
       model: models.Chain,
       as: 'Chain',
       required: true,
+      where: { active: true },
     },
   ];
 
