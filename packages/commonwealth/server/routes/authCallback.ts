@@ -65,6 +65,8 @@ const authCallback = async (
     defaults: {
       profile_id: profile.id,
       issued_at: iat,
+      created_at: new Date(),
+      updated_at: new Date(),
     }
   });
   if (!created) {
