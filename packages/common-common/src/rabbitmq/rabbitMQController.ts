@@ -1,12 +1,32 @@
 import Rascal from 'rascal';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {RascalSubscriptions, TRmqMessages} from "./types";
+import {factory, formatFilename} from 'common-common/src/logging';
+import {RascalPublications, RascalSubscriptions, rmqMsgToName, TRmqMessages} from "./types";
+import {ModelStatic} from "chain-events/services/database/models/types";
+import {Sequelize} from "sequelize";
+import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
+import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
+import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
+import {ChainModelStatic} from "commonwealth/server/models/chain";
 
 const log = factory.getLogger(formatFilename(__filename));
 
-class PublishError extends Error {
+// TODO: enforce/check/use?
+export type SafeRmqPublishSupported =
+  ChainEntityModelStatic
+  | ChainEventModelStatic
+  | ChainEventTypeModelStatic
+  | ChainModelStatic;
+
+export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
     super(msg);
+    Object.setPrototypeOf(this, RabbitMQControllerError.prototype);
+  }
+}
+
+class PublishError extends RabbitMQControllerError {
+  constructor(msg: string) {
+    super(`Error publishing. ${msg}`);
     Object.setPrototypeOf(this, PublishError.prototype);
   }
 }
@@ -38,20 +58,20 @@ export class RabbitMQController {
       Rascal.withDefaultConfig(this._rabbitMQConfig)
     );
 
-    this.broker.on('error', (err, { vhost, connectionUrl }) => {
+    this.broker.on('error', (err, {vhost, connectionUrl}) => {
       log.error(`Broker error on vhost: ${vhost} using url: ${connectionUrl}`, err)
     });
-    this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
+    this.broker.on('vhost_initialized', ({vhost, connectionUrl}) => {
       log.info(
         `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`
       );
     });
-    this.broker.on('blocked', (reason, { vhost, connectionUrl }) => {
+    this.broker.on('blocked', (reason, {vhost, connectionUrl}) => {
       log.warn(
         `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`
       );
     });
-    this.broker.on('unblocked', ({ vhost, connectionUrl }) => {
+    this.broker.on('unblocked', ({vhost, connectionUrl}) => {
       log.info(
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`
       );
@@ -69,18 +89,18 @@ export class RabbitMQController {
    */
   public async startSubscription(
     messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>,
-    subscriptionName: string,
-    msgProcessorContext?: {[key: string]: any}
+    subscriptionName: RascalSubscriptions,
+    msgProcessorContext?: { [key: string]: any }
   ): Promise<any> {
     if (!this._initialized) {
-      throw new Error("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
     }
 
     let subscription: Rascal.SubscriberSessionAsPromised;
-    try {
-      if (!this.subscribers.includes(subscriptionName))
-        throw new Error('Subscription does not exist');
+    if (!this.subscribers.includes(subscriptionName))
+      throw new RabbitMQControllerError('Subscription does not exist');
 
+    try {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
@@ -103,7 +123,7 @@ export class RabbitMQController {
         ackOrNack(err, {strategy: 'nack'})
       });
     } catch (err) {
-      throw new Error(`Rascal config error: ${err.message}`);
+      throw new RabbitMQControllerError(`${err.message}`);
     }
     return subscription;
   }
@@ -112,13 +132,13 @@ export class RabbitMQController {
   //      if a message is successfully published to a particular queue then the callback is executed
 
   // TODO: the publish ACK should be in a transaction with the publish itself
-  public async publish(data: TRmqMessages, publisherName: any): Promise<any> {
+  public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
-      throw new Error("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
     }
 
     if (!this.publishers.includes(publisherName))
-      throw new Error('Publisher is not defined');
+      throw new RabbitMQControllerError('Publisher is not defined');
 
     let publication;
     try {
@@ -128,11 +148,55 @@ export class RabbitMQController {
         throw new PublishError(err.message);
       });
     } catch (err) {
-      if (err instanceof PublishError) throw new Error(`Publish error: ${err.message}`);
-      else throw new Error(`Rascal config error: ${err.message}`)
+      if (err instanceof PublishError) throw err;
+      else throw new RabbitMQControllerError(`Rascal config error: ${err.message}`)
     }
+  }
 
-
+  /**
+   * This function implements a method of publishing that guarantees eventual consistency. The function assumes that a
+   * data record has already been entered in the source database, and now we need to publish a part of this data
+   * record to a queue. Eventual consistency is achieved specifically by the 'queued' column of the data records. That
+   * is, if the message is successfully published to the required queue, the 'queued' column is updated to reflect this.
+   * If the update to the queue column fails then the message is not published and is left to be re-published by the
+   * background job RepublishMessage.
+   * @param publishData The content of the message to send
+   * @param objectId The id of the data record in the source database
+   * @param publication {RascalPublications} The Rascal publication (aka queue) to send the message to
+   * @param DB {sequelize: Sequelize, model: SafeRmqPublishSupported} An object containing a sequelize connection/object
+   *  and the sequelize model static which contains the objectId.
+   */
+  public async safePublish(
+    publishData: TRmqMessages,
+    objectId: number | string,
+    publication: RascalPublications,
+    DB: { sequelize: Sequelize, model: SafeRmqPublishSupported }
+  ) {
+    const modelName = rmqMsgToName(publishData);
+    try {
+      await DB.sequelize.transaction(async (t) => {
+        // yes I know this is ugly/bad, but I have yet to find a workaround to TS2349 when <any> is not applied.
+        // We don't get types on the model anyway but at least this way the model above is typed to facilitate calling
+        // this 'safPublish' function (arguably more important to ensure this function is not used with incompatible
+        // models).
+       (<any>(await DB.model)).update({
+          queued: -1
+        }, {
+          where: {
+            id: objectId
+          }
+        });
+        await this.publish(publishData, publication);
+      });
+    } catch (e) {
+      if (e instanceof RabbitMQControllerError) {
+        log.error(`RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${RascalPublications.ChainCUDChainEvents}.`, e);
+        // if this fails once not much damage is done since the message is re-queued later again anyway
+        (<any>(await DB.model)).increment("queued", {where: {id: objectId}});
+      } else {
+        log.error(`Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`, e)
+      }
+    }
   }
 
   public get initialized(): boolean {

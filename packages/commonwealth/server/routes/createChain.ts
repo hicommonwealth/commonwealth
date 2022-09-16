@@ -12,7 +12,7 @@ import {ChainAttributes} from '../models/chain';
 import {ChainNodeAttributes} from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import {DB} from '../database';
-import {TypedRequestBody, TypedResponse, success} from '../types';
+import {success, TypedRequestBody, TypedResponse} from '../types';
 
 import {AddressInstance} from '../models/address';
 import {mixpanelTrack} from '../util/mixpanelUtil';
@@ -20,7 +20,8 @@ import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
 import {RoleAttributes, RoleInstance} from '../models/role';
 import {IRmqMsgCreateChainCUD, RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 
-import { AppError, ServerError } from '../util/errors';
+import {AppError, ServerError} from '../util/errors';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -319,21 +320,16 @@ const createChain = async (
     substrate_spec: sanitizedSpec || '',
     cud: 'create-chain'
   }
-  try {
-    // attempt to publish - if the publish fails then don't update the db
-    await rabbitMQController.publish(publishData, RascalPublications.ChainCUDChainEvents);
-    // if publish succeeds attempt to update the database - if the update fails then log and move on
-    // a background job will re-queue the message and update the db if successful
-    models.Chain.update({
-      queued: true
-    }, {
-      where: {id: chain.id}
-    }).catch((error) => {
-      log.error(`Failed to ack queued message for chain_id: ${chain.id}`, error);
-    });
-  } catch (e) {
-    log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
-  }
+
+  await rabbitMQController.safePublish(
+    publishData,
+    chain.id,
+    RascalPublications.ChainCUDChainEvents,
+    {
+      sequelize: models.sequelize,
+      model: models.Chain
+    }
+  );
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;

@@ -2,17 +2,17 @@
  * Determines which chain entities each event affects and updates state accordingly.
  */
 import {
-  IEventHandler,
   CWEvent,
+  EntityEventKind,
   eventToEntity,
   getUniqueEntityKey,
-  EntityEventKind,
   IChainEntityKind,
   IChainEventData,
+  IEventHandler,
   SubstrateTypes,
 } from 'chain-events/src';
 
-import {factory, addPrefix} from 'common-common/src/logging';
+import {addPrefix, factory} from 'common-common/src/logging';
 import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
 import {IRmqMsgCreateEntityCUD, RascalPublications} from 'common-common/src/rabbitmq/types';
 import {DB} from "../../database/database";
@@ -80,21 +80,16 @@ export default class extends IEventHandler {
         chain_id: dbEntity.chain,
         cud: 'create'
       }
-      try {
-        // attempt to publish - if the publish fails then don't update the db
-        await this._rmqController.publish(publishData, RascalPublications.ChainEntityCUDMain)
-        // if publish succeeds attempt to update the database - if the update fails then log and move on
-        // a background job will re-queue the message and update the db if successful
-        await this._models.ChainEventType.update({
-          queued: true
-        }, {
-          where: {id: dbEntity.id}
-        }).catch((error) => {
-          log.error(`Failed to ack queued message for chain_id: ${dbEntity.id}`, error);
-        });
-      } catch (e) {
-        log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
-      }
+
+      await this._rmqController.safePublish(
+        publishData,
+        dbEntity.id,
+        RascalPublications.ChainEntityCUDMain,
+        {
+          sequelize: this._models.sequelize,
+          model: this._models.ChainEntity
+        }
+      );
 
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;

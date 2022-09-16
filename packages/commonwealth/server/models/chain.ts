@@ -23,6 +23,7 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
+  queued: number;
   id?: string;
   description?: string;
   discord?: string;
@@ -47,7 +48,6 @@ export type ChainAttributes = {
   address?: string;
   token_name?: string;
   ce_verbose?: boolean;
-  queued: boolean;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -96,7 +96,6 @@ export default (
       description: { type: dataTypes.STRING, allowNull: true },
       address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
-      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -137,6 +136,7 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
+      queued: {type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0}
     },
     {
       tableName: 'Chains',

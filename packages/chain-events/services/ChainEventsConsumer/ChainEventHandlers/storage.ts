@@ -1,15 +1,15 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {
-  IEventHandler,
-  CWEvent,
-  IChainEventKind,
-  SubstrateTypes, IChainEventData,
-} from 'chain-events/src';
+import {CWEvent, IChainEventKind, IEventHandler, SubstrateTypes,} from 'chain-events/src';
 import Sequelize from 'sequelize';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController, RascalPublications, IRmqMsgCreateCETypeCUD } from 'common-common/src/rabbitmq';
+import {addPrefix, factory, formatFilename} from 'common-common/src/logging';
+import {
+  IRmqMsgCreateCETypeCUD,
+  RabbitMQController,
+  RabbitMQControllerError,
+  RascalPublications
+} from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash'
 import {DB} from "../../database/database";
@@ -91,21 +91,16 @@ export default class extends IEventHandler {
         chainEventTypeId: dbEventType.id,
         cud: 'create'
       }
-      try {
-        // attempt to publish - if the publish fails then don't update the db
-        await this._rmqController.publish(publishData, RascalPublications.ChainEventTypeCUDMain);
-        // if publish succeeds attempt to update the database - if the update fails then log and move on
-        // a background job will re-queue the message and update the db if successful
-        await this._models.ChainEventType.update({
-          queued: true
-        }, {
-          where: {id: dbEventType.id}
-        }).catch((error) => {
-          log.error(`Failed to ack queued message for chain_id: ${dbEventType.id}`, error);
-        });
-      } catch (e) {
-        log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
-      }
+
+      await this._rmqController.safePublish(
+        publishData,
+        dbEventType.id,
+        RascalPublications.ChainEventTypeCUDMain,
+        {
+          sequelize: this._models.sequelize,
+          model: this._models.ChainEventType
+        }
+      );
     }
 
     if (!dbEventType) {

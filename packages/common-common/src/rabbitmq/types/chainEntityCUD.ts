@@ -1,5 +1,9 @@
 export type TRmqMsgEntityCUD = IRmqMsgCreateEntityCUD;
 
+export function isTRmqMsgEntityCUD(data: any): data is TRmqMsgEntityCUD {
+  return isRmqMsgCreateEntityCUD(data);
+}
+
 export interface IRmqMsgCreateEntityCUD {
   ce_id: number;
   chain_id: string;

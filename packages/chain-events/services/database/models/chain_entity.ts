@@ -9,7 +9,7 @@ export type ChainEntityAttributes = {
   chain: string;
   type: string;
   type_id: string;
-  queued: boolean;
+  queued: number;
   author?: string;
   completed?: boolean;
   created_at?: Date;
@@ -36,7 +36,7 @@ export default (
     author: { type: dataTypes.STRING, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
-    queued: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false }
+    queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 }
   }, {
     tableName: 'ChainEntities',
     timestamps: true,

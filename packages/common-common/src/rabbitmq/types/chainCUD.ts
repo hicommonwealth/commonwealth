@@ -3,6 +3,13 @@ import {RegisteredTypes} from "@polkadot/types/types";
 
 export type TRmqMsgChainCUD = IRmqMsgCreateChainCUD | IRmqMsgDeleteChainCUD | IRmqMsgUpdateChainCUD | IRmqMsgUpdateChainNodeCUD;
 
+export function isTRmqMsgChainCUD(data: any): data is TRmqMsgChainCUD {
+  if (isRmqMsgDeleteChainCUD(data)) return true;
+  else if (isRmqMsgCreateChainCUD(data)) return true;
+  else if (isRmqMsgUpdateChainCUD(data)) return true;
+  else return false;
+}
+
 export interface IRmqMsgDeleteChainCUD {
   chain_id: string;
   cud: 'delete-chain';

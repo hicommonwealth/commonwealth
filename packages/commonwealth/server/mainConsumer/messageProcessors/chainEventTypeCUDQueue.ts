@@ -22,10 +22,6 @@ export async function processChainEventTypeCUD(
         e
       );
       throw e;
-      // TODO: if we don't catch here the error is propogated up to the RabbitMQ
-      //  Controller which will re-publish the message up to 3 times. A proper
-      //  dead-letter queue strategy should also be set up with a consumer which
-      //  sends alerts to devs
     }
   } else {
     console.log("The received message type is not supported!", data);

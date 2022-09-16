@@ -5,6 +5,10 @@ import {IRmqMsgCreateEntityCUD} from "./chainEntityCUD";
 
 export type TRmqMsgCENotificationsCUD = IRmqMsgCreateCENotificationsCUD;
 
+export function isTRmqMsgCENotificationsCUD(data: any): data is TRmqMsgCENotificationsCUD {
+  return isRmqMsgCreateCENotificationsCUD(data);
+}
+
 export interface IRmqMsgCreateCENotificationsCUD {
   ChainEvent: ChainEventAttributes
   event: CWEvent

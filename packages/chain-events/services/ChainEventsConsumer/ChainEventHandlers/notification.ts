@@ -1,9 +1,4 @@
-import {
-  CWEvent,
-  IChainEventData,
-  IChainEventKind,
-  IEventHandler,
-} from 'chain-events/src';
+import {CWEvent, IChainEventData, IChainEventKind, IEventHandler,} from 'chain-events/src';
 import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
 import {addPrefix, factory} from '../../../src/logging';
 import {ChainEventAttributes} from '../../database/models/chain_event';
@@ -57,23 +52,15 @@ export default class extends IEventHandler {
       ChainEvent: formattedEvent, event, cud: 'create'
     }
 
-    try {
-      // attempt to publish - if the publish fails then don't update the db
-      await this._rmqController.publish(
-        publishData,
-        RascalPublications.ChainEventNotificationsCUDMain
-      );      // if publish succeeds attempt to update the database - if the update fails then log and move on
-      // a background job will re-queue the message and update the db if successful
-      await this._models.ChainEvent.update({
-        queued: true
-      }, {
-        where: {id: dbEvent.id}
-      }).catch((error) => {
-        log.error(`Failed to ack queued message for chain_id: ${dbEvent.id}`, error);
-      });
-    } catch (e) {
-      log.error(`Failed to queue ChainCUD msg: ${JSON.stringify(publishData)}`);
-    }
+    await this._rmqController.safePublish(
+      publishData,
+      dbEvent.id,
+      RascalPublications.ChainEventNotificationsCUDMain,
+      {
+        sequelize: this._models.sequelize,
+        model: this._models.ChainEvent
+      }
+    );
 
     log.info("Chain-event Notification sent to CUD queue.");
     return dbEvent;

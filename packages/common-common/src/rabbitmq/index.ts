@@ -1,3 +1,4 @@
 export {getRabbitMQConfig} from './RabbitMQConfig';
-export {RabbitMQController} from './rabbitMQController';
+export * from './rabbitMQController';
 export * from './types';
+export {RepublishFailedMessages} from './republishFailedMessages';
