@@ -26,6 +26,7 @@ import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
+import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 
@@ -76,6 +77,17 @@ export class ComponentShowcase implements m.ClassComponent {
                 label="Filter"
               />
             }
+          />
+        </div>
+        <h1>Breadcrumbs</h1>
+        <div class="basic-gallery">
+          <CWBreadcrumbs
+            breadcrumbs={[
+              { label: 'Page', path: '' },
+              { label: 'Page', path: '' },
+              { label: 'Page', path: '' },
+              { label: 'Current', path: '' },
+            ]}
           />
         </div>
         <h1>Tag</h1>
