@@ -10,16 +10,37 @@
   .functions-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+
+    .header-row {
+      border-bottom: 1px solid $neutral-600;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr; 
+    }
 
     .function-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      border-bottom: 1px solid $neutral-600;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 8px 0;
 
-      .function-inputs {
+      .functions-input-container {
         display: flex;
-        gap: 4px;
+        flex-direction: column;
+
+        .function-inputs {
+          display: flex;
+          gap: 4px;
+        }
+      }
+
+      .functions-output-container {
+        display: flex;
+        flex-direction: column;
+
+        .function-outputs {
+          display: flex;
+          gap: 4px;
+        }
       }
     }
   }

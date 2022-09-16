@@ -57,21 +57,40 @@ class GeneralContractPage
           <CWText type="h4">General Contract</CWText>
           <CWText>Contract Address: {contractAddress}</CWText>
           <div class="functions-container">
+            <div class="header-row">
+              <CWText>Name</CWText>
+              <CWText>State Mutability</CWText>
+              <CWText>Inputs</CWText>
+              <CWText>Outputs</CWText>
+            </div>
             {loadContractAbi(contractAddress).map((fn: AbiFunction) => {
               console.log(fn);
               return (
                 <div class="function-row">
                   <CWText>{fn.name}</CWText>
                   <CWText>{fn.stateMutability}</CWText>
+                  <div class="functions-input-container">
                   {fn.inputs.map((input, i) => {
                     return (
                       <div class="function-inputs">
-                        <CWText>{i}</CWText>
+                        <CWText>[{i}]</CWText>
                         <CWText>{input.type}</CWText>
                         <CWText>{input.name}</CWText>
                       </div>
                     );
                   })}
+                  </div>
+                  <div class="functions-output-container">
+                  {fn.outputs.map((output, i) => {
+                    return (
+                      <div class="function-outputs">
+                        <CWText>[{i}]</CWText>
+                        <CWText>{output.type}</CWText>
+                        <CWText>{output.name}</CWText>
+                      </div>
+                    );
+                  })}
+                  </div>
                   {/* <CWText>{JSON.stringify(fn.outputs)}</CWText> */}
                 </div>
               );
