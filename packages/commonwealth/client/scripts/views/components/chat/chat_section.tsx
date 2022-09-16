@@ -181,25 +181,23 @@ export class ChatSection
         : (this.channels[metadata.category] = [metadata]);
     });
 
-    const channelToggleTree: ToggleTree = {
-      toggledState: true,
+    const chatDefaultToggleTree: ToggleTree = {
+      toggledState: false,
       children: this.categoryToToggleTree(Object.keys(this.channels), true),
     };
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-chat-toggle-tree`]) {
-      console.log('setting toggle tree from scratch');
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
-    } else if (!verifyCachedToggleTree('chat', channelToggleTree)) {
-      console.log(
-        'setting chat toggle tree since the cached version differs from the updated version'
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
       );
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
+    } else if (!verifyCachedToggleTree('chat', chatDefaultToggleTree)) {
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
+      );
     }
     const toggleTreeState = vnode.attrs.mobile
-      ? channelToggleTree
+      ? chatDefaultToggleTree
       : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
 
     // ---------- Build Section Props ---------- //
@@ -428,7 +426,7 @@ export class ChatSection
     ) : null;
 
     const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'CHAT',
+      title: 'Chat',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
