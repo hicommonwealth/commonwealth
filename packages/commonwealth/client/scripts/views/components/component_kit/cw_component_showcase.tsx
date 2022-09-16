@@ -3,7 +3,6 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
-// import app from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
@@ -27,9 +26,8 @@ import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle } from './cw_toggle';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
+import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
-// import { NewLoginModal } from '../../modals/login_modal';
-// import { isWindowMediumSmallInclusive } from './helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -67,19 +65,17 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        {/* <CWButton
-          label="Click for Login modal"
-          onclick={() =>
-            app.modals.create({
-              modal: NewLoginModal,
-              data: {
-                modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                  ? 'fullScreen'
-                  : 'centered',
-              },
-            })
-          }
-        /> */}
+        <h1>Breadcrumbs</h1>
+        <div class="basic-gallery">
+          <CWBreadcrumbs
+            breadcrumbs={[
+              { label: 'Page', path: '' },
+              { label: 'Page', path: '' },
+              { label: 'Page', path: '' },
+              { label: 'Current', path: '' },
+            ]}
+          />
+        </div>
         <h1>Tag</h1>
         <div class="basic-gallery">
           <CWTag label="Ref #90" />

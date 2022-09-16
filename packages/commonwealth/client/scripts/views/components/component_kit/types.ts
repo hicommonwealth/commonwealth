@@ -4,6 +4,7 @@ export enum ComponentType {
   Avatar = 'Avatar',
   AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
+  Breadcrumbs = 'Breadcrumbs',
   Button = 'Button',
   ButtonGroup = 'ButtonGroup',
   Card = 'Card',
