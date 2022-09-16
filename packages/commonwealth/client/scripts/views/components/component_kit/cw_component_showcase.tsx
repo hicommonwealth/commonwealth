@@ -27,6 +27,7 @@ import { CWToggle } from './cw_toggle';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
+import { CWTag } from './cw_tag';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -74,6 +75,14 @@ export class ComponentShowcase implements m.ClassComponent {
               { label: 'Current', path: '' },
             ]}
           />
+        </div>
+        <h1>Tag</h1>
+        <div class="basic-gallery">
+          <CWTag label="Ref #90" />
+          <CWTag label="Passed" status="passed" />
+          <CWTag label="Failed" status="failed" />
+          <CWTag label="Active" status="active" />
+          <CWTag label="12 days" iconName="clock" />
         </div>
         <h1>Popover Menu</h1>
         <div class="basic-gallery">
