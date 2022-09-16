@@ -1,0 +1,26 @@
+@import 'shared';
+
+.GeneralContractPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+
+  .functions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .function-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .function-inputs {
+        display: flex;
+        gap: 4px;
+      }
+    }
+  }
+}

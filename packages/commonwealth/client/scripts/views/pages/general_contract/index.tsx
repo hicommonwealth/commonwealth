@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import 'pages/discussions/index.scss';
+import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'client/scripts/models';
 import m from 'mithril';
@@ -9,9 +9,14 @@ import {
   parseFunctionsFromABI,
   getEtherscanABI,
 } from '../../../helpers/abi_utils';
-import { AbiFunction } from '../../../helpers/types';
+import {
+  AbiFunction,
+  AbiFunctionInput,
+  AbiFunctionOutput,
+} from '../../../helpers/types';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import { CWText } from '../../components/component_kit/cw_text';
 
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
@@ -36,7 +41,6 @@ class GeneralContractPage
       } else {
         loadAbiFromEtherscan(address);
       }
-      console.log(contract);
     };
 
     const { contractAddress } = vnode.attrs;
@@ -49,18 +53,29 @@ class GeneralContractPage
 
     return (
       <Sublayout>
-        <div class="General Contract Page">
-          <div class="container">
-            <h1>General Contract</h1>
-            <h2>Contract Address: {contractAddress}</h2>
-            <h2>
-              Abi Functions:{' '}
-              {loadContractAbi(contractAddress).map((fn: AbiFunction) => (
-                <div class="function-container">
-                  <div class="fn-name">{fn.name}</div>
+        <div class="GeneralContractPage">
+          <CWText type="h4">General Contract</CWText>
+          <CWText>Contract Address: {contractAddress}</CWText>
+          <div class="functions-container">
+            {loadContractAbi(contractAddress).map((fn: AbiFunction) => {
+              console.log(fn);
+              return (
+                <div class="function-row">
+                  <CWText>{fn.name}</CWText>
+                  <CWText>{fn.stateMutability}</CWText>
+                  {fn.inputs.map((input, i) => {
+                    return (
+                      <div class="function-inputs">
+                        <CWText>{i}</CWText>
+                        <CWText>{input.type}</CWText>
+                        <CWText>{input.name}</CWText>
+                      </div>
+                    );
+                  })}
+                  {/* <CWText>{JSON.stringify(fn.outputs)}</CWText> */}
                 </div>
-              ))}
-            </h2>
+              );
+            })}
           </div>
         </div>
       </Sublayout>
