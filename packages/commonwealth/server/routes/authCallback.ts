@@ -64,7 +64,7 @@ const authCallback = async (
     },
     defaults: {
       profile_id: profile.id,
-      issued_at: iat,
+      issued_at: Math.floor(iat / 1000), // convert to seconds
       created_at: new Date(),
       updated_at: new Date(),
     }
