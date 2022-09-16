@@ -14,13 +14,12 @@
     .header-row {
       border-bottom: 1px solid $neutral-600;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr; 
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr; 
     }
 
     .function-row {
-      border-bottom: 1px solid $neutral-600;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
       padding: 8px 0;
 
       .functions-input-container {

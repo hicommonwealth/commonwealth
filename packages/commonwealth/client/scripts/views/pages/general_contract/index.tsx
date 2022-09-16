@@ -4,7 +4,6 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'client/scripts/models';
 import m from 'mithril';
-import { FunctionInfo } from '../../components/abi_ui_generation/function_info';
 import {
   parseFunctionsFromABI,
   getEtherscanABI,
@@ -17,10 +16,14 @@ import {
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
+  private input: string;
+
   view(vnode) {
     const loadAbiFromEtherscan = async (address: string) => {
       try {
@@ -62,37 +65,46 @@ class GeneralContractPage
               <CWText>State Mutability</CWText>
               <CWText>Inputs</CWText>
               <CWText>Outputs</CWText>
+              <CWText>Call Function</CWText>
             </div>
-            {loadContractAbi(contractAddress).map((fn: AbiFunction) => {
+            {loadContractAbi(contractAddress).map((fn: AbiFunction, idx: number) => {
               console.log(fn);
               return (
-                <div class="function-row">
-                  <CWText>{fn.name}</CWText>
-                  <CWText>{fn.stateMutability}</CWText>
-                  <div class="functions-input-container">
-                  {fn.inputs.map((input, i) => {
-                    return (
-                      <div class="function-inputs">
-                        <CWText>[{i}]</CWText>
-                        <CWText>{input.type}</CWText>
-                        <CWText>{input.name}</CWText>
-                      </div>
-                    );
-                  })}
+                  <div class="function-row">
+                    <CWText>{fn.name}</CWText>
+                    <CWText>{fn.stateMutability}</CWText>
+                    <div class="functions-input-container">
+                    {fn.inputs.map((input, i) => {
+                      return (
+                        <div class="function-inputs">
+                          <CWText>[{i}]</CWText>
+                          <CWText>{input.type}</CWText>
+                          <CWText>{input.name}</CWText>
+                        </div>
+                      );
+                    })}
+                    </div>
+                    <div class="functions-output-container">
+                      {fn.outputs.map((output, i) => {
+                        return (
+                          <div class="function-outputs">
+                            <CWText>[{i}]</CWText>
+                            <CWText>{output.type}</CWText>
+                            <CWText>{output.name}</CWText>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div class="function-call">
+                      <CWButton label="Submit"/>
+                      {/* <CWTextInput
+                        placeholder="Input"
+                        oninput={(e) => {
+                          this.input = e.target.value;
+                        }}
+                      /> */}
+                    </div>
                   </div>
-                  <div class="functions-output-container">
-                  {fn.outputs.map((output, i) => {
-                    return (
-                      <div class="function-outputs">
-                        <CWText>[{i}]</CWText>
-                        <CWText>{output.type}</CWText>
-                        <CWText>{output.name}</CWText>
-                      </div>
-                    );
-                  })}
-                  </div>
-                  {/* <CWText>{JSON.stringify(fn.outputs)}</CWText> */}
-                </div>
               );
             })}
           </div>
