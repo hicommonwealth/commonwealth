@@ -1,5 +1,7 @@
-import app from 'state';
+/* @jsx m */
+
 import m from 'mithril';
+import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs } from './types';
 import { CreateInviteModal } from '../../modals/create_invite_modal';
