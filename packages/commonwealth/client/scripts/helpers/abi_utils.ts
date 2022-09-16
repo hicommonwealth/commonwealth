@@ -2,7 +2,6 @@ import { chain } from 'web3-core/types';
 import { AbiFunction, AbiEvent } from './types';
 
 export function parseFunctionsFromABI(abiString: string): AbiFunction[] {
-  console.log("Parsing functions from ABI");
   let fns: AbiFunction[] = [];
   if (abiString) {
     const abi = JSON.parse(abiString);
@@ -13,7 +12,6 @@ export function parseFunctionsFromABI(abiString: string): AbiFunction[] {
 }
 
 export function parseEventsFromABI(abiString: string): AbiEvent[] {
-  console.log("Parsing Events from ABI");
   let events: AbiEvent[] = [];
   if (abiString) {
     const abi = JSON.parse(abiString);

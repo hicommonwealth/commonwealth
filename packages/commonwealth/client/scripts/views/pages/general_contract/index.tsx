@@ -27,6 +27,7 @@ class GeneralContractPage
   private input: string;
 
   view(vnode) {
+    // TODO: figure out when to use this method properly
     const loadAbiFromEtherscan = async (address: string) => {
       try {
         const etherscanAbi = await getEtherscanABI('mainnet', address);
@@ -92,6 +93,26 @@ class GeneralContractPage
                                 inputValidationFn={(
                                   val: string
                                 ): [ValidationStatus, string] => {
+                                  // TODO Array Validation will be complex. Check what cases we want to cover here
+                                  if (input.type.slice(-2) === "[]") {
+                                    if (val[0] !== "[" || val[val.length - 1] !== "]") {
+                                      return ['failure', "Input must be an array"];
+                                    } else {
+                                      return ['success', ""];
+                                    }
+                                  }
+                                  if (input.type === "address") {
+                                    if (val.length !== 42) {
+                                      return ['failure', "Input must be an address"];
+                                    } else {
+                                      return ['success', ""];
+                                    }
+                                  }
+                                  if (input.type === "bool") {
+                                    if (val !== "true" && val !== "false") {
+                                      return ['failure', "Input must be a boolean"];
+                                    }
+                                  }
                                   if (input.type.substring(0, 4) === 'uint') {
                                     if (!Number.isNaN(Number(val))) {
                                       return ['success', ''];
