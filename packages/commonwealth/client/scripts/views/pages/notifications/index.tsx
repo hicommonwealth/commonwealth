@@ -18,7 +18,7 @@ const MAX_NOTIFS = 40;
 let init = false;
 let pageKey = 0;
 
-function increment(type: 'chain-event' | 'discussion') {
+const increment = (type: 'chain-event' | 'discussion') => {
   if (type === 'chain-event') {
     if (
       app.user.notifications.chainEventNotifications.length >=
@@ -32,11 +32,12 @@ function increment(type: 'chain-event' | 'discussion') {
     )
       minDiscussionNotification += MAX_NOTIFS;
   }
-}
+};
 
-function nextPage() {
+const nextPage = () => {
   const numChainEventNotif =
     app.user.notifications.chainEventNotifications.length;
+
   const numDiscussionNotif =
     app.user.notifications.discussionNotifications.length;
 
@@ -59,10 +60,11 @@ function nextPage() {
     increment('discussion');
     m.redraw();
   }
-}
+};
 
-function previousPage() {
+const previousPage = () => {
   let flag = false;
+
   if (minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
     flag = true;
@@ -78,11 +80,12 @@ function previousPage() {
     minDiscussionNotification = 0;
     flag = true;
   }
-  if (flag) m.redraw();
-}
 
-const NotificationsPage: m.Component<{}> = {
-  view: (vnode) => {
+  if (flag) m.redraw();
+};
+
+class NotificationsPage implements m.ClassComponent {
+  view() {
     if (!app.isLoggedIn())
       return m(PageError, {
         title: [
@@ -97,6 +100,7 @@ const NotificationsPage: m.Component<{}> = {
       });
 
     const activeEntity = app.chain;
+
     if (!activeEntity)
       return m(PageLoading, {
         title: [
@@ -111,11 +115,9 @@ const NotificationsPage: m.Component<{}> = {
 
     const discussionNotifications =
       app.user.notifications.discussionNotifications;
+
     const chainEventNotifications =
       app.user.notifications.chainEventNotifications;
-
-    // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
-    // console.log("Sorted Notifications:", sortedNotifications);
 
     return m(
       Sublayout,
@@ -280,7 +282,7 @@ const NotificationsPage: m.Component<{}> = {
         ]),
       ]
     );
-  },
-};
+  }
+}
 
 export default NotificationsPage;
