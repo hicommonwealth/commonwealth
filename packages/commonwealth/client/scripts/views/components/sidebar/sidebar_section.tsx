@@ -86,6 +86,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       if (containsChildren) {
         this.toggled = !toggled;
       }
+      localStorage.setItem('sidebar-toggle', 'false');
       onclick(e, this.toggled);
     };
 
