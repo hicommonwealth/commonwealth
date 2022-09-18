@@ -23,8 +23,8 @@ export class NotificationRow
       onListPage?: boolean;
     }>
 {
-  scrollOrStop: boolean;
-  markingRead: boolean;
+  private markingRead: boolean;
+  private scrollOrStop: boolean;
 
   oncreate(vnode) {
     if (
@@ -32,18 +32,22 @@ export class NotificationRow
       vnode.attrs.onListPage &&
       m.route.param('id') === vnode.attrs.notifications[0].id.toString()
     ) {
-      vnode.state.scrollOrStop = true;
+      this.scrollOrStop = true;
     }
   }
 
   view(vnode) {
     const { notifications } = vnode.attrs;
+
     const notification = notifications[0];
+
     const { category } = notifications[0].subscription;
+
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
+
       const chainId = notification.chainEvent.type.chain;
 
       // construct compatible CW event from DB by inserting network from type
@@ -52,17 +56,20 @@ export class NotificationRow
         network: notification.chainEvent.type.eventNetwork,
         data: notification.chainEvent.data,
       };
+
       const chainName = app.config.chains.getById(chainId)?.name;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
+
       const label = ChainEventLabel(chainId, chainEvent);
 
-      if (vnode.state.scrollOrStop) {
+      if (this.scrollOrStop) {
         setTimeout(() => {
           const el = document.getElementById(m.route.param('id'));
           if (el) el.scrollIntoView();
         }, 1);
-        vnode.state.scrollOrStop = false;
+
+        this.scrollOrStop = false;
       }
 
       if (!label) {
@@ -76,6 +83,7 @@ export class NotificationRow
           [m('.comment-body', [m('.comment-body-top', 'Loading...')])]
         );
       }
+
       return link(
         'a.NotificationRow',
         `/notifications?id=${notification.id}`,
@@ -93,7 +101,7 @@ export class NotificationRow
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    vnode.state.scrollOrStop = true;
+                    this.scrollOrStop = true;
                     app.user.notifications.delete([notification]).then(() => {
                       m.redraw();
                     });
@@ -114,8 +122,8 @@ export class NotificationRow
         },
         null,
         () => {
-          if (vnode.state.scrollOrStop) {
-            vnode.state.scrollOrStop = false;
+          if (this.scrollOrStop) {
+            this.scrollOrStop = false;
             return;
           }
           app.user.notifications
@@ -170,21 +178,21 @@ export class NotificationRow
                     onclick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      vnode.state.markingRead = true;
+                      this.markingRead = true;
                       app.user.notifications
                         .markAsRead(notifications)
                         ?.then(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         })
                         .catch(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         });
                     },
                   },
                   [
-                    vnode.state.markingRead
+                    this.markingRead
                       ? m(Spinner, { size: 'xs', active: true })
                       : 'Mark as read',
                   ]
@@ -268,21 +276,21 @@ export class NotificationRow
                     onclick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      vnode.state.markingRead = true;
+                      this.markingRead = true;
                       app.user.notifications
                         .markAsRead(notifications)
                         ?.then(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         })
                         .catch(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         });
                     },
                   },
                   [
-                    vnode.state.markingRead
+                    this.markingRead
                       ? m(Spinner, { size: 'xs', active: true })
                       : 'Mark as read',
                   ]

@@ -19,9 +19,12 @@ import { jumpHighlightComment } from '../view_proposal/helpers';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
+
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
+
     if (!doc.ops) throw new Error();
+
     decoded_comment_text = m(QuillFormattedText, {
       doc,
       hideFormatting: true,
@@ -30,11 +33,15 @@ const getCommentPreview = (comment_text) => {
   } catch (e) {
     // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
     let doc = decodeURIComponent(comment_text);
+
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
+
     const matches = doc['matchAll'](regexp);
+
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
+
     decoded_comment_text = m(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
       hideFormatting: true,
@@ -54,7 +61,6 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     comment_id,
     comment_text,
     parent_comment_id,
-    parent_comment_text,
     chain_id,
     author_address,
     author_chain,
@@ -168,7 +174,6 @@ export const getBatchNotificationFields = (
     comment_id,
     comment_text,
     parent_comment_id,
-    parent_comment_text,
     chain_id,
     author_address,
     author_chain,
