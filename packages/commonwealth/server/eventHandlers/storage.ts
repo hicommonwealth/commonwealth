@@ -10,6 +10,9 @@ import {
 } from 'chain-events/src';
 import Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import NodeCache from 'node-cache';
+import hash from 'object-hash'
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -19,7 +22,9 @@ export interface StorageFilterConfig {
 }
 
 export default class extends IEventHandler {
-  public readonly name = 'Storage';
+  public readonly name = 'Storage'
+  public readonly eventCache: NodeCache
+  public readonly ttl = 20;
 
   constructor(
     private readonly _models,
@@ -27,6 +32,11 @@ export default class extends IEventHandler {
     private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
+    this.eventCache = new NodeCache({
+      stdTTL: this.ttl,
+      deleteOnExpire: true,
+      useClones: false
+    });
   }
 
   /**
@@ -106,14 +116,28 @@ export default class extends IEventHandler {
         log.trace(`found chain event type: ${dbEventType.id}`);
       }
     }
-
-    // create event in db
-    // TODO: we should reconsider duplicate event handling at some point
-    const dbEvent = await this._models.ChainEvent.create({
+    const eventData = {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,
+    }
+
+    // duplicate event check
+    const eventKey = hash(eventData, {
+      respectType: false
     });
-    return dbEvent;
+    const cachedEvent = this.eventCache.get(eventKey);
+
+    if (!cachedEvent) {
+      const dbEvent = await this._models.ChainEvent.create(eventData);
+      // no need to save the entire event data since the key is the hash of the data
+      this.eventCache.set(eventKey, true);
+
+      return dbEvent;
+    } else {
+      // refresh ttl for the duplicated event
+      this.eventCache.ttl(eventKey, this.ttl)
+      // return nothing so following handlers ignore this event
+    }
   }
 }
