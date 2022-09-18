@@ -2,7 +2,7 @@
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.transaction(async (t) => {
+        await queryInterface.sequelize.transaction(async (t) => {
             await queryInterface.addColumn('ChainEventTypes', 'queued',
                 {type: Sequelize.SMALLINT}, {transaction: t});
             await queryInterface.sequelize.query(`

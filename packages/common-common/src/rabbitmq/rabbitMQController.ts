@@ -1,4 +1,4 @@
-import Rascal from 'rascal';
+import * as Rascal from 'rascal';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {RascalPublications, RascalSubscriptions, rmqMsgToName, TRmqMessages} from "./types";
 import {Sequelize} from "sequelize";
