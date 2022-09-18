@@ -29,7 +29,6 @@
     "start-consumer": "ts-node --project server/mainConsumer/tsconfig.consumer.json server/mainConsumer/mainConsumer.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts",
-    "migrate-events": "ts-node --project tsconfig.node.json server/scripts/migrateChainEntities.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "migrate-identities": "NO_CLIENT=true NO_PRERENDER=true IDENTITY_MIGRATION=true ts-node --project tsconfig.node.json server.ts",
     "migrate-flags": "NO_CLIENT=true NO_PRERENDER=true FLAG_MIGRATION=true ts-node --project tsconfig.node.json server.ts",

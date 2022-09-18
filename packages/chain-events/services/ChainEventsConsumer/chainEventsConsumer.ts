@@ -43,7 +43,6 @@ async function setupChainEventConsumer() {
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(
     models,
-    null,
     rmqController
   );
 

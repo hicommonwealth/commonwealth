@@ -8,20 +8,26 @@ import {
   getUniqueEntityKey,
   IChainEventData,
   EntityEventKind,
-} from 'chain-events/src';
+} from '../../../src';
 import { WhereOptions } from 'sequelize';
 
-import { DB } from '../database';
 import {
-  ChainEventAttributes,
-  ChainEventInstance,
-} from '../models/chain_event';
-
+  IRmqMsgCreateCENotificationsCUD,
+  IRmqMsgCreateCETypeCUD,
+  RabbitMQController,
+  RascalPublications
+} from 'common-common/src/rabbitmq'
 import { factory, formatFilename } from 'common-common/src/logging';
+import {DB} from "../../database/database";
+import {ChainEventAttributes, ChainEventInstance} from "../../database/models/chain_event";
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {
-  constructor(private readonly _models: DB, private readonly _chain?: string) {
+  constructor(
+    private readonly _models: DB,
+    private readonly _rmqController: RabbitMQController,
+    private readonly _chain?: string
+  ) {
     super();
   }
 
@@ -50,6 +56,24 @@ export default class extends IEventHandler<ChainEventInstance> {
       log.trace(
         `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
       );
+
+      if (created) {
+        const publishData: IRmqMsgCreateCETypeCUD = {
+          chainEventTypeId: dbEventType.id,
+          cud: 'create'
+        }
+
+        await this._rmqController.safePublish(
+          publishData,
+          dbEventType.id,
+          RascalPublications.ChainEventTypeCUDMain,
+          {
+            sequelize: this._models.sequelize,
+            model: this._models.ChainEventType
+          }
+        );
+      }
+
       const queryFieldName = `event_data.${fieldName}`;
       const queryArgs: WhereOptions<ChainEventAttributes> =
         eventType === EntityEventKind.Vote
@@ -68,11 +92,28 @@ export default class extends IEventHandler<ChainEventInstance> {
       });
       if (!existingEvent) {
         log.trace('No existing event found, creating new event in db!');
-        return this._models.ChainEvent.create({
+        const dbEvent = await this._models.ChainEvent.create({
           chain_event_type_id: dbEventType.id,
           block_number: event.blockNumber,
           event_data: event.data,
         });
+
+        const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
+        formattedEvent.ChainEventType = dbEventType.toJSON();
+
+        const publishData: IRmqMsgCreateCENotificationsCUD = {
+          ChainEvent: formattedEvent, event, cud: 'create'
+        }
+
+        await this._rmqController.safePublish(
+          publishData,
+          dbEvent.id,
+          RascalPublications.ChainEventNotificationsCUDMain,
+          {
+            sequelize: this._models.sequelize,
+            model: this._models.ChainEvent
+          }
+        );
       } else {
         existingEvent.event_data = event.data;
         await existingEvent.save();

@@ -13,7 +13,7 @@ import {
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import StorageHandler from '../../../server/eventHandlers/storage';
-import MigrationHandler from '../../../server/eventHandlers/migration';
+import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 
 chai.use(chaiHttp);
 const { assert } = chai;
