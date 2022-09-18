@@ -44,3 +44,40 @@ export enum RascalSubscriptions {
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainSubscription'
 }
 
+export enum RascalExchanges {
+  ChainEvents = 'ChainEventsExchange',
+  CUD = 'CreateUpdateDeleteExchange',
+  Notifications = 'NotificationsExchange',
+  DeadLetter = 'DeadLetterExchange'
+}
+
+export enum RascalQueues {
+  ChainEvents = 'ChainEventsQueue',
+  ChainCUDChainEvents = 'ChainCUDChainEventsQueue',
+  ChainEntityCUDMain = 'ChainEntityCUDMainQueue',
+  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
+  ChainEventNotifications = 'ChainEventNotificationsQueue',
+  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainQueue',
+  DeadLetter = 'DeadLetterQueue'
+}
+
+export enum RascalBindings {
+  ChainEvents = 'ChainEventsBinding',
+  ChainCUDChainEvents = 'ChainCUDChainEventsBinding',
+  ChainEntityCUDMain = 'ChainEntityCUDMainBinding',
+  ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
+  ChainEventNotifications = 'ChainEventNotificationsBinding',
+  ChainEventType = 'ChainEventTypeBinding',
+  DeadLetter = 'DeadLetterBinding'
+}
+
+export enum RascalRoutingKeys {
+  ChainEvents = 'ChainEvents',
+  ChainCUD = 'ChainCUD',
+  ChainEntityCUD = 'ChainEntityCUD',
+  ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
+  ChainEventNotifications = 'ChainEventNotifications',
+  ChainEventTypeCUD = 'ChainEventTypeCUD',
+  DeadLetter = 'deadLetter'
+}
+

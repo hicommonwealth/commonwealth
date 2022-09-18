@@ -1,5 +1,12 @@
-import Rascal from "rascal";
-import { RascalPublications, RascalSubscriptions } from "./types";
+import * as Rascal from "rascal";
+import {
+  RascalBindings,
+  RascalExchanges,
+  RascalPublications,
+  RascalQueues,
+  RascalRoutingKeys,
+  RascalSubscriptions
+} from "./types";
 
 /**
  * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.
@@ -32,27 +39,27 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
       [vhost]: {
         'connection': rabbitmq_uri,
         'exchanges': {
-          'ChainEventsExchange': {
+          [RascalExchanges.ChainEvents]: {
             'assert': true,
             'type': 'fanout',
             'options': {
               'durable': true,
             },
-          'DeadLetterExchange': {
-              'assert': true,
-              'options': {
-                'durable': true
-              }
-          }
           },
-          'CreateUpdateDeleteExchange': {
+          [RascalExchanges.DeadLetter]: {
+            'assert': true,
+            'options': {
+              'durable': true
+            }
+          },
+          [RascalExchanges.CUD]: {
             'assert': true,
             'type': 'topic',
             'options': {
               'durable': true
             }
           },
-          'NotificationsExchange': {
+          [RascalExchanges.Notifications]: {
             'assert': true,
             'type': 'topic',
             'options': {
@@ -61,107 +68,107 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           }
         },
         'queues': {
-          'ChainEventsQueue': {
+          [RascalQueues.ChainEvents]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'ChainCUDChainEventsQueue': {
+          [RascalQueues.ChainCUDChainEvents]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'ChainEntityCUDMainQueue': {
+          [RascalQueues.ChainEntityCUDMain]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'ChainEventNotificationsCUDMainQueue': {
+          [RascalQueues.ChainEventNotificationsCUDMain]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'ChainEventNotificationsQueue': {
+          [RascalQueues.ChainEventNotifications]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'ChainEventTypeCUDMainQueue': {
+          [RascalQueues.ChainEventTypeCUDMain]: {
             'assert': true,
             'purge': purge,
             'options': {
-              'x-dead-letter-exchange': 'DeadLetterExchange',
-              'dead-letter-routing-key': 'dlQueue'
+              'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+              'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
             }
           },
-          'DeadLetterQueue': {
+          [RascalQueues.DeadLetter]: {
             'assert': true,
             'purge': purge
           }
         },
         'bindings': {
-          'ChainEventsBinding': {
-            'source': 'ChainEventsExchange',
-            'destination': 'ChainEventsQueue',
+          [RascalBindings.ChainEvents]: {
+            'source': RascalExchanges.ChainEvents,
+            'destination': RascalQueues.ChainEvents,
             'destinationType': 'queue',
-            'bindingKey': 'ChainEvents'
+            'bindingKey': RascalRoutingKeys.ChainEvents
           },
-          'ChainCUDChainEventsBinding': {
-            'source': 'CreateUpdateDeleteExchange',
-            'destination': 'ChainCUDChainEventsQueue',
+          [RascalBindings.ChainCUDChainEvents]: {
+            'source': RascalExchanges.CUD,
+            'destination': RascalQueues.ChainCUDChainEvents,
             'destinationType': 'queue',
-            'bindingKey': 'ChainCUD'
+            'bindingKey': RascalRoutingKeys.ChainCUD
           },
-          'ChainEntityCUDMainBinding': {
-            'source': 'CreateUpdateDeleteExchange',
-            'destination': 'ChainEntityCUDMainQueue',
+          [RascalBindings.ChainEntityCUDMain]: {
+            'source': RascalExchanges.CUD,
+            'destination': RascalQueues.ChainEntityCUDMain,
             'destinationType': 'queue',
-            'bindingKey': 'ChainEntityCUD'
+            'bindingKey': RascalRoutingKeys.ChainEntityCUD
           },
-          'ChainEventNotificationsCUDBinding': {
-            'source': 'CreateUpdateDeleteExchange',
-            'destination': 'ChainEventNotificationsCUDMainQueue',
+          [RascalBindings.ChainEventNotificationsCUD]: {
+            'source': RascalExchanges.CUD,
+            'destination': RascalQueues.ChainEventNotificationsCUDMain,
             'destinationType': 'queue',
-            'bindingKey': 'ChainEventNotificationsCUD'
+            'bindingKey': RascalRoutingKeys.ChainEventNotificationsCUD
           },
-          'ChainEventNotificationsBinding': {
-            'source': 'NotificationsExchange',
-            'destination': 'ChainEventNotificationsQueue',
+          [RascalBindings.ChainEventNotifications]: {
+            'source': RascalExchanges.Notifications,
+            'destination': RascalQueues.ChainEventNotifications,
             'destinationType': 'queue',
-            'bindingKey': 'ChainEventNotifications'
+            'bindingKey': RascalBindings.ChainEventNotifications
           },
-          'ChainEventTypeBinding': {
-            'source': 'CreateUpdateDeleteExchange',
-            'destination': 'ChainEventTypeCUDMainQueue',
+          [RascalBindings.ChainEventType]: {
+            'source': RascalExchanges.CUD,
+            'destination': RascalQueues.ChainEventTypeCUDMain,
             'destinationType': 'queue',
-            'bindingKey': 'ChainEventTypeCUD'
+            'bindingKey': RascalRoutingKeys.ChainEventTypeCUD
           },
-          'DeadLetterBinding': {
-            'source': 'DeadLetterExchange',
-            'destination': 'DeadLetterQueue',
+          [RascalBindings.DeadLetter]: {
+            'source': RascalExchanges.DeadLetter,
+            'destination': RascalQueues.DeadLetter,
             'destinationType': 'queue',
-            'bindingKey': 'dlQueue'
+            'bindingKey': RascalRoutingKeys.DeadLetter
           }
         },
         'publications': {
           [RascalPublications.ChainEvents]: {
-            'exchange': 'ChainEventsExchange',
-            'routingKey': 'ChainEvents',
+            'exchange': RascalExchanges.ChainEvents,
+            'routingKey': RascalRoutingKeys.ChainEvents,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -169,8 +176,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             }
           },
           [RascalPublications.ChainCUDChainEvents]: {
-            'exchange': 'CreateUpdateDeleteExchange',
-            'routingKey': 'ChainCUD',
+            'exchange': RascalExchanges.CUD,
+            'routingKey': RascalRoutingKeys.ChainCUD,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -178,8 +185,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             }
           },
           [RascalPublications.ChainEntityCUDMain]: {
-            'exchange': 'CreateUpdateDeleteExchange',
-            'routingKey': 'ChainEntityCUD',
+            'exchange': RascalExchanges.CUD,
+            'routingKey': RascalRoutingKeys.ChainEntityCUD,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -187,8 +194,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
           },
           [RascalPublications.ChainEventNotificationsCUDMain]: {
-            'exchange': 'CreateUpdateDeleteExchange',
-            'routingKey': 'ChainEventNotificationsCUD',
+            'exchange': RascalExchanges.CUD,
+            'routingKey': RascalRoutingKeys.ChainEventNotificationsCUD,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -196,8 +203,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
           },
           [RascalPublications.ChainEventNotifications]: {
-            'exchange': 'NotificationsExchange',
-            'routingKey': 'ChainEventNotifications',
+            'exchange': RascalExchanges.Notifications,
+            'routingKey': RascalRoutingKeys.ChainEventNotifications,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -205,8 +212,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
           },
           [RascalPublications.ChainEventTypeCUDMain]: {
-            'exchange': 'CreateUpdateDeleteExchange',
-            'routingKey': 'ChainEventTypeCUD',
+            'exchange': RascalExchanges.CUD,
+            'routingKey': RascalRoutingKeys.ChainEventTypeCUD,
             'confirm': true,
             'timeout': 10000,
             'options': {
@@ -216,7 +223,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
         },
         'subscriptions': {
           [RascalSubscriptions.ChainEvents]: {
-            'queue': 'ChainEventsQueue',
+            'queue': RascalQueues.ChainEvents,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -224,7 +231,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           },
           [RascalSubscriptions.ChainCUDChainEvents]: {
-            'queue': 'ChainCUDChainEventsQueue',
+            'queue': RascalQueues.ChainCUDChainEvents,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -232,7 +239,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           },
           [RascalSubscriptions.ChainEntityCUDMain]: {
-            'queue': 'ChainEntityCUDMainQueue',
+            'queue': RascalQueues.ChainEntityCUDMain,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -240,7 +247,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           },
           [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
-            'queue': 'ChainEventNotificationsCUDMainQueue',
+            'queue': RascalQueues.ChainEventNotificationsCUDMain,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -248,7 +255,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           },
           [RascalSubscriptions.ChainEventNotifications]: {
-            'queue': 'ChainEventNotificationsQueue',
+            'queue': RascalQueues.ChainEventNotifications,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -256,7 +263,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           },
           [RascalSubscriptions.ChainEventTypeCUDMain]: {
-            'queue': 'ChainEventTypeCUDQueue',
+            'queue': RascalQueues.ChainEventTypeCUDMain,
             'contentType': 'application/json',
             'retry': {
               'delay': 1000
@@ -264,10 +271,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'prefetch': 10,
           }
         }
-      }
+      },
     }
-  };
+  }
 
-  // the above configuration is correct but Rascal has some type issues
+// the above configuration is correct but Rascal has some type issues
   return <Rascal.BrokerConfig>config;
 }

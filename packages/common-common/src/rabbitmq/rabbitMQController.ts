@@ -1,7 +1,6 @@
 import Rascal from 'rascal';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {RascalPublications, RascalSubscriptions, rmqMsgToName, TRmqMessages} from "./types";
-import {ModelStatic} from "chain-events/services/database/models/types";
 import {Sequelize} from "sequelize";
 import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
