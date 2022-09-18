@@ -1,11 +1,11 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .NotificationsPage {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  padding: 24px;
+  flex: 1;
   font-size: 15px;
+  padding: 24px;
 
   .NotificationsList {
     border-radius: 4px;

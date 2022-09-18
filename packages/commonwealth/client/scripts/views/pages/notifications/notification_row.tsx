@@ -1,23 +1,25 @@
-import 'components/notification_row.scss';
+/* @jsx m */
 
+import m from 'mithril';
 import { Spinner } from 'construct-ui';
 import _ from 'lodash';
-import m from 'mithril';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
+
+import 'pages/notifications/notification_row.scss';
 
 import app from 'state';
+import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 import { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { jumpHighlightComment } from '../pages/view_proposal/helpers';
-import { MarkdownFormattedText } from './quill/markdown_formatted_text';
-import { QuillFormattedText } from './quill/quill_formatted_text';
+import { getProposalUrl, getCommunityUrl } from 'utils';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
+import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
+import { jumpHighlightComment } from '../view_proposal/helpers';
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -268,17 +270,17 @@ const getBatchNotificationFields = (
   };
 };
 
-const NotificationRow: m.Component<
-  {
-    notifications: Notification[];
-    onListPage?: boolean;
-  },
-  {
-    scrollOrStop: boolean;
-    markingRead: boolean;
-  }
-> = {
-  oncreate: (vnode) => {
+export class NotificationRow
+  implements
+    m.ClassComponent<{
+      notifications: Notification[];
+      onListPage?: boolean;
+    }>
+{
+  scrollOrStop: boolean;
+  markingRead: boolean;
+
+  oncreate(vnode) {
     if (
       m.route.param('id') &&
       vnode.attrs.onListPage &&
@@ -286,8 +288,9 @@ const NotificationRow: m.Component<
     ) {
       vnode.state.scrollOrStop = true;
     }
-  },
-  view: (vnode) => {
+  }
+
+  view(vnode) {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
@@ -547,7 +550,5 @@ const NotificationRow: m.Component<
         pageJump ? () => setTimeout(() => pageJump(), 1) : null
       );
     }
-  },
-};
-
-export default NotificationRow;
+  }
+}

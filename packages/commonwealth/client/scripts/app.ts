@@ -658,7 +658,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
             ),
-            '/notifications': importRoute('views/pages/notifications_page', {
+            '/notifications': importRoute('views/pages/notifications', {
               scoped: true,
               deferChain: true,
             }),
@@ -888,10 +888,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
 
             // Notifications
-            '/:scope/notifications': importRoute(
-              'views/pages/notifications_page',
-              { scoped: true, deferChain: true }
-            ),
+            '/:scope/notifications': importRoute('views/pages/notifications', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
             '/notification-settings': importRoute(
               'views/pages/notification_settings',

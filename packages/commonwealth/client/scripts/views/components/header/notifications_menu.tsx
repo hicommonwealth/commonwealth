@@ -8,8 +8,8 @@ import 'components/header/notifications_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import NotificationRow from 'views/components/notification_row';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { NotificationRow } from '../../pages/notifications/notification_row';
 
 const MAX_NOTIFS = 40;
 

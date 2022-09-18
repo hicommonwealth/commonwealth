@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/notifications_page.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
+import 'pages/notifications/index.scss';
+
 import app from 'state';
-import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+import { NotificationRow } from './notification_row';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
@@ -217,7 +218,11 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      if (app.user.notifications.chainEventNotifications.length === 0) return;
+                      if (
+                        app.user.notifications.chainEventNotifications
+                          .length === 0
+                      )
+                        return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
@@ -259,7 +264,9 @@ const NotificationsPage: m.Component<{}> = {
                   pageData: () => {
                     return allNotifications;
                   },
-                  pageKey: () => {return pageKey},
+                  pageKey: () => {
+                    return pageKey;
+                  },
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
                       notifications: [data],
