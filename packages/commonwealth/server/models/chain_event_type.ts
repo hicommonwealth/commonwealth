@@ -26,7 +26,9 @@ export default (
     ],
   });
 
-  ChainEventType.associate = (models) => {};
+  ChainEventType.associate = (models) => {
+    models.ChainEventType.hasMany(models.Subscription, {foreignKey: 'chain_event_type_id'})
+  };
 
   return ChainEventType;
 };

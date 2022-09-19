@@ -20,7 +20,6 @@ export type ThreadAttributes = {
   topic_id?: number;
   pinned?: boolean;
   chain: string;
-  chain_entity_id?: number
 
   read_only?: boolean;
   version_history?: string[];
@@ -35,7 +34,6 @@ export type ThreadAttributes = {
 
   // associations
   Chain?: ChainAttributes;
-  ChainEntityTile: ChainEntityMetaAttributes;
   Address?: AddressAttributes;
   Attachments?:
     | AttachmentAttributes[]
@@ -78,7 +76,6 @@ export default (
         allowNull: false,
       },
       chain: { type: dataTypes.STRING, allowNull: false },
-      chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
       read_only: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
