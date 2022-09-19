@@ -80,8 +80,8 @@ async function mainProcess(
   }
 
   // group the erc20s and erc721s by url so that we only create 1 listener/subscriber for each endpoint
-  const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
-  const erc721ByUrl = _.groupBy(erc721Tokens, 'url');
+  const erc20ByUrl = _.groupBy(erc20Tokens, (token) => token.ChainNode.url);
+  const erc721ByUrl = _.groupBy(erc721Tokens, (token) => token.ChainNode.url);
 
   // this creates/updates/deletes a single listener in listenerInstances called 'erc20' or 'erc721' respectively
   await manageErcListeners(ChainNetwork.ERC20, erc20ByUrl, listenerInstances, producer, rollbar);
