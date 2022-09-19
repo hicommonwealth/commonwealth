@@ -14,6 +14,9 @@ import { CWText } from './component_kit/cw_text';
 import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import { getClasses } from './component_kit/helpers';
 
+const LIVE_PREVIEW_MAX = 3;
+const ENDED_PREVIEW_MAX = 1;
+
 export type VoteInformation = {
   label: string;
   value: string;
@@ -181,6 +184,7 @@ export type ResultsSectionAttrs = {
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
   votedFor: string;
+  isPreview: boolean;
 };
 
 export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
@@ -193,6 +197,7 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
       voteInformation,
       pollEnded,
       votedFor,
+      isPreview,
     } = vnode.attrs;
 
     const calculateProgressStatus = (
@@ -212,27 +217,37 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
 
     const hasVotes =
       voteInformation.filter((vote) => vote.voteCount > 0).length > 0;
+    let numOptionsBeyondPreview;
+    if (!pollEnded) {
+      numOptionsBeyondPreview = voteInformation.length - LIVE_PREVIEW_MAX;
+    } else {
+      numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
+    }
 
     return (
       <div class="ResultsSection">
-        <div class="results-header">
-          <CWText type="b1" fontWeight="bold">
-            {resultString}
-          </CWText>
-          <CWText
-            type="caption"
-            className={getClasses<{ clickable?: boolean }>({
-              clickable: onResultsClick && hasVotes,
-            })}
-            onclick={
-              onResultsClick && hasVotes ? (e) => onResultsClick(e) : undefined
-            }
-          >
-            {`${Math.floor(totalVoteCount * 100) / 100} ${
-              tokenSymbol ?? 'votes'
-            }`}
-          </CWText>
-        </div>
+        {!isPreview && (
+          <div class="results-header">
+            <CWText type="b1" fontWeight="bold">
+              {resultString}
+            </CWText>
+            <CWText
+              type="caption"
+              className={getClasses<{ clickable?: boolean }>({
+                clickable: onResultsClick && hasVotes,
+              })}
+              onclick={
+                onResultsClick && hasVotes
+                  ? (e) => onResultsClick(e)
+                  : undefined
+              }
+            >
+              {`${Math.floor(totalVoteCount * 100) / 100} ${
+                tokenSymbol ?? 'votes'
+              }`}
+            </CWText>
+          </div>
+        )}
         <div class="results-content">
           {voteInformation
             .sort((option1, option2) => {
@@ -243,6 +258,14 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
               }
             })
             .map((option, index) => {
+              if (
+                isPreview &&
+                (pollEnded
+                  ? index >= ENDED_PREVIEW_MAX
+                  : index >= LIVE_PREVIEW_MAX)
+              ) {
+                return;
+              }
               return (
                 <CWProgressBar
                   progress={
@@ -258,6 +281,13 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
               );
             })}
         </div>
+        {isPreview && numOptionsBeyondPreview > 0 && (
+          <CWText type="caption" className="more-options">
+            {`+ ${numOptionsBeyondPreview} more option${
+              numOptionsBeyondPreview === 1 ? '' : 's'
+            }`}
+          </CWText>
+        )}
       </div>
     );
   }
@@ -297,6 +327,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
       votedFor,
       voteInformation,
       tooltipErrorMessage,
+      isPreview = false,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -333,7 +364,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           {proposalTitle}
         </CWText>
         <div class="poll-voting-section">
-          {!this.hasVoted && !pollEnded && (
+          {!this.hasVoted && !pollEnded && !isPreview && (
             <>
               <PollOptions
                 multiSelect={multiSelect}
@@ -351,7 +382,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
               />
             </>
           )}
-          {(this.hasVoted || pollEnded) && (
+          {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay
               timeRemaining={timeRemaining}
               voteDirectionString={this.voteDirectionString}
@@ -368,6 +399,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
           pollEnded={pollEnded}
           totalVoteCount={this.totalVoteCount}
           votedFor={votedFor}
+          isPreview={isPreview}
         />
       </CWCard>
     );

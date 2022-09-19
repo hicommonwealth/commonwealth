@@ -14,6 +14,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
     account: Account,
     walletSignature: string
   ) => Promise<void>;
+  reset?: () => Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
