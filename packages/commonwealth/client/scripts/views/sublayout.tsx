@@ -54,8 +54,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
       this.isSwitcherToggled = this.isSidebarToggled;
     }
-    const isCommunityHeaderToggled =
-      this.isSidebarToggled && this.isSwitcherToggled && app.chain;
+    const { isSidebarToggled, isSwitcherToggled } = this;
+    const isSidebarContainerToggled = isSidebarToggled || isSwitcherToggled;
+    const isCommunityHeaderToggled = isSidebarToggled && isSwitcherToggled;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
@@ -66,9 +67,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
         <div class="header-and-body-container">
           <div class="header-container">
             <SublayoutHeaderLeft
-              isSidebarToggled={this.isSidebarToggled}
+              isSidebarToggled={isSidebarToggled}
               toggleSidebar={() => {
-                this.isSidebarToggled = !this.isSidebarToggled;
+                this.isSidebarToggled = !isSidebarToggled;
               }}
             />
             {!hideSearch && <SearchBar />}
@@ -78,14 +79,14 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            {this.isSidebarToggled && this.isSwitcherToggled && (
+            {isSidebarContainerToggled && (
               <div class="sidebar-container">
                 {isCommunityHeaderToggled && (
                   <CommunityHeader meta={app.chain.meta} />
                 )}
                 <div class="sidebar-inner-container">
-                  {this.isSwitcherToggled && <SidebarQuickSwitcher />}
-                  {this.isSidebarToggled && <Sidebar />}
+                  {isSwitcherToggled && <SidebarQuickSwitcher />}
+                  {isSidebarToggled && <Sidebar />}
                 </div>
               </div>
             )}
