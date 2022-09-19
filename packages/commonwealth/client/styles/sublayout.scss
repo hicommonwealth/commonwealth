@@ -33,15 +33,12 @@
     .sidebar-container {
       display: flex;
       flex-direction: column;
-
-      @include smallInclusive {
-        width: 100%;
-      }
+      width: min-content;
 
       .sidebar-inner-container {
         display: flex;
         height: 100%;
-        width: 100%;
+        width: min-content;
       }
     }
 
