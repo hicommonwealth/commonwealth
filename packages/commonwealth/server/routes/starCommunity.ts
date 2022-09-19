@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoStarValue: 'Must pass isAlreadyStarred boolean to set starred status',

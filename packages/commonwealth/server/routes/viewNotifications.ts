@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import { DB, sequelize } from '../database';
 import { performance, PerformanceObserver } from 'perf_hooks';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;

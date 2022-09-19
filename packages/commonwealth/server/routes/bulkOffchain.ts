@@ -15,7 +15,7 @@ import { ThreadInstance } from '../models/thread';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { RuleInstance } from '../models/rule';
 import { CommunityBannerInstance } from '../models/community_banner';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -75,6 +75,7 @@ const bulkOffchain = async (
               },
               {
                 model: models.ChainEntityMeta,
+                as: 'chain_entity_meta'
               },
               {
                 model: models.LinkedThread,

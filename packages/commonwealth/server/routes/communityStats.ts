@@ -2,7 +2,7 @@ import { QueryTypes, Op }  from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const communityStats = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.query);

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { sequelize } from '../../database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));

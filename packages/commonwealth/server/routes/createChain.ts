@@ -20,7 +20,7 @@ import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
 import {RoleAttributes, RoleInstance} from '../models/role';
 import {IRmqMsgCreateChainCUD, RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 
-import {AppError, ServerError} from '../util/errors';
+import {AppError, ServerError} from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

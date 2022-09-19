@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { ReactionInstance } from '../models/reaction';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

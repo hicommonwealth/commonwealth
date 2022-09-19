@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

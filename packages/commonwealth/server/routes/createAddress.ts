@@ -12,7 +12,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

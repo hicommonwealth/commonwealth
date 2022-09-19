@@ -75,13 +75,18 @@ class ChainEntityController {
     }
   }
 
+  /**
+   * Refreshes the raw chain entities from chain-events + ChainEntityMeta from the main service
+   * to form full ChainEntities
+   * @param chain
+   */
   public async refresh(chain: string) {
     const options: any = {chain};
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(getBaseUrl(ServiceUrls.chainEvents), options),
-      getFetch(getBaseUrl(), options)
+      getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', options),
+      getFetch(getBaseUrl() + '/api/getEntityMeta', options)
     ]);
 
     // save the chain-entity objects in the store
@@ -97,6 +102,14 @@ class ChainEntityController {
         entity.title = entityMetaJSON.title;
         entity.threadId = entityMetaJSON.thread_id;
       }
+    }
+  }
+
+  public async refreshRawEntities(chain: string) {
+    const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', {chain});
+    for (const entityJSON of entities) {
+      const entity = ChainEntity.fromJSON(entityJSON);
+      this._store.add(entity);
     }
   }
 

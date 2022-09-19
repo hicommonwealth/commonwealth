@@ -2,7 +2,7 @@
 import axios from 'axios';
 const FormData = require('form-data');
 import models from '../database';
-import { ServerError } from './errors';
+import { ServerError } from 'common-common/src/errors';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));

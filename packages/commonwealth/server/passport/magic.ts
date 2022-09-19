@@ -15,7 +15,7 @@ import { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AddressInstance } from '../models/address';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {
@@ -161,7 +161,7 @@ export function useMagicAuth(models: DB) {
         /* This just uses the ETH Address to encode a Substrate Address, which I'm not sure is the right approach.
            We may want to derive / generate various Magic Chain Addresses on the front end then create / store them via the `createAddress` route
            We will have to:
-            1. validate the signature + pass the address back + 
+            1. validate the signature + pass the address back +
             2. have some specific logic for generating / loading various Magic Extensions as necessary
         */
 

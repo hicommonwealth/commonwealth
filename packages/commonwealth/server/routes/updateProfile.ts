@@ -10,7 +10,7 @@ import {
 import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',

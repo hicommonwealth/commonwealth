@@ -9,7 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {

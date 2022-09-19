@@ -25,6 +25,7 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -47,8 +48,7 @@ export const modelFromServer = (thread) => {
     url,
     pinned,
     collaborators,
-    chain_entities,
-    ChainEntities,
+    chain_entity_meta,
     has_poll,
     polls = [], // associated Polls
     reactions,
@@ -89,16 +89,13 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  let chainEntitiesProcessed: ChainEntity[];
-  if (chain_entities && !ChainEntities) {
-    chainEntitiesProcessed = chain_entities.map((c) => {
-      return {
-        id: c.id,
-        chain,
-        type: c.type,
-        typeId: c.type_id || c.typeId,
-      };
-    });
+  let chainEntitiesProcessed: ChainEntity[] = [];
+  if (chain_entity_meta) {
+    for (const meta of chain_entity_meta) {
+      const full_entity = app.chain.chainEntities.store.getById(meta.ce_id);
+      if (meta.title) full_entity.title = meta.title;
+      if (full_entity) chainEntitiesProcessed.push(full_entity);
+    }
   }
 
   const lastEditedProcessed = last_edited
@@ -153,7 +150,7 @@ export const modelFromServer = (thread) => {
     url,
     pinned,
     collaborators,
-    chainEntities: chainEntitiesProcessed || ChainEntities,
+    chainEntities: chainEntitiesProcessed,
     versionHistory: versionHistoryProcessed,
     lastEdited: lastEditedProcessed,
     hasPoll: has_poll,
@@ -527,14 +524,16 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-      chain: app.activeChainId(),
-      linking_thread_id: linkingThreadId,
-      linked_thread_id: linkedThreadId,
-      address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain.id,
-      jwt: app.user.jwt,
-    });
+    const [response,] = await Promise.all([
+      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+        chain: app.activeChainId(),
+        linking_thread_id: linkingThreadId,
+        linked_thread_id: linkedThreadId,
+        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAccount.chain.id,
+        jwt: app.user.jwt,
+      }),
+    ])
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -545,15 +544,17 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const response = await $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-      chain: app.activeChainId(),
-      linking_thread_id: linkingThreadId,
-      linked_thread_id: linkedThreadId,
-      address: app.user.activeAccount.address,
-      author_chain: app.user.activeAccount.chain.id,
-      remove_link: true,
-      jwt: app.user.jwt,
-    });
+    const [response,] = await Promise.all([
+      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
+        chain: app.activeChainId(),
+        linking_thread_id: linkingThreadId,
+        linked_thread_id: linkedThreadId,
+        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAccount.chain.id,
+        remove_link: true,
+        jwt: app.user.jwt,
+      }),
+    ])
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -582,7 +583,10 @@ class ThreadsController {
       chain: app.activeChainId(),
       ids,
     };
-    const response = await $.get(`${app.serverUrl()}/getThreads`, params);
+    const [response,] = await Promise.all([
+      $.get(`${app.serverUrl()}/getThreads`, params),
+      app.chain.chainEntities.refreshRawEntities(app.activeChainId())
+    ])
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
@@ -652,8 +656,11 @@ class ThreadsController {
     if (topicId) params['topic_id'] = topicId;
     if (stageName) params['stage'] = stageName;
 
-    // TODO: figure out optimal strategy to get ChainEntity data i.e. Is ChainEntityMeta enough or do we need to query the server or store for the others
-    const response = await $.get(`${app.serverUrl()}/bulkThreads`, params);
+    // fetch threads and refresh entities so we can join them together
+    const [response,] = await Promise.all([
+      $.get(`${app.serverUrl()}/bulkThreads`, params),
+      app.chain.chainEntities.refreshRawEntities(chain)
+    ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);
     }

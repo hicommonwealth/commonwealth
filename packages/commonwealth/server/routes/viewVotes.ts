@@ -1,6 +1,6 @@
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { VoteAttributes } from '../models/vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 

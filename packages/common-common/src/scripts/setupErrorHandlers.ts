@@ -1,7 +1,6 @@
 import Rollbar from 'rollbar';
 import { Request, Response, Express } from 'express';
-import { ROLLBAR_SERVER_TOKEN } from '../config';
-import { ServerError, AppError } from '../util/errors';
+import { ServerError, AppError } from '../errors';
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned

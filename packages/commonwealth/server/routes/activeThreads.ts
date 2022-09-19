@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 
 const MIN_THREADS_PER_TOPIC = 0;
@@ -36,7 +36,7 @@ const activeThreads = async (
     { model: models.Address, as: 'collaborators',},
     { model: models.Topic, as: 'topic', },
     { model: models.LinkedThread, as: 'linked_threads' },
-    { model: models.ChainEntityMeta }
+    { model: models.ChainEntityMeta, as: 'chain_entity_meta' }
   ];
 
   await Promise.all(communityTopics.map(async (topic) => {

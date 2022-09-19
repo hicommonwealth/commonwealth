@@ -26,7 +26,7 @@ import models from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache from './server/util/identityFetchCache';
 import BanCache from './server/util/banCheckCache';
-import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
 
 require('express-async-errors');

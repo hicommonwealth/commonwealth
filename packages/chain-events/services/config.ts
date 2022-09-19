@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+export const DEFAULT_PORT = '8081';
+
 export const DATABASE_URI =
   !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'
@@ -23,3 +25,5 @@ export const NUM_WORKERS = process.env.NUM_WORKERS ? Number(process.env.NUM_WORK
 
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
+
+export const SERVER_URL = process.env.SERVER_URL || "http://localhost:8080"

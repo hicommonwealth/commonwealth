@@ -15,7 +15,7 @@ import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB, sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,

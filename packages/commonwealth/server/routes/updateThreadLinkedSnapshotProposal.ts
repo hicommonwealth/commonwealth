@@ -3,7 +3,7 @@ import bs58 from 'bs58';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoThread: 'Cannot find thread',

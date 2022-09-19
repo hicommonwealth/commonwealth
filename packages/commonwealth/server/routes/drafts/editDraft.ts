@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

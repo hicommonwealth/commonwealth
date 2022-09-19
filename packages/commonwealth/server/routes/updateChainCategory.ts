@@ -2,7 +2,7 @@ import { Response, NextFunction } from 'express';
 import { ChainCategoryInstance } from 'server/models/chain_category';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {
   create: string;

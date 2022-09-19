@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

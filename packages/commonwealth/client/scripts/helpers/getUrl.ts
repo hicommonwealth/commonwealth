@@ -23,7 +23,7 @@ export function getBaseUrl(service?: ServiceUrls) {
 
 export async function getFetch(url: string, queryParams?: { [key: string]: any }) {
   let queryUrl;
-  if (queryParams) queryUrl = url + new URLSearchParams(queryParams);
+  if (queryParams) queryUrl = url + '?' + new URLSearchParams(queryParams);
   try {
     const response = await fetch(queryUrl || url, {
       method: 'GET',
@@ -34,7 +34,10 @@ export async function getFetch(url: string, queryParams?: { [key: string]: any }
       },
       referrerPolicy: 'strict-origin-when-cross-origin',
     })
-    if (response.ok) return response.json();
+    if (response.ok) {
+      const {result} = await response.json();
+      return result;
+    }
     else console.error(response)
   } catch (e) {
     console.error(e);

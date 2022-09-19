@@ -27,7 +27,7 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

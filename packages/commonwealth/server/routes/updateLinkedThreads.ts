@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   InsufficientPermissions:
@@ -107,6 +107,7 @@ const updateLinkedThreads = async (
         },
         {
           model: models.ChainEntityMeta,
+          as: 'chain_entity_meta'
         },
         {
           model: models.Reaction,

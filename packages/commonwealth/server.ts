@@ -33,7 +33,7 @@ import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/confi
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
-import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import {sendBatchedNotificationEmails} from './server/scripts/emails';
 import setupAPI from './server/router';

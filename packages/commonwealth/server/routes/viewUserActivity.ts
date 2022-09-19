@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NotLoggedIn: 'Must be logged in to view user dashboard',

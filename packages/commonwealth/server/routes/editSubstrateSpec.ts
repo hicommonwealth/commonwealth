@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { ChainBase } from 'common-common/src/types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import {

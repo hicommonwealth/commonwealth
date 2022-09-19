@@ -6,7 +6,7 @@ import { DB } from '../database';
 import { ChainBase } from 'common-common/src/types';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

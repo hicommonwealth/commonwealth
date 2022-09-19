@@ -13,7 +13,7 @@ import {
 } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

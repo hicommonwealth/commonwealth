@@ -26,7 +26,6 @@ const getEntityMeta = async (models: DB, req: Request, res: Response, next: Next
         attributes: ['title'],
       }
     ],
-    order: [['created_at', 'DESC']],
     where: {
       chain: req.query.chain,
     }

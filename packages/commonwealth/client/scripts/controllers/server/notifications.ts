@@ -2,9 +2,9 @@
 import $ from 'jquery';
 import m from 'mithril';
 
-import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification, ChainEventType } from 'models';
-import { modelFromServer } from 'models/NotificationSubscription';
+import {NotificationStore} from 'stores';
+import {NotificationSubscription, Notification, ChainEventType} from 'models';
+import {modelFromServer} from 'models/NotificationSubscription';
 
 import app from 'state';
 
@@ -38,6 +38,7 @@ interface NotifOptions {
   chain_filter: string,
   maxId: number
 }
+
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
   private _chainEventStore: NotificationStore = new NotificationStore();
@@ -295,8 +296,8 @@ class NotificationsController {
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined};
+      ? {chain_filter: app.activeChainId(), maxId: undefined}
+      : {chain_filter: undefined, maxId: undefined};
 
     if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxChainEventNotificationId;
@@ -314,8 +315,8 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? {chain_filter: app.activeChainId(), maxId: undefined}
+      : {chain_filter: undefined, maxId: undefined};
 
     if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxDiscussionNotificationId;
@@ -382,8 +383,8 @@ class NotificationsController {
 
       const subs = result;
       subs.forEach((sub) =>
-      this._subscriptions.push(modelFromServer(sub))
-    );
+        this._subscriptions.push(modelFromServer(sub))
+      );
     });
   }
 

@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AppError } from '../util/errors';
+import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
 import validateChain from '../util/validateChain';

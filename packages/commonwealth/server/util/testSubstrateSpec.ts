@@ -3,7 +3,7 @@ import { RegisteredTypes } from '@polkadot/types/types';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from './errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,5 +1,5 @@
 import {  DB } from '../database';
-import { AppError } from '../util/errors';
+import { AppError } from 'common-common/src/errors';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { WalletId } from 'common-common/src/types';

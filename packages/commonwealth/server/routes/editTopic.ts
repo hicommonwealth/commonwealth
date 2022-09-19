@@ -6,7 +6,7 @@ import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
 import { TopicAttributes } from '../models/topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -9,7 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));

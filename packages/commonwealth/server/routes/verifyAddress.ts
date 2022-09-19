@@ -39,7 +39,7 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 

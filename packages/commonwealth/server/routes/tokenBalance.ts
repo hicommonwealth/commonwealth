@@ -2,7 +2,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
