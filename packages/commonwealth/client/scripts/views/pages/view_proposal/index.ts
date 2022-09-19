@@ -1123,7 +1123,7 @@ const ViewProposalPage: m.Component<
                   }),
               ]),
           ]),
-        m(`.view-proposal-body ${sidebarCheck && '.hasSidebar'}`, [
+        m(`.view-proposal-body${sidebarCheck ? ' .hasSidebar' : ''}`, [
           m('.view-proposal-content-container', [
             m(ProposalHeader, {
               proposal,
