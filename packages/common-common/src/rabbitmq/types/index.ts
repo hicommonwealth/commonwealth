@@ -11,6 +11,11 @@ export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
 export * from './chainEventTypeCUD'
 
+export class RmqMsgFormatError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
 export function rmqMsgToName(data: TRmqMessages) {
   if (isTRmqMsgChainCUD(data)) return 'Chain'
   else if (isTRmqMsgEntityCUD(data)) return 'ChainEntity'

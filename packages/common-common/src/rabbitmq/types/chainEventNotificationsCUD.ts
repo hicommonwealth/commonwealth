@@ -16,8 +16,9 @@ export interface IRmqMsgCreateCENotificationsCUD {
 }
 
 export function isRmqMsgCreateCENotificationsCUD(data: any): data is IRmqMsgCreateEntityCUD {
+  // TODO: optimize notifications to reduce message size/data duplication
   return (
-    typeof data.ChainEvent?.id === 'string'
+    typeof data.ChainEvent?.id === 'number'
     && data.ChainEvent.chain_event_type_id && typeof data.ChainEvent.chain_event_type_id === 'string'
     && typeof data.ChainEvent.block_number === 'number'
     && data.ChainEvent.event_data

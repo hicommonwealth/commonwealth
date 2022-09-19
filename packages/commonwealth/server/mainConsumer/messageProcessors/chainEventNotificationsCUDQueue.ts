@@ -3,7 +3,7 @@ import { Logger } from 'typescript-logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
   isRmqMsgCreateCENotificationsCUD,
-  RascalPublications, TRmqMsgCENotificationsCUD
+  RascalPublications, RmqMsgFormatError, TRmqMsgCENotificationsCUD
 } from 'common-common/src/rabbitmq/types';
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
 import {NotificationInstance} from "../../models/notification";
@@ -20,9 +20,9 @@ export async function processChainEventNotificationsCUD(
   data: TRmqMsgCENotificationsCUD
 ) {
   if (!isRmqMsgCreateCENotificationsCUD(data)) {
-    console.error("Incorrect message format", data);
     // TODO: rollbar/datadog reporting
-    return;
+    this.log.error(`Incorrect CENotificationsCUD message format: ${JSON.stringify(data)}`);
+    throw new RmqMsgFormatError(`Incorrect message format: ${data}`);
   }
 
   const chainEvent = data.ChainEvent;

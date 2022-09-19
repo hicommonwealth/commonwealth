@@ -1,6 +1,6 @@
 import * as Rascal from 'rascal';
 import {factory, formatFilename} from 'common-common/src/logging';
-import {RascalPublications, RascalSubscriptions, rmqMsgToName, TRmqMessages} from "./types";
+import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, rmqMsgToName, TRmqMessages} from "./types";
 import {Sequelize} from "sequelize";
 import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
@@ -103,13 +103,14 @@ export class RabbitMQController {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
-        try {
-          if (msgProcessorContext) messageProcessor.call({rmqController: this, ...msgProcessorContext}, content);
-          else messageProcessor(content);
-          ackOrNack();
-        } catch (e) {
-          ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}])
-        }
+        // TODO: fix error handling - to test run the chain-events subscriber + consumer and then run the main service
+        //  consumer. To test an 'error' change isRmqMsgCreateCENotificationsCUD ChainEvent.id to be 'string' instead of 'number'
+        messageProcessor.call({rmqController: this, ...msgProcessorContext}, content).catch((e) => {
+          // if the message processor throws because of a message formatting error then we immediately deadLetter the
+          // message to avoid re-queuing the message multiple times
+          if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
+          ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+        })
       });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
