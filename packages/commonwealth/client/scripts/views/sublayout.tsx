@@ -13,10 +13,7 @@ import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from './components/component_kit/helpers';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
 
 type SublayoutAttrs = {
@@ -29,6 +26,7 @@ type SublayoutAttrs = {
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
+  private isSwitcherToggled: boolean;
 
   view(vnode) {
     const {
@@ -45,14 +43,19 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
-    if (
-      !isWindowMediumSmallInclusive(window.innerWidth) ||
-      localStorage.getItem('sidebar-toggle') === 'true'
-    ) {
-      this.isSidebarToggled = true;
-    } else {
+    const isOnMobile = isWindowSmallInclusive(window.innerWidth);
+    const storedSidebarToggleState =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+    const hideBodyContainer = isOnMobile && storedSidebarToggleState;
+    if (!app.chain) {
       this.isSidebarToggled = false;
+      this.isSwitcherToggled = true;
+    } else {
+      this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
+      this.isSwitcherToggled = this.isSidebarToggled;
     }
+    const isCommunityHeaderToggled =
+      this.isSidebarToggled && this.isSwitcherToggled && app.chain;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
@@ -75,23 +78,20 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            <div
-              class={getClasses<{ isSidebarToggled: boolean }>(
-                { isSidebarToggled: this.isSidebarToggled },
-                'sidebar-container'
-              )}
-            >
-              {app.chain && <CommunityHeader meta={app.chain.meta} />}
-              <div class="sidebar-inner-container">
-                {!app.isCustomDomain() && <SidebarQuickSwitcher />}
-                {app.chain && <Sidebar />}
+            {this.isSidebarToggled && this.isSwitcherToggled && (
+              <div class="sidebar-container">
+                {isCommunityHeaderToggled && (
+                  <CommunityHeader meta={app.chain.meta} />
+                )}
+                <div class="sidebar-inner-container">
+                  {this.isSwitcherToggled && <SidebarQuickSwitcher />}
+                  {this.isSidebarToggled && <Sidebar />}
+                </div>
               </div>
-            </div>
+            )}
             <div
-              class={getClasses<{ isSidebarToggled: boolean }>(
-                { isSidebarToggled: this.isSidebarToggled },
-                'body-and-sticky-headers-container'
-              )}
+              class="body-and-sticky-headers-container"
+              style={hideBodyContainer ? 'display:none' : 'display:flex'}
             >
               <SublayoutBanners
                 banner={banner}

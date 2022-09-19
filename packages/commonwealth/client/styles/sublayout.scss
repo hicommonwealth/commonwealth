@@ -34,14 +34,6 @@
       display: flex;
       flex-direction: column;
 
-      @include mediumSmallInclusive {
-        display: none;
-
-        &.isSidebarToggled {
-          display: flex;
-        }
-      }
-
       @include smallInclusive {
         width: 100%;
       }
@@ -57,14 +49,6 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-
-      @include smallInclusive {
-        display: flex;
-
-        &.isSidebarToggled {
-          display: none;
-        }
-      }
 
       .Body {
         display: flex;
