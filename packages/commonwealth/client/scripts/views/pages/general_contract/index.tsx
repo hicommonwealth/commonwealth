@@ -31,7 +31,9 @@ class GeneralContractPage
 {
   private functionInputArgs: [[]];
 
-  oninit(vnode) {}
+  oninit(vnode) {
+    this.functionInputArgs = [[]];
+  }
 
   view(vnode) {
     const callFunction = async (fn: AbiFunction) => {
@@ -47,12 +49,12 @@ class GeneralContractPage
 
       // handle array and int types
       console.log('function called');
-      const processedArgs = fn.inputs.map((arg, idx) => {
-        const type = types[idx];
-        if (type.substring(0, 4) === 'uint') return BigNumber.from(arg);
-        if (type.slice(-2) === '[]') return JSON.parse(arg);
-        return arg;
-      });
+      // const processedArgs = fn.inputs.map((arg, idx) => {
+      //   const type = types[idx];
+      //   if (type.substring(0, 4) === 'uint') return BigNumber.from(arg);
+      //   if (type.slice(-2) === '[]') return JSON.parse(arg);
+      //   return arg;
+      // });
     };
 
     // TODO: figure out when to use this method properly
@@ -119,7 +121,7 @@ class GeneralContractPage
                                   name="Contract Input Field"
                                   placeholder="Insert Input Here"
                                   oninput={(e) => {
-                                    this.input = e.target.value;
+                                    // this.input = e.target.value;
                                   }}
                                   inputValidationFn={(
                                     val: string
