@@ -51,7 +51,24 @@ class GeneralContractPage
       return web3Contract;
     };
 
-    const callFunction = async (fn: AbiItem) => {
+    const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      // handle array and int types
+      const processedArgs = fn.inputs.map((arg, idx) => {
+        const type = arg.type;
+        if (type.substring(0, 4) === 'uint')
+          return BigNumber.from('valuegoeshere');
+        if (type.slice(-2) === '[]') return JSON.parse('valuegoeshere');
+        return arg;
+      });
+
+      const functionContract = getWeb3Contract();
+
+      // 5. Build function tx
+      // Assumption is using this methodology for calling functions
+      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
+
+      const functionTx = functionContract.methods[fn.name](...processedArgs);
+
       const sender = app.user.activeAccount;
       //   // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
@@ -59,36 +76,21 @@ class GeneralContractPage
         ChainBase.Ethereum
       );
 
+      console.log(signingWallet.chain);
+
       //   // get chain
       const chain = (app.chain as Ethereum).chain;
 
-      // handle array and int types
       console.log('function called');
-      // const processedArgs = fn.inputs.map((arg, idx) => {
-      //   const type = types[idx];
-      //   if (type.substring(0, 4) === 'uint') return BigNumber.from(arg);
-      //   if (type.slice(-2) === '[]') return JSON.parse(arg);
-      //   return arg;
-      // });
 
-      // console.log(
-      //   `Calling the function by ${_value} function in contract at address: ${contractAddress}`
-      // );
+      // Sign Tx with PK
+      const createTransaction = await chain.makeContractTx(
+        contractAddress,
+        functionTx.encodeABI(),
+        signingWallet
+      );
 
-      // // Sign Tx with PK
-      // const createTransaction = await web3.eth.personal.signTransaction(
-      //   {
-      //     to: contractAddress,
-      //     data: incrementTx.encodeABI(),
-      //     gas: await incrementTx.estimateGas(),
-      //   }
-      // );
-
-      // // Send Tx and Wait for Receipt
-      // const createReceipt = await web3.eth.sendSignedTransaction(
-      //   createTransaction.rawTransaction
-      // );
-      // console.log(`Tx successful with hash: ${createReceipt.transactionHash}`);
+      console.log('Tx successful with hash:', createTransaction.txStatus, createTransaction.txhash);
     };
 
     // TODO: figure out when to use this method properly
@@ -238,7 +240,7 @@ class GeneralContractPage
                       label="Submit"
                       onclick={() => {
                         notifySuccess('Submit Call button clicked!');
-                        callFunction(fn);
+                        callFunction(contractAddress, fn);
                       }}
                     />
                   </div>

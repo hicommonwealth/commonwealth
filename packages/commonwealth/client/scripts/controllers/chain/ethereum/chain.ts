@@ -55,7 +55,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       {from: wallet.accounts[0].address, to, data });
 
     const txReceipt = await this.api.eth.sendSignedTransaction(signedData.raw);
-    // TODO: get receipt, status, etc
+
     const txStatus = txReceipt.status;
     const txhash = txReceipt.transactionHash;
     return { txStatus, txhash };
