@@ -1,21 +1,30 @@
 import { chain } from 'web3-core/types';
+import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { AbiFunction, AbiEvent } from './types';
 
-export function parseFunctionsFromABI(abiString: string): AbiFunction[] {
-  let fns: AbiFunction[] = [];
+export function parseAbiItemsFromABI(abiString: string): AbiItem[] {
+  try {
+    return JSON.parse(abiString);
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+export function parseFunctionsFromABI(abiString: string): AbiItem[] {
+  let fns: AbiItem[] = [];
   if (abiString) {
-    const abi = JSON.parse(abiString);
-    fns = abi.filter((x) => x.type === "function")
+    const abiItems = parseAbiItemsFromABI(abiString)
+    fns = abiItems.filter((x) => x.type === "function")
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return fns;
 }
 
-export function parseEventsFromABI(abiString: string): AbiEvent[] {
-  let events: AbiEvent[] = [];
+export function parseEventsFromABI(abiString: string): AbiItem[] {
+  let events: AbiItem[] = [];
   if (abiString) {
-    const abi = JSON.parse(abiString);
-    events = abi.filter((x) => x.type === "event")
+    const abiItems = parseAbiItemsFromABI(abiString)
+    events = abiItems.filter((x) => x.type === "event")
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return events;
@@ -31,7 +40,7 @@ function getSourceCodeEnpoint(network: chain, address: string): string {
   return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
 }
 
-export async function getEtherscanABI(network: chain, address: string): Promise<AbiFunction[]> {
+export async function getEtherscanABI(network: chain, address: string): Promise<AbiItem[]> {
   try {
     console.log("fetching from etherscan...");
     const resp = await fetch(getSourceCodeEnpoint(network, address));
