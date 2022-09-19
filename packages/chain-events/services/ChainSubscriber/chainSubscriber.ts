@@ -30,7 +30,12 @@ let pool: Pool;
 let producer: RabbitMqHandler;
 let rollbar: Rollbar;
 
-// the function that executes every [REPEAT_TIME] minutes
+/**
+ * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
+ * listen to and then creates, updates, or deletes the listeners.
+ * @param producer {RabbitMqHandler} Used by the ChainEvents Listeners to push the messages to a queue
+ * @param pool {Pool} Used by the function query the database
+ */
 async function mainProcess(
   producer: RabbitMqHandler,
   pool: Pool,
@@ -134,6 +139,7 @@ initializer()
     return mainProcess(producer, pool);
   })
   .then(() => {
+    // re-run this function every [REPEAT_TIME] minutes
     setInterval(
       mainProcess,
       REPEAT_TIME * 60000,
