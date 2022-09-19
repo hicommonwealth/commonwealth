@@ -9,9 +9,9 @@ import 'pages/web3login.scss';
 import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
+import { NewLoginModal } from '../modals/login_modal';
 
 class Web3LoginPage implements m.ClassComponent {
   private error?: string;
@@ -20,9 +20,7 @@ class Web3LoginPage implements m.ClassComponent {
     const token = m.route.param('connect');
     if (app.isCustomDomain() || !token) {
       // hide page if invalid arguments or via custom domain
-      return (
-        <PageNotFound />
-      );
+      return <PageNotFound />;
     }
 
     // hit auth callback and redirect
@@ -57,18 +55,20 @@ class Web3LoginPage implements m.ClassComponent {
         <div class="Web3LoginPage">
           <div class="web3-login-container">
             {/* <h3>{app.isLoggedIn() ? 'Connect to Commonwealth': 'Log into Commonwealth'}</h3> */}
-            {app.isLoggedIn()
-              ? <CWButton
-                  label="Connect"
-                  buttonType="lg"
-                  onclick={onSuccess}
-                />
-              : m(LoginWithWalletDropdown, {
-                label: 'Log In',
-                joiningChain: null,
-                loggingInWithAddress: true,
-                onSuccess,
-            })}
+            <CWButton
+              label="Connect"
+              buttonType="lg-primary-blue"
+              onclick={() => {
+                if (app.isLoggedIn()) {
+                  onSuccess();
+                } else {
+                  app.modals.create({
+                    modal: NewLoginModal,
+                    data: { onSuccess },
+                  });
+                }
+              }}
+            />
             {m.route.param('prev')
               ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
               : link(

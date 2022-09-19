@@ -25,6 +25,7 @@ type LoginModalAttrs = {
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
   initialWallets?: IWebWallet<any>[];
+  onSuccess?: () => void;
 };
 
 export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
@@ -90,7 +91,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     }
   }
 
-  view() {
+  view(vnode) {
+    const { onSuccess } = vnode.attrs;
+
     // Handles Magic Link Login
     const handleEmailLoginCallback = async () => {
       this.magicLoading = true;
@@ -102,6 +105,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       try {
         await loginWithMagicLink(this.email);
         this.magicLoading = false;
+        if (onSuccess) onSuccess();
         $('.LoginDesktop').trigger('modalexit');
       } catch (e) {
         notifyError("Couldn't send magic link");
@@ -122,13 +126,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
       if (app.isLoggedIn()) {
         completeClientLogin(account);
-        if (exitOnComplete)
+        if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
           }
-
+          if (onSuccess) onSuccess();
+        }
         m.redraw();
       } else {
         // log in as the new user
@@ -139,12 +144,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
             app.config.chains.getById(app.activeChainId());
           await updateActiveAddresses(chain);
         }
-        if (exitOnComplete)
+        if (exitOnComplete) {
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
           }
+          if (onSuccess) onSuccess();
+        }
         m.redraw();
       }
     };
@@ -274,6 +281,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         } else {
           $('.LoginDesktop').trigger('modalexit');
         }
+        if (onSuccess) onSuccess();
         m.redraw();
       } catch (e) {
         console.log(e);
