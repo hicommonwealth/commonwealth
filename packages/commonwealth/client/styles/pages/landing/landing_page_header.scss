@@ -48,8 +48,21 @@
   width: 30px;
   height: 30px;
   position: absolute;
-  right: 35px;
-  top: 20px;
+
+  @include extraSmall {
+    right: 36px;
+    top: 45px;
+  }
+
+  @include small {
+    right: 146px;
+    top: 30px;
+  }
+
+  @include mediumSmall {
+    right: 296px;
+    top: 49px;
+  }
 }
 
 .tokenSectionContainer {
@@ -131,10 +144,6 @@ header {
 }
 
 @include small {
-  .menuButton {
-    display: none;
-  }
-
   #landing-page {
     margin: 0;
   }
