@@ -60,7 +60,7 @@ async function mainProcess(
                allChains.network,
                allChains.base,
                allChains.verbose_logging,
-               "ChainNodes".url
+               JSON_BUILD_OBJECT('id', "ChainNodes".id, 'url', "ChainNodes".url) as "ChainNode"
       FROM allChains
                JOIN "ChainNodes" ON allChains.chain_node_id = "ChainNodes".id
       WHERE MOD(allChains.index, ?) = ?;

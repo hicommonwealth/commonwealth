@@ -296,6 +296,8 @@ async function updateExistingListeners(
   rollbar: Rollbar
 ) {
   for (const chain of allChains) {
+    // skip a chain if the listener is inactive due to an error occurring for that specific listener i.e. connection error
+    if (!listenerInstances[chain.id]) continue;
     // if the chain is a substrate chain and its spec has changed since the last
     // check then update the active listener with the new spec
     if (
