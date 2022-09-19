@@ -18,6 +18,7 @@ function generateText(wallet: IWebWallet<any>) {
     wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
   } Wallet`;
 }
+
 export class LoginDesktopSidebar
   implements
     m.ClassComponent<{

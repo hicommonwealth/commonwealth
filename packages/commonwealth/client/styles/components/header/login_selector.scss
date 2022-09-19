@@ -16,11 +16,11 @@
 }
 
 .TOSModal {
-  height: 140px;
-  width: 400px;
   display: flex;
   flex-direction: column;
+  height: 140px;
   margin: 8px;
+  width: 400px;
 
   .close-button-wrapper {
     display: flex;
@@ -28,8 +28,8 @@
   }
 
   .content-wrapper {
-    display: flex;
     align-items: center;
+    display: flex;
     flex-direction: column;
     gap: 24px;
     margin-top: 4px;

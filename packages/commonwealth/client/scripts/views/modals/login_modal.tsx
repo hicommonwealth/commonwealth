@@ -3,15 +3,14 @@
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-
 import _ from 'underscore';
+
 import { initAppState } from 'app';
 import {
   completeClientLogin,
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
-
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
@@ -72,7 +71,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.bodyType = 'walletList';
     }
 
-    // Override if initial data is provided (needed for redirecting wallets)
+    // Override if initial data is provided (needed for redirecting wallets + CommonBot)
     if (vnode.attrs.initialBody) {
       this.bodyType = vnode.attrs.initialBody;
     }
@@ -92,6 +91,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   }
 
   view() {
+    // Handles Magic Link Login
     const handleEmailLoginCallback = async () => {
       this.magicLoading = true;
       if (!this.email) {
@@ -110,6 +110,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
+    // Performs Login on the client
     const logInWithAccount = async (
       account: Account,
       exitOnComplete: boolean
@@ -120,7 +121,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         this.username = profile.name;
       }
       if (app.isLoggedIn()) {
-        // Already logged in with another account
         completeClientLogin(account);
         if (exitOnComplete)
           if (isWindowMediumSmallInclusive(window.innerWidth)) {
@@ -149,6 +149,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
+    // Handle branching logic after wallet is selected
     const accountVerifiedCallback = async (
       account: Account,
       newlyCreated: boolean,
@@ -162,6 +163,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         return;
       }
 
+      // Handle Linking vs New Account cases
       if (!linking) {
         this.primaryAccount = account;
         this.address = account.address;
@@ -179,6 +181,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         this.profiles = [account.profile]; // TODO: Update when User -> Many Profiles goes in
       }
 
+      // Handle receiving and caching wallet signature strings
       if (!newlyCreated && !linking) {
         try {
           const signature = await this.selectedWallet.signWithAccount(account);
@@ -207,6 +210,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
+    // Handle Logic for creating a new account, including validating signature
     const createNewAccountCallback = async () => {
       try {
         if (this.selectedWallet.chain !== 'near') {
@@ -229,11 +233,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       m.redraw();
     };
 
+    // Handle branching logic for linking an account
     const linkExistingAccountCallback = async () => {
       this.bodyType = 'selectPrevious';
       m.redraw();
     };
 
+    // Handle signature and validation logic for linking an account
+    // Validates both linking (secondary) and primary accounts
     const performLinkingCallback = async () => {
       try {
         const signature = await this.selectedLinkingWallet.signWithAccount(
@@ -254,6 +261,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
+    // Handle saving profile information
     const saveProfileInfoCallback = async () => {
       const data = {
         name: this.username,

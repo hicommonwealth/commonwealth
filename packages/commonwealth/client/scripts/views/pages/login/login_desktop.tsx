@@ -1,8 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import app from 'state';
-import $ from 'jquery';
 import { Spinner } from 'construct-ui';
 
 import 'pages/login/login_desktop.scss';

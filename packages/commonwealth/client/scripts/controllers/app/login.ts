@@ -131,8 +131,6 @@ export async function completeClientLogin(account: Account) {
     }
   } catch (e) {
     console.trace(e);
-    // if the address' role wasn't initialized correctly,
-    // setActiveAccount will throw an exception but we should continue
   }
 }
 

@@ -2,10 +2,10 @@
 
 import m from 'mithril';
 import app from 'state';
-import 'components/component_kit/cw_wallets_list.scss';
+import $ from 'jquery';
 import { Spinner } from 'construct-ui';
 
-import $ from 'jquery';
+import 'components/component_kit/cw_wallets_list.scss';
 
 import { Account, AddressInfo, IWebWallet } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -13,7 +13,6 @@ import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import Substrate from 'controllers/chain/substrate/main';
 import { addressSwapper } from 'commonwealth/shared/utils';
-
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
