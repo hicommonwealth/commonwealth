@@ -76,7 +76,6 @@ export async function initAppState(
                 contract_abi: contract?.ContractAbi?.abi
               }));
             });
-            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
