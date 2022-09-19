@@ -25,6 +25,7 @@ type LoginModalAttrs = {
   initialBody?: LoginBodyType;
   initialSidebar?: LoginSidebarType;
   initialAccount?: Account;
+  wallets?: IWebWallet<any>[];
 };
 
 export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
@@ -84,6 +85,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     }
     if (vnode.attrs.initialWebWallet) {
       this.selectedWallet = vnode.attrs.initialWebWallet;
+    }
+    if (vnode.attrs.wallets) {
+      this.wallets = vnode.attrs.wallets;
     }
   }
 

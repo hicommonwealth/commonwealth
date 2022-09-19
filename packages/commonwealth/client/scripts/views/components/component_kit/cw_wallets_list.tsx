@@ -19,7 +19,9 @@ import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses } from './helpers';
 import User from '../widgets/user';
+import { CWIconButton } from './cw_icon_button';
 
+// Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
 const LinkAccountItem: m.Component<
   {
@@ -108,6 +110,16 @@ export class AccountSelector
     const { accounts, wallet, onSelect } = vnode.attrs;
     return (
       <div class="AccountSelector">
+        <div class="close-button-wrapper">
+          <CWIconButton
+            iconButtonTheme="primary"
+            iconName="close"
+            iconSize="small"
+            className="close-icon"
+            onclick={() => $('.AccountSelector').trigger('modalexit')}
+          />
+        </div>
+
         {accounts.map((account, idx) => {
           return m(LinkAccountItem, {
             account,
@@ -184,7 +196,6 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                   setSelectedWallet(wallet);
 
                   if (wallet.chain === 'substrate') {
-                    console.log('subby');
                     app.modals.create({
                       modal: AccountSelector,
                       data: {

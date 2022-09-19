@@ -73,8 +73,17 @@
 }
 
 .AccountSelector {
-  height: 212px;
-  width: 332px;
+  height: 400px;
+  width: 400px;
+  margin: 8px;
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+
+  .close-button-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
 
   .account-item {
     cursor: pointer;
@@ -116,8 +125,6 @@
     }
   }
   .account-item.account-item-emphasized {
-    background: $primary-300;
-
     &:hover {
       background: $neutral-200;
     }
