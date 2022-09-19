@@ -123,59 +123,57 @@ const LinkAccountItem: m.Component<
           vnode.state.linking ? 'account-item-disabled' : ''
         }`,
         onclick: async (e) => {
-          e.preventDefault();
-          if (vnode.state.linking) return;
-
-          // check address status if currently logged in
-          if (app.isLoggedIn()) {
-            const { result } = await $.post(
-              `${app.serverUrl()}/getAddressStatus`,
-              {
-                address,
-                chain: app.activeChainId(),
-                jwt: app.user.jwt,
-              }
-            );
-            if (result.exists) {
-              if (result.belongsToUser) {
-                notifyInfo(
-                  'This address is already linked to your current account.'
-                );
-                return;
-              } else {
-                const modalMsg =
-                  'This address is currently linked to another account. ' +
-                  'Remove it from that account and transfer to yours?';
-                const confirmed = await confirmationModalWithText(modalMsg)();
-                if (!confirmed) {
-                  vnode.state.linking = false;
-                  return;
-                }
-              }
-            }
-          }
-
-          try {
-            const signerAccount = await createUserWithAddress(
-              address,
-              webWallet.name,
-              app.chain?.id || webWallet.defaultNetwork
-            );
-            vnode.state.linking = true;
-            m.redraw();
-            await webWallet.validateWithAccount(signerAccount);
-            vnode.state.linking = false;
-            m.redraw();
-            // return if user signs for two addresses
-            if (linkNewAddressModalVnode.state.linkingComplete) return;
-            linkNewAddressModalVnode.state.linkingComplete = true;
-            accountVerifiedCallback(signerAccount);
-          } catch (err) {
-            // catch when the user rejects the sign message prompt
-            vnode.state.linking = false;
-            errorCallback('Verification failed');
-            m.redraw();
-          }
+          // e.preventDefault();
+          // if (vnode.state.linking) return;
+          // // check address status if currently logged in
+          // if (app.isLoggedIn()) {
+          //   const { result } = await $.post(
+          //     `${app.serverUrl()}/getAddressStatus`,
+          //     {
+          //       address,
+          //       chain: app.activeChainId(),
+          //       jwt: app.user.jwt,
+          //     }
+          //   );
+          //   if (result.exists) {
+          //     if (result.belongsToUser) {
+          //       notifyInfo(
+          //         'This address is already linked to your current account.'
+          //       );
+          //       return;
+          //     } else {
+          //       const modalMsg =
+          //         'This address is currently linked to another account. ' +
+          //         'Remove it from that account and transfer to yours?';
+          //       const confirmed = await confirmationModalWithText(modalMsg)();
+          //       if (!confirmed) {
+          //         vnode.state.linking = false;
+          //         return;
+          //       }
+          //     }
+          //   }
+          // }
+          // try {
+          //   const signerAccount = await createUserWithAddress(
+          //     address,
+          //     webWallet.name,
+          //     app.chain?.id || webWallet.defaultNetwork
+          //   );
+          //   vnode.state.linking = true;
+          //   m.redraw();
+          //   await webWallet.validateWithAccount(signerAccount);
+          //   vnode.state.linking = false;
+          //   m.redraw();
+          //   // return if user signs for two addresses
+          //   if (linkNewAddressModalVnode.state.linkingComplete) return;
+          //   linkNewAddressModalVnode.state.linkingComplete = true;
+          //   accountVerifiedCallback(signerAccount);
+          // } catch (err) {
+          //   // catch when the user rejects the sign message prompt
+          //   vnode.state.linking = false;
+          //   errorCallback('Verification failed');
+          //   m.redraw();
+          // }
         },
       },
       [

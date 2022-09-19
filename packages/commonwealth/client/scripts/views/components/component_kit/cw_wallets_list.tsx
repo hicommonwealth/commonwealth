@@ -3,10 +3,11 @@
 import m from 'mithril';
 import app from 'state';
 import 'components/component_kit/cw_wallets_list.scss';
+import { Spinner } from 'construct-ui';
 
 import $ from 'jquery';
 
-import { Account, IWebWallet } from 'models';
+import { Account, AddressInfo, IWebWallet } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
@@ -17,6 +18,108 @@ import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses } from './helpers';
+import User from '../widgets/user';
+
+// TODO: This should eventually be replaced with a component native to the new flow
+const LinkAccountItem: m.Component<
+  {
+    account: { address: string; meta?: { name: string } };
+    wallet: IWebWallet<any>;
+    onSelect: (idx: number) => void;
+    idx: number;
+  },
+  { linking: boolean }
+> = {
+  view: (vnode) => {
+    const { account, wallet, onSelect, idx } = vnode.attrs;
+    const address = app.chain
+      ? addressSwapper({
+          address: account.address,
+          currentPrefix: (app.chain as Substrate).chain.ss58Format,
+        })
+      : account.address;
+    const baseName = app.chain?.meta.base || wallet.chain;
+    const capitalizedBaseName = `${baseName
+      .charAt(0)
+      .toUpperCase()}${baseName.slice(1)}`;
+    const name =
+      account.meta?.name ||
+      `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
+    return m(
+      '.account-item',
+      {
+        class: `account-item-emphasized`,
+        onclick: () => onSelect(idx),
+      },
+      [
+        m('.account-item-avatar', [
+          m(
+            '.account-user',
+            m(User, {
+              user: new AddressInfo(
+                null,
+                address,
+                app.chain?.id || wallet.defaultNetwork
+              ),
+              avatarOnly: true,
+              avatarSize: 40,
+            })
+          ),
+        ]),
+        m('.account-item-left', [
+          m('.account-item-name', `${name}`),
+          m('.account-item-address', [
+            m(
+              '.account-user',
+              m(User, {
+                user: new AddressInfo(
+                  null,
+                  address,
+                  app.chain?.id || wallet.defaultNetwork
+                ),
+                hideAvatar: true,
+              })
+            ),
+          ]),
+          vnode.state.linking &&
+            m('p.small-text', 'Check your wallet for a confirmation prompt.'),
+        ]),
+        m('.account-item-right', [
+          vnode.state.linking &&
+            m('.account-waiting', [
+              // TODO: show a (?) icon with a tooltip explaining to check your wallet
+              m(Spinner, { size: 'xs', active: true }),
+            ]),
+        ]),
+      ]
+    );
+  },
+};
+
+export class AccountSelector
+  implements
+    m.ClassComponent<{
+      accounts: Array<{ address: string; meta?: { name: string } }>;
+      wallet: IWebWallet<any>;
+      onSelect: (idx: number) => void;
+    }>
+{
+  view(vnode) {
+    const { accounts, wallet, onSelect } = vnode.attrs;
+    return (
+      <div class="AccountSelector">
+        {accounts.map((account, idx) => {
+          return m(LinkAccountItem, {
+            account,
+            wallet,
+            onSelect,
+            idx,
+          });
+        })}
+      </div>
+    );
+  }
+}
 
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
@@ -40,6 +143,32 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       accountVerifiedCallback,
       linking,
     } = vnode.attrs;
+
+    async function handleNormalWalletLogin(wallet, address) {
+      if (app.isLoggedIn()) {
+        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+          address,
+          chain: app.activeChainId() ?? wallet.chain,
+          jwt: app.user.jwt,
+        });
+        if (result.exists && result.belongsToUser) {
+          notifyInfo('This address is already linked to your current account.');
+          return;
+        }
+      }
+
+      try {
+        const { account: signerAccount, newlyCreated } =
+          await createUserWithAddress(
+            address,
+            wallet.name,
+            app.chain?.id || wallet.defaultNetwork
+          );
+        accountVerifiedCallback(signerAccount, newlyCreated, linking);
+      } catch (err) {
+        console.log(err);
+      }
+    }
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
@@ -54,96 +183,88 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                   await wallet.enable();
                   setSelectedWallet(wallet);
 
-                  if (wallet.chain === 'near') {
-                    // Near Redirect Flow
-                    const WalletAccount = (await import('near-api-js'))
-                      .WalletAccount;
-                    if (!app.chain.apiInitialized) {
-                      await app.chain.initApi();
-                    }
-                    const nearWallet = new WalletAccount(
-                      (app.chain as Near).chain.api,
-                      'commonwealth_near'
-                    );
-                    if (nearWallet.isSignedIn()) {
-                      nearWallet.signOut();
-                    }
-                    const redirectUrl = !app.isCustomDomain()
-                      ? `${
-                          window.location.origin
-                        }/${app.activeChainId()}/finishNearLogin`
-                      : `${window.location.origin}/finishNearLogin`;
-                    nearWallet.requestSignIn({
-                      contractId: (app.chain as Near).chain.isMainnet
-                        ? 'commonwealth-login.near'
-                        : 'commonwealth-login.testnet',
-                      successUrl: redirectUrl,
-                      failureUrl: redirectUrl,
+                  if (wallet.chain === 'substrate') {
+                    console.log('subby');
+                    app.modals.create({
+                      modal: AccountSelector,
+                      data: {
+                        accounts: wallet.accounts,
+                        wallet,
+                        onSelect: async (accountIndex) => {
+                          let address;
+                          if (app.chain) {
+                            address = addressSwapper({
+                              address: wallet.accounts[0].address,
+                              currentPrefix: (app.chain as Substrate).chain
+                                .ss58Format,
+                            });
+                          } else {
+                            address = wallet.accounts[accountIndex].address;
+                          }
+                          $('.AccountSelector').trigger('modalexit');
+                          await handleNormalWalletLogin(wallet, address);
+                        },
+                      },
                     });
-                  } else if (wallet.defaultNetwork === 'axie-infinity') {
-                    // Axie Redirect Flow
-                    const result = await $.post(`${app.serverUrl()}/auth/sso`, {
-                      issuer: 'AxieInfinity',
-                    });
-                    if (result.status === 'Success' && result.result.stateId) {
-                      const stateId = result.result.stateId;
-
-                      // redirect to axie page for login
-                      // eslint-disable-next-line max-len
-                      window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
-                    } else {
-                      vnode.state.error(result.error || 'Could not login');
-                    }
                   } else {
-                    // Normal Wallet Flow
-                    let address;
-                    if (
-                      wallet.chain === 'ethereum' ||
-                      wallet.chain === 'solana'
-                    ) {
-                      address = wallet.accounts[0];
-                    } else if (wallet.chain === 'cosmos') {
-                      address = wallet.accounts[0].address;
-                    } else if (wallet.chain === 'substrate') {
-                      // TODO: Handle them selecting their address from the options?
-                      address = addressSwapper({
-                        address: wallet.accounts[0].address,
-                        currentPrefix: (app.chain as Substrate).chain
-                          .ss58Format,
+                    if (wallet.chain === 'near') {
+                      // Near Redirect Flow
+                      const WalletAccount = (await import('near-api-js'))
+                        .WalletAccount;
+                      if (!app.chain.apiInitialized) {
+                        await app.chain.initApi();
+                      }
+                      const nearWallet = new WalletAccount(
+                        (app.chain as Near).chain.api,
+                        'commonwealth_near'
+                      );
+                      if (nearWallet.isSignedIn()) {
+                        nearWallet.signOut();
+                      }
+                      const redirectUrl = !app.isCustomDomain()
+                        ? `${
+                            window.location.origin
+                          }/${app.activeChainId()}/finishNearLogin`
+                        : `${window.location.origin}/finishNearLogin`;
+                      nearWallet.requestSignIn({
+                        contractId: (app.chain as Near).chain.isMainnet
+                          ? 'commonwealth-login.near'
+                          : 'commonwealth-login.testnet',
+                        successUrl: redirectUrl,
+                        failureUrl: redirectUrl,
                       });
-                    }
-
-                    if (app.isLoggedIn()) {
-                      const { result } = await $.post(
-                        `${app.serverUrl()}/getAddressStatus`,
+                    } else if (wallet.defaultNetwork === 'axie-infinity') {
+                      // Axie Redirect Flow
+                      const result = await $.post(
+                        `${app.serverUrl()}/auth/sso`,
                         {
-                          address,
-                          chain: app.activeChainId() ?? wallet.chain,
-                          jwt: app.user.jwt,
+                          issuer: 'AxieInfinity',
                         }
                       );
-                      if (result.exists && result.belongsToUser) {
-                        notifyInfo(
-                          'This address is already linked to your current account.'
-                        );
-                        return;
-                      }
-                    }
+                      if (
+                        result.status === 'Success' &&
+                        result.result.stateId
+                      ) {
+                        const stateId = result.result.stateId;
 
-                    try {
-                      const { account: signerAccount, newlyCreated } =
-                        await createUserWithAddress(
-                          address,
-                          wallet.name,
-                          app.chain?.id || wallet.defaultNetwork
-                        );
-                      accountVerifiedCallback(
-                        signerAccount,
-                        newlyCreated,
-                        linking
-                      );
-                    } catch (err) {
-                      console.log(err);
+                        // redirect to axie page for login
+                        // eslint-disable-next-line max-len
+                        window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                      } else {
+                        vnode.state.error(result.error || 'Could not login');
+                      }
+                    } else {
+                      // Normal Wallet Flow
+                      let address;
+                      if (
+                        wallet.chain === 'ethereum' ||
+                        wallet.chain === 'solana'
+                      ) {
+                        address = wallet.accounts[0];
+                      } else if (wallet.chain === 'cosmos') {
+                        address = wallet.accounts[0].address;
+                      }
+                      await handleNormalWalletLogin(wallet, address);
                     }
                   }
                 }}

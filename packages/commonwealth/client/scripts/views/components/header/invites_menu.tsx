@@ -8,7 +8,7 @@ import 'components/header/invites_menu.scss';
 import app from 'state';
 import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal, NewLoginModal } from 'views/modals/login_modal';
+import { NewLoginModal } from 'views/modals/login_modal';
 
 export const handleEmailInvites = (state) => {
   if (!state.modalAutoTriggered && app.user) {
