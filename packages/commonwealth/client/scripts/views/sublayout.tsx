@@ -26,7 +26,26 @@ type SublayoutAttrs = {
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
-  private isSwitcherToggled: boolean;
+  private showBodyContainer: boolean;
+  private showCommunityHeader: boolean;
+  private showQuickSwitcher: boolean;
+  private showSidebarContainer: boolean;
+
+  checkSidebarToggles() {
+    const isOnMobile = isWindowSmallInclusive(window.innerWidth);
+    const storedSidebarToggleState =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+    if (!app.chain) {
+      this.isSidebarToggled = false;
+      this.showQuickSwitcher = true;
+    } else {
+      this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
+      this.showQuickSwitcher = this.isSidebarToggled;
+    }
+    this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
+    this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
+    this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
+  }
 
   view(vnode) {
     const {
@@ -43,24 +62,18 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
 
-    const isOnMobile = isWindowSmallInclusive(window.innerWidth);
-    const storedSidebarToggleState =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-    const hideBodyContainer = isOnMobile && storedSidebarToggleState;
-    if (!app.chain) {
-      this.isSidebarToggled = false;
-      this.isSwitcherToggled = true;
-    } else {
-      this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
-      this.isSwitcherToggled = this.isSidebarToggled;
-    }
-    const { isSidebarToggled, isSwitcherToggled } = this;
-    const isSidebarContainerToggled = isSidebarToggled || isSwitcherToggled;
-    const isCommunityHeaderToggled = isSidebarToggled && isSwitcherToggled;
-
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
+
+    this.checkSidebarToggles();
+    const {
+      showBodyContainer,
+      showSidebarContainer,
+      showCommunityHeader,
+      isSidebarToggled,
+      showQuickSwitcher,
+    } = this;
 
     return (
       <div class="Sublayout">
@@ -79,20 +92,20 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             />
           </div>
           <div class="sidebar-and-body-container">
-            {isSidebarContainerToggled && (
+            {showSidebarContainer && (
               <div class="sidebar-container">
-                {isCommunityHeaderToggled && (
+                {showCommunityHeader && (
                   <CommunityHeader meta={app.chain.meta} />
                 )}
                 <div class="sidebar-inner-container">
-                  {isSwitcherToggled && <SidebarQuickSwitcher />}
+                  {showQuickSwitcher && <SidebarQuickSwitcher />}
                   {isSidebarToggled && <Sidebar />}
                 </div>
               </div>
             )}
             <div
               class="body-and-sticky-headers-container"
-              style={hideBodyContainer ? 'display:none' : 'display:flex'}
+              style={showBodyContainer ? 'display:flex' : 'display:none'}
             >
               <SublayoutBanners
                 banner={banner}
