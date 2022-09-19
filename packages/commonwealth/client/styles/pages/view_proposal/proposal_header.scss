@@ -85,6 +85,8 @@
 
   .proposal-content {
     display: flex;
+    width: 100%;
+    word-break: break-word;
   }
 
   .proposal-content-right {
