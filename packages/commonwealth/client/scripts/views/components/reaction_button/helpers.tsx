@@ -72,13 +72,9 @@ export const onReactionClick = (
   e.preventDefault();
   e.stopPropagation();
 
-  if (!app.isLoggedIn()) {
+  if (!app.isLoggedIn() || !app.user.activeAccount) {
     app.modals.create({
       modal: NewLoginModal,
-    });
-  } else if (!app.user.activeAccount) {
-    app.modals.create({
-      modal: SelectAddressModal,
     });
   } else {
     const { address: userAddress, chain } = app.user.activeAccount;

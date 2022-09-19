@@ -271,18 +271,18 @@ const ConfirmInviteModal: m.Component<
                       },
                       'Connect a new address'
                     ),
-                  addresses.length === 0 &&
-                    m(LoginWithWalletDropdown, {
-                      loggingInWithAddress: false,
-                      joiningChain: app.chain?.id || 'edgeware',
-                      label: 'Connect an address',
-                      onSuccess: (e) => {
-                        // $('.ConfirmInviteModal').trigger('modalexit');
-                        m.route.set(
-                          `/${invites[vnode.state.location].chain_id}`
-                        );
-                      },
-                    }),
+                  // addresses.length === 0 &&
+                  //   m(LoginWithWalletDropdown, {
+                  //     loggingInWithAddress: false,
+                  //     joiningChain: app.chain?.id || 'edgeware',
+                  //     label: 'Connect an address',
+                  //     onSuccess: (e) => {
+                  //       // $('.ConfirmInviteModal').trigger('modalexit');
+                  //       m.route.set(
+                  //         `/${invites[vnode.state.location].chain_id}`
+                  //       );
+                  //     },
+                  //   }),
                 ],
           ])
         : m('.compact-modal-body', [
