@@ -53,15 +53,22 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // TODO: test whether signTypedData works on WC
     const webWalletSignature = await this.signLoginToken(
       account.validationToken
     );
-    return account.validate(webWalletSignature);
+    return webWalletSignature;
   }
 
-    public async reset() {
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
+  }
+
+  public async reset() {
     console.log('Attempting to reset WalletConnect');
     const ks = await this._provider.wc.killSession();
     this._provider.disconnect();
