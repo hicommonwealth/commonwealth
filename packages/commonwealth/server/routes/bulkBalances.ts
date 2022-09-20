@@ -70,8 +70,6 @@ const bulkBalances = async (
     throw new AppError(BulkBalancesErrors.NoRegisteredAddresses);
   }
 
-  const balances: bulkBalanceResp = {};
-
   // get bases for addresses being returned
   const baseQuery = `
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
@@ -82,7 +80,7 @@ const bulkBalances = async (
     type: QueryTypes.SELECT,
   }));
 
-  balances['bases'] = bases;
+  const balances: bulkBalanceResp = {};
 
   // Iterate through chain nodes
   for (const nodeIdString of Object.keys(chainNodes)) {
@@ -159,7 +157,7 @@ const bulkBalances = async (
     }
   }
 
-  return success(res, balances);
+  return success(res, balances, bases);
 };
 
 export default bulkBalances;
