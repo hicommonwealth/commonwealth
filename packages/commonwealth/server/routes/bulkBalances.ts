@@ -25,16 +25,16 @@ type bulkBalanceReq = {
   };
 };
 
-type bulkBalanceResp = [
-  {
+type bulkBalanceResp = {
+  balances: {
     [nodeId: string]:
       | {
           [tokenAddress: string]: number;
         }
       | number;
-  },
-  string[]
-];
+  };
+  bases: string[];
+};
 
 const bulkBalances = async (
   models: DB,
@@ -166,7 +166,7 @@ const bulkBalances = async (
     }
   }
 
-  return success(res, [balances, bases]);
+  return success(res, {balances, bases});
 };
 
 export default bulkBalances;
