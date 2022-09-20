@@ -251,11 +251,6 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               onclick={() =>
                 app.modals.create({
                   modal: NewLoginModal,
-                  data: {
-                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                      ? 'fullScreen'
-                      : 'centered',
-                  },
                 })
               }
             />

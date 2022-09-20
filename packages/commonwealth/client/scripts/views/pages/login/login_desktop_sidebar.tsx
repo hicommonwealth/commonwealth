@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import app from 'state';
 
 import 'pages/login/login_desktop_sidebar.scss';
 
@@ -11,7 +12,19 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
 
-function generateText(wallet: IWebWallet<any>) {
+function generateText(wallets: Array<IWebWallet<any>>) {
+  if (wallets.length === 0) {
+    const chainbase = app.chain?.meta?.base;
+
+    if (chainbase) {
+      return `Please install a ${
+        chainbase.charAt(0).toUpperCase() + chainbase.slice(1)
+      } Wallet`;
+    } else {
+      return 'Please install a Web3 Wallet';
+    }
+  }
+  const wallet = wallets[0];
   const startsWithVowel = wallet.chain === 'ethereum';
 
   return `This Community requires a${startsWithVowel ? 'n' : ''} ${
@@ -41,7 +54,11 @@ export class LoginDesktopSidebar
           <div class="connect-wallet">
             <div class="sidebar-content">
               <LoginText
-                headerText="Connect Your Wallet"
+                headerText={
+                  wallets.length > 0
+                    ? 'Connect Your Wallet'
+                    : 'Please Install a Wallet to Login'
+                }
                 bodyText={`Many communities require different wallets 
                             based on the chain they are built on and 
                             the types of tokens members hold.`}
@@ -64,7 +81,7 @@ export class LoginDesktopSidebar
         {sidebarType === 'communityWalletOptions' && (
           <div class="eth-wallet">
             <CWText type="h4" fontWeight="semiBold" className="header-text">
-              {generateText(wallets[0])}
+              {generateText(wallets)}
             </CWText>
             <CWText type="b2" className="sidebar-body-text">
               Many communities require different wallets based on the chain they
