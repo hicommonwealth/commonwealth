@@ -27,6 +27,7 @@ import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { AccountSelector } from '../component_kit/cw_wallets_list';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -320,87 +321,121 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       return true;
     });
 
+    // Extract unique addresses
+    const uniqueAddresses = [];
+    const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
+      (addressInfo) => {
+        if (!uniqueAddresses.includes(addressInfo.address)) {
+          uniqueAddresses.push(addressInfo.address);
+          return true;
+        }
+        return false;
+      }
+    );
+
     const activeCommunityMeta = app.chain?.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
-    async function performJoinCommunityLinking() {
-      if (samebaseAddresses.length >= 1) {
-        const originAddressInfo = samebaseAddresses[0];
+    // Handles linking the existing address to the community
+    async function linkToCommunity(accountIndex: number) {
+      const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
 
-        if (originAddressInfo) {
-          try {
-            const targetChain = activeChainId || originAddressInfo.chain.id;
+      if (originAddressInfo) {
+        try {
+          const targetChain = activeChainId || originAddressInfo.chain.id;
 
-            const address = originAddressInfo.address;
+          const address = originAddressInfo.address;
 
-            const res = await linkExistingAddressToChainOrCommunity(
-              address,
-              targetChain,
-              originAddressInfo.chain.id
+          const res = await linkExistingAddressToChainOrCommunity(
+            address,
+            targetChain,
+            originAddressInfo.chain.id
+          );
+
+          if (res && res.result) {
+            const { verification_token, addresses, encodedAddress } =
+              res.result;
+            app.user.setAddresses(
+              addresses.map((a) => {
+                return new AddressInfo(
+                  a.id,
+                  a.address,
+                  a.chain,
+                  a.keytype,
+                  a.wallet_id
+                );
+              })
+            );
+            const addressInfo = app.user.addresses.find(
+              (a) => a.address === encodedAddress && a.chain.id === targetChain
             );
 
-            if (res && res.result) {
-              const { verification_token, addresses, encodedAddress } =
-                res.result;
-              app.user.setAddresses(
-                addresses.map((a) => {
-                  return new AddressInfo(
-                    a.id,
-                    a.address,
-                    a.chain,
-                    a.keytype,
-                    a.wallet_id
-                  );
-                })
-              );
-              const addressInfo = app.user.addresses.find(
-                (a) =>
-                  a.address === encodedAddress && a.chain.id === targetChain
-              );
-
-              const account = app.chain.accounts.get(
-                encodedAddress,
-                addressInfo.keytype
-              );
-              if (app.chain) {
-                account.setValidationToken(verification_token);
-              }
-              if (
-                activeChainId &&
-                !app.roles.getRoleInCommunity({
-                  account,
-                  chain: activeChainId,
-                })
-              ) {
-                await app.roles.createRole({
-                  address: addressInfo,
-                  chain: activeChainId,
-                });
-              }
-              await setActiveAccount(account);
-              if (
-                app.user.activeAccounts.filter((a) => isSameAccount(a, account))
-                  .length === 0
-              ) {
-                app.user.setActiveAccounts(
-                  app.user.activeAccounts.concat([account])
-                );
-              }
-            } else {
-              // Todo: handle error
+            const account = app.chain.accounts.get(
+              encodedAddress,
+              addressInfo.keytype
+            );
+            if (app.chain) {
+              account.setValidationToken(verification_token);
+              console.log('setting validation token');
             }
-
-            // If token forum make sure has token and add to app.chain obj
-            if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-              await app.chain.activeAddressHasToken(
-                app.user.activeAccount.address
+            if (
+              activeChainId &&
+              !app.roles.getRoleInCommunity({
+                account,
+                chain: activeChainId,
+              })
+            ) {
+              await app.roles.createRole({
+                address: addressInfo,
+                chain: activeChainId,
+              });
+            }
+            await setActiveAccount(account);
+            if (
+              app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+                .length === 0
+            ) {
+              app.user.setActiveAccounts(
+                app.user.activeAccounts.concat([account])
               );
             }
-            m.redraw();
-          } catch (err) {
-            console.error(err);
+          } else {
+            // Todo: handle error
           }
+
+          // If token forum make sure has token and add to app.chain obj
+          if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+            await app.chain.activeAddressHasToken(
+              app.user.activeAccount.address
+            );
+          }
+          m.redraw();
+        } catch (err) {
+          console.error(err);
         }
+      }
+    }
+
+    // Handles displaying the login modal or the account selector modal
+    // TODO: Replace with pretty modal
+    async function performJoinCommunityLinking() {
+      if (sameBaseAddressesRemoveDuplicates.length > 1) {
+        app.modals.create({
+          modal: AccountSelector,
+          data: {
+            accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+              address: addressInfo.address,
+            })),
+            walletNetwork: activeChainInfo?.network,
+            walletChain: activeChainInfo?.base,
+            onSelect: async (accountIndex) => {
+              await linkToCommunity(accountIndex);
+              $('.AccountSelector').trigger('modalexit');
+            },
+          },
+        });
+      } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
+        await linkToCommunity(0);
       } else {
         app.modals.create({
           modal: NewLoginModal,

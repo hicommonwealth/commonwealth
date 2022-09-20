@@ -4,6 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Spinner } from 'construct-ui';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
@@ -25,21 +26,22 @@ import { CWIconButton } from './cw_icon_button';
 const LinkAccountItem: m.Component<
   {
     account: { address: string; meta?: { name: string } };
-    wallet: IWebWallet<any>;
+    walletNetwork: ChainNetwork;
+    walletChain: ChainBase;
     onSelect: (idx: number) => void;
     idx: number;
   },
   { linking: boolean }
 > = {
   view: (vnode) => {
-    const { account, wallet, onSelect, idx } = vnode.attrs;
+    const { account, walletNetwork, walletChain, onSelect, idx } = vnode.attrs;
     const address = app.chain
       ? addressSwapper({
           address: account.address,
           currentPrefix: (app.chain as Substrate).chain.ss58Format,
         })
       : account.address;
-    const baseName = app.chain?.meta.base || wallet.chain;
+    const baseName = app.chain?.meta.base || walletChain;
     const capitalizedBaseName = `${baseName
       .charAt(0)
       .toUpperCase()}${baseName.slice(1)}`;
@@ -60,7 +62,7 @@ const LinkAccountItem: m.Component<
               user: new AddressInfo(
                 null,
                 address,
-                app.chain?.id || wallet.defaultNetwork
+                app.chain?.id || walletNetwork
               ),
               avatarOnly: true,
               avatarSize: 40,
@@ -76,7 +78,7 @@ const LinkAccountItem: m.Component<
                 user: new AddressInfo(
                   null,
                   address,
-                  app.chain?.id || wallet.defaultNetwork
+                  app.chain?.id || walletNetwork
                 ),
                 hideAvatar: true,
               })
@@ -101,12 +103,13 @@ export class AccountSelector
   implements
     m.ClassComponent<{
       accounts: Array<{ address: string; meta?: { name: string } }>;
-      wallet: IWebWallet<any>;
+      walletNetwork: ChainNetwork;
+      walletChain: ChainBase;
       onSelect: (idx: number) => void;
     }>
 {
   view(vnode) {
-    const { accounts, wallet, onSelect } = vnode.attrs;
+    const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
     return (
       <div class="AccountSelector">
         <div class="close-button-wrapper">
@@ -122,7 +125,8 @@ export class AccountSelector
         {accounts.map((account, idx) => {
           return m(LinkAccountItem, {
             account,
-            wallet,
+            walletChain,
+            walletNetwork,
             onSelect,
             idx,
           });
@@ -199,7 +203,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       modal: AccountSelector,
                       data: {
                         accounts: wallet.accounts,
-                        wallet,
+                        walletNetwork: wallet.defaultNetwork,
+                        walletChain: wallet.chain,
                         onSelect: async (accountIndex) => {
                           let address;
                           if (app.chain) {
@@ -272,6 +277,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       ) {
                         address = wallet.accounts[0];
                       } else if (wallet.chain === 'cosmos') {
+                        address = wallet.accounts[0].address;
+                      } else if (wallet.defaultNetwork === 'terra') {
                         address = wallet.accounts[0].address;
                       }
                       await handleNormalWalletLogin(wallet, address);
