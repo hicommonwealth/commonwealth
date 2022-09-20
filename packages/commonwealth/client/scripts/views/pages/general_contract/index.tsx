@@ -6,7 +6,7 @@ import { Contract } from 'models';
 import m from 'mithril';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import Ethereum from 'controllers/chain/ethereum/main';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -40,12 +40,14 @@ class GeneralContractPage
     saving: false,
     status: undefined,
     form: {
-      functionItemToFunctionInputArgs: new Map<AbiItem, Map<AbiInput, string>>(),
+      functionItemToFunctionInputArgs: new Map<
+        AbiItem,
+        Map<AbiInput, string>
+      >(),
     },
   };
 
   view(vnode) {
-
     // Payable functions are not supported in this implementation
 
     const getWeb3Contract = async (): Promise<Web3Contract> => {
@@ -54,8 +56,8 @@ class GeneralContractPage
       const contract: Contract =
         app.contracts.store.getContractByAddress(contractAddress);
       // Initialize Chain and Create contract instance
-      const currChain = app.chain
-      const currNode = currChain.meta.ChainNode
+      const currChain = app.chain;
+      const currNode = currChain.meta.ChainNode;
       const web3Api = await ethChain.initApi(currNode);
       const web3Contract: Web3Contract = new web3Api.eth.Contract(
         parseAbiItemsFromABI(contract.abi),
@@ -66,17 +68,22 @@ class GeneralContractPage
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       // handle array and int types
-      // const processedArgs = fn.inputs.map((arg: AbiInput) => {
-      //   const type = arg.type;
-      //   if (type.substring(0, 4) === 'uint')
-      //   return BigNumber.from(this.functionItemToFunctionInputArgs.get(fn).get(arg));
-      //   if (type.slice(-2) === '[]') return JSON.parse(this.functionItemToFunctionInputArgs.get(fn).get(arg));
-      //   return this.functionItemToFunctionInputArgs.get(fn).get(arg);
-      // });
+      const processedArgs = fn.inputs.map((arg: AbiInput) => {
+        const type = arg.type;
+        if (type.substring(0, 4) === 'uint')
+          return BigNumber.from(
+            this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg)
+          );
+        if (type.slice(-2) === '[]')
+          return JSON.parse(
+            this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg)
+          );
+        return this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg);
+      });
 
       // This is for testing only
       contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
-      const processedArgs = ['0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc']
+      // const processedArgs = ['0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc']
 
       console.log(processedArgs);
 
@@ -96,9 +103,13 @@ class GeneralContractPage
 
       // }
 
-      const methodSignature = `${fn.name  }(${  fn.inputs.map((input) => input.type).join(",")})`;
+      const methodSignature = `${fn.name}(${fn.inputs
+        .map((input) => input.type)
+        .join(',')})`;
 
-      const functionTx = functionContract.methods[methodSignature](...processedArgs);
+      const functionTx = functionContract.methods[methodSignature](
+        ...processedArgs
+      );
       const sender = app.user.activeAccount;
       //   // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
@@ -114,7 +125,7 @@ class GeneralContractPage
         const createTransaction = await chain.makeContractTx(
           contractAddress,
           functionTx.encodeABI(),
-          signingWallet,
+          signingWallet
         );
         console.log('Tx successful with hash:', createTransaction);
       } else {
@@ -123,9 +134,9 @@ class GeneralContractPage
         const tx = await chain.makeContractCall(
           contractAddress,
           functionTx.encodeABI(),
-          signingWallet,
+          signingWallet
         );
-        console.log("Tx successful with hash:", tx);
+        console.log('Tx successful with hash:', tx);
       }
     };
 
@@ -196,12 +207,26 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                if (!this.state.form.functionItemToFunctionInputArgs.has(fn)) {
-                                  this.state.form.functionItemToFunctionInputArgs.set(fn, new Map<AbiInput, string>());
+                                if (
+                                  !this.state.form.functionItemToFunctionInputArgs.has(
+                                    fn
+                                  )
+                                ) {
+                                  this.state.form.functionItemToFunctionInputArgs.set(
+                                    fn,
+                                    new Map<AbiInput, string>()
+                                  );
                                 }
-                                const inputArgMap = this.state.form.functionItemToFunctionInputArgs.get(fn);
+                                const inputArgMap =
+                                  this.state.form.functionItemToFunctionInputArgs.get(
+                                    fn
+                                  );
                                 inputArgMap.set(input, e.target.value);
-                                this.state.form.functionItemToFunctionInputArgs.set(fn, inputArgMap);
+                                this.state.form.functionItemToFunctionInputArgs.set(
+                                  fn,
+                                  inputArgMap
+                                );
+                                this.state.loaded = true;
                               }}
                               inputValidationFn={(
                                 val: string
@@ -279,9 +304,20 @@ class GeneralContractPage
                   <div class="function-call">
                     <CWButton
                       label="Submit"
+                      disabled={this.state.saving || !this.state.loaded}
                       onclick={() => {
                         notifySuccess('Submit Call button clicked!');
-                        callFunction(contractAddress, fn);
+                        this.state.saving = true;
+                        try {
+                          callFunction(contractAddress, fn);
+                        } catch (err) {
+                          notifyError(
+                            err.responseJSON?.error ||
+                              'Submitting Function Call failed'
+                          );
+                        } finally {
+                          this.state.saving = false;
+                        }
                       }}
                     />
                   </div>
