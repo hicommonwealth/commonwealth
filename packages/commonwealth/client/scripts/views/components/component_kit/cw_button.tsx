@@ -27,14 +27,16 @@ export type ButtonType =
   | 'lg-tertiary-blue'
   | 'primary-blue-dark'
   | 'secondary-blue-dark'
-  | 'mini';
+  | 'mini-black'
+  | 'mini-white';
 
 export type ButtonStyleAttrs = {
   buttonType?: ButtonType;
 } & StyleAttrs;
 
 export type ButtonAttrs = {
-  iconName?: IconName;
+  iconLeft?: IconName;
+  iconRight?: IconName;
   label: string | Vnode<any>;
   onclick: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
@@ -42,7 +44,7 @@ export type ButtonAttrs = {
 const getTextType = (buttonType: ButtonType) => {
   if (buttonType.slice(0, 2) === 'lg') {
     return 'buttonLg';
-  } else if (buttonType === 'mini') {
+  } else if (buttonType.slice(0, 4) === 'mini') {
     return 'buttonMini';
   } else {
     return 'buttonSm';
@@ -55,7 +57,8 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
       buttonType = 'primary-blue',
       className,
       disabled = false,
-      iconName,
+      iconLeft,
+      iconRight,
       label,
       onclick,
     } = vnode.attrs;
@@ -64,17 +67,17 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
         class={getClasses<ButtonStyleAttrs>(
           {
             disabled,
-            className,
             buttonType,
+            className,
           },
           ComponentType.Button
         )}
         onclick={onclick}
         disabled={disabled}
       >
-        {!!iconName && (
+        {!!iconLeft && (
           <CWIcon
-            iconName={iconName}
+            iconName={iconLeft}
             iconSize="small"
             className="button-icon"
           />
@@ -82,6 +85,13 @@ export class CWButton implements m.ClassComponent<ButtonAttrs> {
         <CWText type={getTextType(buttonType)} className="button-text" noWrap>
           {label}
         </CWText>
+        {!!iconRight && (
+          <CWIcon
+            iconName={iconRight}
+            iconSize="small"
+            className="button-icon"
+          />
+        )}
       </button>
     );
   }

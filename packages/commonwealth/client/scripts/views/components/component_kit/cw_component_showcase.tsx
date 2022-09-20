@@ -12,10 +12,10 @@ import { CWTextInput } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { CWRadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CWCheckbox } from './cw_checkbox';
+import { CheckboxType, CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
@@ -41,15 +41,40 @@ const displayIcons = (icons) => {
   });
 };
 
-const radioGroupOptions = [
+const radioGroupOptions: Array<RadioButton> = [
   { label: 'This', value: 'This' },
   { label: 'Is', value: 'Is' },
   { label: 'A', value: 'A' },
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
+
+const checkboxGroupOptions: Array<CheckboxType> = [
+  {
+    label: 'Discussion',
+    value: 'discussion',
+  },
+  {
+    label: 'Pre Voting',
+    value: 'preVoting',
+  },
+  {
+    label: 'In Voting',
+    value: 'inVoting',
+  },
+  {
+    label: 'Passed',
+    value: 'passed',
+  },
+  {
+    label: 'Failed',
+    value: 'failed',
+  },
+];
+
 export class ComponentShowcase implements m.ClassComponent {
   private checkboxChecked: boolean;
+  private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
@@ -61,22 +86,30 @@ export class ComponentShowcase implements m.ClassComponent {
     this.radioGroupSelection = radioGroupOptions[2].value;
     this.selectedTab = 1;
     this.voteCount = 0;
+    this.checkboxGroupSelected = [];
   }
 
   view() {
+    // console.log(this.checkboxGroupSelected);
     return (
       <div class="ComponentShowcase">
         <h1>Filter Menu</h1>
         <div class="basic-gallery">
           <CWFilterMenu
             header="Stages"
-            trigger={
-              <CWButton
-                iconName="chevronDown"
-                buttonType="mini"
-                label="Filter"
-              />
-            }
+            filterMenuItems={checkboxGroupOptions}
+            selectedItems={this.checkboxGroupSelected}
+            onchange={(e) => {
+              const itemValue = e.target.value;
+              // console.log(itemValue);
+              if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
+                this.checkboxGroupSelected.push(itemValue);
+              } else {
+                this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
+                  (item) => item !== itemValue
+                );
+              }
+            }}
           />
         </div>
         <h1>Breadcrumbs</h1>
@@ -366,8 +399,8 @@ export class ComponentShowcase implements m.ClassComponent {
             placeholder="Type here"
           />
           <CWTextInput
-            label="Text field with icon"
-            name="Text field with icon"
+            label="Text field with icons"
+            name="Text field with icons"
             placeholder="Type here"
             iconRight="edit"
           />
@@ -392,9 +425,10 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Buttons</h1>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
+            iconLeft="person"
+            iconRight="person"
             buttonType="primary-red"
-            label="Primary red with icon"
+            label="Primary red with icons"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
@@ -415,8 +449,9 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            label="Secondary red with icon"
+            iconLeft="person"
+            iconRight="person"
+            label="Secondary red with icons"
             buttonType="secondary-red"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -439,8 +474,9 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            label="Tertiary blue with icon"
+            iconLeft="person"
+            iconRight="person"
+            label="Tertiary blue with icons"
             buttonType="tertiary-blue"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -458,8 +494,9 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            label="Large primary red with icon"
+            iconLeft="person"
+            iconRight="person"
+            label="Large primary red with icons"
             buttonType="lg-primary-red"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -477,8 +514,9 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            label="Large secondary red with icon"
+            iconLeft="person"
+            iconRight="person"
+            label="Large secondary red with icons"
             buttonType="lg-secondary-red"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -496,8 +534,9 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            label="Large tertiary red with icon"
+            iconLeft="person"
+            iconRight="person"
+            label="Large tertiary red with icons"
             buttonType="lg-tertiary-red"
             onclick={() => notifySuccess('Button clicked!')}
           />
@@ -529,19 +568,39 @@ export class ComponentShowcase implements m.ClassComponent {
         </div>
         <div class="button-gallery">
           <CWButton
-            iconName="person"
-            buttonType="mini"
-            label="Mini with icon"
+            iconLeft="person"
+            iconRight="person"
+            buttonType="mini-black"
+            label="Mini black with icons"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Mini"
-            buttonType="mini"
+            label="Mini black"
+            buttonType="mini-black"
             onclick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
-            label="Mini Disabled"
-            buttonType="mini"
+            label="Mini black disabled"
+            buttonType="mini-black"
+            disabled
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div class="button-gallery">
+          <CWButton
+            iconLeft="person"
+            buttonType="mini-white"
+            label="Mini white with icons"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Mini white"
+            buttonType="mini-white"
+            onclick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            label="Mini white disabled"
+            buttonType="mini-white"
             disabled
             onclick={() => notifySuccess('Button clicked!')}
           />

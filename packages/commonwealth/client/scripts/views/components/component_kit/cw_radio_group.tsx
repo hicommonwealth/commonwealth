@@ -26,9 +26,7 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
               label={o.label}
               checked={o.value === toggledOption}
               groupName={name}
-              onchange={(e) => {
-                onchange(e);
-              }}
+              onchange={onchange}
               disabled={o.disabled}
             />
           );

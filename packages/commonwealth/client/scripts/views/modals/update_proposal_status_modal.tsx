@@ -66,7 +66,7 @@ export class UpdateProposalStatusModal
             <div class="stage-options">
               {stages.map((targetStage) => (
                 <CWButton
-                  iconName={this.stage === targetStage ? 'check' : ''}
+                  iconLeft={this.stage === targetStage ? 'check' : ''}
                   label={threadStageToLabel(targetStage)}
                   onclick={() => {
                     this.stage = targetStage;

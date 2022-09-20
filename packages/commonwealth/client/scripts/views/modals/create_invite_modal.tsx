@@ -486,7 +486,7 @@ export class CreateInviteModal
                 }}
                 trigger={
                   <CWButton
-                    iconName="chevronDown"
+                    iconLeft="chevronDown"
                     buttonType="lg-secondary-blue"
                     label={selectedChainId}
                   />

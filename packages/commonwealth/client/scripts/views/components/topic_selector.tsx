@@ -97,7 +97,7 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
         trigger={
           <CWButton
             buttonType="lg-secondary-blue"
-            iconName="chevronDown"
+            iconLeft="chevronDown"
             label={
               isNotUndefined(selectedTopic)
                 ? selectedTopic.name

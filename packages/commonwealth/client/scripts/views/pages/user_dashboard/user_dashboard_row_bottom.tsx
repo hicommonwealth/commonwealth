@@ -48,12 +48,12 @@ export class UserDashboardRowBottom
         <div class="buttons-row">
           <CWButton
             label="Discuss"
-            iconName="plus"
+            iconLeft="plus"
             buttonType="secondary-blue"
           />
           <CWButton
             label={bothActive ? 'Unsubscribe' : 'Subscribe'}
-            iconName="bell"
+            iconLeft="bell"
             buttonType="secondary-blue"
             onclick={(e) => {
               e.stopPropagation();
@@ -100,7 +100,7 @@ export class UserDashboardRowBottom
               trigger={
                 <CWButton
                   label="Share"
-                  iconName="share"
+                  iconLeft="share"
                   buttonType="secondary-blue"
                 />
               }

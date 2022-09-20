@@ -4,42 +4,61 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
-import { CWPopover, SharedPopoverAttrs } from './cw_popover';
+import { CWPopover } from './cw_popover';
 import { ComponentType } from '../types';
-import { CWCheckbox } from '../cw_checkbox';
+import { CheckboxType, CWCheckbox } from '../cw_checkbox';
 import { CWText } from '../cw_text';
-
-export type FilterMenuItemAttrs = {
-  label: string;
-  checked: boolean;
-  onchange: (e?: any) => void;
-};
+import { CWButton } from '../cw_button';
+import { getClasses } from '../helpers';
 
 type FilterMenuAttrs = {
-  filterMenuItems: Array<FilterMenuItemAttrs>;
+  filterMenuItems: Array<CheckboxType>;
   header: string;
-} & SharedPopoverAttrs;
+  onchange: () => void;
+  selectedItems: Array<string>;
+};
 
 export class CWFilterMenu implements m.ClassComponent<FilterMenuAttrs> {
   view(vnode) {
-    const { filterMenuItems, header, trigger } = vnode.attrs;
+    const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
 
     return (
       <CWPopover
         content={
           <div class={ComponentType.FilterMenu}>
-            <CWText>{header}</CWText>
-            {filterMenuItems.map((f) => (
-              <CWCheckbox
-                checked={f.checked}
-                label={f.label}
-                onchange={f.onchange}
-              />
-            ))}
+            <CWText type="b2" fontWeight="bold">
+              {header}
+            </CWText>
+            {filterMenuItems.map((item) => {
+              // console.log(selectedItems.some((i) => i === item.value));
+              return (
+                <CWCheckbox
+                  value={item.value}
+                  label={item.label}
+                  checked={
+                    selectedItems.find((i) => {
+                      console.log(item);
+                      return i === item.value;
+                    }) !== undefined
+                  }
+                  onchange={onchange}
+                  disabled={item.disabled}
+                />
+              );
+            })}
           </div>
         }
         interactionType="click"
-        trigger={trigger}
+        trigger={
+          <CWButton
+            label="Filter"
+            buttonType="mini-white"
+            iconRight="chevronDown"
+            className={getClasses<{ someChecked: boolean }>({
+              someChecked: selectedItems.length > 0,
+            })}
+          />
+        }
       />
     );
   }

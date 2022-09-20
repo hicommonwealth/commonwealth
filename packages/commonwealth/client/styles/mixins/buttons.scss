@@ -1,7 +1,6 @@
 @mixin iconAndText($color) {
   .Icon.button-icon {
     color: $color;
-    margin-right: 8px;
   }
 
   .Text.button-text {
@@ -265,7 +264,7 @@
   }
 }
 
-@mixin mini {
+@mixin miniBlack {
   align-items: center;
   padding: 4px 12px;
   background: $neutral-800;
@@ -287,5 +286,31 @@
     pointer-events: none;
   }
 
-  @include iconAndText(white);
+  @include iconAndText($white);
+}
+
+@mixin miniWhite {
+  align-items: center;
+  padding: 4px 12px;
+  background: $white;
+  border: 1px solid $neutral-300;
+  border-radius: $border-radius-rounded-corners;
+
+  &:hover {
+    border-color: $primary-200;
+  }
+
+  &:active {
+    border-color: $primary-500;
+  }
+
+  &.disabled {
+    background: $neutral-50;
+    border: 1px solid $neutral-100;
+    pointer-events: none;
+
+    @include iconAndText($neutral-300);
+  }
+
+  @include iconAndText($neutral-800);
 }

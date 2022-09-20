@@ -8,7 +8,11 @@ import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type Checkbox = { label?: string; value: string };
+export type CheckboxType = {
+  label?: string;
+  value: string;
+  disabled?: boolean;
+};
 
 type CheckboxStyleAttrs = {
   checked: boolean;
@@ -17,7 +21,7 @@ type CheckboxStyleAttrs = {
 
 type CheckboxAttrs = {
   onchange: (e?: any) => void;
-} & Checkbox &
+} & Omit<CheckboxType, 'disabled'> &
   CheckboxStyleAttrs;
 
 export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
