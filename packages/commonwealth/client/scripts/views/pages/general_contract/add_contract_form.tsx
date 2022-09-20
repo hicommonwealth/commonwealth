@@ -169,19 +169,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             }
           }}
         />
-
-        <CWButton
-          label="Generate UI for ABI"
-          disabled={
-            this.state.saving ||
-            !validAddress ||
-            !this.state.form.ethChainId ||
-            this.state.loading
-          }
-          onclick={async () => {
-            await generateABIUI();
-          }}
-        />
         {this.state.message && (
           <CWValidationText
             message={this.state.message}
