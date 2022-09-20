@@ -25,15 +25,16 @@ type bulkBalanceReq = {
   };
 };
 
-type bulkBalanceResp = {
-  [nodeId: string]:
-    | {
-        [tokenAddress: string]: number;
-      }
-    | number
-    | string[];
-
-};
+type bulkBalanceResp = [
+  {
+    [nodeId: string]:
+      | {
+          [tokenAddress: string]: number;
+        }
+      | number;
+  },
+  string[]
+];
 
 const bulkBalances = async (
   models: DB,
@@ -80,7 +81,13 @@ const bulkBalances = async (
     type: QueryTypes.SELECT,
   }));
 
-  const balances: bulkBalanceResp = {};
+  const balances: {
+    [nodeId: string]:
+      | {
+          [tokenAddress: string]: number;
+        }
+      | number;
+  } = {};
 
   // Iterate through chain nodes
   for (const nodeIdString of Object.keys(chainNodes)) {
@@ -157,7 +164,7 @@ const bulkBalances = async (
     }
   }
 
-  return success(res, balances, bases);
+  return success(res, [balances, bases]);
 };
 
 export default bulkBalances;
