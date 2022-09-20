@@ -63,6 +63,8 @@ class GeneralContractPage
       //   return this.functionItemToFunctionInputArgs.get(fn).get(arg);
       // });
 
+      // This is for testing only
+      contractAddress = "0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00";
       const processedArgs = ["0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc"]
 
       console.log(processedArgs);
@@ -73,8 +75,21 @@ class GeneralContractPage
       // Assumption is using this methodology for calling functions
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
-      const functionTx = functionContract.methods[fn.name](...processedArgs);
+      // if (fn.stateMutability !== "view" && fn.constant !== true) {
+      // // // set options for transaction
+      // // const opts: any = {};
+      // // if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
+      // // if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+      // } else {
 
+      // }
+
+      const methodSignature = `${fn.name  }(${  fn.inputs.map((input) => input.type).join(",")})`;
+
+      console.log(methodSignature)
+      console.log("contract methods are", functionContract.methods)
+
+      const functionTx = functionContract.methods[methodSignature](...processedArgs);
       const sender = app.user.activeAccount;
       //   // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
@@ -85,15 +100,24 @@ class GeneralContractPage
       //   // get chain
       const chain = (app.chain as Ethereum).chain;
 
-      console.log('function called');
-      // Sign Tx with PK
-      const createTransaction = await chain.makeContractTx(
-        contractAddress,
-        functionTx.encodeABI(),
-        signingWallet,
-      );
-
-      console.log('Tx successful with hash:', createTransaction);
+      if (fn.stateMutability !== 'view' && fn.constant !== true) {
+        // Sign Tx with PK if not view function
+        const createTransaction = await chain.makeContractTx(
+          contractAddress,
+          functionTx.encodeABI(),
+          signingWallet,
+        );
+        console.log('Tx successful with hash:', createTransaction);
+      } else {
+        console.log('function called');
+        // send transaction
+        const tx = await chain.makeContractCall(
+          contractAddress,
+          functionTx.encodeABI(),
+          signingWallet,
+        );
+        console.log("Tx successful with hash:", tx);
+      }
     };
 
     // TODO: figure out when to use this method properly

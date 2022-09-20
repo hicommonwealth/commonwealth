@@ -45,10 +45,14 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._instance;
   }
 
-  public async makeContractCall(to: string, data: string) {
+  public async makeContractCall(to: string, data: string, wallet: IWebWallet<any>) {
     // encoding + decoding require ABI + happen inside contracts controller
-    const result = await this.api.eth.call({ to, data });
-    return result;
+    try {
+      const result = await wallet.contractCall({ to, data });
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /*
@@ -59,15 +63,19 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     data: string,
     wallet: IWebWallet<any>
   ) {
-    // Not using contractApi because it's ethers-dependent
-    // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
-    console.log('wallets are', wallet.accounts[0]);
-    const txHash = await wallet.sendTransaction({
-      from: wallet.accounts[0],
-      to,
-      data,
-    });
-    return txHash;
+    try {
+      // Not using contractApi because it's ethers-dependent
+      // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
+      console.log('wallets are', wallet.accounts[0]);
+      const txHash = await wallet.sendTransaction({
+        from: wallet.accounts[0],
+        to,
+        data,
+      });
+      return txHash;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   public get denom() {

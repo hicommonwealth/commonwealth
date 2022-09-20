@@ -42,6 +42,14 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async contractCall(tx: TransactionConfig): Promise<string> {
+    const txResult = await this._web3.givenProvider.request({
+      method: 'eth_call',
+      params: [tx],
+    });
+    return txResult;
+  }
+
   public async sendTransaction(tx: TransactionConfig): Promise<string> {
     const txHash = await this._web3.givenProvider.request({
       method: 'eth_sendTransaction',
