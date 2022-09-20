@@ -5,8 +5,6 @@ import m from 'mithril';
 import 'components/component_kit/cw_wallet_option_row.scss';
 
 import { WalletId } from 'common-common/src/types';
-import { IWebWallet } from 'client/scripts/models';
-
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
@@ -19,7 +17,7 @@ type WalletOptionRowStyleAttrs = {
 
 type WalletOptionRowAttrs = {
   onclick?: () => void;
-  wallet: IWebWallet<any>;
+  walletName: string;
 } & WalletOptionRowStyleAttrs;
 
 const getWalletKeyFromValue = (value: string) => {
@@ -30,7 +28,7 @@ export class CWWalletOptionRow
   implements m.ClassComponent<WalletOptionRowAttrs>
 {
   view(vnode) {
-    const { disabled = false, darkMode, onclick, wallet } = vnode.attrs;
+    const { disabled = false, darkMode, onclick, walletName } = vnode.attrs;
     return (
       <div
         class={getClasses<WalletOptionRowStyleAttrs>(
@@ -42,14 +40,14 @@ export class CWWalletOptionRow
         )}
         onclick={onclick}
       >
-        <CWCustomIcon size={32} iconName={wallet.name} iconSize="large" />
+        <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
         <CWText
           type="h5"
           fontWeight="semiBold"
           className="wallet-option-text"
           noWrap
         >
-          {getWalletKeyFromValue(wallet.name)}
+          {getWalletKeyFromValue(walletName)}
         </CWText>
       </div>
     );
