@@ -12,7 +12,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enable: () => Promise<void>;
   validateWithAccount: (account: Account) => Promise<void>;
   // TODO add optional parameter: Function Callback
-  contractCall: (tx: TransactionConfig) => Promise<string>;
+  contractCall?: (tx: TransactionConfig) => Promise<string>;
   sendTransaction?: (tx: TransactionConfig) => Promise<string>;
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
