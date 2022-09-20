@@ -27,14 +27,10 @@ import Sublayout from '../../sublayout';
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
-  private contract: any;
-  private functionInputArgs: [[]];
+  private functionItemToFunctionInputArgs: Map<AbiItem, Map<AbiInput, string>>;
 
   oninit(vnode) {
-    this.functionInputArgs = [[]];
-
-    // // 5. Build increment tx
-    // const incrementTx = incrementer.methods.increment(_value);
+    this.functionItemToFunctionInputArgs = new Map<AbiItem, Map<AbiInput, string>>();
   }
 
   view(vnode) {
@@ -44,9 +40,8 @@ class GeneralContractPage
       const ethChain = app.chain.chain as EthereumChain;
       const contract: Contract =
         app.contracts.store.getContractByAddress(contractAddress);
-      // 4. Create contract instance
+      // Initialize Chain and Create contract instance
       const currChain = app.chain
-      console.log(currChain)
       const currNode = currChain.meta.ChainNode
       const web3Api = await ethChain.initApi(currNode);
       const web3Contract: Web3Contract = new web3Api.eth.Contract(
@@ -58,13 +53,15 @@ class GeneralContractPage
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       // handle array and int types
-      const processedArgs = fn.inputs.map((arg, idx) => {
+      const processedArgs = fn.inputs.map((arg: AbiInput) => {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
-          return BigNumber.from('valuegoeshere');
-        if (type.slice(-2) === '[]') return JSON.parse('valuegoeshere');
-        return arg;
+        return BigNumber.from(this.functionItemToFunctionInputArgs.get(fn).get(arg));
+        if (type.slice(-2) === '[]') return JSON.parse(this.functionItemToFunctionInputArgs.get(fn).get(arg));
+        return this.functionItemToFunctionInputArgs.get(fn).get(arg);
       });
+
+      console.log(processedArgs);
 
       const functionContract = getWeb3Contract();
 
@@ -152,11 +149,11 @@ class GeneralContractPage
                   <CWText>{fn.name}</CWText>
                   <CWText>{fn.stateMutability}</CWText>
                   <div class="functions-input-container">
-                    {fn.inputs.map((input: AbiInput, i) => {
+                    {fn.inputs.map((input: AbiInput, inputIdx: number) => {
                       return (
                         <div>
                           <div class="function-inputs">
-                            <CWText>[{i}]</CWText>
+                            <CWText>[{inputIdx}]</CWText>
                             <CWText>{input.type}</CWText>
                             <CWText>{input.name}</CWText>
                           </div>
@@ -165,7 +162,12 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                // this.input = e.target.value;
+                                if (!this.functionItemToFunctionInputArgs.has(fn)) {
+                                  this.functionItemToFunctionInputArgs.set(fn, new Map<AbiInput, string>());
+                                }
+                                const inputArgMap = this.functionItemToFunctionInputArgs.get(fn);
+                                inputArgMap.set(input, e.target.value);
+                                this.functionItemToFunctionInputArgs.set(fn, inputArgMap);
                               }}
                               inputValidationFn={(
                                 val: string
