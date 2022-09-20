@@ -76,10 +76,12 @@ const bulkBalances = async (
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
       LEFT JOIN "Chains" c ON addr.chain = c.id 
       WHERE addr.profile_id = ${profileId};`;
-  const bases: string[] = <any>(await sequelize.query(baseQuery, {
+  const basesRaw: string[] = <any>(await sequelize.query(baseQuery, {
     raw: true,
     type: QueryTypes.SELECT,
   }));
+
+  const bases = basesRaw.map((b) => b['base']);
 
   const balances: {
     [nodeId: string]:
