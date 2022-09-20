@@ -64,8 +64,8 @@ class GeneralContractPage
       // });
 
       // This is for testing only
-      contractAddress = "0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00";
-      const processedArgs = ["0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc"]
+      contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
+      const processedArgs = ['0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc']
 
       console.log(processedArgs);
 
@@ -88,6 +88,7 @@ class GeneralContractPage
 
       console.log(methodSignature)
       console.log("contract methods are", functionContract.methods)
+      console.log("method signature is", functionContract.methods[fn.name])
 
       const functionTx = functionContract.methods[methodSignature](...processedArgs);
       const sender = app.user.activeAccount;
