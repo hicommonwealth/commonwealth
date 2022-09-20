@@ -74,8 +74,6 @@ export default class WebWalletController {
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === account.address)) {
-        console.log(`Found wallet: ${wallet.name}`);
-        console.log(account.address)
         await this._setWalletId(account, wallet.name);
         return wallet;
       }

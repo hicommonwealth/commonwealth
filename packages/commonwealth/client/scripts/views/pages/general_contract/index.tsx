@@ -26,7 +26,7 @@ import Sublayout from '../../sublayout';
 import { ChainFormState } from '../create_community/types';
 
 type CreateContractForm = {
-  functionItemToFunctionInputArgs: Map<AbiItem, Map<AbiInput, string>>;
+  functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
 };
 
 type CreateContractState = ChainFormState & { form: CreateContractForm };
@@ -40,9 +40,9 @@ class GeneralContractPage
     saving: false,
     status: undefined,
     form: {
-      functionItemToFunctionInputArgs: new Map<
-        AbiItem,
-        Map<AbiInput, string>
+      functionNameToFunctionInputArgs: new Map<
+        string,
+        Map<number, string>
       >(),
     },
   };
@@ -68,22 +68,22 @@ class GeneralContractPage
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       // handle array and int types
-      const processedArgs = fn.inputs.map((arg: AbiInput) => {
+      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
-            this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg)
+            this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index)
           );
         if (type.slice(-2) === '[]')
           return JSON.parse(
-            this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg)
+            this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index)
           );
-        return this.state.form.functionItemToFunctionInputArgs.get(fn).get(arg);
+        console.log(this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index));
+        return this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index);
       });
 
       // This is for testing only
       contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
-      // const processedArgs = ['0xE4452Cb39ad3Faa39434b9D768677B34Dc90D5dc']
 
       console.log(processedArgs);
 
@@ -208,24 +208,35 @@ class GeneralContractPage
                               placeholder="Insert Input Here"
                               oninput={(e) => {
                                 if (
-                                  !this.state.form.functionItemToFunctionInputArgs.has(
-                                    fn
+                                  !this.state.form.functionNameToFunctionInputArgs.has(
+                                    fn.name
                                   )
                                 ) {
-                                  this.state.form.functionItemToFunctionInputArgs.set(
-                                    fn,
-                                    new Map<AbiInput, string>()
+                                  this.state.form.functionNameToFunctionInputArgs.set(
+                                    fn.name,
+                                    new Map<number, string>()
+                                  );
+                                  console.log("setting new map");
+                                  const inputArgMap =
+                                  this.state.form.functionNameToFunctionInputArgs.get(
+                                    fn.name
+                                  );
+                                  inputArgMap.set(inputIdx, e.target.value);
+                                  this.state.form.functionNameToFunctionInputArgs.set(
+                                    fn.name,
+                                    inputArgMap
+                                  );
+                                } else {
+                                  const inputArgMap =
+                                  this.state.form.functionNameToFunctionInputArgs.get(
+                                    fn.name
+                                  );
+                                  inputArgMap.set(inputIdx, e.target.value);
+                                  this.state.form.functionNameToFunctionInputArgs.set(
+                                    fn.name,
+                                    inputArgMap
                                   );
                                 }
-                                const inputArgMap =
-                                  this.state.form.functionItemToFunctionInputArgs.get(
-                                    fn
-                                  );
-                                inputArgMap.set(input, e.target.value);
-                                this.state.form.functionItemToFunctionInputArgs.set(
-                                  fn,
-                                  inputArgMap
-                                );
                                 this.state.loaded = true;
                               }}
                               inputValidationFn={(
