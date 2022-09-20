@@ -135,6 +135,7 @@ export class AccountSelector
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
   darkMode?: boolean;
+  resetWalletConnectLink?: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
   setBodyType: (bodyType: string) => void;
@@ -148,6 +149,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
     const {
       connectAnotherWayOnclick,
       darkMode,
+      resetWalletConnectLink = true,
       hasNoWalletsLink = true,
       wallets,
       setSelectedWallet,
@@ -281,36 +283,50 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
               />
             ))}
           </div>
-          {hasNoWalletsLink && (
-            <CWTooltip
-              interactionType="click"
-              tooltipContent={
-                <>
-                  <CWText type="caption">
-                    If you don’t see your wallet then make sure:
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension installed?
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension active?
-                  </CWText>
-                </>
-              }
-              tooltipType="solidArrow"
-              trigger={
-                <CWText
-                  type="caption"
-                  className={getClasses<{ darkMode?: boolean }>(
-                    { darkMode },
-                    'no-wallet-link'
-                  )}
+          <div className="wallet-list-links">
+            {resetWalletConnectLink && (
+              <CWText
+                onClick={async () => await webWallet.reset()}
+                type="caption"
+                className={getClasses<{ darkMode?: boolean }>(
+                  { darkMode },
+                  'reset-wc-link'
+                )}
                 >
-                  Don't see your wallet?
-                </CWText>
-              }
-            />
-          )}
+                Reset WalletConnect
+              </CWText>
+            )}
+            {hasNoWalletsLink && (
+              <CWTooltip
+                interactionType="click"
+                tooltipContent={
+                  <>
+                    <CWText type="caption">
+                      If you don’t see your wallet then make sure:
+                    </CWText>
+                    <CWText type="caption">
+                      • Your wallet chrome extension installed?
+                    </CWText>
+                    <CWText type="caption">
+                      • Your wallet chrome extension active?
+                    </CWText>
+                  </>
+                }
+                tooltipType="solidArrow"
+                trigger={
+                  <CWText
+                    type="caption"
+                    className={getClasses<{ darkMode?: boolean }>(
+                      { darkMode },
+                      'no-wallet-link'
+                    )}
+                  >
+                    Don't see your wallet?
+                  </CWText>
+                }
+              />
+            )}
+          </div>
         </div>
         <CWText
           type="b2"
