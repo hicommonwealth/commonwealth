@@ -9,7 +9,7 @@ import { CommunityOptionsPopover } from './components/community_options_popover'
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { CWDivider } from './components/component_kit/cw_divider';
-import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 
 type SublayoutHeaderLeftAttrs = {
   isSidebarToggled: boolean;
@@ -32,21 +32,19 @@ export class SublayoutHeaderLeft
             m.route.set('/');
           }}
         />
-        {isWindowMediumSmallInclusive(window.innerWidth) && (
-          <CWDivider isVertical />
-        )}
+        {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
         {app.chain && <CommunityOptionsPopover />}
-        {!isSidebarToggled && app.activeChainId() && (
+        {!isSidebarToggled && app.chain && (
           <CWCommunityAvatar size="large" community={app.chain.meta} />
         )}
-        {isWindowMediumSmallInclusive(window.innerWidth) && app.chain && (
+        {isWindowSmallInclusive(window.innerWidth) && app.chain && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             onclick={() => {
               toggleSidebar();
               localStorage.setItem(
-                'sidebar-toggle',
+                `${app.activeChainId()}-sidebar-toggle`,
                 (!isSidebarToggled).toString()
               );
               m.redraw();
