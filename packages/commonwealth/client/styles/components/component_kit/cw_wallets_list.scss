@@ -11,12 +11,13 @@
     margin-bottom: 24px;
 
     .wallets {
-      display: grid;
-      overflow-y: scroll;
-      row-gap: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
       width: 284px;
       // preserves box shadow in scroll container
-      height: 174px;
+      max-height: 174px;
       margin-bottom: -4px;
       padding-bottom: 4px;
 
