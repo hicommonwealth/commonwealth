@@ -76,31 +76,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
 
   view(vnode) {
     const validAddress = isAddress(this.state.form.address);
-    const disableField = !validAddress || !this.state.loaded;
-
-    const generateABIUI = async () => {
-      if (
-        !this.state.form.address ||
-        !this.state.form.ethChainId ||
-        !this.state.form.nodeUrl
-      )
-        return;
-      this.state.loading = true;
-      this.state.status = undefined;
-      this.state.message = '';
-      try {
-        this.state.status = 'success';
-      } catch (e) {
-        this.state.status = 'failure';
-        this.state.message = e.message;
-        this.state.loading = false;
-        m.redraw();
-        return;
-      }
-      this.state.loaded = true;
-      this.state.loading = false;
-      m.redraw();
-    };
 
     return (
       <div class="CreateCommunityForm">

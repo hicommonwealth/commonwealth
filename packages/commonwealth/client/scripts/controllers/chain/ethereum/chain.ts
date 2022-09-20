@@ -52,7 +52,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     // Not using contractApi because it's ethers-dependent
     // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
     const signedData = await wallet.signTransaction(
-      {from: wallet.accounts[0].address, to, data });
+      {from: wallet.accounts[0], to, data });
 
     const txReceipt = await this.api.eth.sendSignedTransaction(signedData.raw);
 
