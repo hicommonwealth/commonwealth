@@ -1,6 +1,7 @@
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { AddressInstance } from 'server/models/address';
-import { DB } from '../database';
+import { QueryTypes } from 'sequelize';
+import { DB, sequelize } from '../database';
 import { AppError, ServerError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 
@@ -29,7 +30,9 @@ type bulkBalanceResp = {
     | {
         [tokenAddress: string]: number;
       }
-    | number;
+    | number
+    | string[];
+
 };
 
 const bulkBalances = async (
@@ -66,7 +69,20 @@ const bulkBalances = async (
   if (profileWalletAddresses.length === 0) {
     throw new AppError(BulkBalancesErrors.NoRegisteredAddresses);
   }
+
   const balances: bulkBalanceResp = {};
+
+  // get bases for addresses being returned
+  const baseQuery = `
+    SELECT DISTINCT(c.base) FROM "Addresses" addr 
+      LEFT JOIN "Chains" c ON addr.chain = c.id 
+      WHERE addr.profile_id = ${profileId};`;
+  const bases: string[] = <any>(await sequelize.query(baseQuery, {
+    raw: true,
+    type: QueryTypes.SELECT,
+  }));
+
+  balances['bases'] = bases;
 
   // Iterate through chain nodes
   for (const nodeIdString of Object.keys(chainNodes)) {
