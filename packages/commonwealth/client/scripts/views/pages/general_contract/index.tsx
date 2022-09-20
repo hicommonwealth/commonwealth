@@ -7,7 +7,7 @@ import m from 'mithril';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { notifySuccess } from 'controllers/app/notifications';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -23,15 +23,26 @@ import {
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import { ChainFormState } from '../create_community/types';
 
+type CreateContractForm = {
+  functionItemToFunctionInputArgs: Map<AbiItem, Map<AbiInput, string>>;
+};
+
+type CreateContractState = ChainFormState & { form: CreateContractForm };
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
-  private functionItemToFunctionInputArgs: Map<AbiItem, Map<AbiInput, string>>;
-
-  oninit(vnode) {
-    this.functionItemToFunctionInputArgs = new Map<AbiItem, Map<AbiInput, string>>();
-  }
+  private state: CreateContractState = {
+    message: '',
+    loaded: false,
+    loading: false,
+    saving: false,
+    status: undefined,
+    form: {
+      functionItemToFunctionInputArgs: new Map<AbiItem, Map<AbiInput, string>>(),
+    },
+  };
 
   view(vnode) {
 
@@ -76,19 +87,16 @@ class GeneralContractPage
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
       // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      // // // set options for transaction
-      // // const opts: any = {};
-      // // if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      // // if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+      //   // // set options for transaction
+      //   const opts: any = {};
+      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
+      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+
       // } else {
 
       // }
 
       const methodSignature = `${fn.name  }(${  fn.inputs.map((input) => input.type).join(",")})`;
-
-      console.log(methodSignature)
-      console.log("contract methods are", functionContract.methods)
-      console.log("method signature is", functionContract.methods[fn.name])
 
       const functionTx = functionContract.methods[methodSignature](...processedArgs);
       const sender = app.user.activeAccount;
@@ -110,7 +118,7 @@ class GeneralContractPage
         );
         console.log('Tx successful with hash:', createTransaction);
       } else {
-        console.log('function called');
+        console.log('view function called');
         // send transaction
         const tx = await chain.makeContractCall(
           contractAddress,
@@ -188,12 +196,12 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                if (!this.functionItemToFunctionInputArgs.has(fn)) {
-                                  this.functionItemToFunctionInputArgs.set(fn, new Map<AbiInput, string>());
+                                if (!this.state.form.functionItemToFunctionInputArgs.has(fn)) {
+                                  this.state.form.functionItemToFunctionInputArgs.set(fn, new Map<AbiInput, string>());
                                 }
-                                const inputArgMap = this.functionItemToFunctionInputArgs.get(fn);
+                                const inputArgMap = this.state.form.functionItemToFunctionInputArgs.get(fn);
                                 inputArgMap.set(input, e.target.value);
-                                this.functionItemToFunctionInputArgs.set(fn, inputArgMap);
+                                this.state.form.functionItemToFunctionInputArgs.set(fn, inputArgMap);
                               }}
                               inputValidationFn={(
                                 val: string
