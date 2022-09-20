@@ -54,7 +54,7 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
         {!!monthlyThreadCount && (
           <>
             <CWText className="card-subtext" type="b2" fontWeight="medium">
-              {`${pluralize(monthlyThreadCount, 'thread')} this month`}
+              {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
               <>
