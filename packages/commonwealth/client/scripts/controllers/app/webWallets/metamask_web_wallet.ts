@@ -42,9 +42,12 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signTransaction(tx: TransactionConfig): Promise<RLPEncodedTransaction> {
-    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
-    return rlpEncodedTx;
+  public async sendTransaction(tx: TransactionConfig): Promise<string> {
+    const txHash = await this._web3.givenProvider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    return txHash;
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -84,7 +87,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     try {
       // default to ETH
       const chainId = app.chain?.meta.node.ethChainId || 1;
-
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
@@ -122,7 +124,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           throw switchError;
         }
       }
-
       // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;

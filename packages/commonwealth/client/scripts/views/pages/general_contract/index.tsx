@@ -86,15 +86,14 @@ class GeneralContractPage
       const chain = (app.chain as Ethereum).chain;
 
       console.log('function called');
-
       // Sign Tx with PK
       const createTransaction = await chain.makeContractTx(
         contractAddress,
         functionTx.encodeABI(),
-        signingWallet
+        signingWallet,
       );
 
-      console.log('Tx successful with hash:', createTransaction.txStatus, createTransaction.txhash);
+      console.log('Tx successful with hash:', createTransaction);
     };
 
     // TODO: figure out when to use this method properly
