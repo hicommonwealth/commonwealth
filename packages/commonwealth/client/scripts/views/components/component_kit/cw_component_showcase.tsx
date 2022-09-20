@@ -104,10 +104,12 @@ export class ComponentShowcase implements m.ClassComponent {
               // console.log(itemValue);
               if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
                 this.checkboxGroupSelected.push(itemValue);
+                // m.redraw();
               } else {
                 this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
                   (item) => item !== itemValue
                 );
+                // m.redraw();
               }
             }}
           />
@@ -795,7 +797,7 @@ export class ComponentShowcase implements m.ClassComponent {
             }}
           />
         </div>
-        <h1>Checkbox</h1>
+        {/* <h1>Checkbox</h1>
         <div class="choice-gallery">
           <CWCheckbox
             checked={this.checkboxChecked}
@@ -812,7 +814,7 @@ export class ComponentShowcase implements m.ClassComponent {
             disabled
             indeterminate
           />
-        </div>
+        </div> */}
         <h1>Cards</h1>
         <div class="card-gallery">
           <div class="top-card-row">

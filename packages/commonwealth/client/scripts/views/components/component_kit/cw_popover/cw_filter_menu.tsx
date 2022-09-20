@@ -21,6 +21,7 @@ type FilterMenuAttrs = {
 export class CWFilterMenu implements m.ClassComponent<FilterMenuAttrs> {
   view(vnode) {
     const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
+    // console.log({ selectedItems });
 
     return (
       <CWPopover
@@ -30,17 +31,23 @@ export class CWFilterMenu implements m.ClassComponent<FilterMenuAttrs> {
               {header}
             </CWText>
             {filterMenuItems.map((item) => {
-              // console.log(selectedItems.some((i) => i === item.value));
+              // console.log(
+              //   selectedItems,
+              //   selectedItems.some((i) => i === item.value)
+              // );
+
+              const isChecked =
+                selectedItems.find((i) => {
+                  return i === item.value;
+                }) !== undefined;
+
+              console.log({ isChecked });
+
               return (
                 <CWCheckbox
                   value={item.value}
                   label={item.label}
-                  checked={
-                    selectedItems.find((i) => {
-                      console.log(item);
-                      return i === item.value;
-                    }) !== undefined
-                  }
+                  checked={isChecked}
                   onchange={onchange}
                   disabled={item.disabled}
                 />
