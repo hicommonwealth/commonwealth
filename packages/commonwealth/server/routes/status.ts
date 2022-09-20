@@ -51,9 +51,10 @@ const status = async (
           `
         SELECT "Threads".chain, COUNT("Threads".id) 
         FROM "Threads"
-        WHERE "Threads".deleted_at IS NULL
-        AND NOT "Threads".pinned
+        WHERE "Threads".created_at > :thirtyDaysAgo
+        AND "Threads".deleted_at IS NULL
         AND "Threads".chain IS NOT NULL
+        AND NOT "Threads".pinned
         GROUP BY "Threads".chain;
         `,
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
@@ -81,7 +82,10 @@ const status = async (
       disableRichText,
       lastVisited,
     ] = await Promise.all([
-      unfilteredAddresses.filter((address) => !!address.verified && chains.map((c) => c.id).includes(address.chain)),
+      unfilteredAddresses.filter(
+        (address) =>
+          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+      ),
       user.getSocialAccounts(),
       user.getSelectedChain(),
       user.isAdmin,
