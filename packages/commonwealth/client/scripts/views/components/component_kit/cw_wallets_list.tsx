@@ -12,6 +12,7 @@ import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/main';
 import Substrate from 'controllers/chain/substrate/main';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
@@ -135,7 +136,7 @@ export class AccountSelector
 type WalletsListAttrs = {
   connectAnotherWayOnclick: () => void;
   darkMode?: boolean;
-  resetWalletConnectLink?: boolean;
+  showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
   setBodyType: (bodyType: string) => void;
@@ -149,7 +150,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
     const {
       connectAnotherWayOnclick,
       darkMode,
-      resetWalletConnectLink = true,
+      showResetWalletConnect,
       hasNoWalletsLink = true,
       wallets,
       setSelectedWallet,
@@ -182,6 +183,14 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
         console.log(err);
       }
     }
+
+    const resetWalletConnectOnclick = async (wallets) => {
+      const wallet = wallets.find((w) => w instanceof WalletConnectWebWalletController);
+      await wallet.reset();
+      $('.AccountSelector').trigger('modalexit');
+      m.redraw();
+    }
+
     return (
       <div class="WalletsList">
         <div class="wallets-and-link-container">
@@ -284,16 +293,15 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
             ))}
           </div>
           <div className="wallet-list-links">
-            {resetWalletConnectLink && (
+            {showResetWalletConnect && (
               <CWText
-                onClick={async () => await webWallet.reset()}
                 type="caption"
                 className={getClasses<{ darkMode?: boolean }>(
                   { darkMode },
                   'reset-wc-link'
                 )}
                 >
-                Reset WalletConnect
+                <a href="#" onclick={resetWalletConnectOnclick.bind(this, wallets)}>Reset WalletConnect</a>
               </CWText>
             )}
             {hasNoWalletsLink && (

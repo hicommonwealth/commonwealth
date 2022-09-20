@@ -47,6 +47,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
       performLinkingCallback,
       setSelectedLinkingWallet,
       magicLoading,
+      showResetWalletConnect,
     } = vnode.attrs;
 
     const hasBoilerplate =
@@ -88,6 +89,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
               setSidebarType={setSidebarType}
               setBodyType={setBodyType}
               accountVerifiedCallback={accountVerifiedCallback}
+              showResetWalletConnect={showResetWalletConnect}
               linking={false}
             />
           )}
@@ -103,6 +105,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
               setSelectedWallet={setSelectedLinkingWallet}
               setBodyType={setBodyType}
               accountVerifiedCallback={accountVerifiedCallback}
+              showResetWalletConnect={showResetWalletConnect}
               linking={true}
             />
           )}

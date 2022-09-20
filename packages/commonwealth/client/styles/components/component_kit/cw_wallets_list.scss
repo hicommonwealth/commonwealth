@@ -40,11 +40,12 @@
 
     .reset-wc-link {
       align-self: flex-start;
-      color: $neutral-500;
-      cursor: pointer;
-      margin: 8px 12px 8px 0;
-
-      &.darkMode {
+      a {
+        color: $neutral-500;
+        cursor: pointer;
+        margin: 8px 12px 8px 0;
+      }
+      &.darkMode a {
         color: $neutral-400;
       }
     }
