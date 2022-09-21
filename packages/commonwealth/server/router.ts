@@ -30,6 +30,7 @@ import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
 import createContract from './routes/contracts/createContract';
+import createContractAbi from './routes/contractAbis/createContractAbi';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
@@ -243,6 +244,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateContract.bind(this, models)
   );
+  router.post(
+    '/createContractAbi',
+    passport.authenticate('jwt', { session: false }),
+    createContractAbi.bind(this, models)
+  )
 
   router.post(
     '/starCommunity',

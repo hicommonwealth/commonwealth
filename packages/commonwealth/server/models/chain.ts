@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { RegisteredTypes } from '@polkadot/types/types';
 import { DataTypes } from 'sequelize';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType, ContractsViewable } from 'common-common/src/types';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
@@ -40,6 +40,7 @@ export type ChainAttributes = {
   substrate_spec?: RegisteredTypes;
   has_chain_events_listener?: boolean;
   default_summary_view?: boolean;
+  contracts_viewable?: ContractsViewable;
   terms?: string;
   admin_only_polling?: boolean;
   snapshot?: string[];
@@ -128,6 +129,7 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
+      contracts_viewable: { type: dataTypes.STRING, allowNull: false },
       snapshot: {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,

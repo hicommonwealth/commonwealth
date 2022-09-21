@@ -31,12 +31,14 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateContractReq = ContractAttributes & Omit<ChainNodeAttributes, 'id'> & {
-  node_url: string;
-  address: string;
-  abi: string,
-  contractType: ContractType;
-};
+type CreateContractReq = ContractAttributes &
+  Omit<ChainNodeAttributes, 'id'> & {
+    community: string;
+    node_url: string;
+    address: string;
+    abi: string;
+    contractType: ContractType;
+  };
 
 type CreateContractResp = {
   contract: ContractAttributes;
@@ -49,52 +51,49 @@ const createContract = async (
   res: TypedResponse<CreateContractResp>,
   next: NextFunction
 ) => {
-    if (!req.user) {
-        return next(new Error('Not logged in'));
-    }
-    // require Admin privilege for creating Contract
-    if (!req.user.isAdmin) {
-        return next(new Error(Errors.NotAdmin));
-    }
+  if (!req.user) {
+    return next(new Error('Not logged in'));
+  }
+  // require Admin privilege for creating Contract
+  if (!req.user.isAdmin) {
+    return next(new Error(Errors.NotAdmin));
+  }
 
-    if (!req.body.contractType || !req.body.contractType.trim()) {
-        return next(new Error(Errors.NoType));
-    }
+  if (!req.body.contractType || !req.body.contractType.trim()) {
+    return next(new Error(Errors.NoType));
+  }
 
-    if (!Web3.utils.isAddress(req.body.address)) {
-        return next(new Error(Errors.InvalidAddress));
-    }
+  if (!Web3.utils.isAddress(req.body.address)) {
+    return next(new Error(Errors.InvalidAddress));
+  }
 
-    const {
-        address,
-        contractType,
-        abi,
-        symbol,
-        token_name,
-        decimals
-    } = req.body;
+  const { community, address, contractType, abi, symbol, token_name, decimals } = req.body;
 
-    const oldContract = await models.Contract.findOne({
-        where: { address: req.body.address },
-    });
-    if (oldContract && oldContract.address === req.body.address) {
-        return next(new Error(Errors.ContractAddressExists));
-    }
+  const oldContract = await models.Contract.findOne({
+    where: { address: req.body.address },
+  });
+  if (oldContract && oldContract.address === req.body.address) {
+    return next(new Error(Errors.ContractAddressExists));
+  }
 
-    const eth_chain_id: number = req.body.eth_chain_id;
-    const chain_base: string = req.body.chain_base;
+  const eth_chain_id: number = req.body.eth_chain_id;
+  const chain_base: string = req.body.chain_base;
 
+  try {
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const node = await models.ChainNode.scope('withPrivateData').findOne({ where: {
+    const node = await models.ChainNode.scope('withPrivateData').findOne({
+      where: {
         eth_chain_id,
-        chain_base
-    }});
+        chain_base,
+      },
+    });
 
-    const contract_abi = await models.ContractAbi.create({
+    let contract;
+    if (abi != null) {
+      const contract_abi = await models.ContractAbi.create({
         abi,
-    })
-
-    const contract = await models.Contract.create({
+      });
+      contract = await models.Contract.create({
         address,
         token_name,
         abi_id: contract_abi.id,
@@ -102,29 +101,48 @@ const createContract = async (
         decimals,
         type: contractType,
         chain_node_id: node.id,
+      });
+    } else {
+      contract = await models.Contract.create({
+        address,
+        token_name,
+        symbol,
+        decimals,
+        type: contractType,
+        chain_node_id: node.id,
+      });
+    }
+
+    await models.CommunityContract.create({
+      chain_id: community,
+      contract_id: contract.id,
     });
 
     if (req.body.address) {
-        const [newContract] = await models.Contract.findOrCreate({
-            where: {
-                address: req.body.address,
-                chain_node_id: node.id,
-            },
-            defaults: {
-                address: req.body.address,
-                chain_node_id: node.id,
-                type: ContractType.ERC20,
-            }
-        });
+      const [newContract] = await models.Contract.findOrCreate({
+        where: {
+          address: req.body.address,
+          chain_node_id: node.id,
+        },
+        defaults: {
+          address: req.body.address,
+          chain_node_id: node.id,
+          type: ContractType.ERC20,
+        },
+      });
     }
 
     const nodeJSON = node.toJSON();
     delete nodeJSON.private_url;
 
     return success(res, {
-        contract: contract.toJSON(),
-        node: nodeJSON,
+      contract: contract.toJSON(),
+      node: nodeJSON,
     });
+  } catch (err) {
+    console.log('Error creating contract: ', err);
+    return next(err);
+  }
 };
 
 export default createContract;

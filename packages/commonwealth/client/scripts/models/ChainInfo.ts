@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase } from 'common-common/src/types';
+import { ChainNetwork, ChainBase, ContractsViewable } from 'common-common/src/types';
 import { ChainInstance } from 'server/models/chain';
 import NodeInfo from './NodeInfo';
 
@@ -35,6 +35,7 @@ class ChainInfo {
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
   public defaultSummaryView: boolean;
+  public contractsViewable: ContractsViewable;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -70,6 +71,7 @@ class ChainInfo {
     blockExplorerIds,
     collapsedOnHomepage,
     defaultSummaryView,
+    contractsViewable,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -102,6 +104,7 @@ class ChainInfo {
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
     this.defaultSummaryView = defaultSummaryView;
+    this.contractsViewable = contractsViewable;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.ss58Prefix = ss58_prefix;
@@ -134,6 +137,7 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
+    contracts_viewable,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -173,6 +177,7 @@ class ChainInfo {
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
       defaultSummaryView: default_summary_view,
+      contractsViewable: contracts_viewable,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -259,6 +264,7 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultSummaryView,
+    contractsViewable,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -277,6 +283,7 @@ class ChainInfo {
       terms,
       icon_url: iconUrl,
       default_summary_view: defaultSummaryView,
+      contracts_viewable: contractsViewable,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -294,6 +301,7 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
+    this.contractsViewable = updatedChain.contracts_viewable;
   }
 
   public getAvatar(size: number) {

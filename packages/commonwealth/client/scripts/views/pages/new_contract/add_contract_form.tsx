@@ -7,44 +7,49 @@ import Web3 from 'web3';
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
-import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType, ContractType } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  ContractType,
+} from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
 
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-
 import {
-    initChainForm,
-    defaultChainRows,
-    ethChainRows,
+  initChainForm,
+  defaultChainRows,
+  ethChainRows,
 } from '../create_community/chain_input_rows';
 
 import {
-ChainFormFields,
-ChainFormState,
-EthChainAttrs,
-EthFormFields,
+  ChainFormIdFields,
+  ChainFormState,
+  EthChainAttrs,
+  EthFormFields,
 } from '../create_community/types';
 
 type ContractFormFields = {
-  eth_chain_id: number,
-  abi: JSON,
-  contractType: ContractType.Aave |ContractType.Compound |
-  ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
+  eth_chain_id: number;
+  abi: JSON;
+  contractType:
+    | ContractType.Aave
+    | ContractType.Compound
+    | ContractType.ERC20
+    | ContractType.ERC721
+    | ContractType.SPL;
   decimals: number;
   token_name: string;
 };
 
-type CreateContractForm = ChainFormFields & EthFormFields & ContractFormFields;
+type CreateContractForm = ChainFormIdFields &
+  EthFormFields &
+  ContractFormFields;
 
 type CreateContractState = ChainFormState & { form: CreateContractForm };
 
@@ -66,7 +71,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       symbol: '',
       token_name: '',
       decimals: 0,
-      ...initChainForm(),
     },
   };
 
@@ -89,13 +93,15 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loaded = false;
           }}
           textarea
-        />,
+        />
         <SelectRow
           title="Contract Type"
           options={[
             ContractType.ERC20,
-            ContractType.ERC721, ContractType.SPL,
-            ContractType.Aave, ContractType.Compound
+            ContractType.ERC721,
+            ContractType.SPL,
+            ContractType.Aave,
+            ContractType.Compound,
           ]}
           value={this.state.form.contractType}
           onchange={(value) => {
@@ -136,33 +142,27 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loading
           }
           onclick={async () => {
-            const { altWalletUrl, chainString, eth_chain_id, nodeUrl, symbol } =
+            const { eth_chain_id, nodeUrl } =
               this.state.form;
             this.state.saving = true;
             try {
-              const res = await $.post(`${app.serverUrl()}/createContract`, {
-                alt_wallet_url: altWalletUrl,
-                chain_base: ChainBase.Ethereum,
-                chain_string: chainString,
+              const res = await app.contracts.add(
+                app.activeChainId(),
+                ChainBase.Ethereum,
                 eth_chain_id,
-                jwt: app.user.jwt,
-                network: ChainNetwork.ERC20,
-                node_url: nodeUrl,
-                default_symbol: symbol,
-                ...this.state.form,
-              });
-              if (res.result.admin_address) {
-                await linkExistingAddressToChainOrCommunity(
-                  res.result.admin_address,
-                  res.result.role.chain_id,
-                  res.result.role.chain_id
-                );
-              }
-              // await initAppState(false);
-              // m.route.set(`/${res.result.chain?.id}`);
+                nodeUrl,
+                this.state.form.address,
+                this.state.form.abi,
+                this.state.form.contractType,
+                this.state.form.symbol,
+                this.state.form.token_name,
+                this.state.form.decimals
+              );
+              notifySuccess(`Contract ${res.address} for Community ${app.activeChainId()} created successfully!`);
+              m.redraw();
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error || 'Creating new contract with community failed'
               );
             } finally {
               this.state.saving = false;

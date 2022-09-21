@@ -70,11 +70,17 @@ export async function initAppState(
             delete chain.ChainNode;
             chain.Contracts.map((contract) => {
               // TODO Type checking the contract abi
-              return app.contracts.addToStore(
-                Contract.fromJSON({
-                ...contract,
-                contract_abi: contract?.ContractAbi?.abi
-              }));
+              if (!app.contracts.getByIdentifier(contract.id)) {
+                return app.contracts.addToStore(
+                  Contract.fromJSON({
+                    ...contract,
+                    contract_abi: contract?.ContractAbi?.abi,
+                    community: chain.id,
+                  })
+                );
+              } else {
+                return contract;
+              }
             });
             return app.config.chains.add(
               ChainInfo.fromJSON({
@@ -939,6 +945,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/:scope': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/new/contract': importRoute('views/pages/new_contract', {
               scoped: true,
               deferChain: true,
             }),

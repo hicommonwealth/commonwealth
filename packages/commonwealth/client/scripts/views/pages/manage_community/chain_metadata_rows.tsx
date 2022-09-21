@@ -10,9 +10,10 @@ import {
   ChainBase,
   ChainCategoryType,
   ChainNetwork,
+  ContractsViewable,
 } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -51,6 +52,7 @@ export class ChainMetadataRows
   customDomain: string;
   terms: string;
   defaultSummaryView: boolean;
+  contractsViewable: ContractsViewable;
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
@@ -78,6 +80,7 @@ export class ChainMetadataRows
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
     this.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
+    this.contractsViewable = vnode.attrs.chain.contractsViewable;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
@@ -183,6 +186,18 @@ export class ChainMetadataRows
               ? 'Discussion listing defaults to summary view'
               : 'Discussion listing defaults to latest activity view'
           }
+        />
+        <SelectRow
+          title="Contract Viewable Settings"
+          options={[
+            ContractsViewable.Off,
+            ContractsViewable.AdminOnly,
+            ContractsViewable.AllUsers,
+          ]}
+          value={this.contractsViewable}
+          onchange={(value) => {
+            this.contractsViewable = value;
+          }}
         />
         <InputRow
           title="Custom Stages"
@@ -295,6 +310,7 @@ export class ChainMetadataRows
               terms,
               iconUrl,
               defaultSummaryView,
+              contractsViewable
             } = this;
 
             for (const space of snapshot) {
@@ -355,6 +371,7 @@ export class ChainMetadataRows
                 terms,
                 iconUrl,
                 defaultSummaryView,
+                contractsViewable
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');

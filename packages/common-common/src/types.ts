@@ -51,6 +51,12 @@ export enum ChainType {
   Offchain = 'offchain',
 }
 
+export enum ContractsViewable {
+  Off = 'off',
+  AdminOnly = 'admin-only',
+  AllUsers = 'all-users',
+}
+
 export enum WalletId {
   Magic = 'magic',
   Polkadot = 'polkadot',
