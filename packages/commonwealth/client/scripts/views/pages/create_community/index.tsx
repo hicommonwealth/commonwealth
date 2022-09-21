@@ -36,7 +36,6 @@ export enum CommunityType {
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
   AddContract = 'Add Contract',
-  GeneralUIFromABI = 'General UI from ABI',
 }
 
 const ADMIN_ONLY_TABS = [

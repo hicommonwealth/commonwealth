@@ -15,6 +15,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
+import Web3 from 'web3';
 import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
@@ -24,7 +25,6 @@ import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { ChainFormState } from '../create_community/types';
-import Web3 from 'web3';
 
 type CreateContractForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
@@ -59,7 +59,7 @@ class GeneralContractPage
       const currChain = app.chain;
       const currNode = currChain.meta.ChainNode;
       const web3Api = await ethChain.initApi(currNode);
-      return web3Api
+      return web3Api 
     }
 
     const getWeb3Contract = async (): Promise<Web3Contract> => {
