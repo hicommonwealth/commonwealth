@@ -15,7 +15,8 @@ enum BulkBalancesErrors {
 
 // ----------- OUTSTANDING QUESTIONS -----------
 // 1. Max across addresses or sum across addresses?
-// 2. How is this route being authenticated, if at all?
+//      - SUM WAS DECIDED ON, LESS EXPECTED FOR ADMINS BUT BETTER FOR USERS
+//      - WE WANT TO LET THE USERS DECIDE IN THE FUTURE, POSSIBLY.
 
 type bulkBalanceReq = {
   profileId: number;
@@ -55,7 +56,7 @@ const bulkBalances = async (
   const profile = await models.Profile.findOne({
     where: { id: profileId },
   });
-  if (!profile) throw new ServerError(BulkBalancesErrors.NoProfile);
+  if (!profile) throw new AppError(BulkBalancesErrors.NoProfile);
 
   // Get all addresses registered with user
   const addressInstances: AddressInstance[] = await models.Address.findAll({
