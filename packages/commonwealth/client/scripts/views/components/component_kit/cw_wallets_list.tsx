@@ -264,7 +264,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
                         // redirect to axie page for login
                         // eslint-disable-next-line max-len
-                        window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                        window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
                       } else {
                         vnode.state.error(result.error || 'Could not login');
                       }

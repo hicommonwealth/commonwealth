@@ -31,6 +31,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
+import { chain } from 'lodash';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -428,7 +429,10 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     // Handles displaying the login modal or the account selector modal
     // TODO: Replace with pretty modal
     async function performJoinCommunityLinking() {
-      if (sameBaseAddressesRemoveDuplicates.length > 1) {
+      if (
+        sameBaseAddressesRemoveDuplicates.length > 1 &&
+        app.activeChainId() !== 'axie-infinity'
+      ) {
         app.modals.create({
           modal: AccountSelector,
           data: {
