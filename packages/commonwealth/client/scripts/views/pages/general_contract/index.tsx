@@ -31,7 +31,7 @@ type CreateContractForm = {
 };
 
 type CreateContractState = ChainFormState & {
-  functionNameToFunctionOutput: Map<string, string>;
+  functionNameToFunctionOutput: Map<string, any>;
   form: CreateContractForm;
 };
 class GeneralContractPage
@@ -43,7 +43,7 @@ class GeneralContractPage
     loading: false,
     saving: false,
     status: undefined,
-    functionNameToFunctionOutput: new Map<string, string>(),
+    functionNameToFunctionOutput: new Map<string, any>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     },
@@ -161,7 +161,9 @@ class GeneralContractPage
 
       // simple return type
       if (!Array.isArray(tx)) {
-        this.state.functionNameToFunctionOutput.set(fn.name, tx.toString());
+        const decodedTx = web3Api.eth.abi.decodeParameter(fn.outputs[0].type, tx);
+        console.log('decodedTx:', decodedTx);
+        this.state.functionNameToFunctionOutput.set(fn.name, decodedTx);
         return;
       }
 
