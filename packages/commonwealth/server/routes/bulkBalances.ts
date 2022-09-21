@@ -73,6 +73,8 @@ const bulkBalances = async (
   }
 
   // get bases for addresses being returned
+  // THIS IS FOR THE COMMON BOT'S "VALID ADDRESS BY CHAINBASE" RULE
+  // THIS WILL BE REMOVED EVENTUALLY WHEN RULES-API GOES LIVE
   const baseQuery = `
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
       LEFT JOIN "Chains" c ON addr.chain = c.id 
