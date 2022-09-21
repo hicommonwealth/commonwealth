@@ -24,12 +24,16 @@ import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { ChainFormState } from '../create_community/types';
+import Web3 from 'web3';
 
 type CreateContractForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
 };
 
-type CreateContractState = ChainFormState & { form: CreateContractForm };
+type CreateContractState = ChainFormState & {
+  functionNameToFunctionOutput: Map<string, string>;
+  form: CreateContractForm;
+};
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
@@ -39,26 +43,31 @@ class GeneralContractPage
     loading: false,
     saving: false,
     status: undefined,
+    functionNameToFunctionOutput: new Map<string, string>(),
     form: {
-      functionNameToFunctionInputArgs: new Map<
-        string,
-        Map<number, string>
-      >(),
+      functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     },
   };
 
   view(vnode) {
     // Payable functions are not supported in this implementation
 
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-      const { contractAddress } = vnode.attrs;
+    const getWeb3 = async (): Promise<Web3> => {
+      // Initialize Chain
       const ethChain = app.chain.chain as EthereumChain;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
+
       const currChain = app.chain;
       const currNode = currChain.meta.ChainNode;
       const web3Api = await ethChain.initApi(currNode);
+      return web3Api
+    }
+
+    const getWeb3Contract = async (): Promise<Web3Contract> => {
+      const { contractAddress } = vnode.attrs;
+      const contract: Contract =
+        app.contracts.store.getContractByAddress(contractAddress);
+      // Initialize Chain and Create contract instance
+      const web3Api = await getWeb3();
       const web3Contract: Web3Contract = new web3Api.eth.Contract(
         parseAbiItemsFromABI(contract.abi),
         contractAddress
@@ -72,14 +81,24 @@ class GeneralContractPage
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
-            this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index)
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
           );
         if (type.slice(-2) === '[]')
           return JSON.parse(
-            this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index)
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
           );
-        console.log(this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index));
-        return this.state.form.functionNameToFunctionInputArgs.get(fn.name).get(index);
+        console.log(
+          this.state.form.functionNameToFunctionInputArgs
+            .get(fn.name)
+            .get(index)
+        );
+        return this.state.form.functionNameToFunctionInputArgs
+          .get(fn.name)
+          .get(index);
       });
 
       // This is for testing only
@@ -120,24 +139,47 @@ class GeneralContractPage
       //   // get chain
       const chain = (app.chain as Ethereum).chain;
 
+      const web3Api = await getWeb3();
+      let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
-        const createTransaction = await chain.makeContractTx(
+        tx = await chain.makeContractTx(
           contractAddress,
           functionTx.encodeABI(),
           signingWallet
         );
-        console.log('Tx successful with hash:', createTransaction);
       } else {
         console.log('view function called');
         // send transaction
-        const tx = await chain.makeContractCall(
+        tx = await chain.makeContractCall(
           contractAddress,
           functionTx.encodeABI(),
           signingWallet
         );
-        console.log('Tx successful with hash:', tx);
       }
+      console.log('Tx successful with hash:', tx);
+
+      // simple return type
+      if (!Array.isArray(tx)) {
+        this.state.functionNameToFunctionOutput.set(fn.name, tx.toString());
+        return;
+      }
+
+      // complex return type
+      const processArray = (arr) => {
+        const newArr = [];
+        for (let i = 0; i < arr.length; i++) {
+          const val = Array.isArray(arr[i])
+            ? processArray(arr[i])
+            : arr[i].toString();
+          newArr.push(val);
+        }
+        return newArr;
+      };
+
+      const processed = processArray([...tx]);
+
+      this.state.functionNameToFunctionOutput.set(fn.name, JSON.stringify(processed, null, 2));
     };
 
     // TODO: figure out when to use this method properly
@@ -216,11 +258,11 @@ class GeneralContractPage
                                     fn.name,
                                     new Map<number, string>()
                                   );
-                                  console.log("setting new map");
+                                  console.log('setting new map');
                                   const inputArgMap =
-                                  this.state.form.functionNameToFunctionInputArgs.get(
-                                    fn.name
-                                  );
+                                    this.state.form.functionNameToFunctionInputArgs.get(
+                                      fn.name
+                                    );
                                   inputArgMap.set(inputIdx, e.target.value);
                                   this.state.form.functionNameToFunctionInputArgs.set(
                                     fn.name,
@@ -228,9 +270,9 @@ class GeneralContractPage
                                   );
                                 } else {
                                   const inputArgMap =
-                                  this.state.form.functionNameToFunctionInputArgs.get(
-                                    fn.name
-                                  );
+                                    this.state.form.functionNameToFunctionInputArgs.get(
+                                      fn.name
+                                    );
                                   inputArgMap.set(inputIdx, e.target.value);
                                   this.state.form.functionNameToFunctionInputArgs.set(
                                     fn.name,
@@ -304,10 +346,15 @@ class GeneralContractPage
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
                       return (
-                        <div class="function-outputs">
-                          <CWText>[{i}]</CWText>
-                          <CWText>{output.type}</CWText>
-                          <CWText>{output.name}</CWText>
+                        <div>
+                          <div class="function-outputs">
+                            <CWText>[{i}]</CWText>
+                            <CWText>{output.type}</CWText>
+                            <CWText>{output.name}</CWText>
+                          </div>
+                          <div>
+                            <CWText>{this.state.functionNameToFunctionOutput.get(fn.name)}</CWText>
+                          </div>
                         </div>
                       );
                     })}
