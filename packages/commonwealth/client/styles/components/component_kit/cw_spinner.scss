@@ -1,0 +1,19 @@
+@import 'shared';
+
+.Spinner {
+  animation: loading-spinner 2.75s ease-in-out infinite;
+  height: fit-content;
+  width: fit-content;
+
+  @keyframes loading-spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(540deg);
+    }
+    100% {
+      transform: rotate(1080deg);
+    }
+  }
+}
