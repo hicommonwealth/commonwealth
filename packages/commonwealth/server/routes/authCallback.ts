@@ -1,4 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
+import { DISCORD_BOT_SUCCESS_URL } from 'server/config';
 import { DB } from '../database';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
@@ -92,8 +93,11 @@ const authCallback = async (
   // 5. encrypt response object & respond
   const encryptedResponse = await encryptWithJWE(responseObject);
 
+  // construct callback URL for reply
+  const redirectURL = `${DISCORD_BOT_SUCCESS_URL}/success/${encryptedResponse}`;
+
   // redirect once response received on client
-  return success(res, encryptedResponse);
+  return success(res, redirectURL);
 };
 
 export default authCallback;

@@ -50,9 +50,9 @@ class Web3LoginPage implements m.ClassComponent {
           }
         );
         if (status === 'Success') {
-          const responseToken = result;
+          // TODO: validate URL?
           // REDIRECT TO CMNBOT
-          window.location.href = `http://localhost:3000/success/${responseToken}`;
+          window.location.href = result
         } else {
           console.error('Unknown error occurred', status, result);
         }
