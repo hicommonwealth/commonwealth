@@ -12,9 +12,12 @@ import { CWButton } from '../components/component_kit/cw_button';
 import LoginWithWalletDropdown from '../components/login_with_wallet_dropdown';
 import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
+import { Spinner } from 'construct-ui';
+import { PageLoading } from './loading';
 
 class Web3LoginPage implements m.ClassComponent {
   private error?: string;
+  private loading?: boolean;
 
   view() {
     const token = m.route.param('connect');
@@ -24,6 +27,12 @@ class Web3LoginPage implements m.ClassComponent {
         <PageNotFound />
       );
     }
+    if (this.loading) {
+      const message = 'Redirecting...'
+      return (
+        <PageLoading message={message} />
+      )
+    }
 
     // hit auth callback and redirect
     const onSuccess = async () => {
@@ -31,6 +40,7 @@ class Web3LoginPage implements m.ClassComponent {
         // user should never be logged out when this method is called
         return;
       }
+      this.loading = true;
       try {
         const { status, result } = await $.get(
           `${app.serverUrl()}/auth/callback`,
