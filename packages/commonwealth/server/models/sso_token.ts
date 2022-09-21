@@ -8,6 +8,7 @@ export type SsoTokenAttributes = {
   issued_at?: number;
   issuer?: string;
   address_id?: number;
+  profile_id?: number;
   state_id?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -29,6 +30,7 @@ export default (
     issued_at: { type: dataTypes.INTEGER, allowNull: true },
     issuer: { type: dataTypes.STRING, allowNull: true },
     address_id: { type: dataTypes.INTEGER, allowNull: true },
+    profile_id: { type: dataTypes.INTEGER, allowNull: true },
     state_id: { type: dataTypes.STRING, allowNull: true },
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -52,6 +54,7 @@ export default (
 
   SsoToken.associate = (models) => {
     models.SsoToken.belongsTo(models.Address, { foreignKey: 'address_id', targetKey: 'id' });
+    models.SsoToken.belongsTo(models.Profile, { foreignKey: 'profile_id', targetKey: 'id' });
   };
 
   return SsoToken;
