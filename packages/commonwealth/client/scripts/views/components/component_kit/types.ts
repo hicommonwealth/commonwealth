@@ -27,6 +27,7 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',
   Tag = 'Tag',
