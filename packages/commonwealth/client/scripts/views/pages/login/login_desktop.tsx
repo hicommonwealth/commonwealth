@@ -45,6 +45,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
       performLinkingCallback,
       setSelectedLinkingWallet,
       magicLoading,
+      showResetWalletConnect,
     } = vnode.attrs;
 
     return (
@@ -71,6 +72,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={false}
+                showResetWalletConnect={showResetWalletConnect}
               />
             </div>
           )}
@@ -185,6 +187,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 setSelectedWallet={setSelectedWallet}
                 hasNoWalletsLink={false}
                 wallets={wallets}
+                showResetWalletConnect={showResetWalletConnect}
               />
             </div>
           )}
@@ -215,6 +218,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 setBodyType={setBodyType}
                 accountVerifiedCallback={accountVerifiedCallback}
                 linking={true}
+                showResetWalletConnect={showResetWalletConnect}
               />
             </div>
           )}

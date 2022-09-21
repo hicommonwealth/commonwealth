@@ -90,7 +90,6 @@ export async function completeClientLogin(account: Account) {
     );
 
     if (!addressInfo && account.addressId) {
-      // TODO: add keytype
       addressInfo = new AddressInfo(
         account.addressId,
         account.address,

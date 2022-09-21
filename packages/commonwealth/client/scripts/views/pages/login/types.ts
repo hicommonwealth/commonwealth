@@ -41,4 +41,5 @@ export type LoginAttrs = {
   logInWithAccountCallback: () => void;
   saveProfileInfoCallback: () => void;
   performLinkingCallback: () => void;
+  showResetWalletConnect: boolean;
 };

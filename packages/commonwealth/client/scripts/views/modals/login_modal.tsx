@@ -22,6 +22,7 @@ import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -112,6 +113,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
   view(vnode) {
     const { onSuccess } = vnode.attrs;
+    const wcEnabled = _.any(this.wallets, (w) => w instanceof WalletConnectWebWalletController && w.enabled);
 
     // Handles Magic Link Login
     const handleEmailLoginCallback = async () => {
@@ -371,6 +373,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         handleEmailLoginCallback={handleEmailLoginCallback}
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
+        showResetWalletConnect={wcEnabled}
       />
     ) : (
       <LoginDesktop
@@ -415,6 +418,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         handleEmailLoginCallback={handleEmailLoginCallback}
         saveProfileInfoCallback={saveProfileInfoCallback}
         performLinkingCallback={performLinkingCallback}
+        showResetWalletConnect={wcEnabled}
       />
     );
   }

@@ -17,7 +17,7 @@
       overflow-y: auto;
       width: 284px;
       // preserves box shadow in scroll container
-      max-height: 174px;
+      height: 176px;
       margin-bottom: -4px;
       padding-bottom: 4px;
 
@@ -30,6 +30,24 @@
         padding-bottom: 0;
 
         @include visibleScrollbar(dark);
+      }
+    }
+
+    .wallet-list-links {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .reset-wc-link {
+      align-self: flex-start;
+      a {
+        color: $neutral-500;
+        cursor: pointer;
+        margin: 8px 12px 8px 0;
+      }
+      &.darkMode a {
+        color: $neutral-400;
       }
     }
 
