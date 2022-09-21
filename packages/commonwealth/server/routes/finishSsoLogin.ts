@@ -75,8 +75,6 @@ const finishSsoLogin = async (
     throw new ServerError(Errors.NoSharedSecret);
   }
 
-  console.log('StateId', req.body.stateId);
-
   // verify request stateId (i.e. that /auth/sso was called)
   const emptyTokenInstance = await models.SsoToken.findOne({
     where: { state_id: req.body.stateId },

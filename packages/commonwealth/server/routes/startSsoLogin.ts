@@ -24,7 +24,6 @@ const startSsoLogin = async (
       throw new ServerError(Errors.NoSharedSecret);
     }
     const stateId: string = uuidv4();
-    console.log('start state id', stateId);
     await models.SsoToken.create({
       state_id: stateId,
       created_at: new Date(),
