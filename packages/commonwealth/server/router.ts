@@ -216,11 +216,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models)
   );
-  router.post(
-    '/deleteChain',
-    passport.authenticate('jwt', { session: false }),
-    deleteChain.bind(this, models)
-  );
+  router.post('/deleteChain', deleteChain.bind(this, models));
   router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
@@ -775,7 +771,7 @@ function setupRouter(
   router.get(
     '/auth/callback',
     passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models),
+    authCallback.bind(this, models)
   );
 
   // logout
