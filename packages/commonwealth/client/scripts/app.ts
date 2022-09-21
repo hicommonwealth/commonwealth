@@ -649,6 +649,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
@@ -881,6 +882,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/dashboard/:type': importRoute('views/pages/user_dashboard', {
+              scoped: false,
+              deferChain: true,
+            }),
+            '/web3login': importRoute('views/pages/web3login', {
               scoped: false,
               deferChain: true,
             }),
