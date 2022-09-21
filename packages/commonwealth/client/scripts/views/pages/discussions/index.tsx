@@ -101,10 +101,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
-      return m(PageLoading, {
-        title: 'Discussions',
-        showNewProposalButton: true,
-      });
+      return <PageLoading title="Discussions" showNewProposalButton />;
     }
 
     this.topicName = vnode.attrs.topic;
@@ -126,7 +123,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
         }
       >
         <div class="DiscussionsPage">
-          <DiscussionFilterBar
+          {/* <DiscussionFilterBar
             topic={this.topicName}
             stage={this.stageName}
             parentState={this}
@@ -137,7 +134,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
               topicName={this.topicName}
               stageName={this.stageName}
             />
-          )}
+          )} */}
         </div>
       </Sublayout>
     );
