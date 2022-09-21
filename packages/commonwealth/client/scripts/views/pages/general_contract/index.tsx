@@ -102,7 +102,7 @@ class GeneralContractPage
       });
 
       // This is for testing only
-      contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
+      // contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
 
       console.log(processedArgs);
 
