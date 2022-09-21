@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
-
 import 'components/sidebar/sidebar_section.scss';
 
+import m from 'mithril';
+import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
   SubSectionAttrs,
@@ -86,7 +86,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       if (containsChildren) {
         this.toggled = !toggled;
       }
-      localStorage.setItem('sidebar-toggle', 'false');
+      localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
       onclick(e, this.toggled);
     };
 
