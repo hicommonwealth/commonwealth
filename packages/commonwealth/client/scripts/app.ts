@@ -884,6 +884,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/web3login': importRoute('views/pages/web3login', {
+              scoped: false,
+              deferChain: true,
+            }),
             // Scoped routes
             //
 
