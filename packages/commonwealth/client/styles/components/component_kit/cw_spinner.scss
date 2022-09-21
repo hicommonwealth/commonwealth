@@ -2,8 +2,8 @@
 
 .Spinner {
   animation: loading-spinner 2.75s ease-in-out infinite;
-  height: 48px;
-  width: 48px;
+  height: fit-content;
+  width: fit-content;
 
   @keyframes loading-spinner {
     0% {
