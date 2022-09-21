@@ -1,5 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DISCORD_BOT_SUCCESS_URL } from 'server/config';
+import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import { DB } from '../database';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
