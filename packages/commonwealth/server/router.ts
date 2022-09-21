@@ -134,6 +134,7 @@ import bulkEntities from './routes/bulkEntities';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import tokenBalance from './routes/tokenBalance';
+import bulkBalances from './routes/bulkBalances';
 import getSupportedEthChains from './routes/getSupportedEthChains';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
@@ -235,6 +236,10 @@ function setupRouter(
   router.post(
     '/tokenBalance',
     tokenBalance.bind(this, models, tokenBalanceCache)
+  );
+  router.post(
+    '/bulkBalances',
+    bulkBalances.bind(this, models, tokenBalanceCache)
   );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
