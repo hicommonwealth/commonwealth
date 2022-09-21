@@ -12,6 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
 import { NewLoginModal } from '../modals/login_modal';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
 class Web3LoginPage implements m.ClassComponent {
   private error?: string;
@@ -64,7 +65,13 @@ class Web3LoginPage implements m.ClassComponent {
                 } else {
                   app.modals.create({
                     modal: NewLoginModal,
-                    data: { onSuccess },
+                    data: {
+                      onSuccess,
+                      modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                        ? 'fullScreen'
+                        : 'centered',
+                      breakpointFn: isWindowMediumSmallInclusive,
+                    },
                   });
                 }
               }}

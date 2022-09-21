@@ -23,7 +23,10 @@ import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -249,11 +252,17 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               label="Log in"
               compact={true}
               size={small ? 'sm' : 'default'}
-              onclick={() =>
+              onclick={() => {
                 app.modals.create({
                   modal: NewLoginModal,
-                })
-              }
+                  data: {
+                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                      ? 'fullScreen'
+                      : 'centered',
+                    breakpointFn: isWindowMediumSmallInclusive,
+                  },
+                });
+              }}
             />
           </div>
         </div>
@@ -443,6 +452,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
             modalType: isWindowMediumSmallInclusive(window.innerWidth)
               ? 'fullScreen'
               : 'centered',
+            breakpointFn: isWindowMediumSmallInclusive,
           },
         });
       }

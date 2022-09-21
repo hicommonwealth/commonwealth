@@ -60,7 +60,7 @@
 }
 
 .LoginMobile {
-  @include mediumSmall {
+  @include mediumSmallInclusive {
     background-image: url('/static/img/login-background-mediumsmall.png');
   }
 

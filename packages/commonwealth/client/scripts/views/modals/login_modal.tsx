@@ -14,7 +14,10 @@ import {
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../components/component_kit/helpers';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
@@ -44,6 +47,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
   private magicLoading: boolean;
+  private showMobile: boolean;
 
   oninit(vnode) {
     // Determine if in a community
@@ -72,6 +76,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.bodyType = 'walletList';
     }
 
+    this.showMobile = isWindowMediumSmallInclusive(window.innerWidth);
+
     // Override if initial data is provided (needed for redirecting wallets + CommonBot)
     if (vnode.attrs.initialBody) {
       this.bodyType = vnode.attrs.initialBody;
@@ -91,6 +97,19 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     }
   }
 
+  onremove() {
+    // eslint-disable-next-line no-restricted-globals
+    removeEventListener('resize', () =>
+      breakpointFnValidator(
+        this.showMobile,
+        (state: boolean) => {
+          this.showMobile = state;
+        },
+        isWindowMediumSmallInclusive
+      )
+    );
+  }
+
   view(vnode) {
     const { onSuccess } = vnode.attrs;
 
@@ -106,7 +125,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         await loginWithMagicLink(this.email);
         this.magicLoading = false;
         if (onSuccess) onSuccess();
-        $('.LoginDesktop').trigger('modalexit');
+        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          $('.LoginMobile').trigger('modalexit');
+        } else {
+          $('.LoginDesktop').trigger('modalexit');
+        }
       } catch (e) {
         notifyError("Couldn't send magic link");
         this.magicLoading = false;
@@ -294,7 +317,18 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
-    return isWindowMediumSmallInclusive(window.innerWidth) ? (
+    // eslint-disable-next-line no-restricted-globals
+    addEventListener('resize', () =>
+      breakpointFnValidator(
+        this.showMobile,
+        (state: boolean) => {
+          this.showMobile = state;
+        },
+        isWindowMediumSmallInclusive
+      )
+    );
+
+    return this.showMobile ? (
       <LoginMobile
         address={this.address}
         currentlyInCommunityPage={this.currentlyInCommunityPage}

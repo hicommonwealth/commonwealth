@@ -1,3 +1,5 @@
+import m from 'mithril';
+
 import breakpoints from 'mixins/breakpoints.scss';
 
 import { isBoolean, isNotNil } from 'helpers/typeGuards';
@@ -45,3 +47,16 @@ export const isWindowSmall = (width: number) =>
 
 export const isWindowExtraSmall = (width: number) =>
   width < breakpoints.breakpointExtraSmallMax;
+
+export const breakpointFnValidator = (
+  widthState: boolean,
+  setWidthState: (state: boolean) => void,
+  breakpointFn: (width: number) => boolean
+) => {
+  const breakPointState = breakpointFn(window.innerWidth);
+
+  if (widthState !== breakPointState) {
+    setWidthState(breakPointState);
+    m.redraw();
+  }
+};

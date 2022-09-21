@@ -9,6 +9,7 @@ import app from 'state';
 import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 export const handleEmailInvites = (state) => {
   if (!state.modalAutoTriggered && app.user) {
@@ -21,6 +22,12 @@ export const handleEmailInvites = (state) => {
     } else if (!app.user.activeAccount) {
       app.modals.create({
         modal: NewLoginModal,
+        data: {
+          modalType: isWindowMediumSmallInclusive(window.innerWidth)
+            ? 'fullScreen'
+            : 'centered',
+          breakpointFn: isWindowMediumSmallInclusive,
+        },
       });
     }
   }

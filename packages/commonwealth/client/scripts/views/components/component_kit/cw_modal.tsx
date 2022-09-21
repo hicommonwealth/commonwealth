@@ -7,7 +7,7 @@ import 'components/component_kit/cw_modal.scss';
 
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
-import { getClasses } from './helpers';
+import { breakpointFnValidator, getClasses } from './helpers';
 import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
@@ -16,9 +16,12 @@ type ModalAttrs = {
   oncreatemodal: () => void;
   modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
+  breakpointFn?: (width: number) => boolean;
 };
 
 export class CWModal implements m.ClassComponent<ModalAttrs> {
+  private modalTypeState: string;
+
   oncreate(vnode) {
     const { spec, oncreatemodal } = vnode.attrs;
     const completeCallback = spec.completeCallback || (() => undefined);
@@ -28,11 +31,45 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     oncreatemodal(spec, confirmExit, completeCallback, exitCallback, vnode);
   }
 
+  oninit(vnode) {
+    const { modalType } = vnode.attrs;
+    this.modalTypeState = modalType || 'centered';
+  }
+
+  onremove(vnode) {
+    const { breakpointFn } = vnode.attrs;
+    if (breakpointFn) {
+      // eslint-disable-next-line no-restricted-globals
+      removeEventListener('resize', () =>
+        breakpointFnValidator(
+          this.modalTypeState === 'fullScreen',
+          (state: boolean) => {
+            this.modalTypeState = state ? 'fullScreen' : 'centered';
+          },
+          breakpointFn
+        )
+      );
+    }
+  }
+
   view(vnode) {
-    const { onclick, modalType = 'centered', spec } = vnode.attrs;
+    const { onclick, spec, breakpointFn } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
+
+    if (breakpointFn) {
+      // eslint-disable-next-line no-restricted-globals
+      addEventListener('resize', () =>
+        breakpointFnValidator(
+          this.modalTypeState === 'fullScreen',
+          (state: boolean) => {
+            this.modalTypeState = state ? 'fullScreen' : 'centered';
+          },
+          breakpointFn
+        )
+      );
+    }
 
     return (
       <div class={ComponentType.Modal}>
@@ -42,7 +79,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
         >
           <div
             class={getClasses<{ isFullScreen: boolean }>(
-              { isFullScreen: modalType === 'fullScreen' },
+              { isFullScreen: this.modalTypeState === 'fullScreen' },
               'modal-container'
             )}
             onclick={(e) => {

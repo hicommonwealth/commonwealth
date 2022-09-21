@@ -2,7 +2,10 @@ import m from 'mithril';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import {
+  breakpointFnValidator,
+  isWindowMediumSmallInclusive,
+} from '../../components/component_kit/helpers';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
@@ -116,6 +119,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                           )
                             ? 'fullScreen'
                             : 'centered',
+                          breakpointFn: isWindowMediumSmallInclusive,
                         },
                       }),
                   },
