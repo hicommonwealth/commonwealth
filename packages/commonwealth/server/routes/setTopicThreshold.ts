@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -8,9 +9,9 @@ export const Errors = {
 };
 
 const setTopicThreshold = async (models, req, res: Response, next: NextFunction) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.topic_id || req.body.token_threshold === undefined) {
-    return next(new Error(Errors.MissingTopicIdOrThreshold));
+    return next(new AppError(Errors.MissingTopicIdOrThreshold));
   }
 
   const topic = await models.Topic.findOne({
@@ -18,11 +19,11 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
       id: req.body.topic_id,
     }
   });
-  if (!topic) return next(new Error(Errors.InvalidTopicId));
+  if (!topic) return next(new AppError(Errors.InvalidTopicId));
 
   const token_threshold = parseInt(req.body.token_threshold, 10);
   if (Number.isNaN(token_threshold) || token_threshold < 0) {
-    return next(new Error(Errors.InvalidThreshold));
+    return next(new AppError(Errors.InvalidThreshold));
   }
 
   await models.Topic.update({

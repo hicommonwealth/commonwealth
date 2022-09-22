@@ -100,7 +100,7 @@ export class RabbitMQController {
         log.error(`Publisher error ${messageId}`, err);
       });
     } catch (err) {
-      throw new Error(`Rascal config error: ${err.message}`);
+      throw new Error(`Rascal config error: ${err.message}`)
     }
   }
 }

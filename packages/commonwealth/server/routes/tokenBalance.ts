@@ -36,13 +36,13 @@ const tokenBalance = async (
   let contract: ContractInstance;
   try {
     [chain, error] = await validateChain(models, req.body);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err);
   }
   try {
     [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err)
   }

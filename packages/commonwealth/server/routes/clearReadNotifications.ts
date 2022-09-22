@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { sequelize, DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -11,7 +12,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new AppError('Not logged in'));
   }
 
   await sequelize.query(

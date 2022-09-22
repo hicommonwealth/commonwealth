@@ -96,3 +96,5 @@ export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
 export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
 export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
+
+export const DISCORD_BOT_SUCCESS_URL = process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';

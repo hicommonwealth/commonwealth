@@ -97,7 +97,7 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      expectErrorOnResponse(500, Errors.NoDuplicates, errorRes);
+      expectErrorOnResponse(400, Errors.NoDuplicates, errorRes);
       webhookUrls = await models['Webhook'].findAll({
         where: { url: webhookUrl },
       });
@@ -140,7 +140,7 @@ describe('Webhook Tests', () => {
           auth: true,
           jwt: notAdminJWT,
         });
-      expectErrorOnResponse(500, Errors.NotAdmin, errorRes);
+      expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
       const webhookUrls = await models['Webhook'].findAll({
         where: { url: webhookUrl },
       });
@@ -176,7 +176,7 @@ describe('Webhook Tests', () => {
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      expectErrorOnResponse(500, Errors.NoWebhookFound, errorRes);
+      expectErrorOnResponse(400, Errors.NoWebhookFound, errorRes);
     });
 
     it('should fail to delete a webhook from non-admin', async () => {
@@ -191,7 +191,7 @@ describe('Webhook Tests', () => {
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: notAdminJWT });
-      expectErrorOnResponse(500, Errors.NotAdmin, errorRes);
+      expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
     });
   });
 
@@ -235,7 +235,7 @@ describe('Webhook Tests', () => {
         .get('/api/getWebhooks')
         .set('Accept', 'application/json')
         .query({ chain, auth: true, jwt: notAdminJWT });
-      expectErrorOnResponse(500, Errors.NotAdmin, errorRes);
+      expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
     });
   });
 
