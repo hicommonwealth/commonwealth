@@ -57,8 +57,6 @@ const updateTopic = async (
     newTopic = await models.Topic.findOne({
       where: { id: req.body.topic_id },
     });
-    console.log('if');
-    console.log(newTopic);
   } else {
     [newTopic] = await models.Topic.findOrCreate({
       where: {
@@ -66,8 +64,6 @@ const updateTopic = async (
         chain_id: thread.chain,
       },
     });
-    console.log('else');
-    console.log(newTopic);
     thread.topic_id = newTopic.id;
     await thread.save();
   }
