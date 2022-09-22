@@ -1,0 +1,21 @@
+@import 'shared';
+
+.ThreadsOverview {
+  display: flex;
+  flex-direction: column;
+  padding: 56px;
+
+  .header-row {
+    align-items: center;
+    border-bottom: 1px solid $neutral-300;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 352px 1fr;
+    padding-bottom: 16px;
+
+    .threads-header-container {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

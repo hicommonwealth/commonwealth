@@ -87,9 +87,9 @@ class RecentActivityController {
       if (!thread.Address) {
         console.error('Thread missing address');
       }
-      if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
+      if (!app.threads.overviewStore.getByIdentifier(thread.id)) {
         try {
-          app.threads.summaryStore.add(modeledThread);
+          app.threads.overviewStore.add(modeledThread);
         } catch (e) {
           console.error(e.message);
         }
