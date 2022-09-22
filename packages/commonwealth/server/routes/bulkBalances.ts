@@ -1,6 +1,6 @@
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { AddressInstance } from 'server/models/address';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { DB, sequelize } from '../database';
 import { AppError, ServerError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
@@ -133,7 +133,13 @@ const bulkBalances = async (
       let atLeastOneTokenAddress = false;
 
       // Build token balances for each address
-      for (const tokenAddress of tokenAddresses) {
+      const tokenContracts = await models.Contract.findAll({
+        where: {
+          address: { [Op.in]: tokenAddresses },
+          chain_node_id: nodeId, // to filter out same address on multiple chains
+        }
+      });
+      for (const tokenContract of tokenContracts) {
         let balanceTotal = 0;
         for (const userWalletAddress of profileWalletAddresses) {
           try {
@@ -141,15 +147,15 @@ const bulkBalances = async (
             const balance = await tokenBalanceCache.getBalance(
               nodeId,
               userWalletAddress,
-              tokenAddress,
-              'erc20'
+              tokenContract.address,
+              tokenContract.type
             );
             balanceTotal += balance.toNumber();
             atLeastOneTokenAddress = true;
           } catch (e) {
             console.log(
               "Couldn't get balance for token address",
-              tokenAddress,
+              tokenContract.address,
               'on chainNodeId',
               nodeId,
               ' with wallet ',
@@ -158,7 +164,7 @@ const bulkBalances = async (
           }
         }
         if (atLeastOneTokenAddress) {
-          tokenBalances[tokenAddress] = balanceTotal;
+          tokenBalances[tokenContract.address] = balanceTotal;
         }
       }
 
