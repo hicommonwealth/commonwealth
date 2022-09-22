@@ -28,6 +28,7 @@ import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
+import { CWSpinner } from './cw_spinner';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -65,6 +66,10 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Spinner</h1>
+        <div class="basic-gallery">
+          <CWSpinner />
+        </div>
         <h1>Breadcrumbs</h1>
         <div class="basic-gallery">
           <CWBreadcrumbs
