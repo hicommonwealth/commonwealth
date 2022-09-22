@@ -91,6 +91,7 @@ class TopicsController {
         topic_name: topicName,
         address: app.user.activeAccount.address,
       });
+      console.log(response.result);
       const result = new Topic(response.result);
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
