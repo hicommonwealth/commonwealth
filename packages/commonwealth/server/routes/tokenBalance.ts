@@ -48,7 +48,7 @@ const tokenBalance = async (
   }
 
   let chain_node_id = chain.ChainNode.id;
-  if (chain.ChainNode.chain_base !== 'cosmos') {
+  if (['ethereum', 'near', 'solana'].includes(chain.ChainNode.chain_base)) {
     try {
       const { contract_address } = req.body;
       contract = await models.Contract.findOne({
