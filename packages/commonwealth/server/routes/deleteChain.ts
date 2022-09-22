@@ -12,10 +12,12 @@ export const Errors = {
   NotAdmin: 'Must be admin',
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
-  CannotDeleteChain: 'Cannot delete a chain with registered addresses',
+  CannotDeleteChain: 'Cannot delete this protected chain',
   NotAcceptableAdmin: 'Not an Acceptable Admin',
   BadSecret: 'Must provide correct secret',
 };
+
+const protectedIdList = [];
 
 type deleteChainReq = {
   id: string;
@@ -50,6 +52,10 @@ const deleteChain = async (
 
   if (!id) {
     return next(new AppError(Errors.NeedChainId));
+  }
+
+  if (protectedIdList.includes(id)) {
+    return next(new AppError(Errors.CannotDeleteChain));
   }
 
   await models.sequelize.transaction(async (t) => {
