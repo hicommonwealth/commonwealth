@@ -1,15 +1,15 @@
 /* @jsx m */
 
 import m from 'mithril';
+import moment from 'moment';
 
 import 'pages/discussions/threads_overview_topic_summary_row.scss';
 
 import app from 'state';
 import { Thread, Topic } from 'models';
-// import { formatTimestampAsDate, link } from 'helpers';
-// import { getProposalUrlPath } from 'identifiers';
-// import { slugify } from 'utils';
-// import { getLastUpdated, isHot } from './helpers';
+import { getProposalUrlPath } from 'identifiers';
+import { slugify } from 'utils';
+import { getLastUpdated, isHot } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type SummaryRowAttrs = {
@@ -58,19 +58,30 @@ export class ThreadsOverviewTopicSummaryRow
           {sortedThreads.slice(0, 5).map((thread) => {
             console.log(thread);
 
-            // const discussionLink = getProposalUrlPath(
-            //   thread.slug,
-            //   `${thread.identifier}-${slugify(thread.title)}`
-            // );
+            const discussionLink = getProposalUrlPath(
+              thread.slug,
+              `${thread.identifier}-${slugify(thread.title)}`
+            );
 
             return (
-              <CWText type="b2" fontWeight="bold">
-                {thread.title}
-                {/* <div class="last-updated">
-          {formatTimestampAsDate(getLastUpdated(thread))}
-          {isHot(thread) && <span>🔥</span>}
-        </div> */}
-              </CWText>
+              <div
+                class="recent-thread-row"
+                onclick={(e) => {
+                  e.preventDefault();
+                  m.route.set(discussionLink);
+                }}
+              >
+                <CWText
+                  type="caption"
+                  fontWeight="medium"
+                  className="last-updated-text"
+                >
+                  {moment(getLastUpdated(thread)).format('l')}
+                </CWText>
+                <CWText type="b2" fontWeight="bold">
+                  {thread.title}
+                </CWText>
+              </div>
             );
           })}
         </div>

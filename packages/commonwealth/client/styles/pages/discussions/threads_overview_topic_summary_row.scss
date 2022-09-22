@@ -3,7 +3,7 @@
 .ThreadsOverviewTopicSummaryRow {
   border-bottom: 1px solid $neutral-200;
   display: grid;
-  grid-template-columns: 352px 1fr 1fr;
+  grid-template-columns: 352px 1fr;
   gap: 16px;
   padding: 16px 0;
 
@@ -18,6 +18,17 @@
 
     .threads-count-text.Text {
       color: $neutral-500;
+    }
+  }
+
+  .recent-threads-column {
+    display: flex;
+    flex-direction: column;
+
+    .recent-thread-row {
+      .last-updated-text.Text {
+        color: $neutral-500;
+      }
     }
   }
 }
