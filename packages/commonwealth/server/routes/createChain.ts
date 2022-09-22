@@ -57,7 +57,7 @@ type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAt
   id: string;
   node_url: string;
   substrate_spec: string;
-  address: string;
+  address?: string;
   decimals: number;
 };
 
@@ -157,14 +157,6 @@ const createChain = async (
       altWalletUrl = node.alt_wallet_url;
       privateUrl = node.private_url;
     }
-
-    // TODO: Document to BD that multiple communities with the same contract can now exist
-    // const existingChain = await models.Chain.findOrCreate({
-    //   where: { address: req.body.address, chain_node_id: node.id }
-    // });
-    // if (existingChain) {
-    //   return next(new AppError(Errors.ChainAddressExists));
-    // }
 
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
