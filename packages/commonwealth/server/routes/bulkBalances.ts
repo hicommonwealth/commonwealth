@@ -98,6 +98,11 @@ const bulkBalances = async (
   for (const nodeIdString of Object.keys(chainNodes)) {
     let tokenAddresses = req.body.chainNodes[nodeIdString];
     const nodeId = parseInt(nodeIdString, 10);
+    const node = await models.ChainNode.findOne({
+      where: {
+        id: nodeId,
+      }
+    });
 
     // Handle when only one value in array
     if (typeof tokenAddresses === 'string') {
@@ -134,30 +139,33 @@ const bulkBalances = async (
 
       // Build token balances for each address
       // If cannot find contract in our DB, filter it out from query response.
-      // TODO: Can't query for arbitrary until TBC-API goes out, requires BP not passed from Commonbot.
-      const tokenContracts = await models.Contract.findAll({
-        where: {
-          address: { [Op.in]: tokenAddresses },
-          chain_node_id: nodeId, // to filter out same address on multiple chains
-        }
-      });
-      for (const tokenContract of tokenContracts) {
+
+      for (const tokenAddress of tokenAddresses) {
         let balanceTotal = 0;
         for (const userWalletAddress of profileWalletAddresses) {
           try {
-            // TODO: Needs to change to support 721 and spl-token when Zak contracts table is merged
+            const contract = await models.Contract.findOne({
+              where: {
+                address: tokenAddress,
+              }
+            });
+
             const balance = await tokenBalanceCache.getBalance(
               nodeId,
               userWalletAddress,
-              tokenContract.address,
-              tokenContract.type
+              tokenAddress,
+              contract ?
+                contract.type :
+                node.chain_base === 'ethereum' ?
+                  'erc20' :
+                  'spl' // default assume solana default
             );
             balanceTotal += balance.toNumber();
             atLeastOneTokenAddress = true;
           } catch (e) {
             console.log(
               "Couldn't get balance for token address",
-              tokenContract.address,
+              tokenAddress,
               'on chainNodeId',
               nodeId,
               ' with wallet ',
@@ -166,7 +174,7 @@ const bulkBalances = async (
           }
         }
         if (atLeastOneTokenAddress) {
-          tokenBalances[tokenContract.address] = balanceTotal;
+          tokenBalances[tokenAddress] = balanceTotal;
         }
       }
 
