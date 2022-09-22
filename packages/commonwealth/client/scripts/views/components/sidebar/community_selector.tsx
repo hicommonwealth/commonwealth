@@ -72,7 +72,7 @@ const homeButton = (
   >
     <img
       class="mobile-logo"
-      src="https://commonwealth.im/static/img/logo.png"
+      src="https://commonwealth.im/static/brand_assets/logo_stacked.png"
       style="height:18px; width:18px;"
     />
     <span>Home</span>
