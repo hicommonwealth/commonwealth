@@ -55,9 +55,9 @@
             }
 
             .username {
-              color: $neutral-500;
-
               @include caption;
+
+              font-weight: 500;
             }
 
             .identity-icon {
