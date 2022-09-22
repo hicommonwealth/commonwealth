@@ -9,6 +9,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { DB } from '../database';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,7 +30,7 @@ const editThread = async (
   const { body, title, kind, stage, thread_id, version_history, url } =
     req.body;
   if (!thread_id) {
-    return next(new Error(Errors.NoThreadId));
+    return next(new AppError(Errors.NoThreadId));
   }
 
   if (kind === 'discussion') {
@@ -37,13 +38,13 @@ const editThread = async (
       (!body || !body.trim()) &&
       (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
     ) {
-      return next(new Error(Errors.NoBodyOrAttachment));
+      return next(new AppError(Errors.NoBodyOrAttachment));
     }
   }
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const attachFiles = async () => {
     if (
@@ -97,7 +98,7 @@ const editThread = async (
       address: author.address,
     });
     if (!canInteract) {
-      return next(new Error(banError));
+      return next(new AppError(banError));
     }
   }
 
@@ -115,7 +116,7 @@ const editThread = async (
       },
     });
   }
-  if (!thread) return next(new Error('No thread with that id found'));
+  if (!thread) return next(new AppError('No thread with that id found'));
 
   try {
     let latestVersion;
@@ -152,7 +153,7 @@ const editThread = async (
       if (validURL(url)) {
         thread.url = url;
       } else {
-        return next(new Error(Errors.InvalidLink));
+        return next(new AppError(Errors.InvalidLink));
       }
     }
 
@@ -210,7 +211,7 @@ const editThread = async (
         return !alreadyExists;
       });
     } catch (e) {
-      return next(new Error('Failed to parse mentions'));
+      return next(new AppError('Failed to parse mentions'));
     }
 
     // grab mentions to notify tagged users
@@ -273,7 +274,7 @@ const editThread = async (
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

@@ -6,6 +6,7 @@ import validateRoles from '../util/validateRoles';
 import { DB } from '../database';
 import { TopicAttributes } from '../models/topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -47,22 +48,22 @@ const editTopic = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   if (!req.body.id) {
-    return next(new Error(Errors.NoTopicId));
+    return next(new AppError(Errors.NoTopicId));
   }
 
   const name = req.body.name.trim();
-  if (!name) return next(new Error(Errors.TopicRequired));
+  if (!name) return next(new AppError(Errors.TopicRequired));
   if (req.body.name.match(/["<>%{}|\\/^`]/g)) {
-    return next(new Error(Errors.InvalidTopicName));
+    return next(new AppError(Errors.InvalidTopicName));
   }
 
   const featured_in_sidebar = req.body.featured_in_sidebar === 'true';
   const featured_in_new_post = req.body.featured_in_new_post === 'true';
   const default_offchain_template = req.body.default_offchain_template?.trim();
   if (featured_in_new_post && !default_offchain_template) {
-    return next(new Error(Errors.DefaultTemplateRequired));
+    return next(new AppError(Errors.DefaultTemplateRequired));
   }
 
   const requesterIsAdmin = await validateRoles(
@@ -72,13 +73,13 @@ const editTopic = async (
     chain.id
   );
   if (requesterIsAdmin === null) {
-    return next(new Error(Errors.NotAdmin));
+    return next(new AppError(Errors.NotAdmin));
   }
 
   const { id, description, telegram, rule_id } = req.body;
   try {
     const topic = await models.Topic.findOne({ where: { id } });
-    if (!topic) return next(new Error(Errors.TopicNotFound));
+    if (!topic) return next(new AppError(Errors.TopicNotFound));
     if (name) topic.name = name;
     if (name || description) topic.description = description || '';
     if (name || telegram) topic.telegram = telegram || '';
@@ -87,7 +88,7 @@ const editTopic = async (
     topic.default_offchain_template = default_offchain_template || '';
     if (rule_id) {
       const rule = await models.Rule.findOne({ where: { id: rule_id } });
-      if (!rule) return next(new Error(Errors.RuleNotFound));
+      if (!rule) return next(new AppError(Errors.RuleNotFound));
       topic.rule_id = rule_id;
     }
     await topic.save();

@@ -39,7 +39,12 @@ const validateTopicThreshold = async (
     const communityContracts = await models.CommunityContract.findOne({
       where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],
-    }); // TODO: @JAKE in the future, we will have more than one contract, 
+    });
+    if (!communityContracts) {
+      log.warn(`Could not find TokenContract associated for ${topicId}.`);
+      return false;
+    }
+    // TODO: @JAKE in the future, we will have more than one contract, 
       // need to handle this through the TBC Rule, passing in associated Contract.id
     const threshold = topic.token_threshold;
     if (threshold && threshold > 0) {

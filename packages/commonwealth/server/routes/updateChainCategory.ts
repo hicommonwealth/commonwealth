@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { ChainCategoryInstance } from 'server/models/chain_category';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {
   create: string;
@@ -45,7 +46,7 @@ const updateChainCategory = async (
     }
     return res.json({ status: 'Success' });
   } else {
-    return next(new Error('No update action specified.'));
+    return next(new AppError('No update action specified.'));
   }
 };
 

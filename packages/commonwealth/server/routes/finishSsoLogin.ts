@@ -20,6 +20,7 @@ import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -100,7 +101,7 @@ const finishSsoLogin = async (
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
-      throw new Error('Could not decode token');
+      throw new AppError('Could not decode token');
     }
   } catch (e) {
     log.info(`Axie token decoding error: ${e.message}`);
@@ -202,7 +203,7 @@ const finishSsoLogin = async (
           where: { id: existingAddress.user_id },
         });
         if (!oldUser) {
-          throw new Error('User should exist');
+          throw new AppError('User should exist');
         }
         const msg = {
           to: oldUser.email,

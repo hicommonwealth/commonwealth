@@ -444,6 +444,14 @@ const LinkNewAddressModal: m.Component<
                           'p.small-text',
                           'Use your wallet to switch between accounts.'
                         ),
+                        webWallet.reset && m('p.small-text', [
+                          m('a', {
+                            href: '#',
+                            onclick: async () => {
+                              await webWallet.reset();
+                            }
+                          }, `Reset ${webWallet.label}`),
+                        ]),
                       ];
                     } else {
                       return [
@@ -522,7 +530,7 @@ const LinkNewAddressModal: m.Component<
                             const stateId = result.result.stateId;
 
                             // redirect to axie page for login
-                            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+                            window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
                           } else {
                             vnode.state.error(
                               result.error || 'Could not login'

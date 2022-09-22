@@ -181,7 +181,6 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      // address: Contracts[0]?.address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
