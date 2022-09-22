@@ -1,0 +1,23 @@
+@import 'shared';
+
+.ThreadsOverviewTopicSummaryRow {
+  border-bottom: 1px solid $neutral-200;
+  display: grid;
+  grid-template-columns: 352px 1fr 1fr;
+  gap: 16px;
+  padding: 16px 0;
+
+  .topic-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .topic-name-text.Text {
+      color: $primary-500;
+    }
+
+    .threads-count-text.Text {
+      color: $neutral-500;
+    }
+  }
+}

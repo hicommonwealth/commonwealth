@@ -1,10 +1,11 @@
 /* @jsx m */
 
+import m from 'mithril';
+import { debounce } from 'lodash';
+
 import 'pages/discussions/index.scss';
 
 import app from 'state';
-import { debounce } from 'lodash';
-import m from 'mithril';
 import { PageLoading } from '../loading';
 import { ThreadsOverview } from './threads_overview';
 import { RecentListing } from './recent_listing';
@@ -117,7 +118,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       <Sublayout
         title="Discussions"
         description={this.getPageDescription()}
-        showNewProposalButton={true}
+        showNewProposalButton
         onscroll={
           !this.threadsOverview ? debounce(this.onscroll.bind(this), 400) : null
         }

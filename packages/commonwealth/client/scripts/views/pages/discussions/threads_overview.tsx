@@ -8,7 +8,7 @@ import app from 'state';
 import { LoadingRow } from '../../components/loading_row';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ThreadSummaryRow } from './thread_summary_row';
+import { ThreadsOverviewTopicSummaryRow } from './threads_overview_topic_summary_row';
 
 export class ThreadsOverview implements m.ClassComponent {
   private initializing: boolean;
@@ -29,11 +29,19 @@ export class ThreadsOverview implements m.ClassComponent {
     return (
       <div class="ThreadsOverview">
         <div class="header-row">
-          <CWText type="h5" fontWeight="semiBold">
+          <CWText
+            type="h5"
+            fontWeight="semiBold"
+            className="threads-header-row-text"
+          >
             Topic
           </CWText>
           <div class="threads-header-container">
-            <CWText type="h5" fontWeight="semiBold">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="threads-header-row-text"
+            >
               Recent threads
             </CWText>
             <CWButton buttonType="mini" label="Create Thread" iconName="plus" />
@@ -45,7 +53,10 @@ export class ThreadsOverview implements m.ClassComponent {
             .filter((thread) => thread.topic.id === topic.id);
 
           return (
-            <ThreadSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
+            <ThreadsOverviewTopicSummaryRow
+              monthlyThreads={monthlyThreads}
+              topic={topic}
+            />
           );
         })}
       </div>

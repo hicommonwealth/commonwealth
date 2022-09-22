@@ -13,9 +13,17 @@
     grid-template-columns: 352px 1fr;
     padding-bottom: 16px;
 
+    .threads-header-row-text.Text {
+      color: $neutral-500;
+    }
+
     .threads-header-container {
       display: flex;
       justify-content: space-between;
+
+      .threads-header-row-text.Text {
+        color: $neutral-500;
+      }
     }
   }
 }

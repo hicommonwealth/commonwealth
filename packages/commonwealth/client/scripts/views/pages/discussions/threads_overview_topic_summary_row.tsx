@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/discussions/thread_summary_row.scss';
+import 'pages/discussions/threads_overview_topic_summary_row.scss';
 
 import app from 'state';
 import { Thread, Topic } from 'models';
@@ -12,30 +12,14 @@ import { Thread, Topic } from 'models';
 // import { getLastUpdated, isHot } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 
-const getThreadCells = (sortedThreads: Thread[]) =>
-  sortedThreads.slice(0, 5).map((thread) => {
-    // const discussionLink = getProposalUrlPath(
-    //   thread.slug,
-    //   `${thread.identifier}-${slugify(thread.title)}`
-    // );
-
-    return (
-      <CWText>
-        {thread.title}
-        {/* <div class="last-updated">
-          {formatTimestampAsDate(getLastUpdated(thread))}
-          {isHot(thread) && <span>🔥</span>}
-        </div> */}
-      </CWText>
-    );
-  });
-
 type SummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
   topic: Topic;
 };
 
-export class ThreadSummaryRow implements m.ClassComponent<SummaryRowAttrs> {
+export class ThreadsOverviewTopicSummaryRow
+  implements m.ClassComponent<SummaryRowAttrs>
+{
   view(vnode) {
     const { monthlyThreads, topic } = vnode.attrs;
 
@@ -46,11 +30,12 @@ export class ThreadSummaryRow implements m.ClassComponent<SummaryRowAttrs> {
     });
 
     return (
-      <div class="ThreadSummaryRow">
+      <div class="ThreadsOverviewTopicSummaryRow">
         <div class="topic-column">
           <CWText
             type="h4"
             fontWeight="semiBold"
+            className="topic-name-text"
             onclick={(e) => {
               e.preventDefault();
               m.route.set(
@@ -60,12 +45,35 @@ export class ThreadSummaryRow implements m.ClassComponent<SummaryRowAttrs> {
           >
             {topic.name}
           </CWText>
-          <CWText type="caption" fontWeight="medium">
-            [count] Threads
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="threads-count-text"
+          >
+            {monthlyThreads.length} Threads
           </CWText>
           <CWText type="b2">{topic.description}</CWText>
         </div>
-        <div class="recent-threads-column">{getThreadCells(sortedThreads)}</div>
+        <div class="recent-threads-column">
+          {sortedThreads.slice(0, 5).map((thread) => {
+            console.log(thread);
+
+            // const discussionLink = getProposalUrlPath(
+            //   thread.slug,
+            //   `${thread.identifier}-${slugify(thread.title)}`
+            // );
+
+            return (
+              <CWText type="b2" fontWeight="bold">
+                {thread.title}
+                {/* <div class="last-updated">
+          {formatTimestampAsDate(getLastUpdated(thread))}
+          {isHot(thread) && <span>🔥</span>}
+        </div> */}
+              </CWText>
+            );
+          })}
+        </div>
       </div>
     );
   }
