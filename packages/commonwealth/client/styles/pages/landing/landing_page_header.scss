@@ -75,6 +75,7 @@
 
 .LandingPageHeaderLoginButton {
   cursor: pointer;
+  white-space: nowrap;
   img {
     position: relative;
     top: -2px;
@@ -85,7 +86,6 @@
   }
 }
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
-  white-space: nowrap;
   a.btn-primary.pb-3.text-white {
     padding-top: 14px;
     padding-bottom: 9px;

@@ -64,16 +64,22 @@ export const VULTR_IP = process.env.VULTR_IP;
 
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === 'development') {
-    if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT) {
-      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`
-    } else return 'amqp://guest:guest@localhost:5672'
-  } else return process.env.CLOUDAMQP_URL
-})()
+    if (
+      process.env.VULTR_RABBITMQ_CONTAINER_PORT &&
+      process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
+    ) {
+      return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
+    } else return 'amqp://guest:guest@localhost:5672';
+  } else return process.env.CLOUDAMQP_URL;
+})();
 
 // if REDIS_URL exists use that (production or local redis instance) otherwise if
 // the Vultr server info is given then use that. Undefined otherwise.
-export const REDIS_URL = process.env.REDIS_URL ? process.env.REDIS_URL :
-  process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}` : undefined
+export const REDIS_URL = process.env.REDIS_URL
+  ? process.env.REDIS_URL
+  : process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT
+  ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
+  : undefined;
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
@@ -90,11 +96,12 @@ export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 
 export const DEFAULT_COMMONWEALTH_LOGO =
-  'https://commonwealth.im/static/img/logo.png';
+  'https://commonwealth.im/static/brand_assets/logo_stacked.png';
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
 export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
 export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
 
-export const DISCORD_BOT_SUCCESS_URL = process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
+export const DISCORD_BOT_SUCCESS_URL =
+  process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
