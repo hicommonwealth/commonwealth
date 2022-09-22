@@ -52,7 +52,7 @@ const Login: m.Component<{}, {
             const stateId = result.result.stateId;
 
             // redirect to axie page for login
-            window.location.href = `https://marketplace.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
+            window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
           } else {
             vnode.state.error = result.error || 'Could not login';
           }
