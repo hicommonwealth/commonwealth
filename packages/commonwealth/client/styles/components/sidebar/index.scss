@@ -11,7 +11,7 @@
   width: $sidebar-width;
 
   @include smallInclusive {
-    width: 100%;
+    width: calc(100vw - 56px);
   }
 
   .buttons-container {

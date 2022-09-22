@@ -7,7 +7,7 @@ enum UpdateTopicErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
   NoAddr = 'Must provide address',
-  NoTopic = 'Must provide topic_name',
+  NoTopic = 'Must provide topic_name or topic_id',
   InvalidAddr = 'Invalid address',
   NoPermission = `You do not have permission to edit post topic`,
 }
@@ -19,9 +19,11 @@ const updateTopic = async (
   next: NextFunction
 ) => {
   if (!req.user) return next(new AppError(UpdateTopicErrors.NoUser));
-  if (!req.body.thread_id) return next(new AppError(UpdateTopicErrors.NoThread));
+  if (!req.body.thread_id)
+    return next(new AppError(UpdateTopicErrors.NoThread));
   if (!req.body.address) return next(new AppError(UpdateTopicErrors.NoAddr));
-  if (!req.body.topic_name) return next(new AppError(UpdateTopicErrors.NoTopic));
+  if (!req.body.topic_name && !req.body.topic_id)
+    return next(new AppError(UpdateTopicErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find(
