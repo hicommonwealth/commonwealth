@@ -33,7 +33,7 @@ export class Footer implements m.ClassComponent {
 
     return (
       <div class="Footer">
-        <img src="/static/img/logo.svg" alt="Commonwealth" />
+        <img src="./512x512.png" alt="Commonwealth" />
         <div class="footer-links-container">
           {footercontents.map((item) => {
             return isNotUndefined(item.redirectTo) ? (
