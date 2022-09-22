@@ -133,6 +133,8 @@ const bulkBalances = async (
       let atLeastOneTokenAddress = false;
 
       // Build token balances for each address
+      // If cannot find contract in our DB, filter it out from query response.
+      // TODO: Can't query for arbitrary until TBC-API goes out, requires BP not passed from Commonbot.
       const tokenContracts = await models.Contract.findAll({
         where: {
           address: { [Op.in]: tokenAddresses },
