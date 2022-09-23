@@ -125,20 +125,25 @@ async function mainProcess(
     );
 
   let query =`
-    SELECT
-      "Chains"."id",
-      "Chains"."substrate_spec",
-      "url",
-      "private_url",
-      "Chains"."address",
-      "Chains"."base",
-      "Chains"."type",
-      "Chains"."network",
-      "Chains"."ce_verbose"
-    FROM "Chains"
-    JOIN "ChainNodes"
-    ON "Chains".chain_node_id = "ChainNodes".id
-    WHERE "Chains"."has_chain_events_listener" = true;
+  SELECT
+    c."id",
+    c."substrate_spec",
+    cn."url",
+    cn."private_url",
+    con.address,
+    c."base",
+    c."type",
+    c."network",
+    c."ce_verbose"
+  FROM "Chains" c 
+  JOIN "ChainNodes" cn
+    ON c.chain_node_id = cn.id
+  LEFT JOIN "CommunityContracts" cc
+    ON cc.chain_id = c.id
+  LEFT JOIN "Contracts" con
+    ON con.chain_node_id = cn.id
+  WHERE c."has_chain_events_listener" = true
+  AND con.type IN ('marlin-testnet', 'aave', 'compound');
   `;
   const allChains = (await pool.query(query)).rows;
 
