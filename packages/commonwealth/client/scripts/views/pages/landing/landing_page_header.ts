@@ -83,8 +83,8 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
             onclick: () => redirectClick('/'),
           }),
           m(CWText, {
-            fontWeight: 'regular',
-            type: 'h3',
+            fontWeight: 'semiBold',
+            type: 'h4',
             // noWarp: true,
           }, 'Commonwealth'),
         ]),
