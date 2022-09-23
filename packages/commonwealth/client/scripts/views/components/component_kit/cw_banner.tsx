@@ -8,7 +8,6 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
-import { renderQuillTextBody } from '../quill/helpers';
 
 type BannerAttrs = {
   bannerContent: string;
