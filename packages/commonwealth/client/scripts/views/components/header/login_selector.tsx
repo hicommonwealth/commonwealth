@@ -21,17 +21,13 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import SelectAddressModal from 'views/modals/select_address_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import {
-  breakpointFnValidator,
-  isWindowMediumSmallInclusive,
-} from '../component_kit/helpers';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
-import { chain } from 'lodash';
+import SelectAddressModal from '../../modals/select_address_modal';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -116,19 +112,29 @@ export class LoginSelectorMenuLeft
           />
         )}
         <Cui.MenuItem
-          onclick={() =>
-            app.modals.create({
-              modal: SelectAddressModal,
-            })
-          }
+          onclick={() => {
+            if (nAccountsWithoutRole > 0) {
+              app.modals.create({
+                modal: SelectAddressModal,
+              });
+            } else {
+              app.modals.create({
+                modal: NewLoginModal,
+                data: {
+                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                    ? 'fullScreen'
+                    : 'centered',
+                  breakpointFn: isWindowMediumSmallInclusive,
+                },
+              });
+            }
+          }}
           label={
             <div class="label-wrap">
               {mobile && <CWIcon iconName="wallet" />}
               <span>
                 {nAccountsWithoutRole > 0
                   ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                  : activeAddressesWithRole.length > 0
-                  ? 'Manage addresses'
                   : 'Connect a new address'}
               </span>
             </div>

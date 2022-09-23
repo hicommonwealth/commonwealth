@@ -8,7 +8,6 @@ import app from 'state';
 import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { NewLoginModal } from '../../modals/login_modal';
-import SelectAddressModal from '../../modals/select_address_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;

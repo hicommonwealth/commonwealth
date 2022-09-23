@@ -32,8 +32,21 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 
   oninit(vnode) {
-    const { modalType } = vnode.attrs;
+    const { modalType, breakpointFn } = vnode.attrs;
     this.modalTypeState = modalType || 'centered';
+
+    if (breakpointFn) {
+      // eslint-disable-next-line no-restricted-globals
+      addEventListener('resize', () =>
+        breakpointFnValidator(
+          this.modalTypeState === 'fullScreen',
+          (state: boolean) => {
+            this.modalTypeState = state ? 'fullScreen' : 'centered';
+          },
+          breakpointFn
+        )
+      );
+    }
   }
 
   onremove(vnode) {
@@ -57,19 +70,6 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
-
-    if (breakpointFn) {
-      // eslint-disable-next-line no-restricted-globals
-      addEventListener('resize', () =>
-        breakpointFnValidator(
-          this.modalTypeState === 'fullScreen',
-          (state: boolean) => {
-            this.modalTypeState = state ? 'fullScreen' : 'centered';
-          },
-          breakpointFn
-        )
-      );
-    }
 
     return (
       <div class={ComponentType.Modal}>

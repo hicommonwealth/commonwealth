@@ -11,6 +11,7 @@ import {
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
@@ -22,7 +23,6 @@ import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -96,6 +96,17 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     if (vnode.attrs.initialWallets) {
       this.wallets = vnode.attrs.initialWallets;
     }
+
+    // eslint-disable-next-line no-restricted-globals
+    addEventListener('resize', () =>
+      breakpointFnValidator(
+        this.showMobile,
+        (state: boolean) => {
+          this.showMobile = state;
+        },
+        isWindowMediumSmallInclusive
+      )
+    );
   }
 
   onremove() {
@@ -113,7 +124,10 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
 
   view(vnode) {
     const { onSuccess } = vnode.attrs;
-    const wcEnabled = _.any(this.wallets, (w) => w instanceof WalletConnectWebWalletController && w.enabled);
+    const wcEnabled = _.any(
+      this.wallets,
+      (w) => w instanceof WalletConnectWebWalletController && w.enabled
+    );
 
     // Handles Magic Link Login
     const handleEmailLoginCallback = async () => {
@@ -318,17 +332,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         }
       }
     };
-
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener('resize', () =>
-      breakpointFnValidator(
-        this.showMobile,
-        (state: boolean) => {
-          this.showMobile = state;
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
 
     return this.showMobile ? (
       <LoginMobile
