@@ -4,7 +4,10 @@ import entities from "./routes/entities";
 import { DB } from "../database/database";
 import viewChainActivity from "./routes/viewChainActivity";
 
-
+/**
+ * Function that creates an Express Router for the ChainEvents app. This function defines all of our apps routes.
+ * @param models {DB}
+ */
 function setupRouter(models: DB): Router {
   const router = Router();
 

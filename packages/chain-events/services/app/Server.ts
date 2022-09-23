@@ -17,6 +17,9 @@ const app = express();
 
 setupPassport();
 
+/**
+ * Entry point for the ChainEvents App
+ */
 async function main() {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));

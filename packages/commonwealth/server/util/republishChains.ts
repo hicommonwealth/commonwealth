@@ -24,7 +24,8 @@ export class RepublishChains extends RepublishFailedMessages<DB> {
     const result = await this._models.Chain.findAll({
       where: {
         queued: {
-          [Sequelize.Op.between]: [0, 5]
+          // TODO:
+          [Sequelize.Op.between]: [-1, 5]
         }
       },
       include: [

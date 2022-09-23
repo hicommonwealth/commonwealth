@@ -11,7 +11,8 @@ export type Ithis = {
 
 /**
  * This function ingests chain-events from the RabbitMQ {@link RascalSubscriptions.ChainEvents} subscription and
- * processes each of them using the given handlers.
+ * processes each of them using the given handlers. Event handlers mainly update the database and republish messages
+ * to other queues.
  * @param event {CWEvent} The chain-event to pass to all the handlers
  */
 export async function processChainEvents(this: Ithis, event: CWEvent) {

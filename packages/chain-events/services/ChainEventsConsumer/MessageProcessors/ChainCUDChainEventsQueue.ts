@@ -15,7 +15,9 @@ export type Ithis = {
 /**
  * This function processes ChainCUD RabbitMQ messages that originate from the 'main' service. This function is passed
  * as the message processor callback to the RabbitMQ Controller and processes messages from the
- * {@link RascalSubscriptions.ChainCUDChainEvents} subscription
+ * {@link RascalSubscriptions.ChainCUDChainEvents} subscription. ChainCUD message includes creating, updating, or
+ * deleting chains and creating ChainNodes. This functions helps ensure that Chains in the main service match the chains
+ * in the ChainEvents service.
  * @param data {TRmqMsgChainCUD} The chain data necessary to execute a specific CUD action
  */
 export async function processChainCUD(
