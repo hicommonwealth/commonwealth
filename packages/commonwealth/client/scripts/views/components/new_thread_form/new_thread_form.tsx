@@ -91,7 +91,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     titleEle.value = draft.title;
     this.form.title = draft.title;
     this.form.topic = app.topics.getByName(draft.topic, draft.chain);
-    this.activeTopic = app.topics.getByName(draft.topic, draft.chain);
+    this.activeTopic = this.form.topic;
     this.fromDraft = draft.id;
 
     localStorage.setItem(
@@ -173,7 +173,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
   }
 
   private _updateTopicState(topic: Topic) {
-    console.log(topic.id, topic.name)
     localStorage.setItem(`${app.activeChainId()}-active-topic`, topic.name);
     this.activeTopic = topic;
     this.form.topic = topic;

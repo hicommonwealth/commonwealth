@@ -253,7 +253,7 @@ class ThreadsController {
       // TODO: Change to POST /thread
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
-        author: JSON.stringify(app.user.activeAccount?.profile),
+        author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
         address,
         title: encodeURIComponent(title),
@@ -295,7 +295,6 @@ class ThreadsController {
       return result;
     } 
     catch (err) {
-      console.log(err.message)
       console.log('Failed to create thread');
       throw new Error(
         err.responseJSON && err.responseJSON.error
