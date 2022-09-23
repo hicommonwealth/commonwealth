@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB, sequelize } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -8,10 +9,10 @@ export const Errors = {
 
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
   if (!req.body['notification_ids[]']) {
-    return next(new Error(Errors.NoNotificationIds));
+    return next(new AppError(Errors.NoNotificationIds));
   }
 
   let idOptions;

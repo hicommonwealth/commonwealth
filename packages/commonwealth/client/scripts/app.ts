@@ -638,6 +638,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
@@ -879,6 +880,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/web3login': importRoute('views/pages/web3login', {
+              scoped: false,
+              deferChain: true,
+            }),
             // Scoped routes
             //
 
@@ -888,12 +893,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
 

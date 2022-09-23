@@ -1092,6 +1092,7 @@ const ViewProposalPage: m.Component<
                         };
                       }),
                       incrementalVoteCast: 1,
+                      isPreview: false,
                       tooltipErrorMessage: app.user.activeAccount
                         ? null
                         : 'You must join this community to vote.',
@@ -1122,7 +1123,7 @@ const ViewProposalPage: m.Component<
                   }),
               ]),
           ]),
-        m(`.view-proposal-body ${sidebarCheck && '.hasSidebar'}`, [
+        m(`.view-proposal-body${sidebarCheck ? ' .hasSidebar' : ''}`, [
           m('.view-proposal-content-container', [
             m(ProposalHeader, {
               proposal,

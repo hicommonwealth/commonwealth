@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -11,7 +12,7 @@ export const Errors = {
 
 const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const { thread_id } = req.body;
 
   const thread = await models.Thread.findOne({
@@ -19,7 +20,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
       id: thread_id,
     },
   });
-  if (!thread) return next(new Error(Errors.NoThread));
+  if (!thread) return next(new AppError(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified).map((addr) => addr.id);
   if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
@@ -32,7 +33,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
     });
-    if (!role) return next(new Error(Errors.NotAdminOrOwner));
+    if (!role) return next(new AppError(Errors.NotAdminOrOwner));
   }
 
   const chain_entity_ids = typeof req.body['chain_entity_id[]'] === 'string' ? [req.body['chain_entity_id[]']]
@@ -58,7 +59,7 @@ const updateThreadLinkedChainEntities = async (models: DB, req: Request, res: Re
   });
   for (let i = 0; i < entitiesToSet.length; i++) {
     if (entitiesToSet[i].thread_id) {
-      return next(new Error(Errors.ChainEntityAlreadyHasThread));
+      return next(new AppError(Errors.ChainEntityAlreadyHasThread));
     }
     entitiesToSet[i].thread_id = thread_id;
     await entitiesToSet[i].save();

@@ -1,0 +1,28 @@
+@import 'shared';
+
+.Breadcrumbs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+
+  .current-text.Text {
+    color: $neutral-600;
+  }
+
+  .separator-text.Text {
+    color: $neutral-400;
+  }
+
+  .parent-text.Text {
+    color: $neutral-400;
+
+    &:hover {
+      color: $primary-300;
+    }
+
+    &:active {
+      color: $primary-500;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import validateChain from '../../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from '../../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,12 +20,12 @@ const deleteDraft = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   if (!req.body.id) {
-    return next(new Error(Errors.NoId));
+    return next(new AppError(Errors.NoId));
   }
 
   try {
@@ -38,7 +39,7 @@ const deleteDraft = async (
       },
     });
     if (!draft) {
-      return next(new Error(Errors.NotFound));
+      return next(new AppError(Errors.NotFound));
     }
     await draft.destroy();
     return res.json({ status: 'Success' });
