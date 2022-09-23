@@ -3,6 +3,7 @@ import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
@@ -73,13 +74,20 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
           class: `landing-header ${INITIAL_HEADER_STYLE}     mt-8`,
         },
         [
-          m(CWIcon, {
+          m('.Logo-Name', [
+            m(CWIcon, {
             iconName: 'commonLogo',
             iconSize: 'xxl',
             alt: 'Commonwealth',
             style: m.route.get() === '/' ? '' : 'cursor:pointer',
             onclick: () => redirectClick('/'),
           }),
+          m(CWText, {
+            fontWeight: 'regular',
+            type: 'h3',
+            // noWarp: true,
+          }, 'Commonwealth'),
+        ]),
           m(
             'nav',
             { class: 'lg:block hidden' },

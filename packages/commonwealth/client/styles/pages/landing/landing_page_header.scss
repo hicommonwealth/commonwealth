@@ -12,6 +12,11 @@
   }
 }
 
+.Logo-Name {
+  display: flex; 
+  align-items: center;
+}
+
 .menuOpen {
   position: fixed;
   top: 0;
