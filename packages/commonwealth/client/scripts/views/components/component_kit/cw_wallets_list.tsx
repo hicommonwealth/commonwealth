@@ -39,7 +39,10 @@ const LinkAccountItem: m.Component<
     const address = app.chain
       ? addressSwapper({
           address: account.address,
-          currentPrefix: (app.chain as Substrate).chain.ss58Format,
+          currentPrefix: parseInt(
+            (app.chain as Substrate)?.meta.ss58Prefix,
+            10
+          ),
         })
       : account.address;
     const baseName = app.chain?.meta.base || walletChain;
@@ -165,12 +168,25 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
     async function handleNormalWalletLogin(wallet, address) {
       if (app.isLoggedIn()) {
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
-          address,
+          address:
+            wallet.chain === ChainBase.Substrate
+              ? addressSwapper({
+                  address,
+                  currentPrefix: parseInt(
+                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    10
+                  ),
+                })
+              : address,
           chain: app.activeChainId() ?? wallet.chain,
           jwt: app.user.jwt,
         });
         if (result.exists && result.belongsToUser) {
           notifyInfo('This address is already linked to your current account.');
+          return;
+        }
+        if (result.exists) {
+          notifyInfo('This address is already linked to another account.');
           return;
         }
       }

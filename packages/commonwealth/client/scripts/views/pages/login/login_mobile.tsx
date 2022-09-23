@@ -156,6 +156,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                   label="email address"
                   placeholder="your-email@email.com"
                   oninput={handleSetEmail}
+                  onenterkey={handleEmailLoginCallback}
                 />
               ) : (
                 <Spinner active={true} size="xl" position="inherit" />
