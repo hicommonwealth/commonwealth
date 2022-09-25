@@ -200,37 +200,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  // proposal-meta
-  .ProposalHeaderStage,
-  .ProposalHeaderTopics,
-  .ProposalHeaderOnchainId,
-  .ProposalHeaderOnchainStatus,
-  .ProposalBodyAuthor,
-  .ProposalBodyCreated,
-  .ProposalBodyLastEnded,
-  .ProposalBodyDelete,
-  .ProposalBodyEdit,
-  .ProposalBodyDelete,
-  .ProposalBodyCancelEdit,
-  .ProposalBodySaveEdit,
-  .ViewCountBlock,
-  .ProposalHeaderExternalLink {
-    font-size: $discussion-meta-font-size;
-    display: inline-block;
-    color: $discussion-meta-color;
-    > a:link,
-    > a:visited,
-    a.proposal-collaborators,
-    > .User a.user-display-name {
-      color: $discussion-meta-color;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
   .ProposalSocialHeader {
     font-size: $discussion-meta-font-size;
     display: inline-block;
@@ -256,41 +225,6 @@ $discussion-title-font-size: 1.45rem;
 
     svg:hover {
       stroke: $neutral-500;
-    }
-  }
-
-  .ProposalTitleEditor {
-    .ProposalTitleSaveEdit {
-      font-size: $discussion-meta-font-size;
-      color: $discussion-meta-color;
-    }
-
-    .cui-input {
-      margin-right: 10px;
-    }
-
-    .proposal-title-buttons {
-      display: inline-flex;
-      position: relative;
-      bottom: 5px;
-
-      .ProposalTitleCancelEdit {
-        margin-left: 5px;
-      }
-    }
-  }
-
-  .ProposalHeaderStage {
-    &.primary {
-      color: $primary-500;
-    }
-
-    &.positive {
-      color: $green-500;
-    }
-
-    &.negative {
-      color: $rorange-500;
     }
   }
 

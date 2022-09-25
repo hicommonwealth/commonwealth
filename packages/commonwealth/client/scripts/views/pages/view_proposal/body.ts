@@ -446,12 +446,6 @@ export const ProposalBodySaveEdit: m.Component<{
   },
 };
 
-export const ProposalBodySpacer: m.Component<{}> = {
-  view: (vnode) => {
-    return m('.ProposalBodySpacer', m.trust('&middot;'));
-  },
-};
-
 const formatBody = (vnode, updateCollapse) => {
   const { item } = vnode.attrs;
   if (!item) return;

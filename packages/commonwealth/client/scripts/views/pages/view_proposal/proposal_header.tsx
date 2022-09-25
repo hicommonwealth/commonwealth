@@ -30,7 +30,7 @@ import {
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
   ProposalLinkEditor,
-} from './header';
+} from './proposal_header_components';
 import {
   GlobalStatus,
   ProposalBodyAvatar,
