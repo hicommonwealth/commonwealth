@@ -311,7 +311,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const saveProfileInfoCallback = async () => {
       const data = {
         name: this.username,
-        avatar_url: this.avatarUrl,
+        avatarUrl: this.avatarUrl,
       };
       try {
         await app.profiles.updateProfileForAccount(this.primaryAccount, data);
