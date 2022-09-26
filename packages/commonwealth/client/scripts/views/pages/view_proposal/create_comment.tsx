@@ -17,19 +17,18 @@ import { notifyError } from 'controllers/app/notifications';
 import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { GlobalStatus } from './body';
-import { IProposalPageState } from '.';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
+import { ProposalPageState, GlobalStatus } from './types';
 
 type CreateCommmentAttrs = {
   callback: CallableFunction;
   cancellable?: boolean;
   getSetGlobalEditingStatus: CallableFunction;
   parentComment?: Comment<any>;
-  proposalPageState: IProposalPageState;
+  proposalPageState: ProposalPageState;
   rootProposal: AnyProposal | Thread;
   tabindex?: number;
 };

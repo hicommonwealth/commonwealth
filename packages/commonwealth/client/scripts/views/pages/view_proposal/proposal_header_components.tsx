@@ -14,8 +14,6 @@ import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import { Thread, ThreadStage, AnyProposal } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { activeQuillEditorHasText, GlobalStatus } from './body';
-import { IProposalPageState } from '.';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import {
   getStatusClass,
@@ -25,6 +23,8 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { GlobalStatus, ProposalPageState } from './types';
+import { activeQuillEditorHasText } from './helpers';
 
 export class ProposalHeaderStage
   implements m.ClassComponent<{ proposal: Thread }>
@@ -158,7 +158,7 @@ export class ProposalTitleEditMenuItem
   implements
     m.ClassComponent<{
       item: AnyProposal;
-      proposalPageState: IProposalPageState;
+      proposalPageState: ProposalPageState;
       getSetGlobalEditingStatus: CallableFunction;
       parentState;
     }>

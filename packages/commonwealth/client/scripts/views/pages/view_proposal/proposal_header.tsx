@@ -60,9 +60,9 @@ import {
   CancelButton,
 } from '../../components/proposals/voting_actions_components';
 import { QuillEditor } from '../../components/quill/quill_editor';
-import { IProposalPageState, scrollToForm } from '.';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { GlobalStatus } from './types';
+import { GlobalStatus, ProposalPageState } from './types';
+import { scrollToForm } from './helpers';
 
 export class ProposalHeader
   implements
@@ -70,7 +70,7 @@ export class ProposalHeader
       commentCount: number;
       viewCount: number;
       getSetGlobalEditingStatus: CallableFunction;
-      proposalPageState: IProposalPageState;
+      proposalPageState: ProposalPageState;
       proposal: AnyProposal | Thread;
       isAuthor: boolean;
       isEditor: boolean;
