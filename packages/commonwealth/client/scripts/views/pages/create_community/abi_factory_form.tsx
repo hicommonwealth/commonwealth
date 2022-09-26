@@ -9,7 +9,6 @@ import 'pages/abi_factory_form.scss';
 import { Contract } from 'models';
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import EthereumChain from 'controllers/chain/ethereum/chain';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
