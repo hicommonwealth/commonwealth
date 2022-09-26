@@ -12,13 +12,11 @@ module.exports = {
       type: Sequelize.BOOLEAN,
       allowNull: true,
       defaultValue: 'false',
-      after: 'default_summary_view',
     });
 
     await queryInterface.addColumn('Contracts', 'nickname', {
       type: Sequelize.STRING,
       allowNull: true,
-      before: 'address'
     });
   },
 
