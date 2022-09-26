@@ -473,43 +473,41 @@ export class ProposalBodyText
       );
     };
 
-    return (
-      <div>
-        {() => {
-          try {
-            const doc = JSON.parse(body);
-            if (!doc.ops) throw new Error();
-            if (
-              doc.ops.length === 1 &&
-              doc.ops[0] &&
-              typeof doc.ops[0].insert === 'string' &&
-              doc.ops[0].insert.trim() === ''
-            ) {
-              return getPlaceholder();
-            }
+    const text = () => {
+      try {
+        const doc = JSON.parse(body);
+        if (!doc.ops) throw new Error();
+        if (
+          doc.ops.length === 1 &&
+          doc.ops[0] &&
+          typeof doc.ops[0].insert === 'string' &&
+          doc.ops[0].insert.trim() === ''
+        ) {
+          return getPlaceholder();
+        }
 
-            return (
-              <QuillFormattedText
-                doc={doc}
-                cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
-                collapse={false}
-                hideFormatting={false}
-              />
-            );
-          } catch (e) {
-            if (body?.toString().trim() === '') {
-              return getPlaceholder();
-            }
-            return (
-              <MarkdownFormattedText
-                doc={body}
-                cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
-              />
-            );
-          }
-        }}
-      </div>
-    );
+        return (
+          <QuillFormattedText
+            doc={doc}
+            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+            collapse={false}
+            hideFormatting={false}
+          />
+        );
+      } catch (e) {
+        if (body?.toString().trim() === '') {
+          return getPlaceholder();
+        }
+        return (
+          <MarkdownFormattedText
+            doc={body}
+            cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+          />
+        );
+      }
+    };
+
+    return <div>{text()}</div>;
   }
 }
 
