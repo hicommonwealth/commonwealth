@@ -37,6 +37,9 @@ class ContractsController {
   public getByType(type: string) {
     return this._store.getContractByType(type);
   }
+  public getContractFactories() {
+    return this._store.getContractFactories();
+  }
   public getByCommunity(communityId: string) {
     return this._store.getContractByCommunity(communityId);
   }

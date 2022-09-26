@@ -13,6 +13,8 @@ class Contract {
   public readonly symbol?: string;
   public readonly abi?: string;
   public readonly community?: string;
+  public readonly isFactory?: boolean;
+  public readonly nickname?: string;
 
   constructor(
     id,
@@ -25,7 +27,9 @@ class Contract {
     tokenName?,
     symbol?,
     contractAbi?,
-    community?
+    community?,
+    isFactory?,
+    nickname?,
   ) {
     this.id = id;
     this.address = address;
@@ -38,6 +42,8 @@ class Contract {
     this.symbol = symbol;
     this.abi = contractAbi;
     this.community = community;
+    this.isFactory = isFactory;
+    this.nickname = nickname;
   }
 
   public static fromJSON({
@@ -52,6 +58,8 @@ class Contract {
     symbol,
     contract_abi,
     community,
+    is_factory,
+    nickname,
   }) {
     return new Contract(
       id,
@@ -65,6 +73,8 @@ class Contract {
       symbol,
       contract_abi,
       community,
+      is_factory,
+      nickname,
     );
   }
 }

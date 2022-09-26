@@ -14,6 +14,11 @@ class ContractsStore extends IdStore<Contract> {
         return this.getAll().filter((c) => c.community === community);
     }
 
+    public getContractFactories(): Array<Contract> {
+        // filter through the _storeId map for all contracts that are factories
+        return this.getAll().filter((c) => c.isFactory === true);
+    }
+
     public getContractByAddress(address: string): Contract {
         // filter through the _storeId map for a contract with a specified address
         const contracts = this.getAll().filter((c) => c.address === address);
