@@ -14,6 +14,8 @@ export type ContractAttributes = {
   token_name?: string;
   symbol?: string;
   type: string;
+  is_factory?: boolean;
+  nickname?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;
