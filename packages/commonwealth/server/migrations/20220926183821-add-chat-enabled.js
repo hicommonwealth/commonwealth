@@ -25,8 +25,6 @@ module.exports = {
         { transcation: t }
       );
     });
-
-    // set chat_enabled to false for chains with id=axie-infinity
   },
 
   down: async (queryInterface, Sequelize) => {
