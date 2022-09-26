@@ -58,7 +58,6 @@ export class RolesController {
     community?: string;
   }): JQueryPromise<void> {
     // TODO: Change to POST /role
-    console.log('options: ', { options });
     return $.post('/api/createRole', {
       jwt: this.User.jwt,
       address_id: options.address.id,
