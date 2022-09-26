@@ -25,6 +25,7 @@ import Sublayout from '../../sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { AddContractForm } from '../new_contract/add_contract_form';
+import { AbiFactoryForm } from './abi_factory_form';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -35,7 +36,7 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
-  AddContract = 'Add Contract',
+  AbiFactory = 'Abi Factory',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -111,8 +112,8 @@ class CreateCommunity implements m.ClassComponent {
           );
         case CommunityType.SplToken:
           return <SplTokenForm />;
-        case CommunityType.AddContract:
-          return <AddContractForm ethChains={ethChains} ethChainNames={ethChainNames} />;
+        case CommunityType.AbiFactory:
+          return <AbiFactoryForm ethChains={ethChains} ethChainNames={ethChainNames} />;
         default:
           throw new Error(`Invalid community type: ${this.state.activeForm}`);
       }
