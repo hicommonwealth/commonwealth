@@ -139,7 +139,6 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
 
     return (
       <div class="CreateCommunityForm">
-        {...ethChainRows(vnode.attrs, this.state.form)}
         <SelectRow
           title="DAO Type"
           options={[ChainNetwork.Aave, ChainNetwork.Compound]}
