@@ -135,6 +135,10 @@ header {
 }
 
 header {
+  .logoWithText {
+    max-height: 38px;
+  }
+
   @include small {
     border-radius: 33px;
     &.fixed-header {
