@@ -3,6 +3,16 @@ import { Contract } from '../models';
 
 // Models a store of all the contracts
 class ContractsStore extends IdStore<Contract> {
+    public getContractByNickname(nickname: string): Contract {
+        // filter through the _storeId map for a contract with a specified nickname
+        const contracts = this.getAll().filter((c) => c.nickname === nickname);
+        if (contracts.length > 0) {
+            return contracts[0];
+        } else {
+            console.log("No contract found with nickname: ", nickname);
+            return null;
+        }
+    }
 
     public getContractByType(type: string): Array<Contract> {
         // filter through the _storeId map for all contracts with a specified type

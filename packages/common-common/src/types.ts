@@ -76,12 +76,6 @@ export enum ChainCategoryType {
   DAO = 'DAO',
 }
 
-export enum DaoFactoryType {
-  GnosisSafe = 'gnosis-safe',
-  PartyBid = 'partybid',
-  NounsBuilder = 'nouns-builder',
-}
-
 // TODO: remove many of these chain networks, esp substrate (make them all "Substrate"),
 // and just use id to identify specific chains for conditionals
 export enum ChainNetwork {

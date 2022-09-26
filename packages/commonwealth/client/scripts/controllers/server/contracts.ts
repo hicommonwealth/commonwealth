@@ -28,6 +28,9 @@ class ContractsController {
   public get initialized() {
     return this._initialized;
   }
+  public getByNickname(nickname: string) {
+    return this._store.getContractByNickname(nickname);
+  }
   public getByIdentifier(id) {
     return this._store.getById(id);
   }

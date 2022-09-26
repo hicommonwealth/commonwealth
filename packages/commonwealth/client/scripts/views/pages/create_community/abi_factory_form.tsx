@@ -8,7 +8,7 @@ import 'pages/abi_factory_form.scss';
 
 import { Contract } from 'models';
 import app from 'state';
-import { ChainBase, ChainNetwork, DaoFactoryType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -31,6 +31,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
+import { parseFunctionsFromABI } from 'helpers/abi_utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -42,7 +43,7 @@ type EthDaoFormFields = {
 
 type CreateFactoryDaoForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
-  daoFactoryType: DaoFactoryType;
+  daoFactoryType: string;
 };
 
 type CreateFactoryEthDaoForm = ChainFormFields &
@@ -65,7 +66,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
-      daoFactoryType: null,
+      daoFactoryType: '',
       address: '',
       chainString: 'Ethereum Mainnet',
       ethChainId: 1,
@@ -86,9 +87,12 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
-    const loadFactoryContracts = () => {
-      const contracts: Contract[] = app.contracts.store.getContractFactories();
-      return contracts;
+    const loadContractAbi = () => {
+        const { contractAddress } = vnode.attrs;
+        const contract: Contract =
+          app.contracts.store.getContractByNickname(contractAddress);
+        const abiFunctions = parseFunctionsFromABI(contract.abi);
+        return abiFunctions;
     };
 
     const { contractAddress } = vnode.attrs;
@@ -103,10 +107,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     }
 
     return (
-      <div class="CreateCommunityForm">
+      <div class="CreateDaoFromFactoryForm">
         <SelectRow
           title="DAO Type"
-          options={[DaoFactoryType.GnosisSafe, DaoFactoryType.PartyBid, DaoFactoryType.NounsBuilder]}
+          options={app.contracts.store.getContractFactories().map(contract => contract.nickname)}
           value={this.state.form.daoFactoryType}
           onchange={(value) => {
             this.state.form.daoFactoryType = value;
@@ -115,7 +119,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         />
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
-          <CWText>Contract Address: {contractAddress}</CWText>
+          <CWText>Selected Dao Factory: {this.state.form.daoFactoryType}</CWText>
           <div class="functions-container">
             <div class="header-row">
               <CWText>Name</CWText>

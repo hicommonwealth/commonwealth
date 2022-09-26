@@ -20,7 +20,7 @@ import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
   getEtherscanABI,
-} from '../../../helpers/abi_utils';
+} from 'helpers/abi_utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
