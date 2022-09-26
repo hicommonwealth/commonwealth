@@ -18,6 +18,7 @@ module.exports = {
     await queryInterface.addColumn('Contracts', 'nickname', {
       type: Sequelize.STRING,
       allowNull: true,
+      before: 'address'
     });
   },
 
