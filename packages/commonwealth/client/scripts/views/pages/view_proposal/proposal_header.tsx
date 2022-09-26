@@ -30,21 +30,21 @@ import {
   ProposalTitleEditor,
   ProposalTitleEditMenuItem,
   ProposalLinkEditor,
+  EditCollaboratorsButton,
+  ProposalBodyAuthor,
+  ProposalBodyAvatar,
+  ProposalBodyCancelEdit,
+  ProposalBodyCreated,
+  ProposalBodyDeleteMenuItem,
+  ProposalBodyEditMenuItem,
+  ProposalBodyLastEdited,
+  ProposalBodySaveEdit,
 } from './proposal_header_components';
 import {
-  ProposalBodyAvatar,
-  ProposalBodyAuthor,
-  ProposalBodyCreated,
-  ProposalBodyLastEdited,
-  ProposalBodyCancelEdit,
-  ProposalBodySaveEdit,
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyEditMenuItem,
-  ProposalBodyDeleteMenuItem,
-  EditCollaboratorsButton,
-} from './body';
+} from './proposal_body_components';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';

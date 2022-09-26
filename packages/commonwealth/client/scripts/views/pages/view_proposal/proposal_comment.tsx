@@ -11,24 +11,26 @@ import { slugify } from 'utils';
 import { Thread, Comment, AnyProposal } from 'models';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import {
-  ProposalBodyAvatar,
-  ProposalBodyAuthor,
-  ProposalBodyCreated,
-  ProposalBodyLastEdited,
-  ProposalBodyCancelEdit,
-  ProposalBodySaveEdit,
   ProposalBodyText,
   ProposalBodyAttachments,
   ProposalBodyEditor,
-  ProposalBodyEditMenuItem,
-  ProposalBodyDeleteMenuItem,
-} from './body';
+} from './proposal_body_components';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { GlobalStatus, ProposalPageState } from './types';
 import { scrollToForm } from './helpers';
+import {
+  ProposalBodyAvatar,
+  ProposalBodyAuthor,
+  ProposalBodyCreated,
+  ProposalBodyLastEdited,
+  ProposalBodyEditMenuItem,
+  ProposalBodyDeleteMenuItem,
+  ProposalBodySaveEdit,
+  ProposalBodyCancelEdit,
+} from './proposal_header_components';
 
 export class ProposalComment
   implements
