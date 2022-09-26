@@ -36,52 +36,51 @@ export class TipDetail
 
     const contributors = proposal.getVotes();
 
-    return m(
-      Sublayout,
-      {
-        showNewProposalButton: true,
-        title: headerTitle,
-      },
-      [
-        m('.TipDetailPage', [
-          m('.tip-details', [
-            m('.title', title),
-            m('.proposal-page-row', [
-              m('.label', 'Finder'),
-              m(User, {
+    return (
+      <Sublayout showNewProposalButton title={headerTitle}>
+        <div class="TipDetail">
+          <div class="tip-details">
+            <div class="title">{title}</div>
+            <div class="proposal-page-row">
+              <div class="label">Finder</div>
+              {m(User, {
                 user: author,
                 linkify: true,
                 popover: true,
                 showAddressWithDisplayName: true,
-              }),
-            ]),
-            m('.proposal-page-row', [
-              m('.label', 'Beneficiary'),
-              m(User, {
+              })}
+            </div>
+            <div class="proposal-page-row">
+              <div class="label">Beneficiary</div>
+              {m(User, {
                 user: app.profiles.getProfile(proposal.author.chain.id, who),
                 linkify: true,
                 popover: true,
                 showAddressWithDisplayName: true,
-              }),
-            ]),
-            m('.proposal-page-row', [
-              m('.label', 'Reason'),
-              m('.tip-reason', [m(MarkdownFormattedText, { doc: reason })]),
-            ]),
-            m('.proposal-page-row', [
-              m('.label', 'Amount'),
-              m('.amount', [
-                m('.denominator', proposal.support.denom),
-                m('', proposal.support.inDollars),
-              ]),
-            ]),
-          ]),
-          m('.tip-contributions', [
-            proposal.canVoteFrom(app.user.activeAccount as SubstrateAccount) &&
-              m('.contribute', [
-                m('.title', 'Contribute'),
-                m('.mb-12', [
-                  m('.label', 'Amount'),
+              })}
+            </div>
+            <div class="proposal-page-row">
+              <div class="label">Reason</div>
+              <div class="tip-reason">
+                <MarkdownFormattedText doc={reason} />
+              </div>
+            </div>
+            <div class="proposal-page-row">
+              <div class="label">Amount</div>
+              <div class="amount">
+                <div class="denominator">{proposal.support.denom}</div>
+                <div>{proposal.support.inDollars}</div>
+              </div>
+            </div>
+          </div>
+          <div class="tip-contributions">
+            {proposal.canVoteFrom(
+              app.user.activeAccount as SubstrateAccount
+            ) && (
+              <div class="contribute">
+                <div class="title">Contribute</div>
+                <div class="mb-12">
+                  <div class="label">Amount</div>
                   <CWTextInput
                     name="amount"
                     placeholder="Enter tip amount"
@@ -94,8 +93,8 @@ export class TipDetail
                       );
                       m.redraw();
                     }}
-                  />,
-                ]),
+                  />
+                </div>
                 <CWButton
                   disabled={tipAmount === undefined}
                   label="Submit Transaction"
@@ -110,28 +109,31 @@ export class TipDetail
                       )
                     );
                   }}
-                />,
-              ]),
-            contributors.length > 0 && [
-              m('.contributors .title', 'Contributors'),
-              contributors.map(({ account, deposit }) =>
-                m('.contributors-row', [
-                  m('.amount', [
-                    m('.denominator', deposit.denom),
-                    m('', deposit.inDollars),
-                  ]),
-                  m(User, {
-                    user: account,
-                    linkify: true,
-                    popover: true,
-                    showAddressWithDisplayName: true,
-                  }),
-                ])
-              ),
-            ],
-          ]),
-        ]),
-      ]
+                />
+              </div>
+            )}
+            {contributors.length > 0 && (
+              <>
+                <div class="contributors title">Contributors</div>
+                {contributors.map(({ account, deposit }) => (
+                  <div class="contributors-row">
+                    <div class="amount">
+                      <div class="denominator">{deposit.denom}</div>
+                      <div>{deposit.inDollars}</div>
+                    </div>
+                    {m(User, {
+                      user: account,
+                      linkify: true,
+                      popover: true,
+                      showAddressWithDisplayName: true,
+                    })}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </Sublayout>
     );
   }
 }
