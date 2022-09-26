@@ -97,7 +97,7 @@ export class NotificationsMenu
 
     return (
       <CWPopoverMenu
-        class="NotificationsMenu"
+        className="NotificationsMenu"
         closeOnContentClick={true}
         closeOnOutsideClick={true}
         hasArrow={false}

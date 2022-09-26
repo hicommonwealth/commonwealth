@@ -18,6 +18,7 @@ import { TooltipType } from './cw_tooltip';
 export type PopoverInteractionType = 'click' | 'hover';
 
 export type SharedPopoverAttrs = {
+  className?: string;
   hoverCloseDelay?: number;
   hoverOpenDelay?: number;
   interactionType?: PopoverInteractionType;

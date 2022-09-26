@@ -69,12 +69,19 @@ type PopoverMenuAttrs = {
 
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
   view(vnode) {
-    const { popoverMenuItems, trigger } = vnode.attrs;
+    const { className, popoverMenuItems, trigger } = vnode.attrs;
 
     return (
       <CWPopover
         content={
-          <div class={ComponentType.PopoverMenu}>{popoverMenuItems}</div>
+          <div
+            class={getClasses<{ className?: string }>(
+              { className },
+              ComponentType.PopoverMenu
+            )}
+          >
+            {popoverMenuItems}
+          </div>
         }
         interactionType="click"
         trigger={trigger}

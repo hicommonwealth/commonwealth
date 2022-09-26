@@ -135,7 +135,7 @@ const dispatchHooks = async (
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
-  excludedAddrs.push(finalThread.Address.address);
+  // excludedAddrs.push(finalThread.Address.address);
 
   // dispatch notifications to subscribers of the given chain
   models.Subscription.emitNotifications(

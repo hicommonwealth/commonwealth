@@ -3,8 +3,8 @@
 import m from 'mithril';
 
 import app from 'state';
-import { pluralize } from 'helpers';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import { FeedbackModal } from '../../modals/feedback_modal';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import {
   CWPopoverMenu,
@@ -38,12 +38,14 @@ export class HelpMenu implements m.ClassComponent {
           <>
             <CWPopoverMenuItem
               label="Send Feedback"
-              onclick={() => app.modals.create({ modal: ConfirmInviteModal })}
+              onclick={() => app.modals.create({ modal: FeedbackModal })}
             />
-            <CWPopoverMenuItem type="Divider" />
+            <CWPopoverMenuItem type="divider" />
             <CWPopoverMenuItem
               label="Help"
-              onclick={() => app.modals.create({ modal: ConfirmInviteModal })}
+              onclick={() =>
+                m.route.set('https://docs.commonwealth.im/commonwealth/')
+              }
             />
           </>
         }
