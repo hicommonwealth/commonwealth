@@ -32,6 +32,7 @@ export class InvitesMenu implements m.ClassComponent {
 
     return (
       <PopoverMenu
+        className="InvitesMenu"
         hasArrow={false}
         transitionDuration={0}
         hoverCloseDelay={0}

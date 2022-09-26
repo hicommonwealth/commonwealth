@@ -29,6 +29,7 @@ export class SublayoutHeaderRight
         {showNewProposalButton && (
           <NewProposalButton fluid={false} threadOnly={!chain} />
         )}
+        <HelpMenu />
         {app.isLoggedIn() && <NotificationsMenu />}
         {app.isLoggedIn() && <InvitesMenu />}
         <InvitesMenu />
