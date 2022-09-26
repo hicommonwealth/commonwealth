@@ -47,8 +47,6 @@ export class ProposalHeaderStage
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (proposal.stage === ThreadStage.Discussion) return;
 
     return (
       <CWText
@@ -81,24 +79,19 @@ export class ProposalHeaderStage
 export class ProposalHeaderTopics
   implements
     m.ClassComponent<{
-      proposal: AnyProposal | Thread;
+      proposalTopic: string;
     }>
 {
   view(vnode) {
-    const { proposal } = vnode.attrs;
-    if (!proposal) return;
-    if (!(proposal instanceof Thread)) return;
-    if (!proposal.topic) return;
+    const { proposalTopic } = vnode.attrs;
 
     return (
       <CWText
         onclick={() =>
-          m.route.set(
-            `/${app.activeChainId()}/discussions/${proposal.topic.name}`
-          )
+          m.route.set(`/${app.activeChainId()}/discussions/${proposalTopic}`)
         }
       >
-        {proposal.topic?.name}
+        {proposalTopic}
       </CWText>
     );
   }
@@ -112,8 +105,6 @@ export class ProposalHeaderTitle
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
-
-    if (!proposal) return;
 
     return (
       <div class="ProposalHeaderTitle">
@@ -133,7 +124,6 @@ export class ProposalHeaderOnchainId
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
-    if (!proposal) return;
 
     return (
       <CWText>
@@ -152,7 +142,6 @@ export class ProposalHeaderOnchainStatus
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
-    if (!proposal) return;
 
     return (
       <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
@@ -175,16 +164,14 @@ export class ProposalHeaderViewCount
 export class ProposalTitleEditMenuItem
   implements
     m.ClassComponent<{
-      item: AnyProposal;
       proposalPageState: ProposalPageState;
       getSetGlobalEditingStatus: CallableFunction;
       parentState;
     }>
 {
   view(vnode) {
-    const { item, getSetGlobalEditingStatus, proposalPageState, parentState } =
+    const { getSetGlobalEditingStatus, proposalPageState, parentState } =
       vnode.attrs;
-    if (!item) return;
 
     return (
       <MenuItem
@@ -196,12 +183,16 @@ export class ProposalTitleEditMenuItem
               const confirmed = await confirmationModalWithText(
                 'Unsubmitted replies will be lost. Continue?'
               )();
+
               if (!confirmed) return;
             }
+
             proposalPageState.replying = false;
+
             proposalPageState.parentCommentId = null;
           }
           parentState.editing = true;
+
           getSetGlobalEditingStatus(GlobalStatus.Set, true);
         }}
       />
@@ -221,8 +212,6 @@ export class ProposalTitleSaveEdit
   view(vnode) {
     const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
 
-    if (!proposal) return;
-
     const proposalLink = getProposalUrlPath(
       proposal.slug,
       `${proposal.identifier}-${slugify(proposal.title)}`
@@ -234,7 +223,9 @@ export class ProposalTitleSaveEdit
         disabled={parentState.saving}
         onclick={(e) => {
           e.preventDefault();
+
           parentState.saving = true;
+
           app.chain.chainEntities
             .updateEntityTitle(
               proposal.uniqueIdentifier,
@@ -242,11 +233,17 @@ export class ProposalTitleSaveEdit
             )
             .then(() => {
               m.route.set(proposalLink);
+
               parentState.editing = false;
+
               parentState.saving = false;
+
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
+
               proposal.title = parentState.updatedTitle;
+
               m.redraw();
+
               notifySuccess('Thread successfully edited');
             });
         }}
@@ -296,8 +293,6 @@ export class ProposalTitleEditor
   view(vnode) {
     const { item, parentState, getSetGlobalEditingStatus } = vnode.attrs;
 
-    if (!item) return;
-
     const isThread = item instanceof Thread;
 
     return (
@@ -331,7 +326,6 @@ export class ProposalTitleEditor
 export class ProposalLinkEditor
   implements
     m.ClassComponent<{
-      item: Thread | AnyProposal;
       parentState;
     }>
 {
@@ -340,8 +334,7 @@ export class ProposalLinkEditor
   }
 
   view(vnode) {
-    const { item, parentState } = vnode.attrs;
-    if (!item) return;
+    const { parentState } = vnode.attrs;
 
     return (
       <CWTextInput
@@ -359,14 +352,12 @@ export class ProposalLinkEditor
 export class ProposalHeaderPrivacyMenuItems
   implements
     m.ClassComponent<{
-      proposal: AnyProposal | Thread;
+      proposal: Thread;
       getSetGlobalEditingStatus: CallableFunction;
     }>
 {
   view(vnode) {
     const { proposal, getSetGlobalEditingStatus } = vnode.attrs;
-    if (!proposal) return;
-    if (!(proposal instanceof Thread)) return;
 
     return (
       <MenuItem
@@ -396,7 +387,7 @@ export class ProposalBodyAuthor
 {
   view(vnode) {
     const { item } = vnode.attrs;
-    if (!item) return;
+
     if (!item.author) return;
 
     // Check for accounts on forums that originally signed up on a different base chain,
@@ -410,7 +401,6 @@ export class ProposalBodyAuthor
         item.authorChain !== app.chain.base
       ) {
         return m(AnonymousUser, {
-          // hideAvatar: true,
           distinguishingKey: item.author,
         });
       }
@@ -429,7 +419,6 @@ export class ProposalBodyAuthor
           user: author,
           popover: true,
           linkify: true,
-          // hideAvatar: true,
           showAddressWithDisplayName: true,
         })}
         {item instanceof Thread &&
@@ -470,8 +459,9 @@ export class ProposalBodyCreated
 {
   view(vnode) {
     const { item, link } = vnode.attrs;
-    if (!item) return;
+
     if (!item.createdAt) return;
+
     const isThread = item instanceof Thread;
 
     if (item instanceof Thread || item instanceof Comment) {
@@ -480,9 +470,13 @@ export class ProposalBodyCreated
           href={isThread ? `${link}?comment=body` : link}
           onclick={(e) => {
             e.preventDefault();
+
             const target = isThread ? `${link}?comment=body` : link;
+
             if (target === document.location.href) return;
+
             history.replaceState(history.state, '', target);
+
             jumpHighlightComment(isThread ? 'body' : item.id, false, 500);
           }}
         >
@@ -503,8 +497,9 @@ export class ProposalBodyLastEdited
 {
   view(vnode) {
     const { item } = vnode.attrs;
-    if (!item) return;
+
     const isThread = item instanceof Thread;
+
     if (!item.lastEdited) {
       return;
     }
@@ -555,8 +550,6 @@ export class ProposalBodyEditMenuItem
     const { item, getSetGlobalEditingStatus, proposalPageState, parentState } =
       vnode.attrs;
 
-    if (!item) return;
-
     if (item instanceof Thread && item.readOnly) return;
 
     return (
@@ -564,19 +557,25 @@ export class ProposalBodyEditMenuItem
         label="Edit"
         onclick={async (e) => {
           e.preventDefault();
+
           parentState.currentText =
             item instanceof Thread ? item.body : item.text;
+
           if (proposalPageState.replying) {
             if (activeQuillEditorHasText()) {
               const confirmed = await confirmationModalWithText(
                 'Unsubmitted replies will be lost. Continue?'
               )();
+
               if (!confirmed) return;
             }
+
             proposalPageState.replying = false;
+
             proposalPageState.parentCommentId = null;
           }
           parentState.editing = true;
+
           getSetGlobalEditingStatus(GlobalStatus.Set, true);
         }}
       />
@@ -593,7 +592,7 @@ export class ProposalBodyDeleteMenuItem
 {
   view(vnode) {
     const { item, refresh } = vnode.attrs;
-    if (!item) return;
+
     const isThread = item instanceof Thread;
 
     return (
@@ -601,13 +600,18 @@ export class ProposalBodyDeleteMenuItem
         label="Delete"
         onclick={async (e) => {
           e.preventDefault();
+
           const confirmed = await confirmationModalWithText(
             isThread ? 'Delete this entire thread?' : 'Delete this comment?'
           )();
+
           if (!confirmed) return;
+
           (isThread ? app.threads : app.comments).delete(item).then(() => {
             if (isThread) navigateToSubpage('/');
+
             if (refresh) refresh();
+
             m.redraw();
             // TODO: set notification bar for 'thread deleted/comment deleted'
           });
@@ -660,17 +664,25 @@ export class ProposalBodyCancelEdit
         disabled={parentState.saving}
         onclick={async (e) => {
           e.preventDefault();
+
           let confirmed = true;
+
           const threadText = parentState.quillEditorState.textContentsAsString;
+
           if (threadText !== parentState.currentText) {
             confirmed = await confirmationModalWithText(
               'Cancel editing? Changes will not be saved.'
             )();
           }
+
           if (!confirmed) return;
+
           parentState.editing = false;
+
           getSetGlobalEditingStatus(GlobalStatus.Set, false);
+
           clearEditingLocalStorage(item, item instanceof Thread);
+
           m.redraw();
         }}
       />
@@ -690,7 +702,6 @@ export class ProposalBodySaveEdit
   view(vnode) {
     const { item, getSetGlobalEditingStatus, parentState, callback } =
       vnode.attrs;
-    if (!item) return;
 
     return (
       <CWButton
@@ -698,15 +709,20 @@ export class ProposalBodySaveEdit
         disabled={parentState.saving}
         onclick={(e) => {
           e.preventDefault();
+
           if (parentState.updatedUrl) {
             if (!validURL(parentState.updatedUrl)) {
               notifyError('Must provide a valid URL.');
               return;
             }
           }
+
           parentState.saving = true;
+
           parentState.quillEditorState.disable();
+
           const itemText = parentState.quillEditorState.textContentsAsString;
+
           if (item instanceof Thread) {
             app.threads
               .edit(
@@ -717,19 +733,29 @@ export class ProposalBodySaveEdit
               )
               .then(() => {
                 navigateToSubpage(`/discussion/${item.id}`);
+
                 parentState.editing = false;
+
                 parentState.saving = false;
+
                 clearEditingLocalStorage(item, true);
+
                 getSetGlobalEditingStatus(GlobalStatus.Set, false);
+
                 m.redraw();
+
                 notifySuccess('Thread successfully edited');
               });
           } else if (item instanceof Comment) {
             app.comments.edit(item, itemText).then(() => {
               parentState.editing = false;
+
               parentState.saving = false;
+
               clearEditingLocalStorage(item, false);
+
               getSetGlobalEditingStatus(GlobalStatus.Set, false);
+
               callback();
             });
           }

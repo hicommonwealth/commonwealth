@@ -9,7 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { Thread, ThreadKind, AnyProposal, Topic } from 'models';
+import { Thread, ThreadKind, AnyProposal, Topic, ThreadStage } from 'models';
 import {
   ChangeTopicMenuItem,
   ThreadSubscriptionMenuItem,
@@ -131,8 +131,10 @@ export class ProposalHeader
             <div class="proposal-body-meta">
               {proposal instanceof Thread ? (
                 <>
-                  <ProposalHeaderStage proposal={proposal} />
-                  <ProposalHeaderTopics proposal={proposal} />
+                  {proposal.stage !== ThreadStage.Discussion && (
+                    <ProposalHeaderStage proposal={proposal} />
+                  )}
+                  <ProposalHeaderTopics proposalTopic={proposal.topic?.name} />
                   <ProposalHeaderViewCount viewCount={viewCount} />
                   {app.isLoggedIn() &&
                     !getSetGlobalEditingStatus(GlobalStatus.Get) && (
@@ -145,7 +147,6 @@ export class ProposalHeader
                           <>
                             {(isEditor || isAuthor || isAdmin) && (
                               <ProposalBodyEditMenuItem
-                                item={proposal}
                                 proposalPageState={
                                   vnode.attrs.proposalPageState
                                 }
@@ -158,7 +159,7 @@ export class ProposalHeader
                             {isAuthor && (
                               <EditCollaboratorsButton proposal={proposal} />
                             )}
-                            {isAdmin && proposal instanceof Thread && (
+                            {isAdmin && (
                               <ChangeTopicMenuItem
                                 proposal={proposal}
                                 onChangeHandler={(topic: Topic) => {
@@ -250,7 +251,7 @@ export class ProposalHeader
               {proposal instanceof Thread &&
               proposal.kind === ThreadKind.Link &&
               this.editing ? (
-                <ProposalLinkEditor item={proposal} parentState={this} />
+                <ProposalLinkEditor parentState={this} />
               ) : (
                 <ProposalHeaderExternalLink proposal={proposal} />
               )}

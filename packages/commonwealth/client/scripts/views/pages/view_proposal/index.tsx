@@ -366,9 +366,11 @@ class ViewProposalPage
 
       if (call === GlobalStatus.Set && status !== undefined) {
         this.editing = status;
+
         if (status === false) {
           this.recentlyEdited = true;
         }
+
         m.redraw();
       }
     };
