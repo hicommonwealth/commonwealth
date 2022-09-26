@@ -73,12 +73,17 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
           class: `landing-header ${INITIAL_HEADER_STYLE}     mt-8`,
         },
         [
-          m(CWIcon, {
-            iconName: 'commonLogo',
-            iconSize: 'xxl',
+          // m(CWIcon, {
+          //   iconName: 'commonLogo',
+          //   iconSize: 'xxl',
+          //   alt: 'Commonwealth',
+          //   style: m.route.get() === '/' ? '' : 'cursor:pointer',
+          //   onclick: () => redirectClick('/'),
+          // }),
+          m('img', {
+            src: 'static/img/commonLogoWithText.svg',
             alt: 'Commonwealth',
-            style: m.route.get() === '/' ? '' : 'cursor:pointer',
-            onclick: () => redirectClick('/'),
+            class: 'logoWithText',
           }),
           m(
             'nav',
