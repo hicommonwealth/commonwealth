@@ -71,8 +71,6 @@ class GeneralContractPage
   }
 
   view(vnode) {
-    // Payable functions are not supported in this implementation
-
     const getWeb3 = async (): Promise<Web3> => {
       // Initialize Chain
       const ethChain = app.chain.chain as EthereumChain;
