@@ -116,38 +116,23 @@ export class ProposalHeader
       <div class="ProposalHeader">
         <div class="proposal-top">
           <div class="proposal-top-left">
-            {!(proposal instanceof Thread) && (
-              <div class="proposal-meta-top">
-                <div class="proposal-meta-top-left">
-                  <ProposalHeaderOnchainId proposal={proposal} />
-                </div>
-                <div class="proposal-meta-top-right">
-                  <QueueButton proposal={proposal} />
-                  <ExecuteButton proposal={proposal} />
-                  <CancelButton proposal={proposal} />
-                </div>
-              </div>
-            )}
-            {!this.editing && (
-              <div class="proposal-title">
-                <ProposalHeaderTitle proposal={proposal} />
-              </div>
-            )}
-            {this.editing && (
+            {this.editing ? (
               <ProposalTitleEditor
                 item={proposal}
                 getSetGlobalEditingStatus={getSetGlobalEditingStatus}
                 parentState={this}
               />
+            ) : (
+              <ProposalHeaderTitle proposal={proposal} />
             )}
+            <ProposalBodyAuthor item={proposal} />
+            <ProposalBodyCreated item={proposal} link={proposalLink} />
+            <ProposalBodyLastEdited item={proposal} />
             <div class="proposal-body-meta">
               {proposal instanceof Thread ? (
                 <>
                   <ProposalHeaderStage proposal={proposal} />
                   <ProposalHeaderTopics proposal={proposal} />
-                  <ProposalBodyCreated item={proposal} link={proposalLink} />
-                  <ProposalBodyLastEdited item={proposal} />
-                  <ProposalBodyAuthor item={proposal} />
                   <ProposalHeaderViewCount viewCount={viewCount} />
                   {app.isLoggedIn() &&
                     !getSetGlobalEditingStatus(GlobalStatus.Get) && (
@@ -292,15 +277,9 @@ export class ProposalHeader
         {proposal instanceof Thread && (
           <div class="proposal-content">
             <div class="proposal-content-right">
-              {!this.editing && <ProposalBodyText item={proposal} />}
-              {!this.editing && attachments && attachments.length > 0 && (
-                <ProposalBodyAttachments item={proposal} />
-              )}
-              {this.editing && (
-                <ProposalBodyEditor item={proposal} parentState={this} />
-              )}
-              <div class="proposal-body-bottom">
-                {this.editing ? (
+              {this.editing ? (
+                <>
+                  <ProposalBodyEditor item={proposal} parentState={this} />
                   <div class="proposal-body-button-group">
                     <ProposalBodySaveEdit
                       item={proposal}
@@ -313,7 +292,10 @@ export class ProposalHeader
                       parentState={this}
                     />
                   </div>
-                ) : (
+                </>
+              ) : (
+                <>
+                  <ProposalBodyText item={proposal} />
                   <div class="proposal-response-row">
                     <ThreadReactionButton thread={proposal} />
                     <InlineReplyButton
@@ -329,16 +311,27 @@ export class ProposalHeader
                         proposalPageState.parentCommentId = null;
                       }}
                     />
+                    {attachments && attachments.length > 0 && (
+                      <ProposalBodyAttachments item={proposal} />
+                    )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           </div>
         )}
-        {!(proposal instanceof Thread) && hasBody && (
-          <div class="proposal-content">
-            <ProposalBodyText item={proposal} />
-          </div>
+        {!(proposal instanceof Thread) && (
+          <>
+            <ProposalHeaderOnchainId proposal={proposal} />
+            <QueueButton proposal={proposal} />
+            <ExecuteButton proposal={proposal} />
+            <CancelButton proposal={proposal} />
+            {hasBody && (
+              <div class="proposal-content">
+                <ProposalBodyText item={proposal} />
+              </div>
+            )}
+          </>
         )}
       </div>
     );
