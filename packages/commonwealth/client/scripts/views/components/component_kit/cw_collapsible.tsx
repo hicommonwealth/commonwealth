@@ -20,18 +20,22 @@ export class CWCollapsible implements m.ClassComponent<CollapsibleAttrs> {
 
     return (
       <div class={ComponentType.Collapsible}>
-        <div class="expand-icon-button">
-          <CWIconButton
-            iconName={this.isExpanded ? 'chevronDown' : 'chevronRight'}
-            iconSize="large"
-            onclick={() => {
-              this.isExpanded = !this.isExpanded;
-            }}
-          />
-        </div>
         <div class="header-and-content-container">
-          <div class="collapsible-header">{headerContent}</div>
-          {this.isExpanded && collapsibleContent}
+          <div class="collapsible-header">
+            <div class="expand-icon-button">
+              <CWIconButton
+                iconName={this.isExpanded ? 'chevronDown' : 'chevronRight'}
+                iconSize="large"
+                onclick={() => {
+                  this.isExpanded = !this.isExpanded;
+                }}
+              />
+            </div>
+            {headerContent}
+          </div>
+          <div class="content-container">
+            {this.isExpanded && collapsibleContent}
+          </div>
         </div>
       </div>
     );

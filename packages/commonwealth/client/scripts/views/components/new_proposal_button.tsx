@@ -197,9 +197,10 @@ export class NewProposalButton implements m.Component<NewProposalButtonAttrs> {
             iconButtonTheme="black"
             iconName="plusCircle"
             iconSize="medium"
+            inline={true}
           />
         }
-        position="bottom-end"
+        position="bottom-start"
         closeOnContentClick={true}
         menuAttrs={{
           align: 'left',
