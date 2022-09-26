@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import moment from 'moment';
 
 import 'pages/view_proposal/index.scss';
 
@@ -26,40 +25,22 @@ import {
   Thread,
   Account,
   ProposalModule,
-  ThreadStage,
-  ChainEntity,
   AnyProposal,
 } from 'models';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
-import { VotingResults } from 'views/components/proposals/voting_results';
-import { VotingActions } from 'views/components/proposals/voting_actions';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { CreateComment } from './create_comment';
-import { LinkedProposalsEmbed } from './linked_proposals_embed';
-import { PollEditorCard } from './poll_editor_card';
-import { LinkedProposalsCard } from './linked_proposals_card';
-import { LinkedThreadsCard } from './linked_threads_card';
-import {
-  activeQuillEditorHasText,
-  getProposalPollTimestamp,
-  handleProposalPollVote,
-} from './helpers';
-import { PollCard } from '../../components/poll_card';
-import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
+import { activeQuillEditorHasText } from './helpers';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { ProposalHeader } from './proposal_header';
-import { AaveViewProposalDetail } from './aave_summary';
 import { GlobalStatus, Prefetch } from './types';
-import { ProposalComments } from './proposal_comments';
 import { TipDetail } from '../tip_detail';
+import { ProposalBody } from './proposal_body';
+import { ProposalSidebar } from './proposal_sidebar';
 
 class ViewProposalPage
   implements
@@ -469,329 +450,76 @@ class ViewProposalPage
     return (
       <Sublayout showNewProposalButton title={headerTitle}>
         <div class="ViewProposalPage">
-          {sidebarCheck && (
-            <div class="view-proposal-body-with-tabs">
-              <CWTabBar>
-                <CWTab
-                  label="Proposal"
-                  onclick={() => {
-                    this.tabSelected = 'viewProposal';
-                  }}
-                  isSelected={this.tabSelected === 'viewProposal'}
-                />
-                <CWTab
-                  label="Info & Results"
-                  onclick={() => {
-                    this.tabSelected = 'viewSidebar';
-                  }}
-                  isSelected={this.tabSelected === 'viewSidebar'}
-                />
-              </CWTabBar>
-              {this.tabSelected === 'viewProposal' && (
-                <>
-                  <div class="view-proposal-content-container">
-                    <ProposalHeader
-                      proposal={proposal}
-                      commentCount={commentCount}
-                      viewCount={viewCount}
-                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                      proposalPageState={this}
-                      isAuthor={isAuthor}
-                      isEditor={isEditor}
-                      isAdmin={isAdminOrMod}
-                    />
-                    {!(proposal instanceof Thread) && (
-                      <LinkedProposalsEmbed proposal={proposal} />
-                    )}
-                    {proposal instanceof AaveProposal && (
-                      <AaveViewProposalDetail proposal={proposal} />
-                    )}
-                    {!(proposal instanceof Thread) && (
-                      <VotingResults proposal={proposal} />
-                    )}
-                    {!(proposal instanceof Thread) && (
-                      <VotingActions proposal={proposal} />
-                    )}
-                    <ProposalComments
-                      proposal={proposal}
-                      comments={comments}
-                      createdCommentCallback={createdCommentCallback}
-                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                      proposalPageState={this}
-                      recentlySubmitted={this.recentlySubmitted}
-                      isAdmin={isAdminOrMod}
-                    />
-                    {!this.editing && !this.parentCommentId && (
-                      <CreateComment
-                        callback={createdCommentCallback}
-                        cancellable
-                        getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                        proposalPageState={this}
-                        parentComment={null}
-                        rootProposal={proposal}
-                      />
-                    )}
-                  </div>
-                </>
-              )}
-              {this.tabSelected === 'viewSidebar' && (
-                <div class="view-sidebar-content-container">
-                  {showLinkedSnapshotOptions && proposal instanceof Thread && (
-                    <LinkedProposalsCard
-                      onChangeHandler={(
-                        stage: ThreadStage,
-                        chainEntities: ChainEntity[],
-                        snapshotProposal: SnapshotProposal[]
-                      ) => {
-                        proposal.stage = stage;
-                        proposal.chainEntities = chainEntities;
-                        if (app.chain?.meta.snapshot) {
-                          proposal.snapshotProposal = snapshotProposal[0]?.id;
-                        }
-                        app.threads.fetchThreadsFromId([proposal.identifier]);
-                        m.redraw();
-                      }}
-                      proposal={proposal}
-                      showAddProposalButton={isAuthor || isAdminOrMod}
-                    />
-                  )}
-                  {showLinkedThreadOptions && proposal instanceof Thread && (
-                    <LinkedThreadsCard
-                      proposalId={proposal.id}
-                      allowLinking={isAuthor || isAdminOrMod}
-                    />
-                  )}
-                  {proposal instanceof Thread &&
-                    [
-                      ...new Map(
-                        this.polls?.map((poll) => [poll.id, poll])
-                      ).values(),
-                    ].map((poll: Poll) => {
-                      return (
-                        <PollCard
-                          multiSelect={false}
-                          pollEnded={
-                            poll.endsAt && poll.endsAt?.isBefore(moment().utc())
-                          }
-                          hasVoted={
-                            app.user.activeAccount &&
-                            poll.getUserVote(
-                              app.user.activeAccount?.chain?.id,
-                              app.user.activeAccount?.address
-                            )
-                          }
-                          disableVoteButton={!app.user.activeAccount}
-                          votedFor={
-                            poll.getUserVote(
-                              app.user.activeAccount?.chain?.id,
-                              app.user.activeAccount?.address
-                            )?.option
-                          }
-                          proposalTitle={poll.prompt}
-                          timeRemaining={getProposalPollTimestamp(
-                            poll,
-                            poll.endsAt && poll.endsAt?.isBefore(moment().utc())
-                          )}
-                          totalVoteCount={poll.votes?.length}
-                          voteInformation={poll.options.map((option) => {
-                            return {
-                              label: option,
-                              value: option,
-                              voteCount: poll.votes.filter(
-                                (v) => v.option === option
-                              ).length,
-                            };
-                          })}
-                          incrementalVoteCast={1}
-                          isPreview={false}
-                          tooltipErrorMessage={
-                            app.user.activeAccount
-                              ? null
-                              : 'You must join this community to vote.'
-                          }
-                          onVoteCast={(option, isSelected, callback) =>
-                            handleProposalPollVote(
-                              poll,
-                              option,
-                              isSelected,
-                              callback
-                            )
-                          }
-                          onResultsClick={(e) => {
-                            e.preventDefault();
-                            if (poll.votes.length > 0) {
-                              app.modals.create({
-                                modal: OffchainVotingModal,
-                                data: { votes: poll.votes },
-                              });
-                            }
-                          }}
-                        />
-                      );
-                    })}
-                  {proposal instanceof Thread &&
-                    isAuthor &&
-                    (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                      <PollEditorCard
-                        proposal={proposal}
-                        proposalAlreadyHasPolling={!this.polls?.length}
-                      />
-                    )}
-                </div>
-              )}
-            </div>
-          )}
+          <div class="view-proposal-body-with-tabs">
+            <CWTabBar>
+              <CWTab
+                label="Proposal"
+                onclick={() => {
+                  this.tabSelected = 'viewProposal';
+                }}
+                isSelected={this.tabSelected === 'viewProposal'}
+              />
+              <CWTab
+                label="Info & Results"
+                onclick={() => {
+                  this.tabSelected = 'viewSidebar';
+                }}
+                isSelected={this.tabSelected === 'viewSidebar'}
+              />
+            </CWTabBar>
+            {this.tabSelected === 'viewProposal' && (
+              <ProposalBody
+                commentCount={commentCount}
+                comments={comments}
+                createdCommentCallback={createdCommentCallback}
+                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                isAdminOrMod={isAdminOrMod}
+                isAuthor={isAuthor}
+                isEditor={isEditor}
+                proposal={proposal}
+                proposalPageState={this}
+                viewCount={viewCount}
+              />
+            )}
+            {this.tabSelected === 'viewSidebar' && (
+              <ProposalSidebar
+                isAdmin={isAdmin}
+                isAdminOrMod={isAdminOrMod}
+                isAuthor={isAuthor}
+                polls={this.polls}
+                proposal={proposal}
+                showLinkedSnapshotOptions={showLinkedSnapshotOptions}
+                showLinkedThreadOptions={showLinkedThreadOptions}
+              />
+            )}
+          </div>
           <div
             class={getClasses<{ hasSidebar?: boolean }>(
               { hasSidebar: sidebarCheck },
               'view-proposal-body'
             )}
           >
-            <div class="view-proposal-content-container">
-              <ProposalHeader
-                proposal={proposal}
-                commentCount={commentCount}
-                viewCount={viewCount}
-                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                proposalPageState={this}
-                isAuthor={isAuthor}
-                isEditor={isEditor}
-                isAdmin={isAdminOrMod}
-              />
-              {!(proposal instanceof Thread) && (
-                <LinkedProposalsEmbed proposal={proposal} />
-              )}
-              {proposal instanceof AaveProposal && (
-                <AaveViewProposalDetail proposal={proposal} />
-              )}
-              {!(proposal instanceof Thread) && (
-                <VotingResults proposal={proposal} />
-              )}
-              {!(proposal instanceof Thread) && (
-                <VotingActions proposal={proposal} />
-              )}
-              <ProposalComments
-                proposal={proposal}
-                comments={comments}
-                createdCommentCallback={createdCommentCallback}
-                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                proposalPageState={this}
-                recentlySubmitted={this.recentlySubmitted}
-                isAdmin={isAdminOrMod}
-              />
-              {!this.editing && !this.parentCommentId && (
-                <CreateComment
-                  callback={createdCommentCallback}
-                  cancellable
-                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                  proposalPageState={this}
-                  parentComment={null}
-                  rootProposal={proposal}
-                />
-              )}
-            </div>
-            <div class="view-sidebar-content-container">
-              {showLinkedSnapshotOptions && proposal instanceof Thread && (
-                <LinkedProposalsCard
-                  onChangeHandler={(
-                    stage: ThreadStage,
-                    chainEntities: ChainEntity[],
-                    snapshotProposal: SnapshotProposal[]
-                  ) => {
-                    proposal.stage = stage;
-                    proposal.chainEntities = chainEntities;
-                    if (app.chain?.meta.snapshot) {
-                      proposal.snapshotProposal = snapshotProposal[0]?.id;
-                    }
-                    app.threads.fetchThreadsFromId([proposal.identifier]);
-                    m.redraw();
-                  }}
-                  proposal={proposal}
-                  showAddProposalButton={isAuthor || isAdminOrMod}
-                />
-              )}
-              {showLinkedThreadOptions && proposal instanceof Thread && (
-                <LinkedThreadsCard
-                  proposalId={proposal.id}
-                  allowLinking={isAuthor || isAdminOrMod}
-                />
-              )}
-              {proposal instanceof Thread &&
-                [
-                  ...new Map(
-                    this.polls?.map((poll) => [poll.id, poll])
-                  ).values(),
-                ].map((poll: Poll) => {
-                  return (
-                    <PollCard
-                      multiSelect={false}
-                      pollEnded={
-                        poll.endsAt && poll.endsAt?.isBefore(moment().utc())
-                      }
-                      hasVoted={
-                        app.user.activeAccount &&
-                        poll.getUserVote(
-                          app.user.activeAccount?.chain?.id,
-                          app.user.activeAccount?.address
-                        )
-                      }
-                      disableVoteButton={!app.user.activeAccount}
-                      votedFor={
-                        poll.getUserVote(
-                          app.user.activeAccount?.chain?.id,
-                          app.user.activeAccount?.address
-                        )?.option
-                      }
-                      proposalTitle={poll.prompt}
-                      timeRemaining={getProposalPollTimestamp(
-                        poll,
-                        poll.endsAt && poll.endsAt?.isBefore(moment().utc())
-                      )}
-                      totalVoteCount={poll.votes?.length}
-                      voteInformation={poll.options.map((option) => {
-                        return {
-                          label: option,
-                          value: option,
-                          voteCount: poll.votes.filter(
-                            (v) => v.option === option
-                          ).length,
-                        };
-                      })}
-                      incrementalVoteCast={1}
-                      tooltipErrorMessage={
-                        app.user.activeAccount
-                          ? null
-                          : 'You must join this community to vote.'
-                      }
-                      onVoteCast={(option, isSelected, callback) =>
-                        handleProposalPollVote(
-                          poll,
-                          option,
-                          isSelected,
-                          callback
-                        )
-                      }
-                      onResultsClick={(e) => {
-                        e.preventDefault();
-                        if (poll.votes.length > 0) {
-                          app.modals.create({
-                            modal: OffchainVotingModal,
-                            data: { votes: poll.votes },
-                          });
-                        }
-                      }}
-                    />
-                  );
-                })}
-              {proposal instanceof Thread &&
-                isAuthor &&
-                (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                  <PollEditorCard
-                    proposal={proposal}
-                    proposalAlreadyHasPolling={!this.polls?.length}
-                  />
-                )}
-            </div>
+            <ProposalBody
+              commentCount={commentCount}
+              comments={comments}
+              createdCommentCallback={createdCommentCallback}
+              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              isAdminOrMod={isAdminOrMod}
+              isAuthor={isAuthor}
+              isEditor={isEditor}
+              proposal={proposal}
+              proposalPageState={this}
+              viewCount={viewCount}
+            />
+            <ProposalSidebar
+              isAdmin={isAdmin}
+              isAdminOrMod={isAdminOrMod}
+              isAuthor={isAuthor}
+              polls={this.polls}
+              proposal={proposal}
+              showLinkedSnapshotOptions={showLinkedSnapshotOptions}
+              showLinkedThreadOptions={showLinkedThreadOptions}
+            />
           </div>
         </div>
       </Sublayout>
