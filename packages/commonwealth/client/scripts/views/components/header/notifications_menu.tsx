@@ -97,9 +97,13 @@ export class NotificationsMenu
 
     return (
       <CWPopoverMenu
+        class="NotificationsMenu"
+        closeOnContentClick={true}
+        closeOnOutsideClick={true}
         hasArrow={false}
-        transitionDuration={0}
         hoverCloseDelay={0}
+        position="bottom-end"
+        transitionDuration={0}
         trigger={
           unreadNotificationsCount === 0 ? (
             <CWIconButton
@@ -114,24 +118,7 @@ export class NotificationsMenu
             </span>
           )
         }
-        // <Button
-        //   class="toggle"
-        //   style="padding: 8px; display: flex;"
-        //   intent={unreadNotificationsCount > 0 ? 'primary' : undefined}
-        //   label={
-        //     <>
-
-        //     </>
-        //   }
-        //   size={small ? 'sm' : 'default'}
-        //   compact={true}
-        // />
-
-        position="bottom-end"
-        closeOnContentClick={true}
-        closeOnOutsideClick={true}
-        class="NotificationsMenu"
-        content={
+        popoverMenuItems={
           <>
             <div class="NotificationsMenuHeader">
               <Button

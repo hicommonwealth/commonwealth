@@ -18,6 +18,8 @@ type NewProposalMenuAttrs = {
 
 export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
   view(vnode) {
+    console.log('npm');
+
     const { mobile } = vnode.attrs;
 
     const activeAccount = app.user.activeAccount;
@@ -32,7 +34,6 @@ export class NewProposalMenu implements m.ClassComponent<NewProposalMenuAttrs> {
         []
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-
     return (
       <>
         <CWPopoverMenuItem
@@ -205,7 +206,7 @@ export class NewProposalButton implements m.Component<NewProposalButtonAttrs> {
         menuAttrs={{
           align: 'left',
         }}
-        content={<NewProposalMenu />}
+        popoverMenuItems={<NewProposalMenu />}
       />
     );
   }
