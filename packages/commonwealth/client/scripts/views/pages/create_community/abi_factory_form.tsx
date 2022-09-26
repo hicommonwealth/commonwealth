@@ -8,14 +8,20 @@ import 'pages/abi_factory_form.scss';
 
 import { Contract } from 'models';
 import app from 'state';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import EthereumChain from 'controllers/chain/ethereum/chain';
+import Ethereum from 'controllers/chain/ethereum/main';
+import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
-
+import { BigNumber, ethers } from 'ethers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWValidationText, ValidationStatus } from 'views/components/component_kit/cw_validation_text';
+import {
+  CWValidationText,
+  ValidationStatus,
+} from 'views/components/component_kit/cw_validation_text';
 
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 
@@ -31,7 +37,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
-import { parseFunctionsFromABI } from 'helpers/abi_utils';
+import { parseAbiItemsFromABI, parseFunctionsFromABI } from 'helpers/abi_utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -87,21 +93,134 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
-    const loadContractAbi = () => {
-        const { contractAddress } = vnode.attrs;
-        const contract: Contract =
-          app.contracts.store.getContractByNickname(contractAddress);
-        const abiFunctions = parseFunctionsFromABI(contract.abi);
-        return abiFunctions;
+    const getWeb3 = async (): Promise<Web3> => {
+        // Initialize Chain
+        const ethChain = app.chain.chain as EthereumChain;
+        const currChain = app.chain;
+        const currNode = currChain.meta.ChainNode;
+        const web3Api = await ethChain.initApi(currNode);
+        return web3Api;
     };
 
-    const { contractAddress } = vnode.attrs;
+    const getWeb3Contract = async (): Promise<Web3Contract> => {
+        const { contractAddress } = vnode.attrs;
+        const contract: Contract =
+          app.contracts.store.getContractByAddress(contractAddress);
+        // Initialize Chain and Create contract instance
+        const web3Api = await getWeb3();
+        const web3Contract: Web3Contract = new web3Api.eth.Contract(
+          parseAbiItemsFromABI(contract.abi),
+          contractAddress
+        );
+        return web3Contract;
+    };
+
+    const callFunction = async (nickname: string, fn: AbiItem) => {
+      // handle array and int types
+      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
+        const type = arg.type;
+        if (type.substring(0, 4) === 'uint')
+          return BigNumber.from(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
+        if (type.slice(-2) === '[]')
+          return JSON.parse(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
+        return this.state.form.functionNameToFunctionInputArgs
+          .get(fn.name)
+          .get(index);
+      });
+
+      const functionContract = await getWeb3Contract();
+
+      const contractAddress = app.contracts.getByNickname(nickname).address;
+
+      // 5. Build function tx
+      // Assumption is using this methodology for calling functions
+      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
+
+      // if (fn.stateMutability !== "view" && fn.constant !== true) {
+      //   // // set options for transaction
+      //   const opts: any = {};
+      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
+      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+
+      // } else {
+
+      // }
+
+      const methodSignature = `${fn.name}(${fn.inputs
+        .map((input) => input.type)
+        .join(',')})`;
+
+      const functionTx = functionContract.methods[methodSignature](
+        ...processedArgs
+      );
+      const sender = app.user.activeAccount;
+      //   // get querying wallet
+      const signingWallet = await app.wallets.locateWallet(
+        sender,
+        ChainBase.Ethereum
+      );
+
+      //   // get chain
+      const chain = (app.chain as Ethereum).chain;
+
+      const web3Api = await getWeb3();
+      let tx: string;
+      if (fn.stateMutability !== 'view' && fn.constant !== true) {
+        // Sign Tx with PK if not view function
+        tx = await chain.makeContractTx(
+          contractAddress,
+          functionTx.encodeABI(),
+          signingWallet
+        );
+      } else {
+        // send transaction
+        tx = await chain.makeContractCall(
+          contractAddress,
+          functionTx.encodeABI(),
+          signingWallet
+        );
+      }
+      // simple return type
+      if (fn.outputs.length === 1) {
+        const decodedTx = web3Api.eth.abi.decodeParameter(
+          fn.outputs[0].type,
+          tx
+        );
+        const result: any[] = [];
+        result.push(decodedTx);
+        this.state.functionNameToFunctionOutput.set(fn.name, result);
+      } else if (fn.outputs.length > 1) {
+        const decodedTxMap = web3Api.eth.abi.decodeParameters(
+          fn.outputs.map((output) => output.type),
+          tx
+        );
+        // complex return type
+        const processed = Array.from(Object.values(decodedTxMap));
+        this.state.functionNameToFunctionOutput.set(fn.name, processed);
+      }
+    };
+
+    const loadContractAbi = (nickname: string) => {
+      const contract: Contract =
+        app.contracts.getByNickname(nickname);
+      const abiFunctions = parseFunctionsFromABI(contract.abi);
+      return abiFunctions;
+    };
+
     if (!app.contracts || !app.chain || !this.state.loaded) {
-      return <PageLoading title="General Contract" />;
+      return <PageLoading title="Dao From Factory Launcher" />;
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
         return (
-          <PageNotFound content="Contract ABI UI Generator Only Available for Ethereum based Chains" />
+          <PageNotFound content="Factory Dao Creator Only Available for Ethereum based Chains" />
         );
       }
     }
@@ -110,16 +229,20 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       <div class="CreateDaoFromFactoryForm">
         <SelectRow
           title="DAO Type"
-          options={app.contracts.store.getContractFactories().map(contract => contract.nickname)}
+          options={app.contracts.store
+            .getContractFactories()
+            .map((contract) => contract.nickname)}
           value={this.state.form.daoFactoryType}
           onchange={(value) => {
             this.state.form.daoFactoryType = value;
-            this.state.loaded = false;
+            this.state.loaded = true;
           }}
         />
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
-          <CWText>Selected Dao Factory: {this.state.form.daoFactoryType}</CWText>
+          <CWText>
+            Selected Dao Factory: {this.state.form.daoFactoryType}
+          </CWText>
           <div class="functions-container">
             <div class="header-row">
               <CWText>Name</CWText>
@@ -128,7 +251,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               <CWText>Outputs</CWText>
               <CWText>Call Function</CWText>
             </div>
-            {loadContractAbi().map((fn: AbiItem, fnIdx: number) => {
+            {loadContractAbi(this.state.form.daoFactoryType).map((fn: AbiItem, fnIdx: number) => {
               return (
                 <div class="function-row">
                   <CWText>{fn.name}</CWText>
@@ -270,7 +393,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                         notifySuccess('Submit Call button clicked!');
                         this.state.saving = true;
                         try {
-                          callFunction(contractAddress, fn);
+                          callFunction(this.state.form.daoFactoryType, fn);
                         } catch (err) {
                           notifyError(
                             err.responseJSON?.error ||

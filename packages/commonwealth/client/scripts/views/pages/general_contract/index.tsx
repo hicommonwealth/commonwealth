@@ -190,7 +190,7 @@ class GeneralContractPage
     const loadContractAbi = () => {
       const { contractAddress } = vnode.attrs;
       const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
+        app.contracts.getByAddress(contractAddress);
       const abiFunctions = parseFunctionsFromABI(contract.abi);
       return abiFunctions;
     };
