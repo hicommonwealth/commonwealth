@@ -117,7 +117,9 @@ export class ProposalHeaderTitle
 
     return (
       <div class="ProposalHeaderTitle">
-        {proposal.title}
+        <CWText type="h3" fontWeight="semiBold">
+          {proposal.title}
+        </CWText>
         {proposal instanceof Thread && proposal.readOnly && (
           <CWIcon iconName="lock" iconSize="small" />
         )}
@@ -386,50 +388,6 @@ export class ProposalHeaderPrivacyMenuItems
   }
 }
 
-export class ProposalBodyAvatar
-  implements
-    m.ClassComponent<{
-      item: Thread | Comment<any>;
-    }>
-{
-  view(vnode) {
-    const { item } = vnode.attrs;
-    if (!item) return;
-    if (!item.author) return;
-
-    // Check for accounts on forums that originally signed up on a different base chain,
-    // Render them as anonymous as the forum is unable to support them.
-
-    if (
-      item.authorChain !== app.chain.id &&
-      item.authorChain !== app.chain.base
-    ) {
-      return m(AnonymousUser, {
-        avatarOnly: true,
-        avatarSize: 40,
-        showAsDeleted: true,
-        distinguishingKey: item.author.slice(item.author.length - 3),
-      });
-    }
-
-    const author: Account = app.chain.accounts.get(item.author);
-
-    return (item as Comment<any>).deleted
-      ? m(AnonymousUser, {
-          avatarOnly: true,
-          avatarSize: 40,
-          showAsDeleted: true,
-          distinguishingKey: item.author.slice(item.author.length - 3),
-        })
-      : m(User, {
-          user: author,
-          popover: true,
-          avatarOnly: true,
-          avatarSize: 40,
-        });
-  }
-}
-
 export class ProposalBodyAuthor
   implements
     m.Component<{
@@ -452,7 +410,7 @@ export class ProposalBodyAuthor
         item.authorChain !== app.chain.base
       ) {
         return m(AnonymousUser, {
-          hideAvatar: true,
+          // hideAvatar: true,
           distinguishingKey: item.author,
         });
       }
@@ -471,7 +429,7 @@ export class ProposalBodyAuthor
           user: author,
           popover: true,
           linkify: true,
-          hideAvatar: true,
+          // hideAvatar: true,
           showAddressWithDisplayName: true,
         })}
         {item instanceof Thread &&

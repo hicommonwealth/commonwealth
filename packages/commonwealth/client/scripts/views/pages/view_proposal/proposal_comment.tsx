@@ -22,7 +22,6 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { GlobalStatus, ProposalPageState } from './types';
 import { scrollToForm } from './helpers';
 import {
-  ProposalBodyAvatar,
   ProposalBodyAuthor,
   ProposalBodyCreated,
   ProposalBodyLastEdited,
@@ -32,19 +31,18 @@ import {
   ProposalBodyCancelEdit,
 } from './proposal_header_components';
 
-export class ProposalComment
-  implements
-    m.ClassComponent<{
-      comment: Comment<any>;
-      getSetGlobalEditingStatus: CallableFunction;
-      proposalPageState: ProposalPageState;
-      parent: AnyProposal | Comment<any> | Thread;
-      proposal: AnyProposal | Thread;
-      callback?: CallableFunction;
-      isAdmin?: boolean;
-      isLast: boolean;
-    }>
-{
+type ProposalCommentAttrs = {
+  callback?: CallableFunction;
+  comment: Comment<any>;
+  getSetGlobalEditingStatus: CallableFunction;
+  isAdmin?: boolean;
+  isLast: boolean;
+  parent: AnyProposal | Comment<any> | Thread;
+  proposal: AnyProposal | Thread;
+  proposalPageState: ProposalPageState;
+};
+
+export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
   private editing: boolean;
   private quillEditorState: QuillEditor;
   private replying: boolean;
@@ -77,12 +75,11 @@ export class ProposalComment
         class="ProposalComment"
         onchange={() => m.redraw()} // TODO: avoid catching bubbled input events
       >
+        {/* For now, we are limiting threading to 1 level deep
+            Comments whose parents are other comments should not display the reply option */}
         {(!isLast || app.user.activeAccount) && (
           <div class="thread-connector" />
         )}
-        <div class="comment-avatar">
-          <ProposalBodyAvatar item={comment} />
-        </div>
         <div class="comment-body">
           <div class="comment-body-top">
             <ProposalBodyAuthor item={comment} />

@@ -93,18 +93,6 @@
     flex: 1;
     flex-direction: column;
     justify-content: space-between;
-    margin-bottom: 40px;
-    margin-left: 28px;
-    overflow-x: auto;
-
-    @include extraSmall {
-      margin-left: 16px;
-    }
-
-    .proposal-content-meta {
-      padding-bottom: 12px;
-      font-size: 1rem;
-    }
 
     .comment-response-row,
     .proposal-response-row {

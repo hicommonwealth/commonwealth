@@ -13,18 +13,19 @@ import { GlobalStatus, ProposalPageState } from './types';
 import { MAX_THREAD_LEVEL } from './constants';
 import { ProposalComment } from './proposal_comment';
 
+type ProposalCommentsAttrs = {
+  comments: Array<Comment<any>>;
+  createdCommentCallback: CallableFunction;
+  getSetGlobalEditingStatus: CallableFunction;
+  isAdmin: boolean;
+  proposal: Thread | AnyProposal;
+  proposalPageState: ProposalPageState;
+  recentlySubmitted?: number;
+  user?: any;
+};
+
 export class ProposalComments
-  implements
-    m.ClassComponent<{
-      proposal: Thread | AnyProposal;
-      comments: Array<Comment<any>>;
-      createdCommentCallback: CallableFunction;
-      getSetGlobalEditingStatus: CallableFunction;
-      proposalPageState: ProposalPageState;
-      user?: any;
-      recentlySubmitted?: number;
-      isAdmin: boolean;
-    }>
+  implements m.ClassComponent<ProposalCommentsAttrs>
 {
   private commentError: any;
   private dom;
@@ -132,7 +133,7 @@ export class ProposalComments
           return (
             <div
               class={`threading-level-${threadLevel}`}
-              style="margin-left: 32px;"
+              style="margin-left: 8px;"
             >
               <ProposalComment
                 comment={comment}

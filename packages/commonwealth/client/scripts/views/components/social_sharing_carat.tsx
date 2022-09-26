@@ -3,20 +3,19 @@
 import m from 'mithril';
 import { MenuItem, Icons, PopoverMenu } from 'construct-ui';
 import { int } from 'aws-sdk/clients/datapipeline';
+
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-type SocialSharingCaratAttrs = { commentID?: int };
-
 export class SocialSharingCarat
-  implements m.ClassComponent<SocialSharingCaratAttrs>
+  implements m.ClassComponent<{ commentID?: int }>
 {
   view(vnode) {
     const domain = document.location.origin;
     return (
       <PopoverMenu
         transitionDuration={0}
-        closeOnOutsideClick={true}
-        closeOnContentClick={true}
+        closeOnOutsideClick
+        closeOnContentClick
         menuAttrs={{ size: 'default' }}
         content={[
           <MenuItem

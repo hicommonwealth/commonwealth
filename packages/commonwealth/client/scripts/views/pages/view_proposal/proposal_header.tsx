@@ -32,7 +32,6 @@ import {
   ProposalLinkEditor,
   EditCollaboratorsButton,
   ProposalBodyAuthor,
-  ProposalBodyAvatar,
   ProposalBodyCancelEdit,
   ProposalBodyCreated,
   ProposalBodyDeleteMenuItem,
@@ -292,9 +291,6 @@ export class ProposalHeader
         <CWDivider />
         {proposal instanceof Thread && (
           <div class="proposal-content">
-            <div class="proposal-content-left">
-              <ProposalBodyAvatar item={proposal} />
-            </div>
             <div class="proposal-content-right">
               {!this.editing && <ProposalBodyText item={proposal} />}
               {!this.editing && attachments && attachments.length > 0 && (
