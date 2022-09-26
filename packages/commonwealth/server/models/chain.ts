@@ -129,7 +129,7 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
-      contracts_viewable: { type: dataTypes.STRING, allowNull: false },
+      contracts_viewable: { type: dataTypes.STRING, allowNull: true },
       snapshot: {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
