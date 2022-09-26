@@ -12,8 +12,6 @@ import Sublayout from 'views/sublayout';
 type PageNotFoundAttrs = { title?: string; message?: string };
 
 export class PageNotFound implements m.ClassComponent<PageNotFoundAttrs> {
-  oncreate() {}
-
   view(vnode) {
     const { message, title } = vnode.attrs;
 

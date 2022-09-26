@@ -2,11 +2,9 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Button, Input } from 'construct-ui';
 import moment from 'moment';
 
 import 'pages/view_proposal/index.scss';
-import 'pages/view_proposal/tips.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -28,7 +26,6 @@ import {
   Thread,
   Account,
   ProposalModule,
-  DepositVote,
   ThreadStage,
   ChainEntity,
   AnyProposal,
@@ -41,13 +38,8 @@ import { PageNotFound } from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { IBalanceAccount } from 'models/interfaces';
 import { CreateComment } from './create_comment';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
-import User from '../../components/widgets/user';
-import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import { createTXModal } from '../../modals/tx_signing_modal';
-import { SubstrateAccount } from '../../../controllers/chain/substrate/account';
 import { PollEditorCard } from './poll_editor_card';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -67,6 +59,7 @@ import { ProposalHeader } from './proposal_header';
 import { AaveViewProposalDetail } from './aave_summary';
 import { GlobalStatus, Prefetch } from './types';
 import { ProposalComments } from './proposal_comments';
+import { TipDetail } from '../tip_detail';
 
 class ViewProposalPage
   implements
@@ -97,7 +90,6 @@ class ViewProposalPage
 
   oncreate() {
     // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
-
     if (!this.editing) {
       this.editing = false;
     }
@@ -109,11 +101,7 @@ class ViewProposalPage
     const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
 
     if (!app.chain?.meta && !isDiscussion) {
-      return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: 'Loading...',
-      });
+      return <PageLoading showNewProposalButton title="Loading..." />;
     }
 
     const type =
@@ -442,118 +430,13 @@ class ViewProposalPage
     });
 
     if (proposal instanceof SubstrateTreasuryTip) {
-      const {
-        author,
-        title,
-        data: { who, reason },
-      } = proposal;
-
-      const contributors = proposal.getVotes();
-
-      return m(
-        Sublayout,
-        {
-          showNewProposalButton: true,
-          title: headerTitle,
-        },
-        [
-          m('.TipDetailPage', [
-            m('.tip-details', [
-              m('.title', title),
-              m('.proposal-page-row', [
-                m('.label', 'Finder'),
-                m(User, {
-                  user: author,
-                  linkify: true,
-                  popover: true,
-                  showAddressWithDisplayName: true,
-                }),
-              ]),
-              m('.proposal-page-row', [
-                m('.label', 'Beneficiary'),
-                m(User, {
-                  user: app.profiles.getProfile(proposal.author.chain.id, who),
-                  linkify: true,
-                  popover: true,
-                  showAddressWithDisplayName: true,
-                }),
-              ]),
-              m('.proposal-page-row', [
-                m('.label', 'Reason'),
-                m('.tip-reason', [m(MarkdownFormattedText, { doc: reason })]),
-              ]),
-              m('.proposal-page-row', [
-                m('.label', 'Amount'),
-                m('.amount', [
-                  m('.denominator', proposal.support.denom),
-                  m('', proposal.support.inDollars),
-                ]),
-              ]),
-            ]),
-            m('.tip-contributions', [
-              proposal.canVoteFrom(
-                app.user.activeAccount as SubstrateAccount
-              ) &&
-                m('.contribute', [
-                  m('.title', 'Contribute'),
-                  m('.mb-12', [
-                    m('.label', 'Amount'),
-                    m(Input, {
-                      name: 'amount',
-                      placeholder: 'Enter tip amount',
-                      autocomplete: 'off',
-                      fluid: true,
-                      oninput: (e) => {
-                        const result = (e.target as any).value;
-                        this.tipAmount =
-                          result.length > 0
-                            ? app.chain.chain.coins(parseFloat(result), true)
-                            : undefined;
-                        m.redraw();
-                      },
-                    }),
-                  ]),
-                  m(Button, {
-                    disabled: this.tipAmount === undefined,
-                    intent: 'primary',
-                    rounded: true,
-                    label: 'Submit Transaction',
-                    onclick: (e) => {
-                      e.preventDefault();
-                      createTXModal(
-                        proposal.submitVoteTx(
-                          new DepositVote(
-                            app.user.activeAccount as IBalanceAccount<any>,
-                            app.chain.chain.coins(this.tipAmount)
-                          )
-                        )
-                      );
-                    },
-                    tabindex: 4,
-                    type: 'submit',
-                  }),
-                ]),
-              contributors.length > 0 && [
-                m('.contributors .title', 'Contributors'),
-                contributors.map(({ account, deposit }) =>
-                  m('.contributors-row', [
-                    m('.amount', [
-                      m('.denominator', deposit.denom),
-                      m('', deposit.inDollars),
-                    ]),
-                    m(User, {
-                      user: account,
-                      linkify: true,
-                      popover: true,
-                      showAddressWithDisplayName: true,
-                    }),
-                  ])
-                ),
-              ],
-            ]),
-          ]),
-        ]
-      );
+      <TipDetail
+        proposal={proposal}
+        headerTitle={headerTitle}
+        setTipAmount={(tip) => {
+          this.tipAmount = tip;
+        }}
+      />;
     }
 
     const showLinkedSnapshotOptions =
