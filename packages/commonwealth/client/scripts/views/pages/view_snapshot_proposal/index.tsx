@@ -152,21 +152,19 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
               />
             )}
             {this.activeTab === 'info-and-results' && (
-              <div class="proposal-cards-container">
-                <SnapshotProposalCards
-                  identifier={identifier}
-                  proposal={this.proposal}
-                  scores={this.scores}
-                  space={this.space}
-                  symbol={this.symbol}
-                  threads={this.threads}
-                  totals={this.totals}
-                  votes={this.votes}
-                  validatedAgainstStrategies={this.validatedAgainstStrategies}
-                  fetchedPower={this.fetchedPower}
-                  totalScore={this.totalScore}
-                />
-              </div>
+              <SnapshotProposalCards
+                identifier={identifier}
+                proposal={this.proposal}
+                scores={this.scores}
+                space={this.space}
+                symbol={this.symbol}
+                threads={this.threads}
+                totals={this.totals}
+                votes={this.votes}
+                validatedAgainstStrategies={this.validatedAgainstStrategies}
+                fetchedPower={this.fetchedPower}
+                totalScore={this.totalScore}
+              />
             )}
           </div>
           <div class="proposal-body">

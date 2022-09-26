@@ -137,23 +137,4 @@
   .proposal-title {
     margin-bottom: 6px;
   }
-
-  &.highlighted {
-    border-radius: 20px;
-    background-color: $yellow-200;
-
-    .thread-connector {
-      background: $green-500;
-    }
-  }
-
-  &.highlighted.highlightAnimationComplete {
-    background-color: transparent;
-    transition: background-color 1s ease-in-out;
-
-    .thread-connector {
-      background: $neutral-200;
-      transition: background 1s ease-in-out;
-    }
-  }
 }

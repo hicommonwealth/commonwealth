@@ -64,6 +64,16 @@
     }
   }
 
+  .thread-connector {
+    position: absolute;
+    top: 48px;
+    bottom: -40px;
+    background: $neutral-200;
+    left: 19px;
+    width: 2px;
+    z-index: -1;
+  }
+
   &.highlighted {
     border-radius: 20px;
     background-color: $yellow-200;

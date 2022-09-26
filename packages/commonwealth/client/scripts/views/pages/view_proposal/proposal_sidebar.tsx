@@ -3,6 +3,8 @@
 import m from 'mithril';
 import moment from 'moment';
 
+import 'pages/view_proposal/proposal_sidebar.scss';
+
 import app from 'state';
 import { AnyProposal, ChainEntity, Poll, Thread, ThreadStage } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
@@ -36,7 +38,7 @@ export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="view-sidebar-content-container">
+      <div class="ProposalSidebar">
         {showLinkedSnapshotOptions && proposal instanceof Thread && (
           <LinkedProposalsCard
             onChangeHandler={(

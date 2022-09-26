@@ -2,6 +2,8 @@
 
 import m from 'mithril';
 
+import 'pages/view_proposal/proposal_body.scss';
+
 import { AnyProposal, Comment, Thread } from 'models';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { ProposalHeader } from './proposal_header';
@@ -42,7 +44,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="view-proposal-content-container">
+      <div class="ProposalBody">
         <ProposalHeader
           proposal={proposal}
           commentCount={commentCount}

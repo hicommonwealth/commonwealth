@@ -441,7 +441,7 @@ class ViewProposalPage
       }
     };
 
-    const sidebarCheck =
+    const hasSidebar =
       showLinkedSnapshotOptions ||
       showLinkedThreadOptions ||
       (proposal instanceof Thread && this.polls?.length > 0) ||
@@ -450,7 +450,7 @@ class ViewProposalPage
     return (
       <Sublayout showNewProposalButton title={headerTitle}>
         <div class="ViewProposalPage">
-          <div class="view-proposal-body-with-tabs">
+          <div class="proposal-body-with-tabs">
             <CWTabBar>
               <CWTab
                 label="Proposal"
@@ -495,8 +495,8 @@ class ViewProposalPage
           </div>
           <div
             class={getClasses<{ hasSidebar?: boolean }>(
-              { hasSidebar: sidebarCheck },
-              'view-proposal-body'
+              { hasSidebar },
+              'proposal-body'
             )}
           >
             <ProposalBody

@@ -6,11 +6,7 @@
   flex-direction: column;
   padding: 24px;
 
-  .view-proposal-body-with-tabs {
-    .TabBar {
-      margin-bottom: 8px;
-    }
-
+  .proposal-body-with-tabs {
     @include medium {
       display: none;
     }
@@ -18,72 +14,16 @@
     @include large {
       display: none;
     }
-
-    .view-proposal-content-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 560px;
-
-      @include extraSmall {
-        width: 100%;
-      }
-    }
-
-    .view-sidebar-content-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
   }
 
-  .view-proposal-body {
+  .proposal-body {
     display: flex;
-    gap: 56px;
+    flex-direction: row;
     justify-content: space-between;
     width: 100%;
 
-    &.hasSidebar {
-      @include mediumSmallInclusive {
-        display: none;
-      }
-    }
-
     @include mediumSmallInclusive {
-      gap: 0;
-    }
-
-    .view-proposal-content-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 560px;
-
-      @include extraSmall {
-        width: 100%;
-      }
-    }
-  }
-
-  .right-content-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 24px 24px 24px 0;
-    width: 296px;
-
-    @include smallInclusive {
       display: none;
     }
-  }
-
-  .thread-connector {
-    position: absolute;
-    top: 48px;
-    bottom: -40px;
-    background: $neutral-200;
-    left: 19px;
-    width: 2px;
-    z-index: -1;
   }
 }

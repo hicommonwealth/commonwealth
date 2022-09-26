@@ -1,0 +1,10 @@
+@import 'shared';
+
+.ProposalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-right: 40px;
+  max-width: 768px;
+  width: 100%;
+}
