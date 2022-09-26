@@ -23,8 +23,6 @@ import {
   ValidationStatus,
 } from 'views/components/component_kit/cw_validation_text';
 
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-
 import {
   initChainForm,
   defaultChainRows,
@@ -94,16 +92,13 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const disableField = !validAddress || !this.state.loaded;
 
     const getWeb3 = async (): Promise<Web3> => {
-        // Initialize Chain
-        const ethChain = app.chain.chain as EthereumChain;
-        const currChain = app.chain;
-        const currNode = currChain.meta.ChainNode;
-        const web3Api = await ethChain.initApi(currNode);
-        return web3Api;
+        const provider = new Web3.providers.WebsocketProvider(this.state.form.nodeUrl);
+        const _api = new Web3(provider);
+        console.log(`Could not connect to Ethereum on ${this.state.form.nodeUrl}`);
+        return _api;
     };
 
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-        const { contractAddress } = vnode.attrs;
+    const getWeb3Contract = async (contractAddress: string): Promise<Web3Contract> => {
         const contract: Contract =
           app.contracts.store.getContractByAddress(contractAddress);
         // Initialize Chain and Create contract instance
@@ -136,9 +131,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           .get(index);
       });
 
-      const functionContract = await getWeb3Contract();
 
       const contractAddress = app.contracts.getByNickname(nickname).address;
+
+      const functionContract = await getWeb3Contract(contractAddress);
 
       // 5. Build function tx
       // Assumption is using this methodology for calling functions
