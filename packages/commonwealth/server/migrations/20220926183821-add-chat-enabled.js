@@ -8,11 +8,25 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn('Chains', 'chat_enabled', {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.addColumn(
+        'Chains',
+        'chat_enabled',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: true,
+        },
+        { transcation: t }
+      );
+
+      await queryInterface.sequelize.query(
+        `UPDATE "Chains" SET chat_enabled = 'f' WHERE id IN ('axie-infinity', 'terra');`,
+        { transcation: t }
+      );
     });
+
+    // set chat_enabled to false for chains with id=axie-infinity
   },
 
   down: async (queryInterface, Sequelize) => {
