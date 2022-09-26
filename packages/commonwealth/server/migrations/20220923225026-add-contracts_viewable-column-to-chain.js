@@ -10,7 +10,7 @@ module.exports = {
      */
     await queryInterface.addColumn('Chains', 'contracts_viewable', {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'off',
       after: 'default_summary_view',
     });
