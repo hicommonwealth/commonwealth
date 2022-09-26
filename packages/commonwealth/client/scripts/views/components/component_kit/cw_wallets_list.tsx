@@ -186,8 +186,9 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
           return;
         }
         if (result.exists) {
-          notifyInfo('This address is already linked to another account.');
-          return;
+          notifyInfo(
+            'This address is already linked to another account. Signing will transfer ownership to your account.'
+          );
         }
       }
 

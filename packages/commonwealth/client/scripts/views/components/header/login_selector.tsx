@@ -300,7 +300,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     // add all addresses if joining a community
     const activeBase = activeChainInfo?.base;
     const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
-    const samebaseAddresses = app.user.addresses.filter((a) => {
+    const samebaseAddresses = app.user.addresses.filter((a, idx) => {
       // if no active chain, add all addresses
       if (!activeBase) return true;
 
@@ -309,7 +309,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       if (addressChainInfo?.base !== activeBase) return false;
 
       // // ensure doesn't already exist
-      const addressExists = !!app.user.addresses.find(
+      const addressExists = !!app.user.addresses.slice(idx + 1).find(
         (prev) =>
           activeBase === ChainBase.Substrate &&
           (app.config.chains.getById(prev.chain.id)?.base ===
@@ -337,24 +337,12 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       return true;
     });
 
-    // Extract unique addresses
-    const uniqueAddresses = [];
-    const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
-      (addressInfo) => {
-        if (!uniqueAddresses.includes(addressInfo.address)) {
-          uniqueAddresses.push(addressInfo.address);
-          return true;
-        }
-        return false;
-      }
-    );
-
     const activeCommunityMeta = app.chain?.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     // Handles linking the existing address to the community
     async function linkToCommunity(accountIndex: number) {
-      const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
+      const originAddressInfo = samebaseAddresses[accountIndex];
 
       if (originAddressInfo) {
         try {
@@ -436,13 +424,13 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     // TODO: Replace with pretty modal
     async function performJoinCommunityLinking() {
       if (
-        sameBaseAddressesRemoveDuplicates.length > 1 &&
+        samebaseAddresses.length > 1 &&
         app.activeChainId() !== 'axie-infinity'
       ) {
         app.modals.create({
           modal: AccountSelector,
           data: {
-            accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+            accounts: samebaseAddresses.map((addressInfo) => ({
               address: addressInfo.address,
             })),
             walletNetwork: activeChainInfo?.network,
@@ -453,7 +441,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
             },
           },
         });
-      } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
+      } else if (samebaseAddresses.length === 1) {
         await linkToCommunity(0);
       } else {
         app.modals.create({
