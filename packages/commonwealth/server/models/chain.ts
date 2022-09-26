@@ -1,18 +1,15 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { DataTypes } from 'sequelize';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
-import {
-  TopicAttributes,
-  TopicInstance,
-} from './topic';
+import { TopicAttributes, TopicInstance } from './topic';
 import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 
 export type ChainAttributes = {
   name: string;
@@ -23,6 +20,7 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
+  chat_enabled: boolean;
   id?: string;
   description?: string;
   discord?: string;
@@ -55,12 +53,8 @@ export type ChainAttributes = {
     | StarredCommunityAttributes[]
     | StarredCommunityAttributes['id'][];
   topics?: TopicAttributes[] | TopicAttributes['id'][];
-  Threads?:
-    | ThreadAttributes[]
-    | ThreadAttributes['id'][];
-  Comments?:
-    | CommentAttributes[]
-    | CommentAttributes['id'][];
+  Threads?: ThreadAttributes[] | ThreadAttributes['id'][];
+  Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
 };
@@ -121,6 +115,11 @@ export default (
         defaultValue: true,
       },
       type: { type: dataTypes.STRING, allowNull: false },
+      chat_enabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       decimals: { type: dataTypes.INTEGER, allowNull: true },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
