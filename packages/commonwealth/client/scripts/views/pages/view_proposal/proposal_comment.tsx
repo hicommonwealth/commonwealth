@@ -8,7 +8,6 @@ import 'pages/view_proposal/index.scss';
 import app from 'state';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { CommentParent } from 'controllers/server/comments';
 import { Thread, Comment, AnyProposal } from 'models';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
 import {
@@ -61,9 +60,6 @@ export class ProposalComment
     } = vnode.attrs;
 
     if (!comment) return;
-    const parentType = comment.parentComment
-      ? CommentParent.Comment
-      : CommentParent.Proposal;
 
     const commentLink = getProposalUrlPath(
       proposal.slug,
@@ -74,106 +70,89 @@ export class ProposalComment
       .getByProposal(proposal)
       .filter((c) => c.parentComment === comment.id && !c.deleted).length;
 
-    return m(
-      '.ProposalComment',
-      {
-        class: `${parentType}-child comment-${comment.id}`,
-        onchange: () => m.redraw(), // TODO: avoid catching bubbled input events
-      },
-      [
-        (!isLast || app.user.activeAccount) && m('.thread-connector'),
-        m('.comment-avatar', [m(ProposalBodyAvatar, { item: comment })]),
-        m('.comment-body', [
-          m('.comment-body-top', [
-            m(ProposalBodyAuthor, { item: comment }),
-            m(ProposalBodyCreated, { item: comment, link: commentLink }),
-            m(ProposalBodyLastEdited, { item: comment }),
-
-            ((!this.editing &&
+    return (
+      <div
+        class="ProposalComment"
+        onchange={() => m.redraw()} // TODO: avoid catching bubbled input events
+      >
+        {(!isLast || app.user.activeAccount) && (
+          <div class="thread-connector" />
+        )}
+        <div class="comment-avatar">
+          <ProposalBodyAvatar item={comment} />
+        </div>
+        <div class="comment-body">
+          <div class="comment-body-top">
+            <ProposalBodyAuthor item={comment} />
+            <ProposalBodyCreated item={comment} link={commentLink} />
+            <ProposalBodyLastEdited item={comment} />
+            {((!this.editing &&
               app.user.activeAccount &&
               !getSetGlobalEditingStatus(GlobalStatus.Get) &&
               app.user.activeAccount?.chain.id === comment.authorChain &&
               app.user.activeAccount?.address === comment.author) ||
-              isAdmin) && [
-              m(PopoverMenu, {
-                closeOnContentClick: true,
-                content: [
-                  app.user.activeAccount?.address === comment.author &&
-                    m(ProposalBodyEditMenuItem, {
-                      item: comment,
-                      proposalPageState,
-                      getSetGlobalEditingStatus,
-                      parentState: this,
-                    }),
-                  m(ProposalBodyDeleteMenuItem, {
-                    item: comment,
-                    refresh: () => callback(),
-                  }),
-                ],
-                transitionDuration: 0,
-                trigger: m('', [
-                  m(CWIcon, {
-                    iconName: 'chevronDown',
-                    iconSize: 'small',
-                  }),
-                ]),
-              }),
-            ],
-            m(SocialSharingCarat, { commentID: comment.id }),
-
-            // For now, we are limiting threading to 1 level deep
-            // Comments whose parents are other comments should not display the reply option
-            // !this.editing
-            //   && app.user.activeAccount
-            //   && !getSetGlobalEditingStatus(GlobalStatus.Get)
-            //   && parentType === CommentParent.Proposal
-            //   && [
-            //     m(ProposalBodyReply, {
-            //       item: comment,
-            //       getSetGlobalReplyStatus,
-            //       parentType,
-            //       parentState: this,
-            //     }),
-            //   ],
-          ]),
-          m('.comment-body-content', [
-            !this.editing && m(ProposalBodyText, { item: comment }),
-
-            !this.editing &&
+              isAdmin) && (
+              <PopoverMenu
+                closeOnContentClick
+                transitionDuration={0}
+                content={
+                  app.user.activeAccount?.address === comment.author && (
+                    <>
+                      <ProposalBodyEditMenuItem
+                        item={comment}
+                        proposalPageState={proposalPageState}
+                        getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                        parentState={this}
+                      />
+                      <ProposalBodyDeleteMenuItem
+                        item={comment}
+                        refresh={() => callback()}
+                      />
+                    </>
+                  )
+                }
+                trigger={
+                  <div>
+                    <CWIcon iconName="chevronDown" iconSize="small" />
+                  </div>
+                }
+              />
+            )}
+            <SocialSharingCarat commentID={comment.id} />
+          </div>
+          <div class="comment-body-content">
+            {!this.editing && <ProposalBodyText item={comment} />}
+            {!this.editing &&
               comment.attachments &&
-              comment.attachments.length > 0 &&
-              m(ProposalBodyAttachments, { item: comment }),
-
-            this.editing &&
-              m(ProposalBodyEditor, {
-                item: comment,
-                parentState: this,
-              }),
-          ]),
-          m('.comment-body-bottom', [
-            this.editing &&
-              m('.comment-edit-buttons', [
-                m(ProposalBodySaveEdit, {
-                  item: comment,
-                  getSetGlobalEditingStatus,
-                  parentState: this,
-                  callback,
-                }),
-                m(ProposalBodyCancelEdit, {
-                  item: comment,
-                  getSetGlobalEditingStatus,
-                  parentState: this,
-                }),
-              ]),
-            !this.editing &&
-              !comment.deleted &&
-              m('.comment-response-row', [
-                m(CommentReactionButton, {
-                  comment,
-                }),
-                m(InlineReplyButton, {
-                  commentReplyCount,
-                  onclick: () => {
+              comment.attachments.length > 0 && (
+                <ProposalBodyAttachments item={comment} />
+              )}
+            {this.editing && (
+              <ProposalBodyEditor item={comment} parentState={this} />
+            )}
+          </div>
+          <div class="comment-body-bottom">
+            {this.editing && (
+              <div class="comment-edit-buttons">
+                <ProposalBodySaveEdit
+                  item={comment}
+                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                  parentState={this}
+                  callback={callback}
+                />
+                <ProposalBodyCancelEdit
+                  item={comment}
+                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                  parentState={this}
+                />
+              </div>
+            )}
+            {!this.editing && !comment.deleted && (
+              <div class="comment-response-row">
+                <CommentReactionButton comment={comment} />
+                <InlineReplyButton
+                  commentReplyCount={commentReplyCount}
+                  onclick={() => {
                     if (
                       !proposalPageState.replying ||
                       proposalPageState.parentCommentId !== comment.id
@@ -184,12 +163,13 @@ export class ProposalComment
                     } else {
                       proposalPageState.replying = false;
                     }
-                  },
-                }),
-              ]),
-          ]),
-        ]),
-      ]
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     );
   }
 }

@@ -19,7 +19,6 @@ import VersionHistoryModal from 'views/modals/version_history_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainType } from 'common-common/src/types';
 import { validURL } from '../../../../../shared/utils';
-import { IProposalPageState } from '.';
 import {
   activeQuillEditorHasText,
   clearEditingLocalStorage,
@@ -27,7 +26,7 @@ import {
   jumpHighlightComment,
 } from './helpers';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { GlobalStatus } from './types';
+import { GlobalStatus, ProposalPageState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
@@ -128,25 +127,23 @@ export class ProposalBodyAuthor
           item.collaborators.length > 0 && (
             <>
               <span class="proposal-collaborators"> and </span>
-              {m(Popover, {
-                inline: true,
-                interactionType: 'hover',
-                transitionDuration: 0,
-                hoverOpenDelay: 500,
-                closeOnContentClick: true,
-                class: 'proposal-collaborators-popover',
-                content: item.collaborators.map(({ address, chain }) => {
+              <Popover
+                interactionType="hover"
+                transitionDuration={0}
+                hoverOpenDelay={500}
+                closeOnContentClick
+                content={item.collaborators.map(({ address, chain }) => {
                   return m(User, {
                     user: new AddressInfo(null, address, chain, null),
                     linkify: true,
                   });
-                }),
-                trigger: (
+                })}
+                trigger={
                   <a href="#">
                     {pluralize(item.collaborators?.length, 'other')}
                   </a>
-                ),
-              })}
+                }
+              />
             </>
           )}
       </>
@@ -240,7 +237,7 @@ export class ProposalBodyEditMenuItem
     m.Component<{
       item: Thread | Comment<any>;
       parentState;
-      proposalPageState: IProposalPageState;
+      proposalPageState: ProposalPageState;
       getSetGlobalEditingStatus;
     }>
 {
@@ -252,26 +249,28 @@ export class ProposalBodyEditMenuItem
 
     if (item instanceof Thread && item.readOnly) return;
 
-    return m(MenuItem, {
-      label: 'Edit',
-      onclick: async (e) => {
-        e.preventDefault();
-        parentState.currentText =
-          item instanceof Thread ? item.body : item.text;
-        if (proposalPageState.replying) {
-          if (activeQuillEditorHasText()) {
-            const confirmed = await confirmationModalWithText(
-              'Unsubmitted replies will be lost. Continue?'
-            )();
-            if (!confirmed) return;
+    return (
+      <MenuItem
+        label="Edit"
+        onclick={async (e) => {
+          e.preventDefault();
+          parentState.currentText =
+            item instanceof Thread ? item.body : item.text;
+          if (proposalPageState.replying) {
+            if (activeQuillEditorHasText()) {
+              const confirmed = await confirmationModalWithText(
+                'Unsubmitted replies will be lost. Continue?'
+              )();
+              if (!confirmed) return;
+            }
+            proposalPageState.replying = false;
+            proposalPageState.parentCommentId = null;
           }
-          proposalPageState.replying = false;
-          proposalPageState.parentCommentId = null;
-        }
-        parentState.editing = true;
-        getSetGlobalEditingStatus(GlobalStatus.Set, true);
-      },
-    });
+          parentState.editing = true;
+          getSetGlobalEditingStatus(GlobalStatus.Set, true);
+        }}
+      />
+    );
   }
 }
 
@@ -287,22 +286,24 @@ export class ProposalBodyDeleteMenuItem
     if (!item) return;
     const isThread = item instanceof Thread;
 
-    return m(MenuItem, {
-      label: 'Delete',
-      onclick: async (e) => {
-        e.preventDefault();
-        const confirmed = await confirmationModalWithText(
-          isThread ? 'Delete this entire thread?' : 'Delete this comment?'
-        )();
-        if (!confirmed) return;
-        (isThread ? app.threads : app.comments).delete(item).then(() => {
-          if (isThread) navigateToSubpage('/');
-          if (refresh) refresh();
-          m.redraw();
-          // TODO: set notification bar for 'thread deleted/comment deleted'
-        });
-      },
-    });
+    return (
+      <MenuItem
+        label="Delete"
+        onclick={async (e) => {
+          e.preventDefault();
+          const confirmed = await confirmationModalWithText(
+            isThread ? 'Delete this entire thread?' : 'Delete this comment?'
+          )();
+          if (!confirmed) return;
+          (isThread ? app.threads : app.comments).delete(item).then(() => {
+            if (isThread) navigateToSubpage('/');
+            if (refresh) refresh();
+            m.redraw();
+            // TODO: set notification bar for 'thread deleted/comment deleted'
+          });
+        }}
+      />
+    );
   }
 }
 
@@ -315,18 +316,20 @@ export class EditCollaboratorsButton
   view(vnode) {
     const { proposal } = vnode.attrs;
 
-    return m(MenuItem, {
-      label: 'Edit collaborators',
-      onclick: async (e) => {
-        e.preventDefault();
-        app.modals.create({
-          modal: EditCollaboratorsModal,
-          data: {
-            thread: proposal,
-          },
-        });
-      },
-    });
+    return (
+      <MenuItem
+        label="Edit collaborators"
+        onclick={async (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: EditCollaboratorsModal,
+            data: {
+              thread: proposal,
+            },
+          });
+        }}
+      />
+    );
   }
 }
 

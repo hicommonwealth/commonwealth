@@ -26,9 +26,13 @@ export class ProposalComments
       isAdmin: boolean;
     }>
 {
-  commentError: any;
-  dom;
-  highlightedComment: boolean;
+  private commentError: any;
+  private dom;
+  private highlightedComment: boolean;
+
+  oncreate(vvnode) {
+    this.dom = vvnode.dom;
+  }
 
   view(vnode) {
     const {
@@ -39,18 +43,18 @@ export class ProposalComments
       proposalPageState,
       isAdmin,
     } = vnode.attrs;
+
     // Jump to the comment indicated in the URL upon page load. Avoid
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
-    if (
-      vnode.state.dom &&
-      comments?.length > 0 &&
-      !vnode.state.highlightedComment
-    ) {
-      vnode.state.highlightedComment = true;
+
+    if (this.dom && comments?.length > 0 && !this.highlightedComment) {
+      this.highlightedComment = true;
+
       const commentId = window.location.search.startsWith('?comment=')
         ? window.location.search.replace('?comment=', '')
         : null;
+
       if (commentId) jumpHighlightComment(commentId);
     }
 
@@ -61,40 +65,51 @@ export class ProposalComments
         proposalPageState.parentCommentId === comment.id &&
         !getSetGlobalEditingStatus(GlobalStatus.Get)
       ) {
-        return m(CreateComment, {
-          callback: createdCommentCallback,
-          cancellable: true,
-          getSetGlobalEditingStatus,
-          proposalPageState,
-          parentComment: comment,
-          rootProposal: proposal,
-        });
+        return (
+          <CreateComment
+            callback={createdCommentCallback}
+            cancellable
+            getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+            proposalPageState={proposalPageState}
+            parentComment={comment}
+            rootProposal={proposal}
+          />
+        );
       }
     };
 
     const isLivingCommentTree = (comment, children) => {
-      if (!comment.deleted) return true;
-      else if (!children.length) return false;
-      else {
+      if (!comment.deleted) {
+        return true;
+      } else if (!children.length) {
+        return false;
+      } else {
         let survivingDescendents = false;
+
         for (let i = 0; i < children.length; i++) {
           const child = children[i];
+
           if (!child.deleted) {
             survivingDescendents = true;
             break;
           }
+
           const grandchildren = app.comments
             .getByProposal(proposal)
             .filter((c) => c.parentComment === child.id);
+
           for (let j = 0; j < grandchildren.length; j++) {
             const grandchild = grandchildren[j];
+
             if (!grandchild.deleted) {
               survivingDescendents = true;
               break;
             }
           }
+
           if (survivingDescendents) break;
         }
+
         return survivingDescendents;
       }
     };
@@ -105,60 +120,59 @@ export class ProposalComments
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
+
       return comments_.map((comment: Comment<any>, idx) => {
         if (!comment) return;
+
         const children = app.comments
           .getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
+
         if (isLivingCommentTree(comment, children)) {
-          return m(
-            `.threading-level-${threadLevel}`,
-            {
-              style: `margin-left: 32px`,
-            },
-            [
-              m(ProposalComment, {
-                comment,
-                getSetGlobalEditingStatus,
-                proposalPageState,
-                parent,
-                proposal,
-                callback: createdCommentCallback,
-                isAdmin,
-                isLast: idx === comments_.length - 1,
-              }),
-              !!children.length &&
-                canContinueThreading &&
-                recursivelyGatherComments(children, comment, threadLevel + 1),
-              canContinueThreading && nestedReplyForm(comment),
-            ]
+          return (
+            <div
+              class={`threading-level-${threadLevel}`}
+              style="margin-left: 32px;"
+            >
+              <ProposalComment
+                comment={comment}
+                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                proposalPageState={proposalPageState}
+                parent={parent}
+                proposal={proposal}
+                callback={createdCommentCallback}
+                isAdmin={isAdmin}
+                isLast={idx === comments_.length - 1}
+              />
+              {!!children.length && canContinueThreading && (
+                <>
+                  {recursivelyGatherComments(
+                    children,
+                    comment,
+                    threadLevel + 1
+                  )}
+                  {canContinueThreading && nestedReplyForm(comment)}
+                </>
+              )}
+            </div>
           );
+        } else {
+          return null;
         }
       });
     };
 
-    return m(
-      '.ProposalComments',
-      {
-        oncreate: (vvnode) => {
-          vnode.state.dom = vvnode.dom;
-        },
-      },
-      [
-        // show comments
-        comments &&
-          m(
-            '.proposal-comments',
-            recursivelyGatherComments(comments, proposal, 0)
-          ),
-        // create comment
-        // errors
-        vnode.state.commentError &&
-          m(CWValidationText, {
-            message: vnode.state.commentError,
-            status: 'failure',
-          }),
-      ]
+    return (
+      <div class="ProposalComments">
+        {comments && (
+          <div class="proposal-comments">
+            {recursivelyGatherComments(comments, proposal, 0)}
+          </div>
+        )}
+        {this.commentError && (
+          <CWValidationText message={this.commentError} status="failure" />
+        )}
+      </div>
     );
   }
 }
