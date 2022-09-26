@@ -450,7 +450,12 @@ class ViewProposalPage
     return (
       <Sublayout showNewProposalButton title={headerTitle}>
         <div class="ViewProposalPage">
-          <div class="proposal-body-with-tabs">
+          <div
+            class={getClasses<{ hasSidebar?: boolean }>(
+              { hasSidebar },
+              'proposal-body-with-tabs'
+            )}
+          >
             <CWTabBar>
               <CWTab
                 label="Proposal"

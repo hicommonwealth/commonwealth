@@ -7,12 +7,19 @@
   padding: 24px;
 
   .proposal-body-with-tabs {
-    @include medium {
-      display: none;
-    }
+    display: none;
 
-    @include large {
-      display: none;
+    &.hasSidebar {
+      display: flex;
+      flex-direction: column;
+
+      @include medium {
+        display: none;
+      }
+
+      @include large {
+        display: none;
+      }
     }
   }
 
@@ -22,8 +29,10 @@
     justify-content: space-between;
     width: 100%;
 
-    @include mediumSmallInclusive {
-      display: none;
+    &.hasSidebar {
+      @include mediumSmallInclusive {
+        display: none;
+      }
     }
   }
 }
