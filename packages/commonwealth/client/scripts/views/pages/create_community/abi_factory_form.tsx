@@ -1,43 +1,62 @@
 /* @jsx m */
 
-import 'pages/general_contract/index.scss';
-import app from 'state';
-import { Contract } from 'models';
 import m from 'mithril';
-import EthereumChain from 'controllers/chain/ethereum/chain';
-import Ethereum from 'controllers/chain/ethereum/main';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { BigNumber, ethers } from 'ethers';
-import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { Contract as Web3Contract } from 'web3-eth-contract';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
-import { ChainBase } from 'common-common/src/types';
+import $ from 'jquery';
 import Web3 from 'web3';
+
+import 'pages/abi_factory_form.scss';
+
+import { Contract } from 'models';
+import app from 'state';
+import { ChainBase, ChainNetwork, DaoFactoryType } from 'common-common/src/types';
+import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
+
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
+
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWValidationText, ValidationStatus } from 'views/components/component_kit/cw_validation_text';
+
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+
 import {
-  parseAbiItemsFromABI,
-  parseFunctionsFromABI,
-  getEtherscanABI,
-} from '../../../helpers/abi_utils';
+  initChainForm,
+  defaultChainRows,
+  ethChainRows,
+} from 'views/pages/create_community/chain_input_rows';
+
+import {
+  ChainFormFields,
+  ChainFormState,
+  EthChainAttrs,
+  EthFormFields,
+} from 'views/pages/create_community/types';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
-import Sublayout from '../../sublayout';
-import { ChainFormState } from '../create_community/types';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
-type CreateContractForm = {
+type EthDaoFormFields = {
+  tokenName: string;
+};
+
+type CreateFactoryDaoForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
+  daoFactoryType: DaoFactoryType;
 };
 
-type CreateContractState = ChainFormState & {
+type CreateFactoryEthDaoForm = ChainFormFields &
+  EthFormFields &
+  EthDaoFormFields &
+  CreateFactoryDaoForm;
+
+type CreateAbiFactoryState = ChainFormState & {
   functionNameToFunctionOutput: Map<string, any[]>;
-  form: CreateContractForm;
+  form: CreateFactoryEthDaoForm;
 };
-class GeneralContractPage
-  implements m.ClassComponent<{ contractAddress?: string }>
-{
-  private state: CreateContractState = {
+
+export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
+  private state: CreateAbiFactoryState = {
     message: '',
     loaded: false,
     loading: false,
@@ -46,153 +65,30 @@ class GeneralContractPage
     functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
+      daoFactoryType: null,
+      address: '',
+      chainString: 'Ethereum Mainnet',
+      ethChainId: 1,
+      id: '',
+      name: '',
+      nodeUrl: '',
+      symbol: '',
+      tokenName: 'token',
+      ...initChainForm(),
     },
   };
 
-  loadAbiFromEtherscan = async (contractAddress: string): Promise<JSON> => {
-    try {
-      return await getEtherscanABI('mainnet', contractAddress);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  async oninit(vnode) {
-    const { contractAddress } = vnode.attrs;
-    const contract: Contract =
-      app.contracts.store.getContractByAddress(contractAddress);
-    if (contract.abi === undefined || contract.abi === '') {
-      this.loadAbiFromEtherscan(contract.address).then((abi) => {
-        // Populate Abi Table
-        app.contracts.addContractAbi(contract, abi);
-      });
-    }
-    this.state.loaded = true;
+  oninit(vnode) {
+    this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
   view(vnode) {
-    // Payable functions are not supported in this implementation
+    const validAddress = isAddress(this.state.form.address);
+    const disableField = !validAddress || !this.state.loaded;
 
-    const getWeb3 = async (): Promise<Web3> => {
-      // Initialize Chain
-      const ethChain = app.chain.chain as EthereumChain;
-
-      const currChain = app.chain;
-      const currNode = currChain.meta.ChainNode;
-      const web3Api = await ethChain.initApi(currNode);
-      return web3Api;
-    };
-
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-      const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
-      const web3Api = await getWeb3();
-      const web3Contract: Web3Contract = new web3Api.eth.Contract(
-        parseAbiItemsFromABI(contract.abi),
-        contractAddress
-      );
-      return web3Contract;
-    };
-
-    const callFunction = async (contractAddress: string, fn: AbiItem) => {
-      // handle array and int types
-      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
-        const type = arg.type;
-        if (type.substring(0, 4) === 'uint')
-          return BigNumber.from(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        if (type.slice(-2) === '[]')
-          return JSON.parse(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        return this.state.form.functionNameToFunctionInputArgs
-          .get(fn.name)
-          .get(index);
-      });
-
-      const functionContract = await getWeb3Contract();
-
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
-
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
-
-      // } else {
-
-      // }
-
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
-
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
-      const sender = app.user.activeAccount;
-      //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
-      );
-
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
-
-      const web3Api = await getWeb3();
-      let tx: string;
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        // Sign Tx with PK if not view function
-        tx = await chain.makeContractTx(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
-        );
-      } else {
-        // send transaction
-        tx = await chain.makeContractCall(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
-        );
-      }
-      // simple return type
-      if (fn.outputs.length === 1) {
-        const decodedTx = web3Api.eth.abi.decodeParameter(
-          fn.outputs[0].type,
-          tx
-        );
-        const result: any[] = [];
-        result.push(decodedTx);
-        this.state.functionNameToFunctionOutput.set(fn.name, result);
-      } else if (fn.outputs.length > 1) {
-        const decodedTxMap = web3Api.eth.abi.decodeParameters(
-          fn.outputs.map((output) => output.type),
-          tx
-        );
-        // complex return type
-        const processed = Array.from(Object.values(decodedTxMap));
-        this.state.functionNameToFunctionOutput.set(fn.name, processed);
-      }
-    };
-
-    const loadContractAbi = () => {
-      const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      const abiFunctions = parseFunctionsFromABI(contract.abi);
-      return abiFunctions;
+    const loadFactoryContracts = () => {
+      const contracts: Contract[] = app.contracts.store.getContractFactories();
+      return contracts;
     };
 
     const { contractAddress } = vnode.attrs;
@@ -207,7 +103,16 @@ class GeneralContractPage
     }
 
     return (
-      <Sublayout>
+      <div class="CreateCommunityForm">
+        <SelectRow
+          title="DAO Type"
+          options={[DaoFactoryType.GnosisSafe, DaoFactoryType.PartyBid, DaoFactoryType.NounsBuilder]}
+          value={this.state.form.daoFactoryType}
+          onchange={(value) => {
+            this.state.form.daoFactoryType = value;
+            this.state.loaded = false;
+          }}
+        />
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
           <CWText>Contract Address: {contractAddress}</CWText>
@@ -333,9 +238,8 @@ class GeneralContractPage
                   </div>
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray = this.state.functionNameToFunctionOutput.get(
-                        fn.name
-                      )
+                      const fnOutputArray =
+                        this.state.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div class="function-outputs">
@@ -345,7 +249,9 @@ class GeneralContractPage
                           </div>
                           <div>
                             <CWText>
-                              {fnOutputArray && fnOutputArray[i].toString() ? fnOutputArray[i].toString() : ''}
+                              {fnOutputArray && fnOutputArray[i].toString()
+                                ? fnOutputArray[i].toString()
+                                : ''}
                             </CWText>
                           </div>
                         </div>
@@ -377,9 +283,7 @@ class GeneralContractPage
             })}
           </div>
         </div>
-      </Sublayout>
+      </div>
     );
   }
 }
-
-export default GeneralContractPage;
