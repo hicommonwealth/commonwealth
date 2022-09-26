@@ -31,11 +31,55 @@
 
   .comment-body-bottom {
     padding: 4px 0 2px;
+    display: flex;
+    justify-content: space-between;
+
+    .comment-response-row,
+    .proposal-response-row {
+      width: 100%;
+      display: flex;
+      max-width: 300px;
+      align-items: center;
+      margin-top: 16px;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
+
+    .proposal-body-button-group,
+    .comment-body-bottom-right,
+    .comment-edit-buttons {
+      margin-top: 18px;
+
+      .cancel-editing {
+        margin-right: 15px;
+      }
+    }
   }
 
   .comment-body-content {
     @include extraSmall {
       margin-right: 10px;
+    }
+  }
+
+  &.highlighted {
+    border-radius: 20px;
+    background-color: $yellow-200;
+
+    .thread-connector {
+      background: $green-500;
+    }
+  }
+
+  &.highlighted.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+
+    .thread-connector {
+      background: $neutral-200;
+      transition: background 1s ease-in-out;
     }
   }
 }

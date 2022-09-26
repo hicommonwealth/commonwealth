@@ -89,10 +89,13 @@
   }
 
   .proposal-content-right {
+    display: flex;
     flex: 1;
-    overflow-x: auto;
-    margin-left: 28px;
+    flex-direction: column;
+    justify-content: space-between;
     margin-bottom: 40px;
+    margin-left: 28px;
+    overflow-x: auto;
 
     @include extraSmall {
       margin-left: 16px;
@@ -102,6 +105,29 @@
       padding-bottom: 12px;
       font-size: 1rem;
     }
+
+    .comment-response-row,
+    .proposal-response-row {
+      width: 100%;
+      display: flex;
+      max-width: 300px;
+      align-items: center;
+      margin-top: 16px;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
+
+    .proposal-body-button-group,
+    .comment-body-bottom-right,
+    .comment-edit-buttons {
+      margin-top: 18px;
+
+      .cancel-editing {
+        margin-right: 15px;
+      }
+    }
   }
 
   .social-right {
@@ -110,5 +136,24 @@
 
   .proposal-title {
     margin-bottom: 6px;
+  }
+
+  &.highlighted {
+    border-radius: 20px;
+    background-color: $yellow-200;
+
+    .thread-connector {
+      background: $green-500;
+    }
+  }
+
+  &.highlighted.highlightAnimationComplete {
+    background-color: transparent;
+    transition: background-color 1s ease-in-out;
+
+    .thread-connector {
+      background: $neutral-200;
+      transition: background 1s ease-in-out;
+    }
   }
 }

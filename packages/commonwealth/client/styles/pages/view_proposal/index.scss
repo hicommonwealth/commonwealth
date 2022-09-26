@@ -1,19 +1,5 @@
 @import 'shared';
 
-.view-proposal-content-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 704px;
-  width: 100%;
-}
-
-.view-sidebar-content-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .ViewProposalPage {
   display: flex;
   flex: 1;
@@ -32,6 +18,23 @@
     @include large {
       display: none;
     }
+
+    .view-proposal-content-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 560px;
+
+      @include extraSmall {
+        width: 100%;
+      }
+    }
+
+    .view-sidebar-content-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
   }
 
   .view-proposal-body {
@@ -49,86 +52,17 @@
     @include mediumSmallInclusive {
       gap: 0;
     }
-  }
 
-  .ProposalHeader {
-    .proposal-content {
-      position: relative;
-    }
-  }
-
-  .ProposalHeader,
-  .ProposalComment {
-    &.highlighted {
-      border-radius: 20px;
-      background-color: $yellow-200;
-
-      .thread-connector {
-        background: $green-500;
-      }
-    }
-
-    &.highlighted.highlightAnimationComplete {
-      background-color: transparent;
-      transition: background-color 1s ease-in-out;
-
-      .thread-connector {
-        background: $neutral-200;
-        transition: background 1s ease-in-out;
-      }
-    }
-  }
-
-  .proposal-body-bottom,
-  .comment-body-bottom {
-    display: flex;
-    justify-content: space-between;
-
-    .comment-response-row,
-    .proposal-response-row {
-      width: 100%;
+    .view-proposal-content-container {
       display: flex;
-      max-width: 300px;
-      align-items: center;
-      margin-top: 16px;
-
-      > * {
-        margin-right: 8px;
-      }
-    }
-
-    .proposal-body-button-group,
-    .comment-body-bottom-right,
-    .comment-edit-buttons {
-      margin-top: 18px;
-
-      .cancel-editing {
-        margin-right: 15px;
-      }
-    }
-  }
-
-  .threading-level-1 {
-    .new-comment-child {
-      margin-left: 108px !important;
+      flex-direction: column;
+      gap: 16px;
+      width: 560px;
 
       @include extraSmall {
-        margin-left: 0 !important;
         width: 100%;
       }
     }
-  }
-
-  .threading-level-2 {
-    .InlineReplyButton {
-      display: none !important;
-    }
-  }
-
-  h3 {
-    font-size: 23px;
-    font-weight: 500;
-    margin-bottom: 8px;
   }
 
   .right-content-container {
@@ -141,27 +75,6 @@
     @include smallInclusive {
       display: none;
     }
-  }
-
-  .QuillEditor {
-    margin-top: 8px;
-  }
-
-  .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
-    stroke: $neutral-500;
-
-    &:hover {
-      stroke: $neutral-500;
-    }
-  }
-
-  .InlineReplyButton {
-    display: flex;
-  }
-
-  .proposal-content,
-  .ProposalComment {
-    position: relative;
   }
 
   .thread-connector {

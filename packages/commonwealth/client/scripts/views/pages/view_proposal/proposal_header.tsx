@@ -292,9 +292,6 @@ export class ProposalHeader
         <CWDivider />
         {proposal instanceof Thread && (
           <div class="proposal-content">
-            {(commentCount > 0 || app.user.activeAccount) && (
-              <div class="thread-connector" />
-            )}
             <div class="proposal-content-left">
               <ProposalBodyAvatar item={proposal} />
             </div>
