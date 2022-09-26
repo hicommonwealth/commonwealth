@@ -200,46 +200,6 @@ $discussion-title-font-size: 1.45rem;
     }
   }
 
-  .ProposalSocialHeader {
-    font-size: $discussion-meta-font-size;
-    display: inline-block;
-    color: $discussion-meta-color;
-    margin-left: 10px;
-
-    > a:link,
-    > a:visited,
-    a.proposal-collaborators,
-    > .User a.user-display-name {
-      color: $discussion-meta-color;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    svg {
-      cursor: pointer;
-      stroke: $neutral-500;
-    }
-
-    svg:hover {
-      stroke: $neutral-500;
-    }
-  }
-
-  .proposal-collaborators-popover {
-    color: $neutral-800;
-
-    .cui-popover-content {
-      padding-top: 22px;
-
-      .User {
-        display: block;
-      }
-    }
-  }
-
   .right-content-container {
     display: flex;
     flex-direction: column;
@@ -256,12 +216,6 @@ $discussion-title-font-size: 1.45rem;
     margin-top: 8px;
   }
 
-  .ProposalBodyCancelEdit,
-  .ProposalBodySaveEdit {
-    margin-right: 12px;
-    margin-top: 14px;
-  }
-
   .cui-icon.cui-icon-chevron-down.cui-icon-action > svg {
     stroke: $neutral-500;
 
@@ -272,13 +226,6 @@ $discussion-title-font-size: 1.45rem;
 
   .InlineReplyButton {
     display: flex;
-  }
-
-  .ProposalBodyText.proposal-body-placeholder {
-    &,
-    .User .user-display-name {
-      color: $neutral-500;
-    }
   }
 
   .proposal-content,

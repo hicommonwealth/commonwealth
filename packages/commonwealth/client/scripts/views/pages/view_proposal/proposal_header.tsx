@@ -32,7 +32,6 @@ import {
   ProposalLinkEditor,
 } from './proposal_header_components';
 import {
-  GlobalStatus,
   ProposalBodyAvatar,
   ProposalBodyAuthor,
   ProposalBodyCreated,
@@ -63,6 +62,7 @@ import {
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { IProposalPageState, scrollToForm } from '.';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { GlobalStatus } from './types';
 
 export class ProposalHeader
   implements
@@ -113,67 +113,68 @@ export class ProposalHeader
 
     const hasBody = !!(proposal as AnyProposal).description;
 
-    return m(
-      '.ProposalHeader',
-      {
-        class: `proposal-${proposal.slug}`,
-      },
-      [
-        m('.proposal-top', [
-          m('.proposal-top-left', [
-            !(proposal instanceof Thread) &&
-              m('.proposal-meta-top', [
-                m('.proposal-meta-top-left', [
-                  m(ProposalHeaderOnchainId, { proposal }),
-                ]),
-                m('.proposal-meta-top-right', [
-                  <QueueButton proposal={proposal} />,
-                  <ExecuteButton proposal={proposal} />,
-                  <CancelButton proposal={proposal} />,
-                ]),
-              ]),
-            !this.editing &&
-              m('.proposal-title', [m(ProposalHeaderTitle, { proposal })]),
-            this.editing &&
-              m(ProposalTitleEditor, {
-                item: proposal,
-                getSetGlobalEditingStatus,
-                parentState: this,
-              }),
-            m(
-              '.proposal-body-meta',
-              proposal instanceof Thread
-                ? [
-                    m(ProposalHeaderStage, { proposal }),
-                    m(ProposalHeaderTopics, { proposal }),
-                    m(ProposalBodyCreated, {
-                      item: proposal,
-                      link: proposalLink,
-                    }),
-                    m(ProposalBodyLastEdited, { item: proposal }),
-                    m(ProposalBodyAuthor, { item: proposal }),
-                    m(ProposalHeaderViewCount, { viewCount }),
-                    app.isLoggedIn() &&
-                      !getSetGlobalEditingStatus(GlobalStatus.Get) && (
-                        <PopoverMenu
-                          transitionDuration={0}
-                          closeOnOutsideClick
-                          closeOnContentClick
-                          menuAttrs={{ size: 'default' }}
-                          content={[
-                            (isEditor || isAuthor || isAdmin) &&
-                              m(ProposalBodyEditMenuItem, {
-                                item: proposal,
-                                proposalPageState:
-                                  vnode.attrs.proposalPageState,
-                                getSetGlobalEditingStatus,
-                                parentState: this,
-                              }),
-                            isAuthor &&
-                              m(EditCollaboratorsButton, {
-                                proposal,
-                              }),
-                            isAdmin && proposal instanceof Thread && (
+    return (
+      <div class="ProposalHeader">
+        <div class="proposal-top">
+          <div class="proposal-top-left">
+            {!(proposal instanceof Thread) && (
+              <div class="proposal-meta-top">
+                <div class="proposal-meta-top-left">
+                  <ProposalHeaderOnchainId proposal={proposal} />
+                </div>
+                <div class="proposal-meta-top-right">
+                  <QueueButton proposal={proposal} />
+                  <ExecuteButton proposal={proposal} />
+                  <CancelButton proposal={proposal} />
+                </div>
+              </div>
+            )}
+            {!this.editing && (
+              <div class="proposal-title">
+                <ProposalHeaderTitle proposal={proposal} />
+              </div>
+            )}
+            {this.editing && (
+              <ProposalTitleEditor
+                item={proposal}
+                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                parentState={this}
+              />
+            )}
+            <div class="proposal-body-meta">
+              {proposal instanceof Thread ? (
+                <>
+                  <ProposalHeaderStage proposal={proposal} />
+                  <ProposalHeaderTopics proposal={proposal} />
+                  <ProposalBodyCreated item={proposal} link={proposalLink} />
+                  <ProposalBodyLastEdited item={proposal} />
+                  <ProposalBodyAuthor item={proposal} />
+                  <ProposalHeaderViewCount viewCount={viewCount} />
+                  {app.isLoggedIn() &&
+                    !getSetGlobalEditingStatus(GlobalStatus.Get) && (
+                      <PopoverMenu
+                        transitionDuration={0}
+                        closeOnOutsideClick
+                        closeOnContentClick
+                        menuAttrs={{ size: 'default' }}
+                        content={
+                          <>
+                            {(isEditor || isAuthor || isAdmin) && (
+                              <ProposalBodyEditMenuItem
+                                item={proposal}
+                                proposalPageState={
+                                  vnode.attrs.proposalPageState
+                                }
+                                getSetGlobalEditingStatus={
+                                  getSetGlobalEditingStatus
+                                }
+                                parentState={this}
+                              />
+                            )}
+                            {isAuthor && (
+                              <EditCollaboratorsButton proposal={proposal} />
+                            )}
+                            {isAdmin && proposal instanceof Thread && (
                               <ChangeTopicMenuItem
                                 proposal={proposal}
                                 onChangeHandler={(topic: Topic) => {
@@ -181,15 +182,19 @@ export class ProposalHeader
                                   m.redraw();
                                 }}
                               />
-                            ),
-                            (isAuthor || isAdmin || app.user.isSiteAdmin) &&
-                              m(ProposalBodyDeleteMenuItem, { item: proposal }),
-                            (isAuthor || isAdmin) &&
-                              m(ProposalHeaderPrivacyMenuItems, {
-                                proposal,
-                                getSetGlobalEditingStatus,
-                              }),
-                            (isAuthor || isAdmin) &&
+                            )}
+                            {(isAuthor || isAdmin || app.user.isSiteAdmin) && (
+                              <ProposalBodyDeleteMenuItem item={proposal} />
+                            )}
+                            {(isAuthor || isAdmin) && (
+                              <ProposalHeaderPrivacyMenuItems
+                                proposal={proposal}
+                                getSetGlobalEditingStatus={
+                                  getSetGlobalEditingStatus
+                                }
+                              />
+                            )}
+                            {(isAuthor || isAdmin) &&
                               app.chain?.meta.snapshot.length > 0 && (
                                 <MenuItem
                                   onclick={() => {
@@ -208,111 +213,116 @@ export class ProposalHeader
                                   }}
                                   label="Snapshot proposal from thread"
                                 />
-                              ),
-                            (isAuthor || isAdmin) && <CWDivider />,
+                              )}
+                            {(isAuthor || isAdmin) && <CWDivider />}
                             <ThreadSubscriptionMenuItem
                               proposal={proposal as Thread}
-                            />,
-                          ]}
-                          trigger={
-                            <div>
-                              <CWIcon iconName="chevronDown" iconSize="small" />
-                            </div>
-                          }
-                        />
-                      ),
-                    <SocialSharingCarat />,
-                  ]
-                : [
-                    m(ProposalBodyAuthor, { item: proposal }),
-                    m(ProposalHeaderOnchainStatus, { proposal }),
-                    app.isLoggedIn() &&
-                      (isAdmin || isAuthor) &&
-                      !getSetGlobalEditingStatus(GlobalStatus.Get) &&
-                      proposalTitleIsEditable && (
-                        <PopoverMenu
-                          transitionDuration={0}
-                          closeOnOutsideClick
-                          closeOnContentClick
-                          menuAttrs={{ size: 'default' }}
-                          content={[
-                            m(ProposalTitleEditMenuItem, {
-                              item: proposal,
-                              proposalPageState,
-                              getSetGlobalEditingStatus,
-                              parentState: this,
-                            }),
-                          ]}
-                          trigger={
-                            <div>
-                              <CWIcon iconName="chevronDown" iconSize="small" />
-                            </div>
-                          }
-                        />
-                      ),
-                  ]
-            ),
-            m('.proposal-body-link', [
-              proposal instanceof Thread &&
-                proposal.kind === ThreadKind.Link && [
-                  this.editing
-                    ? m(ProposalLinkEditor, {
-                        item: proposal,
-                        parentState: this,
-                      })
-                    : m(ProposalHeaderExternalLink, { proposal }),
-                ],
-              !(proposal instanceof Thread) &&
+                            />
+                          </>
+                        }
+                        trigger={
+                          <div>
+                            <CWIcon iconName="chevronDown" iconSize="small" />
+                          </div>
+                        }
+                      />
+                    )}
+                  <SocialSharingCarat />
+                </>
+              ) : (
+                <>
+                  <ProposalBodyAuthor proposal={proposal} />
+                  <ProposalHeaderOnchainStatus proposal={proposal} />
+                  {app.isLoggedIn() &&
+                    (isAdmin || isAuthor) &&
+                    !getSetGlobalEditingStatus(GlobalStatus.Get) &&
+                    proposalTitleIsEditable && (
+                      <PopoverMenu
+                        transitionDuration={0}
+                        closeOnOutsideClick
+                        closeOnContentClick
+                        menuAttrs={{ size: 'default' }}
+                        content={
+                          <ProposalTitleEditMenuItem
+                            item={proposal}
+                            proposalPageState={proposalPageState}
+                            getSetGlobalEditingStatus={
+                              getSetGlobalEditingStatus
+                            }
+                            parentState={this}
+                          />
+                        }
+                        trigger={
+                          <div>
+                            <CWIcon iconName="chevronDown" iconSize="small" />
+                          </div>
+                        }
+                      />
+                    )}
+                </>
+              )}
+            </div>
+            <div class="proposal-body-link">
+              {proposal instanceof Thread &&
+              proposal.kind === ThreadKind.Link &&
+              this.editing ? (
+                <ProposalLinkEditor item={proposal} parentState={this} />
+              ) : (
+                <ProposalHeaderExternalLink proposal={proposal} />
+              )}
+              {!(proposal instanceof Thread) &&
                 (proposal['blockExplorerLink'] ||
                   proposal['votingInterfaceLink'] ||
-                  proposal.threadId) &&
-                m('.proposal-body-link', [
-                  proposal.threadId &&
-                    m(ProposalHeaderThreadLink, { proposal }),
-                  proposal['blockExplorerLink'] &&
-                    m(ProposalHeaderBlockExplorerLink, { proposal }),
-                  proposal['votingInterfaceLink'] &&
-                    m(ProposalHeaderVotingInterfaceLink, { proposal }),
-                ]),
-            ]),
-          ]),
-        ]),
-        <CWDivider />,
-        proposal instanceof Thread &&
-          m('.proposal-content', [
-            (commentCount > 0 || app.user.activeAccount) &&
-              m('.thread-connector'),
-            m('.proposal-content-left', [
-              m(ProposalBodyAvatar, { item: proposal }),
-            ]),
-            m('.proposal-content-right', [
-              !this.editing && m(ProposalBodyText, { item: proposal }),
-              !this.editing &&
-                attachments &&
-                attachments.length > 0 &&
-                m(ProposalBodyAttachments, { item: proposal }),
-              this.editing &&
-                m(ProposalBodyEditor, {
-                  item: proposal,
-                  parentState: this,
-                }),
-              m('.proposal-body-bottom', [
-                this.editing &&
-                  m('.proposal-body-button-group', [
-                    m(ProposalBodySaveEdit, {
-                      item: proposal,
-                      getSetGlobalEditingStatus,
-                      parentState: this,
-                    }),
-                    m(ProposalBodyCancelEdit, {
-                      item: proposal,
-                      getSetGlobalEditingStatus,
-                      parentState: this,
-                    }),
-                  ]),
-                !this.editing &&
-                  m('.proposal-response-row', [
-                    <ThreadReactionButton thread={proposal} />,
+                  proposal.threadId) && (
+                  <div class="proposal-body-link">
+                    {proposal.threadId && (
+                      <ProposalHeaderThreadLink proposal={proposal} />
+                    )}
+                    {proposal['blockExplorerLink'] && (
+                      <ProposalHeaderBlockExplorerLink proposal={proposal} />
+                    )}
+                    {proposal['votingInterfaceLink'] && (
+                      <ProposalHeaderVotingInterfaceLink proposal={proposal} />
+                    )}
+                  </div>
+                )}
+            </div>
+          </div>
+        </div>
+        <CWDivider />
+        {proposal instanceof Thread && (
+          <div class="proposal-content">
+            {(commentCount > 0 || app.user.activeAccount) && (
+              <div class="thread-connector" />
+            )}
+            <div class="proposal-content-left">
+              <ProposalBodyAvatar item={proposal} />
+            </div>
+            <div class="proposal-content-right">
+              {!this.editing && <ProposalBodyText item={proposal} />}
+              {!this.editing && attachments && attachments.length > 0 && (
+                <ProposalBodyAttachments item={proposal} />
+              )}
+              {this.editing && (
+                <ProposalBodyEditor item={proposal} parentState={this} />
+              )}
+              <div class="proposal-body-bottom">
+                {this.editing ? (
+                  <div class="proposal-body-button-group">
+                    <ProposalBodySaveEdit
+                      item={proposal}
+                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                      parentState={this}
+                    />
+                    <ProposalBodyCancelEdit
+                      item={proposal}
+                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                      parentState={this}
+                    />
+                  </div>
+                ) : (
+                  <div class="proposal-response-row">
+                    <ThreadReactionButton thread={proposal} />
                     <InlineReplyButton
                       commentReplyCount={commentCount}
                       onclick={() => {
@@ -325,15 +335,19 @@ export class ProposalHeader
                         }
                         proposalPageState.parentCommentId = null;
                       }}
-                    />,
-                  ]),
-              ]),
-            ]),
-          ]),
-        !(proposal instanceof Thread) &&
-          hasBody &&
-          m('.proposal-content', [m(ProposalBodyText, { item: proposal })]),
-      ]
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        {!(proposal instanceof Thread) && hasBody && (
+          <div class="proposal-content">
+            <ProposalBodyText item={proposal} />
+          </div>
+        )}
+      </div>
     );
   }
 }
