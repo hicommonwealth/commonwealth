@@ -1,0 +1,41 @@
+@import 'shared';
+
+.ProposalComment {
+  position: relative;
+  display: flex;
+  margin-bottom: 40px;
+  padding-top: 16px;
+
+  .comment-body {
+    flex: 1;
+    overflow-x: auto;
+    padding-left: 28px;
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .comment-body-top {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    svg {
+      color: $neutral-500;
+      cursor: pointer;
+    }
+  }
+
+  .comment-body-bottom {
+    padding: 4px 0 2px;
+  }
+
+  .comment-body-content {
+    @include extraSmall {
+      margin-right: 10px;
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/index.scss';
+import 'pages/view_proposal/proposal_comments.scss';
 
 import app from 'state';
 import { Thread, Comment, AnyProposal } from 'models';

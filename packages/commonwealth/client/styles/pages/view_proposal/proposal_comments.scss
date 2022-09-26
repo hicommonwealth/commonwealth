@@ -1,0 +1,12 @@
+@import 'shared';
+
+.ProposalComments {
+  .new-comment-child {
+    margin-left: 72px;
+
+    @include extraSmall {
+      margin-left: 0 !important;
+      width: 100%;
+    }
+  }
+}

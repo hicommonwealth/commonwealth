@@ -3,7 +3,7 @@
 import m from 'mithril';
 import { PopoverMenu } from 'construct-ui';
 
-import 'pages/view_proposal/index.scss';
+import 'pages/view_proposal/proposal_comment.scss';
 
 import app from 'state';
 import { getProposalUrlPath } from 'identifiers';

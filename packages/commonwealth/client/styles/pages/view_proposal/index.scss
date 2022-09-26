@@ -1,37 +1,5 @@
 @import 'shared';
 
-$discussion-outer-padding: 60px;
-$discussion-meta-padding: 12px; // padding between comment meta & comment content
-$discussion-reaction-padding: 18px; // padding between comment content & comment reaction
-$discussion-comment-padding: 28px; // padding between comment content & avatar
-$discussion-comment-padding-mobile: 16px;
-
-$discussion-meta-font-size: 1rem;
-$discussion-meta-color: $neutral-500;
-
-$discussion-title-font-size: 1.45rem;
-
-@mixin supports-jump-highlight() {
-  &.highlighted {
-    border-radius: 20px;
-    background-color: $yellow-200;
-
-    .thread-connector {
-      background: $green-500;
-    }
-  }
-
-  &.highlighted.highlightAnimationComplete {
-    background-color: transparent;
-    transition: background-color 1s ease-in-out;
-
-    .thread-connector {
-      background: $neutral-200;
-      transition: background 1s ease-in-out;
-    }
-  }
-}
-
 .view-proposal-content-container {
   display: flex;
   flex-direction: column;
@@ -91,7 +59,24 @@ $discussion-title-font-size: 1.45rem;
 
   .ProposalHeader,
   .ProposalComment {
-    @include supports-jump-highlight();
+    &.highlighted {
+      border-radius: 20px;
+      background-color: $yellow-200;
+
+      .thread-connector {
+        background: $green-500;
+      }
+    }
+
+    &.highlighted.highlightAnimationComplete {
+      background-color: transparent;
+      transition: background-color 1s ease-in-out;
+
+      .thread-connector {
+        background: $neutral-200;
+        transition: background 1s ease-in-out;
+      }
+    }
   }
 
   .proposal-body-bottom,
@@ -144,60 +129,6 @@ $discussion-title-font-size: 1.45rem;
     font-size: 23px;
     font-weight: 500;
     margin-bottom: 8px;
-  }
-
-  //
-  // body
-  //
-  .ProposalComment {
-    position: relative;
-    display: flex;
-    margin-bottom: 40px;
-    padding-top: 16px;
-
-    .comment-body {
-      flex: 1;
-      overflow-x: auto;
-      padding-left: $discussion-comment-padding;
-
-      @include extraSmall {
-        padding-left: $discussion-comment-padding-mobile;
-      }
-    }
-
-    .comment-body-top {
-      align-items: center;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 8px;
-
-      svg {
-        color: $neutral-500;
-        cursor: pointer;
-      }
-    }
-
-    .comment-body-bottom {
-      padding: 4px 0 2px;
-    }
-
-    .comment-body-content {
-      @include extraSmall {
-        margin-right: 10px;
-      }
-    }
-  }
-
-  .ProposalComments {
-    .new-comment-child {
-      margin-left: 72px;
-
-      @include extraSmall {
-        margin-left: 0 !important;
-        width: 100%;
-      }
-    }
   }
 
   .right-content-container {
