@@ -1,14 +1,32 @@
-import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {
+  Proposal,
+  ProposalStatus,
+  Deposit,
+  Vote,
+} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {
+  QueryProposalsResponse,
+  QueryDepositsResponse,
+  QueryVotesResponse,
+} from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
 import { CWEvent, IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { IEventData, EventKind, Api, ISubmitProposal } from './types';
+import {
+  IEventData,
+  EventKind,
+  Api,
+  ISubmitProposal,
+  IDeposit,
+  IVote,
+} from './types';
 
 const dateToUnix = (d?: Date): number | undefined => {
   if (d) return Math.floor(d.getTime() / 1000);
   return undefined;
 };
+
 export class StorageFetcher extends IStorageFetcher<Api> {
   private readonly log;
 
@@ -21,9 +39,33 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
   private _currentBlock: number;
 
-  private _proposalToEvent(proposal: Proposal): CWEvent<ISubmitProposal> {
-    return {
-      // NOTE: we cannot query the actual submission block
+  // Gets all items from a particular paginated cosmos request keyed by "key", using
+  // the standard pagination system.
+  // TODO: throttling to get around endpoint limits?
+  private async _getAllPaginated<
+    U,
+    T extends { pagination?: { nextKey: Uint8Array } }
+  >(func: (nextKey?: Uint8Array) => Promise<T>, key: string): Promise<U[]> {
+    const result = await func();
+    const data = result[key];
+    if (result.pagination) {
+      let { nextKey } = result.pagination;
+      while (nextKey.length > 0) {
+        const nextData = await func(nextKey);
+        data.push(...nextData[key]);
+        nextKey = nextData.pagination.nextKey;
+      }
+    }
+    return data;
+  }
+
+  private async _proposalToEvents(
+    proposal: Proposal
+  ): Promise<CWEvent<IEventData>[]> {
+    const events: CWEvent<IEventData>[] = [];
+
+    // NOTE: we cannot query the actual submission block
+    const submitEvent: CWEvent<ISubmitProposal> = {
       blockNumber: this._currentBlock,
       network: SupportedNetwork.Cosmos,
       data: {
@@ -34,10 +76,54 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         depositEndTime: dateToUnix(proposal.depositEndTime),
         votingStartTime: dateToUnix(proposal.votingStartTime),
         votingEndTime: dateToUnix(proposal.votingEndTime),
+        // TODO: do we need to query the tally separately if it's complete?
         finalTallyResult: proposal.finalTallyResult,
         totalDeposit: proposal.totalDeposit,
       },
     };
+    events.push(submitEvent);
+
+    if (proposal.status === ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD) {
+      // query deposit events if active
+      const deposits = await this._getAllPaginated<
+        Deposit,
+        QueryDepositsResponse
+      >(
+        (key) => this._api.lcd.gov.deposits(proposal.proposalId, key),
+        'deposits'
+      );
+      const depositEvents: CWEvent<IDeposit>[] = deposits.map((d) => ({
+        blockNumber: this._currentBlock,
+        network: SupportedNetwork.Cosmos,
+        data: {
+          kind: EventKind.Deposit,
+          id: proposal.proposalId.toString(10),
+          depositor: d.depositor,
+          amount: d.amount,
+        },
+      }));
+      events.push(...depositEvents);
+    } else if (
+      proposal.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD
+    ) {
+      // query voting events if active
+      const votes = await this._getAllPaginated<Vote, QueryVotesResponse>(
+        (key) => this._api.lcd.gov.votes(proposal.proposalId, key),
+        'votes'
+      );
+      const voteEvents: CWEvent<IVote>[] = votes.map((v) => ({
+        blockNumber: this._currentBlock,
+        network: SupportedNetwork.Cosmos,
+        data: {
+          kind: EventKind.Vote,
+          id: proposal.proposalId.toString(10),
+          voter: v.voter,
+          option: v.option,
+        },
+      }));
+      events.push(...voteEvents);
+    }
+    return events;
   }
 
   public async fetchOne(id: string): Promise<CWEvent<IEventData>[]> {
@@ -49,7 +135,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     }
 
     const { proposal } = await this._api.lcd.gov.proposal(id);
-    return [this._proposalToEvent(proposal)];
+    return this._proposalToEvents(proposal);
   }
 
   /**
@@ -66,27 +152,14 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       return [];
     }
 
-    // we can only fetch created events, because of the constraints of cosmos' storage
-    const { proposals, pagination } = await this._api.lcd.gov.proposals(
-      0,
-      '',
-      ''
-    );
-
-    // fetch all proposals
-    let { nextKey } = pagination;
-    while (nextKey.length > 0) {
-      const {
-        proposals: addlProposals,
-        pagination: nextPage,
-      } = await this._api.lcd.gov.proposals(0, '', '', nextKey);
-      proposals.push(...addlProposals);
-      nextKey = nextPage.nextKey;
-    }
-
+    const proposals = await this._getAllPaginated<
+      Proposal,
+      QueryProposalsResponse
+    >((key) => this._api.lcd.gov.proposals(0, '', '', key), 'proposals');
     const proposalEvents = [];
     for (const proposal of proposals) {
-      proposalEvents.push(this._proposalToEvent(proposal));
+      const events = await this._proposalToEvents(proposal);
+      proposalEvents.push(...events);
     }
     return proposalEvents;
   }
