@@ -1,29 +1,6 @@
 @import 'shared';
 
 .ProposalComments {
-  .new-comment-child {
-    margin-left: 72px;
-
-    @include extraSmall {
-      margin-left: 0 !important;
-      width: 100%;
-    }
-  }
-
-  .threading-level-1 {
-    .new-comment-child {
-      margin-left: 108px !important;
-
-      @include extraSmall {
-        margin-left: 0 !important;
-        width: 100%;
-      }
-    }
-  }
-
-  .threading-level-2 {
-    .InlineReplyButton {
-      display: none !important;
-    }
-  }
+  display: flex;
+  flex-direction: column;
 }

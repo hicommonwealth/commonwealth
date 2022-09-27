@@ -38,8 +38,6 @@ export class ProposalBodyText
   view(vnode) {
     const { body } = this;
 
-    if (!body) return;
-
     const getPlaceholder = () => {
       if (!(vnode.attrs.item instanceof Thread)) return;
 
@@ -64,7 +62,9 @@ export class ProposalBodyText
     const text = () => {
       try {
         const doc = JSON.parse(body);
+
         if (!doc.ops) throw new Error();
+
         if (
           doc.ops.length === 1 &&
           doc.ops[0] &&

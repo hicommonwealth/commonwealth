@@ -2,66 +2,86 @@
 
 .ProposalComment {
   display: flex;
-  position: relative;
 
-  .thread-connector {
-    background: $neutral-200;
-    bottom: 0;
-    position: absolute;
-    top: 0;
-    width: 2px;
+  .thread-connectors-container {
+    display: flex;
+    gap: 8px;
+    margin-right: 8px;
+
+    .thread-connector {
+      background-color: $neutral-200;
+      height: 100%;
+      width: 1px;
+    }
   }
 
   .comment-body {
-    padding-left: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
 
-    .comment-body-top {
+    .comment-header {
       align-items: center;
       display: flex;
-      flex-wrap: wrap;
       gap: 8px;
 
-      svg {
+      .username {
+        font-weight: 500;
+
+        @include caption;
+      }
+
+      .published-text.Text {
         color: $neutral-500;
-        cursor: pointer;
       }
     }
 
-    .comment-body-content {
-    }
-
-    .comment-body-bottom {
+    .comment-footer {
       display: flex;
       justify-content: space-between;
-      padding: 4px 0 2px;
 
-      .comment-edit-buttons {
-      }
-
-      .comment-response-row {
+      .menu-buttons-left {
         align-items: center;
         display: flex;
-        gap: 8px;
+        gap: 16px;
+
+        .vote-group,
+        .feedback-group {
+          align-items: center;
+          display: flex;
+          gap: 4px;
+
+          .menu-buttons-text.Text {
+            color: $neutral-500;
+          }
+        }
+      }
+
+      .menu-buttons-right {
+        align-items: center;
+        display: flex;
+        gap: 16px;
       }
     }
   }
 
-  &.highlighted {
-    background-color: $yellow-200;
-    border-radius: 20px;
+  // &.highlighted {
+  //   background-color: $yellow-200;
+  //   border-radius: 20px;
 
-    .thread-connector {
-      background: $green-500;
-    }
-  }
+  //   .thread-connector {
+  //     background: $green-500;
+  //   }
+  // }
 
-  &.highlighted.highlightAnimationComplete {
-    background-color: transparent;
-    transition: background-color 1s ease-in-out;
+  // &.highlighted.highlightAnimationComplete {
+  //   background-color: transparent;
+  //   transition: background-color 1s ease-in-out;
 
-    .thread-connector {
-      background: $neutral-200;
-      transition: background 1s ease-in-out;
-    }
-  }
+  //   .thread-connector {
+  //     background: $neutral-200;
+  //     transition: background 1s ease-in-out;
+  //   }
+  // }
 }

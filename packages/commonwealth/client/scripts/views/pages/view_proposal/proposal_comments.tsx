@@ -131,10 +131,7 @@ export class ProposalComments
 
         if (isLivingCommentTree(comment, children)) {
           return (
-            <div
-              class={`threading-level-${threadLevel}`}
-              style="margin-left: 8px;"
-            >
+            <>
               <ProposalComment
                 comment={comment}
                 getSetGlobalEditingStatus={getSetGlobalEditingStatus}
@@ -144,6 +141,7 @@ export class ProposalComments
                 callback={createdCommentCallback}
                 isAdmin={isAdmin}
                 isLast={idx === comments_.length - 1}
+                threadLevel={threadLevel}
               />
               {!!children.length && canContinueThreading && (
                 <>
@@ -155,7 +153,7 @@ export class ProposalComments
                   {canContinueThreading && nestedReplyForm(comment)}
                 </>
               )}
-            </div>
+            </>
           );
         } else {
           return null;
@@ -165,11 +163,7 @@ export class ProposalComments
 
     return (
       <div class="ProposalComments">
-        {comments && (
-          <div class="proposal-comments">
-            {recursivelyGatherComments(comments, proposal, 0)}
-          </div>
-        )}
+        {recursivelyGatherComments(comments, proposal, 0)}
         {this.commentError && (
           <CWValidationText message={this.commentError} status="failure" />
         )}

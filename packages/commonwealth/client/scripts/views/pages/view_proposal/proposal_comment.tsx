@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { PopoverMenu } from 'construct-ui';
+import moment from 'moment';
 
 import 'pages/view_proposal/proposal_comment.scss';
 
@@ -30,6 +30,11 @@ import {
   ProposalBodySaveEdit,
   ProposalBodyCancelEdit,
 } from './proposal_header_components';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 type ProposalCommentAttrs = {
   callback?: CallableFunction;
@@ -40,6 +45,7 @@ type ProposalCommentAttrs = {
   parent: AnyProposal | Comment<any> | Thread;
   proposal: AnyProposal | Thread;
   proposalPageState: ProposalPageState;
+  threadLevel: number;
 };
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
@@ -50,87 +56,52 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
 
   view(vnode) {
     const {
+      callback,
       comment,
       getSetGlobalEditingStatus,
-      proposalPageState,
-      proposal,
-      callback,
       isAdmin,
       isLast,
+      proposal,
+      proposalPageState,
+      threadLevel,
     } = vnode.attrs;
 
-    if (!comment) return;
-
-    const commentLink = getProposalUrlPath(
-      proposal.slug,
-      `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`
-    );
-
-    const commentReplyCount = app.comments
-      .getByProposal(proposal)
-      .filter((c) => c.parentComment === comment.id && !c.deleted).length;
+    // const commentLink = getProposalUrlPath(
+    //   proposal.slug,
+    //   `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`
+    // );
 
     return (
-      <div
-        class="ProposalComment"
-        onchange={() => m.redraw()} // TODO: avoid catching bubbled input events
-      >
-        {/* For now, we are limiting threading to 1 level deep
-            Comments whose parents are other comments should not display the reply option */}
-        {(!isLast || app.user.activeAccount) && (
-          <div class="thread-connector" />
+      <div class="ProposalComment">
+        {threadLevel > 0 && (
+          <div class="thread-connectors-container">
+            {Array(threadLevel)
+              .fill(undefined)
+              .map((_) => (
+                <div class="thread-connector" />
+              ))}
+          </div>
         )}
         <div class="comment-body">
-          <div class="comment-body-top">
+          <div class="comment-header">
             <ProposalBodyAuthor item={comment} />
-            <ProposalBodyCreated item={comment} link={commentLink} />
-            <ProposalBodyLastEdited item={comment} />
-            {((!this.editing &&
-              app.user.activeAccount &&
-              !getSetGlobalEditingStatus(GlobalStatus.Get) &&
-              app.user.activeAccount?.chain.id === comment.authorChain &&
-              app.user.activeAccount?.address === comment.author) ||
-              isAdmin) && (
-              <PopoverMenu
-                closeOnContentClick
-                transitionDuration={0}
-                content={
-                  app.user.activeAccount?.address === comment.author && (
-                    <>
-                      <ProposalBodyEditMenuItem
-                        item={comment}
-                        proposalPageState={proposalPageState}
-                        getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                        parentState={this}
-                      />
-                      <ProposalBodyDeleteMenuItem
-                        item={comment}
-                        refresh={() => callback()}
-                      />
-                    </>
-                  )
-                }
-                trigger={
-                  <div>
-                    <CWIcon iconName="chevronDown" iconSize="small" />
-                  </div>
-                }
-              />
-            )}
-            <SocialSharingCarat commentID={comment.id} />
+            <CWText type="caption" className="published-text">
+              published on
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="published-text"
+            >
+              {moment(comment.createdAt).format('l')}
+            </CWText>
           </div>
-          <div class="comment-body-content">
-            {!this.editing && <ProposalBodyText item={comment} />}
-            {!this.editing &&
-              comment.attachments &&
-              comment.attachments.length > 0 && (
-                <ProposalBodyAttachments item={comment} />
-              )}
-            {this.editing && (
-              <ProposalBodyEditor item={comment} parentState={this} />
-            )}
-          </div>
-          <div class="comment-body-bottom">
+          {this.editing ? (
+            <ProposalBodyEditor item={comment} parentState={this} />
+          ) : (
+            <CWText type="b2">{renderQuillTextBody(comment.text)}</CWText>
+          )}
+          <div class="comment-footer">
             {this.editing && (
               <div class="comment-edit-buttons">
                 <ProposalBodySaveEdit
@@ -146,25 +117,38 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                 />
               </div>
             )}
-            {!this.editing && !comment.deleted && (
-              <div class="comment-response-row">
-                <CommentReactionButton comment={comment} />
-                <InlineReplyButton
-                  commentReplyCount={commentReplyCount}
-                  onclick={() => {
-                    if (
-                      !proposalPageState.replying ||
-                      proposalPageState.parentCommentId !== comment.id
-                    ) {
-                      proposalPageState.replying = true;
-                      proposalPageState.parentCommentId = comment.id;
-                      scrollToForm(comment.id);
-                    } else {
-                      proposalPageState.replying = false;
+            {!this.editing && (
+              <>
+                <div class="menu-buttons-left">
+                  <div class="vote-group">
+                    <CWIconButton iconName="upvote" iconSize="small" />
+                    <CWText type="caption" className="menu-buttons-text">
+                      30
+                    </CWText>
+                    <CWIconButton iconName="downvote" iconSize="small" />
+                  </div>
+                  <div class="feedback-group">
+                    <CWIconButton iconName="feedback" iconSize="small" />
+                    <CWText type="caption" className="menu-buttons-text">
+                      Reply
+                    </CWText>
+                  </div>
+                </div>
+                <div class="menu-buttons-right">
+                  <CWIconButton iconName="share" iconSize="small" />
+                  <CWIconButton iconName="flag" iconSize="small" />
+                  <CWIconButton iconName="bell" iconSize="small" />
+                  <CWPopoverMenu
+                    trigger={
+                      <CWIconButton iconName="dotsVertical" iconSize="small" />
                     }
-                  }}
-                />
-              </div>
+                    popoverMenuItems={[
+                      { label: 'Edit', iconName: 'edit' },
+                      { label: 'Delete', iconName: 'trash' },
+                    ]}
+                  />
+                </div>
+              </>
             )}
           </div>
         </div>

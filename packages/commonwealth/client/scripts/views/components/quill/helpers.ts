@@ -26,7 +26,10 @@ export const countLinesMarkdown = (text: string) => {
 
 // TODO Graham 22-6-5: Add option to trim doc to param length
 // (will allow us to use helper for previews, drafts, etc)
-export const renderQuillTextBody = (textBody: any, params: QuillTextParams) => {
+export const renderQuillTextBody = (
+  textBody: any,
+  params?: QuillTextParams
+) => {
   try {
     const doc = JSON.parse(decodeURIComponent(textBody));
     if (!doc.ops) throw new Error();
