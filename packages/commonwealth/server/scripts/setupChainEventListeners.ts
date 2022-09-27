@@ -192,7 +192,7 @@ const setupChainEventListeners = async (
           });
         } else if (node.network === ChainNetwork.Compound) {
           // @TODO: @JAKE @CONTRACTS: fetch governance contract specifically
-          const contracts = await node.getContracts(); // should 'includes' ChainNode from contract too
+          const contracts = await node.getContracts();
           const api = await CompoundEvents.createApi(node.ChainNode.url, contracts[0].address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
