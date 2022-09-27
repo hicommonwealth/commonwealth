@@ -1,4 +1,5 @@
 import { Any } from 'cosmjs-types/google/protobuf/any';
+import { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import {
   QueryClient,
@@ -11,6 +12,7 @@ import {
 export interface ListenerOptions {
   url: string;
   skipCatchup: boolean;
+  pollTime?: number;
 }
 
 export type Api = {
@@ -51,6 +53,8 @@ export interface ISubmitProposal extends IEvent {
   depositEndTime?: UnixDate;
   votingStartTime?: UnixDate;
   votingEndTime?: UnixDate;
+  totalDeposit?: Coin[];
+  finalTallyResult?: TallyResult;
 }
 
 export interface IDeposit extends IEvent {

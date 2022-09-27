@@ -4,7 +4,11 @@
 import { decodeTxRaw } from '@cosmjs/proto-signing';
 import { Block } from '@cosmjs/tendermint-rpc';
 
-import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
+import {
+  IDisconnectedRange,
+  IEventSubscriber,
+  SupportedNetwork,
+} from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { RawEvent, Api } from './types';
@@ -12,15 +16,18 @@ import { RawEvent, Api } from './types';
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
 
+  private _pollTime: number;
+
   private _listener: NodeJS.Timeout | null;
 
   private _lastBlockHeight: number = null;
 
   protected readonly log;
 
-  constructor(api: Api, name: string, verbose = false) {
+  constructor(api: Api, name: string, pollTime = 15 * 1000, verbose = false) {
     super(api, verbose);
     this._name = name;
+    this._pollTime = pollTime;
 
     this.log = factory.getLogger(
       addPrefix(__filename, [SupportedNetwork.Cosmos, this._name])
@@ -46,34 +53,43 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     return results;
   }
 
+  private _blocksToEvents(blocks: Block[]): RawEvent[] {
+    // parse all transactions
+    const events: RawEvent[] = [];
+    for (const block of blocks) {
+      const {
+        header: { height },
+      } = block;
+      for (const tx of block.txs) {
+        const decodedTx = decodeTxRaw(tx);
+        const {
+          body: { messages },
+        } = decodedTx;
+        for (const message of messages) {
+          events.push({ height, message });
+        }
+      }
+    }
+    return events;
+  }
+
   /**
    * Initializes subscription to chain and starts emitting events.
    */
-  public async subscribe(cb: (event: RawEvent) => void): Promise<void> {
+  public async subscribe(
+    cb: (event: RawEvent) => void,
+    disconnectedRange?: IDisconnectedRange
+  ): Promise<void> {
+    if (disconnectedRange) {
+      // TODO: set disconnected range to recover past blocks via "polling"
+    }
     this._listener = setInterval(async () => {
-      // fetch all blocks
       const blocks = await this._queryBlocks();
-
-      // parse all transactions
-      const events: RawEvent[] = [];
-      for (const block of blocks) {
-        const {
-          header: { height },
-        } = block;
-        for (const tx of block.txs) {
-          const decodedTx = decodeTxRaw(tx);
-          const {
-            body: { messages },
-          } = decodedTx;
-          for (const message of messages) {
-            events.push({ height, message });
-          }
-        }
-      }
+      const events = this._blocksToEvents(blocks);
       for (const event of events) {
         cb(event);
       }
-    }, /* TODO: configure timeout */ 15 * 1000);
+    }, this._pollTime);
   }
 
   public unsubscribe(): void {
