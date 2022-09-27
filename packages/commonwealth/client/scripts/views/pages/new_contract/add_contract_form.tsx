@@ -159,13 +159,13 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 this.state.form.decimals
               );
               notifySuccess(`Contract ${res.address} for Community ${app.activeChainId()} created successfully!`);
-              m.redraw();
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new contract with community failed'
               );
             } finally {
               this.state.saving = false;
+              m.redraw();
             }
           }}
         />

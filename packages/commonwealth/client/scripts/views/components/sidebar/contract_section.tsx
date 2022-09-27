@@ -49,17 +49,12 @@ export class ContractSection
   adminCategory: string;
   // eslint-disable-next-line @typescript-eslint/ban-types
   adminChannel: IChannel | {};
-  onIncomingMessage: (any: any) => void;
   chain: string;
   activeChannel: number;
 
   async oninit(vnode) {
     this.loaded = false;
     this.chain = app.activeChainId();
-
-    this.onIncomingMessage = (msg) => {
-      m.redraw.sync();
-    };
 
     this.loaded = true;
 

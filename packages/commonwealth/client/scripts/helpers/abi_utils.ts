@@ -20,6 +20,17 @@ export function parseFunctionsFromABI(abiString: string): AbiItem[] {
   return fns;
 }
 
+export function parseWriteFunctionsFromABI(abiString: string): AbiItem[] {
+  let fns: AbiItem[] = [];
+  if (abiString) {
+    const abiItems = parseAbiItemsFromABI(abiString)
+    fns = abiItems.filter((x) => x.type === "function" && x.stateMutability !== "view"
+    && x.stateMutability !== "pure" && x.constant !== true)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return fns;
+}
+
 export function parseEventsFromABI(abiString: string): AbiItem[] {
   let events: AbiItem[] = [];
   if (abiString) {
