@@ -142,10 +142,10 @@ async function mainProcess(
       ON cc.chain_id = c.id
     LEFT JOIN "Contracts" con
       ON con.id = cc.contract_id
-  WHERE c."has_chain_events_listener" = true;`
-  //   AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
-  //     (c.base = 'substrate' AND c.type ='chain'));
-  // `;
+  WHERE c."has_chain_events_listener" = true
+    AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
+      (c.base = 'substrate' AND c.type ='chain'));
+  `;
   const allChains = (await pool.query(query)).rows;
 
   // gets the chains specific to this node
