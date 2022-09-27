@@ -27,7 +27,7 @@ import Sublayout from '../../sublayout';
 import { ChainFormState } from '../create_community/types';
 
 type CreateContractForm = {
-  ethToSend: number;
+  functionNameToEthToSend: Map<string, string>;
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
 };
 
@@ -46,7 +46,7 @@ class GeneralContractPage
     status: undefined,
     functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
-      ethToSend: 0,
+      functionNameToEthToSend: new Map<string, string>(),
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     },
   };
@@ -63,7 +63,6 @@ class GeneralContractPage
     const { contractAddress } = vnode.attrs;
     const contract: Contract =
       app.contracts.store.getContractByAddress(contractAddress);
-    console.log('the contract is ', contract);
     if (contract.abi === undefined || contract.abi === '') {
       this.loadAbiFromEtherscan(contract.address).then((abi) => {
         // Populate Abi Table
@@ -131,15 +130,26 @@ class GeneralContractPage
       // Assumption is using this methodology for calling functions
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+      if (fn.stateMutability !== "view" && fn.constant !== true) {
+        // // set options for transaction
+        const opts: any = {};
+        if (this.state.form.functionNameToEthToSend.get(fn.name) !== '') {
+          opts.value = ethers.utils.parseEther(this.state.form.functionNameToEthToSend.get(fn.name));
+        }
+      }
 
-      // } else {
+      const sender = app.user.activeAccount;
+      // get querying wallet
+      const signingWallet = await app.wallets.locateWallet(
+        sender,
+        ChainBase.Ethereum
+      );
 
-      // }
+      // get chain
+      const chain = (app.chain as Ethereum).chain;
+
+      const web3Api = await getWeb3();
+      let tx: string;
 
       const methodSignature = `${fn.name}(${fn.inputs
         .map((input) => input.type)
@@ -148,18 +158,7 @@ class GeneralContractPage
       const functionTx = functionContract.methods[methodSignature](
         ...processedArgs
       );
-      const sender = app.user.activeAccount;
-      //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
-      );
 
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
-
-      const web3Api = await getWeb3();
-      let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
         tx = await chain.makeContractTx(
@@ -202,20 +201,20 @@ class GeneralContractPage
       return abiFunctions;
     };
 
-    const renderPayableInputs = () => {
-      return(
+    const renderPayableInputs = (fnName: string) => {
+      return (
         <div class="payable-input-row">
           <CWText>Amount of ETH To Send</CWText>
           <CWTextInput
             name="Contract Input Field"
             placeholder="Insert Input Here"
             oninput={(e) => {
-              this.state.form.ethToSend = e.target.value;
+              this.state.form.functionNameToEthToSend.set(fnName, e.target.value);
             }}
           />
         </div>
-      )
-    }
+      );
+    };
 
     const { contractAddress } = vnode.attrs;
     if (!app.contracts || !app.chain || !this.state.loaded) {
@@ -271,168 +270,181 @@ class GeneralContractPage
                         />
                       </div>
                     </div>
-                    {fn.stateMutability === 'payable' && renderPayableInputs()}
+                    {fn.stateMutability === 'payable' && renderPayableInputs(fn.type)}
+                  </div>
+                );
+              } else {
+                return (
+                  <div>
+                    <div class="function-row">
+                      <CWText>{fn.name}</CWText>
+                      <CWText>{fn.stateMutability}</CWText>
+                      <div class="functions-input-container">
+                        {fn?.inputs?.map(
+                          (input: AbiInput, inputIdx: number) => {
+                            return (
+                              <div>
+                                <div class="function-inputs">
+                                  <CWText>[{inputIdx}]</CWText>
+                                  <CWText>{input.type}</CWText>
+                                  <CWText>{input.name}</CWText>
+                                </div>
+                                <div>
+                                  <CWTextInput
+                                    name="Contract Input Field"
+                                    placeholder="Insert Input Here"
+                                    oninput={(e) => {
+                                      if (
+                                        !this.state.form.functionNameToFunctionInputArgs.has(
+                                          fn.name
+                                        )
+                                      ) {
+                                        this.state.form.functionNameToFunctionInputArgs.set(
+                                          fn.name,
+                                          new Map<number, string>()
+                                        );
+                                        const inputArgMap =
+                                          this.state.form.functionNameToFunctionInputArgs.get(
+                                            fn.name
+                                          );
+                                        inputArgMap.set(
+                                          inputIdx,
+                                          e.target.value
+                                        );
+                                        this.state.form.functionNameToFunctionInputArgs.set(
+                                          fn.name,
+                                          inputArgMap
+                                        );
+                                      } else {
+                                        const inputArgMap =
+                                          this.state.form.functionNameToFunctionInputArgs.get(
+                                            fn.name
+                                          );
+                                        inputArgMap.set(
+                                          inputIdx,
+                                          e.target.value
+                                        );
+                                        this.state.form.functionNameToFunctionInputArgs.set(
+                                          fn.name,
+                                          inputArgMap
+                                        );
+                                      }
+                                      this.state.loaded = true;
+                                    }}
+                                    inputValidationFn={(
+                                      val: string
+                                    ): [ValidationStatus, string] => {
+                                      // TODO Array Validation will be complex. Check what cases we want to cover here
+                                      if (input.type.slice(-2) === '[]') {
+                                        if (
+                                          val[0] !== '[' ||
+                                          val[val.length - 1] !== ']'
+                                        ) {
+                                          return [
+                                            'failure',
+                                            'Input must be an array',
+                                          ];
+                                        } else {
+                                          return ['success', ''];
+                                        }
+                                      }
+                                      if (input.type === 'bool') {
+                                        if (val !== 'true' && val !== 'false') {
+                                          return [
+                                            'failure',
+                                            'Input must be a boolean',
+                                          ];
+                                        }
+                                      }
+                                      if (
+                                        input.type.substring(0, 4) === 'uint'
+                                      ) {
+                                        if (!Number.isNaN(Number(val))) {
+                                          return ['success', ''];
+                                        } else {
+                                          return [
+                                            'failure',
+                                            'Input must be a number',
+                                          ];
+                                        }
+                                      } else if (input.type === 'bool') {
+                                        if (val === 'true' || val === 'false') {
+                                          return ['success', ''];
+                                        } else {
+                                          return [
+                                            'failure',
+                                            'Input must be a boolean',
+                                          ];
+                                        }
+                                      } else if (input.type === 'address') {
+                                        if (val.length === 42) {
+                                          return ['success', ''];
+                                        } else {
+                                          return [
+                                            'failure',
+                                            'Input must be an address',
+                                          ];
+                                        }
+                                      } else {
+                                        return ['success', ''];
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                      <div class="functions-output-container">
+                        {fn?.outputs?.map((output: AbiOutput, i) => {
+                          const fnOutputArray =
+                            this.state.functionNameToFunctionOutput.get(
+                              fn.name
+                            );
+                          return (
+                            <div>
+                              <div class="function-outputs">
+                                <CWText>[{i}]</CWText>
+                                <CWText>{output.type}</CWText>
+                                <CWText>{output.name}</CWText>
+                              </div>
+                              <div>
+                                <CWText>
+                                  {fnOutputArray && fnOutputArray[i].toString()
+                                    ? fnOutputArray[i].toString()
+                                    : ''}
+                                </CWText>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div class="function-call">
+                        <CWButton
+                          label="Submit"
+                          disabled={this.state.saving || !this.state.loaded}
+                          onclick={() => {
+                            notifySuccess('Submit Call button clicked!');
+                            this.state.saving = true;
+                            try {
+                              callFunction(contractAddress, fn);
+                            } catch (err) {
+                              notifyError(
+                                err.responseJSON?.error ||
+                                  'Submitting Function Call failed'
+                              );
+                            } finally {
+                              this.state.saving = false;
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {fn.stateMutability === 'payable' && renderPayableInputs(fn.name)}
                   </div>
                 );
               }
-              return (
-                <div>
-                  <div class="function-row">
-                    <CWText>{fn.name}</CWText>
-                    <CWText>{fn.stateMutability}</CWText>
-                    <div class="functions-input-container">
-                      {fn?.inputs?.map((input: AbiInput, inputIdx: number) => {
-                        return (
-                          <div>
-                            <div class="function-inputs">
-                              <CWText>[{inputIdx}]</CWText>
-                              <CWText>{input.type}</CWText>
-                              <CWText>{input.name}</CWText>
-                            </div>
-                            <div>
-                              <CWTextInput
-                                name="Contract Input Field"
-                                placeholder="Insert Input Here"
-                                oninput={(e) => {
-                                  if (
-                                    !this.state.form.functionNameToFunctionInputArgs.has(
-                                      fn.name
-                                    )
-                                  ) {
-                                    this.state.form.functionNameToFunctionInputArgs.set(
-                                      fn.name,
-                                      new Map<number, string>()
-                                    );
-                                    const inputArgMap =
-                                      this.state.form.functionNameToFunctionInputArgs.get(
-                                        fn.name
-                                      );
-                                    inputArgMap.set(inputIdx, e.target.value);
-                                    this.state.form.functionNameToFunctionInputArgs.set(
-                                      fn.name,
-                                      inputArgMap
-                                    );
-                                  } else {
-                                    const inputArgMap =
-                                      this.state.form.functionNameToFunctionInputArgs.get(
-                                        fn.name
-                                      );
-                                    inputArgMap.set(inputIdx, e.target.value);
-                                    this.state.form.functionNameToFunctionInputArgs.set(
-                                      fn.name,
-                                      inputArgMap
-                                    );
-                                  }
-                                  this.state.loaded = true;
-                                }}
-                                inputValidationFn={(
-                                  val: string
-                                ): [ValidationStatus, string] => {
-                                  // TODO Array Validation will be complex. Check what cases we want to cover here
-                                  if (input.type.slice(-2) === '[]') {
-                                    if (
-                                      val[0] !== '[' ||
-                                      val[val.length - 1] !== ']'
-                                    ) {
-                                      return [
-                                        'failure',
-                                        'Input must be an array',
-                                      ];
-                                    } else {
-                                      return ['success', ''];
-                                    }
-                                  }
-                                  if (input.type === 'bool') {
-                                    if (val !== 'true' && val !== 'false') {
-                                      return [
-                                        'failure',
-                                        'Input must be a boolean',
-                                      ];
-                                    }
-                                  }
-                                  if (input.type.substring(0, 4) === 'uint') {
-                                    if (!Number.isNaN(Number(val))) {
-                                      return ['success', ''];
-                                    } else {
-                                      return [
-                                        'failure',
-                                        'Input must be a number',
-                                      ];
-                                    }
-                                  } else if (input.type === 'bool') {
-                                    if (val === 'true' || val === 'false') {
-                                      return ['success', ''];
-                                    } else {
-                                      return [
-                                        'failure',
-                                        'Input must be a boolean',
-                                      ];
-                                    }
-                                  } else if (input.type === 'address') {
-                                    if (val.length === 42) {
-                                      return ['success', ''];
-                                    } else {
-                                      return [
-                                        'failure',
-                                        'Input must be an address',
-                                      ];
-                                    }
-                                  } else {
-                                    return ['success', ''];
-                                  }
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div class="functions-output-container">
-                      {fn?.outputs?.map((output: AbiOutput, i) => {
-                        const fnOutputArray =
-                          this.state.functionNameToFunctionOutput.get(fn.name);
-                        return (
-                          <div>
-                            <div class="function-outputs">
-                              <CWText>[{i}]</CWText>
-                              <CWText>{output.type}</CWText>
-                              <CWText>{output.name}</CWText>
-                            </div>
-                            <div>
-                              <CWText>
-                                {fnOutputArray && fnOutputArray[i].toString()
-                                  ? fnOutputArray[i].toString()
-                                  : ''}
-                              </CWText>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div class="function-call">
-                      <CWButton
-                        label="Submit"
-                        disabled={this.state.saving || !this.state.loaded}
-                        onclick={() => {
-                          notifySuccess('Submit Call button clicked!');
-                          this.state.saving = true;
-                          try {
-                            callFunction(contractAddress, fn);
-                          } catch (err) {
-                            notifyError(
-                              err.responseJSON?.error ||
-                                'Submitting Function Call failed'
-                            );
-                          } finally {
-                            this.state.saving = false;
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {fn.stateMutability === 'payable' && renderPayableInputs()}
-                </div>
-              );
             })}
           </div>
         </div>
