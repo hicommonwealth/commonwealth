@@ -14,6 +14,12 @@ module.exports = {
       defaultValue: 'false',
     });
 
+    await queryInterface.addColumn('Contracts', 'is_proxy', {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      defaultValue: 'false',
+    });
+
     await queryInterface.addColumn('Contracts', 'nickname', {
       type: Sequelize.STRING,
       allowNull: true,
@@ -28,6 +34,7 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await queryInterface.removeColumn('Contracts', 'is_factory');
+    await queryInterface.removeColumn('Contracts', 'is_proxy');
     await queryInterface.removeColumn('Contracts', 'nickname');
   }
 };
