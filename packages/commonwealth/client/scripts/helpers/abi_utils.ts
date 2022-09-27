@@ -14,7 +14,7 @@ export function parseFunctionsFromABI(abiString: string): AbiItem[] {
   let fns: AbiItem[] = [];
   if (abiString) {
     const abiItems = parseAbiItemsFromABI(abiString)
-    fns = abiItems.filter((x) => x.type === "function")
+    fns = abiItems.filter((x) => x.type === "function" || x.type === "fallback")
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return fns;

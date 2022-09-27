@@ -224,7 +224,7 @@ class GeneralContractPage
                   <CWText>{fn.name}</CWText>
                   <CWText>{fn.stateMutability}</CWText>
                   <div class="functions-input-container">
-                    {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+                    {fn?.inputs?.map((input: AbiInput, inputIdx: number) => {
                       return (
                         <div>
                           <div class="function-inputs">
@@ -331,7 +331,7 @@ class GeneralContractPage
                     })}
                   </div>
                   <div class="functions-output-container">
-                    {fn.outputs.map((output: AbiOutput, i) => {
+                    {fn?.outputs?.map((output: AbiOutput, i) => {
                       const fnOutputArray = this.state.functionNameToFunctionOutput.get(
                         fn.name
                       )

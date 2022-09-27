@@ -14,6 +14,7 @@ class Contract {
   public readonly abi?: string;
   public readonly community?: string;
   public readonly isFactory?: boolean;
+  public readonly isProxy?: boolean;
   public readonly nickname?: string;
 
   constructor(
@@ -29,6 +30,7 @@ class Contract {
     contractAbi?,
     community?,
     isFactory?,
+    isProxy?,
     nickname?,
   ) {
     this.id = id;
@@ -43,6 +45,7 @@ class Contract {
     this.abi = contractAbi;
     this.community = community;
     this.isFactory = isFactory;
+    this.isProxy = isProxy;
     this.nickname = nickname;
   }
 
@@ -59,6 +62,7 @@ class Contract {
     contract_abi,
     community,
     is_factory,
+    is_proxy,
     nickname,
   }) {
     return new Contract(
@@ -74,6 +78,7 @@ class Contract {
       contract_abi,
       community,
       is_factory,
+      is_proxy,
       nickname,
     );
   }

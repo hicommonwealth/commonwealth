@@ -217,6 +217,11 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       return abiFunctions;
     };
 
+    const isProxyContract = (nickname: string) => {
+      const contract: Contract = app.contracts.getByNickname(nickname);
+      return contract.isProxy;
+    };
+
     return (
       <div class="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
@@ -229,7 +234,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           onchange={(value) => {
             this.state.form.daoFactoryType = value;
             this.state.loaded = true;
-            console.log("loaded")
+            console.log('loaded');
             m.redraw();
           }}
         />
@@ -238,16 +243,16 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           <CWText>
             Selected Dao Factory: {this.state.form.daoFactoryType}
           </CWText>
-          <div class="functions-container">
-            <div class="header-row">
-              <CWText>Name</CWText>
-              <CWText>State Mutability</CWText>
-              <CWText>Inputs</CWText>
-              <CWText>Outputs</CWText>
-              <CWText>Call Function</CWText>
-            </div>
-            {this.state.form.daoFactoryType !== '' &&
-              loadFactoryContractAbi(this.state.form.daoFactoryType).map(
+          {!isProxyContract(this.state.form.daoFactoryType) ? (
+            <div class="functions-container">
+              <div class="header-row">
+                <CWText>Name</CWText>
+                <CWText>State Mutability</CWText>
+                <CWText>Inputs</CWText>
+                <CWText>Outputs</CWText>
+                <CWText>Call Function</CWText>
+              </div>
+              {loadFactoryContractAbi(this.state.form.daoFactoryType).map(
                 (fn: AbiItem, fnIdx: number) => {
                   return (
                     <div class="function-row">
@@ -408,7 +413,14 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                   );
                 }
               )}
-          </div>
+            </div>
+          ) : (
+            <div class="proxy-functions-container">
+              <div class="header-row">
+                <CWText>This is a Proxy</CWText>
+              </div>
+            </div>
+          )}
         </div>
         {...defaultChainRows(this.state.form, disableField)}
       </div>
