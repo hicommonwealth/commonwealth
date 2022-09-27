@@ -130,20 +130,21 @@ async function mainProcess(
     c."substrate_spec",
     cn."url",
     cn."private_url",
-    con.address,
+    con.address as "address",
     c."base",
     c."type",
     c."network",
     c."ce_verbose"
   FROM "Chains" c 
-  JOIN "ChainNodes" cn
-    ON c.chain_node_id = cn.id
-  LEFT JOIN "CommunityContracts" cc
-    ON cc.chain_id = c.id
-  LEFT JOIN "Contracts" con
-    ON con.chain_node_id = cn.id
+    JOIN "ChainNodes" cn
+      ON c.chain_node_id = cn.id
+    LEFT JOIN "CommunityContracts" cc
+      ON cc.chain_id = c.id
+    LEFT JOIN "Contracts" con
+      ON con.id = cc.contract_id
   WHERE c."has_chain_events_listener" = true
-  AND con.type IN ('marlin-testnet', 'aave', 'compound');
+    AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
+      (c.base = 'substrate' AND c.type ='chain'));
   `;
   const allChains = (await pool.query(query)).rows;
 
