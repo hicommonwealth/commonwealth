@@ -198,14 +198,14 @@ export class MobileNewProposalButton implements m.ClassComponent {
             disabled={!app.user.activeAccount}
             label={<Icon name={Icons.PLUS} />}
             inline={true}
-            position="bottom-start"
-            closeOnContentClick={true}
-            menuAttrs={{
-              align: 'left',
-            }}
-            content={<NewProposalMenu />}
-          />
-        }
+            />
+          }
+        position="bottom-start"
+        closeOnContentClick={true}
+        menuAttrs={{
+          align: 'left',
+        }}
+        content={<NewProposalMenu />}
       />
     );
   }
