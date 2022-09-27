@@ -65,17 +65,17 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
-      const contracts = await chainInstance.getContracts();
+      const contracts = await chainInstance.getContracts({ include: [{ model: models.ChainNode, required: true, }]});
       const api = await CompoundEvents.createApi(
-        node.private_url || node.url,
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
       );
       fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.Aave) {
-      const contracts = await chainInstance.getContracts();
+      const contracts = await chainInstance.getContracts({ include: [{ model: models.ChainNode, required: true, }]});
       const api = await AaveEvents.createApi(
-        node.private_url || node.url,
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
       );
       fetcher = new AaveEvents.StorageFetcher(api);
