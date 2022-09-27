@@ -67,7 +67,7 @@ const tokenBalance = async (
     const balance = await tokenBalanceCache.getBalance(
       chain_node_id,
       author.address,
-      contract.address,
+      contract?.address,
       chain.network === ChainNetwork.ERC20
         ? 'erc20' : chain.network === ChainNetwork.ERC721
           ? 'erc721' : chain.network === ChainNetwork.SPL
