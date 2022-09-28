@@ -6,11 +6,9 @@ import lity from 'lity';
 import app from 'state';
 import { Thread, Comment, AnyProposal, Account } from 'models';
 import User from 'views/components/widgets/user';
-import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { clearEditingLocalStorage, formatBody } from './helpers';
+import { formatBody } from './helpers';
 import {
   QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
@@ -128,90 +126,6 @@ export class ProposalBodyAttachments
           </a>
         ))}
       </>
-    );
-  }
-}
-
-export class ProposalBodyEditor
-  implements
-    m.Component<{
-      item: Thread | Comment<any>;
-      parentState;
-    }>
-{
-  private restoreEdits: boolean;
-  private savedEdits: string;
-
-  async oninit(vnode) {
-    const { item } = vnode.attrs;
-
-    const isThread = item instanceof Thread;
-
-    this.savedEdits = isThread
-      ? localStorage.getItem(
-          `${app.activeChainId()}-edit-thread-${item.id}-storedText`
-        )
-      : localStorage.getItem(
-          `${app.activeChainId()}-edit-comment-${item.id}-storedText`
-        );
-
-    if (this.savedEdits) {
-      const modalMsg = 'Previous changes found. Restore edits?';
-
-      this.restoreEdits = await confirmationModalWithText(
-        modalMsg,
-        'Yes',
-        'No'
-      )();
-
-      clearEditingLocalStorage(item, isThread);
-
-      m.redraw();
-    }
-  }
-
-  view(vnode) {
-    const { item, parentState } = vnode.attrs;
-    const { restoreEdits, savedEdits } = this;
-
-    if (!item) return;
-
-    const isThread = item instanceof Thread;
-
-    const body =
-      restoreEdits && savedEdits
-        ? savedEdits
-        : item instanceof Comment
-        ? (item as Comment<any>).text
-        : item instanceof Thread
-        ? (item as Thread).body
-        : null;
-
-    if (!body) return;
-    if (savedEdits && restoreEdits === undefined) {
-      return <QuillEditorComponent />;
-    }
-
-    return (
-      <QuillEditorComponent
-        contentsDoc={(() => {
-          try {
-            const doc = JSON.parse(body);
-            if (!doc.ops) throw new Error();
-            return doc;
-          } catch (e) {
-            return body;
-          }
-        })()}
-        oncreateBind={(state) => {
-          parentState.quillEditorState = state;
-        }}
-        imageUploader
-        theme="snow"
-        editorNamespace={
-          isThread ? `edit-thread-${item.id}` : `edit-comment-${item.id}`
-        }
-      />
     );
   }
 }

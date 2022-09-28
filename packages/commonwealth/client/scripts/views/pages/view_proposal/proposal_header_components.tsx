@@ -9,7 +9,7 @@ import 'pages/view_proposal/proposal_header_components.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { slugify, validURL } from 'utils';
+import { slugify } from 'utils';
 import { pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import {
@@ -35,11 +35,7 @@ import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { GlobalStatus, ProposalPageState } from './types';
-import {
-  activeQuillEditorHasText,
-  clearEditingLocalStorage,
-  jumpHighlightComment,
-} from './helpers';
+import { activeQuillEditorHasText, jumpHighlightComment } from './helpers';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 
 export class ProposalHeaderStage
@@ -641,124 +637,6 @@ export class EditCollaboratorsButton
               thread: proposal,
             },
           });
-        }}
-      />
-    );
-  }
-}
-
-export class ProposalBodyCancelEdit
-  implements
-    m.Component<{
-      item;
-      getSetGlobalEditingStatus;
-      parentState;
-    }>
-{
-  view(vnode) {
-    const { item, getSetGlobalEditingStatus, parentState } = vnode.attrs;
-
-    return (
-      <CWButton
-        label="Cancel"
-        disabled={parentState.saving}
-        onclick={async (e) => {
-          e.preventDefault();
-
-          let confirmed = true;
-
-          const threadText = parentState.quillEditorState.textContentsAsString;
-
-          if (threadText !== parentState.currentText) {
-            confirmed = await confirmationModalWithText(
-              'Cancel editing? Changes will not be saved.'
-            )();
-          }
-
-          if (!confirmed) return;
-
-          parentState.editing = false;
-
-          getSetGlobalEditingStatus(GlobalStatus.Set, false);
-
-          clearEditingLocalStorage(item, item instanceof Thread);
-
-          m.redraw();
-        }}
-      />
-    );
-  }
-}
-
-export class ProposalBodySaveEdit
-  implements
-    m.Component<{
-      item: Thread | Comment<any>;
-      getSetGlobalEditingStatus;
-      parentState;
-      callback?: () => void; // required for Comments
-    }>
-{
-  view(vnode) {
-    const { item, getSetGlobalEditingStatus, parentState, callback } =
-      vnode.attrs;
-
-    return (
-      <CWButton
-        label="Save"
-        disabled={parentState.saving}
-        onclick={(e) => {
-          e.preventDefault();
-
-          if (parentState.updatedUrl) {
-            if (!validURL(parentState.updatedUrl)) {
-              notifyError('Must provide a valid URL.');
-              return;
-            }
-          }
-
-          parentState.saving = true;
-
-          parentState.quillEditorState.disable();
-
-          const itemText = parentState.quillEditorState.textContentsAsString;
-
-          if (item instanceof Thread) {
-            app.threads
-              .edit(
-                item,
-                itemText,
-                parentState.updatedTitle,
-                parentState.updatedUrl
-              )
-              .then(() => {
-                navigateToSubpage(`/discussion/${item.id}`);
-
-                parentState.editing = false;
-
-                parentState.saving = false;
-
-                clearEditingLocalStorage(item, true);
-
-                getSetGlobalEditingStatus(GlobalStatus.Set, false);
-
-                m.redraw();
-
-                notifySuccess('Thread successfully edited');
-              });
-          } else if (item instanceof Comment) {
-            app.comments.edit(item, itemText).then(() => {
-              parentState.editing = false;
-
-              parentState.saving = false;
-
-              clearEditingLocalStorage(item, false);
-
-              getSetGlobalEditingStatus(GlobalStatus.Set, false);
-
-              callback();
-            });
-          }
         }}
       />
     );

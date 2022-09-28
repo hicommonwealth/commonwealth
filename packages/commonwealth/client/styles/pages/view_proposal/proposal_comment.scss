@@ -20,6 +20,7 @@
     flex-direction: column;
     gap: 8px;
     padding: 8px 0;
+    width: 100%;
 
     .comment-header {
       align-items: center;
@@ -30,11 +31,6 @@
         font-weight: 500;
 
         @include caption;
-      }
-
-      .identity-icon {
-        position: unset;
-        top: 0;
       }
 
       .published-text.Text {
@@ -51,14 +47,46 @@
         display: flex;
         gap: 16px;
 
-        .vote-group,
-        .feedback-group {
+        .vote-group {
           align-items: center;
           display: flex;
           gap: 4px;
 
           .menu-buttons-text.Text {
             color: $neutral-500;
+          }
+        }
+
+        .reply-button {
+          align-items: center;
+          cursor: pointer;
+          display: flex;
+          gap: 4px;
+
+          .Icon,
+          .menu-buttons-text.Text {
+            color: $neutral-500;
+          }
+
+          &:hover {
+            .Icon,
+            .menu-buttons-text.Text {
+              color: $neutral-600;
+            }
+          }
+
+          &:active {
+            .Icon,
+            .menu-buttons-text.Text {
+              color: $neutral-800;
+            }
+          }
+
+          &.selected {
+            .Icon,
+            .menu-buttons-text.Text {
+              color: $neutral-800;
+            }
           }
         }
       }

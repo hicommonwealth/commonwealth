@@ -46,8 +46,6 @@
   line-height: 1;
   width: 14px;
   height: 14px;
-  position: relative;
-  top: -2px;
 
   &.green {
     background: $green-500;
@@ -103,9 +101,10 @@
     font-weight: 500;
     margin-left: 4px;
     background: $neutral-100;
-    border-radius: 99px;
-    padding: 4px 8px;
+    border-radius: $border-radius-rounded-corners;
     text-decoration: none !important;
+    padding: 0 8px;
+    height: 16px;
   }
 
   &.linkified a.user-display-name {

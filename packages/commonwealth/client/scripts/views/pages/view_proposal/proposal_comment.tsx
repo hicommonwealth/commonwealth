@@ -35,6 +35,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { renderQuillTextBody } from '../../components/quill/helpers';
+import { EditComment } from './edit_comment';
 
 type ProposalCommentAttrs = {
   callback?: CallableFunction;
@@ -97,28 +98,15 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
             </CWText>
           </div>
           {this.editing ? (
-            <ProposalBodyEditor item={comment} parentState={this} />
+            <EditComment
+              callback={callback}
+              comment={comment}
+              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+            />
           ) : (
-            <CWText type="b2">{renderQuillTextBody(comment.text)}</CWText>
-          )}
-          <div class="comment-footer">
-            {this.editing && (
-              <div class="comment-edit-buttons">
-                <ProposalBodySaveEdit
-                  item={comment}
-                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                  parentState={this}
-                  callback={callback}
-                />
-                <ProposalBodyCancelEdit
-                  item={comment}
-                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                  parentState={this}
-                />
-              </div>
-            )}
-            {!this.editing && (
-              <>
+            <>
+              <CWText type="b2">{renderQuillTextBody(comment.text)}</CWText>
+              <div class="comment-footer">
                 <div class="menu-buttons-left">
                   <div class="vote-group">
                     <CWIconButton iconName="upvote" iconSize="small" />
@@ -127,8 +115,8 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                     </CWText>
                     <CWIconButton iconName="downvote" iconSize="small" />
                   </div>
-                  <div class="feedback-group">
-                    <CWIconButton iconName="feedback" iconSize="small" />
+                  <div class="reply-button" onclick={() => console.log()}>
+                    <CWIcon iconName="feedback" iconSize="small" />
                     <CWText type="caption" className="menu-buttons-text">
                       Reply
                     </CWText>
@@ -154,9 +142,9 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                     ]}
                   />
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
