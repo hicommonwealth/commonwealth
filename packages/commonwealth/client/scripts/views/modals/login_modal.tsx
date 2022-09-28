@@ -314,7 +314,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         avatarUrl: this.avatarUrl,
       };
       try {
-        await app.profiles.updateProfileForAccount(this.primaryAccount, data);
+        if (this.username || this.avatarUrl) {
+          await app.profiles.updateProfileForAccount(this.primaryAccount, data);
+        }
         if (isWindowMediumSmallInclusive(window.innerWidth)) {
           $('.LoginMobile').trigger('modalexit');
         } else {

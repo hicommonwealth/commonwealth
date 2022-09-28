@@ -17,7 +17,7 @@
       overflow-y: auto;
       width: 284px;
       // preserves box shadow in scroll container
-      height: 176px;
+      max-height: 176px;
       margin-bottom: -4px;
       padding-bottom: 4px;
 

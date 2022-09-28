@@ -55,10 +55,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
       bodyType === 'connectWithEmail' ||
       bodyType === 'ethWalletList';
 
-    const hasCreationButtons =
-      bodyType === 'selectAccountType' ||
-      bodyType === 'selectPrevious' ||
-      bodyType === 'welcome';
+    const hasCreationButtons = bodyType === 'selectAccountType';
 
     const { headerText, bodyText } = getText(bodyType);
 
