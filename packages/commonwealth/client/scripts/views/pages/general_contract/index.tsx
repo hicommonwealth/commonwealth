@@ -97,37 +97,6 @@ class GeneralContractPage
     };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
-      if (fn.type === 'fallback') {
-        console.log('fallback');
-        return;
-      }
-
-      // handle array and int types
-      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
-        const type = arg.type;
-        if (type.substring(0, 4) === 'uint')
-          return BigNumber.from(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        if (type.slice(-2) === '[]')
-          return JSON.parse(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        return this.state.form.functionNameToFunctionInputArgs
-          .get(fn.name)
-          .get(index);
-      });
-
-      const functionContract = await getWeb3Contract();
-
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
-
       const sender = app.user.activeAccount;
       // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
@@ -140,15 +109,46 @@ class GeneralContractPage
 
       const web3Api = await getWeb3();
       let tx: string;
+      let functionTx;
 
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
+      if (fn.type !== 'fallback') {
+        // handle array and int types
+        const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
+          const type = arg.type;
+          if (type.substring(0, 4) === 'uint')
+            return BigNumber.from(
+              this.state.form.functionNameToFunctionInputArgs
+                .get(fn.name)
+                .get(index)
+            );
+          if (type.slice(-2) === '[]')
+            return JSON.parse(
+              this.state.form.functionNameToFunctionInputArgs
+                .get(fn.name)
+                .get(index)
+            );
+          return this.state.form.functionNameToFunctionInputArgs
+            .get(fn.name)
+            .get(index);
+        });
 
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
+        // 5. Build function tx
+        // Assumption is using this methodology for calling functions
+        // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
+        const methodSignature = `${fn.name}(${fn.inputs
+          .map((input) => input.type)
+          .join(',')})`;
+
+        const functionContract = await getWeb3Contract();
+
+        functionTx = functionContract.methods[methodSignature](
+          ...processedArgs
+        );
+      }
+
+      let txData = '';
+      if (functionTx !== undefined) txData = functionTx.encodeABI();
       if (fn.stateMutability === 'payable') {
         // Get value to send
         let value = '';
@@ -159,7 +159,7 @@ class GeneralContractPage
         tx = await chain.makeContractTx(
           signingWallet,
           contractAddress,
-          functionTx.encodeABI(),
+          txData,
           value
         );
       }
@@ -168,7 +168,7 @@ class GeneralContractPage
         tx = await chain.makeContractTx(
           signingWallet,
           contractAddress,
-          functionTx.encodeABI()
+          txData
         );
       } else {
         // send transaction
