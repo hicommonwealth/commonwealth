@@ -14,21 +14,20 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { ProposalPageState } from './types';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
+import { QuillEditor } from '../../components/quill/quill_editor';
 
 type EditCommentAttrs = {
   callback?: () => void;
   comment: Comment<any>;
   proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
-  // quillEditorState
-  // saving
-  // updatedTitle
-  // updatedUrl
 };
 
 export class EditComment implements m.ClassComponent<EditCommentAttrs> {
+  private quillEditorState: QuillEditor;
   private restoreEdits: boolean;
   private savedEdits: string;
+  private saving: boolean;
 
   async oninit(vnode) {
     const { comment } = vnode.attrs;
@@ -91,7 +90,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
               }
             })()}
             oncreateBind={(state) => {
-              proposalPageState.quillEditorState = state;
+              this.quillEditorState = state;
             }}
             imageUploader
             theme="snow"
@@ -105,34 +104,33 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
         <div class="comment-edit-buttons">
           <CWButton
             label="Cancel"
-            disabled={proposalPageState.saving}
+            disabled={this.saving}
             buttonType="secondary-blue"
             onclick={async (e) => {
               e.preventDefault();
 
-              // let confirmed = true;
+              let confirmed = true;
 
-              // const threadText =
-              //   proposalPageState.quillEditorState.textContentsAsString;
+              const threadText = this.quillEditorState.textContentsAsString;
 
-              // if (threadText !== proposalPageState.currentText) {
-              //   confirmed = await confirmationModalWithText(
-              //     'Cancel editing? Changes will not be saved.'
-              //   )();
-              // }
+              if (threadText !== body) {
+                confirmed = await confirmationModalWithText(
+                  'Cancel editing? Changes will not be saved.'
+                )();
+              }
 
-              // if (confirmed) {
-              //   setIsGloballyEditing(false);
+              if (confirmed) {
+                setIsGloballyEditing(false);
 
-              //   clearEditingLocalStorage(comment, comment instanceof Thread);
+                clearEditingLocalStorage(comment, comment instanceof Thread);
 
-              //   m.redraw();
-              // }
+                m.redraw();
+              }
             }}
           />
           <CWButton
             label="Save"
-            disabled={proposalPageState.saving}
+            disabled={this.saving}
             onclick={(e) => {
               e.preventDefault();
 
@@ -143,12 +141,11 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                 }
               }
 
-              proposalPageState.saving = true;
+              this.saving = true;
 
-              proposalPageState.quillEditorState.disable();
+              this.quillEditorState.disable();
 
-              const itemText =
-                proposalPageState.quillEditorState.textContentsAsString;
+              const itemText = this.quillEditorState.textContentsAsString;
 
               if (comment instanceof Thread) {
                 app.threads
@@ -161,7 +158,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                   .then(() => {
                     navigateToSubpage(`/discussion/${comment.id}`);
 
-                    proposalPageState.saving = false;
+                    this.saving = false;
 
                     clearEditingLocalStorage(comment, true);
 
@@ -173,7 +170,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                   });
               } else if (comment instanceof Comment) {
                 app.comments.edit(comment, itemText).then(() => {
-                  proposalPageState.saving = false;
+                  this.saving = false;
 
                   clearEditingLocalStorage(comment, false);
 
