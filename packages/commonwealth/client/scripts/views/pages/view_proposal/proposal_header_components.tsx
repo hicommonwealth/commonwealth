@@ -34,7 +34,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { GlobalStatus, ProposalPageState } from './types';
+import { ProposalPageState } from './types';
 import { activeQuillEditorHasText, jumpHighlightComment } from './helpers';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 
@@ -161,12 +161,12 @@ export class ProposalTitleEditMenuItem
   implements
     m.ClassComponent<{
       proposalPageState: ProposalPageState;
-      getSetGlobalEditingStatus: CallableFunction;
+      setIsGloballyEditing: (status: boolean) => void;
       parentState;
     }>
 {
   view(vnode) {
-    const { getSetGlobalEditingStatus, proposalPageState, parentState } =
+    const { setIsGloballyEditing, proposalPageState, parentState } =
       vnode.attrs;
 
     return (
@@ -189,7 +189,7 @@ export class ProposalTitleEditMenuItem
           }
           parentState.editing = true;
 
-          getSetGlobalEditingStatus(GlobalStatus.Set, true);
+          setIsGloballyEditing(true);
         }}
       />
     );
@@ -201,12 +201,12 @@ export class ProposalTitleSaveEdit
   implements
     m.ClassComponent<{
       proposal: AnyProposal;
-      getSetGlobalEditingStatus;
+      setIsGloballyEditing: (status: boolean) => void;
       parentState;
     }>
 {
   view(vnode) {
-    const { proposal, getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    const { proposal, setIsGloballyEditing, parentState } = vnode.attrs;
 
     const proposalLink = getProposalUrlPath(
       proposal.slug,
@@ -234,7 +234,7 @@ export class ProposalTitleSaveEdit
 
               parentState.saving = false;
 
-              getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              setIsGloballyEditing(false);
 
               proposal.title = parentState.updatedTitle;
 
@@ -251,12 +251,12 @@ export class ProposalTitleSaveEdit
 export class ProposalTitleCancelEdit
   implements
     m.ClassComponent<{
-      getSetGlobalEditingStatus;
+      setIsGloballyEditing: (status: boolean) => void;
       parentState;
     }>
 {
   view(vnode) {
-    const { getSetGlobalEditingStatus, parentState } = vnode.attrs;
+    const { setIsGloballyEditing, parentState } = vnode.attrs;
 
     return (
       <CWButton
@@ -266,7 +266,7 @@ export class ProposalTitleCancelEdit
           e.preventDefault();
           parentState.editing = false;
           parentState.saving = false;
-          getSetGlobalEditingStatus(GlobalStatus.Set, false);
+          setIsGloballyEditing(false);
           m.redraw();
         }}
       />
@@ -278,7 +278,7 @@ export class ProposalTitleEditor
   implements
     m.ClassComponent<{
       item: Thread | AnyProposal;
-      getSetGlobalEditingStatus;
+      setIsGloballyEditing: (status: boolean) => void;
       parentState;
     }>
 {
@@ -287,7 +287,7 @@ export class ProposalTitleEditor
   }
 
   view(vnode) {
-    const { item, parentState, getSetGlobalEditingStatus } = vnode.attrs;
+    const { item, parentState, setIsGloballyEditing } = vnode.attrs;
 
     const isThread = item instanceof Thread;
 
@@ -305,11 +305,11 @@ export class ProposalTitleEditor
           <>
             <ProposalTitleSaveEdit
               proposal={item as AnyProposal}
-              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              setIsGloballyEditing={setIsGloballyEditing}
               parentState={parentState}
             />
             <ProposalTitleCancelEdit
-              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              setIsGloballyEditing={setIsGloballyEditing}
               parentState={parentState}
             />
           </>
@@ -349,11 +349,11 @@ export class ProposalHeaderPrivacyMenuItems
   implements
     m.ClassComponent<{
       proposal: Thread;
-      getSetGlobalEditingStatus: CallableFunction;
+      setIsGloballyEditing: (status: boolean) => void;
     }>
 {
   view(vnode) {
-    const { proposal, getSetGlobalEditingStatus } = vnode.attrs;
+    const { proposal, setIsGloballyEditing } = vnode.attrs;
 
     return (
       <MenuItem
@@ -365,7 +365,7 @@ export class ProposalHeaderPrivacyMenuItems
               readOnly: !proposal.readOnly,
             })
             .then(() => {
-              getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              setIsGloballyEditing(false);
               m.redraw();
             });
         }}
@@ -539,11 +539,11 @@ export class ProposalBodyEditMenuItem
       item: Thread | Comment<any>;
       parentState;
       proposalPageState: ProposalPageState;
-      getSetGlobalEditingStatus;
+      setIsGloballyEditing: (status: boolean) => void;
     }>
 {
   view(vnode) {
-    const { item, getSetGlobalEditingStatus, proposalPageState, parentState } =
+    const { item, setIsGloballyEditing, proposalPageState, parentState } =
       vnode.attrs;
 
     if (item instanceof Thread && item.readOnly) return;
@@ -572,7 +572,7 @@ export class ProposalBodyEditMenuItem
           }
           parentState.editing = true;
 
-          getSetGlobalEditingStatus(GlobalStatus.Set, true);
+          setIsGloballyEditing(true);
         }}
       />
     );

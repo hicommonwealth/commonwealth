@@ -37,7 +37,7 @@ import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { GlobalStatus, Prefetch } from './types';
+import { Prefetch } from './types';
 import { TipDetail } from '../tip_detail';
 import { ProposalBody } from './proposal_body';
 import { ProposalSidebar } from './proposal_sidebar';
@@ -51,7 +51,7 @@ class ViewProposalPage
 {
   private comments: Comment<Thread>[];
   private polls: Poll[];
-  private editing: boolean;
+  private isGloballyEditing: boolean;
   private highlightedComment: boolean;
   private parentCommentId: number; // if null or undefined, reply is thread-scoped
   private prefetch: Prefetch;
@@ -71,8 +71,8 @@ class ViewProposalPage
 
   oncreate() {
     // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
-    if (!this.editing) {
-      this.editing = false;
+    if (!this.isGloballyEditing) {
+      this.isGloballyEditing = false;
     }
   }
 
@@ -349,7 +349,7 @@ class ViewProposalPage
     this.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
     const windowListener = (e) => {
-      if (this.editing || activeQuillEditorHasText()) {
+      if (this.isGloballyEditing || activeQuillEditorHasText()) {
         e.preventDefault();
         e.returnValue = '';
       }
@@ -360,20 +360,6 @@ class ViewProposalPage
     const comments = this.comments;
     const viewCount: number = this.viewCount;
     const commentCount: number = app.comments.nComments(proposal);
-
-    const getSetGlobalEditingStatus = (call: string, status?: boolean) => {
-      if (call === GlobalStatus.Get) return this.editing;
-
-      if (call === GlobalStatus.Set && status !== undefined) {
-        this.editing = status;
-
-        if (status === false) {
-          this.recentlyEdited = true;
-        }
-
-        m.redraw();
-      }
-    };
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
@@ -411,6 +397,16 @@ class ViewProposalPage
       role: 'admin',
       chain: app.activeChainId(),
     });
+
+    const setIsGloballyEditing = (status: boolean) => {
+      this.isGloballyEditing = status;
+
+      if (status === false) {
+        this.recentlyEdited = true;
+      }
+
+      m.redraw();
+    };
 
     if (proposal instanceof SubstrateTreasuryTip) {
       <TipDetail
@@ -479,7 +475,7 @@ class ViewProposalPage
                 commentCount={commentCount}
                 comments={comments}
                 createdCommentCallback={createdCommentCallback}
-                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                setIsGloballyEditing={setIsGloballyEditing}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 isEditor={isEditor}
@@ -510,10 +506,11 @@ class ViewProposalPage
               commentCount={commentCount}
               comments={comments}
               createdCommentCallback={createdCommentCallback}
-              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              setIsGloballyEditing={setIsGloballyEditing}
               isAdminOrMod={isAdminOrMod}
               isAuthor={isAuthor}
               isEditor={isEditor}
+              isGloballyEditing={this.isGloballyEditing}
               proposal={proposal}
               proposalPageState={this}
               viewCount={viewCount}

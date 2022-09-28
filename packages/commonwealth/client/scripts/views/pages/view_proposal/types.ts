@@ -1,10 +1,5 @@
 import { Poll, Thread, Comment, AnyProposal } from 'models';
 
-export enum GlobalStatus {
-  Get = 'get',
-  Set = 'set',
-}
-
 export type Prefetch = {
   [identifier: string]: {
     commentsStarted: boolean;

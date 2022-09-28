@@ -12,14 +12,14 @@ import { validURL } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
-import { GlobalStatus, ProposalPageState } from './types';
+import { ProposalPageState } from './types';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 
 type EditCommentAttrs = {
-  callback?: CallableFunction;
+  callback?: () => void;
   comment: Comment<any>;
-  getSetGlobalEditingStatus: CallableFunction;
   proposalPageState: ProposalPageState;
+  setIsGloballyEditing: (status: boolean) => void;
 };
 
 export class EditComment implements m.ClassComponent<EditCommentAttrs> {
@@ -55,7 +55,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
   }
 
   view(vnode) {
-    const { callback, comment, getSetGlobalEditingStatus, proposalPageState } =
+    const { callback, comment, setIsGloballyEditing, proposalPageState } =
       vnode.attrs;
 
     const { restoreEdits, savedEdits } = this;
@@ -121,7 +121,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
               proposalPageState.editing = false;
 
-              getSetGlobalEditingStatus(GlobalStatus.Set, false);
+              setIsGloballyEditing(false);
 
               clearEditingLocalStorage(comment, comment instanceof Thread);
 
@@ -165,7 +165,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
                     clearEditingLocalStorage(comment, true);
 
-                    getSetGlobalEditingStatus(GlobalStatus.Set, false);
+                    setIsGloballyEditing(false);
 
                     m.redraw();
 
@@ -179,7 +179,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
                   clearEditingLocalStorage(comment, false);
 
-                  getSetGlobalEditingStatus(GlobalStatus.Set, false);
+                  setIsGloballyEditing(false);
 
                   callback();
                 });

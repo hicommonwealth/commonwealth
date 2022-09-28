@@ -19,10 +19,11 @@ type ProposalBodyAttrs = {
   commentCount: number;
   comments: Array<Comment<Thread>>;
   createdCommentCallback: () => void;
-  getSetGlobalEditingStatus: (call: string, status?: boolean) => void;
+  setIsGloballyEditing: (status: boolean) => void;
   isAdminOrMod: boolean;
   isAuthor: boolean;
   isEditor: boolean;
+  isGloballyEditing: boolean;
   proposal: AnyProposal | Thread;
   proposalPageState: ProposalPageState;
   viewCount: number;
@@ -34,10 +35,11 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
       commentCount,
       comments,
       createdCommentCallback,
-      getSetGlobalEditingStatus,
+      setIsGloballyEditing,
       isAdminOrMod,
       isAuthor,
       isEditor,
+      isGloballyEditing,
       proposal,
       proposalPageState,
       viewCount,
@@ -49,7 +51,8 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           proposal={proposal}
           commentCount={commentCount}
           viewCount={viewCount}
-          getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+          setIsGloballyEditing={setIsGloballyEditing}
+          isGloballyEditing={isGloballyEditing}
           proposalPageState={proposalPageState}
           isAuthor={isAuthor}
           isEditor={isEditor}
@@ -67,7 +70,8 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           proposal={proposal}
           comments={comments}
           createdCommentCallback={createdCommentCallback}
-          getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+          setIsGloballyEditing={setIsGloballyEditing}
+          isGloballyEditing={isGloballyEditing}
           proposalPageState={proposalPageState}
           recentlySubmitted={proposalPageState.recentlySubmitted}
           isAdmin={isAdminOrMod}
@@ -75,7 +79,8 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         {!proposalPageState.editing && !proposalPageState.parentCommentId && (
           <CreateComment
             callback={createdCommentCallback}
-            getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+            setIsGloballyEditing={setIsGloballyEditing}
+            isGloballyEditing={isGloballyEditing}
             proposalPageState={this}
             parentComment={null}
             rootProposal={proposal}

@@ -21,16 +21,15 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
-import { ProposalPageState, GlobalStatus } from './types';
+import { ProposalPageState } from './types';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type CreateCommmentAttrs = {
-  callback: CallableFunction;
-  getSetGlobalEditingStatus: CallableFunction;
+  callback: () => void;
+  isGloballyEditing: boolean;
   parentComment?: Comment<any>;
   proposalPageState: ProposalPageState;
   rootProposal: AnyProposal | Thread;
-  tabindex?: number;
 };
 
 export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
@@ -41,12 +40,8 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
   private uploadsInProgress;
 
   view(vnode) {
-    const {
-      callback,
-      getSetGlobalEditingStatus,
-      proposalPageState,
-      rootProposal,
-    } = vnode.attrs;
+    const { callback, isGloballyEditing, proposalPageState, rootProposal } =
+      vnode.attrs;
 
     let { parentComment } = vnode.attrs;
 
@@ -151,7 +146,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     const userBalance: BN = TopicGateCheck.getUserBalance();
 
     const disabled =
-      getSetGlobalEditingStatus(GlobalStatus.Get) ||
+      isGloballyEditing ||
       this.quillEditorState?.isBlank() ||
       sendingComment ||
       uploadsInProgress ||

@@ -9,15 +9,16 @@ import { Thread, Comment, AnyProposal } from 'models';
 import { CreateComment } from './create_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
-import { GlobalStatus, ProposalPageState } from './types';
+import { ProposalPageState } from './types';
 import { MAX_THREAD_LEVEL } from './constants';
 import { ProposalComment } from './proposal_comment';
 
 type ProposalCommentsAttrs = {
   comments: Array<Comment<any>>;
-  createdCommentCallback: CallableFunction;
-  getSetGlobalEditingStatus: CallableFunction;
+  createdCommentCallback: () => void;
+  setIsGloballyEditing: (status: boolean) => void;
   isAdmin: boolean;
+  isGloballyEditing: boolean;
   proposal: Thread | AnyProposal;
   proposalPageState: ProposalPageState;
   recentlySubmitted?: number;
@@ -40,7 +41,8 @@ export class ProposalComments
       proposal,
       comments,
       createdCommentCallback,
-      getSetGlobalEditingStatus,
+      setIsGloballyEditing,
+      isGloballyEditing,
       proposalPageState,
       isAdmin,
     } = vnode.attrs;
@@ -64,12 +66,13 @@ export class ProposalComments
       if (
         !proposalPageState.editing &&
         proposalPageState.parentCommentId === comment.id &&
-        !getSetGlobalEditingStatus(GlobalStatus.Get)
+        !isGloballyEditing
       ) {
         return (
           <CreateComment
             callback={createdCommentCallback}
-            getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+            setIsGloballyEditing={setIsGloballyEditing}
+            isGloballyEditing={isGloballyEditing}
             proposalPageState={proposalPageState}
             parentComment={comment}
             rootProposal={proposal}
@@ -131,7 +134,7 @@ export class ProposalComments
             <>
               <ProposalComment
                 comment={comment}
-                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                setIsGloballyEditing={setIsGloballyEditing}
                 proposalPageState={proposalPageState}
                 parent={parent}
                 proposal={proposal}

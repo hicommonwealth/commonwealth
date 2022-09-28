@@ -57,7 +57,7 @@ import {
 } from '../../components/proposals/voting_actions_components';
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { GlobalStatus, ProposalPageState } from './types';
+import { ProposalPageState } from './types';
 import { scrollToForm } from './helpers';
 import { EditComment } from './edit_comment';
 
@@ -66,7 +66,8 @@ export class ProposalHeader
     m.ClassComponent<{
       commentCount: number;
       viewCount: number;
-      getSetGlobalEditingStatus: CallableFunction;
+      setIsGloballyEditing: (status: boolean) => void;
+      isGloballyEditing: boolean;
       proposalPageState: ProposalPageState;
       proposal: AnyProposal | Thread;
       isAuthor: boolean;
@@ -86,7 +87,8 @@ export class ProposalHeader
     const {
       commentCount,
       proposal,
-      getSetGlobalEditingStatus,
+      setIsGloballyEditing,
+      isGloballyEditing,
       proposalPageState,
       viewCount,
       isAuthor,
@@ -117,7 +119,7 @@ export class ProposalHeader
             {this.editing ? (
               <ProposalTitleEditor
                 item={proposal}
-                getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                setIsGloballyEditing={setIsGloballyEditing}
                 parentState={this}
               />
             ) : (
@@ -134,82 +136,75 @@ export class ProposalHeader
                   )}
                   <ProposalHeaderTopics proposalTopic={proposal.topic?.name} />
                   <ProposalHeaderViewCount viewCount={viewCount} />
-                  {app.isLoggedIn() &&
-                    !getSetGlobalEditingStatus(GlobalStatus.Get) && (
-                      <PopoverMenu
-                        transitionDuration={0}
-                        closeOnOutsideClick
-                        closeOnContentClick
-                        menuAttrs={{ size: 'default' }}
-                        content={
-                          <>
-                            {(isEditor || isAuthor || isAdmin) && (
-                              <ProposalBodyEditMenuItem
-                                proposalPageState={
-                                  vnode.attrs.proposalPageState
-                                }
-                                getSetGlobalEditingStatus={
-                                  getSetGlobalEditingStatus
-                                }
-                                parentState={this}
-                              />
-                            )}
-                            {isAuthor && (
-                              <EditCollaboratorsButton proposal={proposal} />
-                            )}
-                            {isAdmin && (
-                              <ChangeTopicMenuItem
-                                proposal={proposal}
-                                onChangeHandler={(topic: Topic) => {
-                                  proposal.topic = topic;
-                                  m.redraw();
-                                }}
-                              />
-                            )}
-                            {(isAuthor || isAdmin || app.user.isSiteAdmin) && (
-                              <ProposalBodyDeleteMenuItem item={proposal} />
-                            )}
-                            {(isAuthor || isAdmin) && (
-                              <ProposalHeaderPrivacyMenuItems
-                                proposal={proposal}
-                                getSetGlobalEditingStatus={
-                                  getSetGlobalEditingStatus
-                                }
-                              />
-                            )}
-                            {(isAuthor || isAdmin) &&
-                              app.chain?.meta.snapshot.length > 0 && (
-                                <MenuItem
-                                  onclick={() => {
-                                    const snapshotSpaces =
-                                      app.chain.meta.snapshot;
-                                    if (snapshotSpaces.length > 1) {
-                                      navigateToSubpage('/multiple-snapshots', {
-                                        action: 'create-from-thread',
-                                        proposal,
-                                      });
-                                    } else {
-                                      navigateToSubpage(
-                                        `/snapshot/${snapshotSpaces}`
-                                      );
-                                    }
-                                  }}
-                                  label="Snapshot proposal from thread"
-                                />
-                              )}
-                            {(isAuthor || isAdmin) && <CWDivider />}
-                            <ThreadSubscriptionMenuItem
-                              proposal={proposal as Thread}
+                  {app.isLoggedIn() && !isGloballyEditing && (
+                    <PopoverMenu
+                      transitionDuration={0}
+                      closeOnOutsideClick
+                      closeOnContentClick
+                      menuAttrs={{ size: 'default' }}
+                      content={
+                        <>
+                          {(isEditor || isAuthor || isAdmin) && (
+                            <ProposalBodyEditMenuItem
+                              proposalPageState={vnode.attrs.proposalPageState}
+                              setIsGloballyEditing={setIsGloballyEditing}
+                              parentState={this}
                             />
-                          </>
-                        }
-                        trigger={
-                          <div>
-                            <CWIcon iconName="chevronDown" iconSize="small" />
-                          </div>
-                        }
-                      />
-                    )}
+                          )}
+                          {isAuthor && (
+                            <EditCollaboratorsButton proposal={proposal} />
+                          )}
+                          {isAdmin && (
+                            <ChangeTopicMenuItem
+                              proposal={proposal}
+                              onChangeHandler={(topic: Topic) => {
+                                proposal.topic = topic;
+                                m.redraw();
+                              }}
+                            />
+                          )}
+                          {(isAuthor || isAdmin || app.user.isSiteAdmin) && (
+                            <ProposalBodyDeleteMenuItem item={proposal} />
+                          )}
+                          {(isAuthor || isAdmin) && (
+                            <ProposalHeaderPrivacyMenuItems
+                              proposal={proposal}
+                              setIsGloballyEditing={setIsGloballyEditing}
+                            />
+                          )}
+                          {(isAuthor || isAdmin) &&
+                            app.chain?.meta.snapshot.length > 0 && (
+                              <MenuItem
+                                onclick={() => {
+                                  const snapshotSpaces =
+                                    app.chain.meta.snapshot;
+                                  if (snapshotSpaces.length > 1) {
+                                    navigateToSubpage('/multiple-snapshots', {
+                                      action: 'create-from-thread',
+                                      proposal,
+                                    });
+                                  } else {
+                                    navigateToSubpage(
+                                      `/snapshot/${snapshotSpaces}`
+                                    );
+                                  }
+                                }}
+                                label="Snapshot proposal from thread"
+                              />
+                            )}
+                          {(isAuthor || isAdmin) && <CWDivider />}
+                          <ThreadSubscriptionMenuItem
+                            proposal={proposal as Thread}
+                          />
+                        </>
+                      }
+                      trigger={
+                        <div>
+                          <CWIcon iconName="chevronDown" iconSize="small" />
+                        </div>
+                      }
+                    />
+                  )}
                   <SocialSharingCarat />
                 </>
               ) : (
@@ -218,7 +213,7 @@ export class ProposalHeader
                   <ProposalHeaderOnchainStatus proposal={proposal} />
                   {app.isLoggedIn() &&
                     (isAdmin || isAuthor) &&
-                    !getSetGlobalEditingStatus(GlobalStatus.Get) &&
+                    !isGloballyEditing &&
                     proposalTitleIsEditable && (
                       <PopoverMenu
                         transitionDuration={0}
@@ -229,9 +224,7 @@ export class ProposalHeader
                           <ProposalTitleEditMenuItem
                             item={proposal}
                             proposalPageState={proposalPageState}
-                            getSetGlobalEditingStatus={
-                              getSetGlobalEditingStatus
-                            }
+                            setIsGloballyEditing={setIsGloballyEditing}
                             parentState={this}
                           />
                         }
@@ -279,7 +272,7 @@ export class ProposalHeader
               {this.editing ? (
                 <EditComment
                   comment={proposal}
-                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                  setIsGloballyEditing={setIsGloballyEditing}
                   proposalPageState={proposalPageState}
                 />
               ) : (

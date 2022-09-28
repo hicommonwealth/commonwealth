@@ -14,7 +14,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { QuillEditor } from '../../components/quill/quill_editor';
-import { GlobalStatus, ProposalPageState } from './types';
+import { ProposalPageState } from './types';
 import { scrollToForm } from './helpers';
 import {
   ProposalBodyAuthor,
@@ -33,7 +33,7 @@ import { EditComment } from './edit_comment';
 type ProposalCommentAttrs = {
   callback?: CallableFunction;
   comment: Comment<any>;
-  getSetGlobalEditingStatus: CallableFunction;
+  setIsGloballyEditing: (status: boolean) => void;
   isAdmin?: boolean;
   isLast: boolean;
   parent: AnyProposal | Comment<any> | Thread;
@@ -52,7 +52,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
     const {
       callback,
       comment,
-      getSetGlobalEditingStatus,
+      setIsGloballyEditing,
       isAdmin,
       isLast,
       proposal,
@@ -94,7 +94,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
             <EditComment
               callback={callback}
               comment={comment}
-              getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              setIsGloballyEditing={setIsGloballyEditing}
               proposalPageState={proposalPageState}
             />
           ) : (
