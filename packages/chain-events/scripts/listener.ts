@@ -261,8 +261,8 @@ if (network === SupportedNetwork.Substrate) {
   CosmosEvents.createApi(url).then(async (api) => {
     const fetcher = new CosmosEvents.StorageFetcher(api);
     try {
-      const fetched = await fetcher.fetch();
-      console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
+      // const fetched = await fetcher.fetch();
+      // console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
     } catch (err) {
       console.log(err);
       console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);

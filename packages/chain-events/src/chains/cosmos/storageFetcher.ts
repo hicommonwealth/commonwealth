@@ -10,8 +10,7 @@ import {
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
-import { populateRange } from '../../util';
-import { CWEvent, IDisconnectedRange, IStorageFetcher, SupportedNetwork } from '../../interfaces';
+import { CWEvent, IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import {
