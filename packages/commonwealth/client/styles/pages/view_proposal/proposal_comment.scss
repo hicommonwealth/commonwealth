@@ -32,6 +32,11 @@
         @include caption;
       }
 
+      .identity-icon {
+        position: unset;
+        top: 0;
+      }
+
       .published-text.Text {
         color: $neutral-500;
       }

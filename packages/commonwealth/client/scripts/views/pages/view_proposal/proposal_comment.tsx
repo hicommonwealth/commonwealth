@@ -77,7 +77,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
           <div class="thread-connectors-container">
             {Array(threadLevel)
               .fill(undefined)
-              .map((_) => (
+              .map(() => (
                 <div class="thread-connector" />
               ))}
           </div>
@@ -143,7 +143,13 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                       <CWIconButton iconName="dotsVertical" iconSize="small" />
                     }
                     popoverMenuItems={[
-                      { label: 'Edit', iconName: 'edit' },
+                      {
+                        label: 'Edit',
+                        iconName: 'edit',
+                        onclick: () => {
+                          this.editing = true;
+                        },
+                      },
                       { label: 'Delete', iconName: 'trash' },
                     ]}
                   />

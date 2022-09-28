@@ -123,8 +123,6 @@ export class ProposalComments
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
       return comments_.map((comment: Comment<any>, idx) => {
-        if (!comment) return;
-
         const children = app.comments
           .getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
