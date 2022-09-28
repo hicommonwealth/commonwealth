@@ -479,6 +479,7 @@ class ViewProposalPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 isEditor={isEditor}
+                isGloballyEditing={this.isGloballyEditing}
                 proposal={proposal}
                 proposalPageState={this}
                 viewCount={viewCount}

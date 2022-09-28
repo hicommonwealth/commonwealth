@@ -116,7 +116,7 @@ export class ProposalHeader
       <div class="ProposalHeader">
         <div class="proposal-top">
           <div class="proposal-top-left">
-            {this.editing ? (
+            {isGloballyEditing ? (
               <ProposalTitleEditor
                 item={proposal}
                 setIsGloballyEditing={setIsGloballyEditing}
@@ -146,7 +146,7 @@ export class ProposalHeader
                         <>
                           {(isEditor || isAuthor || isAdmin) && (
                             <ProposalBodyEditMenuItem
-                              proposalPageState={vnode.attrs.proposalPageState}
+                              proposalPageState={proposalPageState}
                               setIsGloballyEditing={setIsGloballyEditing}
                               parentState={this}
                             />
@@ -241,7 +241,7 @@ export class ProposalHeader
             <div class="proposal-body-link">
               {proposal instanceof Thread &&
               proposal.kind === ThreadKind.Link &&
-              this.editing ? (
+              isGloballyEditing ? (
                 <ProposalLinkEditor parentState={this} />
               ) : (
                 <ProposalHeaderExternalLink proposal={proposal} />
@@ -269,7 +269,7 @@ export class ProposalHeader
         {proposal instanceof Thread && (
           <div class="proposal-content">
             <div class="proposal-content-right">
-              {this.editing ? (
+              {isGloballyEditing ? (
                 <EditComment
                   comment={proposal}
                   setIsGloballyEditing={setIsGloballyEditing}

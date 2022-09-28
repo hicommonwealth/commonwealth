@@ -76,7 +76,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           recentlySubmitted={proposalPageState.recentlySubmitted}
           isAdmin={isAdminOrMod}
         />
-        {!proposalPageState.editing && !proposalPageState.parentCommentId && (
+        {!isGloballyEditing && !proposalPageState.parentCommentId && (
           <CreateComment
             callback={createdCommentCallback}
             setIsGloballyEditing={setIsGloballyEditing}

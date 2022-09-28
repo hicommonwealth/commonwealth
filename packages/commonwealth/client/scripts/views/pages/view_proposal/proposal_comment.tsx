@@ -33,17 +33,17 @@ import { EditComment } from './edit_comment';
 type ProposalCommentAttrs = {
   callback?: CallableFunction;
   comment: Comment<any>;
-  setIsGloballyEditing: (status: boolean) => void;
   isAdmin?: boolean;
+  isGloballyEditing: boolean;
   isLast: boolean;
   parent: AnyProposal | Comment<any> | Thread;
   proposal: AnyProposal | Thread;
   proposalPageState: ProposalPageState;
+  setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
 };
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
-  private editing: boolean;
   private quillEditorState: QuillEditor;
   private replying: boolean;
   private saving: boolean;
@@ -52,11 +52,12 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
     const {
       callback,
       comment,
-      setIsGloballyEditing,
       isAdmin,
+      isGloballyEditing,
       isLast,
       proposal,
       proposalPageState,
+      setIsGloballyEditing,
       threadLevel,
     } = vnode.attrs;
 
@@ -90,7 +91,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
               {moment(comment.createdAt).format('l')}
             </CWText>
           </div>
-          {this.editing ? (
+          {isGloballyEditing ? (
             <EditComment
               callback={callback}
               comment={comment}
@@ -129,7 +130,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                         label: 'Edit',
                         iconName: 'edit',
                         onclick: () => {
-                          this.editing = true;
+                          setIsGloballyEditing(true);
                         },
                       },
                       { label: 'Delete', iconName: 'trash' },

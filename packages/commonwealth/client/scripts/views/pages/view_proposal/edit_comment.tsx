@@ -117,15 +117,13 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                 )();
               }
 
-              if (!confirmed) return;
+              if (confirmed) {
+                setIsGloballyEditing(false);
 
-              proposalPageState.editing = false;
+                clearEditingLocalStorage(comment, comment instanceof Thread);
 
-              setIsGloballyEditing(false);
-
-              clearEditingLocalStorage(comment, comment instanceof Thread);
-
-              m.redraw();
+                m.redraw();
+              }
             }}
           />
           <CWButton
@@ -159,8 +157,6 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                   .then(() => {
                     navigateToSubpage(`/discussion/${comment.id}`);
 
-                    proposalPageState.editing = false;
-
                     proposalPageState.saving = false;
 
                     clearEditingLocalStorage(comment, true);
@@ -173,8 +169,6 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                   });
               } else if (comment instanceof Comment) {
                 app.comments.edit(comment, itemText).then(() => {
-                  proposalPageState.editing = false;
-
                   proposalPageState.saving = false;
 
                   clearEditingLocalStorage(comment, false);

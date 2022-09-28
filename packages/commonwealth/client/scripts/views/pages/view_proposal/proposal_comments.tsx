@@ -64,7 +64,7 @@ export class ProposalComments
     const nestedReplyForm = (comment) => {
       // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
       if (
-        !proposalPageState.editing &&
+        !isGloballyEditing &&
         proposalPageState.parentCommentId === comment.id &&
         !isGloballyEditing
       ) {

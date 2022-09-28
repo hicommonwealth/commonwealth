@@ -187,7 +187,6 @@ export class ProposalTitleEditMenuItem
 
             proposalPageState.parentCommentId = null;
           }
-          parentState.editing = true;
 
           setIsGloballyEditing(true);
         }}
@@ -230,8 +229,6 @@ export class ProposalTitleSaveEdit
             .then(() => {
               m.route.set(proposalLink);
 
-              parentState.editing = false;
-
               parentState.saving = false;
 
               setIsGloballyEditing(false);
@@ -264,7 +261,6 @@ export class ProposalTitleCancelEdit
         disabled={parentState.saving}
         onclick={async (e) => {
           e.preventDefault();
-          parentState.editing = false;
           parentState.saving = false;
           setIsGloballyEditing(false);
           m.redraw();
@@ -570,7 +566,6 @@ export class ProposalBodyEditMenuItem
 
             proposalPageState.parentCommentId = null;
           }
-          parentState.editing = true;
 
           setIsGloballyEditing(true);
         }}
