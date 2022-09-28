@@ -8,6 +8,60 @@
   max-width: 768px;
   width: 100%;
 
+  .proposal-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .proposal-top {
+      display: flex;
+
+      .proposal-top-left {
+        flex: 1;
+
+        .proposal-meta-top {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 12px;
+          height: 35px;
+
+          .proposal-meta-top-left {
+            display: flex;
+            align-items: center;
+          }
+
+          .proposal-meta-top-right {
+            display: flex;
+          }
+        }
+
+        .proposal-body-meta {
+          align-items: center;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 12px;
+
+          svg {
+            color: $neutral-500;
+            cursor: pointer;
+          }
+        }
+
+        .proposal-body-link {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          > * div {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
+
   .proposal-content {
     display: flex;
     width: 100%;

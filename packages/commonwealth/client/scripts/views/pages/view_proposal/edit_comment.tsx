@@ -21,6 +21,7 @@ type EditCommentAttrs = {
   comment: Comment<any>;
   proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
+  updatedUrl?: string;
 };
 
 export class EditComment implements m.ClassComponent<EditCommentAttrs> {
@@ -58,8 +59,13 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
   }
 
   view(vnode) {
-    const { callback, comment, setIsGloballyEditing, proposalPageState } =
-      vnode.attrs;
+    const {
+      callback,
+      comment,
+      setIsGloballyEditing,
+      proposalPageState,
+      updatedUrl,
+    } = vnode.attrs;
 
     const { restoreEdits, savedEdits } = this;
 
@@ -134,8 +140,8 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
             onclick={(e) => {
               e.preventDefault();
 
-              if (proposalPageState.updatedUrl) {
-                if (!validURL(proposalPageState.updatedUrl)) {
+              if (updatedUrl) {
+                if (!validURL(updatedUrl)) {
                   notifyError('Must provide a valid URL.');
                   return;
                 }
@@ -153,7 +159,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
                     comment,
                     itemText,
                     proposalPageState.updatedTitle,
-                    proposalPageState.updatedUrl
+                    updatedUrl
                   )
                   .then(() => {
                     navigateToSubpage(`/discussion/${comment.id}`);

@@ -33,6 +33,7 @@ type ProposalCommentAttrs = {
 };
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
+  private isEditingComment: boolean;
   private quillEditorState: QuillEditor;
   private replying: boolean;
   private saving: boolean;
@@ -49,6 +50,11 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       setIsGloballyEditing,
       threadLevel,
     } = vnode.attrs;
+
+    const setIsEditingComment = (status: boolean) => {
+      setIsGloballyEditing(status);
+      this.isEditingComment = status;
+    };
 
     // const commentLink = getProposalUrlPath(
     //   proposal.slug,
@@ -80,11 +86,11 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
               {moment(comment.createdAt).format('l')}
             </CWText>
           </div>
-          {isGloballyEditing ? (
+          {this.isEditingComment ? (
             <EditComment
               callback={callback}
               comment={comment}
-              setIsGloballyEditing={setIsGloballyEditing}
+              setIsGloballyEditing={setIsEditingComment}
               proposalPageState={proposalPageState}
             />
           ) : (
@@ -119,7 +125,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                         label: 'Edit',
                         iconName: 'edit',
                         onclick: () => {
-                          setIsGloballyEditing(true);
+                          setIsEditingComment(true);
                         },
                       },
                       { label: 'Delete', iconName: 'trash' },

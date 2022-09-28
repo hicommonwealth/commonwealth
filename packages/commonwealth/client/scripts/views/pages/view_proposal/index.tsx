@@ -50,10 +50,10 @@ class ViewProposalPage
     }>
 {
   private comments: Comment<Thread>[];
-  private polls: Poll[];
-  private isGloballyEditing: boolean;
   private highlightedComment: boolean;
+  private isGloballyEditing: boolean;
   private parentCommentId: number; // if null or undefined, reply is thread-scoped
+  private polls: Poll[];
   private prefetch: Prefetch;
   private proposal: AnyProposal | Thread;
   private recentlyEdited: boolean;
@@ -67,13 +67,6 @@ class ViewProposalPage
 
   oninit() {
     this.tabSelected = 'viewProposal';
-  }
-
-  oncreate() {
-    // writes type field if accessed as /proposal/XXX (shortcut for non-substrate chains)
-    if (!this.isGloballyEditing) {
-      this.isGloballyEditing = false;
-    }
   }
 
   view(vnode) {
@@ -298,7 +291,7 @@ class ViewProposalPage
     ) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: proposal.id, // (proposal instanceof Thread) ? proposal.id : proposal.slug,
+        object_id: proposal.id,
       })
         .then((response) => {
           if (response.status !== 'Success') {
