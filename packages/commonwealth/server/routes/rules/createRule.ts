@@ -13,7 +13,7 @@ export const Errors = {
   InvalidRule: 'Rule is not valid',
 };
 
-type CreateRuleReq = { chain_id: string; rule: string; };
+type CreateRuleReq = { chain_id: string; rule: string };
 type CreateRuleResp = RuleAttributes;
 
 const createRule = async (
@@ -48,10 +48,7 @@ const createRule = async (
       chain_id: req.body.chain_id,
       rule: santizedResult,
     });
-    return success(
-      res,
-      ruleInstance.toJSON(),
-    );
+    return success(res, ruleInstance.toJSON());
   } catch (err) {
     throw new ServerError(err);
   }

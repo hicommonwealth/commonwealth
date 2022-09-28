@@ -22,6 +22,7 @@ export { default as Topic } from './Topic';
 export { default as Thread } from './Thread';
 export { default as Poll } from './Poll';
 export { default as Vote } from './Vote';
+export { default as Rule } from './Rule';
 export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
