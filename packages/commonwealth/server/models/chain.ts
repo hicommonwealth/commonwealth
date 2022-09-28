@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { DataTypes } from 'sequelize';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
@@ -10,11 +11,12 @@ import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
 import { UserAttributes } from './user';
 import { ModelStatic, ModelInstance } from './types';
+import { ContractInstance } from './contract';
 
 export type ChainAttributes = {
   name: string;
   chain_node_id: number;
-  symbol: string;
+  default_symbol: string;
   network: ChainNetwork;
   base: ChainBase;
   icon_url: string;
@@ -29,7 +31,6 @@ export type ChainAttributes = {
   telegram?: string;
   github?: string;
   ss58_prefix?: number;
-  decimals?: number;
   stages_enabled?: boolean;
   custom_stages?: string;
   custom_domain?: string;
@@ -42,7 +43,6 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
-  address?: string;
   token_name?: string;
   ce_verbose?: boolean;
 
@@ -57,6 +57,7 @@ export type ChainAttributes = {
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?; // TODO
+  Contract?: ContractInstance;
 };
 
 export type ChainInstance = ModelInstance<ChainAttributes> & {
@@ -72,6 +73,7 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
     TopicInstance,
     TopicInstance['id']
   >;
+  getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
 export type ChainModelStatic = ModelStatic<ChainInstance>;
@@ -87,7 +89,6 @@ export default (
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
-      address: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
@@ -95,7 +96,7 @@ export default (
       element: { type: dataTypes.STRING, allowNull: true },
       telegram: { type: dataTypes.STRING, allowNull: true },
       github: { type: dataTypes.STRING, allowNull: true },
-      symbol: { type: dataTypes.STRING, allowNull: false },
+      default_symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
@@ -157,6 +158,9 @@ export default (
     models.Chain.hasMany(models.ChatChannel);
     models.Chain.belongsToMany(models.User, {
       through: models.WaitlistRegistration,
+    });
+    models.Chain.belongsToMany(models.Contract, {
+      through: models.CommunityContract,
     });
   };
 
