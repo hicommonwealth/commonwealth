@@ -2,7 +2,6 @@ import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { DataTypes } from 'sequelize';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeInstance, ChainNodeAttributes } from './chain_node';
 import { StarredCommunityAttributes } from './starred_community';
