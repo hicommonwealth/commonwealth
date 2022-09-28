@@ -22,10 +22,10 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
 import { ProposalPageState, GlobalStatus } from './types';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type CreateCommmentAttrs = {
   callback: CallableFunction;
-  cancellable?: boolean;
   getSetGlobalEditingStatus: CallableFunction;
   parentComment?: Comment<any>;
   proposalPageState: ProposalPageState;
@@ -43,7 +43,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
   view(vnode) {
     const {
       callback,
-      cancellable,
       getSetGlobalEditingStatus,
       proposalPageState,
       rootProposal,
@@ -97,9 +96,10 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
         );
 
         callback();
+
         this.quillEditorState.resetEditor();
+
         this.error = null;
-        this.sendingComment = false;
 
         this.sendingComment = false;
 
@@ -181,20 +181,14 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
         </div>
         <div class="create-comment-body">
           <div class="reply-header">
-            <h3>
-              {parentType === CommentParent.Comment ? (
-                <>
-                  Replying to{' '}
-                  {m(User, {
-                    user: parentAuthor,
-                    popover: true,
-                    hideAvatar: true,
-                  })}
-                </>
-              ) : (
-                'Reply'
-              )}
-            </h3>
+            <CWText>
+              {parentType === CommentParent.Comment ? 'Replying to' : 'Reply'}
+              {m(User, {
+                user: parentAuthor,
+                popover: true,
+                hideAvatar: true,
+              })}
+            </CWText>
           </div>
           {m(User, { user: author, popover: true, hideAvatar: true })}
           {rootProposal instanceof Thread && rootProposal.readOnly ? (
@@ -263,17 +257,15 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                 }}
               >
                 <div class="form-buttons">
-                  {cancellable && (
-                    <CWButton
-                      buttonType="secondary-blue"
-                      onclick={(e) => {
-                        e.preventDefault();
-                        proposalPageState.replying = false;
-                        proposalPageState.parentCommentId = null;
-                      }}
-                      label="Cancel"
-                    />
-                  )}
+                  <CWButton
+                    buttonType="secondary-blue"
+                    onclick={(e) => {
+                      e.preventDefault();
+                      proposalPageState.replying = false;
+                      proposalPageState.parentCommentId = null;
+                    }}
+                    label="Cancel"
+                  />
                   <CWButton
                     disabled={disabled}
                     onclick={handleSubmitComment}

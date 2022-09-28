@@ -75,7 +75,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         {!proposalPageState.editing && !proposalPageState.parentCommentId && (
           <CreateComment
             callback={createdCommentCallback}
-            cancellable
             getSetGlobalEditingStatus={getSetGlobalEditingStatus}
             proposalPageState={this}
             parentComment={null}

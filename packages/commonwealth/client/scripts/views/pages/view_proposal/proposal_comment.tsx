@@ -10,11 +10,6 @@ import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { Thread, Comment, AnyProposal } from 'models';
 import { SocialSharingCarat } from 'views/components/social_sharing_carat';
-import {
-  ProposalBodyText,
-  ProposalBodyAttachments,
-  ProposalBodyEditor,
-} from './proposal_body_components';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
@@ -27,8 +22,6 @@ import {
   ProposalBodyLastEdited,
   ProposalBodyEditMenuItem,
   ProposalBodyDeleteMenuItem,
-  ProposalBodySaveEdit,
-  ProposalBodyCancelEdit,
 } from './proposal_header_components';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -102,6 +95,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
               callback={callback}
               comment={comment}
               getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+              proposalPageState={proposalPageState}
             />
           ) : (
             <>

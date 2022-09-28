@@ -32,17 +32,14 @@ import {
   ProposalLinkEditor,
   EditCollaboratorsButton,
   ProposalBodyAuthor,
-  ProposalBodyCancelEdit,
   ProposalBodyCreated,
   ProposalBodyDeleteMenuItem,
   ProposalBodyEditMenuItem,
   ProposalBodyLastEdited,
-  ProposalBodySaveEdit,
 } from './proposal_header_components';
 import {
   ProposalBodyText,
   ProposalBodyAttachments,
-  ProposalBodyEditor,
 } from './proposal_body_components';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { InlineReplyButton } from '../../components/inline_reply_button';
@@ -62,6 +59,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { GlobalStatus, ProposalPageState } from './types';
 import { scrollToForm } from './helpers';
+import { EditComment } from './edit_comment';
 
 export class ProposalHeader
   implements
@@ -279,21 +277,11 @@ export class ProposalHeader
           <div class="proposal-content">
             <div class="proposal-content-right">
               {this.editing ? (
-                <>
-                  <ProposalBodyEditor item={proposal} parentState={this} />
-                  <div class="proposal-body-button-group">
-                    <ProposalBodySaveEdit
-                      item={proposal}
-                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                      parentState={this}
-                    />
-                    <ProposalBodyCancelEdit
-                      item={proposal}
-                      getSetGlobalEditingStatus={getSetGlobalEditingStatus}
-                      parentState={this}
-                    />
-                  </div>
-                </>
+                <EditComment
+                  comment={proposal}
+                  getSetGlobalEditingStatus={getSetGlobalEditingStatus}
+                  proposalPageState={proposalPageState}
+                />
               ) : (
                 <>
                   <ProposalBodyText item={proposal} />

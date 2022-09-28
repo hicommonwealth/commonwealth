@@ -69,7 +69,6 @@ export class ProposalComments
         return (
           <CreateComment
             callback={createdCommentCallback}
-            cancellable
             getSetGlobalEditingStatus={getSetGlobalEditingStatus}
             proposalPageState={proposalPageState}
             parentComment={comment}
