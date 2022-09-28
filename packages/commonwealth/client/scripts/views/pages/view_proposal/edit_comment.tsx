@@ -20,6 +20,10 @@ type EditCommentAttrs = {
   comment: Comment<any>;
   proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
+  // quillEditorState
+  // saving
+  // updatedTitle
+  // updatedUrl
 };
 
 export class EditComment implements m.ClassComponent<EditCommentAttrs> {
@@ -27,16 +31,16 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
   private savedEdits: string;
 
   async oninit(vnode) {
-    const { item } = vnode.attrs;
+    const { comment } = vnode.attrs;
 
-    const isThread = item instanceof Thread;
+    const isThread = comment instanceof Thread;
 
     this.savedEdits = isThread
       ? localStorage.getItem(
-          `${app.activeChainId()}-edit-thread-${item.id}-storedText`
+          `${app.activeChainId()}-edit-thread-${comment.id}-storedText`
         )
       : localStorage.getItem(
-          `${app.activeChainId()}-edit-comment-${item.id}-storedText`
+          `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
         );
 
     if (this.savedEdits) {
@@ -48,7 +52,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
         'No'
       )();
 
-      clearEditingLocalStorage(item, isThread);
+      clearEditingLocalStorage(comment, isThread);
 
       m.redraw();
     }
@@ -106,24 +110,24 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
             onclick={async (e) => {
               e.preventDefault();
 
-              let confirmed = true;
+              // let confirmed = true;
 
-              const threadText =
-                proposalPageState.quillEditorState.textContentsAsString;
+              // const threadText =
+              //   proposalPageState.quillEditorState.textContentsAsString;
 
-              if (threadText !== proposalPageState.currentText) {
-                confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.'
-                )();
-              }
+              // if (threadText !== proposalPageState.currentText) {
+              //   confirmed = await confirmationModalWithText(
+              //     'Cancel editing? Changes will not be saved.'
+              //   )();
+              // }
 
-              if (confirmed) {
-                setIsGloballyEditing(false);
+              // if (confirmed) {
+              //   setIsGloballyEditing(false);
 
-                clearEditingLocalStorage(comment, comment instanceof Thread);
+              //   clearEditingLocalStorage(comment, comment instanceof Thread);
 
-                m.redraw();
-              }
+              //   m.redraw();
+              // }
             }}
           />
           <CWButton

@@ -122,12 +122,13 @@ export class ProposalHeader
                       menuAttrs={{ size: 'default' }}
                       content={
                         <>
-                          {(isEditor || isAuthor || isAdmin) && (
-                            <EditTextMenuItem
-                              proposalPageState={proposalPageState}
-                              setIsGloballyEditing={setIsGloballyEditing}
-                            />
-                          )}
+                          {(isEditor || isAuthor || isAdmin) &&
+                            !proposal.readOnly && (
+                              <EditTextMenuItem
+                                proposalPageState={proposalPageState}
+                                setIsGloballyEditing={setIsGloballyEditing}
+                              />
+                            )}
                           {isAuthor && (
                             <EditCollaboratorsButton proposal={proposal} />
                           )}

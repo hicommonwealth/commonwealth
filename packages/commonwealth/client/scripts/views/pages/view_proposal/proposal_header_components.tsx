@@ -532,15 +532,12 @@ export class ProposalBodyLastEdited
 export class EditTextMenuItem
   implements
     m.Component<{
-      item: Thread | Comment<any>;
       proposalPageState: ProposalPageState;
       setIsGloballyEditing: (status: boolean) => void;
     }>
 {
   view(vnode) {
-    const { item, setIsGloballyEditing, proposalPageState } = vnode.attrs;
-
-    if (item instanceof Thread && item.readOnly) return;
+    const { setIsGloballyEditing, proposalPageState } = vnode.attrs;
 
     return (
       <MenuItem
