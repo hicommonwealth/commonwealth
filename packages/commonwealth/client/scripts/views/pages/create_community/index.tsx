@@ -44,6 +44,7 @@ const ADMIN_ONLY_TABS = [
   CommunityType.Cosmos,
   CommunityType.EthDao,
   CommunityType.SputnikDao,
+  CommunityType.AbiFactory
 ];
 
 type CreateCommunityState = {
