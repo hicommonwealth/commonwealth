@@ -61,7 +61,7 @@ class GeneralContractPage
     const { contractAddress } = vnode.attrs;
     const contract: Contract =
       app.contracts.store.getContractByAddress(contractAddress);
-    console.log("the contract is ", contract);
+    console.log('the contract is ', contract);
     if (contract.abi === undefined || contract.abi === '') {
       this.loadAbiFromEtherscan(contract.address).then((abi) => {
         // Populate Abi Table
@@ -72,6 +72,8 @@ class GeneralContractPage
   }
 
   view(vnode) {
+    const Bytes32 = ethers.utils.formatBytes32String;
+
     const getWeb3 = async (): Promise<Web3> => {
       // Initialize Chain
       const ethChain = app.chain.chain as EthereumChain;
@@ -101,6 +103,12 @@ class GeneralContractPage
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
+        if (type.substring(0, 4) === 'byte')
+          return Bytes32(
             this.state.form.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
@@ -188,8 +196,7 @@ class GeneralContractPage
 
     const loadContractAbi = () => {
       const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.getByAddress(contractAddress);
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
       const abiFunctions = parseFunctionsFromABI(contract.abi);
       return abiFunctions;
     };
@@ -332,9 +339,8 @@ class GeneralContractPage
                   </div>
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray = this.state.functionNameToFunctionOutput.get(
-                        fn.name
-                      )
+                      const fnOutputArray =
+                        this.state.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div class="function-outputs">
@@ -344,7 +350,9 @@ class GeneralContractPage
                           </div>
                           <div>
                             <CWText>
-                              {fnOutputArray && fnOutputArray[i].toString() ? fnOutputArray[i].toString() : ''}
+                              {fnOutputArray && fnOutputArray[i].toString()
+                                ? fnOutputArray[i].toString()
+                                : ''}
                             </CWText>
                           </div>
                         </div>
