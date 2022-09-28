@@ -96,14 +96,12 @@ class GeneralContractPage
       return web3Contract;
     };
 
-    const callContractFallback = async (
-      contractAddress: string,
-      fn: AbiItem
-    ) => {
-      const web3Contract = await getWeb3Contract();
-    };
-
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      if (fn.type === 'fallback') {
+        console.log('fallback');
+        return;
+      }
+
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
@@ -130,14 +128,6 @@ class GeneralContractPage
       // Assumption is using this methodology for calling functions
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
-      if (fn.stateMutability !== "view" && fn.constant !== true) {
-        // // set options for transaction
-        const opts: any = {};
-        if (this.state.form.functionNameToEthToSend.get(fn.name) !== '') {
-          opts.value = ethers.utils.parseEther(this.state.form.functionNameToEthToSend.get(fn.name));
-        }
-      }
-
       const sender = app.user.activeAccount;
       // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
@@ -159,19 +149,33 @@ class GeneralContractPage
         ...processedArgs
       );
 
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
+      if (fn.stateMutability === 'payable') {
+        // Get value to send
+        let value = '';
+        if (this.state.form.functionNameToEthToSend.get(fn.name) !== undefined) {
+          value = ethers.utils.parseEther(this.state.form.functionNameToEthToSend.get(fn.name)).toString();
+        }
         // Sign Tx with PK if not view function
         tx = await chain.makeContractTx(
+          signingWallet,
           contractAddress,
           functionTx.encodeABI(),
-          signingWallet
+          value
+        );
+      }
+      else if (fn.stateMutability !== 'view' && fn.constant !== true) {
+        // Sign Tx with PK if not view function
+        tx = await chain.makeContractTx(
+          signingWallet,
+          contractAddress,
+          functionTx.encodeABI()
         );
       } else {
         // send transaction
         tx = await chain.makeContractCall(
+          signingWallet,
           contractAddress,
           functionTx.encodeABI(),
-          signingWallet
         );
       }
       // simple return type
@@ -257,7 +261,7 @@ class GeneralContractPage
                             notifySuccess('Submit Call button clicked!');
                             this.state.saving = true;
                             try {
-                              callContractFallback(contractAddress, fn);
+                              callFunction(contractAddress, fn);
                             } catch (err) {
                               notifyError(
                                 err.responseJSON?.error ||

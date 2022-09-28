@@ -14,6 +14,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   // TODO add optional parameter: Function Callback
   contractCall?: (tx: TransactionConfig) => Promise<string>;
   sendTransaction?: (tx: TransactionConfig) => Promise<string>;
+  sendTransfer?: (tx: TransactionConfig) => Promise<string>;
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
 

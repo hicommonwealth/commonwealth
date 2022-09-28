@@ -45,7 +45,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._instance;
   }
 
-  public async makeContractCall(to: string, data: string, wallet: IWebWallet<any>) {
+  public async makeContractCall(wallet: IWebWallet<any>, to: string, data: string) {
     // encoding + decoding require ABI + happen inside contracts controller
     try {
       const result = await wallet.contractCall({ to, data });
@@ -59,9 +59,10 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   Writing to contract data, aka creating transaction
   */
   public async makeContractTx(
+    wallet: IWebWallet<any>,
     to: string,
-    data: string,
-    wallet: IWebWallet<any>
+    data?: string,
+    value?: string,
   ) {
     try {
       // Not using contractApi because it's ethers-dependent
@@ -70,6 +71,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
         from: wallet.accounts[0],
         to,
         data,
+        value
       });
       return txHash;
     } catch (error) {
