@@ -96,7 +96,7 @@ export class VotingResults
 
       const yesBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(yesBalance.toString())
-      )} ${app.chain.meta.symbol}`;
+      )} ${app.chain.meta.default_symbol}`;
 
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
 
@@ -107,7 +107,7 @@ export class VotingResults
 
       const noBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(noBalance.toString())
-      )} ${app.chain.meta.symbol}`;
+      )} ${app.chain.meta.default_symbol}`;
 
       return (
         <AaveVotingResult
@@ -131,7 +131,7 @@ export class VotingResults
         // TODO: move this marshalling into controller
         const formatCurrency = (n: BN) => {
           const decimals = new BN(10).pow(new BN(app.chain.meta.decimals || 6));
-          const denom = app.chain.meta.symbol;
+          const denom = app.chain.meta.default_symbol;
           const coin = new Coin(denom, n, false, decimals);
           return coin.format();
         };
