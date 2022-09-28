@@ -85,3 +85,18 @@ h3 {
   @include header;
   font-size: 24px;
 }
+
+
+html {
+  -webkit-filter: invert(90%);
+  -moz-filter: invert(90%);
+  -o-filter: invert(90%);
+  -ms-filter: invert(90%);
+}
+
+img {
+  -webkit-filter: invert(90%);
+  -moz-filter: invert(90%);
+  -o-filter: invert(90%);
+  -ms-filter: invert(90%);
+}
