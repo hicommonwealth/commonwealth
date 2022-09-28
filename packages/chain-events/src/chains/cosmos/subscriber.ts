@@ -44,11 +44,16 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       return [currentBlock.block];
     }
 
-    // query all blocks before latest
+    // query all blocks before latest, walking backwards from current
     const results = [currentBlock.block];
-    for (let blockN = lastBlockHeight + 1; blockN < currentHeight; blockN++) {
-      const block = await this.api.tm.block(blockN);
-      results.push(block.block);
+    for (let blockN = currentHeight - 1; blockN > lastBlockHeight; blockN--) {
+      try {
+        const block = await this.api.tm.block(blockN);
+        results.push(block.block);
+      } catch (e) {
+        this.log.warn(`Failed to fetch block ${blockN}, aborting re-subscribe`);
+        break;
+      }
     }
     return results;
   }
@@ -80,8 +85,9 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     cb: (event: RawEvent) => void,
     disconnectedRange?: IDisconnectedRange
   ): Promise<void> {
-    if (disconnectedRange) {
-      // TODO: set disconnected range to recover past blocks via "polling"
+    if (disconnectedRange?.startBlock) {
+      // set disconnected range to recover past blocks via "polling"
+      this._lastBlockHeight = disconnectedRange.startBlock;
     }
     this._listener = setInterval(async () => {
       const blocks = await this._queryBlocks();

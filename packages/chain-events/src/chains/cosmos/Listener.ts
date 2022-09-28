@@ -37,10 +37,10 @@ export class Listener extends BaseListener<
     verbose?: boolean,
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>
   ) {
-    super(SupportedNetwork.Compound, chain, verbose);
+    super(SupportedNetwork.Cosmos, chain, verbose);
 
     this.log = factory.getLogger(
-      addPrefix(__filename, [SupportedNetwork.Compound, this._chain])
+      addPrefix(__filename, [SupportedNetwork.Cosmos, this._chain])
     );
 
     this._options = {
@@ -95,14 +95,19 @@ export class Listener extends BaseListener<
     }
 
     // processed blocks missed during downtime
-    if (!this._options.skipCatchup) await this.processMissedBlocks();
-    else this.log.info(`Skipping event catchup on startup!`);
+    let offlineRange: IDisconnectedRange | null;
+    if (!this._options.skipCatchup) {
+      offlineRange = await this.processMissedBlocks();
+    } else this.log.info(`Skipping event catchup on startup!`);
 
     try {
       this.log.info(
-        `Subscribing to Compound contract: ${this._chain}, on url ${this._options.url}`
+        `Subscribing to Cosmos chain: ${this._chain}, on url ${this._options.url}`
       );
-      await this._subscriber.subscribe(this.processBlock.bind(this));
+      await this._subscriber.subscribe(
+        this.processBlock.bind(this),
+        offlineRange
+      );
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
@@ -133,14 +138,14 @@ export class Listener extends BaseListener<
       await this.handleEvent(evt as CWEvent<IEventData>);
   }
 
-  private async processMissedBlocks(): Promise<void> {
+  private async processMissedBlocks(): Promise<IDisconnectedRange | null> {
     this.log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
       this.log.info(
         `Unable to determine offline range - No discoverReconnectRange function given`
       );
-      return;
+      return null;
     }
 
     // TODO: what to do about this offline range code for Cosmos?
@@ -150,13 +155,13 @@ export class Listener extends BaseListener<
       offlineRange = await this.discoverReconnectRange(this._chain);
       if (!offlineRange) {
         this.log.warn('No offline range found, skipping event catchup.');
-        return;
+        return null;
       }
     } catch (error) {
       this.log.error(
         `Could not discover offline range: ${error.message}. Skipping event catchup.`
       );
-      return;
+      return null;
     }
 
     // compare with default range algorithm: take last cached block in processor
@@ -176,17 +181,9 @@ export class Listener extends BaseListener<
     // (i.e. don't try and fetch all events from block 0 onward)
     if (!offlineRange || !offlineRange.startBlock) {
       this.log.warn(`Unable to determine offline time range.`);
-      return;
+      return null;
     }
-
-    try {
-      const cwEvents = await this.storageFetcher.fetch();
-      for (const event of cwEvents) {
-        await this.handleEvent(event as CWEvent<IEventData>);
-      }
-    } catch (error) {
-      this.log.error(`Unable to fetch events from storage: ${error.message}`);
-    }
+    return offlineRange;
   }
 
   public get options(): CosmosListenerOptions {
