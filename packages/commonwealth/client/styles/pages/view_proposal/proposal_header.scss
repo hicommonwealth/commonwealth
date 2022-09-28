@@ -52,33 +52,4 @@
       }
     }
   }
-
-  .proposal-content {
-    display: flex;
-    width: 100%;
-    word-break: break-word;
-
-    .proposal-content-right {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: space-between;
-
-      .proposal-body-button-group {
-        margin-top: 18px;
-      }
-
-      .proposal-response-row {
-        width: 100%;
-        display: flex;
-        max-width: 300px;
-        align-items: center;
-        margin-top: 16px;
-
-        > * {
-          margin-right: 8px;
-        }
-      }
-    }
-  }
 }

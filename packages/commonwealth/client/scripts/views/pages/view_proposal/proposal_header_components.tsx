@@ -529,18 +529,16 @@ export class ProposalBodyLastEdited
   }
 }
 
-export class ProposalBodyEditMenuItem
+export class EditTextMenuItem
   implements
     m.Component<{
       item: Thread | Comment<any>;
-      parentState;
       proposalPageState: ProposalPageState;
       setIsGloballyEditing: (status: boolean) => void;
     }>
 {
   view(vnode) {
-    const { item, setIsGloballyEditing, proposalPageState, parentState } =
-      vnode.attrs;
+    const { item, setIsGloballyEditing, proposalPageState } = vnode.attrs;
 
     if (item instanceof Thread && item.readOnly) return;
 
@@ -549,9 +547,6 @@ export class ProposalBodyEditMenuItem
         label="Edit"
         onclick={async (e) => {
           e.preventDefault();
-
-          parentState.currentText =
-            item instanceof Thread ? item.body : item.text;
 
           if (proposalPageState.replying) {
             if (activeQuillEditorHasText()) {

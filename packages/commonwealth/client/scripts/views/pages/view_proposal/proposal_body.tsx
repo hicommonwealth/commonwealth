@@ -14,6 +14,21 @@ import { VotingActions } from '../../components/proposals/voting_actions';
 import { ProposalComments } from './proposal_comments';
 import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
+import { CWDivider } from '../../components/component_kit/cw_divider';
+import { EditComment } from './edit_comment';
+import {
+  ProposalBodyAttachments,
+  ProposalBodyText,
+} from './proposal_body_components';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { InlineReplyButton } from '../../components/inline_reply_button';
+import { scrollToForm } from './helpers';
+import {
+  QueueButton,
+  ExecuteButton,
+  CancelButton,
+} from '../../components/proposals/voting_actions_components';
+import { ProposalHeaderOnchainId } from './proposal_header_components';
 
 type ProposalBodyAttrs = {
   commentCount: number;
@@ -45,11 +60,15 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
       viewCount,
     } = vnode.attrs;
 
+    const hasBody = !!(proposal as AnyProposal).description;
+
+    const attachments =
+      proposal instanceof Thread ? (proposal as Thread).attachments : false;
+
     return (
       <div class="ProposalBody">
         <ProposalHeader
           proposal={proposal}
-          commentCount={commentCount}
           viewCount={viewCount}
           setIsGloballyEditing={setIsGloballyEditing}
           isGloballyEditing={isGloballyEditing}
@@ -58,6 +77,56 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           isEditor={isEditor}
           isAdmin={isAdminOrMod}
         />
+        <CWDivider />
+        {proposal instanceof Thread && (
+          <div class="proposal-content">
+            <div class="proposal-content-right">
+              {isGloballyEditing ? (
+                <EditComment
+                  comment={proposal}
+                  setIsGloballyEditing={setIsGloballyEditing}
+                  proposalPageState={proposalPageState}
+                />
+              ) : (
+                <>
+                  <ProposalBodyText item={proposal} />
+                  <div class="proposal-response-row">
+                    <ThreadReactionButton thread={proposal} />
+                    <InlineReplyButton
+                      commentReplyCount={commentCount}
+                      onclick={() => {
+                        if (!proposalPageState.replying) {
+                          proposalPageState.replying = true;
+                          scrollToForm();
+                        } else if (!proposalPageState.parentCommentId) {
+                          // If user is already replying to top-level, cancel reply
+                          proposalPageState.replying = false;
+                        }
+                        proposalPageState.parentCommentId = null;
+                      }}
+                    />
+                    {attachments && attachments.length > 0 && (
+                      <ProposalBodyAttachments item={proposal} />
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {!(proposal instanceof Thread) && (
+          <>
+            <ProposalHeaderOnchainId proposal={proposal} />
+            <QueueButton proposal={proposal} />
+            <ExecuteButton proposal={proposal} />
+            <CancelButton proposal={proposal} />
+            {hasBody && (
+              <div class="proposal-content">
+                <ProposalBodyText item={proposal} />
+              </div>
+            )}
+          </>
+        )}
         {!(proposal instanceof Thread) && (
           <LinkedProposalsEmbed proposal={proposal} />
         )}

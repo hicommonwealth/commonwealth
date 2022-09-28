@@ -7,4 +7,29 @@
   margin-right: 40px;
   max-width: 768px;
   width: 100%;
+
+  .proposal-content {
+    display: flex;
+    width: 100%;
+    word-break: break-word;
+
+    .proposal-content-right {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .proposal-response-row {
+        width: 100%;
+        display: flex;
+        max-width: 300px;
+        align-items: center;
+        margin-top: 16px;
+
+        > * {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
 }

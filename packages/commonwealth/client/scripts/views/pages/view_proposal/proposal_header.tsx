@@ -23,7 +23,6 @@ import {
   ProposalHeaderTopics,
   ProposalHeaderTitle,
   ProposalHeaderStage,
-  ProposalHeaderOnchainId,
   ProposalHeaderOnchainStatus,
   ProposalHeaderViewCount,
   ProposalHeaderPrivacyMenuItems,
@@ -34,37 +33,23 @@ import {
   ProposalBodyAuthor,
   ProposalBodyCreated,
   ProposalBodyDeleteMenuItem,
-  ProposalBodyEditMenuItem,
+  EditTextMenuItem,
   ProposalBodyLastEdited,
 } from './proposal_header_components';
-import {
-  ProposalBodyText,
-  ProposalBodyAttachments,
-} from './proposal_body_components';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { InlineReplyButton } from '../../components/inline_reply_button';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import {
   ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
   ProposalHeaderBlockExplorerLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
-import {
-  QueueButton,
-  ExecuteButton,
-  CancelButton,
-} from '../../components/proposals/voting_actions_components';
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { ProposalPageState } from './types';
-import { scrollToForm } from './helpers';
-import { EditComment } from './edit_comment';
 
 export class ProposalHeader
   implements
     m.ClassComponent<{
-      commentCount: number;
       viewCount: number;
       setIsGloballyEditing: (status: boolean) => void;
       isGloballyEditing: boolean;
@@ -75,7 +60,6 @@ export class ProposalHeader
       isAdmin: boolean;
     }>
 {
-  private currentText: any;
   private editing: boolean;
   private quillEditorState: QuillEditor;
   private savedEdit: string;
@@ -85,7 +69,6 @@ export class ProposalHeader
 
   view(vnode) {
     const {
-      commentCount,
       proposal,
       setIsGloballyEditing,
       isGloballyEditing,
@@ -95,9 +78,6 @@ export class ProposalHeader
       isEditor,
       isAdmin,
     } = vnode.attrs;
-
-    const attachments =
-      proposal instanceof Thread ? (proposal as Thread).attachments : false;
 
     const proposalLink = getProposalUrlPath(
       proposal.slug,
@@ -109,8 +89,6 @@ export class ProposalHeader
       proposal instanceof SubstrateCollectiveProposal ||
       proposal instanceof SubstrateTreasuryTip ||
       proposal instanceof SubstrateTreasuryProposal;
-
-    const hasBody = !!(proposal as AnyProposal).description;
 
     return (
       <div class="ProposalHeader">
@@ -145,10 +123,9 @@ export class ProposalHeader
                       content={
                         <>
                           {(isEditor || isAuthor || isAdmin) && (
-                            <ProposalBodyEditMenuItem
+                            <EditTextMenuItem
                               proposalPageState={proposalPageState}
                               setIsGloballyEditing={setIsGloballyEditing}
-                              parentState={this}
                             />
                           )}
                           {isAuthor && (
@@ -265,56 +242,6 @@ export class ProposalHeader
             </div>
           </div>
         </div>
-        <CWDivider />
-        {proposal instanceof Thread && (
-          <div class="proposal-content">
-            <div class="proposal-content-right">
-              {isGloballyEditing ? (
-                <EditComment
-                  comment={proposal}
-                  setIsGloballyEditing={setIsGloballyEditing}
-                  proposalPageState={proposalPageState}
-                />
-              ) : (
-                <>
-                  <ProposalBodyText item={proposal} />
-                  <div class="proposal-response-row">
-                    <ThreadReactionButton thread={proposal} />
-                    <InlineReplyButton
-                      commentReplyCount={commentCount}
-                      onclick={() => {
-                        if (!proposalPageState.replying) {
-                          proposalPageState.replying = true;
-                          scrollToForm();
-                        } else if (!proposalPageState.parentCommentId) {
-                          // If user is already replying to top-level, cancel reply
-                          proposalPageState.replying = false;
-                        }
-                        proposalPageState.parentCommentId = null;
-                      }}
-                    />
-                    {attachments && attachments.length > 0 && (
-                      <ProposalBodyAttachments item={proposal} />
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-        {!(proposal instanceof Thread) && (
-          <>
-            <ProposalHeaderOnchainId proposal={proposal} />
-            <QueueButton proposal={proposal} />
-            <ExecuteButton proposal={proposal} />
-            <CancelButton proposal={proposal} />
-            {hasBody && (
-              <div class="proposal-content">
-                <ProposalBodyText item={proposal} />
-              </div>
-            )}
-          </>
-        )}
       </div>
     );
   }
