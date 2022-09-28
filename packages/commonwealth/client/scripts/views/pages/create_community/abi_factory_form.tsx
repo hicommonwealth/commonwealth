@@ -36,8 +36,9 @@ import {
 } from 'views/pages/create_community/types';
 import {
   parseAbiItemsFromABI,
-  parseWriteFunctionsFromABI,
+  parseFunctionFromABI,
 } from 'helpers/abi_utils';
+import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -90,6 +91,8 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
   }
 
   view(vnode) {
+    const Bytes32 = ethers.utils.formatBytes32String;
+
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
@@ -128,6 +131,12 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               .get(fn.name)
               .get(index)
           );
+        if (type.substring(0, 4) === 'byte')
+          return Bytes32(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
         if (type.slice(-2) === '[]')
           return JSON.parse(
             this.state.form.functionNameToFunctionInputArgs
@@ -140,22 +149,11 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       });
 
       const contractAddress = app.contracts.getByNickname(nickname).address;
-
       const functionContract = await getWeb3Contract(contractAddress);
 
       // 5. Build function tx
       // Assumption is using this methodology for calling functions
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
-
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
-
-      // } else {
-
-      // }
 
       const methodSignature = `${fn.name}(${fn.inputs
         .map((input) => input.type)
@@ -213,8 +211,151 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
     const loadFactoryContractAbi = (nickname: string) => {
       const contract: Contract = app.contracts.getByNickname(nickname);
-      const abiFunctions = parseWriteFunctionsFromABI(contract.abi);
-      return abiFunctions;
+      const factoryFn = factoryNicknameToCreateFunctionName[nickname];
+      if (!factoryFn) return null;
+      const abiFunction = parseFunctionFromABI(contract.abi, factoryFn);
+      return abiFunction;
+    };
+
+    const renderFactoryFunction = () => {
+      const fn = loadFactoryContractAbi(this.state.form.daoFactoryType);
+      return (
+        <div class="function-row">
+          <CWText>{fn.name}</CWText>
+          <CWText>{fn.stateMutability}</CWText>
+          <div class="functions-input-container">
+            {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+              return (
+                <div>
+                  <div class="function-inputs">
+                    <CWText>[{inputIdx}]</CWText>
+                    <CWText>{input.type}</CWText>
+                    <CWText>{input.name}</CWText>
+                  </div>
+                  <div>
+                    <CWTextInput
+                      name="Contract Input Field"
+                      placeholder="Insert Input Here"
+                      oninput={(e) => {
+                        if (
+                          !this.state.form.functionNameToFunctionInputArgs.has(
+                            fn.name
+                          )
+                        ) {
+                          this.state.form.functionNameToFunctionInputArgs.set(
+                            fn.name,
+                            new Map<number, string>()
+                          );
+                          const inputArgMap =
+                            this.state.form.functionNameToFunctionInputArgs.get(
+                              fn.name
+                            );
+                          inputArgMap.set(inputIdx, e.target.value);
+                          this.state.form.functionNameToFunctionInputArgs.set(
+                            fn.name,
+                            inputArgMap
+                          );
+                        } else {
+                          const inputArgMap =
+                            this.state.form.functionNameToFunctionInputArgs.get(
+                              fn.name
+                            );
+                          inputArgMap.set(inputIdx, e.target.value);
+                          this.state.form.functionNameToFunctionInputArgs.set(
+                            fn.name,
+                            inputArgMap
+                          );
+                        }
+                        this.state.loaded = true;
+                      }}
+                      inputValidationFn={(
+                        val: string
+                      ): [ValidationStatus, string] => {
+                        // TODO Array Validation will be complex. Check what cases we want to cover here
+                        if (input.type.slice(-2) === '[]') {
+                          if (val[0] !== '[' || val[val.length - 1] !== ']') {
+                            return ['failure', 'Input must be an array'];
+                          } else {
+                            return ['success', ''];
+                          }
+                        }
+                        if (input.type === 'bool') {
+                          if (val !== 'true' && val !== 'false') {
+                            return ['failure', 'Input must be a boolean'];
+                          }
+                        }
+                        if (input.type.substring(0, 4) === 'uint') {
+                          if (!Number.isNaN(Number(val))) {
+                            return ['success', ''];
+                          } else {
+                            return ['failure', 'Input must be a number'];
+                          }
+                        } else if (input.type === 'bool') {
+                          if (val === 'true' || val === 'false') {
+                            return ['success', ''];
+                          } else {
+                            return ['failure', 'Input must be a boolean'];
+                          }
+                        } else if (input.type === 'address') {
+                          if (val.length === 42) {
+                            return ['success', ''];
+                          } else {
+                            return ['failure', 'Input must be an address'];
+                          }
+                        } else {
+                          return ['success', ''];
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div class="functions-output-container">
+            {fn.outputs.map((output: AbiOutput, i) => {
+              const fnOutputArray = this.state.functionNameToFunctionOutput.get(
+                fn.name
+              );
+              return (
+                <div>
+                  <div class="function-outputs">
+                    <CWText>[{i}]</CWText>
+                    <CWText>{output.type}</CWText>
+                    <CWText>{output.name}</CWText>
+                  </div>
+                  <div>
+                    <CWText>
+                      {fnOutputArray && fnOutputArray[i].toString()
+                        ? fnOutputArray[i].toString()
+                        : ''}
+                    </CWText>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div class="function-call">
+            <CWButton
+              label="Submit"
+              disabled={this.state.saving || !this.state.loaded}
+              onclick={() => {
+                notifySuccess('Submit Call button clicked!');
+                this.state.saving = true;
+                try {
+                  callFunction(this.state.form.daoFactoryType, fn);
+                } catch (err) {
+                  notifyError(
+                    err.responseJSON?.error || 'Submitting Function Call failed'
+                  );
+                } finally {
+                  this.state.saving = false;
+                }
+              }}
+            />
+          </div>
+        </div>
+      );
     };
 
     return (
@@ -229,7 +370,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           onchange={(value) => {
             this.state.form.daoFactoryType = value;
             this.state.loaded = true;
-            console.log("loaded")
+            console.log('loaded');
             m.redraw();
           }}
         />
@@ -246,168 +387,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               <CWText>Outputs</CWText>
               <CWText>Call Function</CWText>
             </div>
-            {this.state.form.daoFactoryType !== '' &&
-              loadFactoryContractAbi(this.state.form.daoFactoryType).map(
-                (fn: AbiItem, fnIdx: number) => {
-                  return (
-                    <div class="function-row">
-                      <CWText>{fn.name}</CWText>
-                      <CWText>{fn.stateMutability}</CWText>
-                      <div class="functions-input-container">
-                        {fn.inputs.map((input: AbiInput, inputIdx: number) => {
-                          return (
-                            <div>
-                              <div class="function-inputs">
-                                <CWText>[{inputIdx}]</CWText>
-                                <CWText>{input.type}</CWText>
-                                <CWText>{input.name}</CWText>
-                              </div>
-                              <div>
-                                <CWTextInput
-                                  name="Contract Input Field"
-                                  placeholder="Insert Input Here"
-                                  oninput={(e) => {
-                                    if (
-                                      !this.state.form.functionNameToFunctionInputArgs.has(
-                                        fn.name
-                                      )
-                                    ) {
-                                      this.state.form.functionNameToFunctionInputArgs.set(
-                                        fn.name,
-                                        new Map<number, string>()
-                                      );
-                                      const inputArgMap =
-                                        this.state.form.functionNameToFunctionInputArgs.get(
-                                          fn.name
-                                        );
-                                      inputArgMap.set(inputIdx, e.target.value);
-                                      this.state.form.functionNameToFunctionInputArgs.set(
-                                        fn.name,
-                                        inputArgMap
-                                      );
-                                    } else {
-                                      const inputArgMap =
-                                        this.state.form.functionNameToFunctionInputArgs.get(
-                                          fn.name
-                                        );
-                                      inputArgMap.set(inputIdx, e.target.value);
-                                      this.state.form.functionNameToFunctionInputArgs.set(
-                                        fn.name,
-                                        inputArgMap
-                                      );
-                                    }
-                                    this.state.loaded = true;
-                                  }}
-                                  inputValidationFn={(
-                                    val: string
-                                  ): [ValidationStatus, string] => {
-                                    // TODO Array Validation will be complex. Check what cases we want to cover here
-                                    if (input.type.slice(-2) === '[]') {
-                                      if (
-                                        val[0] !== '[' ||
-                                        val[val.length - 1] !== ']'
-                                      ) {
-                                        return [
-                                          'failure',
-                                          'Input must be an array',
-                                        ];
-                                      } else {
-                                        return ['success', ''];
-                                      }
-                                    }
-                                    if (input.type === 'bool') {
-                                      if (val !== 'true' && val !== 'false') {
-                                        return [
-                                          'failure',
-                                          'Input must be a boolean',
-                                        ];
-                                      }
-                                    }
-                                    if (input.type.substring(0, 4) === 'uint') {
-                                      if (!Number.isNaN(Number(val))) {
-                                        return ['success', ''];
-                                      } else {
-                                        return [
-                                          'failure',
-                                          'Input must be a number',
-                                        ];
-                                      }
-                                    } else if (input.type === 'bool') {
-                                      if (val === 'true' || val === 'false') {
-                                        return ['success', ''];
-                                      } else {
-                                        return [
-                                          'failure',
-                                          'Input must be a boolean',
-                                        ];
-                                      }
-                                    } else if (input.type === 'address') {
-                                      if (val.length === 42) {
-                                        return ['success', ''];
-                                      } else {
-                                        return [
-                                          'failure',
-                                          'Input must be an address',
-                                        ];
-                                      }
-                                    } else {
-                                      return ['success', ''];
-                                    }
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div class="functions-output-container">
-                        {fn.outputs.map((output: AbiOutput, i) => {
-                          const fnOutputArray =
-                            this.state.functionNameToFunctionOutput.get(
-                              fn.name
-                            );
-                          return (
-                            <div>
-                              <div class="function-outputs">
-                                <CWText>[{i}]</CWText>
-                                <CWText>{output.type}</CWText>
-                                <CWText>{output.name}</CWText>
-                              </div>
-                              <div>
-                                <CWText>
-                                  {fnOutputArray && fnOutputArray[i].toString()
-                                    ? fnOutputArray[i].toString()
-                                    : ''}
-                                </CWText>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div class="function-call">
-                        <CWButton
-                          label="Submit"
-                          disabled={this.state.saving || !this.state.loaded}
-                          onclick={() => {
-                            notifySuccess('Submit Call button clicked!');
-                            this.state.saving = true;
-                            try {
-                              callFunction(this.state.form.daoFactoryType, fn);
-                            } catch (err) {
-                              notifyError(
-                                err.responseJSON?.error ||
-                                  'Submitting Function Call failed'
-                              );
-                            } finally {
-                              this.state.saving = false;
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                }
-              )}
+            {this.state.form.daoFactoryType !== '' && renderFactoryFunction()}
           </div>
         </div>
         {...defaultChainRows(this.state.form, disableField)}

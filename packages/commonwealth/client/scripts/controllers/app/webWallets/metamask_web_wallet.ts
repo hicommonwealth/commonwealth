@@ -91,7 +91,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
     console.log('Attempting to enable Metamask');
-    console.log(app.chain?.meta.node.ethChainId)
     this._enabling = true;
     try {
       // default to ETH

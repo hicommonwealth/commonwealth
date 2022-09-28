@@ -130,16 +130,6 @@ class GeneralContractPage
       // Assumption is using this methodology for calling functions
       // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
-
-      // } else {
-
-      // }
-
       const methodSignature = `${fn.name}(${fn.inputs
         .map((input) => input.type)
         .join(',')})`;

@@ -1,6 +1,5 @@
 import { chain } from 'web3-core/types';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { AbiFunction, AbiEvent } from './types';
 
 export function parseAbiItemsFromABI(abiString: string): AbiItem[] {
   try {
@@ -10,6 +9,7 @@ export function parseAbiItemsFromABI(abiString: string): AbiItem[] {
     return [];
   }
 }
+
 export function parseFunctionsFromABI(abiString: string): AbiItem[] {
   let fns: AbiItem[] = [];
   if (abiString) {
@@ -30,6 +30,16 @@ export function parseWriteFunctionsFromABI(abiString: string): AbiItem[] {
   }
   return fns;
 }
+
+export function parseFunctionFromABI(abiString: string, functionName: string): AbiItem {
+  const abiFunctions = parseFunctionsFromABI(abiString);
+  const functionItem = abiFunctions.find((abiItem) => abiItem.name === functionName);
+  if (!functionItem) {
+    throw new Error(`Could not find function ${functionName} in ABI`);
+  }
+  return functionItem;
+}
+
 
 export function parseEventsFromABI(abiString: string): AbiItem[] {
   let events: AbiItem[] = [];
