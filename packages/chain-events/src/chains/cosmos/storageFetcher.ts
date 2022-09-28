@@ -10,7 +10,8 @@ import {
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
-import { CWEvent, IStorageFetcher, SupportedNetwork } from '../../interfaces';
+import { populateRange } from '../../util';
+import { CWEvent, IDisconnectedRange, IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import {
@@ -46,11 +47,13 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     U,
     T extends { pagination?: { nextKey: Uint8Array } }
   >(func: (nextKey?: Uint8Array) => Promise<T>, key: string): Promise<U[]> {
+    this.log.info(`Querying first page...`);
     const result = await func();
     const data = result[key];
     if (result.pagination) {
       let { nextKey } = result.pagination;
       while (nextKey.length > 0) {
+        this.log.info(`Querying next page...`);
         const nextData = await func(nextKey);
         data.push(...nextData[key]);
         nextKey = nextData.pagination.nextKey;
@@ -85,6 +88,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
 
     if (proposal.status === ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD) {
       // query deposit events if active
+      this.log.info(`Starting paginated deposits query...`);
       const deposits = await this._getAllPaginated<
         Deposit,
         QueryDepositsResponse
@@ -107,6 +111,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       proposal.status === ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD
     ) {
       // query voting events if active
+      this.log.info(`Starting paginated votes query...`);
       const votes = await this._getAllPaginated<Vote, QueryVotesResponse>(
         (key) => this._api.lcd.gov.votes(proposal.proposalId, key),
         'votes'
@@ -152,6 +157,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       return [];
     }
 
+    this.log.info(`Starting paginated proposals query...`);
     const proposals = await this._getAllPaginated<
       Proposal,
       QueryProposalsResponse

@@ -15,6 +15,7 @@ import {
   Erc20Events,
   SupportedNetwork,
   Erc721Events,
+  CosmosEvents,
 } from '../src/index';
 
 import { contracts, networkSpecs, networkUrls } from './listenerUtils';
@@ -73,6 +74,7 @@ const { argv } = yargs
       data.network !== SupportedNetwork.Substrate &&
       data.network !== SupportedNetwork.ERC20 &&
       data.network !== SupportedNetwork.ERC721 &&
+      data.network !== SupportedNetwork.Cosmos &&
       !data.contractAddress &&
       !contracts[data.chain]
     ) {
@@ -253,6 +255,24 @@ if (network === SupportedNetwork.Substrate) {
       handlers: [new StandaloneEventHandler()],
       skipCatchup,
       verbose: false,
+    });
+  });
+} else if (network === SupportedNetwork.Cosmos) {
+  CosmosEvents.createApi(url).then(async (api) => {
+    const fetcher = new CosmosEvents.StorageFetcher(api);
+    try {
+      const fetched = await fetcher.fetch();
+      console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));
+    } catch (err) {
+      console.log(err);
+      console.error(`Got error from fetcher: ${JSON.stringify(err, null, 2)}.`);
+    }
+    CosmosEvents.subscribeEvents({
+      chain,
+      api,
+      handlers: [new StandaloneEventHandler()],
+      skipCatchup,
+      verbose: true,
     });
   });
 }

@@ -88,14 +88,20 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     if (disconnectedRange?.startBlock) {
       // set disconnected range to recover past blocks via "polling"
       this._lastBlockHeight = disconnectedRange.startBlock;
+      this.log.info(
+        `Polling Cosmos "${this._name}" events from ${this._lastBlockHeight}.`
+      );
     }
-    this._listener = setInterval(async () => {
+    const listenFunc = async () => {
       const blocks = await this._queryBlocks();
       const events = this._blocksToEvents(blocks);
       for (const event of events) {
         cb(event);
       }
-    }, this._pollTime);
+    };
+    await listenFunc();
+    this.log.info(`Starting Cosmos "${this._name}" listener.`);
+    this._listener = setInterval(listenFunc, this._pollTime);
   }
 
   public unsubscribe(): void {
