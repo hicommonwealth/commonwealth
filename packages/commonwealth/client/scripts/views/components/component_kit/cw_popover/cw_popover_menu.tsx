@@ -26,7 +26,7 @@ export type PopoverMenuItemAttrs =
 export class CWPopoverMenuItem
   implements m.ClassComponent<PopoverMenuItemAttrs>
 {
-  view(vnode) {
+  view(vnode: m.VnodeDOM<any, this>) {
     const { type, label, iconName, onclick, disabled, isSecondary } =
       vnode.attrs;
 

@@ -54,6 +54,13 @@
         overflow-y: auto;
         width: 100%;
       }
+
+      .MobileMenu {
+        display: none;
+        @include extraSmall {
+          display: flex;
+        }
+      }
     }
   }
 }

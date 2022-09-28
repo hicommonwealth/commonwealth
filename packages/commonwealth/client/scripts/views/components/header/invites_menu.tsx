@@ -28,7 +28,7 @@ export const handleEmailInvites = (state) => {
 
 export class InvitesMenu implements m.ClassComponent {
   view() {
-    if (!app.config.invites?.length) return;
+    // if (!app.config.invites?.length) return;
 
     return (
       <PopoverMenu

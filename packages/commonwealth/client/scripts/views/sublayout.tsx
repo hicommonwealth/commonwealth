@@ -15,6 +15,7 @@ import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
+import { MobileMenu } from './components/mobile_menu/mobile_menu';
 
 type SublayoutAttrs = {
   hideFooter?: boolean;
@@ -114,6 +115,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 tosStatus={tosStatus}
                 bannerStatus={bannerStatus}
               />
+              <MobileMenu />
               <div class="Body" onscroll={onscroll}>
                 {vnode.children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
