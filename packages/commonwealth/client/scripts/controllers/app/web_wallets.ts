@@ -23,14 +23,19 @@ export default class WebWalletController {
     // handle case like injective, axie, where we require a specific wallet
     const specificChain = app.chain?.meta?.id;
     if (app.chain?.meta?.id) {
-      const specificWallets = this._wallets.filter((w) => !!w.specificChains?.includes(specificChain));
+      const specificWallets = this._wallets.filter(
+        (w) => !!w.specificChains?.includes(specificChain)
+      );
       if (specificWallets.length > 0) return specificWallets;
     }
 
     // handle general case of wallet by chain base
-    return this._wallets.filter((w) => w.available
-      && !w.specificChains // omit chain-specific wallets unless on correct chain
-      && (!chain || w.chain === chain));
+    return this._wallets.filter(
+      (w) =>
+        w.available &&
+        !w.specificChains && // omit chain-specific wallets unless on correct chain
+        (!chain || w.chain === chain)
+    );
   }
 
   public getByName(name: string): IWebWallet<any> | undefined {
@@ -38,7 +43,10 @@ export default class WebWalletController {
   }
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
-  private async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
+  private async _setWalletId(
+    account: Account,
+    wallet: WalletId
+  ): Promise<void> {
     if (app.user.activeAccount.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
@@ -49,21 +57,26 @@ export default class WebWalletController {
         address: account.address,
         author_chain: account.chain.id,
         wallet_id: wallet,
-        jwt: app.user.jwt
+        jwt: app.user.jwt,
       });
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
     }
   }
 
-  public async locateWallet(account: Account, chain?: ChainBase): Promise<IWebWallet<any>> {
+  public async locateWallet(
+    account: Account,
+    chain?: ChainBase
+  ): Promise<IWebWallet<any>> {
     if (chain && account.chain.base !== chain) {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {
       return this.getByName(account.walletId);
     }
+
     const availableWallets = this.availableWallets(chain);
+    console.log('availableWallets', availableWallets);
     if (availableWallets.length === 0) {
       throw new Error('No wallet available');
     }

@@ -6,9 +6,9 @@ import Web3 from 'web3';
 
 import 'pages/abi_factory_form.scss';
 
-import { Contract } from 'models';
+import { Contract, NodeInfo } from 'models';
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
@@ -36,6 +36,7 @@ import {
 } from 'views/pages/create_community/types';
 import { parseAbiItemsFromABI, parseFunctionFromABI } from 'helpers/abi_utils';
 import { factoryNicknameToCreateFunctionName } from 'helpers/types';
+import EthereumChain from 'controllers/chain/ethereum/chain';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -93,18 +94,24 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
-    const getWeb3 = async (): Promise<Web3> => {
+    const getCurrChain = async (contractAddress: string): Promise<EthereumChain> => {
       try {
-        const provider = new Web3.providers.WebsocketProvider(
-          this.state.form.nodeUrl
-        );
-        const _api = new Web3(provider);
-        return _api;
+        const contract: Contract =
+          app.contracts.store.getContractByAddress(contractAddress);
+        let chainNodeId = 1;
+        if (contract.chainNodeId) {
+          chainNodeId = contract.chainNodeId;
+        }
+        const nodeObj = app.config.nodes.getNodesByChainId(chainNodeId);
+
+        const ethChain = new EthereumChain(app);
+
+        const ethApi = await ethChain.initApi(nodeObj);
+
+        return ethChain;
       } catch (e) {
         console.error(e);
-        console.log(
-          `Could not connect to Ethereum on ${this.state.form.nodeUrl}`
-        );
+        console.log(`App Error: ${e.message}`);
       }
     };
 
@@ -114,8 +121,8 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const contract: Contract =
         app.contracts.store.getContractByAddress(contractAddress);
       // Initialize Chain and Create contract instance
-      const web3Api = await getWeb3();
-      const web3Contract: Web3Contract = new web3Api.eth.Contract(
+      const chain = await getCurrChain(contractAddress);
+      const web3Contract: Web3Contract = new chain.api.eth.Contract(
         parseAbiItemsFromABI(contract.abi),
         contractAddress
       );
@@ -163,19 +170,22 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const functionTx = functionContract.methods[methodSignature](
         ...processedArgs
       );
-      console.log("user", app.user)
-      const sender = app.user.activeAccount;
-      console.log("sender is ", sender);
+
       //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
+      const availableWallets = app.wallets.availableWallets(ChainBase.Ethereum);
+      console.log('availableWallets', availableWallets);
+      if (availableWallets.length === 0) {
+        throw new Error('No wallet available');
+      }
+
+      const disabledMetamaskWallets = availableWallets.find(
+        (wallet) => wallet.name === WalletId.Metamask && !wallet.enabled
       );
 
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
+      const signingWallet = disabledMetamaskWallets[0];
+      await signingWallet.enable();
 
-      const web3Api = await getWeb3();
+      const chain = await getCurrChain(contractAddress);
       let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
@@ -185,16 +195,11 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           signingWallet
         );
       } else {
-        // send transaction
-        tx = await chain.makeContractCall(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
-        );
+        return;
       }
       // simple return type
       if (fn.outputs.length === 1) {
-        const decodedTx = web3Api.eth.abi.decodeParameter(
+        const decodedTx = chain.api.eth.abi.decodeParameter(
           fn.outputs[0].type,
           tx
         );
@@ -202,7 +207,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         result.push(decodedTx);
         this.state.functionNameToFunctionOutput.set(fn.name, result);
       } else if (fn.outputs.length > 1) {
-        const decodedTxMap = web3Api.eth.abi.decodeParameters(
+        const decodedTxMap = chain.api.eth.abi.decodeParameters(
           fn.outputs.map((output) => output.type),
           tx
         );
