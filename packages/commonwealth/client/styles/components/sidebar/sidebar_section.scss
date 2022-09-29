@@ -9,15 +9,20 @@
   position: relative;
 
   .section-group-title-container {
-    padding: 8px 16px;
     align-items: center;
+    color: $neutral-800;
     display: flex;
-    justify-content: space-between;
+    justify-content: left;
+    padding: 8px;
     @include small {
       padding: 12px 40px;
     }
     @include extraSmall {
       padding: 12px 16px;
+    }
+
+    .Icon {
+      margin-right: 4px;
     }
   }
 
@@ -28,11 +33,11 @@
 }
 
 .SubSectionGroup {
-  .SubSectionGroupTitle {
+  padding: 4px 8px 4px 28px;
+  .sub-section-group-title {
     align-items: center;
     display: flex;
     min-width: 0;
-    padding: 4px 24px;
 
     @include small {
       padding: 12px 56px;
@@ -48,10 +53,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
-    }
-
-    &.section-title-text-stale {
-      color: $neutral-500;
     }
 
     &.background {

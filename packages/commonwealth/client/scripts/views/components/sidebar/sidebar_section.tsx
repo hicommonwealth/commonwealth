@@ -134,7 +134,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`SubSectionGroupTitle ${
+          class={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
           onclick={(e) => clickHandler(e)}
@@ -234,9 +234,9 @@ export class SidebarSectionGroup
           class="section-group-title-container"
           onclick={(e) => clickHandler(e, title)}
         >
+          {carat}
           <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          {carat}
         </div>
         {this.toggled && (
           <div class="sections-container">

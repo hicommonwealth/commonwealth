@@ -9,7 +9,7 @@ import { SidebarSectionGroup } from './sidebar_section';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`]
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
@@ -21,7 +21,7 @@ function setAdminToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
     JSON.stringify(newTree);
 }
 
@@ -45,7 +45,7 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
     if (!isAdmin && !isMod) return null;
 
     const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
+      localStorage[`${app.activeChainId()}-admin-toggle-tree`]
     );
     const adminGroupData: SectionGroupAttrs[] = [
       {
