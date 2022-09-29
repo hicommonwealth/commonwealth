@@ -16,6 +16,7 @@ import {
   Topic,
 } from 'models';
 import { externalLink, extractDomain, pluralize } from 'helpers';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
@@ -130,6 +131,13 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
 
     const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
 
+    const canComment =
+      app.user.activeAccount ||
+      (!isAdminOrMod &&
+        TopicGateCheck.isGatedTopic(
+          proposal instanceof Thread ? proposal?.topic?.name : null
+        ));
+
     return (
       <div class="ProposalBody">
         <div class="header">
@@ -149,7 +157,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
               <CWIcon iconName="lock" iconSize="small" />
             )}
             <ProposalBodyAuthor item={proposal} />
-            <CWText type="caption">
+            <CWText type="caption" className="published-text">
               published on {moment(proposal.createdAt).format('l')}
             </CWText>
             {/* {proposal.stage !== ThreadStage.Discussion && (
@@ -418,16 +426,18 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             ) : (
               <>
                 <ProposalBodyText item={proposal} />
-                {!isGloballyEditing && !proposalPageState.parentCommentId && (
-                  <CreateComment
-                    updatedCommentsCallback={updatedCommentsCallback}
-                    setIsGloballyEditing={setIsGloballyEditing}
-                    isGloballyEditing={isGloballyEditing}
-                    proposalPageState={this}
-                    parentComment={null}
-                    rootProposal={proposal}
-                  />
-                )}
+                {!isGloballyEditing &&
+                  !proposalPageState.parentCommentId &&
+                  canComment && (
+                    <CreateComment
+                      updatedCommentsCallback={updatedCommentsCallback}
+                      setIsGloballyEditing={setIsGloballyEditing}
+                      isGloballyEditing={isGloballyEditing}
+                      proposalPageState={this}
+                      parentComment={null}
+                      rootProposal={proposal}
+                    />
+                  )}
                 {/* <div class="proposal-response-row">
                   <ThreadReactionButton thread={proposal} />
                   <InlineReplyButton

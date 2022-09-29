@@ -18,7 +18,16 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 12px;
+
+      .username {
+        font-weight: 500;
+
+        @include caption;
+      }
+
+      .published-text.Text {
+        color: $neutral-500;
+      }
     }
   }
 

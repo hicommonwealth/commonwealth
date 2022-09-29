@@ -113,8 +113,8 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                 </div>
                 <div class="menu-buttons-right">
                   <CWIconButton iconName="share" iconSize="small" />
-                  <CWIconButton iconName="flag" iconSize="small" />
-                  <CWIconButton iconName="bell" iconSize="small" />
+                  {/* <CWIconButton iconName="flag" iconSize="small" />
+                  <CWIconButton iconName="bell" iconSize="small" /> */}
                   <CWPopoverMenu
                     trigger={
                       <CWIconButton iconName="dotsVertical" iconSize="small" />

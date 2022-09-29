@@ -3,7 +3,16 @@
 .CreateComment {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+
+  .attribution-row {
+    display: flex;
+    gap: 4px;
+
+    .user-link-text.Text {
+      color: $primary-500;
+    }
+  }
 
   .callout-text.Text {
     background-color: $neutral-200;

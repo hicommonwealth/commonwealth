@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/view_proposal/create_comment.scss';
 
 import app from 'state';
-import { Thread, Comment, AnyProposal, Account } from 'models';
+import { Thread, Comment, AnyProposal } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
@@ -127,17 +127,10 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     const activeTopicName =
       rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
 
-    const isAdmin =
-      app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
-
     let parentScopedClass = 'new-thread-child';
-
-    let parentAuthor: Account;
 
     if (parentType === CommentParent.Comment) {
       parentScopedClass = 'new-comment-child';
-      parentAuthor = app.chain.accounts.get(parentComment.author);
     }
 
     const { error, sendingComment, uploadsInProgress } = this;
@@ -152,9 +145,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       isGloballyEditing ||
       this.quillEditorState?.isBlank() ||
       sendingComment ||
-      uploadsInProgress ||
-      !app.user.activeAccount ||
-      (!isAdmin && TopicGateCheck.isGatedTopic(activeTopicName));
+      uploadsInProgress;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals
@@ -169,25 +160,14 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           'CreateComment'
         )}
       >
-        {/* <div class="create-comment-avatar">
-          {m(User, {
-            user: author,
-            popover: true,
-            avatarOnly: true,
-            avatarSize: 40,
-          })}
-        </div> */}
-        {/* <div class="reply-header">
-            <CWText>
-              {parentType === CommentParent.Comment ? 'Replying to' : 'Reply'}
-              {m(User, {
-                user: parentAuthor,
-                popover: true,
-                hideAvatar: true,
-              })}
-            </CWText>
-          </div>
-          {m(User, { user: author, popover: true, hideAvatar: true })} */}
+        <div class="attribution-row">
+          <CWText type="caption">
+            {parentType === CommentParent.Comment ? 'Reply as' : 'Comment as'}
+          </CWText>
+          <CWText type="caption" fontWeight="medium" className="user-link-text">
+            {m(User, { user: author, hideAvatar: true, linkify: true })}
+          </CWText>
+        </div>
         {rootProposal instanceof Thread && rootProposal.readOnly ? (
           <CWText type="h5" className="callout-text">
             Commenting is disabled because this post has been locked.
