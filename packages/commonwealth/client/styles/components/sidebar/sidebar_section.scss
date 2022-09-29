@@ -15,10 +15,10 @@
     justify-content: left;
     padding: 8px;
     @include small {
-      padding: 12px 40px;
+      padding: 12px 32px 12px 40px;
     }
     @include extraSmall {
-      padding: 12px 16px;
+      padding: 10px 12px;
     }
 
     &:hover {
@@ -27,6 +27,9 @@
 
     .Icon {
       margin-right: 4px;
+      @include smallInclusive {
+        margin-right: 14px;
+      }
     }
   }
 
@@ -44,11 +47,11 @@
     min-width: 0;
 
     @include small {
-      padding: 12px 56px;
+      padding: 12px 32px 12px 78px;
     }
 
     @include extraSmall {
-      padding: 12px 32px;
+      padding: 12px 8px 12px 44px;
     }
 
     .title-text {
