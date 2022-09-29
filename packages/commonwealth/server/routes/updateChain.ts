@@ -78,6 +78,7 @@ const updateChain = async (
     stages_enabled,
     custom_stages,
     custom_domain,
+    chat_enabled,
     default_summary_view,
     terms,
   } = req.body;
@@ -132,6 +133,7 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
+  if (chat_enabled) chain.chat_enabled = chat_enabled;
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
