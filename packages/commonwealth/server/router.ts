@@ -127,6 +127,7 @@ import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
+import migrateEvent from './routes/migrateEvent';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -709,6 +710,7 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
@@ -775,7 +777,7 @@ function setupRouter(
   router.get(
     '/auth/callback',
     passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models),
+    authCallback.bind(this, models)
   );
 
   // logout
