@@ -9,20 +9,14 @@ import { Thread, Comment, AnyProposal } from 'models';
 import { CreateComment } from './create_comment';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
-import { ProposalPageState } from './types';
 import { MAX_THREAD_LEVEL } from './constants';
 import { ProposalComment } from './proposal_comment';
 
 type ProposalCommentsAttrs = {
   comments: Array<Comment<any>>;
-  isAdmin: boolean;
-  isGloballyEditing: boolean;
   proposal: Thread | AnyProposal;
-  proposalPageState: ProposalPageState;
-  recentlySubmitted?: number;
   setIsGloballyEditing: (status: boolean) => void;
   updatedCommentsCallback: () => void;
-  user?: any;
 };
 
 export class ProposalComments
@@ -31,6 +25,8 @@ export class ProposalComments
   private commentError: any;
   private dom;
   private highlightedComment: boolean;
+  private isReplying: boolean;
+  private parentCommentId: number;
 
   oncreate(vvnode) {
     this.dom = vvnode.dom;
@@ -38,13 +34,10 @@ export class ProposalComments
 
   view(vnode) {
     const {
-      proposal,
       comments,
-      updatedCommentsCallback,
+      proposal,
       setIsGloballyEditing,
-      isGloballyEditing,
-      proposalPageState,
-      isAdmin,
+      updatedCommentsCallback,
     } = vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
@@ -61,23 +54,13 @@ export class ProposalComments
       if (commentId) jumpHighlightComment(commentId);
     }
 
-    const nestedReplyForm = (comment) => {
-      // if current comment is replyParent, & no posts are being edited, a nested comment form is rendered
-      if (
-        !isGloballyEditing &&
-        proposalPageState.parentCommentId === comment.id &&
-        !isGloballyEditing
-      ) {
-        return (
-          <CreateComment
-            updatedCommentsCallback={updatedCommentsCallback}
-            setIsGloballyEditing={setIsGloballyEditing}
-            isGloballyEditing={isGloballyEditing}
-            proposalPageState={proposalPageState}
-            parentComment={comment}
-            rootProposal={proposal}
-          />
-        );
+    const handleIsReplying = (isReplying: boolean, id?: number) => {
+      if (isReplying) {
+        this.parentCommentId = id;
+        this.isReplying = true;
+      } else {
+        this.parentCommentId = undefined;
+        this.isReplying = false;
       }
     };
 
@@ -119,12 +102,11 @@ export class ProposalComments
 
     const recursivelyGatherComments = (
       comments_: Comment<any>[],
-      parent: AnyProposal | Thread | Comment<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
-      return comments_.map((comment: Comment<any>, idx) => {
+      return comments_.map((comment: Comment<any>) => {
         const children = app.comments
           .getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
@@ -134,24 +116,22 @@ export class ProposalComments
             <>
               <ProposalComment
                 comment={comment}
+                handleIsReplying={handleIsReplying}
+                isLast={threadLevel === 2}
                 setIsGloballyEditing={setIsGloballyEditing}
-                proposalPageState={proposalPageState}
-                parent={parent}
-                proposal={proposal}
-                updatedCommentsCallback={updatedCommentsCallback}
-                isAdmin={isAdmin}
-                isLast={idx === comments_.length - 1}
                 threadLevel={threadLevel}
+                updatedCommentsCallback={updatedCommentsCallback}
               />
-              {!!children.length && canContinueThreading && (
-                <>
-                  {recursivelyGatherComments(
-                    children,
-                    comment,
-                    threadLevel + 1
-                  )}
-                  {canContinueThreading && nestedReplyForm(comment)}
-                </>
+              {!!children.length &&
+                canContinueThreading &&
+                recursivelyGatherComments(children, threadLevel + 1)}
+              {this.isReplying && this.parentCommentId === comment.id && (
+                <CreateComment
+                  handleIsReplying={handleIsReplying}
+                  parentCommentId={this.parentCommentId}
+                  rootProposal={proposal}
+                  updatedCommentsCallback={updatedCommentsCallback}
+                />
               )}
             </>
           );

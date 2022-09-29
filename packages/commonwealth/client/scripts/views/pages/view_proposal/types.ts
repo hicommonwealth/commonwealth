@@ -12,18 +12,17 @@ export type Prefetch = {
 
 export type ProposalPageState = {
   comments: Comment<Thread>[];
-  polls: Poll[];
-  editing: boolean;
   highlightedComment: boolean;
-  parentCommentId: number; // if null or undefined, reply is thread-scoped
+  isGloballyEditing: boolean;
+  polls: Poll[];
   prefetch: Prefetch;
   proposal: AnyProposal | Thread;
   recentlyEdited: boolean;
   recentlySubmitted: number; // comment ID for CSS highlight transitions
   replying: boolean;
   tabSelected: 'viewProposal' | 'viewSidebar';
-  threadFetched;
-  threadFetchFailed;
+  threadFetched: boolean;
+  threadFetchFailed: boolean;
   tipAmount: number;
   viewCount: number;
 };

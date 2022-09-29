@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'pages/view_proposal/create_comment.scss';
 
 import app from 'state';
-import { Thread, Comment, AnyProposal } from 'models';
+import { Thread, AnyProposal } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CommentParent } from 'controllers/server/comments';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
@@ -18,15 +18,12 @@ import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { getClasses } from '../../components/component_kit/helpers';
 import { jumpHighlightComment } from './helpers';
-import { ProposalPageState } from './types';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type CreateCommmentAttrs = {
-  isGloballyEditing: boolean;
-  parentComment?: Comment<any>;
-  proposalPageState: ProposalPageState;
+  handleIsReplying?: (isReplying: boolean, id?: number) => void;
+  parentCommentId: number;
   rootProposal: AnyProposal | Thread;
   updatedCommentsCallback: () => void;
 };
@@ -40,22 +37,17 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
   view(vnode) {
     const {
-      updatedCommentsCallback,
-      isGloballyEditing,
-      proposalPageState,
+      handleIsReplying,
+      parentCommentId,
       rootProposal,
+      updatedCommentsCallback,
     } = vnode.attrs;
-
-    let { parentComment } = vnode.attrs;
 
     const author = app.user.activeAccount;
 
-    const parentType =
-      parentComment || proposalPageState.parentCommentId
-        ? CommentParent.Comment
-        : CommentParent.Proposal;
-
-    if (!parentComment) parentComment = null;
+    const parentType = parentCommentId
+      ? CommentParent.Comment
+      : CommentParent.Proposal;
 
     if (this.uploadsInProgress === undefined) {
       this.uploadsInProgress = 0;
@@ -90,7 +82,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           rootProposal.uniqueIdentifier,
           chainId,
           commentText,
-          proposalPageState.parentCommentId
+          parentCommentId
         );
 
         updatedCommentsCallback();
@@ -101,7 +93,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
         this.sendingComment = false;
 
-        proposalPageState.recentlySubmitted = res.id;
         // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
@@ -119,19 +110,12 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       }
 
       this.saving = false;
-      proposalPageState.replying = false;
-      proposalPageState.parentCommentId = null;
+      handleIsReplying(false);
       m.redraw();
     };
 
     const activeTopicName =
       rootProposal instanceof Thread ? rootProposal?.topic?.name : null;
-
-    let parentScopedClass = 'new-thread-child';
-
-    if (parentType === CommentParent.Comment) {
-      parentScopedClass = 'new-comment-child';
-    }
 
     const { error, sendingComment, uploadsInProgress } = this;
 
@@ -142,10 +126,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     const userBalance: BN = TopicGateCheck.getUserBalance();
 
     const disabled =
-      isGloballyEditing ||
-      this.quillEditorState?.isBlank() ||
-      sendingComment ||
-      uploadsInProgress;
+      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals
@@ -154,12 +135,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       : 18;
 
     return (
-      <div
-        class={getClasses<{ parentScopedClass: string }>(
-          { parentScopedClass },
-          'CreateComment'
-        )}
-      >
+      <div class="CreateComment">
         <div class="attribution-row">
           <CWText type="caption">
             {parentType === CommentParent.Comment ? 'Reply as' : 'Comment as'}
@@ -228,12 +204,18 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
             >
               <div class="form-buttons">
                 <CWButton
-                  disabled={this.quillEditorState?.isBlank()}
+                  disabled={
+                    !handleIsReplying
+                      ? this.quillEditorState?.isBlank()
+                      : undefined
+                  }
                   buttonType="secondary-blue"
                   onclick={(e) => {
                     e.preventDefault();
-                    proposalPageState.replying = false;
-                    proposalPageState.parentCommentId = null;
+
+                    if (handleIsReplying) {
+                      handleIsReplying(false);
+                    }
                   }}
                   label="Cancel"
                 />

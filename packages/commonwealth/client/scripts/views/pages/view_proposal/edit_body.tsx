@@ -92,7 +92,9 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
 
               if (threadText !== body) {
                 confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.'
+                  'Cancel editing? Changes will not be saved.',
+                  'Yes',
+                  'Keep editing'
                 )();
               }
 

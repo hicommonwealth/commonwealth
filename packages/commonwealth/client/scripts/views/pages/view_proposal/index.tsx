@@ -52,7 +52,6 @@ class ViewProposalPage
   private comments: Comment<Thread>[];
   private highlightedComment: boolean;
   private isGloballyEditing: boolean;
-  private parentCommentId: number; // if null or undefined, reply is thread-scoped
   private polls: Poll[];
   private prefetch: Prefetch;
   private proposal: AnyProposal | Thread;
@@ -60,8 +59,8 @@ class ViewProposalPage
   private recentlySubmitted: number; // comment ID for CSS highlight transitions
   private replying: boolean;
   private tabSelected: 'viewProposal' | 'viewSidebar';
-  private threadFetched;
-  private threadFetchFailed;
+  private threadFetched: boolean;
+  private threadFetchFailed: boolean;
   private tipAmount: number;
   private viewCount: number;
 

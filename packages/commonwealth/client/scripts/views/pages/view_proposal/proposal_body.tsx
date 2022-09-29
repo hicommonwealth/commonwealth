@@ -185,22 +185,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           iconName: 'edit',
                           onclick: async (e) => {
                             e.preventDefault();
-
-                            if (proposalPageState.replying) {
-                              if (activeQuillEditorHasText()) {
-                                const confirmed =
-                                  await confirmationModalWithText(
-                                    'Unsubmitted replies will be lost. Continue?'
-                                  )();
-
-                                if (!confirmed) return;
-                              }
-
-                              proposalPageState.replying = false;
-
-                              proposalPageState.parentCommentId = null;
-                            }
-
                             setIsEditingBody(true);
                           },
                         },
@@ -355,10 +339,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
 
                                     if (!confirmed) return;
                                   }
-
-                                  proposalPageState.replying = false;
-
-                                  proposalPageState.parentCommentId = null;
                                 }
 
                                 setIsGloballyEditing(true);
@@ -426,33 +406,17 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             ) : (
               <>
                 <ProposalBodyText item={proposal} />
-                {!isGloballyEditing &&
-                  !proposalPageState.parentCommentId &&
-                  canComment && (
-                    <CreateComment
-                      updatedCommentsCallback={updatedCommentsCallback}
-                      setIsGloballyEditing={setIsGloballyEditing}
-                      isGloballyEditing={isGloballyEditing}
-                      proposalPageState={this}
-                      parentComment={null}
-                      rootProposal={proposal}
-                    />
-                  )}
-                {/* <div class="proposal-response-row">
-                  <ThreadReactionButton thread={proposal} />
-                  <InlineReplyButton
-                    commentReplyCount={commentCount}
-                    onclick={() => {
-                      if (!proposalPageState.replying) {
-                        proposalPageState.replying = true;
-                        scrollToForm();
-                      } else if (!proposalPageState.parentCommentId) {
-                        // If user is already replying to top-level, cancel reply
-                        proposalPageState.replying = false;
-                      }
-                      proposalPageState.parentCommentId = null;
-                    }}
+                {!isGloballyEditing && canComment && (
+                  <CreateComment
+                    updatedCommentsCallback={updatedCommentsCallback}
+                    setIsGloballyEditing={setIsGloballyEditing}
+                    isGloballyEditing={isGloballyEditing}
+                    proposalPageState={this}
+                    parentComment={null}
+                    rootProposal={proposal}
                   />
+                )}
+                {/* <div class="proposal-response-row">
                   {attachments && attachments.length > 0 && (
                     <ProposalBodyAttachments item={proposal} />
                   )}
@@ -488,14 +452,10 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         )}
 
         <ProposalComments
-          proposal={proposal}
           comments={comments}
-          updatedCommentsCallback={updatedCommentsCallback}
+          proposal={proposal}
           setIsGloballyEditing={setIsGloballyEditing}
-          isGloballyEditing={isGloballyEditing}
-          proposalPageState={proposalPageState}
-          recentlySubmitted={proposalPageState.recentlySubmitted}
-          isAdmin={isAdminOrMod}
+          updatedCommentsCallback={updatedCommentsCallback}
         />
       </div>
     );

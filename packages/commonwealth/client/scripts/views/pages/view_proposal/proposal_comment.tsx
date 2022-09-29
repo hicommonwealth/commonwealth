@@ -5,28 +5,24 @@ import moment from 'moment';
 
 import 'pages/view_proposal/proposal_comment.scss';
 
-// import app from 'state';
+import app from 'state';
 // import { getProposalUrlPath } from 'identifiers';
 // import { slugify } from 'utils';
-import { Thread, Comment, AnyProposal } from 'models';
+import { Comment } from 'models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { QuillEditor } from '../../components/quill/quill_editor';
-import { ProposalPageState } from './types';
 import { ProposalBodyAuthor } from './proposal_header_components';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
+import { scrollToForm } from './helpers';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
-  isAdmin?: boolean;
+  handleIsReplying: (isReplying: boolean, id?: number) => void;
   isGloballyEditing: boolean;
   isLast: boolean;
-  parent: AnyProposal | Comment<any> | Thread;
-  proposal: AnyProposal | Thread;
-  proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
   updatedCommentsCallback?: () => void;
@@ -34,21 +30,15 @@ type ProposalCommentAttrs = {
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
   private isEditingComment: boolean;
-  private quillEditorState: QuillEditor;
-  private replying: boolean;
-  private saving: boolean;
 
   view(vnode) {
     const {
-      updatedCommentsCallback,
       comment,
-      isAdmin,
-      isGloballyEditing,
+      handleIsReplying,
       isLast,
-      proposal,
-      proposalPageState,
       setIsGloballyEditing,
       threadLevel,
+      updatedCommentsCallback,
     } = vnode.attrs;
 
     const setIsEditingComment = (status: boolean) => {
@@ -104,17 +94,23 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                     </CWText>
                     <CWIconButton iconName="downvote" iconSize="small" />
                   </div>
-                  <div class="reply-button" onclick={() => console.log()}>
-                    <CWIcon iconName="feedback" iconSize="small" />
-                    <CWText type="caption" className="menu-buttons-text">
-                      Reply
-                    </CWText>
-                  </div>
+                  {!isLast && (
+                    <div
+                      class="reply-button"
+                      onclick={() => {
+                        scrollToForm(comment.id);
+                        handleIsReplying(true, comment.id);
+                      }}
+                    >
+                      <CWIcon iconName="feedback" iconSize="small" />
+                      <CWText type="caption" className="menu-buttons-text">
+                        Reply
+                      </CWText>
+                    </div>
+                  )}
                 </div>
                 <div class="menu-buttons-right">
                   <CWIconButton iconName="share" iconSize="small" />
-                  {/* <CWIconButton iconName="flag" iconSize="small" />
-                  <CWIconButton iconName="bell" iconSize="small" /> */}
                   <CWPopoverMenu
                     trigger={
                       <CWIconButton iconName="dotsVertical" iconSize="small" />
@@ -127,7 +123,15 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                           setIsEditingComment(true);
                         },
                       },
-                      { label: 'Delete', iconName: 'trash' },
+                      {
+                        label: 'Delete',
+                        iconName: 'trash',
+                        onclick: () => {
+                          app.comments.delete(comment).then(() => {
+                            m.redraw();
+                          });
+                        },
+                      },
                     ]}
                   />
                 </div>
