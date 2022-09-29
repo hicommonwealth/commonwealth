@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Callout } from 'construct-ui';
 
 import 'pages/view_proposal/create_comment.scss';
 
@@ -190,40 +189,33 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           </div>
           {m(User, { user: author, popover: true, hideAvatar: true })} */}
         {rootProposal instanceof Thread && rootProposal.readOnly ? (
-          <Callout
-            intent="primary"
-            content="Commenting is disabled because this post has been locked."
-          />
+          <CWText type="h5" className="callout-text">
+            Commenting is disabled because this post has been locked.
+          </CWText>
         ) : (
           <>
             {app.user.activeAccount?.profile &&
               !app.user.activeAccount.profile.name && (
-                <Callout
-                  class="no-profile-callout"
-                  intent="primary"
-                  content={
-                    <>
-                      You haven't set a display name yet.{' '}
-                      <a
-                        href={`/${app.activeChainId()}/account/${
-                          app.user.activeAccount.address
-                        }?base=${app.user.activeAccount.chain.id}`}
-                        onclick={(e) => {
-                          e.preventDefault();
-                          app.modals.create({
-                            modal: EditProfileModal,
-                            data: {
-                              account: app.user.activeAccount,
-                              refreshCallback: () => m.redraw(),
-                            },
-                          });
-                        }}
-                      >
-                        Set a display name
-                      </a>
-                    </>
-                  }
-                />
+                <CWText type="h5" className="callout-text">
+                  You haven't set a display name yet.
+                  <a
+                    href={`/${app.activeChainId()}/account/${
+                      app.user.activeAccount.address
+                    }?base=${app.user.activeAccount.chain.id}`}
+                    onclick={(e) => {
+                      e.preventDefault();
+                      app.modals.create({
+                        modal: EditProfileModal,
+                        data: {
+                          account: app.user.activeAccount,
+                          refreshCallback: () => m.redraw(),
+                        },
+                      });
+                    }}
+                  >
+                    Set a display name.
+                  </a>
+                </CWText>
               )}
             <QuillEditorComponent
               contentsDoc=""
@@ -235,17 +227,17 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
               tabindex={vnode.attrs.tabindex}
             />
             {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-              <div class="token-requirement">
+              <CWText className="token-req-text">
                 Commenting in {activeTopicName} requires{' '}
-                {weiToTokens(tokenPostingThreshold.toString(), decimals)} $
-                {app.chain.meta.default_symbol}.
+                {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+                {app.chain.meta.default_symbol}.{' '}
                 {userBalance && app.user.activeAccount && (
                   <>
-                    You have ${weiToTokens(userBalance.toString(), decimals)} $
+                    You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                     {app.chain.meta.default_symbol}.
                   </>
                 )}
-              </div>
+              </CWText>
             )}
             <div
               class="form-bottom"
@@ -255,16 +247,16 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
               }}
             >
               <div class="form-buttons">
-                {/* <CWButton
-                    disabled={this.quillEditorState?.isBlank()}
-                    buttonType="secondary-blue"
-                    onclick={(e) => {
-                      e.preventDefault();
-                      proposalPageState.replying = false;
-                      proposalPageState.parentCommentId = null;
-                    }}
-                    label="Cancel"
-                  /> */}
+                <CWButton
+                  disabled={this.quillEditorState?.isBlank()}
+                  buttonType="secondary-blue"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    proposalPageState.replying = false;
+                    proposalPageState.parentCommentId = null;
+                  }}
+                  label="Cancel"
+                />
                 <CWButton
                   disabled={disabled}
                   onclick={handleSubmitComment}

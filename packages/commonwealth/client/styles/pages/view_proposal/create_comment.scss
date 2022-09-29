@@ -3,6 +3,17 @@
 .CreateComment {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+
+  .callout-text.Text {
+    background-color: $neutral-200;
+    border-radius: $border-radius-corners;
+    padding: 16px;
+
+    a {
+      margin-left: 8px;
+    }
+  }
 
   .form-bottom {
     display: flex;
@@ -17,22 +28,7 @@
     }
   }
 
-  .QuillEditor {
-    margin-bottom: 16px;
-
-    .ql-toolbar,
-    .ql-editor {
-      background: $white;
-    }
-
-    .ql-editor {
-      min-height: 100px;
-      border-radius: 2px;
-    }
-  }
-
-  .token-requirement {
+  .token-req-text.Text {
     color: $neutral-500;
-    margin-bottom: 16px;
   }
 }

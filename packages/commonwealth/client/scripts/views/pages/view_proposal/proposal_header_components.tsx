@@ -27,7 +27,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { jumpHighlightComment } from './helpers';
 
 export class ProposalHeaderStage
   implements m.ClassComponent<{ proposal: Thread }>
@@ -184,7 +183,7 @@ export class ProposalBodyAuthor
           linkify: true,
           showAddressWithDisplayName: true,
         })}
-        {item instanceof Thread &&
+        {/* {item instanceof Thread &&
           item.collaborators &&
           item.collaborators.length > 0 && (
             <>
@@ -207,48 +206,9 @@ export class ProposalBodyAuthor
                 }
               />
             </>
-          )}
+          )} */}
       </>
     );
-  }
-}
-
-export class ProposalBodyCreated
-  implements
-    m.Component<{
-      item: AnyProposal | Thread | Comment<any>;
-      link: string;
-    }>
-{
-  view(vnode) {
-    const { item, link } = vnode.attrs;
-
-    if (!item.createdAt) return;
-
-    const isThread = item instanceof Thread;
-
-    if (item instanceof Thread || item instanceof Comment) {
-      return (
-        <a
-          href={isThread ? `${link}?comment=body` : link}
-          onclick={(e) => {
-            e.preventDefault();
-
-            const target = isThread ? `${link}?comment=body` : link;
-
-            if (target === document.location.href) return;
-
-            history.replaceState(history.state, '', target);
-
-            jumpHighlightComment(isThread ? 'body' : item.id, false, 500);
-          }}
-        >
-          {item.createdAt.fromNow()}
-        </a>
-      );
-    } else {
-      return null;
-    }
   }
 }
 
