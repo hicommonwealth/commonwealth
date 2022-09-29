@@ -88,7 +88,9 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
               if (commentText !== body) {
                 confirmed = await confirmationModalWithText(
-                  'Cancel editing? Changes will not be saved.'
+                  'Cancel editing? Changes will not be saved.',
+                  'Delete changes',
+                  'Keep editing'
                 )();
               }
 

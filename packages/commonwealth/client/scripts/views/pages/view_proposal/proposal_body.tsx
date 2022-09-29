@@ -236,24 +236,15 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           onclick: async (e) => {
                             e.preventDefault();
 
-                            const isThread = proposal instanceof Thread;
-
                             const confirmed = await confirmationModalWithText(
-                              isThread
-                                ? 'Delete this entire thread?'
-                                : 'Delete this comment?'
+                              'Delete this entire thread?'
                             )();
 
                             if (!confirmed) return;
 
-                            (isThread ? app.threads : app.comments)
-                              .delete(proposal)
-                              .then(() => {
-                                if (isThread) navigateToSubpage('/');
-
-                                m.redraw();
-                                // TODO: set notification bar for 'thread deleted/comment deleted'
-                              });
+                            app.threads.delete(proposal).then(() => {
+                              navigateToSubpage('/');
+                            });
                           },
                         },
                       ]
