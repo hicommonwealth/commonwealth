@@ -6,6 +6,9 @@ import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs } from './types';
 import { CreateInviteModal } from '../../modals/create_invite_modal';
 import { SidebarSectionGroup } from './sidebar_section';
+import { OrderTopicsModal } from '../../modals/order_topics_modal';
+import { NewTopicModal } from '../../modals/new_topic_modal';
+import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -30,18 +33,16 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
 
   view() {
     if (!app.user) return;
+
     const isAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
-
     const isMod = app.roles.isRoleOfCommunity({
       role: 'moderator',
       chain: app.activeChainId(),
     });
-    console.log({ isAdmin });
-
     if (!isAdmin && !isMod) return null;
 
     const toggleTreeState = JSON.parse(
@@ -97,6 +98,47 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
           handleRedirectClicks(e, `/analytics`, app.activeChainId(), () => {
             setAdminToggleTree(`children.analytics.toggledState`, toggle);
           });
+        },
+      },
+      {
+        title: 'New topic',
+        isActive: false,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({ modal: NewTopicModal });
+        },
+      },
+      {
+        title: 'Order sidebar topics',
+        isActive: false,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({
+            modal: OrderTopicsModal,
+          });
+        },
+      },
+      {
+        title: 'Edit topic thresholds',
+        isActive: false,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          app.modals.create({ modal: EditTopicThresholdsModal });
         },
       },
     ];
