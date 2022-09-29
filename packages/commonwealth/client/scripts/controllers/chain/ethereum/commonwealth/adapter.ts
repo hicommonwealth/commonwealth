@@ -30,9 +30,7 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    const commonContracts = this.app.contracts.getByType('common-protocol').filter(
-      (c) => c.symbol === this.meta.default_symbol
-    );
+    const commonContracts = this.app.contracts.getByType('common-protocol');
     if (!commonContracts || !commonContracts.length) {
       throw new Error('No Common contracts found');
     }
