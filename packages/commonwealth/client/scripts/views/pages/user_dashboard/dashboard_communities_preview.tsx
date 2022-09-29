@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import { Tag } from 'construct-ui';
-import $ from 'jquery';
+
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
 import app from 'state';
@@ -92,20 +92,6 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
           onclick={() => {
             m.route.set('/communities');
             m.redraw();
-          }}
-          label="View more communities"
-        />
-        <CWButton
-          onclick={async () => {
-            try {
-              const res = await $.post('/migrateEvent', {
-                migrateAll: false,
-                secret: 'RiT6gKbCKPRoEQwEPMR8Dt47iA8GqwVZ',
-                chain: 'edgeware',
-              });
-            } catch (e) {
-              console.log(e);
-            }
           }}
           label="View more communities"
         />

@@ -1,5 +1,5 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError } from '../util/errors';
 import { DB } from '../database';
 import {
   migrateChainEntities,
@@ -30,11 +30,15 @@ const migrateEvent = async (
 ) => {
   const { migrateAll, secret, chain_id } = req.body;
 
-  if (!process.env.AIRPLANE_SECRET || process.env.AIRPLANE_SECRET !== secret) {
+  if (
+    !process.env.AIRPLANE_SECRET ||
+    !secret ||
+    process.env.AIRPLANE_SECRET !== secret
+  ) {
     throw new AppError(MigrateEventErrors.Failed);
   }
 
-  if (migrateAll) {
+  if (migrateAll === true) {
     try {
       await migrateChainEntities();
     } catch (e) {
