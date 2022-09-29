@@ -31,6 +31,9 @@ function setAdminToggleTree(path: string, toggle: boolean) {
 
 export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
   private createInviteModalActive: boolean;
+  private editTopicThresholdsModalActive: boolean;
+  private orderTopicsModalActive: boolean;
+  private newTopicModalActive: boolean;
 
   view() {
     if (!app.user) return;
@@ -98,47 +101,66 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
           });
         },
       },
-      // {
-      //   title: 'New topic',
-      //   isActive: false,
-      //   isVisible: true,
-      //   containsChildren: false,
-      //   displayData: null,
-      //   isUpdated: false,
-      //   hasDefaultToggle: false,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     app.modals.create({ modal: NewTopicModal });
-      //   },
-      // },
-      // {
-      //   title: 'Order sidebar topics',
-      //   isActive: false,
-      //   isVisible: true,
-      //   containsChildren: false,
-      //   displayData: null,
-      //   isUpdated: false,
-      //   hasDefaultToggle: false,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     app.modals.create({
-      //       modal: OrderTopicsModal,
-      //     });
-      //   },
-      // },
-      // {
-      //   title: 'Edit topic thresholds',
-      //   isActive: false,
-      //   isVisible: true,
-      //   containsChildren: false,
-      //   displayData: null,
-      //   isUpdated: false,
-      //   hasDefaultToggle: false,
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     app.modals.create({ modal: EditTopicThresholdsModal });
-      //   },
-      // },
+      {
+        title: 'New topic',
+        isActive: this.newTopicModalActive,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          this.newTopicModalActive = true;
+          app.modals.create({
+            modal: NewTopicModal,
+            data: {},
+            exitCallback: () => {
+              this.newTopicModalActive = false;
+            },
+          });
+        },
+      },
+      {
+        title: 'Order sidebar topics',
+        isActive: this.orderTopicsModalActive,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          this.orderTopicsModalActive = true;
+          app.modals.create({
+            modal: OrderTopicsModal,
+            data: {},
+            exitCallback: () => {
+              this.orderTopicsModalActive = false;
+            },
+          });
+        },
+      },
+      {
+        title: 'Edit topic thresholds',
+        isActive: this.editTopicThresholdsModalActive,
+        isVisible: true,
+        containsChildren: false,
+        displayData: null,
+        isUpdated: false,
+        hasDefaultToggle: false,
+        onclick: (e) => {
+          e.preventDefault();
+          this.editTopicThresholdsModalActive = true;
+          app.modals.create({
+            modal: EditTopicThresholdsModal,
+            data: {},
+            exitCallback: () => {
+              this.editTopicThresholdsModalActive = false;
+            },
+          });
+        },
+      },
     ];
 
     // Build Toggle Tree
