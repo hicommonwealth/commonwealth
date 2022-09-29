@@ -56,7 +56,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     author: Account,
     stage = ThreadStage.Discussion
   ) {
-    if (!this) throw new Error('no this');
     const body = quillEditorState.textContentsAsString;
     quillEditorState.disable();
     checkNewThreadErrors(form, body);

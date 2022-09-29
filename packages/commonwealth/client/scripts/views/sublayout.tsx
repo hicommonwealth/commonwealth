@@ -115,10 +115,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 tosStatus={tosStatus}
                 bannerStatus={bannerStatus}
               />
-              <MobileMenu />
               <div class="Body" onscroll={onscroll}>
-                {vnode.children}
-                {!app.isCustomDomain() && !hideFooter && <Footer />}
+                {app.mobileMenu ? (
+                  <MobileMenu />
+                ) : (
+                  <>
+                    {vnode.children}
+                    {!app.isCustomDomain() && !hideFooter && <Footer />}
+                  </>
+                )}
               </div>
             </div>
           </div>
