@@ -15,9 +15,10 @@ export const Errors = {
   CannotDeleteChain: 'Cannot delete this protected chain',
   NotAcceptableAdmin: 'Not an Acceptable Admin',
   BadSecret: 'Must provide correct secret',
+  AdminPresent: 'There exists an admin in this community, cannot delete if there is an admin!',
 };
 
-const protectedIdList = [];
+// const protectedIdList = [];
 
 type deleteChainReq = {
   id: string;
@@ -54,9 +55,9 @@ const deleteChain = async (
     return next(new AppError(Errors.NeedChainId));
   }
 
-  if (protectedIdList.includes(id)) {
-    return next(new AppError(Errors.CannotDeleteChain));
-  }
+  // if (protectedIdList.includes(id)) {
+  //   return next(new AppError(Errors.CannotDeleteChain));
+  // }
 
   await models.sequelize.transaction(async (t) => {
     const chain = await models.Chain.findOne({
@@ -66,6 +67,15 @@ const deleteChain = async (
     });
     if (!chain) {
       return next(new AppError(Errors.NoChain));
+    }
+    const admin = await models.Role.findOne({
+      where: {
+        chain_id: chain.id,
+        permission: 'admin',
+      }
+    });
+    if (!admin) {
+      return next(new AppError(Errors.AdminPresent))
     }
 
     await models.sequelize.query(
