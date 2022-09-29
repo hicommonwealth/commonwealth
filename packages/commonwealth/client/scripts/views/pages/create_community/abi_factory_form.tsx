@@ -34,10 +34,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
-import {
-  parseAbiItemsFromABI,
-  parseFunctionFromABI,
-} from 'helpers/abi_utils';
+import { parseAbiItemsFromABI, parseFunctionFromABI } from 'helpers/abi_utils';
 import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
@@ -97,14 +94,18 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const disableField = !validAddress || !this.state.loaded;
 
     const getWeb3 = async (): Promise<Web3> => {
-      const provider = new Web3.providers.WebsocketProvider(
-        this.state.form.nodeUrl
-      );
-      const _api = new Web3(provider);
-      console.log(
-        `Could not connect to Ethereum on ${this.state.form.nodeUrl}`
-      );
-      return _api;
+      try {
+        const provider = new Web3.providers.WebsocketProvider(
+          this.state.form.nodeUrl
+        );
+        const _api = new Web3(provider);
+        return _api;
+      } catch (e) {
+        console.error(e);
+        console.log(
+          `Could not connect to Ethereum on ${this.state.form.nodeUrl}`
+        );
+      }
     };
 
     const getWeb3Contract = async (
@@ -162,7 +163,9 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const functionTx = functionContract.methods[methodSignature](
         ...processedArgs
       );
+      console.log("user", app.user)
       const sender = app.user.activeAccount;
+      console.log("sender is ", sender);
       //   // get querying wallet
       const signingWallet = await app.wallets.locateWallet(
         sender,
