@@ -33,6 +33,7 @@ import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
+import migrateEvent from './routes/migrateEvent';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -709,6 +710,7 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
@@ -775,7 +777,7 @@ function setupRouter(
   router.get(
     '/auth/callback',
     passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models),
+    authCallback.bind(this, models)
   );
 
   // logout
