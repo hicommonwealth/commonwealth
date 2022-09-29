@@ -2,22 +2,18 @@
 
 .CreateComment {
   display: flex;
+  flex-direction: column;
 
-  .create-comment-body {
-    flex: 1;
-    margin-left: 16px;
+  .form-bottom {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-    .form-bottom {
+    .form-buttons {
       display: flex;
-      flex-direction: column;
+      gap: 8px;
+      justify-content: flex-end;
       width: 100%;
-
-      .form-buttons {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        width: 100%;
-      }
     }
   }
 

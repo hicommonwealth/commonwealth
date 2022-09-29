@@ -8,81 +8,36 @@
   max-width: 768px;
   width: 100%;
 
-  .proposal-header {
+  .header {
     display: flex;
     flex-direction: column;
     gap: 16px;
 
-    .proposal-top {
+    .info-and-menu-row {
+      align-items: center;
       display: flex;
-
-      .proposal-top-left {
-        flex: 1;
-
-        .proposal-meta-top {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 12px;
-          height: 35px;
-
-          .proposal-meta-top-left {
-            display: flex;
-            align-items: center;
-          }
-
-          .proposal-meta-top-right {
-            display: flex;
-          }
-        }
-
-        .proposal-body-meta {
-          align-items: center;
-          display: flex;
-          flex-direction: row;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 12px;
-
-          svg {
-            color: $neutral-500;
-            cursor: pointer;
-          }
-        }
-
-        .proposal-body-link {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-
-          > * div {
-            margin-right: 8px;
-          }
-        }
-      }
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
     }
   }
 
   .proposal-content {
     display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
     word-break: break-word;
 
-    .proposal-content-right {
+    .proposal-response-row {
+      width: 100%;
       display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: space-between;
+      max-width: 300px;
+      align-items: center;
+      margin-top: 16px;
 
-      .proposal-response-row {
-        width: 100%;
-        display: flex;
-        max-width: 300px;
-        align-items: center;
-        margin-top: 16px;
-
-        > * {
-          margin-right: 8px;
-        }
+      > * {
+        margin-right: 8px;
       }
     }
   }

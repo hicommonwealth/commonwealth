@@ -166,16 +166,15 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           'CreateComment'
         )}
       >
-        <div class="create-comment-avatar">
+        {/* <div class="create-comment-avatar">
           {m(User, {
             user: author,
             popover: true,
             avatarOnly: true,
             avatarSize: 40,
           })}
-        </div>
-        <div class="create-comment-body">
-          <div class="reply-header">
+        </div> */}
+        {/* <div class="reply-header">
             <CWText>
               {parentType === CommentParent.Comment ? 'Replying to' : 'Reply'}
               {m(User, {
@@ -185,74 +184,75 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
               })}
             </CWText>
           </div>
-          {m(User, { user: author, popover: true, hideAvatar: true })}
-          {rootProposal instanceof Thread && rootProposal.readOnly ? (
-            <Callout
-              intent="primary"
-              content="Commenting is disabled because this post has been locked."
-            />
-          ) : (
-            <>
-              {app.user.activeAccount?.profile &&
-                !app.user.activeAccount.profile.name && (
-                  <Callout
-                    class="no-profile-callout"
-                    intent="primary"
-                    content={
-                      <>
-                        You haven't set a display name yet.{' '}
-                        <a
-                          href={`/${app.activeChainId()}/account/${
-                            app.user.activeAccount.address
-                          }?base=${app.user.activeAccount.chain.id}`}
-                          onclick={(e) => {
-                            e.preventDefault();
-                            app.modals.create({
-                              modal: EditProfileModal,
-                              data: {
-                                account: app.user.activeAccount,
-                                refreshCallback: () => m.redraw(),
-                              },
-                            });
-                          }}
-                        >
-                          Set a display name
-                        </a>
-                      </>
-                    }
-                  />
-                )}
-              <QuillEditorComponent
-                contentsDoc=""
-                oncreateBind={(state: QuillEditor) => {
-                  this.quillEditorState = state;
-                }}
-                editorNamespace={`${document.location.pathname}-commenting`}
-                imageUploader
-                tabindex={vnode.attrs.tabindex}
-              />
-              {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-                <div class="token-requirement">
-                  Commenting in {activeTopicName} requires{' '}
-                  {weiToTokens(tokenPostingThreshold.toString(), decimals)} $
-                  {app.chain.meta.default_symbol}.
-                  {userBalance && app.user.activeAccount && (
+          {m(User, { user: author, popover: true, hideAvatar: true })} */}
+        {rootProposal instanceof Thread && rootProposal.readOnly ? (
+          <Callout
+            intent="primary"
+            content="Commenting is disabled because this post has been locked."
+          />
+        ) : (
+          <>
+            {app.user.activeAccount?.profile &&
+              !app.user.activeAccount.profile.name && (
+                <Callout
+                  class="no-profile-callout"
+                  intent="primary"
+                  content={
                     <>
-                      You have ${weiToTokens(userBalance.toString(), decimals)}{' '}
-                      ${app.chain.meta.default_symbol}.
+                      You haven't set a display name yet.{' '}
+                      <a
+                        href={`/${app.activeChainId()}/account/${
+                          app.user.activeAccount.address
+                        }?base=${app.user.activeAccount.chain.id}`}
+                        onclick={(e) => {
+                          e.preventDefault();
+                          app.modals.create({
+                            modal: EditProfileModal,
+                            data: {
+                              account: app.user.activeAccount,
+                              refreshCallback: () => m.redraw(),
+                            },
+                          });
+                        }}
+                      >
+                        Set a display name
+                      </a>
                     </>
-                  )}
-                </div>
+                  }
+                />
               )}
-              <div
-                class="form-bottom"
-                onmouseover={() => {
-                  // keeps Quill's isBlank up to date
-                  return m.redraw();
-                }}
-              >
-                <div class="form-buttons">
-                  <CWButton
+            <QuillEditorComponent
+              contentsDoc=""
+              oncreateBind={(state: QuillEditor) => {
+                this.quillEditorState = state;
+              }}
+              editorNamespace={`${document.location.pathname}-commenting`}
+              imageUploader
+              tabindex={vnode.attrs.tabindex}
+            />
+            {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+              <div class="token-requirement">
+                Commenting in {activeTopicName} requires{' '}
+                {weiToTokens(tokenPostingThreshold.toString(), decimals)} $
+                {app.chain.meta.default_symbol}.
+                {userBalance && app.user.activeAccount && (
+                  <>
+                    You have ${weiToTokens(userBalance.toString(), decimals)} $
+                    {app.chain.meta.default_symbol}.
+                  </>
+                )}
+              </div>
+            )}
+            <div
+              class="form-bottom"
+              onmouseover={() => {
+                // keeps Quill's isBlank up to date
+                return m.redraw();
+              }}
+            >
+              <div class="form-buttons">
+                {/* <CWButton
+                    disabled={this.quillEditorState?.isBlank()}
                     buttonType="secondary-blue"
                     onclick={(e) => {
                       e.preventDefault();
@@ -260,18 +260,17 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                       proposalPageState.parentCommentId = null;
                     }}
                     label="Cancel"
-                  />
-                  <CWButton
-                    disabled={disabled}
-                    onclick={handleSubmitComment}
-                    label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
-                  />
-                </div>
-                {error && <CWValidationText message={error} status="failure" />}
+                  /> */}
+                <CWButton
+                  disabled={disabled}
+                  onclick={handleSubmitComment}
+                  label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
+                />
               </div>
-            </>
-          )}
-        </div>
+              {error && <CWValidationText message={error} status="failure" />}
+            </div>
+          </>
+        )}
       </div>
     );
   }

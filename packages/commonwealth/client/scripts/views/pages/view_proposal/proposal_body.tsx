@@ -132,32 +132,25 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
 
     return (
       <div class="ProposalBody">
-        <div class="proposal-header">
-          <div class="proposal-top">
-            <div class="proposal-top-left">
-              {this.isEditingBody ? (
-                <ProposalTitleEditor
-                  item={proposal}
-                  setIsGloballyEditing={setIsGloballyEditing}
-                  parentState={this}
-                />
-              ) : (
-                <>
-                  <CWText type="h3" fontWeight="semiBold">
-                    {proposal.title}
-                  </CWText>
-                  {proposal instanceof Thread && proposal.readOnly && (
-                    <CWIcon iconName="lock" iconSize="small" />
-                  )}
-                </>
-              )}
-              <ProposalBodyAuthor item={proposal} />
-              <ProposalBodyCreated item={proposal} link={proposalLink} />
-              <ProposalBodyLastEdited item={proposal} />
-              <div class="proposal-body-meta">
-                {proposal instanceof Thread ? (
-                  <>
-                    {proposal.stage !== ThreadStage.Discussion && (
+        <div class="header">
+          {this.isEditingBody ? (
+            <ProposalTitleEditor
+              item={proposal}
+              setIsGloballyEditing={setIsGloballyEditing}
+              parentState={this}
+            />
+          ) : (
+            <CWText type="h3" fontWeight="semiBold">
+              {proposal.title}
+            </CWText>
+          )}
+          <div class="info-and-menu-row">
+            {proposal instanceof Thread && proposal.readOnly && (
+              <CWIcon iconName="lock" iconSize="small" />
+            )}
+            <ProposalBodyAuthor item={proposal} />
+            <ProposalBodyCreated item={proposal} link={proposalLink} />
+            {/* {proposal.stage !== ThreadStage.Discussion && (
                       <ProposalHeaderStage proposal={proposal} />
                     )}
                     <CWText
@@ -171,186 +164,172 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                     >
                       {proposal.topic?.name}
                     </CWText>
-                    <CWText>{pluralize(viewCount, 'view')}</CWText>
-                    {app.isLoggedIn() && !isGloballyEditing && hasEditPerms && (
-                      <CWPopoverMenu
-                        popoverMenuItems={
-                          [
-                            ...(hasEditPerms && !proposal.readOnly
-                              ? [
-                                  {
-                                    label: 'Edit',
-                                    iconName: 'edit',
-                                    onclick: async (e) => {
-                                      e.preventDefault();
+                    <CWText>{pluralize(viewCount, 'view')}</CWText> */}
+            {app.isLoggedIn() && hasEditPerms && !isGloballyEditing && (
+              <CWPopoverMenu
+                popoverMenuItems={
+                  [
+                    ...(hasEditPerms && !proposal.readOnly
+                      ? [
+                          {
+                            label: 'Edit',
+                            iconName: 'edit',
+                            onclick: async (e) => {
+                              e.preventDefault();
 
-                                      if (proposalPageState.replying) {
-                                        if (activeQuillEditorHasText()) {
-                                          const confirmed =
-                                            await confirmationModalWithText(
-                                              'Unsubmitted replies will be lost. Continue?'
-                                            )();
+                              if (proposalPageState.replying) {
+                                if (activeQuillEditorHasText()) {
+                                  const confirmed =
+                                    await confirmationModalWithText(
+                                      'Unsubmitted replies will be lost. Continue?'
+                                    )();
 
-                                          if (!confirmed) return;
-                                        }
+                                  if (!confirmed) return;
+                                }
 
-                                        proposalPageState.replying = false;
+                                proposalPageState.replying = false;
 
-                                        proposalPageState.parentCommentId =
-                                          null;
-                                      }
+                                proposalPageState.parentCommentId = null;
+                              }
 
-                                      setIsEditingBody(true);
-                                    },
+                              setIsEditingBody(true);
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor
+                      ? [
+                          {
+                            label: 'Edit collaborators',
+                            iconName: 'edit',
+                            onclick: async (e) => {
+                              e.preventDefault();
+                              app.modals.create({
+                                modal: EditCollaboratorsModal,
+                                data: {
+                                  thread: proposal,
+                                },
+                              });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAdminOrMod
+                      ? [
+                          {
+                            label: 'Change topic',
+                            iconName: 'edit',
+                            onclick: (e) => {
+                              e.preventDefault();
+                              app.modals.create({
+                                modal: ChangeTopicModal,
+                                data: {
+                                  onChangeHandler: (topic: Topic) => {
+                                    proposal.topic = topic;
+                                    m.redraw();
                                   },
-                                ]
-                              : []),
-                            ...(isAuthor
-                              ? [
-                                  {
-                                    label: 'Edit collaborators',
-                                    iconName: 'edit',
-                                    onclick: async (e) => {
-                                      e.preventDefault();
-                                      app.modals.create({
-                                        modal: EditCollaboratorsModal,
-                                        data: {
-                                          thread: proposal,
-                                        },
-                                      });
-                                    },
-                                  },
-                                ]
-                              : []),
-                            ...(isAdminOrMod
-                              ? [
-                                  {
-                                    label: 'Change topic',
-                                    iconName: 'edit',
-                                    onclick: (e) => {
-                                      e.preventDefault();
-                                      app.modals.create({
-                                        modal: ChangeTopicModal,
-                                        data: {
-                                          onChangeHandler: (topic: Topic) => {
-                                            proposal.topic = topic;
-                                            m.redraw();
-                                          },
-                                          thread: proposal,
-                                        },
-                                      });
-                                    },
-                                  },
-                                ]
-                              : []),
-                            ...(isAuthor || isAdminOrMod || app.user.isSiteAdmin
-                              ? [
-                                  {
-                                    label: 'Delete',
-                                    iconName: 'trash',
-                                    onclick: async (e) => {
-                                      e.preventDefault();
+                                  thread: proposal,
+                                },
+                              });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor || isAdminOrMod || app.user.isSiteAdmin
+                      ? [
+                          {
+                            label: 'Delete',
+                            iconName: 'trash',
+                            onclick: async (e) => {
+                              e.preventDefault();
 
-                                      const isThread =
-                                        proposal instanceof Thread;
+                              const isThread = proposal instanceof Thread;
 
-                                      const confirmed =
-                                        await confirmationModalWithText(
-                                          isThread
-                                            ? 'Delete this entire thread?'
-                                            : 'Delete this comment?'
-                                        )();
+                              const confirmed = await confirmationModalWithText(
+                                isThread
+                                  ? 'Delete this entire thread?'
+                                  : 'Delete this comment?'
+                              )();
 
-                                      if (!confirmed) return;
+                              if (!confirmed) return;
 
-                                      (isThread ? app.threads : app.comments)
-                                        .delete(proposal)
-                                        .then(() => {
-                                          if (isThread) navigateToSubpage('/');
+                              (isThread ? app.threads : app.comments)
+                                .delete(proposal)
+                                .then(() => {
+                                  if (isThread) navigateToSubpage('/');
 
-                                          m.redraw();
-                                          // TODO: set notification bar for 'thread deleted/comment deleted'
-                                        });
-                                    },
-                                  },
-                                ]
-                              : []),
-                            ...(isAuthor || isAdminOrMod
-                              ? [
-                                  {
-                                    label: proposal.readOnly
-                                      ? 'Unlock thread'
-                                      : 'Lock thread',
-                                    iconName: 'lock',
-                                    onclick: (e) => {
-                                      e.preventDefault();
-                                      app.threads
-                                        .setPrivacy({
-                                          threadId: proposal.id,
-                                          readOnly: !proposal.readOnly,
-                                        })
-                                        .then(() => {
-                                          setIsEditingBody(false);
-                                          m.redraw();
-                                        });
-                                    },
-                                  },
-                                ]
-                              : []),
-                            ...((isAuthor || isAdminOrMod) &&
-                            app.chain?.meta.snapshot.length > 0
-                              ? [
-                                  {
-                                    label: 'Snapshot proposal from thread',
-                                    iconName: 'democraticProposal',
-                                    onclick: () => {
-                                      const snapshotSpaces =
-                                        app.chain.meta.snapshot;
+                                  m.redraw();
+                                  // TODO: set notification bar for 'thread deleted/comment deleted'
+                                });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor || isAdminOrMod
+                      ? [
+                          {
+                            label: proposal.readOnly
+                              ? 'Unlock thread'
+                              : 'Lock thread',
+                            iconName: 'lock',
+                            onclick: (e) => {
+                              e.preventDefault();
+                              app.threads
+                                .setPrivacy({
+                                  threadId: proposal.id,
+                                  readOnly: !proposal.readOnly,
+                                })
+                                .then(() => {
+                                  setIsEditingBody(false);
+                                  m.redraw();
+                                });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...((isAuthor || isAdminOrMod) &&
+                    app.chain?.meta.snapshot.length > 0
+                      ? [
+                          {
+                            label: 'Snapshot proposal from thread',
+                            iconName: 'democraticProposal',
+                            onclick: () => {
+                              const snapshotSpaces = app.chain.meta.snapshot;
 
-                                      if (snapshotSpaces.length > 1) {
-                                        navigateToSubpage(
-                                          '/multiple-snapshots',
-                                          {
-                                            action: 'create-from-thread',
-                                            proposal,
-                                          }
-                                        );
-                                      } else {
-                                        navigateToSubpage(
-                                          `/snapshot/${snapshotSpaces}`
-                                        );
-                                      }
-                                    },
-                                  },
-                                ]
-                              : []),
-                          ]
-                          /* {(isAuthor || isAdminOrMod) && <CWDivider />}
+                              if (snapshotSpaces.length > 1) {
+                                navigateToSubpage('/multiple-snapshots', {
+                                  action: 'create-from-thread',
+                                  proposal,
+                                });
+                              } else {
+                                navigateToSubpage(
+                                  `/snapshot/${snapshotSpaces}`
+                                );
+                              }
+                            },
+                          },
+                        ]
+                      : []),
+                  ]
+                  /* {(isAuthor || isAdminOrMod) && <CWDivider />}
                             <ThreadSubscriptionMenuItem
                               proposal={proposal as Thread}
                             /> */
-                        }
-                        trigger={
-                          <CWIconButton
-                            iconName="chevronDown"
-                            iconSize="small"
-                          />
-                        }
-                      />
-                    )}
-                    <SocialSharingCarat />
-                  </>
-                ) : (
-                  <>
-                    <ProposalBodyAuthor proposal={proposal} />
-                    <CWText
-                      className={`onchain-status-text ${getStatusClass(
-                        proposal
-                      )}`}
-                    >
-                      {getStatusText(proposal)}
-                    </CWText>
-                    {/* {app.isLoggedIn() &&
+                }
+                trigger={
+                  <CWIconButton iconName="chevronDown" iconSize="small" />
+                }
+              />
+            )}
+            <SocialSharingCarat />
+          </div>
+
+          {/* <CWText
+                  className={`onchain-status-text ${getStatusClass(proposal)}`}
+                >
+                  {getStatusText(proposal)}
+                </CWText> */}
+          {/* {app.isLoggedIn() &&
                       (isAdminOrMod || isAuthor) &&
                       !isGloballyEditing &&
                       proposalTitleIsEditable && (
@@ -388,10 +367,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           }
                         />
                       )} */}
-                  </>
-                )}
-              </div>
-              <div class="proposal-body-link">
+          {/* <div class="proposal-body-link">
                 {proposal instanceof Thread &&
                 proposal.kind === ThreadKind.Link &&
                 this.isEditingBody ? (
@@ -428,54 +404,59 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                       )}
                     </div>
                   )}
-              </div>
-            </div>
-          </div>
+              </div> */}
         </div>
         <CWDivider />
         {proposal instanceof Thread && (
           <div class="proposal-content">
-            <div class="proposal-content-right">
-              {this.isEditingBody ? (
-                <EditComment
-                  comment={proposal}
-                  setIsGloballyEditing={setIsEditingBody}
-                  proposalPageState={proposalPageState}
-                  updatedUrl={this.updatedUrl}
-                />
-              ) : (
-                <>
-                  <ProposalBodyText item={proposal} />
-                  <div class="proposal-response-row">
-                    <ThreadReactionButton thread={proposal} />
-                    <InlineReplyButton
-                      commentReplyCount={commentCount}
-                      onclick={() => {
-                        if (!proposalPageState.replying) {
-                          proposalPageState.replying = true;
-                          scrollToForm();
-                        } else if (!proposalPageState.parentCommentId) {
-                          // If user is already replying to top-level, cancel reply
-                          proposalPageState.replying = false;
-                        }
-                        proposalPageState.parentCommentId = null;
-                      }}
-                    />
-                    {attachments && attachments.length > 0 && (
-                      <ProposalBodyAttachments item={proposal} />
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
+            {this.isEditingBody ? (
+              <EditComment
+                comment={proposal}
+                setIsGloballyEditing={setIsEditingBody}
+                proposalPageState={proposalPageState}
+                updatedUrl={this.updatedUrl}
+              />
+            ) : (
+              <>
+                <ProposalBodyText item={proposal} />
+                {!isGloballyEditing && !proposalPageState.parentCommentId && (
+                  <CreateComment
+                    callback={createdCommentCallback}
+                    setIsGloballyEditing={setIsGloballyEditing}
+                    isGloballyEditing={isGloballyEditing}
+                    proposalPageState={this}
+                    parentComment={null}
+                    rootProposal={proposal}
+                  />
+                )}
+                {/* <div class="proposal-response-row">
+                  <ThreadReactionButton thread={proposal} />
+                  <InlineReplyButton
+                    commentReplyCount={commentCount}
+                    onclick={() => {
+                      if (!proposalPageState.replying) {
+                        proposalPageState.replying = true;
+                        scrollToForm();
+                      } else if (!proposalPageState.parentCommentId) {
+                        // If user is already replying to top-level, cancel reply
+                        proposalPageState.replying = false;
+                      }
+                      proposalPageState.parentCommentId = null;
+                    }}
+                  />
+                  {attachments && attachments.length > 0 && (
+                    <ProposalBodyAttachments item={proposal} />
+                  )}
+                </div> */}
+              </>
+            )}
           </div>
         )}
+
+        {/* subBody components */}
+
         {!(proposal instanceof Thread) && (
           <>
-            <CWText>
-              {proposalSlugToFriendlyName.get(proposal.slug)}{' '}
-              {proposal.shortIdentifier}
-            </CWText>
             <QueueButton proposal={proposal} />
             <ExecuteButton proposal={proposal} />
             <CancelButton proposal={proposal} />
@@ -484,16 +465,19 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                 <ProposalBodyText item={proposal} />
               </div>
             )}
+            <LinkedProposalsEmbed proposal={proposal} />
           </>
-        )}
-        {!(proposal instanceof Thread) && (
-          <LinkedProposalsEmbed proposal={proposal} />
         )}
         {proposal instanceof AaveProposal && (
           <AaveViewProposalDetail proposal={proposal} />
         )}
-        {!(proposal instanceof Thread) && <VotingResults proposal={proposal} />}
-        {!(proposal instanceof Thread) && <VotingActions proposal={proposal} />}
+        {!(proposal instanceof Thread) && (
+          <>
+            <VotingResults proposal={proposal} />
+            <VotingActions proposal={proposal} />
+          </>
+        )}
+
         <ProposalComments
           proposal={proposal}
           comments={comments}
@@ -504,16 +488,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           recentlySubmitted={proposalPageState.recentlySubmitted}
           isAdmin={isAdminOrMod}
         />
-        {!isGloballyEditing && !proposalPageState.parentCommentId && (
-          <CreateComment
-            callback={createdCommentCallback}
-            setIsGloballyEditing={setIsGloballyEditing}
-            isGloballyEditing={isGloballyEditing}
-            proposalPageState={this}
-            parentComment={null}
-            rootProposal={proposal}
-          />
-        )}
       </div>
     );
   }
