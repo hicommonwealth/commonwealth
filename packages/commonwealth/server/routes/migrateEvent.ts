@@ -1,3 +1,4 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
 import { DB } from '../database';
@@ -5,6 +6,8 @@ import {
   migrateChainEntities,
   migrateChainEntity,
 } from '../scripts/migrateChainEntities';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 enum MigrateEventErrors {
   Failed = 'Request Failed.',
@@ -54,6 +57,7 @@ const migrateEvent = async (
   try {
     await migrateChainEntity(chain_id);
   } catch (e) {
+    log.error(e.message);
     throw new AppError(MigrateEventErrors.ChainError);
   }
 
