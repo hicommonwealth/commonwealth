@@ -7,12 +7,9 @@ import 'components/sidebar/community_selector.scss';
 
 import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import User from '../widgets/user';
 import { CommunityLabel } from '../community_label';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
@@ -75,7 +72,7 @@ const homeButton = (
   >
     <img
       class="mobile-logo"
-      src="https://commonwealth.im/static/img/logo.png"
+      src="https://commonwealth.im/static/brand_assets/logo_stacked.png"
       style="height:18px; width:18px;"
     />
     <span>Home</span>

@@ -14,7 +14,7 @@ export default class CompoundChain extends EthereumChain {
   public compoundApi: CompoundAPI;
 
   public coins(n: number, inDollars?: boolean) {
-    return new EthereumCoin(this.app?.chain?.meta.symbol || '???', n, inDollars);
+    return new EthereumCoin(this.app?.chain?.meta.default_symbol || '???', n, inDollars);
   }
 
   public async init(selectedChain: ChainInfo) {

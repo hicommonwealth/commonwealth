@@ -48,6 +48,7 @@ export class ChainMetadataRows
   iconUrl: string;
   stagesEnabled: boolean;
   customStages: string;
+  chatEnabled: boolean;
   customDomain: string;
   terms: string;
   defaultSummaryView: boolean;
@@ -71,6 +72,7 @@ export class ChainMetadataRows
     this.github = vnode.attrs.chain.github;
     this.stagesEnabled = vnode.attrs.chain.stagesEnabled;
     this.customStages = vnode.attrs.chain.customStages;
+    this.chatEnabled = vnode.attrs.chain.chatEnabled;
     this.customDomain = vnode.attrs.chain.customDomain;
     this.terms = vnode.attrs.chain.terms;
     this.iconUrl = vnode.attrs.chain.iconUrl;
@@ -184,6 +186,18 @@ export class ChainMetadataRows
               : 'Discussion listing defaults to latest activity view'
           }
         />
+        <ToggleRow
+          title="Chat Enabled"
+          defaultValue={vnode.attrs.chain.chatEnabled}
+          onToggle={(checked) => {
+            this.chatEnabled = checked;
+          }}
+          caption={(checked) =>
+            checked
+              ? "Don't enable chat feature for this community"
+              : 'Enable chat feature for this community '
+          }
+        />
         <InputRow
           title="Custom Stages"
           value={this.customStages}
@@ -291,6 +305,7 @@ export class ChainMetadataRows
               stagesEnabled,
               customStages,
               customDomain,
+              chatEnabled,
               snapshot,
               terms,
               iconUrl,
@@ -355,6 +370,7 @@ export class ChainMetadataRows
                 terms,
                 iconUrl,
                 defaultSummaryView,
+                chatEnabled,
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');
