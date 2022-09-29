@@ -65,7 +65,7 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
 
-  // Contract
+  // Contracts
   contracts: ContractsController;
 
   // User
@@ -143,7 +143,7 @@ const app: IApp = {
   communities: new CommunitiesController(),
   topics: new TopicsController(),
 
-  // Contract
+  // Contracts
   contracts: new ContractsController(),
 
   // Search

@@ -71,11 +71,11 @@ export async function initAppState(
             chain.Contracts.map((contract) => {
               return app.contracts.addToStore(
                 Contract.fromJSON({
-                ...contract,
-                contract_abi: contract.ContractAbi
-              }));
+                  ...contract,
+                  contract_abi: contract.ContractAbi,
+                })
+              );
             });
-            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
@@ -598,6 +598,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               vnode.attrs.scope?.toString() || customDomain
             : // false => scope is null
               null;
+
+        /* Deprecating the contract_address => community pipeline.
+        This breaks our mental model of where our site is going. 
+        */
 
         // if (scope) {
         //   const scopeIsEthereumAddress =
