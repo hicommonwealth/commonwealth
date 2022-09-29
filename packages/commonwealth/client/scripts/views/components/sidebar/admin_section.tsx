@@ -3,12 +3,13 @@
 import m from 'mithril';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
-import { SectionGroupAttrs, SidebarSectionAttrs } from './types';
+import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { CreateInviteModal } from '../../modals/create_invite_modal';
 import { SidebarSectionGroup } from './sidebar_section';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
+import { verifyCachedToggleTree } from './helpers';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -45,9 +46,6 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
     });
     if (!isAdmin && !isMod) return null;
 
-    const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`]
-    );
     const adminGroupData: SectionGroupAttrs[] = [
       {
         title: 'Invite members',
@@ -100,48 +98,69 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
           });
         },
       },
-      {
-        title: 'New topic',
-        isActive: false,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({ modal: NewTopicModal });
-        },
-      },
-      {
-        title: 'Order sidebar topics',
-        isActive: false,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({
-            modal: OrderTopicsModal,
-          });
-        },
-      },
-      {
-        title: 'Edit topic thresholds',
-        isActive: false,
-        isVisible: true,
-        containsChildren: false,
-        displayData: null,
-        isUpdated: false,
-        hasDefaultToggle: false,
-        onclick: (e) => {
-          e.preventDefault();
-          app.modals.create({ modal: EditTopicThresholdsModal });
-        },
-      },
+      // {
+      //   title: 'New topic',
+      //   isActive: false,
+      //   isVisible: true,
+      //   containsChildren: false,
+      //   displayData: null,
+      //   isUpdated: false,
+      //   hasDefaultToggle: false,
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.modals.create({ modal: NewTopicModal });
+      //   },
+      // },
+      // {
+      //   title: 'Order sidebar topics',
+      //   isActive: false,
+      //   isVisible: true,
+      //   containsChildren: false,
+      //   displayData: null,
+      //   isUpdated: false,
+      //   hasDefaultToggle: false,
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.modals.create({
+      //       modal: OrderTopicsModal,
+      //     });
+      //   },
+      // },
+      // {
+      //   title: 'Edit topic thresholds',
+      //   isActive: false,
+      //   isVisible: true,
+      //   containsChildren: false,
+      //   displayData: null,
+      //   isUpdated: false,
+      //   hasDefaultToggle: false,
+      //   onclick: (e) => {
+      //     e.preventDefault();
+      //     app.modals.create({ modal: EditTopicThresholdsModal });
+      //   },
+      // },
     ];
+
+    // Build Toggle Tree
+    const adminDefaultToggleTree: ToggleTree = {
+      toggledState: false,
+      children: {},
+    };
+
+    // Check if an existing toggle tree is stored
+    if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
+      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+        adminDefaultToggleTree
+      );
+    } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
+      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+        adminDefaultToggleTree
+      );
+    }
+    const toggleTreeState = JSON.parse(
+      localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+    );
+
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Admin Capabilities',
       className: 'AdminSection',

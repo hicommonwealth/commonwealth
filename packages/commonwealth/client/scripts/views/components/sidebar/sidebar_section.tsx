@@ -208,9 +208,6 @@ export class SidebarSectionGroup
         e.redraw = false;
         e.stopPropagation();
       }
-      if (!toggled) {
-        this.hoverColor = '#EDE7FF';
-      }
     };
 
     const mouseLeaveHandler = () => {
@@ -228,7 +225,6 @@ export class SidebarSectionGroup
         class="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
-        style={`background-color: ${hoverColor}`}
       >
         <div
           class="section-group-title-container"
