@@ -16,6 +16,7 @@ import {
   ChainEntity,
   NotificationSubscription,
   Poll,
+  Topic,
 } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -242,8 +243,7 @@ class ThreadsController {
     stage: string,
     chainId: string,
     title: string,
-    topicName: string,
-    topicId: number,
+    topic: Topic,
     body?: string,
     url?: string,
     attachments?: string[],
@@ -261,8 +261,8 @@ class ThreadsController {
         kind,
         stage,
         'attachments[]': attachments,
-        topic_name: topicName,
-        topic_id: topicId,
+        topic_name: topic.name,
+        topic_id: topic.id,
         url,
         readOnly,
         jwt: app.user.jwt,
@@ -293,7 +293,8 @@ class ThreadsController {
         NotificationSubscription.fromJSON(subscriptionJSON)
       );
       return result;
-    } catch (err) {
+    } 
+    catch (err) {
       console.log('Failed to create thread');
       throw new Error(
         err.responseJSON && err.responseJSON.error
