@@ -104,18 +104,22 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._totalbalance;
   }
 
-  public async initApi(node?: NodeInfo): Promise<Web3> {
-    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+  public async init(node: NodeInfo): Promise<Web3> {
     try {
       // TODO: support http?
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
+      return this._api;
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
       this.app.chain.networkStatus = ApiStatus.Disconnected;
       throw error;
     }
+  }
 
+  public async initApi(node?: NodeInfo): Promise<Web3> {
+    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    this.init(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();

@@ -94,7 +94,9 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
-    const getCurrChain = async (contractAddress: string): Promise<EthereumChain> => {
+    const getCurrChain = async (
+      contractAddress: string
+    ): Promise<EthereumChain> => {
       try {
         const contract: Contract =
           app.contracts.store.getContractByAddress(contractAddress);
@@ -106,7 +108,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
         const ethChain = new EthereumChain(app);
 
-        const ethApi = await ethChain.initApi(nodeObj);
+        const ethApi = await ethChain.init(nodeObj);
 
         return ethChain;
       } catch (e) {
@@ -173,17 +175,17 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
       //   // get querying wallet
       const availableWallets = app.wallets.availableWallets(ChainBase.Ethereum);
-      console.log('availableWallets', availableWallets);
       if (availableWallets.length === 0) {
         throw new Error('No wallet available');
       }
+      // For now, we will only enable metamaskWallet, but this can change. Per discussion with Dillon
 
-      const disabledMetamaskWallets = availableWallets.find(
-        (wallet) => wallet.name === WalletId.Metamask && !wallet.enabled
+      const metamaskWallet = availableWallets.find(
+        (wallet) => wallet.name === WalletId.Metamask
       );
-
-      const signingWallet = disabledMetamaskWallets[0];
-      await signingWallet.enable();
+      if (!metamaskWallet.enabled) {
+        await metamaskWallet.enable();
+      }
 
       const chain = await getCurrChain(contractAddress);
       let tx: string;
@@ -192,7 +194,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         tx = await chain.makeContractTx(
           contractAddress,
           functionTx.encodeABI(),
-          signingWallet
+          metamaskWallet
         );
       } else {
         return;
