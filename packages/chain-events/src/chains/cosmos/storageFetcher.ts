@@ -20,6 +20,7 @@ import {
   ISubmitProposal,
   IDeposit,
   IVote,
+  coinToCoins,
 } from './types';
 
 const dateToUnix = (d?: Date): number | undefined => {
@@ -73,14 +74,18 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       data: {
         kind: EventKind.SubmitProposal,
         id: proposal.proposalId.toString(10),
-        content: proposal.content,
+        content: {
+          typeUrl: proposal.content.typeUrl,
+          value: Buffer.from(proposal.content.value).toString('hex'),
+        },
         submitTime: dateToUnix(proposal.submitTime),
         depositEndTime: dateToUnix(proposal.depositEndTime),
         votingStartTime: dateToUnix(proposal.votingStartTime),
         votingEndTime: dateToUnix(proposal.votingEndTime),
         // TODO: do we need to query the tally separately if it's complete?
         finalTallyResult: proposal.finalTallyResult,
-        totalDeposit: proposal.totalDeposit,
+        totalDeposit:
+          proposal.totalDeposit && coinToCoins(proposal.totalDeposit),
       },
     };
     events.push(submitEvent);
@@ -102,7 +107,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
           kind: EventKind.Deposit,
           id: proposal.proposalId.toString(10),
           depositor: d.depositor,
-          amount: d.amount,
+          amount: coinToCoins(d.amount),
         },
       }));
       events.push(...depositEvents);

@@ -5,7 +5,7 @@ import {
 } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { Api, EventKind, IEventData, RawEvent } from '../types';
+import { Api, coinToCoins, EventKind, IEventData, RawEvent } from '../types';
 
 export async function Enrich(
   api: Api,
@@ -40,7 +40,10 @@ export async function Enrich(
           kind,
           id: proposal.proposalId.toString(10),
           proposer: submitProposal.proposer,
-          content: proposal.content,
+          content: {
+            typeUrl: proposal.content.typeUrl,
+            value: Buffer.from(proposal.content.value).toString('hex'),
+          },
           submitTime: dateToUnix(proposal.submitTime),
           depositEndTime: dateToUnix(proposal.depositEndTime),
           votingStartTime: dateToUnix(proposal.votingStartTime),
@@ -57,7 +60,7 @@ export async function Enrich(
           kind,
           id: deposit.proposalId.toString(10),
           depositor: deposit.depositor,
-          amount: deposit.amount,
+          amount: coinToCoins(deposit.amount),
         },
       };
     }

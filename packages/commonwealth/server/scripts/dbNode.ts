@@ -342,6 +342,8 @@ async function mainProcess(
       let network: SupportedNetwork;
       if (chain.base === ChainBase.Substrate)
         network = SupportedNetwork.Substrate;
+      else if (chain.base === ChainBase.CosmosSDK)
+        network = SupportedNetwork.Cosmos;
       else if (chain.network === ChainNetwork.Compound)
         network = SupportedNetwork.Compound;
       else if (chain.network === ChainNetwork.Aave)

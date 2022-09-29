@@ -43,17 +43,25 @@ interface IEvent {
 }
 
 type UnixDate = number;
+type Coins = { [denom: string]: string };
+export function coinToCoins(cs: Coin[]): Coins {
+  const res: Coins = {};
+  for (const c of cs) {
+    res[c.denom] = c.amount;
+  }
+  return res;
+}
 
 export interface ISubmitProposal extends IEvent {
   kind: EventKind.SubmitProposal;
   id: string;
   proposer?: string;
-  content?: Any;
+  content?: { typeUrl: string; value: string }; // hex-encoded protobuf Any value
   submitTime?: UnixDate;
   depositEndTime?: UnixDate;
   votingStartTime?: UnixDate;
   votingEndTime?: UnixDate;
-  totalDeposit?: Coin[];
+  totalDeposit?: Coins;
   finalTallyResult?: TallyResult;
 }
 
@@ -61,7 +69,7 @@ export interface IDeposit extends IEvent {
   kind: EventKind.Deposit;
   id: string;
   depositor: string;
-  amount: Coin[];
+  amount: Coins;
 }
 
 export interface IVote extends IEvent {
