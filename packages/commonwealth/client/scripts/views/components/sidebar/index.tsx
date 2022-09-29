@@ -13,7 +13,7 @@ import { ChatSection } from '../chat/chat_section';
 
 export class Sidebar implements m.ClassComponent {
   view() {
-    const hideChat = ['terra', 'axie-infinity'].includes(app.activeChainId());
+    const hideChat = !app.chain.meta.chatEnabled;
 
     return (
       <div class="Sidebar">

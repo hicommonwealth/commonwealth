@@ -3793,10 +3793,10 @@
   resolved "https://registry.npmjs.org/@sindresorhus/is/-/is-0.14.0.tgz"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@snapshot-labs/snapshot.js@^0.4.16":
-  version "0.4.17"
-  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.4.17.tgz#e8c231e668cd2e0d1f6ac4f90adb5ab8ebf27381"
-  integrity sha512-H7Q0CExh7P5qa6Gu1inkVTq9iBwg6BA/KjTRluS0+yYmrtcM9D36h77xNTRzAsTHxZlwX+ZSY2N9oDNeDSoD8A==
+"@snapshot-labs/snapshot.js@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@snapshot-labs/snapshot.js/-/snapshot.js-0.4.35.tgz#9137f40916f6c4054dee1bd18586dc2a0e9a1eb2"
+  integrity sha512-3AIw536Z7HgeM/7PIwqNKGPffiEL/c0VsYPT+18Z7wEHFgI/UMilhCYcHpZxbnE6AYhlPLowRSFtNwHjwvwRww==
   dependencies:
     "@ensdomains/eth-ens-namehash" "^2.0.15"
     "@ethersproject/abi" "^5.6.4"

@@ -26,6 +26,10 @@ const validateChain = async (
         required: false,
         attributes: ['id', 'name', 'chain_id'],
       },
+      {
+        model: models.ChainNode,
+        required: true,
+      }
     ],
   });
   // searching for chain that doesn't exist

@@ -1,9 +1,9 @@
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../database';
-import { ChainBase } from 'common-common/src/types';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
@@ -66,7 +66,7 @@ const updateChain = async (
   const {
     active,
     icon_url,
-    symbol,
+    default_symbol,
     type,
     name,
     description,
@@ -78,6 +78,7 @@ const updateChain = async (
     stages_enabled,
     custom_stages,
     custom_domain,
+    chat_enabled,
     default_summary_view,
     terms,
   } = req.body;
@@ -119,7 +120,7 @@ const updateChain = async (
 
   if (name) chain.name = name;
   if (description) chain.description = description;
-  if (symbol) chain.symbol = symbol;
+  if (default_symbol) chain.default_symbol = default_symbol;
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
@@ -132,6 +133,7 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
+  if (chat_enabled) chain.chat_enabled = chat_enabled;
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
