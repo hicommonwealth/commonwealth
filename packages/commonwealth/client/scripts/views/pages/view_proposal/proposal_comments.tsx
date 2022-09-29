@@ -102,6 +102,7 @@ export class ProposalComments
 
     const recursivelyGatherComments = (
       comments_: Comment<any>[],
+      parentComment: Comment<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
@@ -124,7 +125,7 @@ export class ProposalComments
               />
               {!!children.length &&
                 canContinueThreading &&
-                recursivelyGatherComments(children, threadLevel + 1)}
+                recursivelyGatherComments(children, comment, threadLevel + 1)}
               {this.isReplying && this.parentCommentId === comment.id && (
                 <CreateComment
                   handleIsReplying={handleIsReplying}

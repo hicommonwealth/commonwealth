@@ -85,57 +85,62 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
           ) : (
             <>
               <CWText type="b2">{renderQuillTextBody(comment.text)}</CWText>
-              <div class="comment-footer">
-                <div class="menu-buttons-left">
-                  <div class="vote-group">
-                    <CWIconButton iconName="upvote" iconSize="small" />
-                    <CWText type="caption" className="menu-buttons-text">
-                      30
-                    </CWText>
-                    <CWIconButton iconName="downvote" iconSize="small" />
-                  </div>
-                  {!isLast && (
-                    <div
-                      class="reply-button"
-                      onclick={() => {
-                        scrollToForm(comment.id);
-                        handleIsReplying(true, comment.id);
-                      }}
-                    >
-                      <CWIcon iconName="feedback" iconSize="small" />
+              {!comment.deleted && (
+                <div class="comment-footer">
+                  <div class="menu-buttons-left">
+                    <div class="vote-group">
+                      <CWIconButton iconName="upvote" iconSize="small" />
                       <CWText type="caption" className="menu-buttons-text">
-                        Reply
+                        30
                       </CWText>
+                      <CWIconButton iconName="downvote" iconSize="small" />
                     </div>
-                  )}
-                </div>
-                <div class="menu-buttons-right">
-                  <CWIconButton iconName="share" iconSize="small" />
-                  <CWPopoverMenu
-                    trigger={
-                      <CWIconButton iconName="dotsVertical" iconSize="small" />
-                    }
-                    popoverMenuItems={[
-                      {
-                        label: 'Edit',
-                        iconName: 'edit',
-                        onclick: () => {
-                          setIsEditingComment(true);
+                    {!isLast && (
+                      <div
+                        class="reply-button"
+                        onclick={() => {
+                          // scrollToForm(comment.id);
+                          handleIsReplying(true, comment.id);
+                        }}
+                      >
+                        <CWIcon iconName="feedback" iconSize="small" />
+                        <CWText type="caption" className="menu-buttons-text">
+                          Reply
+                        </CWText>
+                      </div>
+                    )}
+                  </div>
+                  <div class="menu-buttons-right">
+                    <CWIconButton iconName="share" iconSize="small" />
+                    <CWPopoverMenu
+                      trigger={
+                        <CWIconButton
+                          iconName="dotsVertical"
+                          iconSize="small"
+                        />
+                      }
+                      popoverMenuItems={[
+                        {
+                          label: 'Edit',
+                          iconName: 'edit',
+                          onclick: () => {
+                            setIsEditingComment(true);
+                          },
                         },
-                      },
-                      {
-                        label: 'Delete',
-                        iconName: 'trash',
-                        onclick: () => {
-                          app.comments.delete(comment).then(() => {
-                            m.redraw();
-                          });
+                        {
+                          label: 'Delete',
+                          iconName: 'trash',
+                          onclick: () => {
+                            app.comments.delete(comment).then(() => {
+                              m.redraw();
+                            });
+                          },
                         },
-                      },
-                    ]}
-                  />
+                      ]}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
         </div>
