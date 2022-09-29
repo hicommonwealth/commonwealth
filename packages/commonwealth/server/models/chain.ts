@@ -120,7 +120,6 @@ export default (
         allowNull: false,
         defaultValue: true,
       },
-      decimals: { type: dataTypes.INTEGER, allowNull: true },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
