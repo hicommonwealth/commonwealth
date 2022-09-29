@@ -63,6 +63,7 @@ const deleteChain = async (
     const chain = await models.Chain.findOne({
       where: {
         id,
+        has_chain_events_listener: false, // make sure no chain events
       },
     });
     if (!chain) {
