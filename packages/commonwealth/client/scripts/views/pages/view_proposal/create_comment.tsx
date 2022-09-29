@@ -25,11 +25,11 @@ import { ProposalPageState } from './types';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type CreateCommmentAttrs = {
-  callback: () => void;
   isGloballyEditing: boolean;
   parentComment?: Comment<any>;
   proposalPageState: ProposalPageState;
   rootProposal: AnyProposal | Thread;
+  updatedCommentsCallback: () => void;
 };
 
 export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
@@ -40,8 +40,12 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
   private uploadsInProgress;
 
   view(vnode) {
-    const { callback, isGloballyEditing, proposalPageState, rootProposal } =
-      vnode.attrs;
+    const {
+      updatedCommentsCallback,
+      isGloballyEditing,
+      proposalPageState,
+      rootProposal,
+    } = vnode.attrs;
 
     let { parentComment } = vnode.attrs;
 
@@ -90,7 +94,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
           proposalPageState.parentCommentId
         );
 
-        callback();
+        updatedCommentsCallback();
 
         this.quillEditorState.resetEditor();
 

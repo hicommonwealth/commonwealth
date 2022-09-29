@@ -1,27 +1,24 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { MenuItem, Icons, PopoverMenu } from 'construct-ui';
 import { int } from 'aws-sdk/clients/datapipeline';
 
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export class SocialSharingCarat
   implements m.ClassComponent<{ commentID?: int }>
 {
   view(vnode) {
     const domain = document.location.origin;
+
     return (
-      <PopoverMenu
-        transitionDuration={0}
-        closeOnOutsideClick
-        closeOnContentClick
-        menuAttrs={{ size: 'default' }}
-        content={[
-          <MenuItem
-            iconLeft={Icons.COPY}
-            label="Copy URL"
-            onclick={async () => {
+      <CWPopoverMenu
+        popoverMenuItems={[
+          {
+            iconName: 'copy',
+            label: 'Copy URL',
+            onclick: async () => {
               if (!vnode.attrs.commentID) {
                 await navigator.clipboard.writeText(
                   `${domain}${m.route.get()}`
@@ -31,12 +28,12 @@ export class SocialSharingCarat
                   `${domain}${m.route.get()}?comment=${vnode.attrs.commentID}`
                 );
               }
-            }}
-          />,
-          <MenuItem
-            iconLeft={Icons.TWITTER}
-            label="Share on Twitter"
-            onclick={async () => {
+            },
+          },
+          {
+            iconName: 'twitter',
+            label: 'Share on Twitter',
+            onclick: async () => {
               if (!vnode.attrs.commentID) {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
@@ -50,14 +47,10 @@ export class SocialSharingCarat
                   '_blank'
                 );
               }
-            }}
-          />,
+            },
+          },
         ]}
-        trigger={
-          <div>
-            <CWIcon iconName="share2" iconSize="small" />
-          </div>
-        }
+        trigger={<CWIconButton iconName="share2" iconSize="small" />}
       />
     );
   }

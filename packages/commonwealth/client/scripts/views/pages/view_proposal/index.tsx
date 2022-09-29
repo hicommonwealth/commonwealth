@@ -262,7 +262,7 @@ class ViewProposalPage
       }
     }
 
-    const createdCommentCallback = () => {
+    const updatedCommentsCallback = () => {
       this.comments = app.comments
         .getByProposal(proposal)
         .filter((c) => c.parentComment === null);
@@ -467,7 +467,7 @@ class ViewProposalPage
               <ProposalBody
                 commentCount={commentCount}
                 comments={comments}
-                createdCommentCallback={createdCommentCallback}
+                updatedCommentsCallback={updatedCommentsCallback}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
@@ -499,7 +499,7 @@ class ViewProposalPage
             <ProposalBody
               commentCount={commentCount}
               comments={comments}
-              createdCommentCallback={createdCommentCallback}
+              updatedCommentsCallback={updatedCommentsCallback}
               setIsGloballyEditing={setIsGloballyEditing}
               isAdminOrMod={isAdminOrMod}
               isAuthor={isAuthor}

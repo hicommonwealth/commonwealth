@@ -30,7 +30,6 @@ import { ProposalComments } from './proposal_comments';
 import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { EditComment } from './edit_comment';
 import {
   ProposalBodyAttachments,
   ProposalBodyText,
@@ -50,7 +49,7 @@ import {
   ProposalHeaderStage,
   ProposalTitleEditor,
 } from './proposal_header_components';
-import { SocialSharingCarat } from '../../components/social_sharing_carat';
+import { SocialSharingCarat } from './social_sharing_carat';
 import { ThreadSubscriptionMenuItem } from '../discussions/discussion_row_menu';
 import {
   ProposalHeaderThreadLink,
@@ -69,18 +68,19 @@ import {
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { EditBody } from './edit_body';
 
 type ProposalBodyAttrs = {
   commentCount: number;
   comments: Array<Comment<Thread>>;
-  createdCommentCallback: () => void;
-  setIsGloballyEditing: (status: boolean) => void;
   isAdminOrMod: boolean;
   isAuthor: boolean;
   isEditor: boolean;
   isGloballyEditing: boolean;
   proposal: AnyProposal | Thread;
   proposalPageState: ProposalPageState;
+  setIsGloballyEditing: (status: boolean) => void;
+  updatedCommentsCallback: () => void;
   viewCount: number;
 };
 
@@ -96,7 +96,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
     const {
       commentCount,
       comments,
-      createdCommentCallback,
+      updatedCommentsCallback,
       setIsGloballyEditing,
       isAdminOrMod,
       isAuthor,
@@ -410,10 +410,11 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         {proposal instanceof Thread && (
           <div class="proposal-content">
             {this.isEditingBody ? (
-              <EditComment
-                comment={proposal}
-                setIsGloballyEditing={setIsEditingBody}
+              <EditBody
+                thread={proposal}
+                setIsEditing={setIsEditingBody}
                 proposalPageState={proposalPageState}
+                updatedTitle={''}
                 updatedUrl={this.updatedUrl}
               />
             ) : (
@@ -421,7 +422,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                 <ProposalBodyText item={proposal} />
                 {!isGloballyEditing && !proposalPageState.parentCommentId && (
                   <CreateComment
-                    callback={createdCommentCallback}
+                    updatedCommentsCallback={updatedCommentsCallback}
                     setIsGloballyEditing={setIsGloballyEditing}
                     isGloballyEditing={isGloballyEditing}
                     proposalPageState={this}
@@ -481,7 +482,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         <ProposalComments
           proposal={proposal}
           comments={comments}
-          createdCommentCallback={createdCommentCallback}
+          updatedCommentsCallback={updatedCommentsCallback}
           setIsGloballyEditing={setIsGloballyEditing}
           isGloballyEditing={isGloballyEditing}
           proposalPageState={proposalPageState}

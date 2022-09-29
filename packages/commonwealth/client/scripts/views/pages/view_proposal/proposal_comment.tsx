@@ -20,7 +20,6 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
 
 type ProposalCommentAttrs = {
-  callback?: CallableFunction;
   comment: Comment<any>;
   isAdmin?: boolean;
   isGloballyEditing: boolean;
@@ -30,6 +29,7 @@ type ProposalCommentAttrs = {
   proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
+  updatedCommentsCallback?: () => void;
 };
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
@@ -40,7 +40,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
 
   view(vnode) {
     const {
-      callback,
+      updatedCommentsCallback,
       comment,
       isAdmin,
       isGloballyEditing,
@@ -88,10 +88,9 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
           </div>
           {this.isEditingComment ? (
             <EditComment
-              callback={callback}
               comment={comment}
-              setIsGloballyEditing={setIsEditingComment}
-              proposalPageState={proposalPageState}
+              setIsEditing={setIsEditingComment}
+              updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
             <>

@@ -15,13 +15,13 @@ import { ProposalComment } from './proposal_comment';
 
 type ProposalCommentsAttrs = {
   comments: Array<Comment<any>>;
-  createdCommentCallback: () => void;
-  setIsGloballyEditing: (status: boolean) => void;
   isAdmin: boolean;
   isGloballyEditing: boolean;
   proposal: Thread | AnyProposal;
   proposalPageState: ProposalPageState;
   recentlySubmitted?: number;
+  setIsGloballyEditing: (status: boolean) => void;
+  updatedCommentsCallback: () => void;
   user?: any;
 };
 
@@ -40,7 +40,7 @@ export class ProposalComments
     const {
       proposal,
       comments,
-      createdCommentCallback,
+      updatedCommentsCallback,
       setIsGloballyEditing,
       isGloballyEditing,
       proposalPageState,
@@ -70,7 +70,7 @@ export class ProposalComments
       ) {
         return (
           <CreateComment
-            callback={createdCommentCallback}
+            updatedCommentsCallback={updatedCommentsCallback}
             setIsGloballyEditing={setIsGloballyEditing}
             isGloballyEditing={isGloballyEditing}
             proposalPageState={proposalPageState}
@@ -138,7 +138,7 @@ export class ProposalComments
                 proposalPageState={proposalPageState}
                 parent={parent}
                 proposal={proposal}
-                callback={createdCommentCallback}
+                updatedCommentsCallback={updatedCommentsCallback}
                 isAdmin={isAdmin}
                 isLast={idx === comments_.length - 1}
                 threadLevel={threadLevel}

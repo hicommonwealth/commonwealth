@@ -2,33 +2,37 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/edit_comment.scss';
+import 'pages/view_proposal/edit_body.scss';
 
 import app from 'state';
-import { Comment } from 'models';
+import { navigateToSubpage } from 'app';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { Thread } from 'models';
+import { validURL } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
 
-type EditCommentAttrs = {
-  comment: Comment<any>;
+type EditBodyAttrs = {
+  thread: Thread;
   setIsEditing: (status: boolean) => void;
-  updatedCommentsCallback?: () => void;
+  updatedTitle: string;
+  updatedUrl: string;
 };
 
-export class EditComment implements m.ClassComponent<EditCommentAttrs> {
+export class EditBody implements m.ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
-  private shouldRestoreEdits: boolean;
   private savedEdits: string;
   private saving: boolean;
+  private shouldRestoreEdits: boolean;
 
   async oninit(vnode) {
-    const { comment } = vnode.attrs;
+    const { thread } = vnode.attrs;
 
     this.savedEdits = localStorage.getItem(
-      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
+      `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
     );
 
     if (this.savedEdits) {
@@ -38,21 +42,21 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
         'No'
       )();
 
-      clearEditingLocalStorage(comment, false);
+      clearEditingLocalStorage(thread, true);
 
       m.redraw();
     }
   }
 
   view(vnode) {
-    const { updatedCommentsCallback, comment, setIsEditing } = vnode.attrs;
+    const { thread, setIsEditing, updatedTitle, updatedUrl } = vnode.attrs;
 
     const { shouldRestoreEdits, savedEdits } = this;
 
-    const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+    const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
     return (
-      <div class="EditComment">
+      <div class="EditBody">
         {savedEdits && shouldRestoreEdits === undefined ? (
           <QuillEditorComponent />
         ) : (
@@ -71,7 +75,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
             }}
             imageUploader
             theme="snow"
-            editorNamespace={`edit-comment-${comment.id}`}
+            editorNamespace={`edit-thread-${thread.id}`}
           />
         )}
         <div class="buttons-row">
@@ -84,9 +88,9 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
               let confirmed = true;
 
-              const commentText = this.quillEditorState.textContentsAsString;
+              const threadText = this.quillEditorState.textContentsAsString;
 
-              if (commentText !== body) {
+              if (threadText !== body) {
                 confirmed = await confirmationModalWithText(
                   'Cancel editing? Changes will not be saved.'
                 )();
@@ -95,7 +99,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
               if (confirmed) {
                 setIsEditing(false);
 
-                clearEditingLocalStorage(comment, false);
+                clearEditingLocalStorage(thread, true);
 
                 m.redraw();
               }
@@ -107,21 +111,34 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
             onclick={(e) => {
               e.preventDefault();
 
+              if (updatedUrl) {
+                if (!validURL(updatedUrl)) {
+                  notifyError('Must provide a valid URL.');
+                  return;
+                }
+              }
+
               this.saving = true;
 
               this.quillEditorState.disable();
 
               const itemText = this.quillEditorState.textContentsAsString;
 
-              app.comments.edit(comment, itemText).then(() => {
-                this.saving = false;
+              app.threads
+                .edit(thread, itemText, updatedTitle, updatedUrl)
+                .then(() => {
+                  navigateToSubpage(`/discussion/${thread.id}`);
 
-                clearEditingLocalStorage(comment, false);
+                  this.saving = false;
 
-                setIsEditing(false);
+                  clearEditingLocalStorage(thread, true);
 
-                updatedCommentsCallback();
-              });
+                  setIsEditing(false);
+
+                  m.redraw();
+
+                  notifySuccess('Thread successfully edited');
+                });
             }}
           />
         </div>
