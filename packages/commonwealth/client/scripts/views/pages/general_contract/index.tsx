@@ -151,7 +151,7 @@ class GeneralContractPage
       let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
-        tx = await chain.makeContractTx(
+        const txReceipt = chain.makeContractTx(
           contractAddress,
           functionTx.encodeABI(),
           signingWallet

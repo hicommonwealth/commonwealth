@@ -58,20 +58,20 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   /*
   Writing to contract data, aka creating transaction
   */
-  public async makeContractTx(
+  public makeContractTx(
     to: string,
     data: string,
     wallet: IWebWallet<any>
-  ) {
+  ) : TransactionReceipt {
     try {
       // Not using contractApi because it's ethers-dependent
       // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
-      const txHash = await wallet.sendTransaction({
+      const txReceipt = wallet.sendTransaction({
         from: wallet.accounts[0],
         to,
         data,
       });
-      return txHash;
+      return txReceipt;
     } catch (error) {
       console.log(error);
     }

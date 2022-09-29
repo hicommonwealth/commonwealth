@@ -158,8 +158,8 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           .get(index);
       });
 
-      const contractAddress = app.contracts.getByNickname(nickname).address;
-      const functionContract = await getWeb3Contract(contractAddress);
+      const contract = app.contracts.getByNickname(nickname);
+      const functionContract = await getWeb3Contract(contract.address);
 
       // 5. Build function tx
       // Assumption is using this methodology for calling functions
@@ -187,19 +187,20 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         await metamaskWallet.enable();
       }
 
-      const chain = await getCurrChain(contractAddress);
+      const chain = await getCurrChain(contract.address);
       let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
-        tx = await chain.makeContractTx(
-          contractAddress,
+        const receipt = chain.makeContractTx(
+          contract.address,
           functionTx.encodeABI(),
           metamaskWallet
         );
-        const receipt = chain.api.eth.getTransactionReceipt(tx)
         console.log(receipt)
-        const logs = functionContract.events.ProjectCreated.processReceipt(receipt)
-        console.log(logs)
+        if (contract.nickname === 'curated-factory-goerli') {
+          const eventlogs = functionContract.events.ProjectCreated().processReceipt(receipt)
+          console.log(eventlogs)
+        }
       } else {
         return;
       }
