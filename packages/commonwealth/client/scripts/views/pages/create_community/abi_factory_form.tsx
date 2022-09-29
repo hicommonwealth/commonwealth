@@ -196,6 +196,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           functionTx.encodeABI(),
           metamaskWallet
         );
+        const receipt = chain.api.eth.getTransactionReceipt(tx)
+        console.log(receipt)
+        const logs = functionContract.events.ProjectCreated.processReceipt(receipt)
+        console.log(logs)
       } else {
         return;
       }
