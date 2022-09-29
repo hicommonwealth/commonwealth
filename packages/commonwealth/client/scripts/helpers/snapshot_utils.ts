@@ -250,7 +250,7 @@ export async function getResults(
       let attempts = 0;
       while (attempts <= 3) {
         try {
-         const scores = await snapshot.utils.getScores(
+          const scores = await snapshot.utils.getScores(
             space.id,
             strategies,
             space.network,
