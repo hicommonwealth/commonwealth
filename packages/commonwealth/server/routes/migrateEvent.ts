@@ -14,8 +14,8 @@ enum MigrateEventErrors {
 }
 
 type migrateEventReq = {
-  migrateAll: boolean;
   secret: string;
+  migrateAll?: boolean;
   chain_id?: string;
 };
 
@@ -28,7 +28,7 @@ const migrateEvent = async (
   req: TypedRequestBody<migrateEventReq>,
   res: TypedResponse<migrateEventResp>
 ) => {
-  const { migrateAll, secret, chain_id } = req.body;
+  const { secret, migrateAll, chain_id } = req.body;
 
   if (
     !process.env.AIRPLANE_SECRET ||
@@ -38,7 +38,7 @@ const migrateEvent = async (
     throw new AppError(MigrateEventErrors.Failed);
   }
 
-  if (migrateAll === true) {
+  if (migrateAll && migrateAll === true) {
     try {
       await migrateChainEntities();
     } catch (e) {
