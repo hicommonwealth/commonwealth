@@ -63,7 +63,7 @@
     }
 
     &.background {
-      background-color: $primary-50;
+      background-color: $primary-100;
     }
 
     &.no-background {
@@ -72,7 +72,7 @@
 
     &.active,
     &:hover {
-      background-color: $primary-100;
+      background-color: $primary-50;
     }
 
     .carat {
@@ -92,7 +92,6 @@
   padding: 0 8px 0 32px;
 
   .title-active {
-    color: $purple-400;
     font-weight: 500;
     margin-right: 8px;
     overflow: hidden;
@@ -107,9 +106,12 @@
     white-space: nowrap;
   }
 
-  &.active,
+  &.active {
+    background-color: $primary-100;
+  }
+
   &:hover {
-    background-color: $purple-50;
+    background-color: $primary-50;
   }
 }
 
