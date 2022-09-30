@@ -80,8 +80,7 @@ export default class DaoFactoryController {
             txReceipt.logs[0].topics
           );
           console.log('decodedLog', decodedLog);
-          daoForm.address = decodedLog.projectAddress;
-          console.log('state.form.address', daoForm.address);
+          console.log('state.form.address', decodedLog.projectAddress);
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Ethereum,
@@ -92,6 +91,7 @@ export default class DaoFactoryController {
               token_name: daoForm.tokenName,
               type: ChainType.DAO,
               default_symbol: daoForm.symbol,
+              address: decodedLog.projectAddress,
               ...daoForm,
             });
             if (res.result.admin_address) {
