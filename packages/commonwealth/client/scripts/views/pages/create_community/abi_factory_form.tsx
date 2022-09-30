@@ -95,8 +95,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
   view(vnode) {
     const Bytes32 = ethers.utils.formatBytes32String;
 
-    const validAddress = isAddress(this.state.form.address);
-    const disableField = !validAddress || !this.state.loaded;
+    const disableField = !this.state.loaded;
 
     const getCurrChain = async (
       contractAddress: string
@@ -135,7 +134,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       return web3Contract;
     };
 
-    const callFunction = async (nickname: string, fn: AbiItem) => {
+    const createDao = async (nickname: string, fn: AbiItem) => {
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
@@ -192,7 +191,6 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       }
 
       const chain = await getCurrChain(contract.address);
-      let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         if (contract.nickname === 'curated-factory-goerli') {
           const eventAbiItem = parseEventFromABI(
@@ -215,28 +213,9 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                 txReceipt.logs[0].topics
               );
               console.log('decodedLog', decodedLog);
+              this.state.form.address = decodedLog.projectAddress;
             });
         }
-      } else {
-        return;
-      }
-      // simple return type
-      if (fn.outputs.length === 1) {
-        const decodedTx = chain.api.eth.abi.decodeParameter(
-          fn.outputs[0].type,
-          tx
-        );
-        const result: any[] = [];
-        result.push(decodedTx);
-        this.state.functionNameToFunctionOutput.set(fn.name, result);
-      } else if (fn.outputs.length > 1) {
-        const decodedTxMap = chain.api.eth.abi.decodeParameters(
-          fn.outputs.map((output) => output.type),
-          tx
-        );
-        // complex return type
-        const processed = Array.from(Object.values(decodedTxMap));
-        this.state.functionNameToFunctionOutput.set(fn.name, processed);
       }
     };
 
@@ -374,7 +353,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                 notifySuccess('Submit Call button clicked!');
                 this.state.saving = true;
                 try {
-                  callFunction(this.state.form.daoFactoryType, fn);
+                  createDao(this.state.form.daoFactoryType, fn);
                 } catch (err) {
                   notifyError(
                     err.responseJSON?.error || 'Submitting Function Call failed'
