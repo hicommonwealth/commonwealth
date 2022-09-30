@@ -9,7 +9,7 @@ import 'pages/abi_factory_form.scss';
 import { Contract, NodeInfo } from 'models';
 import app from 'state';
 import { initAppState } from 'app';
-import { ChainBase, ChainType, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType, WalletId } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
@@ -50,21 +50,18 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 type EthDaoFormFields = {
+  network: ChainNetwork.Ethereum;
   tokenName: string;
-};
-
-type CreateFactoryDaoForm = {
-  functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
-  daoFactoryType: string;
 };
 
 type CreateFactoryEthDaoForm = ChainFormFields &
   EthFormFields &
-  EthDaoFormFields &
-  CreateFactoryDaoForm;
+  EthDaoFormFields;
 
 type CreateAbiFactoryState = ChainFormState & {
   functionNameToFunctionOutput: Map<string, any[]>;
+  functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
+  daoFactoryType: string;
   form: CreateFactoryEthDaoForm;
 };
 
@@ -76,12 +73,13 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     saving: false,
     status: undefined,
     functionNameToFunctionOutput: new Map<string, any[]>(),
+    functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
+    daoFactoryType: 'partybidfactory',
     form: {
-      functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
-      daoFactoryType: 'partybidfactory',
       address: '',
       chainString: 'Ethereum Mainnet',
       ethChainId: 1,
+      network: ChainNetwork.Ethereum,
       id: '',
       name: '',
       nodeUrl: '',
@@ -147,23 +145,23 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
-            this.state.form.functionNameToFunctionInputArgs
+            this.state.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
           );
         if (type.substring(0, 4) === 'byte')
           return Bytes32(
-            this.state.form.functionNameToFunctionInputArgs
+            this.state.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
           );
         if (type.slice(-2) === '[]')
           return JSON.parse(
-            this.state.form.functionNameToFunctionInputArgs
+            this.state.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
           );
-        return this.state.form.functionNameToFunctionInputArgs
+        return this.state.functionNameToFunctionInputArgs
           .get(fn.name)
           .get(index);
       });
@@ -217,6 +215,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               );
               console.log('decodedLog', decodedLog);
               this.state.form.address = decodedLog.projectAddress;
+              console.log('state.form.address', this.state.form.address);
               try {
                 const res = await $.post(`${app.serverUrl()}/createChain`, {
                   base: ChainBase.Ethereum,
@@ -261,7 +260,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     };
 
     const renderFactoryFunction = () => {
-      const fn = loadFactoryContractAbi(this.state.form.daoFactoryType);
+      const fn = loadFactoryContractAbi(this.state.daoFactoryType);
       return (
         <div class="function-row">
           <CWText>{fn.name}</CWText>
@@ -281,30 +280,30 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                       placeholder="Insert Input Here"
                       oninput={(e) => {
                         if (
-                          !this.state.form.functionNameToFunctionInputArgs.has(
+                          !this.state.functionNameToFunctionInputArgs.has(
                             fn.name
                           )
                         ) {
-                          this.state.form.functionNameToFunctionInputArgs.set(
+                          this.state.functionNameToFunctionInputArgs.set(
                             fn.name,
                             new Map<number, string>()
                           );
                           const inputArgMap =
-                            this.state.form.functionNameToFunctionInputArgs.get(
+                            this.state.functionNameToFunctionInputArgs.get(
                               fn.name
                             );
                           inputArgMap.set(inputIdx, e.target.value);
-                          this.state.form.functionNameToFunctionInputArgs.set(
+                          this.state.functionNameToFunctionInputArgs.set(
                             fn.name,
                             inputArgMap
                           );
                         } else {
                           const inputArgMap =
-                            this.state.form.functionNameToFunctionInputArgs.get(
+                            this.state.functionNameToFunctionInputArgs.get(
                               fn.name
                             );
                           inputArgMap.set(inputIdx, e.target.value);
-                          this.state.form.functionNameToFunctionInputArgs.set(
+                          this.state.functionNameToFunctionInputArgs.set(
                             fn.name,
                             inputArgMap
                           );
@@ -386,7 +385,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                 notifySuccess('Create Dao button clicked!');
                 this.state.saving = true;
                 try {
-                  createDao(this.state.form.daoFactoryType, fn);
+                  createDao(this.state.daoFactoryType, fn);
                 } catch (err) {
                   notifyError(
                     err.responseJSON?.error || 'Submitting Function Call failed'
@@ -403,15 +402,14 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
     return (
       <div class="CreateCommunityForm">
-        {...ethChainRows(vnode.attrs, this.state.form)}
         <SelectRow
           title="DAO Type"
           options={app.contracts.store
             .getContractFactories()
             .map((contract) => contract.nickname)}
-          value={this.state.form.daoFactoryType}
+          value={this.state.daoFactoryType}
           onchange={(value) => {
-            this.state.form.daoFactoryType = value;
+            this.state.daoFactoryType = value;
             this.state.loaded = true;
             console.log('loaded');
             m.redraw();
@@ -439,7 +437,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
           <CWText>
-            Selected Dao Factory: {this.state.form.daoFactoryType}
+            Selected Dao Factory: {this.state.daoFactoryType}
           </CWText>
           <div class="functions-container">
             <div class="header-row">
@@ -449,7 +447,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               <CWText>Outputs</CWText>
               <CWText>Call Function</CWText>
             </div>
-            {this.state.form.daoFactoryType !== '' && renderFactoryFunction()}
+            {this.state.daoFactoryType !== '' && renderFactoryFunction()}
           </div>
         </div>
         {...defaultChainRows(this.state.form, disableField)}
