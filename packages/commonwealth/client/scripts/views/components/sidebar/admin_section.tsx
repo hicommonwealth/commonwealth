@@ -4,7 +4,6 @@ import m from 'mithril';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
-import { CreateInviteModal } from '../../modals/create_invite_modal';
 import { SidebarSectionGroup } from './sidebar_section';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
@@ -30,7 +29,6 @@ function setAdminToggleTree(path: string, toggle: boolean) {
 }
 
 export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
-  private createInviteModalActive: boolean;
   private editTopicThresholdsModalActive: boolean;
   private orderTopicsModalActive: boolean;
   private newTopicModalActive: boolean;
@@ -50,27 +48,6 @@ export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
     if (!isAdmin && !isMod) return null;
 
     const adminGroupData: SectionGroupAttrs[] = [
-      {
-        title: 'Invite members',
-        containsChildren: false,
-        displayData: null,
-        hasDefaultToggle: false,
-        isActive: this.createInviteModalActive,
-        isVisible: true,
-        isUpdated: false,
-        onclick: (e) => {
-          e.preventDefault();
-          const data = { chainInfo: app.chain.meta };
-          this.createInviteModalActive = true;
-          app.modals.create({
-            modal: CreateInviteModal,
-            data,
-            exitCallback: () => {
-              this.createInviteModalActive = false;
-            },
-          });
-        },
-      },
       {
         title: 'Manage community',
         containsChildren: false,
