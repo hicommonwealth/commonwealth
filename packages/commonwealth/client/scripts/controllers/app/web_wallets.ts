@@ -64,6 +64,26 @@ export default class WebWalletController {
     }
   }
 
+  public async getFirstAvailableMetamaskWallet(): Promise<IWebWallet<any>> {
+    //   // get querying wallet
+    const availableWallets = app.wallets.availableWallets(ChainBase.Ethereum);
+    if (availableWallets.length === 0) {
+      throw new Error('No wallet available');
+    }
+
+    // For now, we will only enable metamaskWallet, but this can change. Per discussion with Dillon
+    const metamaskWallet = availableWallets.find(
+      (wallet) => wallet.name === WalletId.Metamask
+    );
+    if (!metamaskWallet) {
+      throw new Error('No metamask wallet available');
+    }
+    if (!metamaskWallet.enabled) {
+      await metamaskWallet.enable();
+    }
+    return metamaskWallet;
+  }
+
   public async locateWallet(
     account: Account,
     chain?: ChainBase

@@ -8,7 +8,12 @@ import 'pages/abi_factory_form.scss';
 
 import app from 'state';
 import { initAppState } from 'app';
-import { ChainBase, ChainNetwork, ChainType, WalletId } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  WalletId,
+} from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
@@ -101,7 +106,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
     const createDao = async (nickname: string, fn: AbiItem) => {
       const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
-      this.state.form;
+        this.state.form;
       this.state.saving = true;
 
       // handle array and int types
@@ -109,21 +114,15 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
-            this.state.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
+            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
           );
         if (type.substring(0, 4) === 'byte')
           return Bytes32(
-            this.state.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
+            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
           );
         if (type.slice(-2) === '[]')
           return JSON.parse(
-            this.state.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
+            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
           );
         return this.state.functionNameToFunctionInputArgs
           .get(fn.name)
@@ -136,88 +135,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const ethChain = new EthereumChain(app);
 
       this.daoFactoryController = new DaoFactoryController(ethChain, contract);
+      const metamaskWallet =
+        await app.wallets.getFirstAvailableMetamaskWallet();
 
-      const functionContract = this.daoFactoryController.web3Contract;
-
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
-
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
-
-      //   // get querying wallet
-      const availableWallets = app.wallets.availableWallets(ChainBase.Ethereum);
-      if (availableWallets.length === 0) {
-        throw new Error('No wallet available');
-      }
-      // For now, we will only enable metamaskWallet, but this can change. Per discussion with Dillon
-
-      const metamaskWallet = availableWallets.find(
-        (wallet) => wallet.name === WalletId.Metamask
-      );
-      if (!metamaskWallet.enabled) {
-        await metamaskWallet.enable();
-      }
-
-      const chain = await getCurrChain(contract.address);
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        if (contract.nickname === 'curated-factory-goerli') {
-          const eventAbiItem = parseEventFromABI(
-            contract.abi,
-            'ProjectCreated'
-          );
-
-          // Sign Tx with PK if not view function
-          chain
-            .makeContractTx(
-              contract.address,
-              functionTx.encodeABI(),
-              metamaskWallet
-            )
-            .then(async (txReceipt) => {
-              console.log('txReceipt', txReceipt);
-              const decodedLog = chain.api.eth.abi.decodeLog(
-                eventAbiItem.inputs,
-                txReceipt.logs[0].data,
-                txReceipt.logs[0].topics
-              );
-              console.log('decodedLog', decodedLog);
-              this.state.form.address = decodedLog.projectAddress;
-              console.log('state.form.address', this.state.form.address);
-              try {
-                const res = await $.post(`${app.serverUrl()}/createChain`, {
-                  base: ChainBase.Ethereum,
-                  chain_string: chainString,
-                  eth_chain_id: ethChainId,
-                  jwt: app.user.jwt,
-                  node_url: nodeUrl,
-                  token_name: tokenName,
-                  type: ChainType.DAO,
-                  default_symbol: symbol,
-                  ...this.state.form,
-                });
-                if (res.result.admin_address) {
-                  await linkExistingAddressToChainOrCommunity(
-                    res.result.admin_address,
-                    res.result.role.chain_id,
-                    res.result.role.chain_id
-                  );
-                }
-                await initAppState(false);
-                // TODO: notify about needing to run event migration
-                m.route.set(`/${res.result.chain?.id}`);
-              } catch (err) {
-                notifyError(
-                  err.responseJSON?.error ||
-                    'Creating new ETH DAO community failed'
-                );
-              } finally {
-                this.state.saving = false;
-              }
-            });
-        }
+      this.daoFactoryController.createDao(fn, processedArgs, metamaskWallet);
       }
     };
 
@@ -415,9 +336,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         />
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
-          <CWText>
-            Selected Dao Factory: {this.state.daoFactoryType}
-          </CWText>
+          <CWText>Selected Dao Factory: {this.state.daoFactoryType}</CWText>
           <div class="functions-container">
             <div class="header-row">
               <CWText>Name</CWText>
