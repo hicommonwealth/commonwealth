@@ -16,7 +16,6 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
-import { scrollToForm } from './helpers';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
@@ -99,7 +98,6 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                       <div
                         class="reply-button"
                         onclick={() => {
-                          // scrollToForm(comment.id);
                           handleIsReplying(true, comment.id);
                         }}
                       >

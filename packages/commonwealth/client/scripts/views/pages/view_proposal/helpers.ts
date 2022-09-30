@@ -37,35 +37,6 @@ export const jumpHighlightComment = (commentId: number) => {
   }
 };
 
-export const scrollToForm = (parentId?: number) => {
-  setTimeout(() => {
-    const $reply = parentId
-      ? $(`.comment-${parentId}`).nextAll('.CreateComment')
-      : $('.ProposalComments > .CreateComment');
-
-    // if the reply is at least partly offscreen, scroll it entirely into view
-    const scrollTop = $('html, body').scrollTop();
-    const replyTop = $reply.offset()?.top;
-    if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-      $('html, body').animate(
-        {
-          scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40,
-        },
-        500
-      );
-
-    // highlight the reply form
-    const animationDelayTime = 2000;
-    $reply.addClass('highlighted');
-    setTimeout(() => {
-      $reply.removeClass('highlighted');
-    }, animationDelayTime + 500);
-
-    // focus the reply form
-    $reply.find('.ql-editor').focus();
-  }, 1);
-};
-
 export const handleProposalPollVote = async (
   poll: Poll,
   option: string,
