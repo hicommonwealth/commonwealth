@@ -134,7 +134,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`SubSectionGroupTitle ${
+          class={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
           onclick={(e) => clickHandler(e)}
@@ -208,9 +208,6 @@ export class SidebarSectionGroup
         e.redraw = false;
         e.stopPropagation();
       }
-      if (!toggled) {
-        this.hoverColor = '#EDE7FF';
-      }
     };
 
     const mouseLeaveHandler = () => {
@@ -228,15 +225,14 @@ export class SidebarSectionGroup
         class="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
-        style={`background-color: ${hoverColor}`}
       >
         <div
           class="section-group-title-container"
           onclick={(e) => clickHandler(e, title)}
         >
+          {carat}
           <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          {carat}
         </div>
         {this.toggled && (
           <div class="sections-container">
