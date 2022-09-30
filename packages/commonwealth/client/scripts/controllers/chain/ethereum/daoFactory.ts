@@ -1,19 +1,10 @@
-import { ApiStatus, IApp } from 'state';
-import Web3 from 'web3';
+import $ from 'jquery';
 import m from 'mithril';
-import moment from 'moment';
-
-import { TransactionReceipt } from 'web3-core';
 
 import {
   Contract,
   NodeInfo,
-  ITXModalData,
-  ITXData,
-  IChainModule,
-  ChainInfo,
   IWebWallet,
-  IChainAdapter,
 } from 'models';
 
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -116,7 +107,7 @@ export default class DaoFactoryController {
             // TODO: notify about needing to run event migration
             m.route.set(`/${res.result.chain?.id}`);
           } catch (err) {
-            throw new Error(err.responseJSON.error);
+            throw new Error(err);
           }
         });
     }
