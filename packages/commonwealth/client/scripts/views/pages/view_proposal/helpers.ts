@@ -15,38 +15,55 @@ import {
 } from './constants';
 
 // highlight the header/body of a parent thread, or the body of a comment
-export const jumpHighlightComment = (
-  commentId,
-  shouldScroll = true,
-  animationDelayTime = 2000
-) => {
-  const $div =
-    commentId === 'parent' || commentId === 'body'
-      ? $('html, body').find('.ProposalHeader')
-      : $('html, body').find(`.comment-${commentId}`);
+export const jumpHighlightComment = (commentId: number) => {
+  // const $div =
+  // commentId === 'parent' || commentId === 'body'
+  //   ? $('html, body').find('.ProposalHeader')
+  //   : $('html, body').find(`.comment-${commentId}`);
 
-  if ($div.length === 0) return; // if the passed comment was invalid, abort
+  const $div = $('html, body').find(`.comment-${commentId}`);
 
-  const divTop = $div.position().top;
+  if ($div.length > 0) {
+    const divTop = $div.position().top;
 
-  const scrollTime = 500; // time to scroll
+    // clear any previous animation
+    $div.removeClass('highlighted highlightAnimationComplete');
 
-  // clear any previous animation
-  $div.removeClass('highlighted highlightAnimationComplete');
-
-  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
-  if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
+    $('html, body').animate({ scrollTop: divTop }, 500);
     $div.addClass('highlighted');
     setTimeout(() => {
       $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime + scrollTime);
-  } else {
-    $div.addClass('highlighted');
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime);
+    }, 2000 + 500);
   }
+};
+
+export const scrollToForm = (parentId?: number) => {
+  setTimeout(() => {
+    const $reply = parentId
+      ? $(`.comment-${parentId}`).nextAll('.CreateComment')
+      : $('.ProposalComments > .CreateComment');
+
+    // if the reply is at least partly offscreen, scroll it entirely into view
+    const scrollTop = $('html, body').scrollTop();
+    const replyTop = $reply.offset()?.top;
+    if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
+      $('html, body').animate(
+        {
+          scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40,
+        },
+        500
+      );
+
+    // highlight the reply form
+    const animationDelayTime = 2000;
+    $reply.addClass('highlighted');
+    setTimeout(() => {
+      $reply.removeClass('highlighted');
+    }, animationDelayTime + 500);
+
+    // focus the reply form
+    $reply.find('.ql-editor').focus();
+  }, 1);
 };
 
 export const handleProposalPollVote = async (
@@ -142,33 +159,4 @@ export const formatBody = (vnode, updateCollapse) => {
       }
     }
   }
-};
-
-export const scrollToForm = (parentId?: number) => {
-  setTimeout(() => {
-    const $reply = parentId
-      ? $(`.comment-${parentId}`).nextAll('.CreateComment')
-      : $('.ProposalComments > .CreateComment');
-
-    // if the reply is at least partly offscreen, scroll it entirely into view
-    const scrollTop = $('html, body').scrollTop();
-    const replyTop = $reply.offset()?.top;
-    if (scrollTop + $(window).height() < replyTop + $reply.outerHeight())
-      $('html, body').animate(
-        {
-          scrollTop: replyTop + $reply.outerHeight() - $(window).height() + 40,
-        },
-        500
-      );
-
-    // highlight the reply form
-    const animationDelayTime = 2000;
-    $reply.addClass('highlighted');
-    setTimeout(() => {
-      $reply.removeClass('highlighted');
-    }, animationDelayTime + 500);
-
-    // focus the reply form
-    $reply.find('.ql-editor').focus();
-  }, 1);
 };

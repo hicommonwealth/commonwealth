@@ -110,7 +110,9 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       }
 
       this.saving = false;
-      handleIsReplying(false);
+      if (handleIsReplying) {
+        handleIsReplying(false);
+      }
       m.redraw();
     };
 

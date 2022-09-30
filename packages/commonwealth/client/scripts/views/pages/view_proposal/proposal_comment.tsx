@@ -52,7 +52,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
     // );
 
     return (
-      <div class="ProposalComment">
+      <div class={`ProposalComment comment-${comment.id}`}>
         {threadLevel > 0 && (
           <div class="thread-connectors-container">
             {Array(threadLevel)

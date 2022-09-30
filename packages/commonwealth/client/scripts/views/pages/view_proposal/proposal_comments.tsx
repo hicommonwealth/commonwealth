@@ -51,7 +51,7 @@ export class ProposalComments
         ? window.location.search.replace('?comment=', '')
         : null;
 
-      if (commentId) jumpHighlightComment(commentId);
+      if (commentId) jumpHighlightComment(Number(commentId));
     }
 
     const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -113,6 +113,7 @@ export class ProposalComments
           .filter((c) => c.parentComment === comment.id);
 
         if (isLivingCommentTree(comment, children)) {
+          console.log(threadLevel);
           return (
             <>
               <ProposalComment
