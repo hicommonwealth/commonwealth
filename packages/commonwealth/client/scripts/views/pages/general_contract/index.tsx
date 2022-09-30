@@ -151,11 +151,15 @@ class GeneralContractPage
       let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
         // Sign Tx with PK if not view function
-        const txReceipt = chain.makeContractTx(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
-        );
+        chain
+          .makeContractTx(
+            contractAddress,
+            functionTx.encodeABI(),
+            signingWallet
+          )
+          .then((txReceipt) => {
+            console.log('txReceipt', txReceipt);
+          });
       } else {
         // send transaction
         tx = await chain.makeContractCall(

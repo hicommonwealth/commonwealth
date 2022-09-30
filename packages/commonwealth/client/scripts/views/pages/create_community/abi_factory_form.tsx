@@ -34,7 +34,11 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
-import { parseAbiItemsFromABI, parseFunctionFromABI } from 'helpers/abi_utils';
+import {
+  parseAbiItemsFromABI,
+  parseEventFromABI,
+  parseFunctionFromABI,
+} from 'helpers/abi_utils';
 import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { PageNotFound } from '../404';
@@ -190,16 +194,28 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const chain = await getCurrChain(contract.address);
       let tx: string;
       if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        // Sign Tx with PK if not view function
-        const receipt = chain.makeContractTx(
-          contract.address,
-          functionTx.encodeABI(),
-          metamaskWallet
-        );
-        console.log(receipt)
         if (contract.nickname === 'curated-factory-goerli') {
-          const eventlogs = functionContract.events.ProjectCreated().processReceipt(receipt)
-          console.log(eventlogs)
+          const eventAbiItem = parseEventFromABI(
+            contract.abi,
+            'ProjectCreated'
+          );
+
+          // Sign Tx with PK if not view function
+          chain
+            .makeContractTx(
+              contract.address,
+              functionTx.encodeABI(),
+              metamaskWallet
+            )
+            .then((txReceipt) => {
+              console.log('txReceipt', txReceipt);
+              const decodedLog = chain.api.eth.abi.decodeLog(
+                eventAbiItem.inputs,
+                txReceipt.logs[0].data,
+                txReceipt.logs[0].topics
+              );
+              console.log('decodedLog', decodedLog);
+            });
         }
       } else {
         return;

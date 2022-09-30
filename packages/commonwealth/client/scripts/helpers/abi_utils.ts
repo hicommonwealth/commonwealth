@@ -51,6 +51,15 @@ export function parseEventsFromABI(abiString: string): AbiItem[] {
   return events;
 }
 
+export function parseEventFromABI(abiString: string, eventName: string): AbiItem {
+  const abiEvents = parseEventsFromABI(abiString);
+  const eventItem = abiEvents.find((abiItem) => abiItem.name === eventName);
+  if (!eventItem) {
+    throw new Error(`Could not find event ${eventName} in ABI`);
+  }
+  return eventItem;
+}
+
 function getSourceCodeEnpoint(network: chain, address: string): string {
   // Ethers JS default API key
   const apiKey = "8FG3JMZ9USS4NTA6YKEKHINU56SEPPVBJR";

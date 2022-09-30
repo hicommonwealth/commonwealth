@@ -55,33 +55,11 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return txResult;
   }
 
-  public sendTransaction(
-    tx: TransactionConfig,
-    callback?: (err: Error, receipt: TransactionReceipt) => void
-  ): TransactionReceipt {
+  public async sendTransaction(
+    tx: TransactionConfig
+  ): Promise<TransactionReceipt> {
     const web3 = this._web3;
-    web3.eth.sendTransaction(tx, function (error, hash) {
-      if (!error) {
-        console.log('Transaction sent!', hash);
-        const interval = setInterval(function () {
-          console.log('Attempting to get transaction receipt...');
-          web3.eth.getTransactionReceipt(hash, function (err, rec) {
-            if (rec) {
-              console.log(rec);
-              clearInterval(interval);
-              return rec;
-            }
-          });
-        }, 1000);
-      } else {
-        console.log(
-          'Something went wrong while submitting your transaction:',
-          error
-        );
-        return null;
-      }
-    });
-    return null;
+    return web3.eth.sendTransaction(tx);
   }
 
   public async signMessage(message: string): Promise<string> {
