@@ -158,6 +158,7 @@ const app: IApp = {
 
   toasts: getToastStore(),
   modals: getModalStore(),
+  mobileMenu: null,
   loginState: LoginState.NotLoaded,
   config: {
     chains: new ChainStore(),

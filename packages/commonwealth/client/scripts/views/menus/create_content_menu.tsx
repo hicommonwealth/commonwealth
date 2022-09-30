@@ -36,12 +36,13 @@ const getCreateContentMenu = () => {
 
   return [
     {
+      label: 'New thread',
       onclick: () => {
         navigateToSubpage('/new/discussion');
       },
-      label: 'New thread',
     },
     ...topics.map((t) => ({
+      label: `New ${t.name} Thread`,
       onclick: () => {
         // TODO Graham 7-19-22: Let's find a non-localStorage solution
         localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
@@ -57,70 +58,70 @@ const getCreateContentMenu = () => {
         }
         navigateToSubpage('/new/discussion');
       },
-      label: `New ${t.name} Thread`,
     })),
     ...(showOnChainProposalItem
       ? [
           {
-            onclick: () => navigateToSubpage('/new/proposal'),
             label: 'New On-Chain Proposal',
+            onclick: () => navigateToSubpage('/new/proposal'),
           },
         ]
       : []),
     ...(showSputnikProposalItem
       ? [
           {
-            onclick: () => navigateToSubpage('/new/proposal'),
             label: 'New Sputnik proposal',
+            onclick: () => navigateToSubpage('/new/proposal'),
           },
         ]
       : []),
     ...(showSubstrateProposalItems
       ? [
           {
+            label: 'New treasury proposal',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
               }),
-            label: 'New treasury proposal',
           },
           {
+            label: 'New democracy proposal',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
-            label: 'New democracy proposal',
           },
           {
             class:
               activeAccount && (activeAccount as SubstrateAccount).isCouncillor
                 ? ''
                 : 'disabled',
+            label: 'New council motion',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateCollectiveProposal,
               }),
-            label: 'New council motion',
           },
           {
+            label: 'New bounty proposal',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateBountyProposal,
               }),
-            label: 'New bounty proposal',
           },
           {
+            label: 'New tip',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
-            label: 'New tip',
           },
         ]
       : []),
     ...(showSnapshotOptions
       ? [
           {
+            label: 'New Snapshot Proposal',
             onclick: () => {
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
@@ -131,12 +132,12 @@ const getCreateContentMenu = () => {
                 navigateToSubpage(`/new/snapshot/${snapshotSpaces}`);
               }
             },
-            label: 'New Snapshot Proposal',
           },
         ]
       : []),
   ];
 };
+
 export class CreateContentMenu implements m.ClassComponent {
   view() {
     return <>{getCreateContentMenu()}</>;
