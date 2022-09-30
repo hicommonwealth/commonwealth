@@ -82,7 +82,6 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     daoFactoryType: 'partybidfactory',
     form: {
-      address: '',
       chainString: 'Ethereum Mainnet',
       ethChainId: 1,
       network: ChainNetwork.Ethereum,
@@ -105,8 +104,6 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const disableField = !this.state.loaded;
 
     const createDao = async (nickname: string, fn: AbiItem) => {
-      const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
-        this.state.form;
       this.state.saving = true;
 
       // handle array and int types
@@ -131,14 +128,30 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
       const contract = app.contracts.getByNickname(nickname);
 
-      // initialize daoFactory Controller
-      const ethChain = new EthereumChain(app);
+      try {
+        // initialize daoFactory Controller
+        const ethChain = new EthereumChain(app);
 
-      this.daoFactoryController = new DaoFactoryController(ethChain, contract);
-      const metamaskWallet =
-        await app.wallets.getFirstAvailableMetamaskWallet();
+        this.daoFactoryController = new DaoFactoryController(
+          ethChain,
+          contract
+        );
+        const metamaskWallet =
+          await app.wallets.getFirstAvailableMetamaskWallet();
 
-      this.daoFactoryController.createDao(fn, processedArgs, metamaskWallet);
+        this.daoFactoryController.createDao(
+          fn,
+          processedArgs,
+          metamaskWallet,
+          this.state.form
+        );
+      } catch (err) {
+        notifyError(
+          err.responseJSON?.error ||
+            'Creating new ETH DAO Factory based community failed'
+        );
+      } finally {
+        this.state.saving = false;
       }
     };
 

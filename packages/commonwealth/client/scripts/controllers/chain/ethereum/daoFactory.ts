@@ -19,9 +19,21 @@ import {
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
-import { ChainBase, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import {
+  ChainFormFields,
+  EthFormFields,
+} from 'views/pages/create_community/types';
 import EthereumChain from './chain';
+
+type EthDaoFormFields = {
+  network: ChainNetwork.Ethereum;
+  tokenName: string;
+};
+type CreateFactoryEthDaoForm = ChainFormFields &
+  EthFormFields &
+  EthDaoFormFields;
 
 export default class DaoFactoryController {
   public chain: EthereumChain;
@@ -29,6 +41,9 @@ export default class DaoFactoryController {
   public web3Contract: Web3Contract;
 
   constructor(chain: EthereumChain, contract: Contract) {
+    if (!contract.isFactory) {
+      throw new Error('Contract is not a factory');
+    }
     this.chain = chain;
     this.contract = contract;
     try {
@@ -48,7 +63,8 @@ export default class DaoFactoryController {
   public async createDao(
     fn: AbiItem,
     processedArgs: any[],
-    wallet: IWebWallet<any>
+    wallet: IWebWallet<any>,
+    daoForm: CreateFactoryEthDaoForm
   ): Promise<any> {
     const functionContract = this.web3Contract;
 
@@ -68,11 +84,7 @@ export default class DaoFactoryController {
       const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
       // Sign Tx with PK if not view function
       chain
-        .makeContractTx(
-          contract.address,
-          functionTx.encodeABI(),
-          wallet
-        )
+        .makeContractTx(contract.address, functionTx.encodeABI(), wallet)
         .then(async (txReceipt) => {
           console.log('txReceipt', txReceipt);
           const decodedLog = chain.api.eth.abi.decodeLog(
@@ -85,14 +97,14 @@ export default class DaoFactoryController {
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Ethereum,
-              chain_string: chainString,
-              eth_chain_id: ethChainId,
+              chain_string: daoForm.chainString,
+              eth_chain_id: daoForm.ethChainId,
               jwt: app.user.jwt,
-              node_url: nodeUrl,
-              token_name: tokenName,
+              node_url: daoForm.nodeUrl,
+              token_name: daoForm.tokenName,
               type: ChainType.DAO,
-              default_symbol: symbol,
-              ...this.state.form,
+              default_symbol: daoForm.symbol,
+              ...daoForm,
             });
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
@@ -104,11 +116,7 @@ export default class DaoFactoryController {
             // TODO: notify about needing to run event migration
             m.route.set(`/${res.result.chain?.id}`);
           } catch (err) {
-            notifyError(
-              err.responseJSON?.error || 'Creating new ETH DAO community failed'
-            );
-          } finally {
-            this.state.saving = false;
+            throw new Error(err.responseJSON.error);
           }
         });
     }
