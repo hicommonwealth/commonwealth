@@ -6,12 +6,10 @@ import Web3 from 'web3';
 
 import 'pages/abi_factory_form.scss';
 
-import { Contract, NodeInfo } from 'models';
 import app from 'state';
 import { initAppState } from 'app';
 import { ChainBase, ChainNetwork, ChainType, WalletId } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/main';
-import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -44,6 +42,8 @@ import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
+import { Contract } from 'models';
+import DaoFactoryController from 'controllers/chain/ethereum/daoFactory';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -66,6 +66,7 @@ type CreateAbiFactoryState = ChainFormState & {
 };
 
 export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
+  daoFactoryController: DaoFactoryController;
   private state: CreateAbiFactoryState = {
     message: '',
     loaded: false,
@@ -97,43 +98,6 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const Bytes32 = ethers.utils.formatBytes32String;
 
     const disableField = !this.state.loaded;
-
-    const getCurrChain = async (
-      contractAddress: string
-    ): Promise<EthereumChain> => {
-      try {
-        const contract: Contract =
-          app.contracts.store.getContractByAddress(contractAddress);
-        let chainNodeId = 1;
-        if (contract.chainNodeId) {
-          chainNodeId = contract.chainNodeId;
-        }
-        const nodeObj: NodeInfo = app.config.nodes.getNodesByChainId(chainNodeId);
-
-        const ethChain = new EthereumChain(app);
-
-        const ethApi = await ethChain.init(nodeObj);
-
-        return ethChain;
-      } catch (e) {
-        console.error(e);
-        console.log(`App Error: ${e.message}`);
-      }
-    };
-
-    const getWeb3Contract = async (
-      contractAddress: string
-    ): Promise<Web3Contract> => {
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
-      const chain = await getCurrChain(contractAddress);
-      const web3Contract: Web3Contract = new chain.api.eth.Contract(
-        parseAbiItemsFromABI(contract.abi),
-        contractAddress
-      );
-      return web3Contract;
-    };
 
     const createDao = async (nickname: string, fn: AbiItem) => {
       const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
@@ -167,7 +131,13 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       });
 
       const contract = app.contracts.getByNickname(nickname);
-      const functionContract = await getWeb3Contract(contract.address);
+
+      // initialize daoFactory Controller
+      const ethChain = new EthereumChain(app);
+
+      this.daoFactoryController = new DaoFactoryController(ethChain, contract);
+
+      const functionContract = this.daoFactoryController.web3Contract;
 
       const methodSignature = `${fn.name}(${fn.inputs
         .map((input) => input.type)
@@ -403,7 +373,16 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     return (
       <div class="CreateCommunityForm">
         <SelectRow
-          title="DAO Type"
+          title="DAO Network Type (Only Ethereum is supported at this time)"
+          options={[ChainNetwork.Ethereum]}
+          value={this.state.form.network}
+          onchange={(value) => {
+            this.state.form.network = value;
+            this.state.loaded = true;
+          }}
+        />
+        <SelectRow
+          title="DAO Factory Type"
           options={app.contracts.store
             .getContractFactories()
             .map((contract) => contract.nickname)}
