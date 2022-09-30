@@ -1,11 +1,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 
-import {
-  Contract,
-  NodeInfo,
-  IWebWallet,
-} from 'models';
+import { Contract, NodeInfo, IWebWallet } from 'models';
 
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
@@ -84,7 +80,8 @@ export default class DaoFactoryController {
             txReceipt.logs[0].topics
           );
           console.log('decodedLog', decodedLog);
-          console.log('state.form.address', decodedLog.projectAddress);
+          daoForm.address = decodedLog.projectAddress;
+          console.log('state.form.address', daoForm.address);
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
               base: ChainBase.Ethereum,
