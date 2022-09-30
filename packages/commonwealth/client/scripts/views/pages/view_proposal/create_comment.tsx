@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import BN from 'bn.js';
 
 import 'pages/view_proposal/create_comment.scss';
 
@@ -13,7 +14,6 @@ import { QuillEditorComponent } from 'views/components/quill/quill_editor_compon
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
-import BN from 'bn.js';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';

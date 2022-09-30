@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import moment from 'moment';
+import lity from 'lity';
 
 import 'pages/view_proposal/proposal_body.scss';
 
@@ -32,10 +33,6 @@ import { ProposalComments } from './proposal_comments';
 import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import {
-  ProposalBodyAttachments,
-  ProposalBodyText,
-} from './proposal_body_components';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { InlineReplyButton } from '../../components/inline_reply_button';
 import { activeQuillEditorHasText, scrollToForm } from './helpers';
@@ -47,9 +44,10 @@ import {
 import {
   ProposalBodyAuthor,
   ProposalBodyLastEdited,
+  ProposalBodyText,
   ProposalHeaderStage,
   ProposalTitleEditor,
-} from './proposal_header_components';
+} from './proposal_components';
 import { SocialSharingCarat } from './social_sharing_carat';
 import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
 import {
@@ -409,7 +407,26 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                 )}
                 {/* <div class="proposal-response-row">
                   {attachments && attachments.length > 0 && (
-                    <ProposalBodyAttachments item={proposal} />
+                    <>
+                      <CWText>
+                        Attachments ({proposal.attachments.length})
+                      </CWText>
+                      {proposal.attachments.map((attachment) => (
+                        <a
+                          href={attachment.url}
+                          title={attachment.description}
+                          target="_blank"
+                          noopener="noopener"
+                          noreferrer="noreferrer"
+                          onclick={(e) => {
+                            e.preventDefault();
+                            lity(attachment.url);
+                          }}
+                        >
+                          <img src={attachment.url} />
+                        </a>
+                      ))}
+                    </>
                   )}
                 </div> */}
               </>

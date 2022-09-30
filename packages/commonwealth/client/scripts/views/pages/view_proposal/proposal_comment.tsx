@@ -10,7 +10,7 @@ import app from 'state';
 // import { slugify } from 'utils';
 import { Comment } from 'models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalBodyAuthor } from './proposal_header_components';
+import { ProposalBodyAuthor } from './proposal_components';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';

@@ -4,7 +4,7 @@
 import m from 'mithril';
 import { Popover } from 'construct-ui';
 
-import 'pages/view_proposal/proposal_header_components.scss';
+import 'pages/view_proposal/proposal_components.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -27,6 +27,13 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
+import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
+import {
+  QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
+  MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
+} from './constants';
+import { formatBody } from './helpers';
 
 export class ProposalHeaderStage
   implements m.ClassComponent<{ proposal: Thread }>
@@ -257,5 +264,87 @@ export class ProposalBodyLastEdited
         Edited {item.lastEdited.fromNow()}
       </a>
     );
+  }
+}
+
+export class ProposalBodyText
+  implements
+    m.ClassComponent<{
+      item: AnyProposal | Thread | Comment<any>;
+    }>
+{
+  private body: any;
+  private collapsed: boolean;
+
+  oninit(vnode) {
+    this.collapsed = false;
+    formatBody(vnode, true);
+  }
+
+  onupdate(vnode) {
+    formatBody(vnode, false);
+  }
+
+  view(vnode) {
+    const { body } = this;
+
+    const getPlaceholder = () => {
+      if (!(vnode.attrs.item instanceof Thread)) return;
+
+      const author: Account = app.chain
+        ? app.chain.accounts.get(vnode.attrs.item.author)
+        : null;
+
+      return author ? (
+        <>
+          {m(User, {
+            user: author,
+            hideAvatar: true,
+            hideIdentityIcon: true,
+          })}{' '}
+          created this thread
+        </>
+      ) : (
+        'Created this thread'
+      );
+    };
+
+    const text = () => {
+      try {
+        const doc = JSON.parse(body);
+
+        if (!doc.ops) throw new Error();
+
+        if (
+          doc.ops.length === 1 &&
+          doc.ops[0] &&
+          typeof doc.ops[0].insert === 'string' &&
+          doc.ops[0].insert.trim() === ''
+        ) {
+          return getPlaceholder();
+        }
+
+        return (
+          <QuillFormattedText
+            doc={doc}
+            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+            collapse={false}
+            hideFormatting={false}
+          />
+        );
+      } catch (e) {
+        if (body?.toString().trim() === '') {
+          return getPlaceholder();
+        }
+        return (
+          <MarkdownFormattedText
+            doc={body}
+            cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+          />
+        );
+      }
+    };
+
+    return <div>{text()}</div>;
   }
 }
