@@ -50,7 +50,7 @@ const ProjectsPage: m.Component<{}> = {
       return m(PageLoading, {
         message: 'Connecting to chain',
         title: 'Projects',
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
       });
     }
 
@@ -58,7 +58,7 @@ const ProjectsPage: m.Component<{}> = {
       Sublayout,
       {
         title: 'Projects',
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
       },
       m('.ProjectsPage', [
         PROJECTS.map((project) => {

@@ -38,7 +38,7 @@ export const loadSubstrateModules = (
         <PageLoading
           message={`Loading ${name.toLowerCase()}`}
           title={<BreadcrumbsTitleTag title={name} />}
-          showNewProposalButton
+          showCreateContentMenuTrigger
         />
       );
     }

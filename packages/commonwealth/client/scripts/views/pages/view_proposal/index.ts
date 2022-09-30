@@ -476,7 +476,7 @@ const ViewProposalPage: m.Component<
     if (!app.chain?.meta && !isDiscussion) {
       return m(PageLoading, {
         narrow: true,
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: 'Loading...',
       });
     }
@@ -512,7 +512,7 @@ const ViewProposalPage: m.Component<
     if (!app.threads.initialized) {
       return m(PageLoading, {
         narrow: true,
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: headerTitle,
       });
     }
@@ -549,14 +549,14 @@ const ViewProposalPage: m.Component<
           }
           return m(PageLoading, {
             narrow: true,
-            showNewProposalButton: true,
+            showCreateContentMenuTrigger: true,
             title: headerTitle,
           });
         } else {
           if (!app.chain.loaded) {
             return m(PageLoading, {
               narrow: true,
-              showNewProposalButton: true,
+              showCreateContentMenuTrigger: true,
               title: headerTitle,
             });
           }
@@ -587,7 +587,7 @@ const ViewProposalPage: m.Component<
             }
             return m(PageLoading, {
               narrow: true,
-              showNewProposalButton: true,
+              showCreateContentMenuTrigger: true,
               title: headerTitle,
             });
           }
@@ -723,14 +723,14 @@ const ViewProposalPage: m.Component<
     if (vnode.state.comments === undefined) {
       return m(PageLoading, {
         narrow: true,
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: headerTitle,
       });
     }
     if (vnode.state.viewCount === undefined) {
       return m(PageLoading, {
         narrow: true,
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: headerTitle,
       });
     }
@@ -759,7 +759,7 @@ const ViewProposalPage: m.Component<
     ) {
       return m(PageLoading, {
         narrow: true,
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: headerTitle,
       });
     }
@@ -833,7 +833,7 @@ const ViewProposalPage: m.Component<
       return m(
         Sublayout,
         {
-          showNewProposalButton: true,
+          showCreateContentMenuTrigger: true,
           title: headerTitle,
         },
         [
@@ -966,7 +966,7 @@ const ViewProposalPage: m.Component<
     return m(
       Sublayout,
       {
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         title: headerTitle,
       },
       m('.ViewProposalPage', [

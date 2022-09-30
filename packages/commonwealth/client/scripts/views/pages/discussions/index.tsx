@@ -103,7 +103,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     if (!app.chain || !app.chain.serverLoaded) {
       return m(PageLoading, {
         title: 'Discussions',
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
       });
     }
 
@@ -120,7 +120,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       <Sublayout
         title="Discussions"
         description={this.getPageDescription()}
-        showNewProposalButton={true}
+        showCreateContentMenuTrigger={true}
         onscroll={
           !this.summaryView ? debounce(this.onscroll.bind(this), 400) : null
         }

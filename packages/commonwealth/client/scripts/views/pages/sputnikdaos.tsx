@@ -85,7 +85,7 @@ class SputnikDAOsPage implements m.ClassComponent {
         <PageLoading
           message="Loading Sputnik DAOs"
           title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-          showNewProposalButton
+          showCreateContentMenuTrigger
         />
       );
 
@@ -132,7 +132,7 @@ class SputnikDAOsPage implements m.ClassComponent {
           <PageLoading
             message="Loading Sputnik DAOs"
             title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-            showNewProposalButton
+            showCreateContentMenuTrigger
           />
         );
       } else return <PageLoading message="Redirecting..." />;
@@ -141,7 +141,7 @@ class SputnikDAOsPage implements m.ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-        showNewProposalButton
+        showCreateContentMenuTrigger
       >
         <div class="SputnikDAOsPage">
           <CWText type="h3">Sputnik DAOs</CWText>

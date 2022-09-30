@@ -1,13 +1,10 @@
-import { HelpMenu } from '../header/help_menu';
-import { InvitesMenu } from '../header/invites_menu';
-import { NotificationsMenu } from '../header/notifications_menu';
+import { CreateContentMenu } from '../../menus/create_content_menu';
+import { HelpMenu } from '../../menus/help_menu';
 
 export const mobileMenuLookup = {
-  // create: CreateMenu,
+  createContent: CreateContentMenu,
   help: HelpMenu,
-  invites: InvitesMenu,
   // main: MainMenu,
-  notifications: NotificationsMenu,
 };
 
 export type MobileMenuName = keyof typeof mobileMenuLookup;

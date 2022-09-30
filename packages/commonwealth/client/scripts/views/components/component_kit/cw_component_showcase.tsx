@@ -93,7 +93,7 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="basic-gallery">
           <CWPopoverMenu
             trigger={<CWIconButton iconName="dotsVertical" />}
-            popoverMenuItems={[
+            menuItems={[
               { type: 'header', label: 'Community' },
               { label: 'Create Thread', iconName: 'edit' },
               { label: 'Create Proposal', iconName: 'edit' },

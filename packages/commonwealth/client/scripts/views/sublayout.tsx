@@ -21,7 +21,7 @@ type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
   onscroll: () => null; // lazy loading for page content
-  showNewProposalButton?: boolean;
+  showCreateContentMenuTrigger?: boolean;
   title?: string; // displayed at the top of the layout
 };
 
@@ -53,7 +53,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       hideFooter = false,
       hideSearch,
       onscroll,
-      showNewProposalButton,
+      showCreateContentMenuTrigger,
       // title,
     } = vnode.attrs;
 
@@ -89,7 +89,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             {!hideSearch && <SearchBar />}
             <SublayoutHeaderRight
               chain={chain}
-              showNewProposalButton={showNewProposalButton}
+              showCreateContentMenuTrigger={showCreateContentMenuTrigger}
             />
           </div>
           <div class="sidebar-and-body-container">

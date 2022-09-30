@@ -91,7 +91,7 @@ class MultipleSnapshotsPage
     }
 
     return (
-      <Sublayout title="Proposals" showNewProposalButton={true}>
+      <Sublayout title="Proposals" showCreateContentMenuTrigger={true}>
         <div class="MultipleSnapshotsPage">
           <h3>{redirect_options.header_message}</h3>
           {app.chain && this.spaces_metadata && (

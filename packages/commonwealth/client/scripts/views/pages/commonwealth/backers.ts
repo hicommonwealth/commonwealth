@@ -12,14 +12,14 @@
 //       return m(PageLoading, {
 //         message: 'Connecting to chain',
 //         title: 'Backers',
-//         showNewProposalButton: true,
+//         showCreateContentMenuTrigger: true,
 //       });
 //     }
 
 //     return m(Sublayout, {
 //       class: 'BackersPage',
 //       title: 'Backers',
-//       showNewProposalButton: true,
+//       showCreateContentMenuTrigger: true,
 //     }, [
 //       'backers go here'
 //     ]);

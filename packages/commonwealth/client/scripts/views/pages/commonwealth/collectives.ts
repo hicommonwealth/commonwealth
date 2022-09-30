@@ -41,7 +41,7 @@ const CollectivesPage: m.Component<{}> = {
       return m(PageLoading, {
         message: 'Connecting to chain',
         title: 'Collectives',
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
       });
     }
 
@@ -49,7 +49,7 @@ const CollectivesPage: m.Component<{}> = {
       Sublayout,
       {
         title: 'Collectives',
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
       },
       m('.CollectivesPage', [
         COLLECTIVES.map((collective) => {

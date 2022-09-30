@@ -74,7 +74,7 @@ class ValidatorsPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Validators" />}
-          showNewProposalButton
+          showCreateContentMenuTrigger
         />
       );
     }
@@ -107,7 +107,7 @@ class ValidatorsPage implements m.ClassComponent {
         <PageLoading
           message="Loading validators"
           title={<BreadcrumbsTitleTag title="Validators" />}
-          showNewProposalButton
+          showCreateContentMenuTrigger
         />
       );
     }
@@ -126,7 +126,7 @@ class ValidatorsPage implements m.ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Validators" />}
-        showNewProposalButton
+        showCreateContentMenuTrigger
       >
         <div class="ValidatorsPage">
           <GovExplainer

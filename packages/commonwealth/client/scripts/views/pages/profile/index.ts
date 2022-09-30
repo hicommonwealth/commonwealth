@@ -31,8 +31,9 @@ import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
 const getProfileStatus = (account) => {
-  const onOwnProfile = account.chain.id === app.user.activeAccount?.chain?.id &&
-        account.address === app.user.activeAccount?.address;
+  const onOwnProfile =
+    account.chain.id === app.user.activeAccount?.chain?.id &&
+    account.address === app.user.activeAccount?.address;
   const onLinkedProfile =
     !onOwnProfile &&
     app.user.activeAccounts.length > 0 &&
@@ -337,11 +338,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile(vnode.attrs, vnode.state);
     }
-    if (loading) return m(PageLoading, { showNewProposalButton: true });
+    if (loading) return m(PageLoading, { showCreateContentMenuTrigger: true });
     if (!account && !vnode.state.initialized) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     } else if (!account) {
-      return m(PageLoading, { showNewProposalButton: true });
+      return m(PageLoading, { showCreateContentMenuTrigger: true });
     }
 
     if (!vnode.state.allContentCount) {
@@ -434,7 +435,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     return m(
       Sublayout,
       {
-        showNewProposalButton: true,
+        showCreateContentMenuTrigger: true,
         onscroll,
       },
       [

@@ -9,18 +9,18 @@ import Sublayout from 'views/sublayout';
 
 type PageLoadingAttrs = {
   message?: string;
-  showNewProposalButton?: boolean;
+  showCreateContentMenuTrigger?: boolean;
   title?: any;
 };
 
 export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
   view(vnode) {
-    const { title, message, showNewProposalButton } = vnode.attrs;
+    const { title, message, showCreateContentMenuTrigger } = vnode.attrs;
 
     return (
       <Sublayout
         title={title}
-        showNewProposalButton={showNewProposalButton}
+        showCreateContentMenuTrigger={showCreateContentMenuTrigger}
         hideSearch={true}
       >
         <div class="LoadingPage">

@@ -118,7 +118,7 @@ export class NotificationsMenu
             </span>
           )
         }
-        popoverMenuItems={
+        menuItems={
           <>
             <div class="NotificationsMenuHeader">
               <Button
