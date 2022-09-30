@@ -8,7 +8,8 @@ import 'pages/abi_factory_form.scss';
 
 import { Contract, NodeInfo } from 'models';
 import app from 'state';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { initAppState } from 'app';
+import { ChainBase, ChainType, WalletId } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
@@ -41,6 +42,8 @@ import {
 } from 'helpers/abi_utils';
 import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import EthereumChain from 'controllers/chain/ethereum/chain';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { slugifyPreserveDashes } from 'utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -107,7 +110,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         if (contract.chainNodeId) {
           chainNodeId = contract.chainNodeId;
         }
-        const nodeObj = app.config.nodes.getNodesByChainId(chainNodeId);
+        const nodeObj: NodeInfo = app.config.nodes.getNodesByChainId(chainNodeId);
 
         const ethChain = new EthereumChain(app);
 
@@ -135,6 +138,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     };
 
     const createDao = async (nickname: string, fn: AbiItem) => {
+      const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
+      this.state.form;
+      this.state.saving = true;
+
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
@@ -163,10 +170,6 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
 
       const contract = app.contracts.getByNickname(nickname);
       const functionContract = await getWeb3Contract(contract.address);
-
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
 
       const methodSignature = `${fn.name}(${fn.inputs
         .map((input) => input.type)
@@ -205,7 +208,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               functionTx.encodeABI(),
               metamaskWallet
             )
-            .then((txReceipt) => {
+            .then(async (txReceipt) => {
               console.log('txReceipt', txReceipt);
               const decodedLog = chain.api.eth.abi.decodeLog(
                 eventAbiItem.inputs,
@@ -214,6 +217,36 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
               );
               console.log('decodedLog', decodedLog);
               this.state.form.address = decodedLog.projectAddress;
+              try {
+                const res = await $.post(`${app.serverUrl()}/createChain`, {
+                  base: ChainBase.Ethereum,
+                  chain_string: chainString,
+                  eth_chain_id: ethChainId,
+                  jwt: app.user.jwt,
+                  node_url: nodeUrl,
+                  token_name: tokenName,
+                  type: ChainType.DAO,
+                  default_symbol: symbol,
+                  ...this.state.form,
+                });
+                if (res.result.admin_address) {
+                  await linkExistingAddressToChainOrCommunity(
+                    res.result.admin_address,
+                    res.result.role.chain_id,
+                    res.result.role.chain_id
+                  );
+                }
+                await initAppState(false);
+                // TODO: notify about needing to run event migration
+                m.route.set(`/${res.result.chain?.id}`);
+              } catch (err) {
+                notifyError(
+                  err.responseJSON?.error ||
+                    'Creating new ETH DAO community failed'
+                );
+              } finally {
+                this.state.saving = false;
+              }
             });
         }
       }
@@ -347,10 +380,10 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           </div>
           <div class="function-call">
             <CWButton
-              label="Submit"
-              disabled={this.state.saving || !this.state.loaded}
+              label="Create Dao"
+              disabled={this.state.saving}
               onclick={() => {
-                notifySuccess('Submit Call button clicked!');
+                notifySuccess('Create Dao button clicked!');
                 this.state.saving = true;
                 try {
                   createDao(this.state.form.daoFactoryType, fn);
@@ -382,6 +415,25 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loaded = true;
             console.log('loaded');
             m.redraw();
+          }}
+        />
+        <InputRow
+          title="Name"
+          value={this.state.form.name}
+          disabled={disableField}
+          onChangeHandler={(v) => {
+            this.state.form.name = v;
+            this.state.form.id = slugifyPreserveDashes(v);
+          }}
+        />
+        <IdRow id={this.state.form.id} />
+        <InputRow
+          title="Symbol"
+          disabled={disableField}
+          value={this.state.form.symbol}
+          placeholder="XYZ"
+          onChangeHandler={(v) => {
+            this.state.form.symbol = v;
           }}
         />
         <div class="GeneralContractPage">
