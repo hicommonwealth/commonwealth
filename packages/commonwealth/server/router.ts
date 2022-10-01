@@ -126,6 +126,7 @@ import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
+import migrateEvent from './routes/migrateEvent';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -133,6 +134,7 @@ import getEntityMeta from './routes/getEntityMeta';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import tokenBalance from './routes/tokenBalance';
+import bulkBalances from './routes/bulkBalances';
 import getSupportedEthChains from './routes/getSupportedEthChains';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
@@ -147,6 +149,7 @@ import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import {RabbitMQController} from "common-common/src/rabbitmq";
 import updateChainNode from "./routes/updateChainNode";
+import authCallback from './routes/authCallback';
 
 function setupRouter(
   app: Express,
@@ -216,11 +219,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models, rabbitMQController)
   );
-  router.post(
-    '/deleteChain',
-    passport.authenticate('jwt', { session: false }),
-    deleteChain.bind(this, models, rabbitMQController)
-  );
+  router.post('/deleteChain', deleteChain.bind(this, models, rabbitMQController));
   router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
@@ -242,6 +241,10 @@ function setupRouter(
   router.post(
     '/tokenBalance',
     tokenBalance.bind(this, models, tokenBalanceCache)
+  );
+  router.post(
+    '/bulkBalances',
+    bulkBalances.bind(this, models, tokenBalanceCache)
   );
   router.get('/getTokensFromLists', getTokensFromLists.bind(this, models));
   router.get('/getTokenForum', getTokenForum.bind(this, models));
@@ -710,6 +713,7 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
@@ -771,6 +775,12 @@ function setupRouter(
     '/auth/sso/callback',
     // passport.authenticate('jwt', { session: false }),
     finishSsoLogin.bind(this, models)
+  );
+
+  router.get(
+    '/auth/callback',
+    passport.authenticate('jwt', { session: false }),
+    authCallback.bind(this, models)
   );
 
   // logout

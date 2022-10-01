@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
-
 import 'components/sidebar/sidebar_section.scss';
 
+import m from 'mithril';
+import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
   SubSectionAttrs,
@@ -86,7 +86,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       if (containsChildren) {
         this.toggled = !toggled;
       }
-      localStorage.setItem('sidebar-toggle', 'false');
+      localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
       onclick(e, this.toggled);
     };
 
@@ -134,7 +134,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`SubSectionGroupTitle ${
+          class={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
           onclick={(e) => clickHandler(e)}
@@ -208,9 +208,6 @@ export class SidebarSectionGroup
         e.redraw = false;
         e.stopPropagation();
       }
-      if (!toggled) {
-        this.hoverColor = '#EDE7FF';
-      }
     };
 
     const mouseLeaveHandler = () => {
@@ -228,15 +225,14 @@ export class SidebarSectionGroup
         class="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
-        style={`background-color: ${hoverColor}`}
       >
         <div
           class="section-group-title-container"
           onclick={(e) => clickHandler(e, title)}
         >
+          {carat}
           <CWText>{title}</CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
-          {carat}
         </div>
         {this.toggled && (
           <div class="sections-container">

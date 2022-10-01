@@ -51,6 +51,7 @@ export const SPACE_QUERY = gql`
       }
       strategies {
         name
+        network
         params
       }
       members
@@ -93,6 +94,7 @@ export const PROPOSALS_QUERY = gql`
       created
       strategies {
         name
+        network
         params
       }
     }
@@ -129,6 +131,7 @@ export interface SnapshotSpace {
   };
   strategies: Array<{
     name: string;
+    network?: string;
     params: any;
   }>;
   members: string[];
@@ -151,6 +154,7 @@ export interface SnapshotProposal {
   scores_total: number;
   strategies?: Array<{
     name: string;
+    network?: string;
     params: any;
   }>;
 }

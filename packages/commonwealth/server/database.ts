@@ -1,8 +1,8 @@
 import { Sequelize, DataTypes } from 'sequelize';
 
+import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from './config';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 
 import AddressFactory, { AddressModelStatic } from './models/address';
 import BanFactory, { BanModelStatic } from './models/ban';
@@ -26,12 +26,6 @@ import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/com
 import CollaborationFactory, {
   CollaborationModelStatic,
 } from './models/collaboration';
-import ContractCategoryFactory, {
-  ContractCategoryModelStatic,
-} from './models/contract_category';
-import ContractItemFactory, {
-  ContractItemModelStatic,
-} from './models/contract_item';
 import DiscussionDraftFactory, {
   DiscussionDraftModelStatic,
 } from './models/discussion_draft';
@@ -100,6 +94,9 @@ import NotificationsReadFactory, {
   NotificationsReadModelStatic,
 } from './models/notifications_read';
 import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
+import ContractFactory, { ContractModelStatic } from './models/contract';
+import ContractAbiFactory, { ContractAbiModelStatic } from './models/contract_abi';
+import CommunityContractFactory, { CommunityContractModelStatic } from './models/community_contract';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -112,10 +109,11 @@ export type Models = {
   ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChatMessage: ChatMessageModelStatic;
+  Contract: ContractModelStatic;
+  ContractAbi: ContractAbiModelStatic;
+  CommunityContract: CommunityContractModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
-  ContractCategory: ContractCategoryModelStatic;
-  ContractItem: ContractItemModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
@@ -194,9 +192,10 @@ const models: Models = {
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
+  Contract: ContractFactory(sequelize, DataTypes),
+  ContractAbi: ContractAbiFactory(sequelize, DataTypes),
+  CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
-  ContractCategory: ContractCategoryFactory(sequelize, DataTypes),
-  ContractItem: ContractItemFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),

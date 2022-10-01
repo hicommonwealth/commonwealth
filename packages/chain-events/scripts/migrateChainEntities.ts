@@ -41,7 +41,7 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
     throw new Error('no chain found for chain entity migration');
   }
   const node = await models.ChainNode.findOne({
-    where: { id: chainInstance.chain_node_id }
+    where: { id: chainInstance.chain_node_id },
   });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
@@ -67,16 +67,22 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
       const api = await CompoundEvents.createApi(
-        node.url,
-        chainInstance.contract_address
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
       );
       fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.Aave) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
       const api = await AaveEvents.createApi(
-        node.url,
-        chainInstance.contract_address
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
       );
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
@@ -113,7 +119,7 @@ export async function migrateChainEntities(rmqController: RabbitMQController): P
   }
 }
 
-async function main() {
+export async function runMigrations() {
   // "all" means run for all supported chains, otherwise we pass in the name of
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');
@@ -142,5 +148,3 @@ async function main() {
     process.exit(1);
   }
 }
-
-main();

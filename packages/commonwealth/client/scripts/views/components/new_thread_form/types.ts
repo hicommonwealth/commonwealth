@@ -1,10 +1,9 @@
-import { ThreadKind } from 'models';
+import { ThreadKind, Topic } from 'models';
 
 export type NewThreadFormType = {
   kind: ThreadKind;
   title: string;
-  topicId: number;
-  topicName: string;
+  topic: Topic;
   url?: string;
 };
 
