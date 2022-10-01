@@ -1,7 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ChainEventAttributes } from './chain_event';
-import { ChainAttributes } from './chain';
 import { ModelStatic, ModelInstance } from './types';
 
 export type ChainEventTypeAttributes = {
@@ -11,7 +10,6 @@ export type ChainEventTypeAttributes = {
   event_name: string;
   queued: number;
   ChainEvents?: ChainEventAttributes[];
-  Chain?: ChainAttributes;
 }
 
 export type ChainEventTypeInstance = ModelInstance<ChainEventTypeAttributes>;
@@ -41,15 +39,8 @@ export default (
   });
 
   ChainEventType.associate = (models) => {
-    // chain the event happens on
-    models.ChainEventType.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
-
     // many emitted events of this type
     models.ChainEventType.hasMany(models.ChainEvent, { as: 'events' });
-
-    // many users subscribed to this event type
-    // TODO: this is currently unused, but could be useful?
-    // models.ChainEventType.hasMany(models.Subscription, { as: 'subscriptions' });
   };
 
   return ChainEventType;

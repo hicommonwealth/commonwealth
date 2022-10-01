@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { DB } from '../../database/database';
+import {DB} from "../database";
 
 const viewChainActivity = async (
   models: DB,

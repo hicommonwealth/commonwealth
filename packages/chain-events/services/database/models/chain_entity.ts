@@ -1,6 +1,5 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
 import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 
@@ -15,7 +14,6 @@ export type ChainEntityAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: ChainAttributes;
   ChainEvents?: ChainEventAttributes[];
 }
 
@@ -52,7 +50,6 @@ export default (
   });
 
   ChainEntity.associate = (models) => {
-    models.ChainEntity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
     models.ChainEntity.hasMany(models.ChainEvent, { foreignKey: 'entity_id' });
   };
 

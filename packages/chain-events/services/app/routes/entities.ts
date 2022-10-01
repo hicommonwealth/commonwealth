@@ -3,21 +3,12 @@ import { DB } from '../../database/database';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
-  NeedChain: 'Must provide a chain to fetch entities from',
-  InvalidChain: 'Invalid chain',
+  NeedChain: 'Must provide a chain to fetch entities from'
 };
 
 const entities = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.chain) {
     return next(new AppError(Errors.NeedChain));
-  }
-
-  const chain = await models.Chain.findOne({
-    where: { id: req.query.chain }
-  });
-
-  if (!chain) {
-    return next(new AppError(Errors.InvalidChain));
   }
 
   const entityFindOptions: any = {
@@ -29,11 +20,6 @@ const entities = async (models: DB, req: Request, res: Response, next: NextFunct
         ],
         include: [ models.ChainEventType ],
       },
-      // {
-      //   model: models.Thread,
-      //   attributes: ['title'],
-      //   // required: false,
-      // }
     ],
     order: [['created_at', 'DESC']],
     where: {

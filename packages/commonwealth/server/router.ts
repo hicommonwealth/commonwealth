@@ -148,6 +148,7 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
+import viewChainActivity from "./routes/viewChainActivity";
 
 function setupRouter(
   app: Express,
@@ -579,6 +580,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
+  router.post('/viewChainActivity', viewChainActivity.bind(this, models));
   router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
   router.post(
     '/markNotificationsRead',

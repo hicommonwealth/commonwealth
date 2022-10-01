@@ -14,10 +14,6 @@ import {
   Ithis as ChainEventsProcessorContextType,
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
-import {
-  processChainCUD,
-  Ithis as chainCUDContextType,
-} from './MessageProcessors/ChainCUDChainEventsQueue';
 import { SubstrateTypes } from '../../src';
 import {RepublishMessages} from "./republishMessages";
 
@@ -77,20 +73,8 @@ async function setupChainEventConsumer() {
     msgProcessorContext: chainEventsProcessorContext,
   };
 
-  // setup ChainCUDChainEventsQueue message processor context + subscription
-  const chainCUDContext: chainCUDContextType = {
-    models,
-    log,
-  };
-  const chainCUDProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processChainCUD,
-    subscriptionName: RascalSubscriptions.ChainCUDChainEvents,
-    msgProcessorContext: chainCUDContext,
-  };
-
   let subscriptions: RabbitMQSubscription[] = [
     chainEventsProcessorRmqSub,
-    chainCUDProcessorRmqSub,
   ];
 
   const serviceConsumer = new ServiceConsumer(
