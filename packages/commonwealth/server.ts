@@ -20,9 +20,6 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
-
-const log = factory.getLogger(formatFilename(__filename));
-
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache, {
   IdentityFetchCacheNew,
@@ -42,7 +39,8 @@ import setupPassport from './server/passport';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import {BrokerConfig} from "rascal";
-import {RepublishChains} from "./server/util/republishChains";
+
+const log = factory.getLogger(formatFilename(__filename));
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -258,9 +256,6 @@ async function main() {
     console.warn("The RabbitMQController is not initialized! Some services may be unavailable e.g. (Create/Delete chain and Websocket notifications")
     rollbar.critical("The main service RabbitMQController is not initialized!");
     // TODO: this requires an immediate response if in production
-  } else {
-    const republishChainsRunner = new RepublishChains(rabbitMQController, models);
-    republishChainsRunner.run()
   }
 
 

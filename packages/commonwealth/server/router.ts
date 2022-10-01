@@ -147,8 +147,6 @@ import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
-import {RabbitMQController} from "common-common/src/rabbitmq";
-import updateChainNode from "./routes/updateChainNode";
 import authCallback from './routes/authCallback';
 
 function setupRouter(
@@ -159,7 +157,6 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
-  rabbitMQController: RabbitMQController
 ) {
   const router = express.Router();
 
@@ -217,19 +214,13 @@ function setupRouter(
   router.post(
     '/createChain',
     passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models, rabbitMQController)
+    createChain.bind(this, models)
   );
-  router.post('/deleteChain', deleteChain.bind(this, models, rabbitMQController));
+  router.post('/deleteChain', deleteChain.bind(this, models));
   router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
-  );
-
-  router.post(
-    '/updateChainNode',
-    passport.authenticate('jwt', { session: false }),
-    updateChainNode.bind(this, models, rabbitMQController)
   );
 
   router.post(

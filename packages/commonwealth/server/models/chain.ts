@@ -22,7 +22,6 @@ export type ChainAttributes = {
   active: boolean;
   type: ChainType;
   chat_enabled: boolean;
-  queued: number;
   id?: string;
   description?: string;
   discord?: string;
@@ -134,7 +133,6 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
-      queued: {type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0}
     },
     {
       tableName: 'Chains',

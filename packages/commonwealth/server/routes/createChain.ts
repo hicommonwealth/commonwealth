@@ -18,7 +18,6 @@ import {AddressInstance} from '../models/address';
 import {mixpanelTrack} from '../util/mixpanelUtil';
 import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
 import {RoleAttributes, RoleInstance} from '../models/role';
-import {IRmqMsgCreateChainCUD, RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 
 import {AppError, ServerError} from 'common-common/src/errors';
 
@@ -72,7 +71,6 @@ type CreateChainResp = {
 
 const createChain = async (
   models: DB,
-  rabbitMQController: RabbitMQController,
   req: TypedRequestBody<CreateChainReq>,
   res: TypedResponse<CreateChainResp>,
   next: NextFunction
@@ -323,27 +321,6 @@ const createChain = async (
 
     chain.Contract = contract;
   }
-
-  const publishData: IRmqMsgCreateChainCUD = {
-    chain_id: chain.id,
-    base,
-    network,
-    active: true,
-    chain_node_url: node.private_url || node.url,
-    contract_address: address,
-    substrate_spec: sanitizedSpec || '',
-    cud: 'create-chain'
-  }
-
-  await rabbitMQController.safePublish(
-    publishData,
-    chain.id,
-    RascalPublications.ChainCUDChainEvents,
-    {
-      sequelize: models.sequelize,
-      model: models.Chain
-    }
-  );
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;

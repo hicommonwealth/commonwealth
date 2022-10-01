@@ -73,35 +73,6 @@ module.exports = {
                 transaction: t
             });
 
-            // format Chains table
-            await queryInterface.removeColumn('Chains',
-                'ce_verbose',
-                {transaction: t}
-            );
-            await queryInterface.removeColumn(
-                'Chains',
-                'has_chain_events_listener',
-                {transaction: t}
-            );
-            await queryInterface.addColumn(
-                'Chains',
-                'queued',
-                {type: Sequelize.SMALLINT},
-                {transaction: t}
-            );
-            await queryInterface.sequelize.query(`
-                UPDATE "Chains"
-                SET queued = -1;
-            `, {transaction: t});
-            await queryInterface.sequelize.query(`
-                ALTER TABLE "Chains"
-                    ALTER COLUMN queued SET DEFAULT 0;
-            `, {transaction: t});
-            await queryInterface.sequelize.query(`
-                ALTER TABLE "Chains"
-                    ALTER COLUMN queued SET NOT NULL;
-            `, {transaction: t});
-
             // make chain_event_id unique in notifications table
             await queryInterface.addConstraint('Notifications', {
                 name: 'Notifications_unique_chain_event_id',
