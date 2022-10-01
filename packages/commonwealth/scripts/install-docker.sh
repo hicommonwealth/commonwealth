@@ -7,17 +7,24 @@
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs/30969768#30969768
 # the -e option may need to be -E on Mac OS
 # shellcheck disable=SC2046
-export $(grep -v '^#' .env | xargs -d '\n' -e)
+if [[ $OSTYPE == 'darwin'* ]]; then
+  export $(grep -v '^#' .env | xargs)
+  else
+    export $(grep -v '^#' .env | xargs -d '\n' -e)
+fi
 
 # check that all required ENV var were properly loaded into the environment
 if [[ -z "$VULTR_IP" ]]; then
     echo "Must provide VULTR_IP in .env" 1>&2
     exit 1
+    elif [[ -z "$VULTR_USER" ]]; then
+      echo "Must provide VULTR_USER in .env" 1>&2
+      exit 1
 fi
 
 echo "Connecting to root@$VULTR_IP"
 # connect to the Vultr server on which the images will be loaded
-ssh root@"$VULTR_IP" /bin/bash << "EOF"
+ssh root@"$VULTR_IP" VULTR_USER="$VULTR_USER" /bin/bash << "EOF"
 echo "Connection Successful!"
 lsb_release -a
 
