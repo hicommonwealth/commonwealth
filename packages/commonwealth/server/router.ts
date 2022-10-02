@@ -580,7 +580,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
-  router.get('/viewChainIcons', viewChainIcons.bind(this, models));
+  router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
   router.post(
     '/markNotificationsRead',

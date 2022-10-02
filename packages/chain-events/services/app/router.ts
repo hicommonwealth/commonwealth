@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import passport from 'passport';
 import entities from "./routes/entities";
-import events from './routes/events';
+import eventActivity from './routes/eventActivity';
 import { DB } from "../database/database";
 
 /**
@@ -13,7 +13,7 @@ function setupRouter(models: DB): Router {
 
 
   router.get('/entities', entities.bind(this, models));
-  router.get('/events', events.bind(this, models));
+  router.get('/events', eventActivity.bind(this, models));
 
   router.get('/test', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
     return res.status(200).json({success: true})

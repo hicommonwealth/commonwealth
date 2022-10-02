@@ -91,17 +91,32 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    const activity = await getFetch(
+    const events = await getFetch(
       getBaseUrl(ServiceUrls.chainEvents) + '/events',
       {limit: 50, ordered: true}
     );
-    const result: { id: string, icon_url: string }[] = await getFetch(
-      getBaseUrl() + '/viewChainIcons',
-      {chains: activity.map(x => x.chain)}
+    let chains: any = new Set();
+    for (const event of events) {
+      chains.add(event.chain)
+    }
+
+    const res: {result: { id: string, icon_url: string }[], status: boolean} = await $.post(
+      `${app.serverUrl()}/viewChainIcons`,
+      {chains: JSON.stringify(Array.from(chains))}
     );
-    const chainIconUrls = result.reduce((obj, item) => (obj[item.id] = item.icon_url), {});
-    for (const item of activity) {
-      item.icon_url = chainIconUrls[item.chain];
+
+    const chainIconUrls = {}
+    for (const item of res.result) {
+      chainIconUrls[item.id] = item.icon_url
+    }
+
+    for (const event of events) {
+      events.icon_url = chainIconUrls[event.chain];
+    }
+
+    activity = {
+      status: 'Success',
+      result: events
     }
   } else if (requestType === DashboardViews.Global) {
     activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
