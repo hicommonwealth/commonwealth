@@ -34,7 +34,7 @@ async function setupMainConsumer() {
 
   const chainEntityCUDProcessorRmqSub: RabbitMQSubscription = {
     messageProcessor: processChainEntityCUD,
-    subscriptionName: RascalSubscriptions.ChainCUDChainEvents,
+    subscriptionName: RascalSubscriptions.ChainEntityCUDMain,
     msgProcessorContext: context,
   };
 

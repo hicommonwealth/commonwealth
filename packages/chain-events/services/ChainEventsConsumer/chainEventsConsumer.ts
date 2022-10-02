@@ -21,7 +21,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 /**
  * This functions initializes a single RabbitMQController instance and then subscribes to ChainCUD messages coming
- * from the {@link RascalSubscriptions.ChainCUDChainEvents} and the {@link RascalSubscriptions.ChainEvents}
+ * from the {@link RascalSubscriptions.ChainEvents}
  * subscriptions. This is equivalent The function also runs RepublishMessages which periodically republishes data stored in the database
  * that was previously unsuccessfully published.
  */

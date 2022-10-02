@@ -1,11 +1,12 @@
-import { Pool } from 'pg';
+import {Pool} from 'pg';
 import _ from 'underscore';
-import { BrokerConfig } from 'rascal';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { RascalPublications, getRabbitMQConfig } from 'common-common/src/rabbitmq';
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
-import { factory, formatFilename } from 'common-common/src/logging';
+import {BrokerConfig} from 'rascal';
+import {ChainBase, ChainNetwork} from 'common-common/src/types';
+import {RascalPublications, getRabbitMQConfig} from 'common-common/src/rabbitmq';
+import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import {factory, formatFilename} from 'common-common/src/logging';
 import {
+  CW_DATABASE_URI,
   DATABASE_URI,
   NUM_WORKERS,
   RABBITMQ_URI,
@@ -18,10 +19,10 @@ import {
   manageErcListeners,
   manageRegularListeners,
 } from './util';
-import { IListenerInstances } from './types';
+import {ChainAttributes, IListenerInstances} from './types';
 import Rollbar from 'rollbar';
 import models from '../database/database';
-import { QueryTypes } from 'sequelize';
+import {QueryTypes} from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,6 +30,8 @@ const listenerInstances: IListenerInstances = {};
 let pool: Pool;
 let producer: RabbitMqHandler;
 let rollbar: Rollbar;
+
+
 
 /**
  * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
@@ -49,22 +52,39 @@ async function mainProcess(
     log.info("No active listeners");
   }
 
-
   // selects the chain data needed to create the listeners for the current chainSubscriber
-  const allChainsAndTokens: any = await models.sequelize.query(`
-      WITH allChains AS (
-          SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS index FROM "Chains" WHERE active = True
-      ) SELECT allChains.id,
-               allChains.substrate_spec,
-               allChains.contract_address,
-               allChains.network,
-               allChains.base,
-               allChains.verbose_logging,
-               JSON_BUILD_OBJECT('id', "ChainNodes".id, 'url', "ChainNodes".url) as "ChainNode"
+  const query = `
+      WITH allChains AS (SELECT "Chains".id,
+                                "Chains".substrate_spec,
+                                "Chains".network,
+                                "Chains".base,
+                                "Chains".ce_verbose,
+                                "ChainNodes".id                          as chain_node_id,
+                                "ChainNodes".private_url,
+                                "ChainNodes".url,
+                                "Contracts".address,
+                                ROW_NUMBER() OVER (ORDER BY "Chains".id) AS index
+                         FROM "Chains"
+                                  JOIN "ChainNodes" ON "Chains".chain_node_id = "ChainNodes".id
+                                  LEFT JOIN "CommunityContracts" cc
+                                            ON cc.chain_id = "Chains".id
+                                  LEFT JOIN "Contracts"
+                                            ON "Contracts".id = cc.contract_id
+                         WHERE "Chains"."has_chain_events_listener" = true
+                           AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
+                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
+      SELECT allChains.id,
+             allChains.substrate_spec,
+             allChains.address                                                 as contract_address,
+             allChains.network,
+             allChains.base,
+             allChains.ce_verbose                                              as verbose_logging,
+             JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
+                               COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
       FROM allChains
-               JOIN "ChainNodes" ON allChains.chain_node_id = "ChainNodes".id
-      WHERE MOD(allChains.index, ?) = ?;
-  `, { replacements: [NUM_WORKERS, WORKER_NUMBER], raw: true, type: QueryTypes.SELECT });
+      WHERE MOD(allChains.index, 1) = 0;
+  `;
+  const allChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
 
   const erc20Tokens = [];
   const erc721Tokens = [];
@@ -87,7 +107,7 @@ async function mainProcess(
   await manageErcListeners(ChainNetwork.ERC20, erc20ByUrl, listenerInstances, producer, rollbar);
   await manageErcListeners(ChainNetwork.ERC721, erc721ByUrl, listenerInstances, producer, rollbar);
 
-  await manageRegularListeners(chains, listenerInstances, pool, producer, rollbar);
+  await manageRegularListeners(chains, listenerInstances, producer, rollbar);
 
   log.info('Finished scheduled process.');
   if (process.env.TESTING) {
@@ -112,7 +132,7 @@ async function initializer(): Promise<void> {
 
   // setup sql client pool
   pool = new Pool({
-    connectionString: DATABASE_URI,
+    connectionString: CW_DATABASE_URI,
     ssl: process.env.NODE_ENV !== 'production' ? false : {
       rejectUnauthorized: false,
     },

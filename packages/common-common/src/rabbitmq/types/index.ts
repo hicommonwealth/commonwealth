@@ -29,7 +29,6 @@ export type TRmqMessages =
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
-  ChainCUDChainEvents = 'ChainCUDChainEventsPublication',
   ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
@@ -38,7 +37,6 @@ export enum RascalPublications {
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
-  ChainCUDChainEvents = 'ChainCUDChainEventsSubscription',
   ChainEntityCUDMain = 'ChainEntityCUDMainSubscription',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
@@ -54,7 +52,6 @@ export enum RascalExchanges {
 
 export enum RascalQueues {
   ChainEvents = 'ChainEventsQueue',
-  ChainCUDChainEvents = 'ChainCUDChainEventsQueue',
   ChainEntityCUDMain = 'ChainEntityCUDMainQueue',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
   ChainEventNotifications = 'ChainEventNotificationsQueue',

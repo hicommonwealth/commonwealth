@@ -207,14 +207,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
             'prefetch': 10,
           },
-          [RascalSubscriptions.ChainCUDChainEvents]: {
-            'queue': RascalQueues.ChainCUDChainEvents,
-            'contentType': 'application/json',
-            'retry': {
-              'delay': 1000
-            },
-            'prefetch': 10,
-          },
           [RascalSubscriptions.ChainEntityCUDMain]: {
             'queue': RascalQueues.ChainEntityCUDMain,
             'contentType': 'application/json',

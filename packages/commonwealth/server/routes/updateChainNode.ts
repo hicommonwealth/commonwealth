@@ -1,6 +1,6 @@
 import {DB} from "../database";
 import {NextFunction, Request, Response} from "express";
-import {IRmqMsgUpdateChainNodeCUD, RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
+import {RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 import {success} from "../types";
 
 const Errors = {
@@ -29,12 +29,12 @@ const updateChainNode = async (
   const {url, eth_chain_id, alt_wallet_url, private_url, balance_type, name, description} = req.body
 
   if (url || private_url) {
-    const publishData: IRmqMsgUpdateChainNodeCUD = {
-      new_url: private_url || url,
-      old_url: chainNode.private_url || chainNode.private_url,
-      cud: 'update-chainNode'
-    }
-    await rabbitMQController.publish(publishData, RascalPublications.ChainCUDChainEvents);
+    // const publishData: IRmqMsgUpdateChainNodeCUD = {
+    //   new_url: private_url || url,
+    //   old_url: chainNode.private_url || chainNode.private_url,
+    //   cud: 'update-chainNode'
+    // }
+    // await rabbitMQController.publish(publishData, RascalPublications.ChainCUDChainEvents);
   }
 
   if (url) chainNode.url = url;

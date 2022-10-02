@@ -8,13 +8,11 @@ import {
   SupportedNetwork,
 } from '../../src';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { Pool } from 'pg';
-import format from 'pg-format';
-import { IListenerInstances } from './types';
-import { ChainAttributes } from '../database/models/chain';
+import {ChainAttributes, IListenerInstances} from './types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
 import Rollbar from 'rollbar';
+import models, {DB} from "../database/database";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -154,14 +152,12 @@ export async function manageErcListeners(
  * ERC721 listeners.
  * @param chains A list of new chains to create listener instances for
  * @param listenerInstances An object containing all the currently active listener instances
- * @param pool A PG pool instance used by the discoverReconnectRange function
  * @param producer An instance of RabbitMqHandler which is one of the event handlers
  * @param rollbar An instance of rollbar for error reporting
  */
 export async function manageRegularListeners(
   chains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  pool: Pool,
   producer: RabbitMqHandler,
   rollbar: Rollbar
 ) {
@@ -195,7 +191,6 @@ export async function manageRegularListeners(
   await setupNewListeners(
     newChains,
     listenerInstances,
-    pool,
     producer,
     rollbar
   );
@@ -213,14 +208,12 @@ export async function manageRegularListeners(
  * event handlers.
  * @param newChains A list of new chains to create listener instances for
  * @param listenerInstances An object containing all the currently active listener instances
- * @param pool A PG pool instance used by the discoverReconnectRange function
  * @param producer An instance of RabbitMqHandler which is one of the event handlers
  * @param rollbar An instance of rollbar for error reporting
  */
 async function setupNewListeners(
   newChains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  pool: Pool,
   producer: RabbitMqHandler,
   rollbar: Rollbar
 ) {
@@ -236,6 +229,7 @@ async function setupNewListeners(
       network = SupportedNetwork.Moloch;
 
     try {
+      log.info(`Starting listener for: ${chain.id}`);
       listenerInstances[chain.id] = await createListener(chain.id, network, {
         address: chain.contract_address,
         archival: false,
@@ -244,7 +238,7 @@ async function setupNewListeners(
         skipCatchup: false,
         verbose: false, // using this will print event before chain is added to it
         enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-        discoverReconnectRange: discoverReconnectRange.bind({ pool }),
+        discoverReconnectRange: discoverReconnectRange.bind(models),
       });
     } catch (error) {
       delete listenerInstances[chain.id];
@@ -279,6 +273,10 @@ async function setupNewListeners(
         excludedEvents,
       };
     }
+
+    // subscribe the listener to its chain/RPC if it isn't yet subscribed
+    log.info(`Subscribing listener: ${chain.id}`);
+    await listenerInstances[chain.id].subscribe();
   }
 }
 
@@ -358,54 +356,34 @@ export function getListenerNames(
  * e.g. discoverReconnectRange.bind({ pool })
  * @param chain
  */
-async function discoverReconnectRange(chain: string) {
-  if (!this?.pool) {
-    log.info(
-      `[${chain}]: Cannot discover reconnect range because pg-pool is undefined!`
-    );
-    return;
-  }
-
+async function discoverReconnectRange(this: DB, chain: string) {
   let latestBlock;
   try {
-    // eslint-disable-next-line max-len
-    const eventTypes = (
-      await this.pool.query(
-        format('SELECT "id" FROM "ChainEventTypes" WHERE "chain"=%L', chain)
-      )
-    ).rows.map((obj) => obj.id);
+    const eventTypes = (await this.ChainEventType.findAll({
+      where: { chain }
+    })).map(x => x.id);
     if (eventTypes.length === 0) {
       log.info(
         `[${chain}]: No events in database to get last block number from`
       );
       return { startBlock: null };
     }
-    // eslint-disable-next-line max-len
-    latestBlock = (
-      await this.pool.query(
-        format(
-          'SELECT MAX("block_number") FROM "ChainEvents" WHERE "chain_event_type_id" IN (%L)',
-          eventTypes
-        )
-      )
-    ).rows;
+    latestBlock = await this.ChainEvent.max('block_number', {
+      where: {
+        chain_event_type_id: eventTypes
+      }
+    });
   } catch (error) {
     log.warn(
       `[${chain}]: An error occurred while discovering offline time range`,
       error
     );
   }
-  if (
-    latestBlock &&
-    latestBlock.length > 0 &&
-    latestBlock[0] &&
-    latestBlock[0].max
-  ) {
-    const lastEventBlockNumber = latestBlock[0].max;
+  if (latestBlock) {
     log.info(
-      `[${chain}]: Discovered chain event in db at block ${lastEventBlockNumber}.`
+      `[${chain}]: Discovered chain event in db at block ${latestBlock}.`
     );
-    return { startBlock: lastEventBlockNumber + 1 };
+    return { startBlock: latestBlock + 1 };
   } else {
     return { startBlock: null };
   }

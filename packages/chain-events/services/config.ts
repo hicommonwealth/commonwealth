@@ -7,6 +7,10 @@ export const DATABASE_URI =
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'
     : process.env.DATABASE_URL;
 
+export const CW_DATABASE_URI = !process.env.CW_DATABASE_URL || process.env.NODE_ENV === 'development'
+  ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+  : process.env.CW_DATABASE_URL;
+
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
 export const RABBITMQ_URI = (() => {

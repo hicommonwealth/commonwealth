@@ -190,7 +190,7 @@ export class RabbitMQController {
       });
     } catch (e) {
       if (e instanceof RabbitMQControllerError) {
-        log.error(`RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${RascalPublications.ChainCUDChainEvents}.`, e);
+        log.error(`RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${publication}.`, e);
         // if this fails once not much damage is done since the message is re-queued later again anyway
         (<any>(await DB.model)).increment("queued", {where: {id: objectId}});
       } else {
