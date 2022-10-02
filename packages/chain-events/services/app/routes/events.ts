@@ -3,12 +3,12 @@ import { DB } from '../../database/database';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
-  NeedChainOrType: 'Must provide a chain or event type to fetch entities from',
+  NeedChainTypeOrLimit: 'Must provide a chain, an event type, or a limit to fetch events',
 };
 
 const events = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  if (!req.query.chain && !req.query.chain_event_type_id) {
-    return next(new AppError(Errors.NeedChainOrType));
+  if (!req.query.chain && !req.query.chain_event_type_id && !req.query.limit) {
+    return next(new AppError(Errors.NeedChainTypeOrLimit));
   }
 
   const eventTypeOptions: any = {}

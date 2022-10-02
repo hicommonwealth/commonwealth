@@ -270,7 +270,6 @@ async function main() {
     tokenBalanceCache,
     ruleCache,
     banCache,
-    rabbitMQController
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);

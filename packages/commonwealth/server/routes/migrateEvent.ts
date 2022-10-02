@@ -1,10 +1,9 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from '../util/errors';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../database';
 import {
-  migrateChainEntities,
-  migrateChainEntity,
+  runEntityMigrations,
 } from '../scripts/migrateChainEntities';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -43,7 +42,7 @@ const migrateEvent = async (
 
   if (migrateAll && migrateAll === true) {
     try {
-      await migrateChainEntities();
+      await runEntityMigrations();
     } catch (e) {
       throw new AppError(MigrateEventErrors.AllError);
     }
@@ -55,7 +54,7 @@ const migrateEvent = async (
   }
 
   try {
-    await migrateChainEntity(chain_id);
+    await runEntityMigrations(chain_id);
   } catch (e) {
     log.error(e.message);
     throw new AppError(MigrateEventErrors.ChainError);

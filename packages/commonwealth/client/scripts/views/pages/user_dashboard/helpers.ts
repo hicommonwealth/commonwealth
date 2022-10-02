@@ -4,12 +4,13 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { NotificationCategories } from 'common-common/src/types';
-import { NotificationSubscription } from 'models';
-import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
-import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
-import { notifySuccess } from 'controllers/app/notifications';
-import { DashboardViews } from '.';
+import {NotificationCategories} from 'common-common/src/types';
+import {NotificationSubscription} from 'models';
+import {QuillFormattedText} from 'views/components/quill/quill_formatted_text';
+import {MarkdownFormattedText} from 'views/components/quill/markdown_formatted_text';
+import {notifySuccess} from 'controllers/app/notifications';
+import {DashboardViews} from '.';
+import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
 
 export const getCommentPreview = (commentText) => {
   // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there
@@ -90,7 +91,18 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    activity = await $.post(`${app.serverUrl()}/viewChainActivity`);
+    const activity = await getFetch(
+      getBaseUrl(ServiceUrls.chainEvents) + '/events',
+      {limit: 50, ordered: true}
+    );
+    const result: { id: string, icon_url: string }[] = await getFetch(
+      getBaseUrl() + '/viewChainIcons',
+      {chains: activity.map(x => x.chain)}
+    );
+    const chainIconUrls = result.reduce((obj, item) => (obj[item.id] = item.icon_url), {});
+    for (const item of activity) {
+      item.icon_url = chainIconUrls[item.chain];
+    }
   } else if (requestType === DashboardViews.Global) {
     activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
   }

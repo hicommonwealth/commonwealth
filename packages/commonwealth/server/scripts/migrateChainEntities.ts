@@ -10,23 +10,24 @@ import {
   CompoundEvents,
   AaveEvents,
   IDisconnectedRange,
-} from '../src';
+} from 'chain-events/src';
 
-import models from '../services/database/database';
-import MigrationHandler from '../services/ChainEventsConsumer/ChainEventHandlers/migration';
-import EntityArchivalHandler from '../services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
+import cwModels from '../database';
+import ceModels from 'chain-events/services/database/database'
+import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
+import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
+import { constructSubstrateUrl } from '../../shared/substrate';
 import {BrokerConfig} from "rascal";
-import {RABBITMQ_URI} from "../services/config";
+import {RABBITMQ_URI} from "../config";
 import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq'
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const CHAIN_ID = process.env.CHAIN_ID;
 
-export async function migrateChainEntity(chain: string, rmqController: RabbitMQController): Promise<void> {
+async function migrateChainEntity(chain: string, rmqController: RabbitMQController): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
   if (!chain) {
@@ -34,13 +35,13 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
   }
 
   // query one node for each supported chain
-  const chainInstance = await models.Chain.findOne({
+  const chainInstance = await cwModels.Chain.findOne({
     where: { id: chain },
   });
   if (!chainInstance) {
     throw new Error('no chain found for chain entity migration');
   }
-  const node = await models.ChainNode.findOne({
+  const node = await cwModels.ChainNode.findOne({
     where: { id: chainInstance.chain_node_id },
   });
   if (!node) {
@@ -50,8 +51,8 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
   // 2. for each node, fetch and migrate chain entities
   log.info(`Fetching and migrating chain entities for: ${chain}`);
   try {
-    const migrationHandler = new MigrationHandler(models, rmqController, chain);
-    const entityArchivalHandler = new EntityArchivalHandler(models, rmqController, chain);
+    const migrationHandler = new MigrationHandler(ceModels, rmqController, chain);
+    const entityArchivalHandler = new EntityArchivalHandler(ceModels, rmqController, chain);
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
@@ -68,7 +69,7 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
       throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const contracts = await chainInstance.getContracts({
-        include: [{ model: models.ChainNode, required: true }],
+        include: [{ model: cwModels.ChainNode, required: true }],
       });
       const api = await CompoundEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
@@ -78,7 +79,7 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.Aave) {
       const contracts = await chainInstance.getContracts({
-        include: [{ model: models.ChainNode, required: true }],
+        include: [{ model: cwModels.ChainNode, required: true }],
       });
       const api = await AaveEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
@@ -108,8 +109,8 @@ export async function migrateChainEntity(chain: string, rmqController: RabbitMQC
   }
 }
 
-export async function migrateChainEntities(rmqController: RabbitMQController): Promise<void> {
-  const chains = await models.Chain.findAll({
+async function migrateChainEntities(rmqController: RabbitMQController): Promise<void> {
+  const chains = await cwModels.Chain.findAll({
     where: {
       active: true
     },
@@ -119,7 +120,7 @@ export async function migrateChainEntities(rmqController: RabbitMQController): P
   }
 }
 
-export async function runMigrations() {
+export async function runEntityMigrations(chainId?: string) {
   // "all" means run for all supported chains, otherwise we pass in the name of
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');
@@ -139,7 +140,7 @@ export async function runMigrations() {
   }
 
   try {
-    if (CHAIN_ID) await migrateChainEntity(CHAIN_ID, rmqController)
+    if (CHAIN_ID || chainId) await migrateChainEntity(CHAIN_ID || chainId, rmqController)
     else await migrateChainEntities(rmqController)
     log.info('Finished migrating chain entities into the DB');
     process.exit(0);
