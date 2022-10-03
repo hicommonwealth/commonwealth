@@ -22,7 +22,6 @@ import {
 } from './admin_modals';
 import {
   ToggleTree,
-  MobileSidebarSectionAttrs,
   SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
@@ -53,9 +52,7 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class ChatSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
-{
+export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
   channels: {
     [category: string]: IChannel[];
   };
@@ -427,6 +424,7 @@ export class ChatSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Chat',
+      className: 'ChatSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

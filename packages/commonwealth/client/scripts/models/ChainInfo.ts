@@ -39,6 +39,7 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
+  public chatEnabled: boolean;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -75,6 +76,7 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
+    chatEnabled,
     decimals,
     substrateSpec,
     ChainNode,
@@ -104,6 +106,7 @@ class ChainInfo {
     this.defaultSummaryView = defaultSummaryView;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.chatEnabled = chatEnabled;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
@@ -139,6 +142,7 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
+    chat_enabled,
     decimals,
     substrate_spec,
     token_name,
@@ -178,6 +182,7 @@ class ChainInfo {
       ss58_prefix,
       bech32_prefix,
       type,
+      chatEnabled: chat_enabled,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
@@ -258,6 +263,7 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultSummaryView,
+    chatEnabled,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -272,6 +278,7 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
+      chat_enabled: chatEnabled,
       snapshot,
       terms,
       icon_url: iconUrl,
@@ -293,6 +300,7 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
+    this.chatEnabled = updatedChain.chat_enabled;
   }
 
   public getAvatar(size: number) {
