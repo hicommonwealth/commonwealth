@@ -148,6 +148,7 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
+import getRules from './routes/rules/getRules';
 
 function setupRouter(
   app: Express,
@@ -668,6 +669,11 @@ function setupRouter(
 
   // rules
   router.post(
+    '/getRules',
+    passport.authenticate('jwt', { session: false }),
+    getRules.bind(this, models)
+  );
+  router.post(
     '/createRule',
     passport.authenticate('jwt', { session: false }),
     createRule.bind(this, models)
@@ -775,7 +781,7 @@ function setupRouter(
   router.get(
     '/auth/callback',
     passport.authenticate('jwt', { session: false }),
-    authCallback.bind(this, models),
+    authCallback.bind(this, models)
   );
 
   // logout

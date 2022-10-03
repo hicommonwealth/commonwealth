@@ -22,6 +22,7 @@ import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import RulesController from './controllers/server/rules';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -47,6 +48,9 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
+
+  // Rules
+  rules: RulesController;
 
   // Threads
   threads: ThreadsController;
@@ -127,6 +131,9 @@ const app: IApp = {
   // need many max listeners because every account will wait on this
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
+
+  // Rules
+  rules: new RulesController(),
 
   // Thread
   threads: new ThreadsController(),
