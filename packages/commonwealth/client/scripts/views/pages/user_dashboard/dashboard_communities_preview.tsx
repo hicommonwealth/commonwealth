@@ -95,16 +95,6 @@ export class DashboardCommunitiesPreview implements m.ClassComponent {
           }}
           label="View more communities"
         />
-        <CWButton
-          onclick={async () => {
-            try {
-              app.rules.refresh();
-            } catch (e) {
-              console.log(e);
-            }
-          }}
-          label="View more communities"
-        />
       </div>
     );
   }

@@ -23,10 +23,11 @@ const getRules = async (
   res: TypedResponse<getRulesResp>
 ) => {
   const { chain_id } = req.body;
+  console.log('res', req.body);
 
   // Check if chain exists
   if (!chain_id) throw new AppError(GetRulesError.NoChain);
-  const [chain, error] = await validateChain(models, { chain_id });
+  const [_, error] = await validateChain(models, { chain_id });
 
   if (error) throw new AppError(GetRulesError.NoChainFound);
 

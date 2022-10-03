@@ -6,7 +6,7 @@ class Rule {
   public readonly rule: Record<string, unknown>;
   public readonly createdAt: Date;
   public readonly updatedAt: Date;
-  public readonly chain: ChainInfo;
+  // public readonly chain: ChainInfo;
 
   public constructor({
     id,
@@ -14,21 +14,21 @@ class Rule {
     rule,
     createdAt,
     updatedAt,
-    chain,
-  }: {
+  }: // chain,
+  {
     id: number;
     chainId: string;
     rule: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
-    chain: ChainInfo;
+    // chain: ChainInfo;
   }) {
     this.id = id;
     this.chainId = chainId;
     this.rule = rule;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.chain = chain;
+    // this.chain = chain;
   }
 }
 
