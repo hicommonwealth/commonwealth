@@ -48,7 +48,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
-import DaoFactoryController from 'controllers/chain/ethereum/daoFactory';
+import DaoFactoryController from 'client/scripts/controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';

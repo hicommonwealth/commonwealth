@@ -22,15 +22,14 @@ type CreateFactoryEthDaoForm = ChainFormFields &
   EthFormFields &
   EthDaoFormFields;
 
-export default class DaoFactoryController {
+export default class GeneralContractsController {
   public chain: EthereumChain;
   public contract: Contract;
   public web3Contract: Web3Contract;
+  public isFactory: boolean;
 
   constructor(chain: EthereumChain, contract: Contract) {
-    if (!contract.isFactory) {
-      throw new Error('Contract is not a factory');
-    }
+    this.isFactory = contract.isFactory;
     this.chain = chain;
     this.contract = contract;
     try {
@@ -45,6 +44,42 @@ export default class DaoFactoryController {
     } catch (error) {
       console.error('Failed to create DaoFactory controller', error);
     }
+  }
+
+  public async callContractFunction(
+    fn: AbiItem,
+    processedArgs: any[],
+    wallet: IWebWallet<any>
+  ) {
+    const methodSignature = `${fn.name}(${fn.inputs
+      .map((input) => input.type)
+      .join(',')})`;
+
+    const functionContract = this.web3Contract;
+    const chain = this.chain;
+    const contract = this.contract;
+
+    const functionTx = functionContract.methods[methodSignature](
+      ...processedArgs
+    );
+    let tx;
+    if (fn.stateMutability !== 'view' && fn.constant !== true) {
+      // Sign Tx with PK if not view function
+      chain
+        .makeContractTx(contract.address, functionTx.encodeABI(), wallet)
+        .then(async (txReceipt) => {
+          console.log('txReceipt', txReceipt);
+          tx = txReceipt;
+        });
+    } else {
+      // send transaction
+      tx = await chain.makeContractCall(
+        contract.address,
+        functionTx.encodeABI(),
+        wallet
+      );
+    }
+    return tx;
   }
 
   public async createDao(

@@ -21,6 +21,7 @@ import {
   parseFunctionsFromABI,
   getEtherscanABI,
 } from 'helpers/abi_utils';
+import GeneralContractsController from 'controllers/chain/ethereum/general_contracts';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -37,6 +38,7 @@ type CreateContractState = ChainFormState & {
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
+  generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
     message: '',
     loaded: false,
@@ -74,29 +76,6 @@ class GeneralContractPage
   view(vnode) {
     const Bytes32 = ethers.utils.formatBytes32String;
 
-    const getWeb3 = async (): Promise<Web3> => {
-      // Initialize Chain
-      const ethChain = app.chain.chain as EthereumChain;
-
-      const currChain = app.chain;
-      const currNode = currChain.meta.ChainNode;
-      const web3Api = await ethChain.initApi(currNode);
-      return web3Api;
-    };
-
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-      const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
-      const web3Api = await getWeb3();
-      const web3Contract: Web3Contract = new web3Api.eth.Contract(
-        parseAbiItemsFromABI(contract.abi),
-        contractAddress
-      );
-      return web3Contract;
-    };
-
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
@@ -124,50 +103,39 @@ class GeneralContractPage
           .get(index);
       });
 
-      const functionContract = await getWeb3Contract();
+      const contract = app.contracts.getByAddress(contractAddress);
 
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
+      try {
+        // initialize daoFactory Controller
+        const ethChain = app.chain.chain as EthereumChain;
 
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
+        this.generalContractsController = new GeneralContractsController(
+          ethChain,
+          contract
+        );
 
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
-      const sender = app.user.activeAccount;
-      //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
-      );
+        const sender = app.user.activeAccount;
+        //   // get querying wallet
+        const signingWallet = await app.wallets.locateWallet(
+          sender,
+          ChainBase.Ethereum
+        );
 
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
-
-      const web3Api = await getWeb3();
-      let tx: string;
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        // Sign Tx with PK if not view function
-        chain
-          .makeContractTx(
-            contractAddress,
-            functionTx.encodeABI(),
-            signingWallet
-          )
-          .then((txReceipt) => {
-            console.log('txReceipt', txReceipt);
-          });
-      } else {
-        // send transaction
-        tx = await chain.makeContractCall(
-          contractAddress,
-          functionTx.encodeABI(),
+        const tx = this.generalContractsController.callContractFunction(
+          fn,
+          processedArgs,
           signingWallet
         );
+      } catch (err) {
+        notifyError(
+          err.responseJSON?.error ||
+            'Creating new ETH DAO Factory based community failed'
+        );
+      } finally {
+        this.state.saving = false;
       }
+
+      let tx: string;
       // simple return type
       if (fn.outputs.length === 1) {
         const decodedTx = web3Api.eth.abi.decodeParameter(
