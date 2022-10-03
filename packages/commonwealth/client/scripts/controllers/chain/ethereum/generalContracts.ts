@@ -34,7 +34,7 @@ export default class GeneralContractsController {
     this.contract = contract;
     try {
       let nodeObj: NodeInfo;
-      if (this.chain.app.chain.meta.node) {
+      if (this.chain.app.chain) {
         nodeObj = this.chain.app.chain.meta.node;
       } else {
         nodeObj = this.chain.app.config.nodes.getNodesByChainId(
@@ -148,43 +148,44 @@ export default class GeneralContractsController {
     if (contract.nickname === 'curated-factory-goerli') {
       const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
       // Sign Tx with PK if not view function
-      chain
-        .makeContractTx(contract.address, functionTx.encodeABI(), wallet)
-        .then(async (txReceipt) => {
-          console.log('txReceipt', txReceipt);
-          const decodedLog = chain.api.eth.abi.decodeLog(
-            eventAbiItem.inputs,
-            txReceipt.logs[0].data,
-            txReceipt.logs[0].topics
-          );
-          console.log('decodedLog', decodedLog);
-          console.log('state.form.address', decodedLog.projectAddress);
-          try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
-              base: ChainBase.Ethereum,
-              chain_string: daoForm.chainString,
-              eth_chain_id: daoForm.ethChainId,
-              jwt: app.user.jwt,
-              node_url: daoForm.nodeUrl,
-              token_name: daoForm.tokenName,
-              type: ChainType.DAO,
-              default_symbol: daoForm.symbol,
-              address: decodedLog.projectAddress,
-              ...daoForm,
-            });
-            if (res.result.admin_address) {
-              await linkExistingAddressToChainOrCommunity(
-                res.result.admin_address,
-                res.result.role.chain_id,
-                res.result.role.chain_id
-              );
-            }
-            // TODO: notify about needing to run event migration
-            m.route.set(`/${res.result.chain?.id}`);
-          } catch (err) {
-            throw new Error(err);
-          }
+      const txReceipt = await chain.makeContractTx(
+        contract.address,
+        functionTx.encodeABI(),
+        wallet
+      );
+      console.log('txReceipt', txReceipt);
+      const decodedLog = chain.api.eth.abi.decodeLog(
+        eventAbiItem.inputs,
+        txReceipt.logs[0].data,
+        txReceipt.logs[0].topics
+      );
+      console.log('decodedLog', decodedLog);
+      console.log('state.form.address', decodedLog.projectAddress);
+      try {
+        const res = await $.post(`${app.serverUrl()}/createChain`, {
+          base: ChainBase.Ethereum,
+          chain_string: daoForm.chainString,
+          eth_chain_id: daoForm.ethChainId,
+          jwt: app.user.jwt,
+          node_url: daoForm.nodeUrl,
+          token_name: daoForm.tokenName,
+          type: ChainType.DAO,
+          default_symbol: daoForm.symbol,
+          address: decodedLog.projectAddress,
+          ...daoForm,
         });
+        if (res.result.admin_address) {
+          await linkExistingAddressToChainOrCommunity(
+            res.result.admin_address,
+            res.result.role.chain_id,
+            res.result.role.chain_id
+          );
+        }
+        // TODO: notify about needing to run event migration
+        m.route.set(`/${res.result.chain?.id}`);
+      } catch (err) {
+        throw new Error(err);
+      }
     }
   }
 }
