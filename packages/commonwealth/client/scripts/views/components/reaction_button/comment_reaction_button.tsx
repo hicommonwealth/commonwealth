@@ -1,19 +1,21 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { Comment, ChainInfo } from 'models';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
+import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { getClasses } from '../component_kit/helpers';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
 
 type CommentReactionButtonAttrs = {
   comment: Comment<any>;
@@ -87,39 +89,50 @@ export class CommentReactionButton
         });
     };
 
-    const reactionButtonComponent = (
+    const countsComponent = (
+      <CWText class="menu-buttons-text" className="menu-buttons-text">
+        {likes}
+      </CWText>
+    );
+
+    return (
       <div
+        class={getClasses<{ disabled?: boolean }>(
+          { disabled: this.loading },
+          'CommentReactionButton'
+        )}
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(comment);
         }}
-        onclick={async (e) =>
-          onReactionClick(e, hasReacted, dislike, like, comment)
-        }
-        class={`CommentReactionButton${this.loading ? ' disabled' : ''}${
-          hasReacted ? ' has-reacted' : ''
-        }`}
       >
-        <CWIcon iconName={hasReacted ? 'heartFilled' : 'heartEmpty'} />
-        <div class="reactions-count">{likes}</div>
+        <CWIconButton
+          iconName="upvote"
+          iconSize="small"
+          selected={hasReacted}
+          onclick={async (e) =>
+            onReactionClick(e, hasReacted, dislike, like, comment)
+          }
+        />
+        {likes > 0 ? (
+          <CWTooltip
+            interactionType="hover"
+            tooltipContent={
+              <div class="reaction-button-tooltip-contents">
+                {getDisplayedReactorsForPopup({
+                  likes,
+                  reactors: this.reactors,
+                })}
+              </div>
+            }
+            trigger={countsComponent}
+            hoverOpenDelay={100}
+            tooltipType="bordered"
+          />
+        ) : (
+          countsComponent
+        )}
+        <CWIconButton iconName="downvote" iconSize="small" disabled />
       </div>
-    );
-
-    return likes > 0 ? (
-      <Popover
-        interactionType="hover"
-        content={
-          <div class="reaction-button-tooltip-contents">
-            {getDisplayedReactorsForPopup({
-              likes,
-              reactors: this.reactors,
-            })}
-          </div>
-        }
-        trigger={reactionButtonComponent}
-        hoverOpenDelay={100}
-      />
-    ) : (
-      reactionButtonComponent
     );
   }
 }
