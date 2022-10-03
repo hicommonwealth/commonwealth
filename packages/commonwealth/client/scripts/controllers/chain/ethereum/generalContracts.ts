@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import { Contract, NodeInfo, IWebWallet } from 'models';
-import { TransactionReceipt } from 'web3-core';
+import { initAppState } from 'app';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
@@ -181,6 +181,7 @@ export default class GeneralContractsController {
             res.result.role.chain_id
           );
         }
+        await initAppState(false);
         // TODO: notify about needing to run event migration
         m.route.set(`/${res.result.chain?.id}`);
       } catch (err) {
