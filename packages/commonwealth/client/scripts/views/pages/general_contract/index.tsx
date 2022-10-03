@@ -4,6 +4,7 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
+import { Spinner } from 'construct-ui';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import Ethereum from 'controllers/chain/ethereum/main';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -78,6 +79,7 @@ class GeneralContractPage
     const Bytes32 = ethers.utils.formatBytes32String;
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      this.state.loading = true;
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
@@ -132,14 +134,23 @@ class GeneralContractPage
         notifyError(
           err.responseJSON?.error || `Calling Function ${fn.name} failed`
         );
-      } finally {
-        this.state.saving = false;
+        this.state.status = 'failure';
+        this.state.message = err.message;
+        this.state.loading = false;
+        m.redraw();
+        return;
       }
+
+      this.state.saving = false;
       const result = this.generalContractsController.decodeTransactionData(
         fn,
         tx
       );
       this.state.functionNameToFunctionOutput.set(fn.name, result);
+
+      this.state.loaded = true;
+      this.state.loading = false;
+      m.redraw();
     };
 
     const loadContractAbi = () => {
@@ -297,6 +308,7 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
+                            {this.state.loading && <Spinner active />}
                             <CWText>
                               {fnOutputArray && fnOutputArray[i].toString()
                                 ? fnOutputArray[i].toString()
