@@ -33,9 +33,14 @@ export default class GeneralContractsController {
     this.chain = chain;
     this.contract = contract;
     try {
-      const nodeObj: NodeInfo = this.chain.app.config.nodes.getNodesByChainId(
-        this.contract.chainNodeId
-      );
+      let nodeObj: NodeInfo;
+      if (this.chain.app.chain.meta.node) {
+        nodeObj = this.chain.app.chain.meta.node;
+      } else {
+        nodeObj = this.chain.app.config.nodes.getNodesByChainId(
+          this.contract.chainNodeId
+        );
+      }
       this.chain._initApi(nodeObj);
       this.web3Contract = new this.chain.api.eth.Contract(
         parseAbiItemsFromABI(this.contract.abi),

@@ -121,11 +121,14 @@ class GeneralContractPage
           ChainBase.Ethereum
         );
 
+        console.log('signing wallet is ', signingWallet);
+
         tx = await this.generalContractsController.callContractFunction(
           fn,
           processedArgs,
           signingWallet
         );
+        console.log('tx is ', tx);
       } catch (err) {
         notifyError(
           err.responseJSON?.error ||
