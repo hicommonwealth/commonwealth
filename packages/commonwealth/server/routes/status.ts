@@ -110,6 +110,7 @@ const status = async (
     const roles = await models.Role.findAll({
       where: {
         address_id: { [Op.in]: myAddressIds },
+        chain_id: { [Op.in]: chains.map((c) => c.id)}
       },
       include: [models.Address],
     });
