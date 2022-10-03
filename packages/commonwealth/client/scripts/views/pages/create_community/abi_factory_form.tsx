@@ -53,6 +53,7 @@ import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { Spinner } from 'construct-ui';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -104,8 +105,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     const disableField = !this.state.loaded;
 
     const createDao = async (nickname: string, fn: AbiItem) => {
-      this.state.saving = true;
-
+      this.state.loading = true;
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
@@ -150,9 +150,15 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           err.responseJSON?.error ||
             'Creating new ETH DAO Factory based community failed'
         );
-      } finally {
-        this.state.saving = false;
+        this.state.status = 'failure';
+        this.state.message = err.message;
+        this.state.loading = false;
+        m.redraw();
+        return;
       }
+      this.state.loaded = true;
+      this.state.loading = false;
+      m.redraw();
     };
 
     const loadFactoryContractAbi = (nickname: string) => {
@@ -271,6 +277,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                     <CWText>{output.name}</CWText>
                   </div>
                   <div>
+                    {this.state.loading && <Spinner active />}
                     <CWText>
                       {fnOutputArray && fnOutputArray[i].toString()
                         ? fnOutputArray[i].toString()
@@ -284,7 +291,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
           <div class="function-call">
             <CWButton
               label="Create Dao"
-              disabled={this.state.saving}
+              disabled={this.state.saving || this.state.loading}
               onclick={() => {
                 notifySuccess('Create Dao button clicked!');
                 this.state.saving = true;
@@ -292,11 +299,11 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                   createDao(this.state.daoFactoryType, fn);
                 } catch (err) {
                   notifyError(
-                    err.responseJSON?.error || 'Submitting Function Call failed'
+                    err.responseJSON?.error ||
+                      'Creating Dao Function Call failed'
                   );
-                } finally {
-                  this.state.saving = false;
                 }
+                this.state.saving = false;
               }}
             />
           </div>
