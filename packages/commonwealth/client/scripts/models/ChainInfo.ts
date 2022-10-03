@@ -159,7 +159,7 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts ? Contracts[0]?.decimals : 0;
+    const decimals = Contracts ? Contracts[0]?.decimals : 18;
     return new ChainInfo({
       id,
       network,
