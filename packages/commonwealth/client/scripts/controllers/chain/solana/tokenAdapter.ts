@@ -18,7 +18,7 @@ export default class Token extends Solana implements ITokenAdapter {
       chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,
-      contract_address: this.meta.address,
+      contract_address: this.contractAddress,
     });
     if (balanceResp.result) {
       const balance = new BN(balanceResp.result, 10);
