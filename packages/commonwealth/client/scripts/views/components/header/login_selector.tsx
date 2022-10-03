@@ -337,12 +337,24 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       return true;
     });
 
+    // Extract unique addresses
+    const uniqueAddresses = [];
+    const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
+      (addressInfo) => {
+        if (!uniqueAddresses.includes(addressInfo.address)) {
+          uniqueAddresses.push(addressInfo.address);
+          return true;
+        }
+        return false;
+      }
+    );
+
     const activeCommunityMeta = app.chain?.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     // Handles linking the existing address to the community
     async function linkToCommunity(accountIndex: number) {
-      const originAddressInfo = samebaseAddresses[accountIndex];
+      const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
 
       if (originAddressInfo) {
         try {
@@ -424,13 +436,13 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     // TODO: Replace with pretty modal
     async function performJoinCommunityLinking() {
       if (
-        samebaseAddresses.length > 1 &&
+        sameBaseAddressesRemoveDuplicates.length > 1 &&
         app.activeChainId() !== 'axie-infinity'
       ) {
         app.modals.create({
           modal: AccountSelector,
           data: {
-            accounts: samebaseAddresses.map((addressInfo) => ({
+            accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
               address: addressInfo.address,
             })),
             walletNetwork: activeChainInfo?.network,
@@ -441,7 +453,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
             },
           },
         });
-      } else if (samebaseAddresses.length === 1) {
+      } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
         await linkToCommunity(0);
       } else {
         app.modals.create({
@@ -481,7 +493,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               }}
               label={
                 <span class="hidden-sm">
-                  {samebaseAddresses.length === 0
+                  {sameBaseAddressesRemoveDuplicates.length === 0
                     ? `No ${
                         CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
                         CHAINBASE_SHORT[app.chain?.meta?.base] ||
