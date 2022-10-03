@@ -7,7 +7,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export class SocialSharingCarat
-  implements m.ClassComponent<{ commentID?: int }>
+  implements m.ClassComponent<{ commentId?: int }>
 {
   view(vnode) {
     const domain = document.location.origin;
@@ -19,13 +19,13 @@ export class SocialSharingCarat
             iconName: 'copy',
             label: 'Copy URL',
             onclick: async () => {
-              if (!vnode.attrs.commentID) {
+              if (!vnode.attrs.commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${m.route.get()}`
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `${domain}${m.route.get()}?comment=${vnode.attrs.commentID}`
+                  `${domain}${m.route.get()}?comment=${vnode.attrs.commentId}`
                 );
               }
             },
@@ -34,7 +34,7 @@ export class SocialSharingCarat
             iconName: 'twitter',
             label: 'Share on Twitter',
             onclick: async () => {
-              if (!vnode.attrs.commentID) {
+              if (!vnode.attrs.commentId) {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
                   '_blank'
@@ -42,7 +42,7 @@ export class SocialSharingCarat
               } else {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${
-                    vnode.attrs.commentID
+                    vnode.attrs.commentId
                   }`,
                   '_blank'
                 );

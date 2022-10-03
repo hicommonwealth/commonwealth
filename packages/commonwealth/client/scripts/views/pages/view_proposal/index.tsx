@@ -375,20 +375,18 @@ class ViewProposalPage
         );
       }).length > 0;
 
-    const isAdminOrMod =
+    const isAdmin =
       app.roles.isRoleOfCommunity({
         role: 'admin',
         chain: app.activeChainId(),
-      }) ||
+      }) || app.user.isSiteAdmin;
+
+    const isAdminOrMod =
+      isAdmin ||
       app.roles.isRoleOfCommunity({
         role: 'moderator',
         chain: app.activeChainId(),
       });
-
-    const isAdmin = app.roles.isRoleOfCommunity({
-      role: 'admin',
-      chain: app.activeChainId(),
-    });
 
     const setIsGloballyEditing = (status: boolean) => {
       this.isGloballyEditing = status;

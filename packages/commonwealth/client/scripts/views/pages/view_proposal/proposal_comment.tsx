@@ -6,8 +6,6 @@ import moment from 'moment';
 import 'pages/view_proposal/proposal_comment.scss';
 
 import app from 'state';
-// import { getProposalUrlPath } from 'identifiers';
-// import { slugify } from 'utils';
 import { Comment } from 'models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalBodyAuthor } from './proposal_components';
@@ -16,6 +14,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
+import { SocialSharingCarat } from './social_sharing_carat';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
@@ -45,10 +44,16 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       this.isEditingComment = status;
     };
 
-    // const commentLink = getProposalUrlPath(
-    //   proposal.slug,
-    //   `${proposal.identifier}-${slugify(proposal.title)}?comment=${comment.id}`
-    // );
+    const isAdminOrMod =
+      app.user.isSiteAdmin ||
+      app.roles.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      }) ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+      });
 
     return (
       <div class={`ProposalComment comment-${comment.id}`}>
@@ -92,7 +97,11 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                       <CWText type="caption" className="menu-buttons-text">
                         30
                       </CWText>
-                      <CWIconButton iconName="downvote" iconSize="small" />
+                      <CWIconButton
+                        iconName="downvote"
+                        iconSize="small"
+                        disabled
+                      />
                     </div>
                     {!isLast && (
                       <div
@@ -109,33 +118,36 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                     )}
                   </div>
                   <div class="menu-buttons-right">
-                    <CWIconButton iconName="share" iconSize="small" />
-                    <CWPopoverMenu
-                      trigger={
-                        <CWIconButton
-                          iconName="dotsVertical"
-                          iconSize="small"
-                        />
-                      }
-                      popoverMenuItems={[
-                        {
-                          label: 'Edit',
-                          iconName: 'edit',
-                          onclick: () => {
-                            setIsEditingComment(true);
+                    <SocialSharingCarat commentId={comment.id} />
+                    {(comment.author === app.user.activeAccount?.address ||
+                      isAdminOrMod) && (
+                      <CWPopoverMenu
+                        trigger={
+                          <CWIconButton
+                            iconName="dotsVertical"
+                            iconSize="small"
+                          />
+                        }
+                        popoverMenuItems={[
+                          {
+                            label: 'Edit',
+                            iconName: 'edit',
+                            onclick: () => {
+                              setIsEditingComment(true);
+                            },
                           },
-                        },
-                        {
-                          label: 'Delete',
-                          iconName: 'trash',
-                          onclick: () => {
-                            app.comments.delete(comment).then(() => {
-                              m.redraw();
-                            });
+                          {
+                            label: 'Delete',
+                            iconName: 'trash',
+                            onclick: () => {
+                              app.comments.delete(comment).then(() => {
+                                m.redraw();
+                              });
+                            },
                           },
-                        },
-                      ]}
-                    />
+                        ]}
+                      />
+                    )}
                   </div>
                 </div>
               )}

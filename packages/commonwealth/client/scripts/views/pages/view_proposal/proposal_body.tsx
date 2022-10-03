@@ -34,7 +34,6 @@ import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { InlineReplyButton } from '../../components/inline_reply_button';
 import { activeQuillEditorHasText } from './helpers';
 import {
   QueueButton,
