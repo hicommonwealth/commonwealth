@@ -16,6 +16,8 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
 import { SocialSharingCarat } from './social_sharing_carat';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { clearEditingLocalStorage } from './helpers';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
@@ -29,6 +31,8 @@ type ProposalCommentAttrs = {
 
 export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
   private isEditingComment: boolean;
+  private shouldRestoreEdits: boolean;
+  private savedEdits: string;
 
   view(vnode) {
     const {
@@ -84,7 +88,9 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
           {this.isEditingComment ? (
             <EditComment
               comment={comment}
+              savedEdits={this.savedEdits}
               setIsEditing={setIsEditingComment}
+              shouldRestoreEdits={this.shouldRestoreEdits}
               updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
@@ -123,7 +129,22 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                           {
                             label: 'Edit',
                             iconName: 'edit',
-                            onclick: () => {
+                            onclick: async () => {
+                              this.savedEdits = localStorage.getItem(
+                                `${app.activeChainId()}-edit-comment-${
+                                  comment.id
+                                }-storedText`
+                              );
+                              if (this.savedEdits) {
+                                clearEditingLocalStorage(comment, false);
+                                this.shouldRestoreEdits =
+                                  await confirmationModalWithText(
+                                    'Previous changes found. Restore edits?',
+                                    'Yes',
+                                    'No'
+                                  )();
+                              }
+
                               setIsEditingComment(true);
                             },
                           },

@@ -14,66 +14,37 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 
 type EditCommentAttrs = {
   comment: Comment<any>;
+  savedEdits?: string;
   setIsEditing: (status: boolean) => void;
+  shouldRestoreEdits?: boolean;
   updatedCommentsCallback?: () => void;
 };
 
 export class EditComment implements m.ClassComponent<EditCommentAttrs> {
   private quillEditorState: QuillEditor;
-  private shouldRestoreEdits: boolean;
-  private savedEdits: string;
   private saving: boolean;
 
-  async oninit(vnode) {
-    const { comment } = vnode.attrs;
-
-    this.savedEdits = localStorage.getItem(
-      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
-    );
-
-    if (this.savedEdits) {
-      this.shouldRestoreEdits = await confirmationModalWithText(
-        'Previous changes found. Restore edits?',
-        'Yes',
-        'No'
-      )();
-
-      clearEditingLocalStorage(comment, false);
-
-      m.redraw();
-    }
-  }
-
   view(vnode) {
-    const { updatedCommentsCallback, comment, setIsEditing } = vnode.attrs;
-
-    const { shouldRestoreEdits, savedEdits } = this;
-
+    const {
+      comment,
+      savedEdits,
+      setIsEditing,
+      shouldRestoreEdits,
+      updatedCommentsCallback,
+    } = vnode.attrs;
+    console.log({ shouldRestoreEdits, savedEdits });
     const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
-
     return (
       <div class="EditComment">
-        {savedEdits && shouldRestoreEdits === undefined ? (
-          <QuillEditorComponent />
-        ) : (
-          <QuillEditorComponent
-            contentsDoc={(() => {
-              try {
-                const doc = JSON.parse(body);
-                if (!doc.ops) throw new Error();
-                return doc;
-              } catch (e) {
-                return body;
-              }
-            })()}
-            oncreateBind={(state) => {
-              this.quillEditorState = state;
-            }}
-            imageUploader
-            theme="snow"
-            editorNamespace={`edit-comment-${comment.id}`}
-          />
-        )}
+        <QuillEditorComponent
+          contentsDoc={body}
+          oncreateBind={(state: QuillEditor) => {
+            this.quillEditorState = state;
+          }}
+          imageUploader
+          theme="snow"
+          editorNamespace={`edit-comment-${comment.id}`}
+        />
         <div class="buttons-row">
           <CWButton
             label="Cancel"

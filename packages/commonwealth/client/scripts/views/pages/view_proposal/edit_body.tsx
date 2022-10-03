@@ -70,7 +70,7 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
                 return body;
               }
             })()}
-            oncreateBind={(state) => {
+            oncreateBind={(state: QuillEditor) => {
               this.quillEditorState = state;
             }}
             imageUploader
