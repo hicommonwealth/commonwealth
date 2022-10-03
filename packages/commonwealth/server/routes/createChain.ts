@@ -6,7 +6,7 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
@@ -270,6 +270,8 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
+      // TODO: add other balance types if needed
+      balance_type: base === ChainBase.CosmosSDK ? BalanceType.Cosmos : undefined,
     }
   });
 
