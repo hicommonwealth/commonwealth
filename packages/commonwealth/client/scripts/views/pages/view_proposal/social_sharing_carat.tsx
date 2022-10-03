@@ -19,13 +19,16 @@ export class SocialSharingCarat
             iconName: 'copy',
             label: 'Copy URL',
             onclick: async () => {
+              const currentRouteSansCommentParam = m.route
+                .get()
+                .split('?comment=')[0];
               if (!vnode.attrs.commentId) {
                 await navigator.clipboard.writeText(
-                  `${domain}${m.route.get()}`
+                  `${domain}${currentRouteSansCommentParam}`
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `${domain}${m.route.get()}?comment=${vnode.attrs.commentId}`
+                  `${domain}${currentRouteSansCommentParam}?comment=${vnode.attrs.commentId}`
                 );
               }
             },
