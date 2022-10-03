@@ -44,15 +44,15 @@ export class ProposalComments
     // using m.route.param('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
 
-    // if (this.dom && comments?.length > 0 && !this.highlightedComment) {
-    //   this.highlightedComment = true;
+    if (this.dom && comments?.length > 0 && !this.highlightedComment) {
+      this.highlightedComment = true;
 
-    //   const commentId = window.location.search.startsWith('?comment=')
-    //     ? window.location.search.replace('?comment=', '')
-    //     : null;
+      const commentId = window.location.search.startsWith('?comment=')
+        ? window.location.search.replace('?comment=', '')
+        : null;
 
-    //   if (commentId) jumpHighlightComment(Number(commentId));
-    // }
+      if (commentId) jumpHighlightComment(Number(commentId));
+    }
 
     const handleIsReplying = (isReplying: boolean, id?: number) => {
       if (isReplying) {
