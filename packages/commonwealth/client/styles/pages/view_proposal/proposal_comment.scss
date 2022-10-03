@@ -17,24 +17,11 @@
 
   &.highlighted {
     background-color: $yellow-200;
-    border-radius: 20px;
+    border-radius: $border-radius-corners;
 
-    .thread-connectors-container {
-      .thread-connector {
-        background: $green-500;
-      }
-    }
-  }
-
-  &.highlighted.highlightAnimationComplete {
-    background-color: transparent;
-    transition: background-color 1s ease-in-out;
-
-    .thread-connectors-container {
-      .thread-connector {
-        background: $neutral-200;
-        transition: background 1s ease-in-out;
-      }
+    &.highlightAnimationComplete {
+      background-color: transparent;
+      transition: background-color 1s ease-in-out;
     }
   }
 
