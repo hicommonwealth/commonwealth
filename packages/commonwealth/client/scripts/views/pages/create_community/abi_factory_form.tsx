@@ -48,7 +48,7 @@ import EthereumChain from 'controllers/chain/ethereum/chain';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
-import DaoFactoryController from 'client/scripts/controllers/chain/ethereum/generalContracts';
+import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -71,7 +71,7 @@ type CreateAbiFactoryState = ChainFormState & {
 };
 
 export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
-  daoFactoryController: DaoFactoryController;
+  generalContractsController: GeneralContractsController;
   private state: CreateAbiFactoryState = {
     message: '',
     loaded: false,
@@ -132,14 +132,14 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         // initialize daoFactory Controller
         const ethChain = new EthereumChain(app);
 
-        this.daoFactoryController = new DaoFactoryController(
+        this.generalContractsController = new GeneralContractsController(
           ethChain,
           contract
         );
         const metamaskWallet =
           await app.wallets.getFirstAvailableMetamaskWallet();
 
-        this.daoFactoryController.createDao(
+        await this.generalContractsController.createFactoryDao(
           fn,
           processedArgs,
           metamaskWallet,

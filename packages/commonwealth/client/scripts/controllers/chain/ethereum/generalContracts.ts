@@ -82,7 +82,28 @@ export default class GeneralContractsController {
     return tx;
   }
 
-  public async createDao(
+  public decodeTransactionData(fn: AbiItem, tx: string): any {
+    // simple return type
+    let result;
+    if (fn.outputs.length === 1) {
+      const decodedTx = this.chain.api.eth.abi.decodeParameter(
+        fn.outputs[0].type,
+        tx
+      );
+      result = [];
+      result.push(decodedTx);
+    } else if (fn.outputs.length > 1) {
+      const decodedTxMap = this.chain.api.eth.abi.decodeParameters(
+        fn.outputs.map((output) => output.type),
+        tx
+      );
+      // complex return type
+      result = Array.from(Object.values(decodedTxMap));
+    }
+    return result;
+  }
+
+  public async createFactoryDao(
     fn: AbiItem,
     processedArgs: any[],
     wallet: IWebWallet<any>,

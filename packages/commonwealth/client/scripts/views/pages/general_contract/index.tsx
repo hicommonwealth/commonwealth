@@ -21,7 +21,7 @@ import {
   parseFunctionsFromABI,
   getEtherscanABI,
 } from 'helpers/abi_utils';
-import GeneralContractsController from 'controllers/chain/ethereum/general_contracts';
+import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -104,7 +104,7 @@ class GeneralContractPage
       });
 
       const contract = app.contracts.getByAddress(contractAddress);
-
+      let tx: string;
       try {
         // initialize daoFactory Controller
         const ethChain = app.chain.chain as EthereumChain;
@@ -121,7 +121,7 @@ class GeneralContractPage
           ChainBase.Ethereum
         );
 
-        const tx = this.generalContractsController.callContractFunction(
+        tx = await this.generalContractsController.callContractFunction(
           fn,
           processedArgs,
           signingWallet
@@ -129,31 +129,13 @@ class GeneralContractPage
       } catch (err) {
         notifyError(
           err.responseJSON?.error ||
-            'Creating new ETH DAO Factory based community failed'
+            `Calling Function ${fn.name} failed`
         );
       } finally {
         this.state.saving = false;
       }
-
-      let tx: string;
-      // simple return type
-      if (fn.outputs.length === 1) {
-        const decodedTx = web3Api.eth.abi.decodeParameter(
-          fn.outputs[0].type,
-          tx
-        );
-        const result: any[] = [];
-        result.push(decodedTx);
-        this.state.functionNameToFunctionOutput.set(fn.name, result);
-      } else if (fn.outputs.length > 1) {
-        const decodedTxMap = web3Api.eth.abi.decodeParameters(
-          fn.outputs.map((output) => output.type),
-          tx
-        );
-        // complex return type
-        const processed = Array.from(Object.values(decodedTxMap));
-        this.state.functionNameToFunctionOutput.set(fn.name, processed);
-      }
+      const result = this.generalContractsController.decodeTransactionData(fn, tx);
+      this.state.functionNameToFunctionOutput.set(fn.name, result);
     };
 
     const loadContractAbi = () => {
