@@ -16,23 +16,18 @@ import {
 
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {
-  // const $div =
-  // commentId === 'parent' || commentId === 'body'
-  //   ? $('html, body').find('.ProposalHeader')
-  //   : $('html, body').find(`.comment-${commentId}`);
+  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[1];
 
-  const $div = $('html, body').find(`.comment-${commentId}`);
-
-  if ($div.length > 0) {
-    const divTop = $div.position().top;
-
+  if (commentEle) {
     // clear any previous animation
-    $div.removeClass('highlighted highlightAnimationComplete');
-
-    $('html, body').animate({ scrollTop: divTop }, 500);
-    $div.addClass('highlighted');
+    commentEle.classList.remove('highlighted');
+    commentEle.classList.remove('highlightAnimationComplete');
+    // scroll to comment
+    commentEle.scrollIntoView();
+    // add new highlight classes
+    commentEle.classList.add('highlighted');
     setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
+      commentEle.classList.add('highlightAnimationComplete');
     }, 2000 + 500);
   }
 };
