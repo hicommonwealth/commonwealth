@@ -20,6 +20,7 @@ import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
   getEtherscanABI,
+  parseEventFromABI,
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
@@ -104,7 +105,7 @@ class GeneralContractPage
       });
 
       const contract = app.contracts.getByAddress(contractAddress);
-      let tx: string;
+      let tx;
       try {
         // initialize daoFactory Controller
         const ethChain = app.chain.chain as EthereumChain;
@@ -121,8 +122,6 @@ class GeneralContractPage
           ChainBase.Ethereum
         );
 
-        console.log('signing wallet is ', signingWallet);
-
         tx = await this.generalContractsController.callContractFunction(
           fn,
           processedArgs,
@@ -131,13 +130,15 @@ class GeneralContractPage
         console.log('tx is ', tx);
       } catch (err) {
         notifyError(
-          err.responseJSON?.error ||
-            `Calling Function ${fn.name} failed`
+          err.responseJSON?.error || `Calling Function ${fn.name} failed`
         );
       } finally {
         this.state.saving = false;
       }
-      const result = this.generalContractsController.decodeTransactionData(fn, tx);
+      const result = this.generalContractsController.decodeTransactionData(
+        fn,
+        tx
+      );
       this.state.functionNameToFunctionOutput.set(fn.name, result);
     };
 

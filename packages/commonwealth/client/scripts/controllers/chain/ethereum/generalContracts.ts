@@ -2,7 +2,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import { Contract, NodeInfo, IWebWallet } from 'models';
-
+import { TransactionReceipt } from 'web3-core';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
@@ -67,34 +67,51 @@ export default class GeneralContractsController {
     const functionTx = functionContract.methods[methodSignature](
       ...processedArgs
     );
-    let tx;
     if (fn.stateMutability !== 'view' && fn.constant !== true) {
       // Sign Tx with PK if not view function
-      chain
-        .makeContractTx(contract.address, functionTx.encodeABI(), wallet)
-        .then(async (txReceipt) => {
-          console.log('txReceipt', txReceipt);
-          tx = txReceipt;
-        });
-    } else {
-      // send transaction
-      tx = await chain.makeContractCall(
+      const txReceipt = await chain.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
         wallet
       );
+      return txReceipt;
+    } else {
+      // send transaction
+      const tx = await chain.makeContractCall(
+        contract.address,
+        functionTx.encodeABI(),
+        wallet
+      );
+      return tx;
     }
-    return tx;
   }
 
-  public decodeTransactionData(fn: AbiItem, tx: string): any {
+  public decodeTransactionData(fn: AbiItem, tx: any): any {
     // simple return type
     let result;
     if (fn.outputs.length === 1) {
-      const decodedTx = this.chain.api.eth.abi.decodeParameter(
-        fn.outputs[0].type,
-        tx
-      );
+      let decodedTx;
+      if (
+        this.contract.nickname === 'curated-factory-goerli' &&
+        fn.name === 'createProject'
+      ) {
+        const eventAbiItem = parseEventFromABI(
+          this.contract.abi,
+          'ProjectCreated'
+        );
+        const decodedLog = this.chain.api.eth.abi.decodeLog(
+          eventAbiItem.inputs,
+          tx.logs[0].data,
+          tx.logs[0].topics
+        );
+        console.log('decodedLog', decodedLog);
+        decodedTx = decodedLog.projectAddress;
+      } else {
+        decodedTx = this.chain.api.eth.abi.decodeParameter(
+          fn.outputs[0].type,
+          tx
+        );
+      }
       result = [];
       result.push(decodedTx);
     } else if (fn.outputs.length > 1) {
