@@ -127,6 +127,7 @@ import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
+import migrateEvent from './routes/migrateEvent';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -217,11 +218,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models)
   );
-  router.post(
-    '/deleteChain',
-    passport.authenticate('jwt', { session: false }),
-    deleteChain.bind(this, models)
-  );
+  router.post('/deleteChain', deleteChain.bind(this, models));
   router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
@@ -715,6 +712,7 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
