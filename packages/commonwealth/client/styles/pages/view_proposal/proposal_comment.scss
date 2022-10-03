@@ -70,16 +70,6 @@
         display: flex;
         gap: 16px;
 
-        .vote-group {
-          align-items: center;
-          display: flex;
-          gap: 4px;
-
-          .menu-buttons-text.Text {
-            color: $neutral-500;
-          }
-        }
-
         .reply-button {
           align-items: center;
           cursor: pointer;

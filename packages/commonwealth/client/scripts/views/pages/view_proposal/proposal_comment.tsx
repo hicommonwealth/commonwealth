@@ -15,6 +15,7 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
 import { SocialSharingCarat } from './social_sharing_carat';
+import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
@@ -92,17 +93,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
               {!comment.deleted && (
                 <div class="comment-footer">
                   <div class="menu-buttons-left">
-                    <div class="vote-group">
-                      <CWIconButton iconName="upvote" iconSize="small" />
-                      <CWText type="caption" className="menu-buttons-text">
-                        30
-                      </CWText>
-                      <CWIconButton
-                        iconName="downvote"
-                        iconSize="small"
-                        disabled
-                      />
-                    </div>
+                    <CommentReactionButton comment={comment} />
                     {!isLast && (
                       <div
                         class="reply-button"
