@@ -22,7 +22,7 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
-import { ContentType } from 'controllers/server/search';
+import { SearchContentType } from 'shared/types';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
 import { renderQuillTextBody } from './quill/helpers';
@@ -81,9 +81,9 @@ const getCommunityPreview = (
   setUsingFilterMenuFn
 ) => {
   const params =
-    community.contentType === ContentType.Token
+    community.contentType === SearchContentType.Token
       ? { community }
-      : community.contentType === ContentType.Chain
+      : community.contentType === SearchContentType.Chain
       ? { community }
       : null;
 

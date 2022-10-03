@@ -12,6 +12,7 @@ import {
   QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
 } from './constants';
+import { ContentType } from 'shared/types';
 
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {
@@ -77,16 +78,13 @@ export const getProposalPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
     : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
 };
 
-export const clearEditingLocalStorage = (item, isThread: boolean) => {
-  if (isThread) {
-    localStorage.removeItem(
-      `${app.activeChainId()}-edit-thread-${item.id}-storedText`
-    );
-  } else {
-    localStorage.removeItem(
-      `${app.activeChainId()}-edit-comment-${item.id}-storedText`
-    );
-  }
+export const clearEditingLocalStorage = (
+  id: number | string,
+  contentType: ContentType
+) => {
+  localStorage.removeItem(
+    `${app.activeChainId()}-edit-${contentType}-${id}-storedText`
+  );
 };
 
 export const activeQuillEditorHasText = () => {

@@ -18,6 +18,7 @@ import { SocialSharingCarat } from './social_sharing_carat';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
+import { ContentType } from 'shared/types';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;
@@ -129,14 +130,18 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                           {
                             label: 'Edit',
                             iconName: 'edit',
-                            onclick: async () => {
+                            onclick: async (e) => {
+                              e.preventDefault();
                               this.savedEdits = localStorage.getItem(
                                 `${app.activeChainId()}-edit-comment-${
                                   comment.id
                                 }-storedText`
                               );
                               if (this.savedEdits) {
-                                clearEditingLocalStorage(comment, false);
+                                clearEditingLocalStorage(
+                                  comment.id,
+                                  ContentType.Comment
+                                );
                                 this.shouldRestoreEdits =
                                   await confirmationModalWithText(
                                     'Previous changes found. Restore edits?',
@@ -144,7 +149,6 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                                     'No'
                                   )();
                               }
-
                               setIsEditingComment(true);
                             },
                           },

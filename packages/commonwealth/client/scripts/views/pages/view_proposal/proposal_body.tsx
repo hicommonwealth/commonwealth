@@ -34,7 +34,7 @@ import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { activeQuillEditorHasText } from './helpers';
+import { activeQuillEditorHasText, clearEditingLocalStorage } from './helpers';
 import {
   QueueButton,
   ExecuteButton,
@@ -67,6 +67,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditBody } from './edit_body';
+import { ContentType } from 'shared/types';
 
 type ProposalBodyAttrs = {
   commentCount: number;
@@ -84,6 +85,8 @@ type ProposalBodyAttrs = {
 
 export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
   private isEditingBody: boolean;
+  private savedEdits: string;
+  private shouldRestoreEdits: boolean;
   private updatedUrl: string;
 
   oninit(vnode) {
@@ -182,6 +185,23 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           iconName: 'edit',
                           onclick: async (e) => {
                             e.preventDefault();
+                            this.savedEdits = localStorage.getItem(
+                              `${app.activeChainId()}-edit-thread-${
+                                proposal.id
+                              }-storedText`
+                            );
+                            if (this.savedEdits) {
+                              clearEditingLocalStorage(
+                                proposal.id,
+                                ContentType.Thread
+                              );
+                              this.shouldRestoreEdits =
+                                await confirmationModalWithText(
+                                  'Previous changes found. Restore edits?',
+                                  'Yes',
+                                  'No'
+                                )();
+                            }
                             setIsEditingBody(true);
                           },
                         },
@@ -386,6 +406,8 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             {this.isEditingBody ? (
               <EditBody
                 thread={proposal}
+                savedEdits={this.savedEdits}
+                shouldRestoreEdits={this.shouldRestoreEdits}
                 setIsEditing={setIsEditingBody}
                 proposalPageState={proposalPageState}
                 updatedTitle={proposal.title}

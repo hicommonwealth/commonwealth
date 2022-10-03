@@ -11,6 +11,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { ContentType } from 'shared/types';
 
 type EditCommentAttrs = {
   comment: Comment<any>;
@@ -32,7 +33,6 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
       shouldRestoreEdits,
       updatedCommentsCallback,
     } = vnode.attrs;
-    console.log({ shouldRestoreEdits, savedEdits });
     const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
     return (
       <div class="EditComment">
@@ -67,9 +67,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
               if (confirmed) {
                 setIsEditing(false);
-
-                clearEditingLocalStorage(comment, false);
-
+                clearEditingLocalStorage(comment.id, ContentType.Comment);
                 m.redraw();
               }
             }}
@@ -88,11 +86,8 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
 
               app.comments.edit(comment, itemText).then(() => {
                 this.saving = false;
-
-                clearEditingLocalStorage(comment, false);
-
+                clearEditingLocalStorage(comment.id, ContentType.Comment);
                 setIsEditing(false);
-
                 updatedCommentsCallback();
               });
             }}

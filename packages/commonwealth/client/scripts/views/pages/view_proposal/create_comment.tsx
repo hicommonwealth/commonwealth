@@ -8,7 +8,7 @@ import 'pages/view_proposal/create_comment.scss';
 import app from 'state';
 import { Thread, AnyProposal } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
-import { CommentParent } from 'controllers/server/comments';
+import { ContentType } from 'shared/types';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
@@ -46,8 +46,8 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
     const author = app.user.activeAccount;
 
     const parentType = parentCommentId
-      ? CommentParent.Comment
-      : CommentParent.Proposal;
+      ? ContentType.Comment
+      : ContentType.Thread;
 
     if (this.uploadsInProgress === undefined) {
       this.uploadsInProgress = 0;
@@ -140,7 +140,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       <div class="CreateComment">
         <div class="attribution-row">
           <CWText type="caption">
-            {parentType === CommentParent.Comment ? 'Reply as' : 'Comment as'}
+            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
           </CWText>
           <CWText type="caption" fontWeight="medium" className="user-link-text">
             {m(User, { user: author, hideAvatar: true, linkify: true })}

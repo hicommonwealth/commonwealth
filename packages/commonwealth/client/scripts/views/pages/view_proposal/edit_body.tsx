@@ -14,6 +14,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { ContentType } from 'shared/types';
 
 type EditBodyAttrs = {
   thread: Thread;
@@ -24,60 +25,31 @@ type EditBodyAttrs = {
 
 export class EditBody implements m.ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
-  private savedEdits: string;
   private saving: boolean;
-  private shouldRestoreEdits: boolean;
-
-  async oninit(vnode) {
-    const { thread } = vnode.attrs;
-
-    this.savedEdits = localStorage.getItem(
-      `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
-    );
-
-    if (this.savedEdits) {
-      this.shouldRestoreEdits = await confirmationModalWithText(
-        'Previous changes found. Restore edits?',
-        'Yes',
-        'No'
-      )();
-
-      clearEditingLocalStorage(thread, true);
-
-      m.redraw();
-    }
-  }
 
   view(vnode) {
-    const { thread, setIsEditing, updatedTitle, updatedUrl } = vnode.attrs;
-
-    const { shouldRestoreEdits, savedEdits } = this;
+    const {
+      shouldRestoreEdits,
+      savedEdits,
+      thread,
+      setIsEditing,
+      updatedTitle,
+      updatedUrl,
+    } = vnode.attrs;
 
     const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
     return (
       <div class="EditBody">
-        {savedEdits && shouldRestoreEdits === undefined ? (
-          <QuillEditorComponent />
-        ) : (
-          <QuillEditorComponent
-            contentsDoc={(() => {
-              try {
-                const doc = JSON.parse(body);
-                if (!doc.ops) throw new Error();
-                return doc;
-              } catch (e) {
-                return body;
-              }
-            })()}
-            oncreateBind={(state: QuillEditor) => {
-              this.quillEditorState = state;
-            }}
-            imageUploader
-            theme="snow"
-            editorNamespace={`edit-thread-${thread.id}`}
-          />
-        )}
+        <QuillEditorComponent
+          contentsDoc={body}
+          oncreateBind={(state: QuillEditor) => {
+            this.quillEditorState = state;
+          }}
+          imageUploader
+          theme="snow"
+          editorNamespace={`edit-thread-${thread.id}`}
+        />
         <div class="buttons-row">
           <CWButton
             label="Cancel"
@@ -100,9 +72,7 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
 
               if (confirmed) {
                 setIsEditing(false);
-
-                clearEditingLocalStorage(thread, true);
-
+                clearEditingLocalStorage(thread.id, ContentType.Thread);
                 m.redraw();
               }
             }}
@@ -130,15 +100,10 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
                 .edit(thread, itemText, updatedTitle, updatedUrl)
                 .then(() => {
                   navigateToSubpage(`/discussion/${thread.id}`);
-
                   this.saving = false;
-
-                  clearEditingLocalStorage(thread, true);
-
+                  clearEditingLocalStorage(thread.id, ContentType.Thread);
                   setIsEditing(false);
-
                   m.redraw();
-
                   notifySuccess('Thread successfully edited');
                 });
             }}

@@ -5,17 +5,12 @@ import moment from 'moment';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
-import { Comment as CommentModel, Attachment, IUniqueId } from 'models';
+import { Comment, Attachment, IUniqueId } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
 
 // tslint:disable: object-literal-key-quotes
-
-export enum CommentParent {
-  Proposal = 'proposal',
-  Comment = 'comment',
-}
 
 export enum CommentRefreshOption {
   ResetAndLoadComments = 'ResetAndLoadComments',
@@ -103,7 +98,7 @@ export const modelFromServer = (comment) => {
           deleted: false,
         };
 
-  return new CommentModel(commentParams);
+  return new Comment(commentParams);
 };
 
 class CommentsController {
@@ -179,7 +174,7 @@ class CommentsController {
   }
 
   public async edit(
-    comment: CommentModel<any>,
+    comment: Comment<any>,
     body: string,
     attachments?: string[]
   ) {
@@ -226,7 +221,7 @@ class CommentsController {
             plaintext: '[deleted]',
             versionHistory: [],
           });
-          const softDeletion = new CommentModel(revisedComment);
+          const softDeletion = new Comment(revisedComment);
           this._store.remove(existing);
           this._store.add(softDeletion);
           resolve(result);
