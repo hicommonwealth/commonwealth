@@ -14,7 +14,7 @@ import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { SearchContentType } from 'shared/types';
+import { SearchContentType } from 'types';
 import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';

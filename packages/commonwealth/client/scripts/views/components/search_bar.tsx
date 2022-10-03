@@ -22,7 +22,7 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
-import { SearchContentType } from 'shared/types';
+import { SearchContentType } from 'types';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
 import { renderQuillTextBody } from './quill/helpers';

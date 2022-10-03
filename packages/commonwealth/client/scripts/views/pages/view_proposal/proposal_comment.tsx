@@ -7,6 +7,7 @@ import 'pages/view_proposal/proposal_comment.scss';
 
 import app from 'state';
 import { Comment } from 'models';
+import { ContentType } from 'types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalBodyAuthor } from './proposal_components';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -18,7 +19,6 @@ import { SocialSharingCarat } from './social_sharing_carat';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
-import { ContentType } from 'shared/types';
 
 type ProposalCommentAttrs = {
   comment: Comment<any>;

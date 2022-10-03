@@ -1,6 +1,7 @@
 import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
+import { ContentType } from 'types';
 import { Comment, Poll, Thread } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
@@ -12,7 +13,6 @@ import {
   QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
 } from './constants';
-import { ContentType } from 'shared/types';
 
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {

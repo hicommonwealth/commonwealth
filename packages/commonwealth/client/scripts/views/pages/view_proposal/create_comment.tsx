@@ -8,7 +8,7 @@ import 'pages/view_proposal/create_comment.scss';
 import app from 'state';
 import { Thread, AnyProposal } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
-import { ContentType } from 'shared/types';
+import { ContentType } from 'types';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';

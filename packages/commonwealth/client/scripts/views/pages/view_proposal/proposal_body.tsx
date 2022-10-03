@@ -24,6 +24,7 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
 import { slugify } from 'utils';
+import { ContentType } from 'types';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import { AaveViewProposalDetail } from './aave_summary';
@@ -49,11 +50,6 @@ import {
 } from './proposal_components';
 import { SocialSharingCarat } from './social_sharing_carat';
 import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
-import {
-  ProposalHeaderThreadLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
-} from './proposal_header_links';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
@@ -67,7 +63,6 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditBody } from './edit_body';
-import { ContentType } from 'shared/types';
 
 type ProposalBodyAttrs = {
   commentCount: number;

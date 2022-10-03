@@ -2,7 +2,7 @@ import $ from 'jquery';
 import moment from 'moment';
 import SearchStore from 'stores/SearchStore';
 import app from 'state';
-import { SearchContentType } from 'shared/types';
+import { SearchContentType } from 'types';
 import { SearchScope, SearchParams } from '../../models/SearchQuery';
 import { Thread, SearchQuery } from '../../models';
 import { modelFromServer } from './threads';

@@ -8,13 +8,13 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Thread } from 'models';
+import { ContentType } from 'types';
 import { validURL } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
-import { ContentType } from 'shared/types';
 
 type EditBodyAttrs = {
   thread: Thread;
