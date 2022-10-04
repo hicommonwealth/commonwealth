@@ -3,6 +3,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import * as Cui from 'construct-ui';
+import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
 
@@ -402,7 +403,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               })
             ) {
               await app.roles.createRole({
-                address: addressInfo,
+                address: _.omit(addressInfo, 'chain'),
                 chain: activeChainId,
               });
             }
