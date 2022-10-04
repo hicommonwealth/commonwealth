@@ -2,19 +2,20 @@
 
 import app from 'state';
 import m from 'mithril';
+import { CWMenuItemAttrs } from '../components/component_kit/cw_menu_item';
 
-const getMainMenu = () => {
+export const getMainMenuItems = (): CWMenuItemAttrs[] => {
   return [
     {
       label: 'Create',
-      iconName: 'plusCircle',
+      iconName: 'plus-circle',
       onclick: () => {
         app.mobileMenu = 'createContent';
       },
     },
     {
       label: 'Help',
-      iconName: 'help',
+      iconName: 'help-circle',
       onclick: () => {
         app.mobileMenu = 'help';
       },
@@ -31,6 +32,6 @@ const getMainMenu = () => {
 
 export class MainMenu implements m.ClassComponent {
   view() {
-    return <>{getMainMenu()}</>;
+    return <>{getMainMenuItems().map((attrs) => <CWMenuItem {...attrs} />}</>;
   }
 }

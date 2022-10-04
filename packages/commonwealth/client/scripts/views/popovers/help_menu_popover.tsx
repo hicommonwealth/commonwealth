@@ -5,7 +5,7 @@ import m from 'mithril';
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { HelpMenu } from '../menus/help_menu';
+import { getHelpMenuItems } from '../menus/help_menu';
 
 export class HelpMenuPopover implements m.ClassComponent {
   view() {
@@ -30,7 +30,7 @@ export class HelpMenuPopover implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        menuItems={HelpMenu}
+        menuItems={getHelpMenuItems()}
       />
     );
   }

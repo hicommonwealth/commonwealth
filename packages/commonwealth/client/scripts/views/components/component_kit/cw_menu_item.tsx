@@ -6,7 +6,7 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-export type MenuItemAttrs =
+export type CWMenuItemAttrs =
   | { type: 'divider' }
   | { type: 'header'; label: string }
   | {
@@ -18,7 +18,7 @@ export type MenuItemAttrs =
       type?: 'action';
     };
 
-export class CWMenuItem implements m.ClassComponent<MenuItemAttrs> {
+export class CWMenuItem implements m.ClassComponent<CWMenuItemAttrs> {
   view(vnode: m.VnodeDOM<any, this>) {
     const { type, label, iconName, onclick, disabled, isSecondary } =
       vnode.attrs;

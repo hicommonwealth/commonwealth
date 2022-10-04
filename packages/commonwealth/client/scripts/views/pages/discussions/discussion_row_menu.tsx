@@ -15,10 +15,10 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 
-type ThreadMenuItemAttrs = { proposal: Thread };
+type ThreadCWMenuItemAttrs = { proposal: Thread };
 
 export class ThreadSubscriptionMenuItem
-  implements m.ClassComponent<ThreadMenuItemAttrs>
+  implements m.ClassComponent<ThreadCWMenuItemAttrs>
 {
   view(vnode) {
     const { proposal } = vnode.attrs;
@@ -141,7 +141,9 @@ class UpdateProposalStatusMenuItem
   }
 }
 
-class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
+class ThreadDeletionMenuItem
+  implements m.ClassComponent<ThreadCWMenuItemAttrs>
+{
   view(vnode) {
     const { proposal } = vnode.attrs;
 
@@ -173,7 +175,7 @@ class ThreadDeletionMenuItem implements m.ClassComponent<ThreadMenuItemAttrs> {
 }
 
 export class DiscussionRowMenu
-  implements m.ClassComponent<ThreadMenuItemAttrs>
+  implements m.ClassComponent<ThreadCWMenuItemAttrs>
 {
   view(vnode) {
     if (!app.isLoggedIn()) return;

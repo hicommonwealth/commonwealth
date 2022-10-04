@@ -8,12 +8,12 @@ import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { NotificationsMenu } from '../menus/notifications_menu';
 
-export class NotificationsPopover implements m.ClassComponent {
+export class NotificationsMenuPopover implements m.ClassComponent {
   view() {
     const unreadNotificationsCount = app.user.notifications.numUnread;
     return (
       <CWPopoverMenu
-        className="NotificationsPopover"
+        className="NotificationsMenuPopover"
         closeOnContentClick={true}
         closeOnOutsideClick={true}
         hasArrow={false}

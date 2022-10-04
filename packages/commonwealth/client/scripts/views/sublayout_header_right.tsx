@@ -6,14 +6,12 @@ import 'sublayout_header_right.scss';
 
 import app from 'state';
 import { ChainInfo } from 'models';
-import { InvitesMenu } from 'views/components/header/invites_menu';
+import { InvitesMenuPopover } from 'views/popovers/invites_menu_popover';
 import { LoginSelector } from 'views/components/header/login_selector';
-import { NotificationsMenu } from './popovers/notifications_popover';
+import { NotificationsMenuPopover } from './popovers/notifications_menu_popover';
 import { CreateContentPopover } from './popovers/create_content_popover';
-import { HelpMenu } from './menus/help_menu';
-import { CWPopoverMenu } from './components/component_kit/cw_popover/cw_popover_menu';
-import { CWMenuItem } from './components/component_kit/cw_menu_item';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
+import { HelpMenuPopover } from './popovers/help_menu_popover';
 
 type SublayoutHeaderRightAttrs = {
   chain: ChainInfo;
@@ -42,9 +40,9 @@ export class SublayoutHeaderRight
           {showCreateContentMenuTrigger && (
             <CreateContentPopover fluid={false} threadOnly={!chain} />
           )}
-          <HelpMenu />
-          {app.isLoggedIn() && <NotificationsMenu />}
-          {app.isLoggedIn() && <InvitesMenu />}
+          <HelpMenuPopover />
+          {app.isLoggedIn() && <NotificationsMenuPopover />}
+          {app.isLoggedIn() && <InvitesMenuPopover />}
         </div>
         <LoginSelector />
       </div>

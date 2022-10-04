@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'sublayout.scss';
 
 import app from 'state';
-import { handleEmailInvites } from 'views/components/header/invites_menu';
+import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';

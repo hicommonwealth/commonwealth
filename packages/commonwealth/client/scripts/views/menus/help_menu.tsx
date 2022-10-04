@@ -5,7 +5,7 @@ import m from 'mithril';
 import app from 'state';
 import { FeedbackModal } from '../modals/feedback_modal';
 
-const getHelpMenu = () => {
+export const getHelpMenuItems = () => {
   return [
     {
       label: 'Send Feedback',
@@ -23,6 +23,6 @@ const getHelpMenu = () => {
 
 export class HelpMenu implements m.ClassComponent {
   view() {
-    return <>{getHelpMenu()}</>;
+    return <>{getHelpMenuItems()}</>;
   }
 }

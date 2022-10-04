@@ -7,10 +7,10 @@ import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 import { CWPopover, SharedPopoverAttrs } from './cw_popover';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
-import { MenuItemAttrs } from '../cw_menu_item';
+import { CWMenuItemAttrs } from '../cw_menu_item';
 
 type PopoverMenuAttrs = {
-  menuItems: Array<MenuItemAttrs>;
+  menuItems: Array<CWMenuItemAttrs>;
 } & SharedPopoverAttrs;
 
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
