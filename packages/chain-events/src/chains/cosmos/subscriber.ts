@@ -51,7 +51,9 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         const block = await this.api.tm.block(blockN);
         results.push(block.block);
       } catch (e) {
-        this.log.warn(`Failed to fetch block ${blockN}, aborting re-subscribe`);
+        this.log.warn(
+          `Failed to fetch block ${blockN} (${e.message}), aborting re-subscribe`
+        );
         break;
       }
     }
