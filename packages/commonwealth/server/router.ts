@@ -217,11 +217,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createChain.bind(this, models)
   );
-  router.post(
-    '/deleteChain',
-    passport.authenticate('jwt', { session: false }),
-    deleteChain.bind(this, models)
-  );
+  router.post('/deleteChain', deleteChain.bind(this, models));
   router.post(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
