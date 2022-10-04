@@ -75,6 +75,8 @@ import PollFactory, {
 } from './models/poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
+import RolePermissionFactory, { RoleAssignmentModelStatic, RolePermissionModelStatic } from './models/role_assignment';
+import CommunityRoleFactory, { CommunityRoleModelStatic } from './models/community_role';
 import RuleFactory, { RuleModelStatic } from './models/rule';
 import SocialAccountFactory, {
   SocialAccountModelStatic,
@@ -118,6 +120,7 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityRole: CommunityRoleModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
@@ -140,6 +143,7 @@ export type Models = {
   Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
   Role: RoleModelStatic;
+  RoleAssignment: RoleAssignmentModelStatic;
   Rule: RuleModelStatic;
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
@@ -203,6 +207,7 @@ const models: Models = {
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
+  CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
@@ -223,6 +228,7 @@ const models: Models = {
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
+  RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
   Rule: RuleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),

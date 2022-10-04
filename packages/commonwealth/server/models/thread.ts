@@ -133,12 +133,6 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.belongsToMany(models.Role, {
-      through: 'read_only_roles_threads',
-      as: 'read_only_roles',
-      foreignKey: 'thread_id',
-      otherKey: 'id',
-    });
     models.Thread.belongsToMany(models.Address, {
       through: models.Collaboration,
       as: 'collaborators',
