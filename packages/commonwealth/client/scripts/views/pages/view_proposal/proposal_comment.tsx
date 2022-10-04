@@ -25,6 +25,7 @@ type ProposalCommentAttrs = {
   handleIsReplying: (isReplying: boolean, id?: number) => void;
   isGloballyEditing: boolean;
   isLast: boolean;
+  isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
   threadLevel: number;
   updatedCommentsCallback?: () => void;
@@ -40,6 +41,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       comment,
       handleIsReplying,
       isLast,
+      isLocked,
       setIsGloballyEditing,
       threadLevel,
       updatedCommentsCallback,
@@ -60,6 +62,12 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
         role: 'moderator',
         chain: app.activeChainId(),
       });
+
+    const canReply = !isLast && !isLocked;
+
+    const canEditAndDelete =
+      !isLocked &&
+      (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
       <div class={`ProposalComment comment-${comment.id}`}>
@@ -101,7 +109,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                 <div class="comment-footer">
                   <div class="menu-buttons-left">
                     <CommentReactionButton comment={comment} />
-                    {!isLast && (
+                    {canReply && (
                       <div
                         class="reply-button"
                         onclick={() => {
@@ -117,8 +125,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                   </div>
                   <div class="menu-buttons-right">
                     <SocialSharingCarat commentId={comment.id} />
-                    {(comment.author === app.user.activeAccount?.address ||
-                      isAdminOrMod) && (
+                    {canEditAndDelete && (
                       <CWPopoverMenu
                         trigger={
                           <CWIconButton

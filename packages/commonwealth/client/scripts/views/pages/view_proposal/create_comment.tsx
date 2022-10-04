@@ -60,12 +60,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
         return;
       }
 
-      if (this.quillEditorState?.isBlank()) {
-        if (e) e.preventDefault();
-        this.error = 'Comment cannot be blank';
-        return;
-      }
-
       const commentText = this.quillEditorState.textContentsAsString;
 
       this.error = null;
@@ -110,6 +104,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       }
 
       this.saving = false;
+
       if (handleIsReplying) {
         handleIsReplying(false);
       }
@@ -138,43 +133,46 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     return (
       <div class="CreateComment">
-        <div class="attribution-row">
-          <CWText type="caption">
-            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-          </CWText>
-          <CWText type="caption" fontWeight="medium" className="user-link-text">
-            {m(User, { user: author, hideAvatar: true, linkify: true })}
-          </CWText>
-        </div>
-        {rootProposal instanceof Thread && rootProposal.readOnly ? (
+        {!app.user.activeAccount?.profile.name ? (
           <CWText type="h5" className="callout-text">
-            Commenting is disabled because this post has been locked.
+            You haven't set a display name yet.
+            <a
+              href={`/${app.activeChainId()}/account/${
+                app.user.activeAccount.address
+              }?base=${app.user.activeAccount.chain.id}`}
+              onclick={(e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: EditProfileModal,
+                  data: {
+                    account: app.user.activeAccount,
+                    refreshCallback: () => m.redraw(),
+                  },
+                });
+              }}
+            >
+              Set a display name.
+            </a>
           </CWText>
         ) : (
           <>
-            {app.user.activeAccount?.profile &&
-              !app.user.activeAccount.profile.name && (
-                <CWText type="h5" className="callout-text">
-                  You haven't set a display name yet.
-                  <a
-                    href={`/${app.activeChainId()}/account/${
-                      app.user.activeAccount.address
-                    }?base=${app.user.activeAccount.chain.id}`}
-                    onclick={(e) => {
-                      e.preventDefault();
-                      app.modals.create({
-                        modal: EditProfileModal,
-                        data: {
-                          account: app.user.activeAccount,
-                          refreshCallback: () => m.redraw(),
-                        },
-                      });
-                    }}
-                  >
-                    Set a display name.
-                  </a>
+            <div class="attribution-row">
+              <div class="attribution-left-content">
+                <CWText type="caption">
+                  {parentType === ContentType.Comment
+                    ? 'Reply as'
+                    : 'Comment as'}
                 </CWText>
-              )}
+                <CWText
+                  type="caption"
+                  fontWeight="medium"
+                  className="user-link-text"
+                >
+                  {m(User, { user: author, hideAvatar: true, linkify: true })}
+                </CWText>
+              </div>
+              {error && <CWValidationText message={error} status="failure" />}
+            </div>
             <QuillEditorComponent
               contentsDoc=""
               oncreateBind={(state: QuillEditor) => {
@@ -227,7 +225,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
                   label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
                 />
               </div>
-              {error && <CWValidationText message={error} status="failure" />}
             </div>
           </>
         )}

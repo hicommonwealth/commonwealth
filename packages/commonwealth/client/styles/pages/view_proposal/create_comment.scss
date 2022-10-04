@@ -7,10 +7,15 @@
 
   .attribution-row {
     display: flex;
-    gap: 4px;
+    justify-content: space-between;
 
-    .user-link-text.Text {
-      color: $primary-500;
+    .attribution-left-content {
+      display: flex;
+      gap: 4px;
+
+      .user-link-text.Text {
+        color: $primary-500;
+      }
     }
   }
 

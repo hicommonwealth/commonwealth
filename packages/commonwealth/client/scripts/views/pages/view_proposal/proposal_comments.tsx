@@ -119,6 +119,7 @@ export class ProposalComments
                 comment={comment}
                 handleIsReplying={handleIsReplying}
                 isLast={threadLevel === 2}
+                isLocked={proposal.readOnly}
                 setIsGloballyEditing={setIsGloballyEditing}
                 threadLevel={threadLevel}
                 updatedCommentsCallback={updatedCommentsCallback}

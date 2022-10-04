@@ -411,7 +411,11 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             ) : (
               <>
                 <ProposalBodyText item={proposal} />
-                {!isGloballyEditing && canComment && (
+                {proposal instanceof Thread && proposal.readOnly ? (
+                  <CWText type="h5" className="callout-text">
+                    Commenting is disabled because this post has been locked.
+                  </CWText>
+                ) : !isGloballyEditing && canComment ? (
                   <CreateComment
                     updatedCommentsCallback={updatedCommentsCallback}
                     setIsGloballyEditing={setIsGloballyEditing}
@@ -420,7 +424,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                     parentComment={null}
                     rootProposal={proposal}
                   />
-                )}
+                ) : null}
                 {/* <div class="proposal-response-row">
                   {attachments && attachments.length > 0 && (
                     <>
