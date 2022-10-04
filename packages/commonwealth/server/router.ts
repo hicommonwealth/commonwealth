@@ -667,11 +667,7 @@ function setupRouter(
   );
 
   // rules
-  router.post(
-    '/getRules',
-    passport.authenticate('jwt', { session: false }),
-    getRules.bind(this, models)
-  );
+  router.post('/getRules', getRules.bind(this, models));
   router.post(
     '/createRule',
     passport.authenticate('jwt', { session: false }),
@@ -689,7 +685,6 @@ function setupRouter(
   );
   router.post(
     '/checkAddressAgainstRule',
-    passport.authenticate('jwt', { session: false }),
     checkAddressAgainstRule.bind(this, models, ruleCache)
   );
   router.get('/getRuleTypes', getRuleTypes.bind(this, models));
