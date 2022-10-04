@@ -43,6 +43,16 @@ export class SublayoutHeaderRight
         <CWButton
           onclick={async () => {
             try {
+              await app.rules.refresh();
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          label="r"
+        />
+        <CWButton
+          onclick={async () => {
+            try {
               // await app.rules.refresh();
               await app.rules.createRule({
                 chain_id: 'edgeware',
@@ -64,13 +74,59 @@ export class SublayoutHeaderRight
               // await app.rules.refresh();
               await app.rules.deleteRule({
                 chain_id: 'edgeware',
-                rule_id: 7,
+                rule_id: 8,
               });
             } catch (e) {
               console.log(e);
             }
           }}
           label="d"
+        />
+        <CWButton
+          onclick={async () => {
+            try {
+              // await app.rules.refresh();
+              await app.rules.editRule({
+                chain_id: 'edgeware',
+                rule_id: 6,
+                updated_rule: {
+                  AllowListRule: [
+                    ['0x62BE9e2A1A1039cB245F143C58641e8021C868E7'],
+                  ],
+                },
+              });
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          label="e"
+        />
+        <CWButton
+          onclick={async () => {
+            try {
+              // await app.rules.refresh();
+              const outcome = await app.rules.addressPassesRule({
+                rule_id: 8,
+                address: '0xE58E375Cc657e434e6981218A356fAC756b98097',
+              });
+              console.log('outcome: ', outcome);
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          label="ch"
+        />
+        <CWButton
+          onclick={async () => {
+            try {
+              // await app.rules.refresh();
+              const res = await app.rules.getRuleTypes();
+              console.log(res);
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          label="gt"
         />
       </div>
     );

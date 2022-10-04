@@ -1,16 +1,18 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
 import { DB } from '../../database';
 import { AppError, ServerError } from '../../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { RuleAttributes } from '../../models/rule';
+import validateRoles from '../../util/validateRoles';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 import { validateRule } from '../../util/rules/ruleParser';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoRuleSpecified: 'No rule has been specified',
   InvalidRule: 'Rule is not valid',
+  AdminOnly: 'Only admin can create rules',
 };
 
 type CreateRuleReq = { chain_id: string; rule: string };
@@ -21,6 +23,16 @@ const createRule = async (
   req: TypedRequestBody<CreateRuleReq>,
   res: TypedResponse<CreateRuleResp>
 ) => {
+  const isAdmin = await validateRoles(
+    models,
+    req.user,
+    'admin',
+    req.body.chain_id
+  );
+  if (!isAdmin) {
+    throw new AppError(Errors.AdminOnly);
+  }
+
   try {
     const [, error] = await validateChain(models, req.body);
     if (error) {

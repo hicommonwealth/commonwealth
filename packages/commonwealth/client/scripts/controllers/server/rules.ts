@@ -17,7 +17,28 @@ export const ruleModelFromServer = (ruleFromDb) => {
 
 class RulesController {
   private _rulesStore = new RuleStore();
-  // private _ruleTypeStore = new RuleTypeStore();
+
+  // Checks if a provided address passes a given rule.
+  // Agnostic to chain; this will work even if the rule is not in the store
+  public async addressPassesRule({
+    rule_id,
+    address,
+  }: {
+    rule_id: number;
+    address: string;
+  }): Promise<boolean> {
+    try {
+      const res = await $.post(`${app.serverUrl()}/checkAddressAgainstRule`, {
+        rule_id,
+        address,
+        jwt: app.user.jwt,
+      });
+      return res.result.addressIsValidUnderRule;
+    } catch (e) {
+      console.log(e);
+      throw new Error('Unable to check address against provided rule');
+    }
+  }
 
   public async refresh() {
     // First clear the store
@@ -25,7 +46,7 @@ class RulesController {
 
     // Populate store with rules corresponding to current community
     try {
-      const res = await $.get(`${app.serverUrl()}/getRules`, {
+      const res = await $.post(`${app.serverUrl()}/getRules`, {
         chain_id: app.activeChainId() ?? null,
         jwt: app.user.jwt,
       });
@@ -55,6 +76,7 @@ class RulesController {
         jwt: app.user.jwt,
       });
       if (res.result) {
+        // Add rule to store if it's for the current chain
         if (res.result.chain_id === app.activeChainId()) {
           this._rulesStore.add(ruleModelFromServer(res.result));
         }
@@ -65,8 +87,32 @@ class RulesController {
     }
   }
 
-  public async editRule() {
-    // hits /rule route
+  public async editRule({
+    chain_id,
+    rule_id,
+    updated_rule,
+  }: {
+    chain_id: string;
+    rule_id: number;
+    updated_rule: any;
+  }) {
+    try {
+      const res = await $.post(`${app.serverUrl()}/editRule`, {
+        rule_id,
+        chain_id,
+        updated_rule: JSON.stringify(updated_rule),
+        jwt: app.user.jwt,
+      });
+      if (res.result) {
+        const ruleInStore = this._rulesStore.getById(rule_id);
+        if (chain_id === app.activeChainId() && !ruleInStore) {
+          this._rulesStore.add(ruleModelFromServer(res.result));
+        }
+      }
+    } catch (e) {
+      console.log(e);
+      throw new Error('Failed to edit rule');
+    }
   }
 
   public async deleteRule({
@@ -94,8 +140,14 @@ class RulesController {
     }
   }
 
+  // Returns a map of { [ruleTypeName]: RuleType }
   public async getRuleTypes() {
-    // hits /rule route
+    try {
+      const res = await $.get(`${app.serverUrl()}/getRuleTypes`);
+      return res.result;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 

@@ -6,11 +6,11 @@ import { ModelStatic, ModelInstance } from './types';
 export type RuleAttributes = {
   id?: number;
   chain_id: string;
-  rule: Record<string, unknown>;
+  rule: Record<string, Array<unknown>>;
   created_at?: Date;
   updated_at?: Date;
 
-  // Chain?: ChainAttributes; // TODO: Why is this here?
+  Chain?: ChainAttributes;
 };
 
 export type RuleInstance = ModelInstance<RuleAttributes>;

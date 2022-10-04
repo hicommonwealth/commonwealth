@@ -117,6 +117,9 @@ import editChatCategory from './routes/chat/editChatCategory';
 import createRule from './routes/rules/createRule';
 import deleteRule from './routes/rules/deleteRule';
 import getRuleTypes from './routes/rules/getRuleTypes';
+import getRules from './routes/rules/getRules';
+import editRule from './routes/rules/editRule';
+import checkAddressAgainstRule from './routes/rules/checkAddressAgainstRule';
 
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
@@ -149,7 +152,6 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
-import getRules from './routes/rules/getRules';
 
 function setupRouter(
   app: Express,
@@ -676,9 +678,19 @@ function setupRouter(
     createRule.bind(this, models)
   );
   router.post(
+    '/editRule',
+    passport.authenticate('jwt', { session: false }),
+    editRule.bind(this, models)
+  );
+  router.post(
     '/deleteRule',
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
+  );
+  router.post(
+    '/checkAddressAgainstRule',
+    passport.authenticate('jwt', { session: false }),
+    checkAddressAgainstRule.bind(this, models, ruleCache)
   );
   router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 

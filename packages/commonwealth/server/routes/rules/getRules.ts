@@ -23,7 +23,6 @@ const getRules = async (
   res: TypedResponse<getRulesResp>
 ) => {
   const { chain_id } = req.body;
-  console.log('res', req.body);
 
   // Check if chain exists
   if (!chain_id) throw new AppError(GetRulesError.NoChain);
