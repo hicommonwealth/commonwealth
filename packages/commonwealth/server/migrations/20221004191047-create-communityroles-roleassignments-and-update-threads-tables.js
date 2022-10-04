@@ -29,7 +29,7 @@ module.exports = {
             allowNull: false,
           },
           permissions: {
-            type: Sequelize.BIGINTEGER,
+            type: Sequelize.BIGINT,
             defaultValue: 0,
             allowNull: false,
           },
@@ -59,14 +59,14 @@ module.exports = {
           },
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
-          deleted_at: Sequelize.DATE,
+          deleted_at: { type: Sequelize.DATE, allowNull: true },
         },
         { transaction: t }
       );
 
       // Migrate CommunityRoles for Current Chains
       const query = `
-      SELECT c.id as cid, 
+      SELECT c.id as cid
       FROM "Chains" c;`;
       const chains = await queryInterface.sequelize.query(query, {
         transaction: t,
@@ -114,23 +114,23 @@ module.exports = {
       );
     });
     // Add indexes
-    await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.addIndex(
-        'CommunityRoles',
-        { fields: ['chain_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['community_role_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['address_id'] },
-        { transaction: t }
-      );
-    });
+    // await queryInterface.sequelize.transaction(async (t) => {
+    //   await queryInterface.addIndex(
+    //     'CommunityRoles',
+    //     { fields: ['chain_id'] },
+    //     { transaction: t }
+    //   );
+    //   await queryInterface.addIndex(
+    //     'RoleAssignments',
+    //     { fields: ['community_role_id'] },
+    //     { transaction: t }
+    //   );
+    //   await queryInterface.addIndex(
+    //     'RoleAssignments',
+    //     { fields: ['address_id'] },
+    //     { transaction: t }
+    //   );
+    // });
 
     return new Promise((resolve, reject) => {
       resolve();
