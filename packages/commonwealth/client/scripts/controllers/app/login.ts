@@ -128,6 +128,7 @@ export async function completeClientLogin(account: Account) {
     ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
+    m.redraw();
   } catch (e) {
     console.trace(e);
   }
