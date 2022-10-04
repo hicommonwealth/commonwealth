@@ -43,6 +43,7 @@ export class ProposalHeaderStage
 
     return (
       <CWText
+        type="caption"
         className={getClasses<{ stage: 'negative' | 'positive' }>(
           {
             stage:
@@ -188,9 +189,8 @@ export class ProposalBodyAuthor
           user: author,
           popover: true,
           linkify: true,
-          showAddressWithDisplayName: true,
         })}
-        {/* {item instanceof Thread &&
+        {item instanceof Thread &&
           item.collaborators &&
           item.collaborators.length > 0 && (
             <>
@@ -213,7 +213,7 @@ export class ProposalBodyAuthor
                 }
               />
             </>
-          )} */}
+          )}
       </>
     );
   }

@@ -72,7 +72,7 @@ export class ThreadsOverviewTopicSummaryRow
 
             const user = app.chain.accounts.get(thread.author);
             const commentsCount = app.comments.nComments(thread);
-            const gallery = [user, user, user, user];
+            // const gallery = [user, user, user, user];
 
             return (
               <>
@@ -129,7 +129,7 @@ export class ThreadsOverviewTopicSummaryRow
                         <CWText type="caption">+4 others</CWText>
                       </div> */}
                     </div>
-                    <div class="row-bottom-menu">
+                    {/* <div class="row-bottom-menu">
                       <CWIconButton
                         iconSize="small"
                         iconName="share"
@@ -150,7 +150,7 @@ export class ThreadsOverviewTopicSummaryRow
                         iconName="dotsVertical"
                         onclick={(e) => e.stopPropagation()}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}

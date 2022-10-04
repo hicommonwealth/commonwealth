@@ -25,7 +25,7 @@
         @include caption;
       }
 
-      .published-text.Text {
+      .header-text.Text {
         color: $neutral-500;
       }
     }
@@ -54,6 +54,17 @@
       > * {
         margin-right: 8px;
       }
+    }
+  }
+
+  .comments-count {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+
+    .Text,
+    .Icon {
+      color: $neutral-500;
     }
   }
 }

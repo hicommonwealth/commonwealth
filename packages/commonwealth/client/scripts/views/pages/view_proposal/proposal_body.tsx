@@ -2,28 +2,14 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import lity from 'lity';
 
 import 'pages/view_proposal/proposal_body.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import {
-  AnyProposal,
-  Comment,
-  Thread,
-  ThreadKind,
-  ThreadStage,
-  Topic,
-} from 'models';
-import { externalLink, extractDomain, pluralize } from 'helpers';
+import { AnyProposal, Comment, Thread, ThreadStage, Topic } from 'models';
+import { pluralize } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { getProposalUrlPath, proposalSlugToFriendlyName } from 'identifiers';
-import { slugify } from 'utils';
 import { ContentType } from 'types';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
@@ -34,8 +20,7 @@ import { ProposalComments } from './proposal_comments';
 import { CreateComment } from './create_comment';
 import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { activeQuillEditorHasText, clearEditingLocalStorage } from './helpers';
+import { clearEditingLocalStorage } from './helpers';
 import {
   QueueButton,
   ExecuteButton,
@@ -43,7 +28,6 @@ import {
 } from '../../components/proposals/voting_actions_components';
 import {
   ProposalBodyAuthor,
-  ProposalBodyLastEdited,
   ProposalBodyText,
   ProposalHeaderStage,
   ProposalTitleEditor,
@@ -53,12 +37,7 @@ import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_men
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  getStatusClass,
-  getStatusText,
-} from '../../components/proposal_card/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
@@ -82,11 +61,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
   private isEditingBody: boolean;
   private savedEdits: string;
   private shouldRestoreEdits: boolean;
-  private updatedUrl: string;
-
-  oninit(vnode) {
-    this.updatedUrl = (vnode.attrs.proposal as Thread).url;
-  }
 
   view(vnode) {
     const {
@@ -103,26 +77,12 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
       viewCount,
     } = vnode.attrs;
 
-    const hasBody = !!(proposal as AnyProposal).description;
-
-    const attachments =
-      proposal instanceof Thread ? (proposal as Thread).attachments : false;
-
-    const proposalLink = getProposalUrlPath(
-      proposal.slug,
-      `${proposal.identifier}-${slugify(proposal.title)}`
-    );
-
-    const proposalTitleIsEditable =
-      proposal instanceof SubstrateDemocracyProposal ||
-      proposal instanceof SubstrateCollectiveProposal ||
-      proposal instanceof SubstrateTreasuryTip ||
-      proposal instanceof SubstrateTreasuryProposal;
-
     const setIsEditingBody = (status: boolean) => {
       setIsGloballyEditing(status);
       this.isEditingBody = status;
     };
+
+    const hasBody = !!(proposal as AnyProposal).description;
 
     const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
 
@@ -152,24 +112,15 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
               <CWIcon iconName="lock" iconSize="small" />
             )}
             <ProposalBodyAuthor item={proposal} />
-            <CWText type="caption" className="published-text">
+            <CWText type="caption" className="header-text">
               published on {moment(proposal.createdAt).format('l')}
             </CWText>
-            {/* {proposal.stage !== ThreadStage.Discussion && (
-                      <ProposalHeaderStage proposal={proposal} />
-                    )}
-                    <CWText
-                      onclick={() =>
-                        m.route.set(
-                          `/${app.activeChainId()}/discussions/${
-                            proposal.topic?.name
-                          }`
-                        )
-                      }
-                    >
-                      {proposal.topic?.name}
-                    </CWText>
-                    <CWText>{pluralize(viewCount, 'view')}</CWText> */}
+            {proposal.stage !== ThreadStage.Discussion && (
+              <ProposalHeaderStage proposal={proposal} />
+            )}
+            <CWText type="caption" className="header-text">
+              {pluralize(viewCount, 'view')}
+            </CWText>
             {app.isLoggedIn() && hasEditPerms && !isGloballyEditing && (
               <CWPopoverMenu
                 popoverMenuItems={[
@@ -316,84 +267,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             )}
             <SocialSharingCarat />
           </div>
-
-          {/* <CWText
-                  className={`onchain-status-text ${getStatusClass(proposal)}`}
-                >
-                  {getStatusText(proposal)}
-                </CWText> */}
-          {/* {app.isLoggedIn() &&
-                      (isAdminOrMod || isAuthor) &&
-                      !isGloballyEditing &&
-                      proposalTitleIsEditable && (
-                        <CWPopoverMenu
-                          popoverMenuItems={[
-                            {
-                              label: 'Edit title',
-                              iconName: 'edit',
-                              onclick: async (e) => {
-                                e.preventDefault();
-                                if (proposalPageState.replying) {
-                                  if (activeQuillEditorHasText()) {
-                                    const confirmed =
-                                      await confirmationModalWithText(
-                                        'Unsubmitted replies will be lost. Continue?'
-                                      )();
-
-                                    if (!confirmed) return;
-                                  }
-                                }
-
-                                setIsGloballyEditing(true);
-                              },
-                            },
-                          ]}
-                          trigger={
-                            <CWIconButton
-                              iconName="chevronDown"
-                              iconSize="small"
-                            />
-                          }
-                        />
-                      )} */}
-          {/* <div class="proposal-body-link">
-                {proposal instanceof Thread &&
-                proposal.kind === ThreadKind.Link &&
-                this.isEditingBody ? (
-                  <CWTextInput
-                    oninput={(e) => {
-                      const { value } = (e as any).target;
-                      this.updatedUrl = value;
-                    }}
-                    value={this.updatedUrl}
-                  />
-                ) : (
-                  <div class="ProposalHeaderLink">
-                    {externalLink('a', proposal.url, [
-                      extractDomain(proposal.url),
-                    ])}
-                    <CWIcon iconName="externalLink" iconSize="small" />
-                  </div>
-                )}
-                {!(proposal instanceof Thread) &&
-                  (proposal['blockExplorerLink'] ||
-                    proposal['votingInterfaceLink'] ||
-                    proposal.threadId) && (
-                    <div class="proposal-body-link">
-                      {proposal.threadId && (
-                        <ProposalHeaderThreadLink proposal={proposal} />
-                      )}
-                      {proposal['blockExplorerLink'] && (
-                        <ProposalHeaderBlockExplorerLink proposal={proposal} />
-                      )}
-                      {proposal['votingInterfaceLink'] && (
-                        <ProposalHeaderVotingInterfaceLink
-                          proposal={proposal}
-                        />
-                      )}
-                    </div>
-                  )}
-              </div> */}
         </div>
         <CWDivider />
         {proposal instanceof Thread && (
@@ -406,7 +279,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                 setIsEditing={setIsEditingBody}
                 proposalPageState={proposalPageState}
                 updatedTitle={proposal.title}
-                updatedUrl={this.updatedUrl}
               />
             ) : (
               <>
@@ -425,36 +297,10 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                     rootProposal={proposal}
                   />
                 ) : null}
-                {/* <div class="proposal-response-row">
-                  {attachments && attachments.length > 0 && (
-                    <>
-                      <CWText>
-                        Attachments ({proposal.attachments.length})
-                      </CWText>
-                      {proposal.attachments.map((attachment) => (
-                        <a
-                          href={attachment.url}
-                          title={attachment.description}
-                          target="_blank"
-                          noopener="noopener"
-                          noreferrer="noreferrer"
-                          onclick={(e) => {
-                            e.preventDefault();
-                            lity(attachment.url);
-                          }}
-                        >
-                          <img src={attachment.url} />
-                        </a>
-                      ))}
-                    </>
-                  )}
-                </div> */}
               </>
             )}
           </div>
         )}
-
-        {/* subBody components */}
 
         {!(proposal instanceof Thread) && (
           <>
@@ -478,7 +324,10 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             <VotingActions proposal={proposal} />
           </>
         )}
-
+        <div class="comments-count">
+          <CWIcon iconName="feedback" iconSize="small" />
+          <CWText type="caption">{commentCount} Comments</CWText>
+        </div>
         <ProposalComments
           comments={comments}
           proposal={proposal}
@@ -489,3 +338,31 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
     );
   }
 }
+
+// just for proposals?
+//
+// <CWText
+//         className={`onchain-status-text ${getStatusClass(proposal)}`}
+//       >
+//         {getStatusText(proposal)}
+//       </CWText>
+// <div class="proposal-body-link">
+//       {!(proposal instanceof Thread) &&
+//         (proposal['blockExplorerLink'] ||
+//           proposal['votingInterfaceLink'] ||
+//           proposal.threadId) && (
+//           <div class="proposal-body-link">
+//             {proposal.threadId && (
+//               <ProposalHeaderThreadLink proposal={proposal} />
+//             )}
+//             {proposal['blockExplorerLink'] && (
+//               <ProposalHeaderBlockExplorerLink proposal={proposal} />
+//             )}
+//             {proposal['votingInterfaceLink'] && (
+//               <ProposalHeaderVotingInterfaceLink
+//                 proposal={proposal}
+//               />
+//             )}
+//           </div>
+//         )}
+//     </div>

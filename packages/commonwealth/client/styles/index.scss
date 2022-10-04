@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 // page layout
 * {
@@ -8,8 +8,7 @@
 html,
 body {
   box-sizing: border-box;
-  height: auto;
-  min-height: 100%;
+  height: 100vh;
   width: 100%;
 }
 
