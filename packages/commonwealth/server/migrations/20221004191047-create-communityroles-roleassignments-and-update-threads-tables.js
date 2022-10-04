@@ -38,6 +38,33 @@ module.exports = {
         },
         { transaction: t }
       );
+
+      await queryInterface.createTable(
+        'RoleAssignments',
+        {
+          id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
+          community_role_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: { model: 'CommunityRoles', key: 'id' },
+          },
+          address_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: { model: 'Addresses', key: 'id' },
+          },
+          created_at: { type: Sequelize.DATE, allowNull: false },
+          updated_at: { type: Sequelize.DATE, allowNull: false },
+          deleted_at: Sequelize.DATE,
+        },
+        { transaction: t }
+      );
+
+      
     });
     // Add indexes
     await queryInterface.sequelize.transaction(async (t) => {
