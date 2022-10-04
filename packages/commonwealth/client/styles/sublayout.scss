@@ -38,6 +38,7 @@
       .sidebar-inner-container {
         display: flex;
         height: 100%;
+        overflow: hidden;
         width: min-content;
       }
     }

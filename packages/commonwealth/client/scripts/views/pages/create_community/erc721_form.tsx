@@ -190,7 +190,7 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl } =
+            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -210,6 +210,7 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
                 network: ChainNetwork.ERC721,
                 node_url: nodeUrl,
                 type: ChainType.Token,
+                default_symbol: symbol,
                 ...this.state.form,
               });
               if (res.result.admin_address) {

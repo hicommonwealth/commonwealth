@@ -143,31 +143,6 @@ class ManageCommunityPage implements m.ClassComponent {
             roleData={this.roleData}
             webhooks={this.webhooks}
           />
-          {app.user.isSiteAdmin && (
-            <CWButton
-              label="Delete Chain"
-              onclick={async () => {
-                $.post(`${app.serverUrl()}/deleteChain`, {
-                  id: app.config.chains.getById(app.activeChainId()).id,
-                  auth: true,
-                  jwt: app.user.jwt,
-                }).then(
-                  (result) => {
-                    if (result.status !== 'Success') return;
-                    app.config.chains.remove(
-                      app.config.chains.getById(app.activeChainId())
-                    );
-                    notifySuccess('Deleted chain!');
-                    m.route.set('/');
-                    // redirect to /
-                  },
-                  () => {
-                    notifyError('Failed to delete chain!');
-                  }
-                );
-              }}
-            />
-          )}
         </div>
       </Sublayout>
     );

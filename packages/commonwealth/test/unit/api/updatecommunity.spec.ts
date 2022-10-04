@@ -142,14 +142,14 @@ describe('Update Community/Chain Tests', () => {
     });
 
     it('should update symbol', async () => {
-      const symbol = 'CWL';
+      const default_symbol = 'CWL';
       const res = await chai
         .request(app)
         .post('/api/updateChain')
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, symbol });
+        .send({ jwt: jwtToken, id: chain, default_symbol });
       expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.symbol).to.be.equal(symbol);
+      expect(res.body.result.default_symbol).to.be.equal(default_symbol);
     });
 
     it('should update icon_url', async () => {
