@@ -7961,6 +7961,11 @@ cyano-mithril@^0.7.0:
   dependencies:
     mithril-hooks "^0.7.1"
 
+cyano@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/cyano/-/cyano-0.7.0.tgz#9a8c80872d04246df1f47047e0b5c9ce8fce848a"
+  integrity sha512-3WuPxmZhaAqOBHIjyjSo44b16iKfqCxc7psD7OSlC5jgkDV3WEy94nxxjzw5DtFcU0OhfQoCcXC+ws+NL5MxQg==
+
 cyclist@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/cyclist/-/cyclist-1.0.1.tgz"
@@ -13722,7 +13727,7 @@ longest-streak@^2.0.1:
   resolved "https://registry.npmjs.org/longest-streak/-/longest-streak-2.0.4.tgz"
   integrity sha512-vM6rUVCVUJJt33bnmHiZEvr7wPT78ztX7rojL+LW51bHtLh6HTjx84LA5W4+oa6aKEJA7jJu5LR6vQRBpA5DVg==
 
-loose-envify@^1.1.0, loose-envify@^1.4.0:
+loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -17371,13 +17376,6 @@ react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
-
-react@^18.2.0:
-  version "18.2.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
-  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
-  dependencies:
-    loose-envify "^1.1.0"
 
 read-cache@^1.0.0:
   version "1.0.0"

@@ -7,6 +7,7 @@ import 'components/community_label.scss';
 import { CWText } from './component_kit/cw_text';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { IconSize } from './component_kit/cw_icons/types';
+import { cast } from 'cyano-mithril';
 
 type CommunityLabelAttrs = {
   community: any;
@@ -25,3 +26,5 @@ export const _CommunityLabel = (attrs: CommunityLabelAttrs) => {
     </div>
   );
 }
+
+export const CommunityLabel = cast(_CommunityLabel);

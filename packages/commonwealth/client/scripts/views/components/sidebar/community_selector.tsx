@@ -8,18 +8,16 @@ import 'components/sidebar/community_selector.scss';
 import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import User from '../widgets/user';
-import { _CommunityLabel } from '../community_label';
+import { CommunityLabel }  from '../community_label';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { cast, jsx } from 'cyano-mithril';
+import { jsx } from 'cyano-mithril';
 
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
   if (item instanceof ChainInfo) {
     roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
   }
-
-  const CommunityLabel = cast(_CommunityLabel);
-
+  
   return (
     <ListItem
       class={app.communities.isStarred(item.id) ? 'starred' : ''}

@@ -84,7 +84,7 @@ module.exports = {
       '../node_modules', // global node modules
     ],
     alias: {
-      // "cyano-mithril": path.resolve(__dirname, '../node_modules/cyano-mithril'),
+      // "cyano": path.resolve(__dirname, '../node_modules/cyano-mithril'),
       // "react": path.resolve(__dirname, "../node_modules/react"),
       "common-common": path.resolve(__dirname, '../../common-common'),
       "chain-events": path.resolve(__dirname, '../../chain-events'),
