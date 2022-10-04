@@ -454,7 +454,10 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
             },
           },
         });
-      } else if (sameBaseAddressesRemoveDuplicates.length === 1) {
+      } else if (
+        sameBaseAddressesRemoveDuplicates.length === 1 &&
+        app.activeChainId() !== 'axie-infinity'
+      ) {
         await linkToCommunity(0);
       } else {
         app.modals.create({
