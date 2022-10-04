@@ -18,6 +18,22 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background: $white;
+
+// dark mode
+html.invert {
+  filter: invert(90%);
+  -webkit-filter: invert(90%);
+  -moz-filter: invert(90%);
+  -o-filter: invert(90%);
+  -ms-filter: invert(90%);
+
+  img {
+    filter: invert(90%);
+    -webkit-filter: invert(90%);
+    -moz-filter: invert(90%);
+    -o-filter: invert(90%);
+    -ms-filter: invert(90%);
+  }
 }
 
 // global css
