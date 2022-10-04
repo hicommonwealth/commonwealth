@@ -48,6 +48,7 @@ export default (
         defaultValue: 0,
         allowNull: false,
       },
+      created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
