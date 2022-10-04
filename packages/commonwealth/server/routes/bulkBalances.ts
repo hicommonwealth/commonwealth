@@ -1,8 +1,8 @@
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { AddressInstance } from 'server/models/address';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { DB, sequelize } from '../database';
-import { AppError, ServerError } from '../util/errors';
+import { AppError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 
 enum BulkBalancesErrors {
@@ -22,7 +22,7 @@ type bulkBalanceReq = {
   profileId: number;
   token: string;
   chainNodes: {
-    [nodeId: number]: string | string[];
+    [nodeId: number]: Array<{ address: string, tokenType: string }>;
   };
 };
 
@@ -96,16 +96,18 @@ const bulkBalances = async (
 
   // Iterate through chain nodes
   for (const nodeIdString of Object.keys(chainNodes)) {
-    let tokenAddresses = req.body.chainNodes[nodeIdString];
+    const contracts = req.body.chainNodes[nodeIdString];
     const nodeId = parseInt(nodeIdString, 10);
 
     // Handle when only one value in array
-    if (typeof tokenAddresses === 'string') {
-      tokenAddresses = [tokenAddresses];
-    }
+    // no longer needed, always { address, tokenType }
+    // if (typeof tokenAddresses === 'string') {
+    //   tokenAddresses = [tokenAddresses];
+    // }
 
     // Handle no token addresses for chain node
-    if (!tokenAddresses || tokenAddresses.length === 0) {
+    // This is for Cosmos base
+    if (!contracts || contracts.length === 0) {
       let balanceTotal = 0;
       let atLeastOneTokenAddress = false;
       for (const userWalletAddress of profileWalletAddresses) {
@@ -129,27 +131,27 @@ const bulkBalances = async (
         balances[nodeId] = balanceTotal;
       }
     } else {
-      const tokenBalances: { [tokenAddress: string]: number } = {};
+      // this is for Ethereum / Solana Bases
+      const tokenBalances: { [contractAddress: string]: number } = {};
       let atLeastOneTokenAddress = false;
 
       // Build token balances for each address
-      for (const tokenAddress of tokenAddresses) {
+      for (const contract of contracts) {
         let balanceTotal = 0;
         for (const userWalletAddress of profileWalletAddresses) {
           try {
-            // TODO: Needs to change to support 721 and spl-token when Zak contracts table is merged
             const balance = await tokenBalanceCache.getBalance(
               nodeId,
               userWalletAddress,
-              tokenAddress,
-              'erc20'
+              contract.address,
+              contract.tokenType,
             );
             balanceTotal += balance.toNumber();
             atLeastOneTokenAddress = true;
           } catch (e) {
             console.log(
               "Couldn't get balance for token address",
-              tokenAddress,
+              contract.address,
               'on chainNodeId',
               nodeId,
               ' with wallet ',
@@ -158,7 +160,7 @@ const bulkBalances = async (
           }
         }
         if (atLeastOneTokenAddress) {
-          tokenBalances[tokenAddress] = balanceTotal;
+          tokenBalances[contract.address] = balanceTotal;
         }
       }
 
