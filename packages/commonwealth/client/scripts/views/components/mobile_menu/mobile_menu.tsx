@@ -8,6 +8,7 @@ export class MobileMenu implements m.ClassComponent {
   view(vnode: m.VnodeDOM<{}, this>) {
     if (!app.mobileMenu) return;
     const ActiveMenu = mobileMenuLookup[app.mobileMenu];
+    console.log(ActiveMenu);
     return (
       <div class="MobileMenu">
         <ActiveMenu />

@@ -8,7 +8,7 @@ import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CWMenuItem } from '../components/component_kit/cw_menu_item';
 
-const getCreateContentMenuItems = () => {
+export const getCreateContentMenuItems = () => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =

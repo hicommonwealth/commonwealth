@@ -5,7 +5,7 @@ import 'components/create_content_popover.scss';
 import app from 'state';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CreateContentMenu } from '../menus/create_content_menu';
+import { getCreateContentMenuItems } from '../menus/create_content_menu';
 
 type CreateContentPopoverAttrs = {
   fluid: boolean;
@@ -36,7 +36,7 @@ export class CreateContentPopover
         menuAttrs={{
           align: 'left',
         }}
-        MenuItems={<CreateContentMenu />}
+        menuItems={getCreateContentMenuItems()}
       />
     );
   }
