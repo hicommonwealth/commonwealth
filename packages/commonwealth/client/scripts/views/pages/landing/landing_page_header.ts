@@ -2,6 +2,7 @@ import m from 'mithril';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { LoginModal } from 'views/modals/login_modal';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 interface IAttrs {
   navs: { text: string; redirectTo: string }[];
@@ -72,12 +73,17 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
           class: `landing-header ${INITIAL_HEADER_STYLE}     mt-8`,
         },
         [
+          // m(CWIcon, {
+          //   iconName: 'commonLogo',
+          //   iconSize: 'xxl',
+          //   alt: 'Commonwealth',
+          //   style: m.route.get() === '/' ? '' : 'cursor:pointer',
+          //   onclick: () => redirectClick('/'),
+          // }),
           m('img', {
-            class: 'w-40 md:w-48 lg:w-60',
-            src: '/static/img/logo.svg',
+            src: 'static/img/commonLogoWithText.svg',
             alt: 'Commonwealth',
-            style: m.route.get() === '/' ? '' : 'cursor:pointer',
-            onclick: () => redirectClick('/'),
+            class: 'logoWithText',
           }),
           m(
             'nav',

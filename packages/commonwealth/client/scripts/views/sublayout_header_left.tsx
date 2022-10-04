@@ -5,7 +5,6 @@ import m from 'mithril';
 import 'sublayout_header_left.scss';
 
 import app from '../state';
-import { CommunityOptionsPopover } from './components/community_options_popover';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { CWDivider } from './components/component_kit/cw_divider';
@@ -33,8 +32,7 @@ export class SublayoutHeaderLeft
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {app.chain && <CommunityOptionsPopover />}
-        {!isSidebarToggled && app.chain && (
+        {!isSidebarToggled && app.activeChainId() && (
           <CWCommunityAvatar size="large" community={app.chain.meta} />
         )}
         {isWindowSmallInclusive(window.innerWidth) && app.chain && (

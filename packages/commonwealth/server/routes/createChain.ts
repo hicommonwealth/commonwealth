@@ -6,7 +6,7 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
@@ -57,6 +57,8 @@ type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAt
   id: string;
   node_url: string;
   substrate_spec: string;
+  address?: string;
+  decimals: number;
 };
 
 type CreateChainResp = {
@@ -93,10 +95,10 @@ const createChain = async (
   if (req.body.name.length > 255) {
     return next(new AppError(Errors.InvalidNameLength));
   }
-  if (!req.body.symbol || !req.body.symbol.trim()) {
+  if (!req.body.default_symbol || !req.body.default_symbol.trim()) {
     return next(new AppError(Errors.NoSymbol));
   }
-  if (req.body.symbol.length > 9) {
+  if (req.body.default_symbol.length > 9) {
     return next(new AppError(Errors.InvalidSymbolLength));
   }
   if (!req.body.type || !req.body.type.trim()) {
@@ -156,13 +158,6 @@ const createChain = async (
       privateUrl = node.private_url;
     }
 
-    const existingChain = await models.Chain.findOne({
-      where: { address: req.body.address, chain_node_id: node.id }
-    });
-    if (existingChain) {
-      return next(new AppError(Errors.ChainAddressExists));
-    }
-
     const provider = new Web3.providers.WebsocketProvider(privateUrl || url);
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
@@ -187,7 +182,6 @@ const createChain = async (
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
       const { decimals, amount } = supply.value;
-      req.body.decimals = decimals;
       if (new BN(amount, 10).isZero()) {
         throw new AppError('Invalid supply amount');
       }
@@ -232,7 +226,7 @@ const createChain = async (
   const {
     id,
     name,
-    symbol,
+    default_symbol,
     icon_url,
     description,
     network,
@@ -244,8 +238,6 @@ const createChain = async (
     element,
     base,
     bech32_prefix,
-    decimals,
-    address,
     token_name,
   } = req.body;
   if (website && !urlHasValidHTTPPrefix(website)) {
@@ -278,13 +270,15 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
+      // TODO: add other balance types if needed
+      balance_type: base === ChainBase.CosmosSDK ? BalanceType.Cosmos : undefined,
     }
   });
 
   const chain = await models.Chain.create({
     id,
     name,
-    symbol,
+    default_symbol,
     icon_url,
     description,
     network,
@@ -296,14 +290,36 @@ const createChain = async (
     element,
     base,
     bech32_prefix,
-    decimals,
     active: true,
     substrate_spec: sanitizedSpec || '',
     chain_node_id: node.id,
-    address,
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound'
   });
+
+  if (req.body.address) {
+    const [contract] = await models.Contract.findOrCreate({
+      where: {
+        address: req.body.address,
+        chain_node_id: node.id,
+      },
+      defaults: {
+        address: req.body.address,
+        chain_node_id: node.id,
+        decimals: req.body.decimals,
+        token_name: chain.token_name,
+        symbol: chain.default_symbol,
+        type: chain.network,
+      }
+    });
+
+    await models.CommunityContract.create({
+      chain_id: chain.id,
+      contract_id: contract.id,
+    });
+
+    chain.Contract = contract;
+  }
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;

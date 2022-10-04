@@ -10,7 +10,7 @@ export const checkNewThreadErrors = (
   if (!form.title) {
     throw new Error(NewThreadErrors.NoTitle);
   }
-  if (!form.topicName && topics.length > 0) {
+  if (!form.topic && topics.length > 0) {
     throw new Error(NewThreadErrors.NoTopic);
   }
   if (form.kind === ThreadKind.Discussion && !bodyText.length) {
