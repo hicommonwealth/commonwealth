@@ -63,6 +63,55 @@ module.exports = {
         },
         { transaction: t }
       );
+
+      // Migrate CommunityRoles for Current Chains
+      const query = `
+      SELECT c.id as cid, 
+      FROM "Chains" c;`;
+      const chains = await queryInterface.sequelize.query(query, {
+        transaction: t,
+      });
+      await Promise.all(
+        chains[0].map(async (c) => {
+          // create CommunityRoles for each chain
+          await queryInterface.bulkInsert(
+            'CommunityRoles',
+            [
+              {
+                chain_id: c.cid,
+                name: 'admin',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+            ],
+            { transaction: t }
+          );
+          await queryInterface.bulkInsert(
+            'CommunityRoles',
+            [
+              {
+                chain_id: c.cid,
+                name: 'moderator',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+            ],
+            { transaction: t }
+          );
+          await queryInterface.bulkInsert(
+            'CommunityRoles',
+            [
+              {
+                chain_id: c.cid,
+                name: 'member',
+                created_at: new Date(),
+                updated_at: new Date(),
+              },
+            ],
+            { transaction: t }
+          );
+        })
+      );
     });
     // Add indexes
     await queryInterface.sequelize.transaction(async (t) => {
