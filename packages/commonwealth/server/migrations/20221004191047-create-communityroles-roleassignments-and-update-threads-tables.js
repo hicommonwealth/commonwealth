@@ -63,14 +63,22 @@ module.exports = {
         },
         { transaction: t }
       );
-
-      
     });
     // Add indexes
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addIndex(
         'CommunityRoles',
         { fields: ['chain_id'] },
+        { transaction: t }
+      );
+      await queryInterface.addIndex(
+        'RoleAssignments',
+        { fields: ['community_role_id'] },
+        { transaction: t }
+      );
+      await queryInterface.addIndex(
+        'RoleAssignments',
+        { fields: ['address_id'] },
         { transaction: t }
       );
     });
@@ -81,11 +89,9 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.dropTable('RoleAssignments', { transaction: t });
+      await queryInterface.dropTable('CommunityRoles', { transaction: t });
+    });
   },
 };
