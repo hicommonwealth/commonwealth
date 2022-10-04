@@ -17,6 +17,8 @@ coverage/
 *yalc*
 *.pem
 *.csv
+/ios
+/android
 
 # Database downloads
 latest.dump
