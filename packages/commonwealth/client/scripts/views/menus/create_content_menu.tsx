@@ -5,9 +5,10 @@ import 'components/create_content_popover.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import { SubstrateAccount } from 'client/scripts/controllers/chain/substrate/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { CWMenuItem } from '../components/component_kit/cw_menu_item';
 
-const getCreateContentMenu = () => {
+const getCreateContentMenuItems = () => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -140,6 +141,12 @@ const getCreateContentMenu = () => {
 
 export class CreateContentMenu implements m.ClassComponent {
   view() {
-    return <>{getCreateContentMenu()}</>;
+    return (
+      <div class="CreateContentMenu">
+        {getCreateContentMenuItems().map((attrs) => (
+          <CWMenuItem {...attrs} />
+        ))}
+      </div>
+    );
   }
 }

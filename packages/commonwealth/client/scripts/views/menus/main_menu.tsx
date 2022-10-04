@@ -2,9 +2,12 @@
 
 import app from 'state';
 import m from 'mithril';
-import { CWMenuItemAttrs } from '../components/component_kit/cw_menu_item';
+import {
+  CWMenuItem,
+  MenuItemAttrs,
+} from '../components/component_kit/cw_menu_item';
 
-export const getMainMenuItems = (): CWMenuItemAttrs[] => {
+export const getMainMenuItems = (): MenuItemAttrs[] => {
   return [
     {
       label: 'Create',
@@ -32,6 +35,12 @@ export const getMainMenuItems = (): CWMenuItemAttrs[] => {
 
 export class MainMenu implements m.ClassComponent {
   view() {
-    return <>{getMainMenuItems().map((attrs) => <CWMenuItem {...attrs} />}</>;
+    return (
+      <div class="MainMenu">
+        {getMainMenuItems().map((attrs) => (
+          <CWMenuItem {...attrs} />
+        ))}
+      </div>
+    );
   }
 }

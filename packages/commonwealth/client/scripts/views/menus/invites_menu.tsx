@@ -4,6 +4,7 @@ import { pluralize } from 'helpers';
 import m from 'mithril';
 
 import app from 'state';
+import { CWMenuItem } from '../components/component_kit/cw_menu_item';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
 import { LoginModal } from '../modals/login_modal';
 
@@ -34,6 +35,12 @@ export const getInvitesMenuItems = () => {
 
 export class InvitesMenu implements m.ClassComponent {
   view() {
-    return <>{getInvitesMenuItems()}</>;
+    return (
+      <div class="InvitesMenu">
+        {getInvitesMenuItems().map((attrs) => (
+          <CWMenuItem {...attrs} />
+        ))}
+      </div>
+    );
   }
 }

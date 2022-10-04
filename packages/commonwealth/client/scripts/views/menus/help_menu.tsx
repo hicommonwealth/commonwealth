@@ -3,6 +3,7 @@
 import m from 'mithril';
 
 import app from 'state';
+import { CWMenuItem } from '../components/component_kit/cw_menu_item';
 import { FeedbackModal } from '../modals/feedback_modal';
 
 export const getHelpMenuItems = () => {
@@ -23,6 +24,12 @@ export const getHelpMenuItems = () => {
 
 export class HelpMenu implements m.ClassComponent {
   view() {
-    return <>{getHelpMenuItems()}</>;
+    return (
+      <div class="HelpMenu">
+        {getHelpMenuItems().map((attrs) => (
+          <CWMenuItem {...attrs} />
+        ))}
+      </div>
+    );
   }
 }
