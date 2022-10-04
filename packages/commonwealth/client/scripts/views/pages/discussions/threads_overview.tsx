@@ -44,7 +44,7 @@ export class ThreadsOverview implements m.ClassComponent {
             >
               Recent threads
             </CWText>
-            <CWButton buttonType="mini" label="Create Thread" iconName="plus" />
+            {/* <CWButton buttonType="mini" label="Create Thread" iconName="plus" /> */}
           </div>
         </div>
         {topics.map((topic) => {

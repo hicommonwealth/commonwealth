@@ -14,8 +14,9 @@ import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 type SummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -39,32 +40,33 @@ export class ThreadsOverviewTopicSummaryRow
     return (
       <div class="ThreadsOverviewTopicSummaryRow">
         <div class="topic-column">
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="topic-name-text"
-            onclick={(e) => {
-              e.preventDefault();
-              m.route.set(
-                `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
-              );
-            }}
-          >
-            {topic.name}
-          </CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className="threads-count-text"
-          >
-            {monthlyThreads.length} Threads
-          </CWText>
-          <CWText type="b2">{topic.description}</CWText>
+          <div class="name-and-count">
+            <CWText
+              type="h4"
+              fontWeight="semiBold"
+              className="topic-name-text"
+              onclick={(e) => {
+                e.preventDefault();
+                m.route.set(
+                  `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
+                );
+              }}
+            >
+              {topic.name}
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="threads-count-text"
+            >
+              {monthlyThreads.length} Threads
+            </CWText>
+          </div>
+          {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
+        {isWindowMediumSmallInclusive(window.innerWidth) && <CWDivider />}
         <div class="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
-            // console.log(thread);
-
             const discussionLink = getProposalUrlPath(
               thread.slug,
               `${thread.identifier}-${slugify(thread.title)}`
@@ -109,7 +111,11 @@ export class ThreadsOverviewTopicSummaryRow
                   <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
-                  <CWText className="comment-preview-text" type="caption">
+                  <CWText
+                    className="comment-preview-text"
+                    type="caption"
+                    noWrap
+                  >
                     {renderQuillTextBody(thread.body, {
                       hideFormatting: true,
                       collapse: true,

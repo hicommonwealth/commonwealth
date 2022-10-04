@@ -6,18 +6,40 @@
   grid-template-columns: 352px 1fr;
   gap: 16px;
 
+  @include mediumSmallInclusive {
+    display: flex;
+    flex-direction: column;
+    gap: unset;
+  }
+
   .topic-column {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 16px 0;
 
-    .topic-name-text.Text {
-      color: $primary-500;
+    @include mediumSmallInclusive {
+      gap: unset;
     }
 
-    .threads-count-text.Text {
-      color: $neutral-500;
+    .name-and-count {
+      display: flex;
+      flex-direction: column;
+
+      @include mediumSmallInclusive {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .topic-name-text.Text {
+        color: $primary-500;
+      }
+
+      .threads-count-text.Text {
+        color: $neutral-500;
+      }
     }
   }
 
@@ -30,6 +52,10 @@
       flex-direction: column;
       gap: 8px;
       padding: 16px;
+
+      @include mediumSmallInclusive {
+        padding: 16px 0;
+      }
 
       &:hover {
         background-color: $neutral-50;
@@ -78,6 +104,14 @@
 
       .comment-preview-text.Text {
         width: 400px;
+
+        .MarkdownFormattedText {
+          position: unset;
+        }
+
+        @include smallInclusive {
+          width: 100%;
+        }
       }
 
       .row-bottom {
