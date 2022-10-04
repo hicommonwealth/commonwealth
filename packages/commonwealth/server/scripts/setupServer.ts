@@ -39,7 +39,7 @@ const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQControl
     if (typeof addr === 'string') {
       log.info(`Listening on ${addr}`);
     } else {
-      log.info(`Listening on port ${addr.port}`);
+      log.info(`Listening on port ${addr?.port}`);
     }
   };
 

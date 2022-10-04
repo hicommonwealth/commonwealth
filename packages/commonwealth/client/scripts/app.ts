@@ -54,10 +54,14 @@ export async function initAppState(
   return new Promise((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`)
       .then(async (data) => {
+        // Print Server and Client Information
+        console.log(`App is Native: ${app.isNative(window)}`);
+        console.log(`App origin: ${window.location.origin}`);
+        console.log('app.serverUrl()', app.serverUrl());
         app.config.chains.clear();
         app.config.nodes.clear();
-        app.user.notifications.clear();
-        app.user.notifications.clearSubscriptions();
+        // app.user.notifications.clear();
+        // app.user.notifications.clearSubscriptions();
         data.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
@@ -844,6 +848,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Global routes
             //
+            // '/': redirectRoute(() => '/dydx/'),
             '/': importRoute('views/pages/landing', {
               scoped: false,
               hideSidebar: false,

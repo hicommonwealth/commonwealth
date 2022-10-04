@@ -88,7 +88,7 @@ If errors occur try these steps:
 ```bash
   env: python: No such file or directory
   make: *** [Release/sass.a] Error 127
-  gyp ERR! build error 
+  gyp ERR! build error
   gyp ERR! stack Error: `make` failed with exit code: 2
 ```
 
@@ -174,7 +174,7 @@ heroku pg:psql -a <APP_NAME>
 # exit the remote server and log in to local instance
 exit
 psql -d commonwealth -U commonwealth
-# load the local .csv to the local database 
+# load the local .csv to the local database
 # example: \COPY "ChainEvents" FROM '/var/www/html/commonwealth/ChainEvents.csv' CSV;
 \COPY "<TABLE_NAME>" FROM '<LOCAL_PATH><FILENAME>.csv' CSV;
 
@@ -250,6 +250,51 @@ You should now set up any databases and services needed. In particular:
   `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
   at 1pm UTC / 6am PT / 9am ET / 3pm CEST
 
+## Developing for iOS and Android with Capacitor
+
+Make sure you also `npm install -g @capacitor/cli`
+
+The following command should be run to create build directories for both iOS and Android.
+
+- For iOS development, you will need to enable xcode-select via install XCode or XCodeTerminal (macOS only)
+- For Android Studios, you will need to download and install Android Studios.
+
+```
+yarn run add-capacitor
+```
+
+Then, install pods:
+
+```
+cd ios/App
+pod install
+```
+
+You may need to edit the Podfile to account for the monorepo, if Podfile Dependecies have not been correctly added. From the `ios/App` directory, this replaces the first ../../ with ../../../../ for importing over the relative path:
+
+```
+sed -i '1 s'#..\/..\/#..\/..\/..\/..\/#' Podfile
+```
+
+Now return to the commonwealth directory and run `NODE_ENV=mobile yarn start` to act as the mobile app server.
+
+Use the following `yarn` commands to sync and build the `client` directory to the build directory
+
+- yarn build-ios
+- yarn build-android
+- yarn start-ios
+- yarn start-android
+
+Please note, you will need to pull your local service (external IP address) to set the `SERVER_URL` env var.
+Additionally, will need to edit the `server.url` entry in `capacitor.config.ts` for case `mobile` with the your device external IP address.
+
+By default, we use `NODE_ENV=mobile` to run `yarn build-ios` and `yarn build-android`. This `NODE_ENV` will enable live reloads by default for changes to the `client`. If you change `server` files, you will need to "re run" the app.
+
+You can also open the app directly from XCode or Android Studio and more!
+```
+    "open-ios": "npx cap open ios",
+    "open-android": "npx cap open ios",
+```
 ## Custom Domains
 
 To configure a custom domain, you should:
@@ -265,7 +310,7 @@ To test, add a new entry to your /etc/hosts file:
 127.0.0.1       <custom domain>
 ```
 
-Then run a local SSL proxy, for example: 
+Then run a local SSL proxy, for example:
 ```
 npm install -g local-ssl-proxy
 local-ssl-proxy --source 443 --target 8080
@@ -367,7 +412,7 @@ Polkadot/Kusama:
 ## Vultr Scripts
 ### Root/Admin ONLY
 **install-docker.sh**: This script installs Docker on a remote Vultr server.
-- Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP 
+- Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP
   stored in the `VULTR_IP` env var defined in the `.env` file. Also requires the `VULTR_USER` env var to be set so that
   the root user can give the `VULTR_USER` permission to use Docker CLI without using `sudo`. The user of this command
   must have the `cmn_docker_root_ssh` private key in `~/.ssh/`.
