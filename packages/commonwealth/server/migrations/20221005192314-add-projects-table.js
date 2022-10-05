@@ -33,10 +33,10 @@ module.exports = {
         deadline: { type: Sequelize.INTEGER, allowNull: false, },
         funding_amount: { type: Sequelize.STRING, allowNull: false, },
 
-        title: { type: Sequelize.STRING, allowNull: true },
-        description: { type: Sequelize.STRING, allowNull: true },
-        short_description: { type: Sequelize.STRING, allowNull: true },
-        cover_image: { type: Sequelize.STRING, allowNull: true },
+        title: { type: Sequelize.STRING(64), allowNull: true },
+        short_description: { type: Sequelize.STRING(224), allowNull: true },
+        description: { type: Sequelize.TEXT, allowNull: true },
+        cover_image: { type: Sequelize.TEXT, allowNull: true },
 
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -78,6 +78,7 @@ module.exports = {
 
       await queryInterface.addColumn('IpfsPins', 'user_id', {
         type: Sequelize.INTEGER,
+        allowNull: false,
         references: { model: 'Users', key: 'id' },
       }, { transaction: t });
     });
@@ -86,7 +87,6 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('Projects', { transaction: t });
-      await queryInterface.bulkDelete('ChainNodes', { chain: 'common-protocol' }, { transaction: t });
       await queryInterface.bulkDelete('Chains', { id: 'common-protocol' }, { transaction: t });
       await queryInterface.removeColumn('IpfsPins', 'user_id', { transaction: t });
     });
