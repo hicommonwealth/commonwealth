@@ -66,14 +66,6 @@ module.exports = {
     });
 
     await queryInterface.sequelize.transaction(async (t) => {
-      // Delete Roles that are associated with chains that no longer exist
-      await queryInterface.sequelize.query(
-        `DELETE FROM "Roles" WHERE "chain_id" NOT IN (SELECT "id" FROM "Chains")`,
-        { transaction: t }
-      );
-    });
-
-    await queryInterface.sequelize.transaction(async (t) => {
       // Migrate CommunityRoles for Current Chains
       const query = `
       SELECT c.id as cid
@@ -124,13 +116,15 @@ module.exports = {
       );
     });
 
+    // I think we need to do it half and half
     await queryInterface.sequelize.transaction(async (t) => {
       // Migrate RoleAssignments for Current Roles
       const role_query = `
       SELECT r.id as rid, cr.name as crname, r.address_id, r.permission, r.chain_id, cr.id as crid
       FROM "Roles" r
       LEFT JOIN "CommunityRoles" cr
-      ON cr.chain_id = r.chain_id AND CAST(r.permission AS TEXT) = CAST(cr.name AS TEXT);`;
+      ON r.chain_id = cr.chain_id AND CAST(r.permission AS TEXT) = CAST(cr.name AS TEXT)
+      WHERE r.chain_id IN (SELECT "id" FROM "Chains") AND r.address_id IN (SELECT "id" FROM "Addresses");`;
       const rolesWithCommunityRoles = await queryInterface.sequelize.query(
         role_query,
         {
@@ -140,7 +134,6 @@ module.exports = {
       await Promise.all(
         rolesWithCommunityRoles[0].map(async (r) => {
           // create CommunityRoles for each chain
-          console.log(`Creating RoleAssignment for role ${r.rid} with address ${r.address_id}`);
           await queryInterface.bulkInsert(
             'RoleAssignments',
             [
