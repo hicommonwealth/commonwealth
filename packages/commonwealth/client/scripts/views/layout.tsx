@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { EmptyState, Icons, Spinner } from 'construct-ui';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -17,12 +16,17 @@ import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
 import { AppModals } from './app_modals';
 import { UserSurveyPopup } from './components/user_survey_popup';
+import { CWSpinner } from './components/component_kit/cw_spinner';
+import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWText } from './components/component_kit/cw_text';
 
 class LoadingLayout implements m.ClassComponent {
   view() {
     return (
       <div class="Layout">
-        <Spinner active={true} fill={true} size="xl" />
+        <div class="spinner-container">
+          <CWSpinner size="xl" />
+        </div>
         <AppModals />
         <AppToasts />
       </div>
@@ -43,7 +47,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
   private surveyReadyForDisplay = false;
 
   view(vnode) {
-    const { scope, deferChain, hideSidebar } = vnode.attrs;
+    const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
@@ -59,17 +63,16 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
     if (app.loadingError) {
       return (
         <div class="Layout">
-          <EmptyState
-            fill={true}
-            icon={Icons.ALERT_TRIANGLE}
+          <CWEmptyState
+            iconName="cautionTriangle"
             content={
               <div class="loading-error">
-                <p>Application error: {app.loadingError}</p>
-                <p>Please try again later</p>
+                <CWText>Application error: {app.loadingError}</CWText>
+                <CWText>Please try again later</CWText>
               </div>
             }
           />
-          <AppModals />,
+          <AppModals />
           <AppToasts />
         </div>
       );
@@ -80,7 +83,8 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       this.loadingScope = scope;
       initNewTokenChain(scope);
       return <LoadingLayout />;
-    } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+      // } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
+    } else if (true) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
@@ -125,7 +129,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
     return (
-      <div class={`Layout${hideSidebar ? ' hide-sidebar' : ''}`}>
+      <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />
