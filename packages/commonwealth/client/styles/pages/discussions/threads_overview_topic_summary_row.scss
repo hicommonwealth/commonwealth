@@ -46,8 +46,11 @@
   .recent-threads-column {
     display: flex;
     flex-direction: column;
-    max-width: 576px;
     width: 100%;
+
+    @include large {
+      max-width: 720px;
+    }
 
     @include mediumInclusive {
       max-width: 520px;
