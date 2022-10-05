@@ -156,7 +156,7 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
+  const compiler = DEV ? webpack(devWebpackConfig as any) : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
@@ -245,7 +245,7 @@ async function main() {
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
-  
+
 
     // add other middlewares
     app.use(logger('dev'));
