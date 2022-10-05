@@ -20,6 +20,7 @@ import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { RoleAttributes, RoleInstance } from '../models/role';
 
 import { AppError, ServerError } from '../util/errors';
+import { createDefaultCommunityRoles } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -296,6 +297,8 @@ const createChain = async (
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound'
   });
+
+  await createDefaultCommunityRoles(models, chain.id)
 
   if (req.body.address) {
     const [contract] = await models.Contract.findOrCreate({

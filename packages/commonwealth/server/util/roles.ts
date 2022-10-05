@@ -6,7 +6,7 @@ export enum name {
   Member = 'member',
 }
 
-export async function createDefaultRoles(
+export async function createDefaultCommunityRoles(
   models: DB,
   chain_id: string
 ): Promise<void> {
