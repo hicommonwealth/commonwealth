@@ -12,20 +12,24 @@ export const CheckRuleErrors = {
 };
 
 type checkAddressAgainstRuleReq = {
-  rule_id: number;
+  'rule_ids[]': number[];
   address: string;
 };
 
-type checkAddressAgainstRuleResp = { addressIsValidUnderRule: boolean };
+type checkAddressAgainstRuleResp = {
+  ruleChecks: { [rule_id: number]: boolean };
+  validUnderAll: boolean;
+};
 
-const checkAddressAgainstRule = async (
+const checkRules = async (
   models: DB,
   ruleCache: RuleCache,
   req: TypedRequestBody<checkAddressAgainstRuleReq>,
   resp: TypedResponse<checkAddressAgainstRuleResp>
 ) => {
-  const { rule_id, address } = req.body;
-  if (!rule_id) throw new AppError(CheckRuleErrors.NoRuleSpecified);
+  const { address } = req.body;
+  const rule_ids = req.body['rule_ids[]'];
+  if (!rule_ids) throw new AppError(CheckRuleErrors.NoRuleSpecified);
 
   try {
     await models.Address.findOne({ where: { address } });
@@ -33,9 +37,15 @@ const checkAddressAgainstRule = async (
     throw new AppError(CheckRuleErrors.AddressNotValid);
   }
 
-  const isValid = await checkRule(ruleCache, models, rule_id, address);
+  let validUnderAll = true;
+  const ruleChecks = {};
+  for (const rule_id of rule_ids) {
+    const isValid = await checkRule(ruleCache, models, rule_id, address);
+    ruleChecks[rule_id] = isValid;
+    if (!isValid) validUnderAll = false;
+  }
 
-  return success(resp, { addressIsValidUnderRule: isValid });
+  return success(resp, { ruleChecks, validUnderAll });
 };
 
-export default checkAddressAgainstRule;
+export default checkRules;

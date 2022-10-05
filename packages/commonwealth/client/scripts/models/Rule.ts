@@ -24,6 +24,16 @@ class Rule {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
+
+  public static fromJSON({ id, chain_id, rule, created_at, updated_at }) {
+    return new Rule({
+      id,
+      chainId: chain_id,
+      rule,
+      createdAt: created_at,
+      updatedAt: updated_at,
+    });
+  }
 }
 
 export default Rule;

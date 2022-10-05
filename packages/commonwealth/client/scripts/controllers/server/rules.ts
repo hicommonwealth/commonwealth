@@ -3,37 +3,25 @@ import app from 'state';
 import $ from 'jquery';
 import { Rule } from 'models';
 
-export const ruleModelFromServer = (ruleFromDb) => {
-  const { id, chain_id, rule, created_at, updated_at } = ruleFromDb;
-
-  return new Rule({
-    id,
-    chainId: chain_id,
-    rule,
-    createdAt: created_at,
-    updatedAt: updated_at,
-  });
-};
-
 class RulesController {
   private _rulesStore = new RuleStore();
 
-  // Checks if a provided address passes a given rule.
+  // Checks if a provided address passes a set of rules
   // Agnostic to chain; this will work even if the rule is not in the store
-  public async addressPassesRule({
-    rule_id,
+  public async checkAgainstRules({
+    rule_ids,
     address,
   }: {
-    rule_id: number;
+    rule_ids: Array<number>;
     address: string;
-  }): Promise<boolean> {
+  }) {
     try {
-      const res = await $.post(`${app.serverUrl()}/checkAddressAgainstRule`, {
-        rule_id,
+      const res = await $.post(`${app.serverUrl()}/checkRules`, {
+        'rule_ids[]': rule_ids,
         address,
         jwt: app.user.jwt,
       });
-      return res.result.addressIsValidUnderRule;
+      return res.result;
     } catch (e) {
       console.log(e);
       throw new Error('Unable to check address against provided rule');
@@ -53,7 +41,7 @@ class RulesController {
 
       if (res.result.rules.length > 0) {
         await res.result.rules.forEach((rule) => {
-          this._rulesStore.add(ruleModelFromServer(rule));
+          this._rulesStore.add(Rule.fromJSON(rule));
         });
       }
     } catch (e) {
@@ -78,7 +66,7 @@ class RulesController {
       if (res.result) {
         // Add rule to store if it's for the current chain
         if (res.result.chain_id === app.activeChainId()) {
-          this._rulesStore.add(ruleModelFromServer(res.result));
+          this._rulesStore.add(Rule.fromJSON(res.result));
         }
       }
     } catch (e) {
@@ -106,7 +94,7 @@ class RulesController {
       if (res.result) {
         const ruleInStore = this._rulesStore.getById(rule_id);
         if (chain_id === app.activeChainId() && !ruleInStore) {
-          this._rulesStore.add(ruleModelFromServer(res.result));
+          this._rulesStore.add(Rule.fromJSON(res.result));
         }
       }
     } catch (e) {

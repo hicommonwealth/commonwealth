@@ -119,7 +119,7 @@ import deleteRule from './routes/rules/deleteRule';
 import getRuleTypes from './routes/rules/getRuleTypes';
 import getRules from './routes/rules/getRules';
 import editRule from './routes/rules/editRule';
-import checkAddressAgainstRule from './routes/rules/checkAddressAgainstRule';
+import checkRules from './routes/rules/checkRules';
 
 import createWebhook from './routes/webhooks/createWebhook';
 import updateWebhook from './routes/webhooks/updateWebhook';
@@ -683,10 +683,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteRule.bind(this, models)
   );
-  router.post(
-    '/checkAddressAgainstRule',
-    checkAddressAgainstRule.bind(this, models, ruleCache)
-  );
+  router.post('/checkRules', checkRules.bind(this, models, ruleCache));
   router.get('/getRuleTypes', getRuleTypes.bind(this, models));
 
   // settings
