@@ -161,7 +161,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async reset() {
     console.log('Attempting to reset Metamask');
-    this._web3.givenProvider.off(
+    this._web3.givenProvider.removeListener(
       'accountsChanged',
       this._accountsChangedFunc
     );

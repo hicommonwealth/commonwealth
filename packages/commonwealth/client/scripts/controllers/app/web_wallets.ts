@@ -1,4 +1,4 @@
-import { Account, IWebWallet } from 'models';
+import { Account, IWebWallet, NodeInfo } from 'models';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import app from 'state';
 import $ from 'jquery';

@@ -221,7 +221,7 @@ export default class ProjectsController {
       project.address
     );
 
-    const tx = await contract.back(value, { from: backer.address });
+    const tx = await contract.back(value);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to back');
@@ -248,7 +248,7 @@ export default class ProjectsController {
       project.address
     );
 
-    const tx = await contract.curate(value, { from: curator.address });
+    const tx = await contract.curate(value);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to curate');
@@ -278,9 +278,7 @@ export default class ProjectsController {
       project.address
     );
 
-    const tx = await contract.beneficiaryWithdraw({
-      from: beneficiary.address,
-    });
+    const tx = await contract.beneficiaryWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
@@ -310,7 +308,7 @@ export default class ProjectsController {
       project.address
     );
 
-    const tx = await contract.backersWithdraw({ from: backer.address });
+    const tx = await contract.backersWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
@@ -342,7 +340,7 @@ export default class ProjectsController {
       project.address
     );
 
-    const tx = await contract.curatorsWithdraw({ from: curator.address });
+    const tx = await contract.curatorsWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');

@@ -114,7 +114,7 @@ export class InformationSlide
           onclick={async () => {
             const [txReceipt, newProjectId] = await app.projects.createProject({
               beneficiary: '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
-              chainId: 'dydx',
+              chainId: 'ethereum',
               coverImage:
                 'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/b1e3b3f9-67d8-43a3-be80-e9f038da415f.jpeg',
               creator: '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
