@@ -4,7 +4,7 @@ import {
   CWEvent,
   IChainEventData,
   CommonwealthTypes,
-} from 'chain-events';
+} from 'chain-events/src';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { DB } from '../database';
 
