@@ -18,7 +18,7 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 type EditBodyAttrs = {
   thread: Thread;
   setIsEditing: (status: boolean) => void;
-  updatedTitle: string;
+  title: string;
 };
 
 export class EditBody implements m.ClassComponent<EditBodyAttrs> {
@@ -26,13 +26,8 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
   private saving: boolean;
 
   view(vnode) {
-    const {
-      shouldRestoreEdits,
-      savedEdits,
-      thread,
-      setIsEditing,
-      updatedTitle,
-    } = vnode.attrs;
+    const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
+      vnode.attrs;
 
     const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
@@ -86,7 +81,7 @@ export class EditBody implements m.ClassComponent<EditBodyAttrs> {
 
               const itemText = this.quillEditorState.textContentsAsString;
 
-              app.threads.edit(thread, itemText, updatedTitle).then(() => {
+              app.threads.edit(thread, itemText, title).then(() => {
                 navigateToSubpage(`/discussion/${thread.id}`);
                 this.saving = false;
                 clearEditingLocalStorage(thread.id, ContentType.Thread);

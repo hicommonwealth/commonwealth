@@ -18,7 +18,6 @@ import { VotingResults } from '../../components/proposals/voting_results';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { ProposalComments } from './proposal_comments';
 import { CreateComment } from './create_comment';
-import { ProposalPageState } from './types';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { clearEditingLocalStorage } from './helpers';
 import {
@@ -30,7 +29,6 @@ import {
   ProposalBodyAuthor,
   ProposalBodyText,
   ProposalHeaderStage,
-  ProposalTitleEditor,
 } from './proposal_components';
 import { SocialSharingCarat } from './social_sharing_carat';
 import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
@@ -42,6 +40,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { EditBody } from './edit_body';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
 type ProposalBodyAttrs = {
   commentCount: number;
@@ -51,7 +50,6 @@ type ProposalBodyAttrs = {
   isEditor: boolean;
   isGloballyEditing: boolean;
   proposal: AnyProposal | Thread;
-  proposalPageState: ProposalPageState;
   setIsGloballyEditing: (status: boolean) => void;
   updatedCommentsCallback: () => void;
   viewCount: number;
@@ -61,6 +59,11 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
   private isEditingBody: boolean;
   private savedEdits: string;
   private shouldRestoreEdits: boolean;
+  private title: string;
+
+  oninit(vnode) {
+    this.title = vnode.attrs.proposal.title;
+  }
 
   view(vnode) {
     const {
@@ -73,7 +76,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
       isEditor,
       isGloballyEditing,
       proposal,
-      proposalPageState,
       viewCount,
     } = vnode.attrs;
 
@@ -97,10 +99,11 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
       <div class="ProposalBody">
         <div class="header">
           {this.isEditingBody ? (
-            <ProposalTitleEditor
-              item={proposal}
-              setIsGloballyEditing={setIsGloballyEditing}
-              parentState={this}
+            <CWTextInput
+              oninput={(e) => {
+                this.title = e.target.value;
+              }}
+              value={this.title}
             />
           ) : (
             <CWText type="h3" fontWeight="semiBold">
@@ -277,8 +280,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                 savedEdits={this.savedEdits}
                 shouldRestoreEdits={this.shouldRestoreEdits}
                 setIsEditing={setIsEditingBody}
-                proposalPageState={proposalPageState}
-                updatedTitle={proposal.title}
+                title={this.title}
               />
             ) : (
               <>
@@ -292,7 +294,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                     updatedCommentsCallback={updatedCommentsCallback}
                     setIsGloballyEditing={setIsGloballyEditing}
                     isGloballyEditing={isGloballyEditing}
-                    proposalPageState={this}
                     parentComment={null}
                     rootProposal={proposal}
                   />

@@ -50,14 +50,11 @@ class ViewProposalPage
     }>
 {
   private comments: Comment<Thread>[];
-  private highlightedComment: boolean;
   private isGloballyEditing: boolean;
   private polls: Poll[];
   private prefetch: Prefetch;
   private proposal: AnyProposal | Thread;
   private recentlyEdited: boolean;
-  private recentlySubmitted: number; // comment ID for CSS highlight transitions
-  private replying: boolean;
   private tabSelected: 'viewProposal' | 'viewSidebar';
   private threadFetched: boolean;
   private threadFetchFailed: boolean;
@@ -471,7 +468,6 @@ class ViewProposalPage
                 isEditor={isEditor}
                 isGloballyEditing={this.isGloballyEditing}
                 proposal={proposal}
-                proposalPageState={this}
                 viewCount={viewCount}
               />
             )}
@@ -503,7 +499,6 @@ class ViewProposalPage
               isEditor={isEditor}
               isGloballyEditing={this.isGloballyEditing}
               proposal={proposal}
-              proposalPageState={this}
               viewCount={viewCount}
             />
             <ProposalSidebar
