@@ -3,15 +3,19 @@ import { DataTypes, Model } from 'sequelize';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import {
-  RolePermissionAttributes,
-  RolePermissionInstance,
+  RoleAssignmentAttributes,
+  RoleAssignmentInstance,
 } from './role_assignment';
 import { ModelStatic, ModelInstance } from './types';
 
-export type name = 'admin' | 'moderator' | 'member';
+export enum name {
+  Admin = 'admin',
+  Moderator = 'moderator',
+  Member = 'member',
+}
 
 export type CommunityRoleAttributes = {
-  permission: name;
+  name: name;
   id?: number;
   chain_id: string;
   permissions?: bigint;
@@ -19,11 +23,11 @@ export type CommunityRoleAttributes = {
   updated_at?: Date;
 
   // associations
-  RolePermissions?: RolePermissionAttributes[];
+  RolePermissions?: RoleAssignmentAttributes[];
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  getRolePermissions: Sequelize.HasManyGetAssociationsMixin<RolePermissionInstance>;
+  getRolePermissions: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
 };
 
 export type CommunityRoleModelStatic = ModelStatic<CommunityRoleInstance>;
