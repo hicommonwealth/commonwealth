@@ -8,14 +8,14 @@ import {
 } from './role_assignment';
 import { ModelStatic, ModelInstance } from './types';
 
-export enum name {
+export enum RoleName {
   Admin = 'admin',
   Moderator = 'moderator',
   Member = 'member',
 }
 
 export type CommunityRoleAttributes = {
-  name: name;
+  name: RoleName;
   id?: number;
   chain_id: string;
   permissions?: bigint;
