@@ -385,11 +385,8 @@ export class ChainMetadataRows
                 terms,
                 iconUrl,
                 defaultSummaryView,
-<<<<<<< HEAD
                 hideProjects,
-=======
                 chatEnabled,
->>>>>>> master
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');
