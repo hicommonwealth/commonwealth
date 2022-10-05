@@ -11,14 +11,16 @@ import {
   CompoundEvents,
   AaveEvents,
   IDisconnectedRange,
+  CommonwealthEvents,
 } from 'chain-events/src';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
+import ProjectHandler from '../eventHandlers/project';
 import { ChainInstance } from '../models/chain';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -51,6 +53,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   try {
     const migrationHandler = new MigrationHandler(models, chain);
     const entityArchivalHandler = new EntityArchivalHandler(models, chain);
+    const projectHandler = new ProjectHandler(models);
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
@@ -84,6 +87,16 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       );
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
+    } else if (chainInstance.network === ChainNetwork.CommonProtocol) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
+      const api = await CommonwealthEvents.createApi(
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
+      );
+      fetcher = new CommonwealthEvents.StorageFetcher(api);
+      range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');
     }
@@ -97,6 +110,9 @@ export async function migrateChainEntity(chain: string): Promise<void> {
         // eslint-disable-next-line no-await-in-loop
         const dbEvent = await migrationHandler.handle(event);
         await entityArchivalHandler.handle(event, dbEvent);
+        if (chainInstance.network === ChainNetwork.CommonProtocol) {
+          await projectHandler.handle(event, dbEvent);
+        }
       } catch (e) {
         log.error(`Event handle failure: ${e.message}`);
       }

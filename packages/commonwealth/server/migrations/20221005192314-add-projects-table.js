@@ -42,26 +42,13 @@ module.exports = {
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
 
-      const ethChainNodeId = await queryInterface.rawSelect('Chains', {
-        where: {
-          id: 'ethereum'
-        }
-      }, ['chain_node_id']);
-
-      // clone ethereum chain node to avoid revealing private url
-      // const ethNode = await queryInterface.sequelize.query(`
-      //   SELECT url, alt_wallet_url, private_url FROM "ChainNodes" WHERE id = ?
-      // `, { transaction: t, replacements: [ethId] });
-      //
-      // const { url, alt_wallet_url, private_url } = ethNode[0][0];
-      //
-      // const result = await queryInterface.bulkInsert('ChainNodes', [{
-      //   // chain: 'common-protocol',
-      //   url,
-      //   alt_wallet_url,
-      //   private_url,
-      //   eth_chain_id: 1,
-      // }], { transaction: t });
+      const ethChainNode = await queryInterface.bulkInsert('ChainNodes', [{
+        url: 'wss://eth-goerli.g.alchemy.com/v2/j4q_OFABLwfgV8b8Hel7JKLXH1y3G4_y',
+        alt_wallet_url: 'wss://eth-goerli.g.alchemy.com/v2/j4q_OFABLwfgV8b8Hel7JKLXH1y3G4_y',
+        eth_chain_id: 5,
+        balance_type: 'ethereum',
+        chain_base: 'ethereum',
+      }], { transaction: t, returning: true });
 
       // create dummy CWP chain
       await queryInterface.bulkInsert('Chains', [{
@@ -73,7 +60,22 @@ module.exports = {
         base: 'ethereum',
         active: true,
         description: '',
-        chain_node_id: ethChainNodeId
+        chain_node_id: ethChainNode[0].id,
+      }], { transaction: t });
+
+      const contract = await queryInterface.bulkInsert('Contracts', [{
+        address: '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a',
+        chain_node_id: ethChainNode[0].id,
+        type: 'common-protocol',
+        created_at: new Date(),
+        updated_at: new Date(),
+      }], { transaction: t, returning: true });
+
+      await queryInterface.bulkInsert('CommunityContracts', [{
+        chain_id: 'common-protocol',
+        contract_id: contract[0].id,
+        created_at: new Date(),
+        updated_at: new Date(),
       }], { transaction: t });
 
       await queryInterface.addColumn('IpfsPins', 'user_id', {
@@ -86,9 +88,16 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable('Projects', { transaction: t });
-      await queryInterface.bulkDelete('Chains', { id: 'common-protocol' }, { transaction: t });
       await queryInterface.removeColumn('IpfsPins', 'user_id', { transaction: t });
+      await queryInterface.bulkDelete('CommunityContracts', { chain_id: 'common-protocol' }, { transaction: t });
+      await queryInterface.bulkDelete(
+        'Contracts',
+        { address: '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a' },
+        { transaction: t },
+      );
+      await queryInterface.bulkDelete('Chains', { id: 'common-protocol' }, { transaction: t });
+      await queryInterface.bulkDelete('ChainNodes', { eth_chain_id: 5 }, { transaction: t });
+      await queryInterface.dropTable('Projects', { transaction: t });
     });
   }
 };

@@ -23,6 +23,7 @@ export enum ContractType {
   ERC721 = 'erc721',
   MARLINTESTNET = 'marlin-testnet',
   SPL = 'spl',
+  COMMONPROTOCOL = 'common-protocol',
   MOLOCH1 = 'moloch1', // unused
   MOLOCH2 = 'moloch2', // unused
 }
