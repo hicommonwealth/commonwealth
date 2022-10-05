@@ -116,7 +116,7 @@ export async function migrateChainEntities(): Promise<void> {
   const chains = await models.Chain.findAll({
     where: {
       active: true,
-      has_chain_events_listener: true,
+      // has_chain_events_listener: true,
     },
   });
   for (const { id } of chains) {
