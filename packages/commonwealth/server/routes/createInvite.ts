@@ -7,6 +7,8 @@ import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from '../util/errors';
 import { DB } from '../database';
+import { RoleName } from 'server/models/community_role';
+import { createRole } from 'server/util/roles';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -64,11 +66,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
       },
     });
     if (existingRole) return next(new AppError(Errors.IsAlreadyMember));
-    const role = await models.Role.create({
-      chain_id: chain.id,
-      address_id: existingAddress.id,
-      permission: 'member',
-    });
+    const role = await createRole(models, existingAddress.id, chain.id, RoleName.Member);
     // TODO: We need to notify added users; role creation shouldn't happen silently
     return res.json({ status: 'Success', result: role.toJSON() });
   }

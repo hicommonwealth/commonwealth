@@ -13,6 +13,8 @@ import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { AppError, ServerError } from '../util/errors';
+import { createRole } from 'server/util/roles';
+import { RoleName } from 'server/models/community_role';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -141,11 +143,7 @@ const createAddress = async (
         where: { address_id: updatedObj.id, chain_id: req.body.community },
       });
       if (!role) {
-        await models.Role.create({
-          address_id: updatedObj.id,
-          chain_id: req.body.community,
-          permission: 'member',
-        });
+        await createRole(models, updatedObj.id, req.body.community, RoleName.Member);
       }
     }
     return success(res, updatedObj.toJSON());
@@ -182,11 +180,7 @@ const createAddress = async (
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await models.Role.create({
-          address_id: newObj.id,
-          chain_id: req.body.chain,
-          permission: 'member',
-        });
+        await createRole(models, newObj.id, req.body.chain, RoleName.Member);
       }
 
       if (process.env.NODE_ENV !== 'test') {

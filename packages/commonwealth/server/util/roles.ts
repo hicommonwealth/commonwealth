@@ -1,11 +1,7 @@
 import { Transaction } from 'sequelize/types';
+import { RoleName } from 'server/models/community_role';
 import { sequelize, DB } from '../database';
-
-export enum RoleName {
-  Admin = 'admin',
-  Moderator = 'moderator',
-  Member = 'member',
-}
+import { RoleAssignmentInstance } from '../models/role_assignment';
 
 export async function createDefaultCommunityRoles(
   models: DB,
@@ -17,13 +13,16 @@ export async function createDefaultCommunityRoles(
     { name: RoleName.Moderator, permissions: BigInt(0) },
     { name: RoleName.Member, permissions: BigInt(0) },
   ];
-  community_roles.map((crole) =>
-    models.CommunityRole.create({
+  community_roles.forEach(async (crole) => {
+    const role = await models.CommunityRole.create({
       chain_id,
       name: crole.name,
       permissions: crole.permissions,
-    })
-  );
+    });
+    if (!role) {
+      throw new Error('Failed to create new role');
+    }
+  });
 }
 
 export async function createRole(
@@ -32,7 +31,7 @@ export async function createRole(
   chain_id: string,
   role_name: RoleName,
   transaction?: Transaction
-): Promise<void> {
+): Promise<RoleAssignmentInstance> {
   // Get the community role that has given chain_id and name
   const community_role = await models.CommunityRole.findOne({
     where: { chain_id, name: role_name },
@@ -41,11 +40,15 @@ export async function createRole(
     throw new Error('Community role not found');
   }
   // Create role
-  await models.RoleAssignment.create(
+  const roleAssignment = await models.RoleAssignment.create(
     {
       community_role_id: community_role.id,
       address_id,
     },
     { transaction }
   );
+  if (!roleAssignment) {
+    throw new Error('Failed to create new role');
+  }
+  return roleAssignment;
 }

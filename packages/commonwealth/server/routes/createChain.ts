@@ -20,7 +20,8 @@ import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { RoleAttributes, RoleInstance } from '../models/role';
 
 import { AppError, ServerError } from '../util/errors';
-import { createDefaultCommunityRoles } from '../util/roles';
+import { createDefaultCommunityRoles, createRole } from '../util/roles';
+import { RoleName } from 'server/models/community_role';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -384,12 +385,7 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    role = await models.Role.create({
-      address_id: addressToBeAdmin.id,
-      chain_id: chain.id,
-      permission: 'admin',
-      is_user_default: true,
-    });
+    await createRole(models, addressToBeAdmin.id, chain.id, RoleName.Admin);
 
     const [ subscription ] = await models.Subscription.findOrCreate({
       where: {

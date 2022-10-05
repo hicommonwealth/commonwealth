@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { createRole } from 'server/util/roles';
+import { RoleName } from 'server/models/community_role';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
 
@@ -54,11 +56,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
 
   if (existingRole) return next(new AppError(Errors.AlreadyMember));
 
-  const role = await models.Role.create({
-    address_id: existingAddress.id,
-    chain_id: chain.id,
-    permission: 'member',
-  });
+  const role = await createRole(models, existingAddress.id, chain.id, RoleName.Member)
 
   return res.json({ status: 'Success', result: role.toJSON() });
 };
