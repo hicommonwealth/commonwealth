@@ -39,7 +39,7 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
 
   return [
     {
-      label: 'New thread',
+      label: 'New Thread',
       onclick: () => {
         navigateToSubpage('/new/discussion');
       },
@@ -146,6 +146,12 @@ export class CreateContentMenu implements m.ClassComponent {
     return (
       <CWMobileMenu
         className="MainMenu"
+        menuHeader={{
+          label: 'Create',
+          onclick: (e) => {
+            app.mobileMenu = 'MainMenu';
+          },
+        }}
         menuItems={getCreateContentMenuItemAttrs().map((attr) => ({
           ...attr,
           iconName: 'write',

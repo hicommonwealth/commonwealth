@@ -1,11 +1,11 @@
 /* @jsx m */
 
-import m from 'mithril';
 import 'components/create_content_popover.scss';
+import m from 'mithril';
 import app from 'state';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { getCreateContentMenuItemAttrs } from '../menus/create_content_menu';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 type CreateContentPopoverAttrs = {
   fluid: boolean;
@@ -23,13 +23,7 @@ export class CreateContentPopover
         hoverCloseDelay={0}
         hasArrow={false}
         trigger={
-          <CWIconButton
-            disabled={!app.user.activeAccount}
-            iconTheme="black"
-            iconName="plusCircle"
-            iconSize="medium"
-            inline={true}
-          />
+          <CWIcon disabled={!app.user.activeAccount} iconName="plusCircle" />
         }
         position="bottom-start"
         closeOnContentClick={true}

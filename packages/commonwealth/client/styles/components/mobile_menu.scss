@@ -10,6 +10,15 @@
     overflow-y: auto;
   }
 
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    .Icon {
+      margin-right: 12px;
+    }
+  }
+
   .MobileMenuItem {
     border-bottom: 1px solid $neutral-100;
     display: flex;

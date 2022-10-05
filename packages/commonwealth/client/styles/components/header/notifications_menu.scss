@@ -25,8 +25,13 @@
 }
 
 .NotificationsMenuPopover {
-  width: 296px;
+  .NotificationsMenu {
+    width: 296px;
+  }
+}
 
+.NotificationsMenu {
+  width: 100%;
   .NotificationsMenuHeader {
     @include notificationsButton;
 

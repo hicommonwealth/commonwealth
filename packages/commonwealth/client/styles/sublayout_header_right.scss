@@ -10,6 +10,10 @@
     margin-left: 8px;
   }
 
+  .Icon {
+    cursor: pointer;
+  }
+
   .MobileIconPopover {
     display: none;
     @include extraSmall {
@@ -30,12 +34,5 @@
     @include extraSmall {
       display: none;
     }
-  }
-
-  .PopoverMenu {
-    width: 100vw;
-    position: fixed;
-    left: 0;
-    right: 0;
   }
 }

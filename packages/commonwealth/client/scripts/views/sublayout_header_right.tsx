@@ -9,9 +9,10 @@ import { ChainInfo } from 'models';
 import { InvitesMenuPopover } from 'views/popovers/invites_menu_popover';
 import { LoginSelector } from 'views/components/header/login_selector';
 import { NotificationsMenuPopover } from './popovers/notifications_menu_popover';
-import { CreateContentPopover } from './popovers/create_content_popover';
+import { CreateContentPopover } from './popovers/create_content_menu_popover';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { HelpMenuPopover } from './popovers/help_menu_popover';
+import { CWIcon } from './components/component_kit/cw_icons/cw_icon';
 
 type SublayoutHeaderRightAttrs = {
   chain: ChainInfo;
@@ -27,14 +28,14 @@ export class SublayoutHeaderRight
       <div class="SublayoutHeaderRight">
         {/* Only visible in mobile browser widths */}
         <div class="MobileIconPopover">
-          <CWIconButton
+          <CWIcon
             iconTheme="black"
             iconName="dotsVertical"
             onclick={(e) => {
-              if (app.mobileMenu === 'main') {
+              if (app.mobileMenu) {
                 delete app.mobileMenu;
               } else {
-                app.mobileMenu = 'main';
+                app.mobileMenu = 'MainMenu';
               }
             }}
           />

@@ -6,7 +6,7 @@ import 'components/empty_topic_placeholder.scss';
 
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
-import { CreateContentPopover } from '../popovers/create_content_popover';
+import { CreateContentPopover } from '../popovers/create_content_menu_popover';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
 type EmptyListingPlaceholderAttrs = {

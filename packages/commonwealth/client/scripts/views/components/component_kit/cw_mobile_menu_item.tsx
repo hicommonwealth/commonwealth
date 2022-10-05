@@ -41,11 +41,7 @@ export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
         >
           <div class="mobile-menu-item-left">
             {iconName && (
-              <CWIcon
-                className="menu-item-icon"
-                iconName={iconName}
-                iconSize="medium"
-              />
+              <CWIcon className="menu-item-icon" iconName={iconName} />
             )}
             <CWText type="b2" className="menu-item-text">
               {label}

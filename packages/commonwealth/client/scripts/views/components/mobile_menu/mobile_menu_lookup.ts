@@ -4,10 +4,10 @@ import { MainMenu } from '../../menus/main_menu';
 import { NotificationsMenu } from '../../menus/notifications_menu';
 
 export const mobileMenuLookup = {
-  createContent: CreateContentMenu,
-  help: HelpMenu,
-  main: MainMenu,
-  notifications: NotificationsMenu,
+  CreateContentMenu,
+  HelpMenu,
+  MainMenu,
+  NotificationsMenu,
 };
 
 export type MobileMenuName = keyof typeof mobileMenuLookup;

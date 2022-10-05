@@ -1,19 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import 'components/header/notifications_menu.scss';
 
-import app from 'state';
+import m from 'mithril';
 import { PopoverMenu } from 'construct-ui';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { NotificationsMenu } from '../menus/notifications_menu';
+import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
 export class NotificationsMenuPopover implements m.ClassComponent {
   view() {
-    const unreadNotificationsCount = app.user.notifications.numUnread;
     return (
       <PopoverMenu
-        className="NotificationsMenuPopover"
+        overlayClass="NotificationsMenuPopover"
         closeOnContentClick={true}
         closeOnOutsideClick={true}
         hasArrow={false}
@@ -21,18 +19,9 @@ export class NotificationsMenuPopover implements m.ClassComponent {
         position="bottom-end"
         transitionDuration={0}
         trigger={
-          unreadNotificationsCount === 0 ? (
-            <CWIconButton
-              iconName="bell"
-              iconSize="medium"
-              iconTheme="black"
-              style="display: flex;"
-            />
-          ) : (
-            <span>
-              {unreadNotificationsCount > 9 ? '∞' : unreadNotificationsCount}
-            </span>
-          )
+          <div>
+            <CWIcon iconName="bell" />
+          </div>
         }
         content={<NotificationsMenu />}
       />

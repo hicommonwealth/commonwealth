@@ -25,7 +25,7 @@ export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
             iconName: 'plusCircle' as IconName,
             mobileCaret: true,
             onclick: () => {
-              app.mobileMenu = 'createContent';
+              app.mobileMenu = 'CreateContentMenu';
             },
           },
         ]
@@ -35,7 +35,7 @@ export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
       iconName: 'help',
       mobileCaret: true,
       onclick: () => {
-        app.mobileMenu = 'help';
+        app.mobileMenu = 'HelpMenu';
       },
     },
     {
@@ -43,7 +43,7 @@ export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
       iconName: 'bell',
       mobileCaret: true,
       onclick: () => {
-        app.mobileMenu = 'notifications';
+        app.mobileMenu = 'NotificationsMenu';
       },
     },
   ];
