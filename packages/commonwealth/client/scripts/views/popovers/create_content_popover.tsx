@@ -5,7 +5,7 @@ import 'components/create_content_popover.scss';
 import app from 'state';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { getCreateContentMenuItems } from '../menus/create_content_menu';
+import { getCreateContentMenuItemAttrs } from '../menus/create_content_menu';
 
 type CreateContentPopoverAttrs = {
   fluid: boolean;
@@ -25,7 +25,7 @@ export class CreateContentPopover
         trigger={
           <CWIconButton
             disabled={!app.user.activeAccount}
-            iconButtonTheme="black"
+            iconTheme="black"
             iconName="plusCircle"
             iconSize="medium"
             inline={true}
@@ -36,7 +36,7 @@ export class CreateContentPopover
         menuAttrs={{
           align: 'left',
         }}
-        menuItems={getCreateContentMenuItems()}
+        menuItems={getCreateContentMenuItemAttrs()}
       />
     );
   }

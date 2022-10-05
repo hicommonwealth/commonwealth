@@ -5,7 +5,7 @@ import m from 'mithril';
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { getHelpMenuItems } from '../menus/help_menu';
+import { getHelpMenuItemAttrs, getHelpMenuItems } from '../menus/help_menu';
 
 export class HelpMenuPopover implements m.ClassComponent {
   view() {
@@ -18,7 +18,7 @@ export class HelpMenuPopover implements m.ClassComponent {
         trigger={
           <CWIconButton
             disabled={!app.user.activeAccount}
-            iconButtonTheme="black"
+            iconTheme="black"
             iconName="help"
             iconSize="medium"
             inline={true}
@@ -30,7 +30,7 @@ export class HelpMenuPopover implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        menuItems={getHelpMenuItems()}
+        menuItems={getHelpMenuItemAttrs()}
       />
     );
   }

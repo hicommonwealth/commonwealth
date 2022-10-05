@@ -25,7 +25,7 @@ export class NotificationsMenuPopover implements m.ClassComponent {
             <CWIconButton
               iconName="bell"
               iconSize="medium"
-              iconButtonTheme="black"
+              iconTheme="black"
               style="display: flex;"
             />
           ) : (
@@ -34,7 +34,7 @@ export class NotificationsMenuPopover implements m.ClassComponent {
             </span>
           )
         }
-        menuItems={NotificationsMenu}
+        content={<NotificationsMenu />}
       />
     );
   }

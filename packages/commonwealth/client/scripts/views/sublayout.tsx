@@ -13,7 +13,10 @@ import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
+import {
+  isWindowExtraSmall,
+  isWindowSmallInclusive,
+} from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
 import { MobileMenu } from './components/mobile_menu/mobile_menu';
 
@@ -76,6 +79,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       showQuickSwitcher,
     } = this;
 
+    if (!isWindowExtraSmall(window.innerWidth)) {
+      delete app.mobileMenu;
+    }
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">

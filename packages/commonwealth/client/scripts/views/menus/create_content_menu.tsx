@@ -1,14 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import 'components/create_content_popover.scss';
+
+import m from 'mithril';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { CWMenuItem } from '../components/component_kit/cw_menu_item';
+import { MenuItemAttrs } from './types';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 
-export const getCreateContentMenuItems = () => {
+export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -92,17 +94,17 @@ export const getCreateContentMenuItems = () => {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
           },
-          {
-            class:
-              activeAccount && (activeAccount as SubstrateAccount).isCouncillor
-                ? ''
-                : 'disabled',
-            label: 'New council motion',
-            onclick: () =>
-              navigateToSubpage('/new/proposal/:type', {
-                type: ProposalType.SubstrateCollectiveProposal,
-              }),
-          },
+          ...((activeAccount as SubstrateAccount)?.isCouncillor
+            ? [
+                {
+                  label: 'New council motion',
+                  onclick: () =>
+                    navigateToSubpage('/new/proposal/:type', {
+                      type: ProposalType.SubstrateCollectiveProposal,
+                    }),
+                },
+              ]
+            : []),
           {
             label: 'New bounty proposal',
             onclick: () =>
@@ -142,11 +144,13 @@ export const getCreateContentMenuItems = () => {
 export class CreateContentMenu implements m.ClassComponent {
   view() {
     return (
-      <div class="CreateContentMenu">
-        {getCreateContentMenuItems().map((attrs) => (
-          <CWMenuItem {...attrs} />
-        ))}
-      </div>
+      <CWMobileMenu
+        className="MainMenu"
+        menuItems={getCreateContentMenuItemAttrs().map((attr) => ({
+          ...attr,
+          iconName: 'write',
+        }))}
+      />
     );
   }
 }

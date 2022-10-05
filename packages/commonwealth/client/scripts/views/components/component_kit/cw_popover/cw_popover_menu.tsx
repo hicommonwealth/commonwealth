@@ -4,10 +4,11 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
+import { MenuItemAttrs } from 'views/menus/types';
 import { CWPopover, SharedPopoverAttrs } from './cw_popover';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
-import { CWMenuItem, MenuItemAttrs } from '../cw_menu_item';
+import { CWPopoverMenuItem } from '../cw_popover_menu_item';
 
 type PopoverMenuAttrs = {
   menuItems: Array<MenuItemAttrs>;
@@ -16,9 +17,7 @@ type PopoverMenuAttrs = {
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
   view(vnode) {
     const { className, menuItems, trigger } = vnode.attrs;
-    if (!menuItems) {
-      console.log({ className, trigger });
-    }
+
     return (
       <CWPopover
         content={
@@ -29,7 +28,7 @@ export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
             )}
           >
             {menuItems.map((item) => (
-              <CWMenuItem {...item} />
+              <CWPopoverMenuItem {...item} />
             ))}
           </div>
         }

@@ -2,23 +2,38 @@
 
 import app from 'state';
 import m from 'mithril';
-import {
-  CWMenuItem,
-  MenuItemAttrs,
-} from '../components/component_kit/cw_menu_item';
+import { MenuItemAttrs } from './types';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { IconName } from '../components/component_kit/cw_icons/cw_icon_lookup';
 
-export const getMainMenuItems = (): MenuItemAttrs[] => {
+export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
   return [
-    {
-      label: 'Create',
-      iconName: 'plus-circle',
-      onclick: () => {
-        app.mobileMenu = 'createContent';
-      },
-    },
+    // Graham TODO 22.10.05: Reinstate once proper search page built
+    // which can take "empty queries" (i.e. doesn't require active search term)
+    // {
+    //   label: 'Search',
+    //   iconName: 'search',
+    //   mobileCaret: true,
+    //   onclick: () => {
+    //     m.route.set('/search');
+    //   },
+    // },
+    ...(app.activeChainId()
+      ? [
+          {
+            label: 'Create',
+            iconName: 'plusCircle' as IconName,
+            mobileCaret: true,
+            onclick: () => {
+              app.mobileMenu = 'createContent';
+            },
+          },
+        ]
+      : []),
     {
       label: 'Help',
-      iconName: 'help-circle',
+      iconName: 'help',
+      mobileCaret: true,
       onclick: () => {
         app.mobileMenu = 'help';
       },
@@ -26,6 +41,7 @@ export const getMainMenuItems = (): MenuItemAttrs[] => {
     {
       label: 'Notifications',
       iconName: 'bell',
+      mobileCaret: true,
       onclick: () => {
         app.mobileMenu = 'notifications';
       },
@@ -36,11 +52,7 @@ export const getMainMenuItems = (): MenuItemAttrs[] => {
 export class MainMenu implements m.ClassComponent {
   view() {
     return (
-      <div class="MainMenu">
-        {getMainMenuItems().map((attrs) => (
-          <CWMenuItem {...attrs} />
-        ))}
-      </div>
+      <CWMobileMenu className="MainMenu" menuItems={getMainMenuItemAttrs()} />
     );
   }
 }

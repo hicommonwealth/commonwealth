@@ -95,10 +95,10 @@ export class ComponentShowcase implements m.ClassComponent {
             trigger={<CWIconButton iconName="dotsVertical" />}
             menuItems={[
               { type: 'header', label: 'Community' },
-              { label: 'Create Thread', iconName: 'edit' },
-              { label: 'Create Proposal', iconName: 'edit' },
-              { label: 'Create Poll', iconName: 'edit' },
-              { label: 'Create Snapshot', iconName: 'edit', disabled: true },
+              { label: 'Create Thread', iconName: 'write' },
+              { label: 'Create Proposal', iconName: 'write' },
+              { label: 'Create Poll', iconName: 'write' },
+              { label: 'Create Snapshot', iconName: 'write', disabled: true },
               { type: 'divider' },
               { type: 'header', label: 'Universal' },
               { label: 'Create Community', iconName: 'people' },
@@ -668,7 +668,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIconButton
               iconName="views"
               iconSize="large"
-              iconButtonTheme="primary"
+              iconTheme="primary"
               selected={this.selectedIconButton === 1}
               onclick={() => {
                 this.selectedIconButton = 1;
@@ -682,13 +682,27 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIconButton
               iconName="views"
               iconSize="large"
-              iconButtonTheme="neutral"
+              iconTheme="neutral"
               selected={this.selectedIconButton === 2}
               onclick={() => {
                 this.selectedIconButton = 2;
               }}
             />
             {this.selectedIconButton === 2 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconTheme="black"
+              selected={this.selectedIconButton === 3}
+              onclick={() => {
+                this.selectedIconButton = 3;
+              }}
+            />
+            {this.selectedIconButton === 3 && (
               <div class="icon-button-selected">is selected</div>
             )}
           </div>

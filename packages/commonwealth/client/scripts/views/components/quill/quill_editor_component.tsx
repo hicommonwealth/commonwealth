@@ -218,7 +218,7 @@ export class QuillEditorComponent
         <CWIconButton
           iconName="search"
           iconSize="small"
-          iconButtonTheme="primary"
+          iconTheme="primary"
           onclick={(e) => {
             e.preventDefault();
             app.modals.create({

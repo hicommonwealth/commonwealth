@@ -1,24 +1,12 @@
 /* @jsx m */
 
-import { IconName } from 'construct-ui';
 import m from 'mithril';
+import { MenuItemAttrs } from '../../menus/types';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-export type MenuItemAttrs =
-  | { type: 'divider' }
-  | { type: 'header'; label: string }
-  | {
-      disabled?: boolean;
-      iconName?: IconName;
-      isSecondary?: boolean;
-      label: string;
-      onclick: () => void;
-      type?: 'action';
-    };
-
-export class CWMenuItem implements m.ClassComponent<MenuItemAttrs> {
+export class CWPopoverMenuItem implements m.ClassComponent<MenuItemAttrs> {
   view(vnode: m.VnodeDOM<any, this>) {
     const { type, label, iconName, onclick, disabled, isSecondary } =
       vnode.attrs;
@@ -36,14 +24,14 @@ export class CWMenuItem implements m.ClassComponent<MenuItemAttrs> {
         <div
           class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
-            'MenuItem'
+            'PopoverMenuItem'
           )}
           onclick={onclick}
         >
           {iconName && (
             <CWIcon
-              iconName={iconName}
               className="menu-item-icon"
+              iconName={iconName}
               iconSize="small"
             />
           )}

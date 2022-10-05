@@ -36,7 +36,7 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
           {app.isLoggedIn() && (
             <CWIconButton
               iconName="plusCircle"
-              iconButtonTheme="black"
+              iconTheme="black"
               onclick={(e) => {
                 e.preventDefault();
                 mixpanelBrowserTrack({

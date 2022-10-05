@@ -25,7 +25,7 @@ export class SublayoutHeaderLeft
       <div class="SublayoutHeaderLeft">
         <CWIconButton
           iconName="commonLogo"
-          iconButtonTheme="black"
+          iconTheme="black"
           iconSize="xl"
           onclick={() => {
             m.route.set('/');
@@ -37,7 +37,7 @@ export class SublayoutHeaderLeft
         )}
         {isWindowSmallInclusive(window.innerWidth) && app.chain && (
           <CWIconButton
-            iconButtonTheme="black"
+            iconTheme="black"
             iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
             onclick={() => {
               toggleSidebar();

@@ -125,7 +125,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
           )}
         >
           <CWIconButton
-            iconButtonTheme="primary"
+            iconTheme="primary"
             iconName="plusCircle"
             iconSize={size === 'small' ? 'small' : 'medium'}
           />

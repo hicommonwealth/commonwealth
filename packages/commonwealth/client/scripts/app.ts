@@ -17,8 +17,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
-
 import {
   notifyError,
   notifyInfo,

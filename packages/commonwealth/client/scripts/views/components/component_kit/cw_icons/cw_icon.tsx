@@ -22,7 +22,6 @@ export class CWIcon implements m.ClassComponent<IconAttrs> {
     } = vnode.attrs;
 
     const Icon = iconLookup[iconName];
-    console.log({ Icon, iconLookup });
     return (
       <Icon
         className={className}

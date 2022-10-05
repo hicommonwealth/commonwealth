@@ -28,10 +28,14 @@ export class SublayoutHeaderRight
         {/* Only visible in mobile browser widths */}
         <div class="MobileIconPopover">
           <CWIconButton
-            iconButtonTheme="black"
+            iconTheme="black"
             iconName="dotsVertical"
             onclick={(e) => {
-              app.mobileMenu = 'main';
+              if (app.mobileMenu === 'main') {
+                delete app.mobileMenu;
+              } else {
+                app.mobileMenu = 'main';
+              }
             }}
           />
         </div>

@@ -79,9 +79,9 @@ export class NotificationsMenu implements m.ClassComponent {
         this.minChainEventsNotification,
         this.minChainEventsNotification + MAX_NOTIFS
       );
-
+    console.log('here');
     return (
-      <>
+      <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
           <Button
             label={
@@ -218,7 +218,7 @@ export class NotificationsMenu implements m.ClassComponent {
             }}
           />
         </div>
-      </>
+      </div>
     );
   }
 }

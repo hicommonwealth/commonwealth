@@ -6,7 +6,7 @@ import { Button, PopoverMenu, Icons } from 'construct-ui';
 import 'components/header/invites_menu.scss';
 
 import app from 'state';
-import { getInvitesMenuItems } from '../menus/invites_menu';
+import { getInvitesMenuItemAttrs } from '../menus/invites_menu';
 
 export class InvitesMenuPopover implements m.ClassComponent {
   view() {
@@ -44,7 +44,7 @@ export class InvitesMenuPopover implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        content={getInvitesMenuItems()}
+        content={getInvitesMenuItemAttrs()}
       />
     );
   }

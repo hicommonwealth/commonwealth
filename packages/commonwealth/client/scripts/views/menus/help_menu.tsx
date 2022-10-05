@@ -3,10 +3,11 @@
 import m from 'mithril';
 
 import app from 'state';
-import { CWMenuItem } from '../components/component_kit/cw_menu_item';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
+import { MenuItemAttrs } from './types';
 
-export const getHelpMenuItems = () => {
+export const getHelpMenuItemAttrs = (): MenuItemAttrs[] => {
   return [
     {
       label: 'Send Feedback',
@@ -17,7 +18,7 @@ export const getHelpMenuItems = () => {
     },
     {
       label: 'Help',
-      onclick: () => m.route.set('https://docs.commonwealth.im/commonwealth/'),
+      onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
     },
   ];
 };
@@ -25,11 +26,7 @@ export const getHelpMenuItems = () => {
 export class HelpMenu implements m.ClassComponent {
   view() {
     return (
-      <div class="HelpMenu">
-        {getHelpMenuItems().map((attrs) => (
-          <CWMenuItem {...attrs} />
-        ))}
-      </div>
+      <CWMobileMenu className="HelpMenu" menuItems={getHelpMenuItemAttrs()} />
     );
   }
 }

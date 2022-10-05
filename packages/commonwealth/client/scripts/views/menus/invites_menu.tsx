@@ -4,9 +4,10 @@ import { pluralize } from 'helpers';
 import m from 'mithril';
 
 import app from 'state';
-import { CWMenuItem } from '../components/component_kit/cw_menu_item';
+import { CWMobileMenuItem } from '../components/component_kit/cw_mobile_menu_item';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
 import { LoginModal } from '../modals/login_modal';
+import { MenuItemAttrs } from './types';
 
 export const handleEmailInvites = (state) => {
   if (!state.modalAutoTriggered && app.user) {
@@ -24,7 +25,7 @@ export const handleEmailInvites = (state) => {
   }
 };
 
-export const getInvitesMenuItems = () => {
+export const getInvitesMenuItemAttrs = (): MenuItemAttrs[] => {
   return [
     {
       label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
@@ -37,8 +38,8 @@ export class InvitesMenu implements m.ClassComponent {
   view() {
     return (
       <div class="InvitesMenu">
-        {getInvitesMenuItems().map((attrs) => (
-          <CWMenuItem {...attrs} />
+        {getInvitesMenuItemAttrs().map((attrs) => (
+          <CWMobileMenuItem {...attrs} />
         ))}
       </div>
     );

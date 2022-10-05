@@ -57,7 +57,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
 
     return (
       <div class="LoginMobile">
-        <ModalExitButton iconButtonTheme="hasBackground" />
+        <ModalExitButton iconTheme="hasBackground" />
         {hasEthAlert && <LoginEthAlert />}
         <div class={bodyType}>
           <LoginText headerText={headerText} bodyText={bodyText} isMobile />
