@@ -1,17 +1,13 @@
-import Web3 from 'web3';
 import BN from 'bn.js';
-import { providers } from 'ethers';
 import {
   IEventHandler,
   CWEvent,
   IChainEventData,
   CommonwealthTypes,
-} from '@commonwealth/chain-events';
-import { ChainInstance } from 'server/models/chain';
-import { ICuratedProject__factory } from '../../shared/eth/types';
-import { addPrefix, factory } from '../../shared/logging';
+} from 'chain-events';
+import { addPrefix, factory } from 'common-common/src/logging';
 import { DB } from '../database';
-import { ChainNodeAttributes } from '../models/chain_node';
+
 export default class extends IEventHandler {
   public readonly name = 'Project';
 
@@ -37,8 +33,8 @@ export default class extends IEventHandler {
         log.error(`Entity not found on dbEvent: ${dbEvent.toString()}`);
         return; // oops, should not happen
       }
-      const index = (event.data as any).index;
-      const ipfsHash = (event.data as any).ipfsHash;
+      const index = event.data.index;
+      const ipfsHash = event.data.ipfsHash;
 
       const projectRow = await this._models.Project.findOne({
         where: { id: +index },
@@ -57,19 +53,20 @@ export default class extends IEventHandler {
       await this._models.Project.create({
         id: +index,
         entity_id: entityId,
-        chain_id: (event.data as any).chainId,
         ...ipfsParams,
-        creator: (event.data as any).creator,
-        beneficiary: (event.data as any).beneficiary,
-        token: (event.data as any).acceptedToken,
-        curator_fee: (event.data as any).curatorFee,
-        threshold: (event.data as any).threshold,
-        deadline: (event.data as any).deadline,
-        funding_amount: (event.data as any).fundingAmount,
-        title: (event.data as any).title,
-        short_description: (event.data as any).shortDescription,
-        description: (event.data as any).description,
-        cover_image: (event.data as any).coverImage,
+        creator: event.data.creator,
+        beneficiary: event.data.beneficiary,
+        token: event.data.acceptedToken,
+        curator_fee: event.data.curatorFee,
+        threshold: event.data.threshold,
+        deadline: event.data.deadline,
+        funding_amount: event.data.fundingAmount,
+        // TODO: where is this data coming from?
+        // title: event.data.title,
+        // chain_id: event.data.chainId,
+        // short_description: event.data.shortDescription,
+        // description: event.data.description,
+        // cover_image: event.data.coverImage,
       });
     } else if (
       event.data.kind === CommonwealthTypes.EventKind.ProjectBacked ||
