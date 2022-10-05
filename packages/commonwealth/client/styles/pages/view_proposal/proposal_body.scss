@@ -50,7 +50,7 @@
 
     .MarkdownFormattedText,
     .QuillFormattedText {
-      overflow: auto;
+      overflow-x: scroll;
     }
 
     .callout-text.Text {
