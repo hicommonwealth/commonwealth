@@ -370,15 +370,15 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             <VotingActions proposal={proposal} />
           </>
         )}
-        <div class="thread-footer-row">
-          <ThreadReactionButton thread={proposal} />
-          {commentCount > 0 && (
+        {proposal instanceof Thread && (
+          <div class="thread-footer-row">
+            <ThreadReactionButton thread={proposal} />
             <div class="comments-count">
               <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">{commentCount} Comments</CWText>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         <ProposalComments
           comments={comments}
           proposal={proposal}
