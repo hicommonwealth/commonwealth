@@ -2,15 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 require('dotenv').config();
 
 module.exports = {
-  node: {
-    fs: 'empty',
-    net: 'empty',
-  },
   context: __dirname,
   devServer: {
     headers: {
@@ -29,10 +24,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
     }),
-    new MomentLocalesPlugin(), // strip all locales except “en”
-    new webpack.optimize.OccurrenceOrderPlugin(), // used for hot reloading
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
+    }),
+    new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
-    new webpack.NoEmitOnErrorsPlugin(), // used for hot reloading
   ],
   optimization: {
     splitChunks: {
@@ -94,22 +95,21 @@ module.exports = {
       "common-common": path.resolve(__dirname, '../../common-common'),
       "chain-events": path.resolve(__dirname, '../../chain-events'),
       "token-balance-cache": path.resolve(__dirname, '../../token-balance-cache'),
+    },
+    fallback: {
+      fs: false,
+      net: false,
+      crypto: require.resolve("crypto-browserify"),
+      http: require.resolve("stream-http"),
+      https: require.resolve("https-browserify"),
+      os: require.resolve("os-browserify/browser"),
+      vm: require.resolve("vm-browserify"),
+      path: require.resolve("path-browserify"),
+      stream: require.resolve("stream-browserify"),
     }
   },
   module: {
     rules: [
-      {
-        test: /\.md$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-        ],
-        use: [
-          {
-            loader: 'ignore-loader',
-          },
-        ],
-      },
       {
         test: /\.svg$/,
         include: [
@@ -164,6 +164,12 @@ module.exports = {
         test: /\.mjs$/,
         include: /node_modules/,
         type: 'javascript/auto',
+      },
+      {
+        test: /mithril-infinite\.mjs$|magic-sdk\/provider\/dist\/modern\/index.mjs$|polkadot\/util\/logger.js$/,
+        resolve: {
+          fullySpecified: false,
+        },
       },
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
