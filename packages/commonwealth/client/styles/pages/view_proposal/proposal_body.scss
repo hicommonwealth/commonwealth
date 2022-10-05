@@ -48,6 +48,11 @@
     gap: 16px;
     width: 100%;
 
+    .MarkdownFormattedText,
+    .QuillFormattedText {
+      overflow: auto;
+    }
+
     .callout-text.Text {
       background-color: $neutral-200;
       border-radius: $border-radius-corners;

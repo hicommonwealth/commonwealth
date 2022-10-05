@@ -207,7 +207,7 @@ export class ProposalBodyText
       }
     };
 
-    return <div>{text()}</div>;
+    return <>{text()}</>;
   }
 }
 
