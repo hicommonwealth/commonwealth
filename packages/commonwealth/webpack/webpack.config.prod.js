@@ -15,7 +15,7 @@ module.exports = merge(common, {
   output: {
     publicPath: '/build/',
     path: path.join(__dirname, '../build'),
-    filename: 'js/[name].[hash:8].js',
+    filename: 'js/[name].[contenthash:8].js',
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js'
   },
   plugins: [

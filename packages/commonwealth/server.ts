@@ -160,7 +160,7 @@ async function main() {
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler, {
+      ? webpackDevMiddleware(compiler as any, {
           publicPath: '/build',
         })
       : null;
