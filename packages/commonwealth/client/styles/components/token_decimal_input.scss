@@ -3,26 +3,16 @@
 .TokenDecimalInput {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  gap: 8px;
   width: 100%;
-
-  .cui-input {
-    margin: 0 0 8px 0;
-
-    // disable arrows on number
-    input[type='number'] {
-      -moz-appearance: textfield;
-    }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-    }
-  }
 
   .token-settings {
     align-items: center;
     display: flex;
-    flex-direction: row;
+    gap: 8px;
+
+    .toggle-caption-text.Text {
+      color: $neutral-500;
+    }
   }
 }

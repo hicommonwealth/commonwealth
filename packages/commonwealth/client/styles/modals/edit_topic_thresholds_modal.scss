@@ -2,18 +2,19 @@
 
 .EditTopicThresholdsModal {
   .compact-modal-body {
-    height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 340px;
     overflow-y: auto;
 
     .EditTopicThresholdsRow {
-      .topic-name {
-        height: 24px;
-      }
+      display: flex;
+      flex-direction: column;
 
       .input-and-button-row {
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        gap: 8px;
       }
     }
   }
