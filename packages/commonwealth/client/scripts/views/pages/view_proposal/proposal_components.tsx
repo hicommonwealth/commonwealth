@@ -7,9 +7,7 @@ import 'pages/view_proposal/proposal_components.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { slugify } from 'utils';
 import { pluralize, threadStageToLabel } from 'helpers';
-import { getProposalUrlPath } from 'identifiers';
 import {
   Account,
   Comment,
@@ -19,13 +17,11 @@ import {
   AddressInfo,
 } from 'models';
 import VersionHistoryModal from 'views/modals/version_history_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { notifyError } from 'controllers/app/notifications';
 import { ChainType } from 'common-common/src/types';
 import User, { AnonymousUser } from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import { QuillFormattedText } from '../../components/quill/quill_formatted_text';
 import {
@@ -34,85 +30,6 @@ import {
 } from './constants';
 import { formatBody } from './helpers';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
-
-export class ProposalTitleEditor
-  implements
-    m.ClassComponent<{
-      item: Thread | AnyProposal;
-      setIsGloballyEditing: (status: boolean) => void;
-      parentState;
-    }>
-{
-  oninit(vnode) {
-    vnode.attrs.parentState.updatedTitle = vnode.attrs.item.title;
-  }
-
-  view(vnode) {
-    const { item, parentState, setIsGloballyEditing } = vnode.attrs;
-
-    const proposalLink = getProposalUrlPath(
-      item.slug,
-      `${item.identifier}-${slugify(item.title)}`
-    );
-
-    const isThread = item instanceof Thread;
-
-    return (
-      <div class="ProposalTitleEditor">
-        <CWTextInput
-          name="edit-thread-title"
-          oninput={(e) => {
-            const { value } = (e as any).target;
-            parentState.updatedTitle = value;
-          }}
-          value={parentState.updatedTitle}
-        />
-        {!isThread && (
-          <>
-            <CWButton
-              label="Save"
-              disabled={parentState.saving}
-              onclick={(e) => {
-                e.preventDefault();
-
-                parentState.saving = true;
-
-                app.chain.chainEntities
-                  .updateEntityTitle(
-                    item.uniqueIdentifier,
-                    parentState.updatedTitle
-                  )
-                  .then(() => {
-                    m.route.set(proposalLink);
-
-                    parentState.saving = false;
-
-                    setIsGloballyEditing(false);
-
-                    item.title = parentState.updatedTitle;
-
-                    m.redraw();
-
-                    notifySuccess('Thread successfully edited');
-                  });
-              }}
-            />
-            <CWButton
-              label="Cancel"
-              disabled={parentState.saving}
-              onclick={async (e) => {
-                e.preventDefault();
-                parentState.saving = false;
-                setIsGloballyEditing(false);
-                m.redraw();
-              }}
-            />
-          </>
-        )}
-      </div>
-    );
-  }
-}
 
 export class ProposalHeaderStage
   implements m.ClassComponent<{ proposal: Thread }>
@@ -213,54 +130,6 @@ export class ProposalBodyAuthor
   }
 }
 
-export class ProposalBodyLastEdited
-  implements
-    m.ClassComponent<{
-      item: Thread | Comment<any>;
-    }>
-{
-  view(vnode) {
-    const { item } = vnode.attrs;
-
-    const isThread = item instanceof Thread;
-
-    if (!item.lastEdited) {
-      return;
-    }
-
-    return (
-      <a
-        href="#"
-        onclick={async (e) => {
-          e.preventDefault();
-
-          let postWithHistory;
-
-          const grabHistory = isThread && !item.versionHistory?.length;
-
-          if (grabHistory) {
-            try {
-              postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
-            } catch (err) {
-              notifyError('Version history not found.');
-              return;
-            }
-          }
-
-          app.modals.create({
-            modal: VersionHistoryModal,
-            data: {
-              item: grabHistory && postWithHistory ? postWithHistory : item,
-            },
-          });
-        }}
-      >
-        Edited {item.lastEdited.fromNow()}
-      </a>
-    );
-  }
-}
-
 export class ProposalBodyText
   implements
     m.ClassComponent<{
@@ -340,5 +209,54 @@ export class ProposalBodyText
     };
 
     return <div>{text()}</div>;
+  }
+}
+
+// needs refactoring
+export class ProposalBodyLastEdited
+  implements
+    m.ClassComponent<{
+      item: Thread | Comment<any>;
+    }>
+{
+  view(vnode) {
+    const { item } = vnode.attrs;
+
+    const isThread = item instanceof Thread;
+
+    if (!item.lastEdited) {
+      return;
+    }
+
+    return (
+      <a
+        href="#"
+        onclick={async (e) => {
+          e.preventDefault();
+
+          let postWithHistory;
+
+          const grabHistory = isThread && !item.versionHistory?.length;
+
+          if (grabHistory) {
+            try {
+              postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
+            } catch (err) {
+              notifyError('Version history not found.');
+              return;
+            }
+          }
+
+          app.modals.create({
+            modal: VersionHistoryModal,
+            data: {
+              item: grabHistory && postWithHistory ? postWithHistory : item,
+            },
+          });
+        }}
+      >
+        Edited {item.lastEdited.fromNow()}
+      </a>
+    );
   }
 }
