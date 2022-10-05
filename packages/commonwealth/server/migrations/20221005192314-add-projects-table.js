@@ -33,6 +33,11 @@ module.exports = {
         deadline: { type: Sequelize.INTEGER, allowNull: false, },
         funding_amount: { type: Sequelize.STRING, allowNull: false, },
 
+        title: { type: Sequelize.STRING, allowNull: true },
+        description: { type: Sequelize.STRING, allowNull: true },
+        short_description: { type: Sequelize.STRING, allowNull: true },
+        cover_image: { type: Sequelize.STRING, allowNull: true },
+
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
@@ -61,7 +66,7 @@ module.exports = {
       // create dummy CWP chain
       await queryInterface.bulkInsert('Chains', [{
         id: 'common-protocol',
-        symbol: 'CWP',
+        default_symbol: 'CWP',
         name: 'Common Protocol',
         type: 'token',
         network: 'common-protocol',
@@ -70,6 +75,11 @@ module.exports = {
         description: '',
         chain_node_id: ethChainNodeId
       }], { transaction: t });
+
+      await queryInterface.addColumn('IpfsPins', 'user_id', {
+        type: Sequelize.INTEGER,
+        references: { model: 'Users', key: 'id' },
+      }, { transaction: t });
     });
   },
 
@@ -78,6 +88,7 @@ module.exports = {
       await queryInterface.dropTable('Projects', { transaction: t });
       await queryInterface.bulkDelete('ChainNodes', { chain: 'common-protocol' }, { transaction: t });
       await queryInterface.bulkDelete('Chains', { id: 'common-protocol' }, { transaction: t });
+      await queryInterface.removeColumn('IpfsPins', 'user_id', { transaction: t });
     });
   }
 };
