@@ -155,7 +155,7 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
     let isCurator = false;
     let isBacker = false;
     for (const address of addresses) {
-      const addressInfo: [string, string] = [address.address, address.chain];
+      const addressInfo: [string, string] = [address.address, address.chain.id];
       if (project.isAuthor(...addressInfo)) {
         isAuthor = true;
       }

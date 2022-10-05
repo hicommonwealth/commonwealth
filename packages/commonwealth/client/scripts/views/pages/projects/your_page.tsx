@@ -27,9 +27,9 @@ export default class YourPage
         .getAll()
         .filter(
           (project) =>
-            project.isAuthor(address, chain) ||
-            project.isBacker(address, chain) ||
-            project.isCurator(address, chain)
+            project.isAuthor(address, chain.id) ||
+            project.isBacker(address, chain.id) ||
+            project.isCurator(address, chain.id)
         )
         .forEach((project) => allUserProjects.push(project));
     });

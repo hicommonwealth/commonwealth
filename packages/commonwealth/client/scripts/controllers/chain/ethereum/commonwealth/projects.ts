@@ -146,10 +146,10 @@ export default class ProjectsController {
 
     // instantiate contract (TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
-      // TODO: pass in CommonProtocol chain node
       this._app.wallets,
       creator,
       null,
+      this._factoryInfo.node,
       ICuratedProjectFactory__factory.connect,
       this._factoryInfo.address
     );
@@ -216,6 +216,7 @@ export default class ProjectsController {
       this._app.wallets,
       backer,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
@@ -242,6 +243,7 @@ export default class ProjectsController {
       this._app.wallets,
       curator,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
@@ -271,6 +273,7 @@ export default class ProjectsController {
       this._app.wallets,
       beneficiary,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
@@ -302,6 +305,7 @@ export default class ProjectsController {
       this._app.wallets,
       backer,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
@@ -333,6 +337,7 @@ export default class ProjectsController {
       this._app.wallets,
       curator,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );

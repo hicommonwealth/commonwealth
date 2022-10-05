@@ -1,5 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet } from 'models';
+import { Account, IWebWallet, NodeInfo } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -10,7 +10,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _chainInfo: ChainInfo;
+  private _node: NodeInfo;
   private _provider: WalletConnectProvider;
   private _web3: Web3;
 
@@ -36,13 +36,17 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get node() {
+    return this._node;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(message, this.accounts[0]);
     return signature;
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(this._chainInfo.node.ethChainId, message);
+    const msgParams = constructTypedMessage(this._node.ethChainId, message);
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
       JSON.stringify(msgParams),
@@ -56,23 +60,23 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return account.validate(webWalletSignature);
   }
 
-    public async reset() {
+  public async reset() {
     console.log('Attempting to reset WalletConnect');
-    const ks = await this._provider.wc.killSession();
+    await this._provider.wc.killSession();
     this._provider.disconnect();
     this._enabled = false;
   }
 
-  public async enable() {
+  public async enable(node?: NodeInfo) {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      this._chainInfo = app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node.ethChainId;
+      this._node = node || app.chain?.meta.node || app.config.chains.getById(this.defaultNetwork).node;
+      const chainId = this._node.ethChainId;
 
       // use alt wallet url if available
-      const rpc = { [chainId]: this._chainInfo.node.altWalletUrl || this._chainInfo.node.url }
+      const rpc = { [chainId]: this._node.altWalletUrl || this._node.url }
       this._provider = new WalletConnectProvider({ rpc, chainId });
 
       //  Enable session (triggers QR Code modal)
