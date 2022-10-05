@@ -7,13 +7,13 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import '../types';
-import { sequelize, DB } from '../database';
 import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { sequelize, DB } from '../database';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
 import { ProfileAttributes } from '../models/profile';
 
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AddressInstance } from '../models/address';
 import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
