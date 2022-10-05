@@ -1,5 +1,5 @@
 import { ChainStore, NodeStore } from 'stores';
-import { ContractCategory, IChainAdapter, NotificationCategory } from 'models';
+import { IChainAdapter, NotificationCategory } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -83,7 +83,6 @@ export interface IApp {
   config: {
     chains: ChainStore;
     nodes: NodeStore;
-    contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     invites: InviteCodeAttributes[];

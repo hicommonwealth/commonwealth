@@ -13,12 +13,7 @@ import {
 } from 'common-common/src/types';
 import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import {
-  MobileSidebarSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
+import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
@@ -40,7 +35,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 }
 
 export class GovernanceSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
+  implements m.ClassComponent<SidebarSectionAttrs>
 {
   view(vnode) {
     // Conditional Render Details
@@ -475,6 +470,7 @@ export class GovernanceSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',
+      className: 'GovernanceSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

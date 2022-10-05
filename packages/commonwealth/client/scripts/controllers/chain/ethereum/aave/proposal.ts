@@ -42,7 +42,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
   public format(): string {
     return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${
-      this.account.chain.symbol
+      this.account.chain.default_symbol
     }`;
   }
 }

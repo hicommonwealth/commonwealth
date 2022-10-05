@@ -4,7 +4,6 @@ import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
-import { ChainInstance } from 'server/models/chain';
 import NodeInfo from './NodeInfo';
 
 import {
@@ -17,7 +16,7 @@ class ChainInfo {
   public readonly ChainNode: NodeInfo;
   public readonly address: string;
   public readonly tokenName: string;
-  public readonly symbol: string;
+  public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
   public readonly base: ChainBase;
@@ -40,6 +39,7 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
+  public chatEnabled: boolean;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -55,7 +55,7 @@ class ChainInfo {
   constructor({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     iconUrl,
     description,
@@ -77,6 +77,7 @@ class ChainInfo {
     ss58Prefix,
     bech32Prefix,
     type,
+    chatEnabled,
     decimals,
     substrateSpec,
     hideProjects,
@@ -88,7 +89,7 @@ class ChainInfo {
     this.id = id;
     this.network = network;
     this.base = base;
-    this.symbol = symbol;
+    this.default_symbol = default_symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
@@ -108,6 +109,7 @@ class ChainInfo {
     this.defaultSummaryView = defaultSummaryView;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.chatEnabled = chatEnabled;
     this.ss58Prefix = ss58Prefix;
     this.bech32Prefix = bech32Prefix;
     this.decimals = decimals;
@@ -123,7 +125,7 @@ class ChainInfo {
   public static fromJSON({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     icon_url,
     description,
@@ -145,11 +147,11 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    decimals,
+    chat_enabled,
     substrate_spec,
     hide_projects,
     token_name,
-    address,
+    Contracts,
     ChainNode,
     admin_only_polling,
   }) {
@@ -160,10 +162,11 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
+    const decimals = Contracts ? Contracts[0]?.decimals : 18;
     return new ChainInfo({
       id,
       network,
-      symbol,
+      default_symbol,
       name,
       iconUrl: icon_url,
       description,
@@ -185,11 +188,12 @@ class ChainInfo {
       ss58Prefix: ss58_prefix,
       bech32Prefix: bech32_prefix,
       type,
+      chatEnabled: chat_enabled,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       hideProjects: hide_projects,
       tokenName: token_name,
-      address,
+      address: Contracts ? Contracts[0]?.address : '',
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -268,6 +272,7 @@ class ChainInfo {
     iconUrl,
     defaultSummaryView,
     hideProjects,
+    chatEnabled,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -282,6 +287,7 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
+      chat_enabled: chatEnabled,
       snapshot,
       terms,
       icon_url: iconUrl,
@@ -289,7 +295,7 @@ class ChainInfo {
       hide_projects: hideProjects,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInstance = r.result;
+    const updatedChain = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;
@@ -305,12 +311,13 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultSummaryView = updatedChain.default_summary_view;
+    this.chatEnabled = updatedChain.chat_enabled;
   }
 
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      : m(CWJdenticon, { address: this.address || undefined, size });
   }
 }
 
