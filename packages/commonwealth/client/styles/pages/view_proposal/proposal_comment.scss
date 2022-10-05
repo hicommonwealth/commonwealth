@@ -48,6 +48,18 @@
       }
     }
 
+    .comment-text.Text {
+      width: 400px;
+
+      .MarkdownFormattedText {
+        position: unset;
+      }
+
+      @include smallInclusive {
+        width: 100%;
+      }
+    }
+
     .comment-footer {
       display: flex;
       justify-content: space-between;

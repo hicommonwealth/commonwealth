@@ -427,10 +427,11 @@ class ViewProposalPage
     };
 
     const hasSidebar =
-      showLinkedSnapshotOptions ||
-      showLinkedThreadOptions ||
-      (proposal instanceof Thread && this.polls?.length > 0) ||
-      (proposal instanceof Thread && isAuthor);
+      proposal instanceof Thread &&
+      (showLinkedSnapshotOptions ||
+        showLinkedThreadOptions ||
+        this.polls?.length > 0 ||
+        isAuthor);
 
     return (
       <Sublayout showNewProposalButton title={headerTitle}>
@@ -471,7 +472,7 @@ class ViewProposalPage
                 viewCount={viewCount}
               />
             )}
-            {this.tabSelected === 'viewSidebar' && (
+            {hasSidebar && this.tabSelected === 'viewSidebar' && (
               <ProposalSidebar
                 isAdmin={isAdmin}
                 isAdminOrMod={isAdminOrMod}
@@ -501,15 +502,17 @@ class ViewProposalPage
               proposal={proposal}
               viewCount={viewCount}
             />
-            <ProposalSidebar
-              isAdmin={isAdmin}
-              isAdminOrMod={isAdminOrMod}
-              isAuthor={isAuthor}
-              polls={this.polls}
-              proposal={proposal}
-              showLinkedSnapshotOptions={showLinkedSnapshotOptions}
-              showLinkedThreadOptions={showLinkedThreadOptions}
-            />
+            {hasSidebar && (
+              <ProposalSidebar
+                isAdmin={isAdmin}
+                isAdminOrMod={isAdminOrMod}
+                isAuthor={isAuthor}
+                polls={this.polls}
+                proposal={proposal}
+                showLinkedSnapshotOptions={showLinkedSnapshotOptions}
+                showLinkedThreadOptions={showLinkedThreadOptions}
+              />
+            )}
           </div>
         </div>
       </Sublayout>

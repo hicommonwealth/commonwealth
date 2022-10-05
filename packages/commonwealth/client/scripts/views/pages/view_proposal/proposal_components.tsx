@@ -2,7 +2,6 @@
 /* eslint-disable no-restricted-globals */
 
 import m from 'mithril';
-import { Popover } from 'construct-ui';
 
 import 'pages/view_proposal/proposal_components.scss';
 
@@ -34,41 +33,7 @@ import {
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
 } from './constants';
 import { formatBody } from './helpers';
-
-export class ProposalHeaderStage
-  implements m.ClassComponent<{ proposal: Thread }>
-{
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-
-    return (
-      <CWText
-        type="caption"
-        className={getClasses<{ stage: 'negative' | 'positive' }>(
-          {
-            stage:
-              proposal.stage === ThreadStage.ProposalInReview
-                ? 'positive'
-                : proposal.stage === ThreadStage.Voting
-                ? 'positive'
-                : proposal.stage === ThreadStage.Passed
-                ? 'positive'
-                : proposal.stage === ThreadStage.Failed
-                ? 'negative'
-                : 'positive',
-          },
-          'proposal-stage-text'
-        )}
-        onclick={(e) => {
-          e.preventDefault();
-          navigateToSubpage(`?stage=${proposal.stage}`);
-        }}
-      >
-        {threadStageToLabel(proposal.stage)}
-      </CWText>
-    );
-  }
-}
+import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 
 export class ProposalTitleEditor
   implements
@@ -149,6 +114,41 @@ export class ProposalTitleEditor
   }
 }
 
+export class ProposalHeaderStage
+  implements m.ClassComponent<{ proposal: Thread }>
+{
+  view(vnode) {
+    const { proposal } = vnode.attrs;
+
+    return (
+      <CWText
+        type="caption"
+        className={getClasses<{ stage: 'negative' | 'positive' }>(
+          {
+            stage:
+              proposal.stage === ThreadStage.ProposalInReview
+                ? 'positive'
+                : proposal.stage === ThreadStage.Voting
+                ? 'positive'
+                : proposal.stage === ThreadStage.Passed
+                ? 'positive'
+                : proposal.stage === ThreadStage.Failed
+                ? 'negative'
+                : 'positive',
+          },
+          'proposal-stage-text'
+        )}
+        onclick={(e) => {
+          e.preventDefault();
+          navigateToSubpage(`?stage=${proposal.stage}`);
+        }}
+      >
+        {threadStageToLabel(proposal.stage)}
+      </CWText>
+    );
+  }
+}
+
 export class ProposalBodyAuthor
   implements
     m.Component<{
@@ -190,30 +190,24 @@ export class ProposalBodyAuthor
           popover: true,
           linkify: true,
         })}
-        {item instanceof Thread &&
-          item.collaborators &&
-          item.collaborators.length > 0 && (
-            <>
-              <span class="proposal-collaborators"> and </span>
-              <Popover
-                interactionType="hover"
-                transitionDuration={0}
-                hoverOpenDelay={500}
-                closeOnContentClick
-                content={item.collaborators.map(({ address, chain }) => {
-                  return m(User, {
-                    user: new AddressInfo(null, address, chain, null),
-                    linkify: true,
-                  });
-                })}
-                trigger={
-                  <a href="#">
-                    {pluralize(item.collaborators?.length, 'other')}
-                  </a>
-                }
-              />
-            </>
-          )}
+        {item instanceof Thread && item.collaborators?.length > 0 && (
+          <>
+            <span class="proposal-collaborators"> and </span>
+            <CWPopover
+              interactionType="hover"
+              hoverOpenDelay={500}
+              content={item.collaborators.map(({ address, chain }) => {
+                return m(User, {
+                  user: new AddressInfo(null, address, chain, null),
+                  linkify: true,
+                });
+              })}
+              trigger={
+                <a href="#">{pluralize(item.collaborators?.length, 'other')}</a>
+              }
+            />
+          </>
+        )}
       </>
     );
   }

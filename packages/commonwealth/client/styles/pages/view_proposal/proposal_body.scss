@@ -31,6 +31,13 @@
     }
   }
 
+  .proposal-links {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .proposal-content {
     display: flex;
     flex-direction: column;

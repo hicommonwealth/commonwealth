@@ -6,7 +6,7 @@ import moment from 'moment';
 import 'pages/view_proposal/proposal_sidebar.scss';
 
 import app from 'state';
-import { AnyProposal, ChainEntity, Poll, Thread, ThreadStage } from 'models';
+import { ChainEntity, Poll, Thread, ThreadStage } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
@@ -20,7 +20,7 @@ type ProposalSidebarAttrs = {
   isAdminOrMod: boolean;
   isAuthor: boolean;
   polls: Array<Poll>;
-  proposal: AnyProposal | Thread;
+  proposal: Thread;
   showLinkedSnapshotOptions: boolean;
   showLinkedThreadOptions: boolean;
 };
@@ -39,7 +39,7 @@ export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
 
     return (
       <div class="ProposalSidebar">
-        {showLinkedSnapshotOptions && proposal instanceof Thread && (
+        {showLinkedSnapshotOptions && (
           <LinkedProposalsCard
             onChangeHandler={(
               stage: ThreadStage,
@@ -58,80 +58,75 @@ export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
             showAddProposalButton={isAuthor || isAdminOrMod}
           />
         )}
-        {showLinkedThreadOptions && proposal instanceof Thread && (
+        {showLinkedThreadOptions && (
           <LinkedThreadsCard
             proposalId={proposal.id}
             allowLinking={isAuthor || isAdminOrMod}
           />
         )}
-        {proposal instanceof Thread &&
-          [...new Map(polls?.map((poll) => [poll.id, poll])).values()].map(
-            (poll: Poll) => {
-              return (
-                <PollCard
-                  multiSelect={false}
-                  pollEnded={
-                    poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+        {[...new Map(polls?.map((poll) => [poll.id, poll])).values()].map(
+          (poll: Poll) => {
+            return (
+              <PollCard
+                multiSelect={false}
+                pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
+                hasVoted={
+                  app.user.activeAccount &&
+                  poll.getUserVote(
+                    app.user.activeAccount?.chain?.id,
+                    app.user.activeAccount?.address
+                  )
+                }
+                disableVoteButton={!app.user.activeAccount}
+                votedFor={
+                  poll.getUserVote(
+                    app.user.activeAccount?.chain?.id,
+                    app.user.activeAccount?.address
+                  )?.option
+                }
+                proposalTitle={poll.prompt}
+                timeRemaining={getProposalPollTimestamp(
+                  poll,
+                  poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                )}
+                totalVoteCount={poll.votes?.length}
+                voteInformation={poll.options.map((option) => {
+                  return {
+                    label: option,
+                    value: option,
+                    voteCount: poll.votes.filter((v) => v.option === option)
+                      .length,
+                  };
+                })}
+                incrementalVoteCast={1}
+                isPreview={false}
+                tooltipErrorMessage={
+                  app.user.activeAccount
+                    ? null
+                    : 'You must join this community to vote.'
+                }
+                onVoteCast={(option, isSelected, callback) =>
+                  handleProposalPollVote(poll, option, isSelected, callback)
+                }
+                onResultsClick={(e) => {
+                  e.preventDefault();
+                  if (poll.votes.length > 0) {
+                    app.modals.create({
+                      modal: OffchainVotingModal,
+                      data: { votes: poll.votes },
+                    });
                   }
-                  hasVoted={
-                    app.user.activeAccount &&
-                    poll.getUserVote(
-                      app.user.activeAccount?.chain?.id,
-                      app.user.activeAccount?.address
-                    )
-                  }
-                  disableVoteButton={!app.user.activeAccount}
-                  votedFor={
-                    poll.getUserVote(
-                      app.user.activeAccount?.chain?.id,
-                      app.user.activeAccount?.address
-                    )?.option
-                  }
-                  proposalTitle={poll.prompt}
-                  timeRemaining={getProposalPollTimestamp(
-                    poll,
-                    poll.endsAt && poll.endsAt?.isBefore(moment().utc())
-                  )}
-                  totalVoteCount={poll.votes?.length}
-                  voteInformation={poll.options.map((option) => {
-                    return {
-                      label: option,
-                      value: option,
-                      voteCount: poll.votes.filter((v) => v.option === option)
-                        .length,
-                    };
-                  })}
-                  incrementalVoteCast={1}
-                  isPreview={false}
-                  tooltipErrorMessage={
-                    app.user.activeAccount
-                      ? null
-                      : 'You must join this community to vote.'
-                  }
-                  onVoteCast={(option, isSelected, callback) =>
-                    handleProposalPollVote(poll, option, isSelected, callback)
-                  }
-                  onResultsClick={(e) => {
-                    e.preventDefault();
-                    if (poll.votes.length > 0) {
-                      app.modals.create({
-                        modal: OffchainVotingModal,
-                        data: { votes: poll.votes },
-                      });
-                    }
-                  }}
-                />
-              );
-            }
-          )}
-        {proposal instanceof Thread &&
-          isAuthor &&
-          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-            <PollEditorCard
-              proposal={proposal}
-              proposalAlreadyHasPolling={!polls?.length}
-            />
-          )}
+                }}
+              />
+            );
+          }
+        )}
+        {isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+          <PollEditorCard
+            proposal={proposal}
+            proposalAlreadyHasPolling={!polls?.length}
+          />
+        )}
       </div>
     );
   }
