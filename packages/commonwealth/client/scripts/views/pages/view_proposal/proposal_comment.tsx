@@ -104,7 +104,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
             />
           ) : (
             <>
-              <CWText type="b2" className="comment-text">
+              <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
               {!comment.deleted && (

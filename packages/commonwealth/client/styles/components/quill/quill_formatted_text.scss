@@ -323,6 +323,7 @@
   flex-direction: column;
   height: 100%;
   justify-content: space-between;
+  word-break: break-word;
 
   @include formatted-text();
   @include collapsible();

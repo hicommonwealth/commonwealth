@@ -46,6 +46,12 @@
   .recent-threads-column {
     display: flex;
     flex-direction: column;
+    max-width: 576px;
+    width: 100%;
+
+    @include mediumInclusive {
+      max-width: 520px;
+    }
 
     .recent-thread-row {
       display: flex;
@@ -102,16 +108,8 @@
         color: $neutral-500;
       }
 
-      .comment-preview-text.Text {
-        width: 400px;
-
-        .MarkdownFormattedText {
-          position: unset;
-        }
-
-        @include smallInclusive {
-          width: 100%;
-        }
+      .MarkdownFormattedText {
+        position: unset;
       }
 
       .row-bottom {

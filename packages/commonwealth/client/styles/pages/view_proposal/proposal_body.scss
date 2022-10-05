@@ -4,9 +4,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-right: 40px;
+  margin: 0 40px;
   max-width: 768px;
   width: 100%;
+
+  @include mediumSmallInclusive {
+    margin: 0 40px 0 0;
+  }
 
   .header {
     display: flex;
@@ -43,7 +47,6 @@
     flex-direction: column;
     gap: 16px;
     width: 100%;
-    word-break: break-word;
 
     .callout-text.Text {
       background-color: $neutral-200;
@@ -74,14 +77,20 @@
     }
   }
 
-  .comments-count {
+  .thread-footer-row {
     align-items: center;
     display: flex;
-    gap: 4px;
+    gap: 16px;
 
-    .Text,
-    .Icon {
-      color: $neutral-500;
+    .comments-count {
+      align-items: center;
+      display: flex;
+      gap: 4px;
+
+      .Text,
+      .Icon {
+        color: $neutral-500;
+      }
     }
   }
 }

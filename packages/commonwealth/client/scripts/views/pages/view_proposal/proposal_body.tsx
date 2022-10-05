@@ -50,6 +50,7 @@ import {
   ProposalHeaderThreadLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 type ProposalBodyAttrs = {
   commentCount: number;
@@ -369,12 +370,15 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             <VotingActions proposal={proposal} />
           </>
         )}
-        {commentCount > 0 && (
-          <div class="comments-count">
-            <CWIcon iconName="feedback" iconSize="small" />
-            <CWText type="caption">{commentCount} Comments</CWText>
-          </div>
-        )}
+        <div class="thread-footer-row">
+          <ThreadReactionButton thread={proposal} />
+          {commentCount > 0 && (
+            <div class="comments-count">
+              <CWIcon iconName="feedback" iconSize="small" />
+              <CWText type="caption">{commentCount} Comments</CWText>
+            </div>
+          )}
+        </div>
         <ProposalComments
           comments={comments}
           proposal={proposal}

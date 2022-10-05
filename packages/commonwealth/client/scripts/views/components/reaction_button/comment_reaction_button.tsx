@@ -109,9 +109,7 @@ export class CommentReactionButton
           iconName="upvote"
           iconSize="small"
           selected={hasReacted}
-          onclick={async (e) =>
-            onReactionClick(e, hasReacted, dislike, like, comment)
-          }
+          onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         />
         {likes > 0 ? (
           <CWTooltip
@@ -131,7 +129,7 @@ export class CommentReactionButton
         ) : (
           countsComponent
         )}
-        <CWIconButton iconName="downvote" iconSize="small" disabled />
+        {/* <CWIconButton iconName="downvote" iconSize="small" disabled /> */}
       </div>
     );
   }
