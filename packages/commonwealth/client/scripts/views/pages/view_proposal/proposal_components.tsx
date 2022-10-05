@@ -1,5 +1,4 @@
 /* @jsx m */
-/* eslint-disable no-restricted-globals */
 
 import m from 'mithril';
 
@@ -109,7 +108,7 @@ export class ProposalBodyAuthor
         })}
         {item instanceof Thread && item.collaborators?.length > 0 && (
           <>
-            <span class="proposal-collaborators"> and </span>
+            <CWText> and </CWText>
             <CWPopover
               interactionType="hover"
               hoverOpenDelay={500}
