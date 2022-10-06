@@ -17,8 +17,12 @@
     margin-inline-end: 0px;
   }
 
+  overflow: visible;
+
   table {
     width: 100%;
+    overflow-x: scroll;
+    display: block;
 
     thead {
       border-bottom: 1px solid $black;
