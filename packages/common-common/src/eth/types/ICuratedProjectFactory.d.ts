@@ -22,7 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface ICuratedProjectFactoryInterface extends ethers.utils.Interface {
   functions: {
     "addAcceptedTokens(address[])": FunctionFragment;
-    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)": FunctionFragment;
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)": FunctionFragment;
     "isAcceptedToken(address)": FunctionFragment;
     "numProjects()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -223,7 +223,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _url: BytesLike,
@@ -376,7 +376,7 @@ export class ICuratedProjectFactory extends Contract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
+  "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)"(
     _name: BytesLike,
     _ipfsHash: BytesLike,
     _url: BytesLike,
@@ -522,7 +522,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _url: BytesLike,
@@ -717,7 +717,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _url: BytesLike,
@@ -849,7 +849,7 @@ export class ICuratedProjectFactory extends Contract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint256)"(
+    "createProject(bytes32,bytes32,bytes32,address,address,uint256,uint256,uint8)"(
       _name: BytesLike,
       _ipfsHash: BytesLike,
       _url: BytesLike,

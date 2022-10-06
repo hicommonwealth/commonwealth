@@ -14,6 +14,6 @@ interface ICuratedProjectFactory is IProjectBaseFactory {
         address _acceptedToken,
         uint256 _threshold,
         uint256 _deadline,
-        uint256 _curatorFee
+        uint8 _curatorFee
     ) external returns (address);
 }

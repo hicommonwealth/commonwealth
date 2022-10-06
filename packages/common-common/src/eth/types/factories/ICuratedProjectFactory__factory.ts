@@ -224,9 +224,9 @@ const _abi = [
         type: "uint256",
       },
       {
-        internalType: "uint256",
+        internalType: "uint8",
         name: "_curatorFee",
-        type: "uint256",
+        type: "uint8",
       },
     ],
     name: "createProject",
