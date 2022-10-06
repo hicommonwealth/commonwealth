@@ -44,7 +44,7 @@ module.exports = {
 
       const ethChainNode = await queryInterface.bulkInsert('ChainNodes', [{
         url: 'wss://eth-goerli.g.alchemy.com/v2/j4q_OFABLwfgV8b8Hel7JKLXH1y3G4_y',
-        alt_wallet_url: 'wss://eth-goerli.g.alchemy.com/v2/j4q_OFABLwfgV8b8Hel7JKLXH1y3G4_y',
+        alt_wallet_url: 'https://eth-goerli.g.alchemy.com/v2/j4q_OFABLwfgV8b8Hel7JKLXH1y3G4_y',
         eth_chain_id: 5,
         balance_type: 'ethereum',
         chain_base: 'ethereum',
