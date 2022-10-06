@@ -51,7 +51,7 @@ export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
           <CWIconButton
             iconName="close"
             onclick={onClose}
-            iconTheme="primary"
+            iconButtonTheme="primary"
           />
         )}
       </div>

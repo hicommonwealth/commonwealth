@@ -24,7 +24,7 @@ export class CWAddressTooltip implements m.ClassComponent<{ address: string }> {
             <CWIconButton
               iconName="copy"
               iconSize="small"
-              iconTheme="primary"
+              iconButtonTheme="primary"
               onclick={async () => {
                 navigator.clipboard
                   .writeText(address)

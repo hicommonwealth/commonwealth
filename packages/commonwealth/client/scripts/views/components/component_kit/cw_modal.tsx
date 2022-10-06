@@ -58,10 +58,11 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
 }
 
 export class ModalExitButton
-  implements m.ClassComponent<{ disabled?: boolean; iconTheme: IconTheme }>
+  implements
+    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconTheme }>
 {
   view(vnode) {
-    const { disabled, iconTheme } = vnode.attrs;
+    const { disabled, iconButtonTheme } = vnode.attrs;
 
     return (
       // class is to avoid classname collisions when positioning the button,
@@ -69,7 +70,7 @@ export class ModalExitButton
       <div class="ModalExitButton">
         <CWIconButton
           disabled={disabled}
-          iconTheme={iconTheme}
+          iconButtonTheme={iconButtonTheme}
           iconName="close"
           onclick={(e) => {
             e.preventDefault();

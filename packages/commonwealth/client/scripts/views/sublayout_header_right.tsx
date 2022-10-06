@@ -29,14 +29,9 @@ export class SublayoutHeaderRight
         {/* Only visible in mobile browser widths */}
         <div class="MobileIconPopover">
           <CWIcon
-            iconTheme="black"
             iconName="dotsVertical"
             onclick={(e) => {
-              if (app.mobileMenu) {
-                delete app.mobileMenu;
-              } else {
-                app.mobileMenu = 'MainMenu';
-              }
+              app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
             }}
           />
         </div>

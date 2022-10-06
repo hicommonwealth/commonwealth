@@ -668,7 +668,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIconButton
               iconName="views"
               iconSize="large"
-              iconTheme="primary"
+              iconButtonTheme="primary"
               selected={this.selectedIconButton === 1}
               onclick={() => {
                 this.selectedIconButton = 1;
@@ -682,7 +682,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIconButton
               iconName="views"
               iconSize="large"
-              iconTheme="neutral"
+              iconButtonTheme="neutral"
               selected={this.selectedIconButton === 2}
               onclick={() => {
                 this.selectedIconButton = 2;
@@ -696,7 +696,7 @@ export class ComponentShowcase implements m.ClassComponent {
             <CWIconButton
               iconName="views"
               iconSize="large"
-              iconTheme="black"
+              iconButtonTheme="black"
               selected={this.selectedIconButton === 3}
               onclick={() => {
                 this.selectedIconButton = 3;

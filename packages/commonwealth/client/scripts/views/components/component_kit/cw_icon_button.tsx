@@ -11,7 +11,7 @@ export class CWIconButton implements m.ClassComponent<IconAttrs> {
     const {
       componentType = ComponentType.IconButton,
       disabled = false,
-      iconTheme = 'neutral',
+      iconButtonTheme = 'neutral',
       iconName,
       iconSize = 'medium',
       onclick,
@@ -20,7 +20,7 @@ export class CWIconButton implements m.ClassComponent<IconAttrs> {
 
     return (
       <CWIcon
-        className={iconTheme}
+        className={iconButtonTheme}
         componentType={componentType}
         disabled={disabled}
         iconName={iconName}
