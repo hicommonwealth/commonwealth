@@ -11,6 +11,7 @@ import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
+import { AppsSection } from './apps_section';
 
 export class Sidebar implements m.ClassComponent {
   view() {
@@ -21,6 +22,7 @@ export class Sidebar implements m.ClassComponent {
         <AdminSection />
         <DiscussionSection />
         <GovernanceSection />
+        <AppsSection />
         {app.socket && !hideChat && <ChatSection />}
         <ExternalLinksModule />
         <div class="buttons-container">

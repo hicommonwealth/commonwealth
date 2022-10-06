@@ -1,0 +1,35 @@
+@import 'shared';
+
+.IFramePage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .iframe-container {
+    display: flex;
+    flex-direction: column;
+    // gap: 8px;
+
+    .iframe {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // .infinite-scroll-wrapper {
+  //   align-items: center;
+  //   display: flex;
+  //   justify-content: center;
+
+  //   .infinite-scroll-reached-end-text.Text {
+  //     color: $neutral-500;
+  //   }
+  // }
+}

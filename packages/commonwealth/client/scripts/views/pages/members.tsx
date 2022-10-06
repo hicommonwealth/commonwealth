@@ -201,12 +201,11 @@ class MembersPage implements m.ClassComponent {
         onscroll={this.onscroll}
       >
         <div class="MembersPage">
-          <CWText type="h3" fontWeight="medium">
+          <CWText type="h3" >
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
           </CWText>
           <div class="header-row">
-            <CWText type="h5">Member</CWText>
-            <CWText type="h5">Posts / Month</CWText>
+            <CWText type="h3" fontWeight="medium">Member</CWText>
           </div>
           <div class="members-container">
             {profilesLoaded.map((profileInfo) => {

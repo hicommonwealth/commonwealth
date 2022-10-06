@@ -975,6 +975,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/referenda': importRoute('views/pages/referenda', {
               scoped: true,
             }),
+            '/:scope/apps/:src': importRoute('views/pages/iframe', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/:scope/proposals': importRoute('views/pages/proposals', {
               scoped: true,
             }),
