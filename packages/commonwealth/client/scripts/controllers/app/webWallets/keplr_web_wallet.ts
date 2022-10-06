@@ -60,7 +60,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signLoginToken(
       account.validationToken.trim(),
       account.address
@@ -71,7 +71,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         signature: webWalletSignature.signature,
       },
     };
-    return account.validate(JSON.stringify(signature));
+    return JSON.stringify(signature);
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
@@ -87,7 +94,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain?.id || this.defaultNetwork}`;
+      const url = `${window.location.origin}/cosmosAPI/${
+        app.chain?.id || this.defaultNetwork
+      }`;
       const client = await StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;

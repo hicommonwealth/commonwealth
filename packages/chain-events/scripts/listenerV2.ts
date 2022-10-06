@@ -82,6 +82,11 @@ const shortcuts = {
     url: networkUrls['eth-local'],
     address: contracts['commonwealth-local'],
   },
+  cosmos: {
+    chain: 'osmosis',
+    network: SupportedNetwork.Cosmos,
+    url: networkUrls.osmosis,
+  },
 };
 
 async function main(): Promise<any> {
