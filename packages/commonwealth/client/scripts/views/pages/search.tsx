@@ -18,13 +18,12 @@ import { ContentType } from 'controllers/server/search';
 import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { _CommunityLabel } from '../components/community_label';
+import { CommunityLabel } from '../components/community_label';
 import { renderQuillTextBody } from '../components/quill/helpers';
 import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import ErrorPage from './error';
-import { cast, jsx } from 'cyano-mithril';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -80,8 +79,6 @@ const getCommunityResult = (community) => {
       m.route.set(community.id ? `/${community.id}` : '/');
     }
   };
-
-  const CommunityLabel = cast(_CommunityLabel)
 
   return (
     <ListItem

@@ -23,6 +23,7 @@ import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import SelectAddressModal from 'views/modals/select_address_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWToggle } from '../component_kit/cw_toggle';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',

@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { h, cast, jsx } from 'cyano-mithril';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -25,7 +24,7 @@ import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { ContentType } from 'controllers/server/search';
 import User, { UserBlock } from './widgets/user';
-import { _CommunityLabel } from './community_label';
+import { CommunityLabel } from './community_label';
 import { renderQuillTextBody } from './quill/helpers';
 
 const getMemberPreview = (
@@ -79,7 +78,7 @@ const getCommunityPreview = (
   community,
   closeResultsFn,
   tabIndex,
-  setUsingFilterMenuFn,
+  setUsingFilterMenuFn
 ) => {
   const params =
     community.contentType === ContentType.Token
@@ -103,14 +102,12 @@ const getCommunityPreview = (
     closeResultsFn();
   };
 
-  const CommunityLabel = cast(_CommunityLabel);
-
   return (
     <ListItem
       tabIndex={tabIndex}
       label={
         <a class="search-results-item community-result">
-        <CommunityLabel {...params} />
+          <CommunityLabel {...params} />
         </a>
       }
       onclick={onSelect}
@@ -343,7 +340,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
               item,
               state.closeResults,
               tabIndex,
-              state.setUsingFilterMenu,
+              state.setUsingFilterMenu
             )
           : item.searchType === SearchScope.Replies
           ? getCommentPreview(

@@ -13,15 +13,17 @@ type CommunityLabelAttrs = {
   size?: IconSize;
 };
 
-export const _CommunityLabel = (attrs: CommunityLabelAttrs) => {
-  const { community, size = 'small' } = attrs;
+export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
+  view(vnode) {
+    const { community, size = 'small' } = vnode.attrs;
 
-  return (
-    <div class="CommunityLabel">
-      <CWCommunityAvatar community={community} size={size} />
-      <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
-        {community.name}
-      </CWText>
-    </div>
-  );
+    return (
+      <div class="CommunityLabel">
+        <CWCommunityAvatar community={community} size={size} />
+        <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
+          {community.name}
+        </CWText>
+      </div>
+    );
+  }
 }
