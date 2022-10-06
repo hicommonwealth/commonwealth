@@ -118,14 +118,14 @@ export class InformationSlide
               coverImage:
                 'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/b1e3b3f9-67d8-43a3-be80-e9f038da415f.jpeg',
               creator: '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
-              curatorFee: 300,
+              curatorFee: 3,
               deadline: 1662482268,
               description:
                 '{"ops":[{"insert":"This is the general description field.\\n"}]}',
               shortDescription: 'This is my short description',
               threshold: 3,
               title: 'Project title',
-              token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+              token: '0x11eF819024de53671633cC27AA65Fd354d783178',
             });
             console.log({ txReceipt, newProjectId });
           }}
