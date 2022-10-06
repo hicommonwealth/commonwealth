@@ -151,13 +151,15 @@ export const subscribeEvents: SubscribeFunc<
 
   // helper function that sends a block through the event processor and
   // into the event handlers
-  const processor = new Processor(api);
+  const processor = new Processor(api, chain);
   const processEventFn = async (event: RawEvent): Promise<void> => {
     // retrieve events from block
     const cwEvents: CWEvent<IEventData>[] = await processor.process(event);
 
     // process events in sequence
     for (const cwEvent of cwEvents) {
+      cwEvent.chain = chain;
+      cwEvent.received = Date.now();
       await handleEventFn(cwEvent);
     }
   };
@@ -188,7 +190,7 @@ export const subscribeEvents: SubscribeFunc<
       return;
     }
 
-    const fetcher = new StorageFetcher(api);
+    const fetcher = new StorageFetcher(api, chain);
     try {
       const cwEvents = await fetcher.fetch(offlineRange);
 

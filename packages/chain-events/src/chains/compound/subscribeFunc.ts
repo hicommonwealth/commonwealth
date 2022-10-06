@@ -138,6 +138,8 @@ export const subscribeEvents: SubscribeFunc<
 
     // process events in sequence
     for (const cwEvent of cwEvents) {
+      cwEvent.chain = chain;
+      cwEvent.received = Date.now();
       await handleEventFn(cwEvent);
     }
   };
