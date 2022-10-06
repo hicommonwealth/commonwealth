@@ -252,11 +252,29 @@ export class IProjectBase extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    ): Promise<
+      [
+        [number, string, string, string] & {
+          fee: number;
+          feeTo: string;
+          admin: string;
+          pauseGuardian: string;
+        }
+      ]
+    >;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    ): Promise<
+      [
+        [number, string, string, string] & {
+          fee: number;
+          feeTo: string;
+          admin: string;
+          pauseGuardian: string;
+        }
+      ]
+    >;
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -375,11 +393,25 @@ export class IProjectBase extends Contract {
 
   protocolData(
     overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  ): Promise<
+    [number, string, string, string] & {
+      fee: number;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    }
+  >;
 
   "protocolData()"(
     overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  ): Promise<
+    [number, string, string, string] & {
+      fee: number;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    }
+  >;
 
   setIpfsHash(
     _ipfsHash: BytesLike,
@@ -487,11 +519,25 @@ export class IProjectBase extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    ): Promise<
+      [number, string, string, string] & {
+        fee: number;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      }
+    >;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    ): Promise<
+      [number, string, string, string] & {
+        fee: number;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      }
+    >;
 
     setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
 

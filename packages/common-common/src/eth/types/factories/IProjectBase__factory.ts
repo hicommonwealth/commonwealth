@@ -285,6 +285,16 @@ const _abi = [
             name: "feeTo",
             type: "address",
           },
+          {
+            internalType: "address",
+            name: "admin",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "pauseGuardian",
+            type: "address",
+          },
         ],
         internalType: "struct DataTypes.ProtocolData",
         name: "",

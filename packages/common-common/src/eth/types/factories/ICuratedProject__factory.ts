@@ -350,15 +350,25 @@ const _abi = [
             name: "feeTo",
             type: "address",
           },
+          {
+            internalType: "address",
+            name: "admin",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "pauseGuardian",
+            type: "address",
+          },
         ],
         internalType: "struct DataTypes.ProtocolData",
         name: "_protocolData",
         type: "tuple",
       },
       {
-        internalType: "uint256",
+        internalType: "uint8",
         name: "_curatorFee",
-        type: "uint256",
+        type: "uint8",
       },
       {
         internalType: "address",
@@ -484,6 +494,16 @@ const _abi = [
           {
             internalType: "address",
             name: "feeTo",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "admin",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "pauseGuardian",
             type: "address",
           },
         ],
