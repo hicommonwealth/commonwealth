@@ -1,15 +1,19 @@
 import m from 'mithril';
 import $ from 'jquery';
 import _ from 'lodash';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
 import { Profile } from 'models';
+import { ChainBase } from '../../../../../common-common/src/types';
 
 class ProfilesController {
   private _store: ProfileStore = new ProfileStore();
 
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _unfetched: Profile[];
 
@@ -42,31 +46,41 @@ class ProfilesController {
   public async updateProfileForAccount(account, data) {
     return new Promise((resolve, reject) => {
       // TODO: Change to PUT /profile
+      const normalizedAddress =
+        account.chain.base === ChainBase.Substrate && account.chain.ss58Prefix
+          ? addressSwapper({
+              address: account.address,
+              currentPrefix: parseInt(account.chain.ss58Prefix, 10),
+            })
+          : account.address;
+
       $.post(`${app.serverUrl()}/updateProfile`, {
         chain: account.chain.id,
-        address: account.address,
+        address: normalizedAddress,
         data: JSON.stringify(data),
         auth: true,
         jwt: app.user.jwt,
-      }).then(({ result }) => {
-        if (!account.profile) {
-          const profile = new Profile(account.chain.id, account.address);
-          this._store.add(profile);
-          this._refreshProfile(profile);
-        }
-        if (result.updatedProfileAddress) {
-          const { address, chain } = result.updatedProfileAddress;
-          const profile = this._store.getByAddress(address);
-          if (profile) {
+      })
+        .then(({ result }) => {
+          if (!account.profile) {
+            const profile = new Profile(account.chain.id, account.address);
+            this._store.add(profile);
             this._refreshProfile(profile);
-          } else {
-            this._refreshProfile(new Profile(chain, address));
           }
-        }
-        resolve(result.profile);
-      }).catch((error) => {
-        reject(error);
-      });
+          if (result.updatedProfileAddress) {
+            const { address, chain } = result.updatedProfileAddress;
+            const profile = this._store.getByAddress(address);
+            if (profile) {
+              this._refreshProfile(profile);
+            } else {
+              this._refreshProfile(new Profile(chain, address));
+            }
+          }
+          resolve(result.profile);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
@@ -78,42 +92,62 @@ class ProfilesController {
   private async _refreshProfiles(profiles: Profile[]): Promise<Profile[]> {
     // refresh in chunks of 20 to avoid making the body too large
     const chunkedProfiles = _.chunk(profiles, 20);
-    const ps = await Promise.all(chunkedProfiles.map(async (chunk): Promise<Profile[]> => {
-      const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
-      try {
-        // TODO: Change to GET /profiles
-        const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
-          'addresses[]': chunk.map((profile) => profile.address),
-          'chains[]': chunk.map((profile) => profile.chain),
-        });
-        fetchedProfiles.map((profile) => profile.initializeEmpty());
-        return result.result.map((profileData) => {
-          const profile = fetchedProfiles.find((p) => p.chain === profileData.Address.chain
-            && p.address === profileData.Address.address);
-          if (!profile) return null;
-          const pInfo = profileData.data ? JSON.parse(profileData.data) : {};
-          const lastActive = profileData.Address.last_active;
-          const isCouncillor = profileData.Address.is_councillor;
-          const isValidator = profileData.Address.is_validator;
-          // ignore off-chain name if substrate id exists
-          if (profileData.identity) {
-            profile.initializeWithChain(
-              profileData.identity, pInfo.headline, pInfo.bio, pInfo.avatarUrl,
-              profileData.judgements, lastActive, isCouncillor, isValidator
-            );
-          } else {
-            profile.initialize(
-              pInfo.name, pInfo.headline, pInfo.bio, pInfo.avatarUrl,
-              lastActive, isCouncillor, isValidator
-            );
-          }
-          return profile;
-        }).filter((p) => p !== null);
-      } catch (e) {
-        console.error(e);
-        return [];
-      }
-    }));
+    const ps = await Promise.all(
+      chunkedProfiles.map(async (chunk): Promise<Profile[]> => {
+        const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
+        try {
+          // TODO: Change to GET /profiles
+          const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
+            'addresses[]': chunk.map((profile) => profile.address),
+            'chains[]': chunk.map((profile) => profile.chain),
+          });
+          fetchedProfiles.map((profile) => profile.initializeEmpty());
+          return result.result
+            .map((profileData) => {
+              const profile = fetchedProfiles.find(
+                (p) =>
+                  p.chain === profileData.Address.chain &&
+                  p.address === profileData.Address.address
+              );
+              if (!profile) return null;
+              const pInfo = profileData.data
+                ? JSON.parse(profileData.data)
+                : {};
+              const lastActive = profileData.Address.last_active;
+              const isCouncillor = profileData.Address.is_councillor;
+              const isValidator = profileData.Address.is_validator;
+              // ignore off-chain name if substrate id exists
+              if (profileData.identity) {
+                profile.initializeWithChain(
+                  profileData.identity,
+                  pInfo.headline,
+                  pInfo.bio,
+                  pInfo.avatarUrl,
+                  profileData.judgements,
+                  lastActive,
+                  isCouncillor,
+                  isValidator
+                );
+              } else {
+                profile.initialize(
+                  pInfo.name,
+                  pInfo.headline,
+                  pInfo.bio,
+                  pInfo.avatarUrl,
+                  lastActive,
+                  isCouncillor,
+                  isValidator
+                );
+              }
+              return profile;
+            })
+            .filter((p) => p !== null);
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      })
+    );
     m.redraw();
     return _.flatten(ps);
   }

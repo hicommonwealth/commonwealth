@@ -26,6 +26,7 @@ export type TextInputAttrs = {
   maxlength?: number;
   name: string;
   oninput?: (e) => void;
+  onenterkey?: (e) => void;
   placeholder?: string;
   tabindex?: number;
 };
@@ -100,6 +101,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       maxlength,
       name,
       oninput,
+      onenterkey,
       placeholder,
       size = 'large',
       tabindex,
@@ -178,6 +180,11 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
                 }
+              }
+            }}
+            onkeydown={(e) => {
+              if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
+                onenterkey(e);
               }
             }}
             value={value}

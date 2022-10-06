@@ -13,7 +13,6 @@ import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
@@ -22,7 +21,8 @@ const SelectAddressModal: m.Component<
   { selectedIndex: number; loading: boolean }
 > = {
   view: (vnode) => {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> = app.roles.getActiveAccountsByRole();
+    const activeAccountsByRole: Array<[Account, RoleInfo]> =
+      app.roles.getActiveAccountsByRole();
     const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
       vnode.state.loading = true;
@@ -31,7 +31,8 @@ const SelectAddressModal: m.Component<
       const addressInfo = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
       );
-      app.roles.createRole({
+      app.roles
+        .createRole({
           address: addressInfo,
           chain: app.activeChainId(),
         })
@@ -76,7 +77,8 @@ const SelectAddressModal: m.Component<
         return;
       }
 
-      app.roles.deleteRole({
+      app.roles
+        .deleteRole({
           address: addressInfo,
           chain: app.activeChainId(),
         })
@@ -96,9 +98,7 @@ const SelectAddressModal: m.Component<
         });
     };
 
-    const chainbase = app.chain
-      ? app.chain?.meta?.base
-      : ChainBase.Ethereum;
+    const chainbase = app.chain ? app.chain?.meta?.base : ChainBase.Ethereum;
 
     const activeCommunityMeta = app.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
@@ -110,8 +110,11 @@ const SelectAddressModal: m.Component<
           ? m('.select-address-placeholder', [
               m('p', [
                 `Connect ${
-                  (chainbase && app.chain.network === ChainNetwork.Terra) ? 'Terra' :
-                    (chainbase) ? chainbase[0].toUpperCase() + chainbase.slice(1) : 'Web3'
+                  chainbase && app.chain.network === ChainNetwork.Terra
+                    ? 'Terra'
+                    : chainbase
+                    ? chainbase[0].toUpperCase() + chainbase.slice(1)
+                    : 'Web3'
                 } address to join this community: `,
               ]),
             ])
@@ -213,21 +216,22 @@ const SelectAddressModal: m.Component<
             fluid: true,
             rounded: true,
             disabled:
-              typeof vnode.state.selectedIndex !== 'number' || vnode.state.loading,
+              typeof vnode.state.selectedIndex !== 'number' ||
+              vnode.state.loading,
             onclick: createRole.bind(this),
           }),
-        m(LoginWithWalletDropdown, {
-          loggingInWithAddress: false,
-          joiningChain: app.activeChainId(),
-          label:
-            activeAccountsByRole.length !== 0
-              ? 'Connect a new address'
-              : 'Connect address',
-          onSuccess: () => {
-            $('.SelectAddressModal').trigger('modalexit');
-            notifySuccess('New address connected!');
-          },
-        }),
+        // m(LoginWithWalletDropdown, {
+        //   loggingInWithAddress: false,
+        //   joiningChain: app.activeChainId(),
+        //   label:
+        //     activeAccountsByRole.length !== 0
+        //       ? 'Connect a new address'
+        //       : 'Connect address',
+        //   onSuccess: () => {
+        //     $('.SelectAddressModal').trigger('modalexit');
+        //     notifySuccess('New address connected!');
+        //   },
+        // }),
       ]),
     ]);
   },
