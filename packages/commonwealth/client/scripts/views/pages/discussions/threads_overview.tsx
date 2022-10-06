@@ -47,7 +47,7 @@ export class ThreadsOverview implements m.ClassComponent {
             {/* <CWButton buttonType="mini" label="Create Thread" iconName="plus" /> */}
           </div>
         </div>
-        {topics.map((topic) => {
+        {topics.sort((a, b) => a.order - b.order).map((topic) => {
           const monthlyThreads = app.threads.overviewStore
             .getAll()
             .filter((thread) => thread.topic.id === topic.id);
