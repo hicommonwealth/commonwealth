@@ -9,20 +9,14 @@ import Sublayout from 'views/sublayout';
 
 type PageLoadingAttrs = {
   message?: string;
-  showCreateContentMenuTrigger?: boolean;
-  title?: any;
 };
 
 export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
   view(vnode) {
-    const { title, message, showCreateContentMenuTrigger } = vnode.attrs;
+    const { message } = vnode.attrs;
 
     return (
-      <Sublayout
-        title={title}
-        showCreateContentMenuTrigger={showCreateContentMenuTrigger}
-        hideSearch={true}
-      >
+      <Sublayout hideSearch={true}>
         <div class="LoadingPage">
           <Spinner message={message} active={true} size="xl" />
         </div>

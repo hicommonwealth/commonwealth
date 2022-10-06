@@ -20,12 +20,11 @@ import {
 import { CommunityHeader } from './components/sidebar/community_header';
 import { MobileMenu } from './components/mobile_menu/mobile_menu';
 
+// Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
   onscroll: () => null; // lazy loading for page content
-  showCreateContentMenuTrigger?: boolean;
-  title?: string; // displayed at the top of the layout
 };
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
@@ -58,13 +57,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   }
 
   view(vnode) {
-    const {
-      hideFooter = false,
-      hideSearch,
-      onscroll,
-      showCreateContentMenuTrigger,
-      // title,
-    } = vnode.attrs;
+    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
@@ -99,10 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               }}
             />
             {!hideSearch && <SearchBar />}
-            <SublayoutHeaderRight
-              chain={chain}
-              showCreateContentMenuTrigger={showCreateContentMenuTrigger}
-            />
+            <SublayoutHeaderRight chain={chain} />
           </div>
           <div class="sidebar-and-body-container">
             {showSidebarContainer && (

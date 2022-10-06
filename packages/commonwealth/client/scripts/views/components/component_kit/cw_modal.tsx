@@ -8,7 +8,7 @@ import 'components/component_kit/cw_modal.scss';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
-import { IconTheme } from './cw_icons/types';
+import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,7 +59,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
 
 export class ModalExitButton
   implements
-    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconTheme }>
+    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconButtonTheme }>
 {
   view(vnode) {
     const { disabled, iconButtonTheme } = vnode.attrs;

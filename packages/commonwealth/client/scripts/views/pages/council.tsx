@@ -133,7 +133,6 @@ class CouncilPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Council" />}
-          showCreateContentMenuTrigger
         />
       );
     }
@@ -160,10 +159,7 @@ class CouncilPage implements m.ClassComponent {
       .activeElection?.endTime.blocknum;
 
     return (
-      <Sublayout
-        title={<BreadcrumbsTitleTag title="Council" />}
-        showCreateContentMenuTrigger
-      >
+      <Sublayout title={<BreadcrumbsTitleTag title="Council" />}>
         <div class="CouncilPage">
           <GovExplainer
             statHeaders={[

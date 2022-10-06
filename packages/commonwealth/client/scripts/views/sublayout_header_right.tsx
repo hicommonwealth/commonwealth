@@ -16,14 +16,13 @@ import { CWIcon } from './components/component_kit/cw_icons/cw_icon';
 
 type SublayoutHeaderRightAttrs = {
   chain: ChainInfo;
-  showCreateContentMenuTrigger?: boolean;
 };
 
 export class SublayoutHeaderRight
   implements m.ClassComponent<SublayoutHeaderRightAttrs>
 {
   view(vnode) {
-    const { chain, showCreateContentMenuTrigger } = vnode.attrs;
+    const { chain } = vnode.attrs;
     return (
       <div class="SublayoutHeaderRight">
         {/* Only visible in mobile browser widths */}
@@ -37,9 +36,7 @@ export class SublayoutHeaderRight
         </div>
         {/* threadOnly option assumes all chains have proposals beyond threads */}
         <div class="DesktopIconWrap">
-          {showCreateContentMenuTrigger && (
-            <CreateContentPopover fluid={false} threadOnly={!chain} />
-          )}
+          <CreateContentPopover fluid={false} threadOnly={!chain} />
           <HelpMenuPopover />
           {app.isLoggedIn() && <NotificationsMenuPopover />}
           {app.isLoggedIn() && <InvitesMenuPopover />}

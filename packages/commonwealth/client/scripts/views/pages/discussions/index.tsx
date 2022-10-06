@@ -101,10 +101,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
-      return m(PageLoading, {
-        title: 'Discussions',
-        showCreateContentMenuTrigger: true,
-      });
+      return m(PageLoading);
     }
 
     this.topicName = vnode.attrs.topic;
@@ -120,7 +117,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       <Sublayout
         title="Discussions"
         description={this.getPageDescription()}
-        showCreateContentMenuTrigger={true}
         onscroll={
           !this.summaryView ? debounce(this.onscroll.bind(this), 400) : null
         }

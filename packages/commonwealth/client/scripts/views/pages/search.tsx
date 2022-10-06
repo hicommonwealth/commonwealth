@@ -240,9 +240,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
   view() {
     const LoadingPage = (
       <PageLoading
-        narrow
-        showCreateContentMenuTrigger
-        title={<BreadcrumbsTitleTag title="Search" />}
+      // title={<BreadcrumbsTitleTag title="Search" />}
       />
     );
 
@@ -338,10 +336,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         title={<BreadcrumbsTitleTag title="Search" />}
       />
     ) : (
-      <Sublayout
-        title={['Search ', capitalize(scope) || 'Commonwealth']}
-        showCreateContentMenuTrigger
-      >
+      <Sublayout>
         <div class="SearchPage">
           <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (

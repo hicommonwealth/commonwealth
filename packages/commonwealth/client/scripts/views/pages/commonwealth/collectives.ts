@@ -40,17 +40,11 @@ const CollectivesPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Collectives',
-        showCreateContentMenuTrigger: true,
       });
     }
 
     return m(
       Sublayout,
-      {
-        title: 'Collectives',
-        showCreateContentMenuTrigger: true,
-      },
       m('.CollectivesPage', [
         COLLECTIVES.map((collective) => {
           return m(

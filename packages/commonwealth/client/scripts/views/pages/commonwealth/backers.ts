@@ -11,15 +11,11 @@
 //     if (!app.chain || !app.chain.loaded) {
 //       return m(PageLoading, {
 //         message: 'Connecting to chain',
-//         title: 'Backers',
-//         showCreateContentMenuTrigger: true,
 //       });
 //     }
 
 //     return m(Sublayout, {
 //       class: 'BackersPage',
-//       title: 'Backers',
-//       showCreateContentMenuTrigger: true,
 //     }, [
 //       'backers go here'
 //     ]);

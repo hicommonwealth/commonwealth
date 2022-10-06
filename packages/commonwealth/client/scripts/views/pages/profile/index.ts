@@ -338,11 +338,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile(vnode.attrs, vnode.state);
     }
-    if (loading) return m(PageLoading, { showCreateContentMenuTrigger: true });
+    if (loading) return m(PageLoading);
     if (!account && !vnode.state.initialized) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     } else if (!account) {
-      return m(PageLoading, { showCreateContentMenuTrigger: true });
+      return m(PageLoading);
     }
 
     if (!vnode.state.allContentCount) {
@@ -435,7 +435,6 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     return m(
       Sublayout,
       {
-        showCreateContentMenuTrigger: true,
         onscroll,
       },
       [

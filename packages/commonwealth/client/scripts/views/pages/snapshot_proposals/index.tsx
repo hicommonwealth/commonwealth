@@ -118,7 +118,7 @@ class SnapshotProposalsPage
     };
 
     return (
-      <Sublayout title="Proposals" showCreateContentMenuTrigger={true}>
+      <Sublayout title="Proposals">
         {app.chain && (
           <div class="SnapshotProposalsPage">
             <SnapshotProposalStagesBar

@@ -7,6 +7,22 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
+const UnreadNotificationsPip = (
+  <div
+    style="
+      border-radius: 100%;
+      position: relative;
+      background: #EC79DE;
+      bottom: 10px;
+      height: 8px;
+      content: '';
+      width: 8px;
+      right: 10px;
+      top: -4px;
+    "
+  />
+);
+
 export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
   view(vnode: m.VnodeDOM<any, this>) {
     const {
@@ -45,22 +61,7 @@ export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
             {iconName && (
               <CWIcon className="menu-item-icon" iconName={iconName} />
             )}
-            {unreadNotifications && (
-              <div
-                className="notifications-dot"
-                style="
-                  border-radius: 100%;
-                  position: relative;
-                  background: #EC79DE;
-                  bottom: 10px;
-                  height: 8px;
-                  content: '';
-                  width: 8px;
-                  right: 10px;
-                  top: -4px;
-                "
-              />
-            )}
+            {unreadNotifications && UnreadNotificationsPip}
             <CWText type="b2" className="menu-item-text">
               {label}
             </CWText>

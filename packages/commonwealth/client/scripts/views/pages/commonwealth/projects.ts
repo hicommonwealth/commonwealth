@@ -49,17 +49,11 @@ const ProjectsPage: m.Component<{}> = {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {
         message: 'Connecting to chain',
-        title: 'Projects',
-        showCreateContentMenuTrigger: true,
       });
     }
 
     return m(
       Sublayout,
-      {
-        title: 'Projects',
-        showCreateContentMenuTrigger: true,
-      },
       m('.ProjectsPage', [
         PROJECTS.map((project) => {
           return m(

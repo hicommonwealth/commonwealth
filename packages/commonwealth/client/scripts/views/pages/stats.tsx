@@ -98,8 +98,7 @@ class StatsPage implements m.Component {
       return (
         <PageLoading
           message="Loading analytics"
-          title={<BreadcrumbsTitleTag title="Analytics" />}
-          showCreateContentMenuTrigger
+          // title={<BreadcrumbsTitleTag title="Analytics" />}
         />
       );
 
