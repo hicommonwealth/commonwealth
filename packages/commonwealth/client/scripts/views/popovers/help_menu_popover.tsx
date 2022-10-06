@@ -15,7 +15,7 @@ export class HelpMenuPopover implements m.ClassComponent {
         hasArrow={false}
         transitionDuration={0}
         hoverCloseDelay={0}
-        trigger={<CWIcon disabled={!app.user.activeAccount} iconName="help" />}
+        trigger={<CWIcon iconName="help" />}
         position="bottom-end"
         closeOnContentClick={true}
         closeOnOutsideClick={true}

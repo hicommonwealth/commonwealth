@@ -5,7 +5,6 @@ import m from 'mithril';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { CWMobileMenuItem } from '../components/component_kit/cw_mobile_menu_item';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
 import { LoginModal } from '../modals/login_modal';
 import { MenuItemAttrs } from './types';

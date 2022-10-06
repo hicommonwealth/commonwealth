@@ -360,7 +360,7 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Text field with icon"
             name="Text field with icon"
             placeholder="Type here"
-            iconRight="edit"
+            iconRight="write"
           />
           <CWTextInput
             name="Text field"

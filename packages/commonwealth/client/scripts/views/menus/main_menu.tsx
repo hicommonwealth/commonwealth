@@ -38,14 +38,20 @@ export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
         app.mobileMenu = 'HelpMenu';
       },
     },
-    {
-      label: 'Notifications',
-      iconName: 'bell',
-      mobileCaret: true,
-      onclick: () => {
-        app.mobileMenu = 'NotificationsMenu';
-      },
-    },
+    ...(app.isLoggedIn()
+      ? [
+          {
+            label: 'Notifications',
+            mobileCaret: true,
+            iconName: 'bell' as const,
+            type: 'notification' as const,
+            unreadNotifications: !!app.user?.notifications.numUnread,
+            onclick: () => {
+              app.mobileMenu = 'NotificationsMenu';
+            },
+          },
+        ]
+      : []),
   ];
 };
 

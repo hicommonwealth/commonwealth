@@ -17,6 +17,7 @@ export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
       disabled,
       isSecondary,
       mobileCaret,
+      unreadNotifications,
     } = vnode.attrs;
 
     if (type === 'header') {
@@ -35,13 +36,30 @@ export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
             'MobileMenuItem'
           )}
           onclick={(e) => {
-            delete app.mobileMenu;
+            // Graham TODO 22.10.06: Temporary solution as we transition Notifications
+            app.mobileMenu = null;
             onclick();
           }}
         >
           <div class="mobile-menu-item-left">
             {iconName && (
               <CWIcon className="menu-item-icon" iconName={iconName} />
+            )}
+            {unreadNotifications && (
+              <div
+                className="notifications-dot"
+                style="
+                  border-radius: 100%;
+                  position: relative;
+                  background: #EC79DE;
+                  bottom: 10px;
+                  height: 8px;
+                  content: '';
+                  width: 8px;
+                  right: 10px;
+                  top: -4px;
+                "
+              />
             )}
             <CWText type="b2" className="menu-item-text">
               {label}

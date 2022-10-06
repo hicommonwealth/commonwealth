@@ -25,6 +25,13 @@
 }
 
 .NotificationsMenuPopover {
+  .unread-notifications {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+  }
   .NotificationsMenu {
     width: 296px;
   }

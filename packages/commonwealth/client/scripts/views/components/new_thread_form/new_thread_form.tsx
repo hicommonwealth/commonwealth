@@ -636,7 +636,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                           <div class="draft-title">
                             {fromDraft === draft.id ? (
                               <>
-                                <CWIcon iconName="edit" iconSize="small" />
+                                <CWIcon iconName="write" iconSize="small" />
                                 <CWText
                                   fontWeight="semiBold"
                                   noWrap

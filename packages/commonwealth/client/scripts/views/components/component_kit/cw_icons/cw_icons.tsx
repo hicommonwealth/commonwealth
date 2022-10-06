@@ -33,7 +33,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //   className,
 //   componentType,
 //   disabled,
-//   iconButtonTheme,
+// ,
 //   iconSize,
 //   selected,
 //   ...domAttrs
@@ -41,7 +41,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // return (
 //   <svg
 //     class={getClasses<IconStyleAttrs>(
-//       { className, disabled, iconButtonTheme, iconSize, selected },
+//       { className, disabled, iconSize, selected },
 //       componentType
 //     )}
 //     xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +62,6 @@ export const CWArrowLeft: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -70,7 +69,7 @@ export const CWArrowLeft: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +95,6 @@ export const CWArrowRight: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -104,7 +102,7 @@ export const CWArrowRight: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +128,6 @@ export const CWBacker: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -138,7 +135,7 @@ export const CWBacker: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +168,6 @@ export const CWBadge: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -179,7 +175,7 @@ export const CWBadge: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +198,6 @@ export const CWBell: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -210,7 +205,7 @@ export const CWBell: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +232,6 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -245,7 +239,7 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -273,7 +267,6 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -281,7 +274,7 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -309,7 +302,6 @@ export const CWCheck: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -317,7 +309,7 @@ export const CWCheck: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -343,7 +335,6 @@ export const CWChevronDown: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -351,7 +342,7 @@ export const CWChevronDown: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -377,7 +368,6 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -385,7 +375,7 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -411,7 +401,6 @@ export const CWChevronRight: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -419,7 +408,7 @@ export const CWChevronRight: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -445,7 +434,6 @@ export const CWChevronUp: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -453,7 +441,7 @@ export const CWChevronUp: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -479,7 +467,6 @@ export const CWClock: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -487,7 +474,7 @@ export const CWClock: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -513,7 +500,6 @@ export const CWClose: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -521,7 +507,7 @@ export const CWClose: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -551,7 +537,6 @@ export const CWCloud: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -559,7 +544,7 @@ export const CWCloud: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -589,7 +574,6 @@ export const CWCollapse: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -597,7 +581,7 @@ export const CWCollapse: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -623,7 +607,6 @@ export const CWCommonLogo: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -631,7 +614,7 @@ export const CWCommonLogo: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         width="32"
@@ -653,7 +636,6 @@ export const CWCopy: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -661,7 +643,7 @@ export const CWCopy: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -688,7 +670,6 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -696,7 +677,7 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -718,7 +699,6 @@ export const CWCow: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -726,7 +706,7 @@ export const CWCow: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -752,7 +732,6 @@ export const CWCurator: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -760,7 +739,7 @@ export const CWCurator: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -788,7 +767,6 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -796,7 +774,7 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -822,7 +800,6 @@ export const CWDiscord: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -830,7 +807,7 @@ export const CWDiscord: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -852,7 +829,6 @@ export const CWDots: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -860,7 +836,7 @@ export const CWDots: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -882,7 +858,6 @@ export const CWDotsVertical: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -890,7 +865,7 @@ export const CWDotsVertical: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -912,7 +887,6 @@ export const CWDownvote: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -920,7 +894,7 @@ export const CWDownvote: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -942,7 +916,6 @@ export const CWElement: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -950,7 +923,7 @@ export const CWElement: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -976,7 +949,6 @@ export const CWExpand: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -984,7 +956,7 @@ export const CWExpand: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1010,7 +982,6 @@ export const CWExternalLink: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1018,7 +989,7 @@ export const CWExternalLink: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1044,7 +1015,6 @@ export const CWFeedback: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1052,7 +1022,7 @@ export const CWFeedback: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1078,7 +1048,6 @@ export const CWFilter: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1086,7 +1055,7 @@ export const CWFilter: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1112,7 +1081,6 @@ export const CWFlag: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1120,7 +1088,7 @@ export const CWFlag: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1146,7 +1114,6 @@ export const CWFlame: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1154,7 +1121,7 @@ export const CWFlame: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1176,7 +1143,6 @@ export const CWGear: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1184,7 +1150,7 @@ export const CWGear: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1260,7 +1226,6 @@ export const CWGithub: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1268,7 +1233,7 @@ export const CWGithub: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1294,7 +1259,6 @@ export const CWHamburger: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1302,7 +1266,7 @@ export const CWHamburger: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1323,7 +1287,6 @@ export const CWHash: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1331,7 +1294,7 @@ export const CWHash: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1357,7 +1320,6 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1365,7 +1327,7 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1391,7 +1353,6 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1399,7 +1360,7 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1425,7 +1386,6 @@ export const CWHelp: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1433,7 +1393,7 @@ export const CWHelp: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1459,7 +1419,6 @@ export const CWHome: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1467,7 +1426,7 @@ export const CWHome: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1493,7 +1452,6 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1501,7 +1459,7 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1528,7 +1486,6 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1536,7 +1493,7 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1562,7 +1519,6 @@ export const CWJar: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1570,7 +1526,7 @@ export const CWJar: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1597,7 +1553,6 @@ export const CWLink: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1605,7 +1560,7 @@ export const CWLink: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1631,7 +1586,6 @@ export const CWLock: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1639,7 +1593,7 @@ export const CWLock: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1665,7 +1619,6 @@ export const CWLogout: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1673,7 +1626,7 @@ export const CWLogout: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1704,7 +1657,6 @@ export const CWMail: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1712,7 +1664,7 @@ export const CWMail: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1738,7 +1690,6 @@ export const CWMute: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1746,7 +1697,7 @@ export const CWMute: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1773,7 +1724,6 @@ export const CWPeople: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1781,7 +1731,7 @@ export const CWPeople: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1808,7 +1758,6 @@ export const CWPerson: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1816,7 +1765,7 @@ export const CWPerson: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1842,7 +1791,6 @@ export const CWPin: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1850,7 +1798,7 @@ export const CWPin: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1874,7 +1822,6 @@ export const CWPlus: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1882,7 +1829,7 @@ export const CWPlus: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1905,7 +1852,6 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1913,7 +1859,7 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1939,7 +1885,6 @@ export const CWSearch: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1947,7 +1892,7 @@ export const CWSearch: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -1973,7 +1918,6 @@ export const CWSend: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -1981,7 +1925,7 @@ export const CWSend: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2007,7 +1951,6 @@ export const CWShare: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2015,7 +1958,7 @@ export const CWShare: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2041,7 +1984,6 @@ export const CWShare2: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2049,7 +1991,7 @@ export const CWShare2: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2075,7 +2017,6 @@ export const CWSidebarCollapse: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2083,7 +2024,7 @@ export const CWSidebarCollapse: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2109,7 +2050,6 @@ export const CWSidebarExpand: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2117,7 +2057,7 @@ export const CWSidebarExpand: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2143,7 +2083,6 @@ export const CWStar: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2151,7 +2090,7 @@ export const CWStar: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2173,7 +2112,6 @@ export const CWSun: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2181,7 +2119,7 @@ export const CWSun: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2253,7 +2191,6 @@ export const CWTelegram: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2261,7 +2198,7 @@ export const CWTelegram: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2287,7 +2224,6 @@ export const CWTrash: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2295,7 +2231,7 @@ export const CWTrash: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2322,7 +2258,6 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2330,7 +2265,7 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2356,7 +2291,6 @@ export const CWTwitter: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2364,7 +2298,7 @@ export const CWTwitter: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2386,7 +2320,6 @@ export const CWUpvote: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2394,7 +2327,7 @@ export const CWUpvote: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2416,7 +2349,6 @@ export const CWViews: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2424,7 +2356,7 @@ export const CWViews: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2451,7 +2383,6 @@ export const CWWallet: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2459,7 +2390,7 @@ export const CWWallet: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2491,7 +2422,6 @@ export const CWWebsite: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2499,7 +2429,7 @@ export const CWWebsite: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
@@ -2525,7 +2455,6 @@ export const CWWrite: m.Component<IconAttrs> = {
       className,
       componentType,
       disabled,
-      iconButtonTheme,
       iconSize,
       selected,
       ...domAttrs
@@ -2533,7 +2462,7 @@ export const CWWrite: m.Component<IconAttrs> = {
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
+          { className, disabled, iconSize, selected },
           componentType
         )}
         xmlns="http://www.w3.org/2000/svg"
