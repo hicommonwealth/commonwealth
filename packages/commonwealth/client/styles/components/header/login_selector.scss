@@ -39,3 +39,17 @@
     }
   }
 }
+
+.LoginSelectorMenuRight {
+  .dark-mode-toggle {
+    cursor: default;
+    .label-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .Toggle {
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -29,6 +29,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import SelectAddressModal from '../../modals/select_address_modal';
+import { CWToggle } from '../component_kit/cw_toggle';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -153,7 +154,7 @@ export class LoginSelectorMenuRight
 {
   view(vnode) {
     const { mobile } = vnode.attrs;
-
+    const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
     return (
       <>
         <Cui.MenuItem
@@ -175,6 +176,28 @@ export class LoginSelectorMenuRight
             <div class="label-wrap">
               {mobile && <CWIcon iconName="person" />}
               <span>Account settings</span>
+            </div>
+          }
+        />
+        <Cui.MenuItem
+          class="dark-mode-toggle"
+          onclick={(e) => {
+            if (isDarkModeOn) {
+              localStorage.setItem('dark-mode-state', 'off');
+              document
+                .getElementsByTagName('html')[0]
+                .classList.remove('invert');
+            } else {
+              document.getElementsByTagName('html')[0].classList.add('invert');
+              localStorage.setItem('dark-mode-state', 'on');
+            }
+            e.stopPropagation();
+            m.redraw();
+          }}
+          label={
+            <div class="label-wrap">
+              <CWToggle checked={isDarkModeOn} onchange={(e) => {}} />
+              <span>Dark mode</span>
             </div>
           }
         />
@@ -540,6 +563,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           transitionDuration={0}
           hoverCloseDelay={0}
           position="top-end"
+          overlayClass="LoginSelectorMenuRight"
           trigger={
             <Cui.Button
               class="login-selector-right-button"
