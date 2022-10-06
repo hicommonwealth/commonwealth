@@ -1,12 +1,38 @@
-import { Transaction } from 'sequelize/types';
+import { Model, Transaction } from 'sequelize/types';
 import { DB } from '../database';
 import { Permission } from '../models/role';
-import { RoleAssignmentInstance } from '../models/role_assignment';
+import {
+  RoleAssignmentAttributes,
+  RoleAssignmentInstance,
+  RoleAssignmentModelStatic,
+} from '../models/role_assignment';
 
-export type RoleInstanceWithPermission = RoleAssignmentInstance & {
-  permission: Permission;
+export class RoleInstanceWithPermission {
+  _roleAssignmentInstance: RoleAssignmentInstance;
   chain_id: string;
-};
+  permission: Permission;
+
+  constructor(
+    _roleAssignmentInstance: RoleAssignmentInstance,
+    chain_id: string,
+    permission: Permission
+  ) {
+    this._roleAssignmentInstance = _roleAssignmentInstance;
+    this.chain_id = chain_id;
+    this.permission = permission;
+  }
+
+  public toJSON(): RoleAssignmentAttributes & {
+    chain_id: string;
+    permission: Permission;
+  } {
+    return {
+      ...this._roleAssignmentInstance.toJSON(),
+      chain_id: this.chain_id,
+      permission: this.permission,
+    };
+  }
+}
 
 export async function createDefaultCommunityRoles(
   models: DB,
@@ -40,7 +66,7 @@ export async function createRole(
   chain_id: string,
   role_name: Permission,
   transaction?: Transaction
-): Promise<RoleAssignmentInstance> {
+): Promise<RoleInstanceWithPermission> {
   // Get the community role that has given chain_id and name
   const community_role = await models.CommunityRole.findOne({
     where: { chain_id, name: role_name },
@@ -59,9 +85,13 @@ export async function createRole(
   if (!roleAssignment) {
     throw new Error('Failed to create new role');
   }
-  return roleAssignment;
+  return new RoleInstanceWithPermission(roleAssignment, chain_id, role_name);
 }
 
-export async function findAllRoles(): Promise<RoleInstanceWithPermission> {
+export async function findAllRoles(query: FindOptions<RoleAssignmentModelStatic>, chain_id: string, permissions?: Permission[]): Promise<RoleInstanceWithPermission[]> {
+  return;
+}
+
+export async function findOneRole(): Promise<RoleInstanceWithPerission> {
   return;
 }

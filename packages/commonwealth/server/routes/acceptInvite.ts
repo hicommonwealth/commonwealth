@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
-import { RoleName } from 'server/models/community_role';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
 import { createRole } from '../util/roles';
