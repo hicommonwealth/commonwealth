@@ -5,8 +5,11 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { Window as KeplrWindow, ChainInfo, EthSignType } from '@keplr-wallet/types';
-
+import {
+  Window as KeplrWindow,
+  ChainInfo,
+  EthSignType,
+} from '@keplr-wallet/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -59,12 +62,19 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signLoginToken(
       account.validationToken.trim(),
       account.address
     );
-    return account.validate(webWalletSignature);
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
