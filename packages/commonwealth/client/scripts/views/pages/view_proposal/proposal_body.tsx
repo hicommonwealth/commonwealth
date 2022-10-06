@@ -105,6 +105,16 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           proposal instanceof Thread ? proposal?.topic?.name : null
         ));
 
+    const reactionsAndReplyButtons = (
+      <div class="thread-footer-row">
+        <ThreadReactionButton thread={proposal} />
+        <div class="comments-count">
+          <CWIcon iconName="feedback" iconSize="small" />
+          <CWText type="caption">{commentCount} Comments</CWText>
+        </div>
+      </div>
+    );
+
     return (
       <div class="ProposalBody">
         <div class="header">
@@ -300,13 +310,16 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
         {proposal instanceof Thread && (
           <div class="proposal-content">
             {this.isEditingBody ? (
-              <EditBody
-                thread={proposal}
-                savedEdits={this.savedEdits}
-                shouldRestoreEdits={this.shouldRestoreEdits}
-                setIsEditing={setIsEditingBody}
-                title={this.title}
-              />
+              <>
+                {proposal instanceof Thread && reactionsAndReplyButtons}
+                <EditBody
+                  thread={proposal}
+                  savedEdits={this.savedEdits}
+                  shouldRestoreEdits={this.shouldRestoreEdits}
+                  setIsEditing={setIsEditingBody}
+                  title={this.title}
+                />
+              </>
             ) : (
               <>
                 <ProposalBodyText item={proposal} />
@@ -315,13 +328,16 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                     Commenting is disabled because this post has been locked.
                   </CWText>
                 ) : !isGloballyEditing && canComment ? (
-                  <CreateComment
-                    updatedCommentsCallback={updatedCommentsCallback}
-                    setIsGloballyEditing={setIsGloballyEditing}
-                    isGloballyEditing={isGloballyEditing}
-                    parentComment={null}
-                    rootProposal={proposal}
-                  />
+                  <>
+                    {proposal instanceof Thread && reactionsAndReplyButtons}
+                    <CreateComment
+                      updatedCommentsCallback={updatedCommentsCallback}
+                      setIsGloballyEditing={setIsGloballyEditing}
+                      isGloballyEditing={isGloballyEditing}
+                      parentComment={null}
+                      rootProposal={proposal}
+                    />
+                  </>
                 ) : null}
               </>
             )}
@@ -369,15 +385,6 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
             <VotingResults proposal={proposal} />
             <VotingActions proposal={proposal} />
           </>
-        )}
-        {proposal instanceof Thread && (
-          <div class="thread-footer-row">
-            <ThreadReactionButton thread={proposal} />
-            <div class="comments-count">
-              <CWIcon iconName="feedback" iconSize="small" />
-              <CWText type="caption">{commentCount} Comments</CWText>
-            </div>
-          </div>
         )}
         <ProposalComments
           comments={comments}

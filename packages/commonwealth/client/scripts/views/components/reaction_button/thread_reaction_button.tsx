@@ -88,7 +88,7 @@ export class ThreadReactionButton
     };
 
     const countsComponent = (
-      <CWText class="menu-buttons-text" className="menu-buttons-text">
+      <CWText className="menu-buttons-text" type="caption" fontWeight="medium">
         {likes}
       </CWText>
     );
