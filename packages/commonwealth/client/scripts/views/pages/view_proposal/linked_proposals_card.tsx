@@ -38,7 +38,7 @@ class ProposalSidebarLinkedChainEntity
 
     const proposalLink = `${
       app.isCustomDomain() ? '' : `/${proposal.chain}`
-    }${getProposalUrlPath(slug, chainEntity.typeId)}`;
+    }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
 
     return link('a', proposalLink, [
       `${chainEntityTypeToProposalName(chainEntity.type)} #${
