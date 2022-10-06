@@ -1,20 +1,15 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import { ChainAttributes } from './chain';
+import { Permission } from './role';
 import {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';
 import { ModelStatic, ModelInstance } from './types';
 
-export enum RoleName {
-  Admin = 'admin',
-  Moderator = 'moderator',
-  Member = 'member',
-}
-
 export type CommunityRoleAttributes = {
-  name: RoleName;
+  name: Permission;
   id?: number;
   chain_id: string;
   permissions?: bigint;
