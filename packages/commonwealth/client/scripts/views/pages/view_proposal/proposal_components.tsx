@@ -102,6 +102,7 @@ export class ProposalBodyAuthor
     ) : (
       <>
         {m(User, {
+          avatarSize: 24,
           user: author,
           popover: true,
           linkify: true,

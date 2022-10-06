@@ -8,6 +8,10 @@
   max-width: 768px;
   width: 100%;
 
+  .user-avatar {
+    margin: -6px 6px -6px 0;
+  }
+
   @include mediumSmallInclusive {
     margin: 0 40px 0 0;
   }
