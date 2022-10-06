@@ -19,7 +19,7 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-const MAGIC_PUBLISHABLE_KEY = 'pk_live_7CB694C6778D5813'; // TODO: Change it back to our proper one
+const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
