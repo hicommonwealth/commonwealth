@@ -111,7 +111,9 @@ class StatsPage implements m.Component {
       );
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Analytics" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Analytics" />}
+      >
         <div class="StatsPage">
           <div class="stat-row">
             <CWText fontWeight="medium">Date</CWText>

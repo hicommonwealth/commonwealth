@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 
-import app from 'state';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { getHelpMenuItemAttrs } from '../menus/help_menu';

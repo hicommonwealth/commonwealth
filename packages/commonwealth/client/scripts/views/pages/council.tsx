@@ -159,7 +159,9 @@ class CouncilPage implements m.ClassComponent {
       .activeElection?.endTime.blocknum;
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Council" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Council" />}
+      >
         <div class="CouncilPage">
           <GovExplainer
             statHeaders={[

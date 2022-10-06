@@ -113,7 +113,9 @@ class ReferendaPage implements m.ClassComponent {
     );
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Referenda" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Referenda" />}
+      >
         <div class="ReferendaPage">
           {onSubstrate && (
             <GovExplainer

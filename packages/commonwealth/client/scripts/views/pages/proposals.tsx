@@ -308,7 +308,9 @@ const ProposalsPage: m.Component<{}> = {
           ];
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Proposals" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Proposals" />}
+      >
         <div class="ProposalsPage">
           {onSubstrate && (
             <SubstrateProposalStats

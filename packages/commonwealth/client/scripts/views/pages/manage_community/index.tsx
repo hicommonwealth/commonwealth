@@ -128,7 +128,9 @@ class ManageCommunityPage implements m.ClassComponent {
     return !this.loadingFinished ? (
       <PageLoading />
     ) : (
-      <Sublayout title="Manage Community">
+      <Sublayout
+      // title="Manage Community"
+      >
         <div class="ManageCommunityPage">
           <ChainMetadataRows
             admins={admins}

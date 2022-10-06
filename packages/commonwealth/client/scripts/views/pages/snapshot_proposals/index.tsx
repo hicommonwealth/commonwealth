@@ -118,7 +118,9 @@ class SnapshotProposalsPage
     };
 
     return (
-      <Sublayout title="Proposals">
+      <Sublayout
+      // title="Proposals"
+      >
         {app.chain && (
           <div class="SnapshotProposalsPage">
             <SnapshotProposalStagesBar
