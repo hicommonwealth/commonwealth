@@ -33,7 +33,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
         message: 'Change Metamask to point to Ethereum Mainnet',
       });
     if (!app.chain || !app.chain.loaded || !app.chain.meta)
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading);
 
     // infer proposal type if possible
     if (!vnode.state.typeEnum) {
@@ -55,17 +55,16 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     >;
     if (!c.ready) {
       app.chain.loadModules([c]);
-      return m(PageLoading, { narrow: true, showNewProposalButton: true });
+      return m(PageLoading);
     }
 
     return m(
       Sublayout,
-      {
-        title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
-          vnode.state.typeEnum
-        )}`,
-        showNewProposalButton: true,
-      },
+      // {
+      //   title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
+      //     vnode.state.typeEnum
+      //   )}`,
+      // },
       [
         m('.NewProposalPage', [
           m(
