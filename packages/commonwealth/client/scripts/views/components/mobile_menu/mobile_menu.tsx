@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import 'components/mobile_menu.scss';
+import 'components/component_kit/cw_mobile_menu.scss';
 
 import m from 'mithril';
 import app from 'state';

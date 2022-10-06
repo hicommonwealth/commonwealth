@@ -8,24 +8,9 @@ import { PopoverMenu } from 'construct-ui';
 import { NotificationsMenu } from '../menus/notifications_menu';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-const UnreadNotificationsPip = (
-  <div
-    style="
-      border-radius: 100%;
-      position: absolute;
-      background: #EC79DE;
-      content: '';
-      height: 10px;
-      width: 10px;
-      top: 17px;
-      right: 50px;
-    "
-  />
-);
-
 export class NotificationsMenuPopover implements m.ClassComponent {
   view() {
-    const unreadNotifications = app.user.notifications.numUnread;
+    const unreadNotifications = !!app.user.notifications.numUnread;
     return (
       <PopoverMenu
         overlayClass="NotificationsMenuPopover"
@@ -38,7 +23,7 @@ export class NotificationsMenuPopover implements m.ClassComponent {
         trigger={
           <div>
             <CWIcon iconName="bell" />
-            {unreadNotifications && UnreadNotificationsPip}
+            {unreadNotifications && <div class="unread-notifications-pip" />}
           </div>
         }
         content={<NotificationsMenu />}

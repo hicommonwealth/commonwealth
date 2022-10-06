@@ -12,6 +12,7 @@
 
   .Icon {
     cursor: pointer;
+    display: inline-block;
   }
 
   .MobileIconPopover {
@@ -27,12 +28,24 @@
     flex-direction: row;
     justify-content: flex-end;
 
+    @include extraSmall {
+      display: none;
+    }
+
     > :not(:first-child) {
       margin-left: 8px;
     }
 
-    @include extraSmall {
-      display: none;
+    .unread-notifications-pip {
+      border-radius: 100%;
+      position: relative;
+      background: $pink-500;
+      content: '';
+      height: 10px;
+      width: 10px;
+      top: -3px;
+      right: 10px;
+      display: inline-block;
     }
   }
 }

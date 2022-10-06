@@ -42,5 +42,17 @@
     .Text {
       margin-left: 4px;
     }
+
+    .unread-notifications-pip {
+      border-radius: 100%;
+      position: relative;
+      background: #ec79de;
+      bottom: 10px;
+      height: 10px;
+      width: 10px;
+      content: '';
+      right: 10px;
+      top: -4px;
+    }
   }
 }
