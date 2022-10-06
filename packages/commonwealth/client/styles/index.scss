@@ -14,10 +14,11 @@ body {
 
 html {
   font-family: $fonts;
-  font-size: 16px;
+  font-size: 14px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background: $white;
+  line-height: 18px;
 
 
   // animate the transition of the darkmode
