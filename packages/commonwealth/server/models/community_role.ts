@@ -1,6 +1,5 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import {
   RoleAssignmentAttributes,
@@ -24,6 +23,7 @@ export type CommunityRoleAttributes = {
 
   // associations
   RolePermissions?: RoleAssignmentAttributes[];
+  Chain?: ChainAttributes;
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
@@ -69,6 +69,7 @@ export default (
     models.CommunityRole.hasMany(models.RoleAssignment, {
       foreignKey: 'community_role_id',
     });
+    models.CommunityRole.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
   };
 
   return CommunityRole;
