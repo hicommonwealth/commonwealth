@@ -38,8 +38,8 @@ const status = async (
           {
             model: models.Contract,
             required: false,
-            include: [{ model: models.ContractAbi, required: false}],
-          }
+            include: [{ model: models.ContractAbi, required: false }],
+          },
         ],
       }),
       models.ChainNode.findAll(),
@@ -311,6 +311,7 @@ const status = async (
         starredCommunities,
         discussionDrafts,
         unseenPosts,
+        browserNotificationsEnabled: user.browser_notifications_enabled,
       },
     });
   } catch (error) {

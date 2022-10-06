@@ -190,13 +190,14 @@ export function updateActiveUser(data) {
     app.user.setDisableRichText(data.disableRichText);
     app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
+    app.user.setBrowserNotificationsEnabled(data.browserNotificationsEnabled);
   }
 }
 
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  chain: string,
+  chain: string
 ): Promise<Account> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
@@ -212,7 +213,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
-  })
+  });
   return account;
 }
 

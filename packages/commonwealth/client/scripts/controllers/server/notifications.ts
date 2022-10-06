@@ -3,7 +3,11 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification, ChainEventType } from 'models';
+import {
+  NotificationSubscription,
+  Notification as CWNotification,
+  ChainEventType,
+} from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
@@ -56,15 +60,15 @@ class NotificationsController {
     return this._numUnread;
   }
 
-  public get discussionNotifications(): Notification[] {
+  public get discussionNotifications(): CWNotification[] {
     return this._discussionStore.getAll();
   }
 
-  public get chainEventNotifications(): Notification[] {
+  public get chainEventNotifications(): CWNotification[] {
     return this._chainEventStore.getAll();
   }
 
-  public get allNotifications(): Notification[] {
+  public get allNotifications(): CWNotification[] {
     return this._discussionStore
       .getAll()
       .concat(this._chainEventStore.getAll());
@@ -168,6 +172,36 @@ class NotificationsController {
     );
   }
 
+  public async updateBrowserNotificationsStatus(enabled: boolean) {
+    try {
+      await $.post(`${app.serverUrl()}/setBrowserNotifications`, {
+        enabled,
+        jwt: app.user.jwt,
+      });
+      app.user.setBrowserNotificationsEnabled(enabled);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  public async requestBrowserNotifications(): Promise<NotificationPermission> {
+    try {
+      const status = await Notification.requestPermission();
+      if (status === 'granted') {
+        console.log('browser notification permissions granted');
+        await this.updateBrowserNotificationsStatus(true);
+      } else {
+        await this.updateBrowserNotificationsStatus(false);
+        console.log('browser notification permissions disabled');
+      }
+
+      return status;
+    } catch (e) {
+      console.log(e);
+      return 'denied';
+    }
+  }
+
   public deleteSubscription(subscription: NotificationSubscription) {
     // TODO: Change to DELETE /subscription
     return post(
@@ -189,7 +223,7 @@ class NotificationsController {
     );
   }
 
-  public markAsRead(notifications: Notification[]) {
+  public markAsRead(notifications: CWNotification[]) {
     // TODO: Change to PUT /notificationsRead
     const MAX_NOTIFICATIONS_READ = 100; // mark up to 100 notifications read at a time
     const unreadNotifications = notifications.filter((notif) => !notif.isRead);
@@ -232,7 +266,7 @@ class NotificationsController {
     else this._discussionStore.remove(n);
   }
 
-  public delete(notifications: Notification[]) {
+  public delete(notifications: CWNotification[]) {
     // TODO: Change to PUT /clearNotifications
     const MAX_NOTIFICATIONS_CLEAR = 100; // delete up to 100 notifications at a time
 
@@ -256,7 +290,7 @@ class NotificationsController {
     );
   }
 
-  public update(n: Notification) {
+  public update(n: CWNotification) {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
       m.redraw();
@@ -348,7 +382,7 @@ class NotificationsController {
           is_read: notificationsReadJSON.is_read,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(
+        const notification = CWNotification.fromJSON(
           data,
           subscription,
           chainEventType

@@ -25,6 +25,12 @@ import {
 import { bundleSubs } from './helpers';
 
 class NotificationSettingsPage implements m.ClassComponent {
+  private browserNotifsEnabled: boolean;
+  oninit() {
+    this.browserNotifsEnabled =
+      Notification.permission === 'granted' &&
+      app.user.browserNotificationsEnabled;
+  }
   view() {
     if (!app.loginStatusLoaded()) {
       return (
@@ -51,8 +57,30 @@ class NotificationSettingsPage implements m.ClassComponent {
           </CWText>
           <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
-            likes, and chain events in the following communities.
+            likes, an d chain events in the following communities.
           </CWText>
+          <CWToggle
+            checked={this.browserNotifsEnabled}
+            onchange={async () => {
+              if (!this.browserNotifsEnabled) {
+                const status =
+                  await app.user.notifications.requestBrowserNotifications();
+                if (status === 'granted') this.browserNotifsEnabled = true;
+                m.redraw();
+              } else {
+                try {
+                  await app.user.notifications.updateBrowserNotificationsStatus(
+                    false
+                  );
+                  this.browserNotifsEnabled = false;
+                } catch (e) {
+                  console.log(e);
+                }
+
+                m.redraw();
+              }
+            }}
+          />
           <div class="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}

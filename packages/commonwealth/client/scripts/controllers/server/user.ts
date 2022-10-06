@@ -113,6 +113,14 @@ export class UserController {
     this._notifications = notifications;
   }
 
+  private _browserNotificationsEnabled: boolean;
+  public get browserNotificationsEnabled(): boolean {
+    return this._browserNotificationsEnabled;
+  }
+  private _setBrowserNotificationsEnabled(enabled: boolean): void {
+    this._browserNotificationsEnabled = enabled;
+  }
+
   private _lastVisited: object;
   public get lastVisited(): object {
     return this._lastVisited;
@@ -206,9 +214,7 @@ export class UserController {
   public setSelectedChain(selectedChain: ChainInfo): void {
     this._setSelectedChain(selectedChain);
   }
-  public selectChain(options: {
-    chain: string;
-  }): JQueryPromise<void> {
+  public selectChain(options: { chain: string }): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/selectChain`, {
       chain: options.chain,
       auth: true,
@@ -234,6 +240,9 @@ export class UserController {
   }
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
+  }
+  public setBrowserNotificationsEnabled(enabled: boolean): void {
+    this._setBrowserNotificationsEnabled(enabled);
   }
   public setDiscussionDrafts(drafts: DraftsController): void {
     this.setDiscussionDrafts(drafts);

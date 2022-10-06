@@ -1,5 +1,6 @@
 import http from 'http';
 import https from 'https';
+import path from 'path';
 import fs from 'fs';
 import { Express } from 'express-serve-static-core';
 import Rollbar from 'rollbar';
@@ -18,8 +19,8 @@ const setupServer = (app: Express, rollbar: Rollbar, models: DB) => {
   if (https_enabled) {
     try {
       const options = {
-        key: fs.readFileSync('../localhost-key.pem'),
-        cert: fs.readFileSync('../localhost.pem'),
+        key: fs.readFileSync(path.resolve(__dirname, '../localhost-key.pem')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../localhost.pem')),
       };
       server = https.createServer(options, app);
     } catch (e) {

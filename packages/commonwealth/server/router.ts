@@ -62,6 +62,7 @@ import getProfile from './routes/getProfile';
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
+import setBrowserNotifications from './routes/setBrowserNotifications';
 
 import getUploadSignature from './routes/getUploadSignature';
 import activeThreads from './routes/activeThreads';
@@ -503,6 +504,11 @@ function setupRouter(
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
     setDefaultRole.bind(this, models)
+  );
+  router.post(
+    '/setBrowserNotifications',
+    passport.authenticate('jwt', { session: false }),
+    setBrowserNotifications.bind(this, models)
   );
 
   // profiles
