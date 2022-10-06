@@ -26,7 +26,16 @@ export const getHelpMenuItemAttrs = (): MenuItemAttrs[] => {
 export class HelpMenu implements m.ClassComponent {
   view() {
     return (
-      <CWMobileMenu className="HelpMenu" menuItems={getHelpMenuItemAttrs()} />
+      <CWMobileMenu
+        menuHeader={{
+          label: 'Help',
+          onclick: (e) => {
+            app.mobileMenu = 'MainMenu';
+          },
+        }}
+        className="HelpMenu"
+        menuItems={getHelpMenuItemAttrs()}
+      />
     );
   }
 }
