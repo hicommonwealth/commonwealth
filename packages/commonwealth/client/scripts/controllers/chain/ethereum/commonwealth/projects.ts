@@ -9,6 +9,7 @@ import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
 import { BigNumberish, ContractReceipt } from 'ethers';
 import { attachSigner } from './contractApi';
+import { formatBytes32String } from 'ethers/lib/utils';
 
 export type IProjectCreationData = {
   title: string; // TODO length limits for contract side
@@ -158,6 +159,7 @@ export default class ProjectsController {
     console.log({ projectId });
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
+    formatBytes32String
     console.log({
       title: title.slice(0, 32),
       ipfsHash,
@@ -170,9 +172,9 @@ export default class ProjectsController {
     });
 
     const tx = await contract.createProject(
-      title.slice(0, 32),
-      ipfsHash,
-      cwUrl,
+      formatBytes32String(title.slice(0, 30)),
+      formatBytes32String(ipfsHash.slice(0, 30)),
+      formatBytes32String(cwUrl.slice(0, 30)),
       beneficiary,
       token,
       threshold.toString(),
