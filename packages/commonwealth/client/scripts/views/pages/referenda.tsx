@@ -72,7 +72,6 @@ class ReferendaPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Referenda" />}
-          showNewProposalButton
         />
       );
     }
@@ -115,8 +114,7 @@ class ReferendaPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Referenda" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
         <div class="ReferendaPage">
           {onSubstrate && (
