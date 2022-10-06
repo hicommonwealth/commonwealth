@@ -6,7 +6,7 @@ import m from 'mithril';
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
-import { LoginModal } from '../modals/login_modal';
+import { NewLoginModal } from '../modals/login_modal';
 import { MenuItemAttrs } from './types';
 
 export const handleEmailInvites = (state) => {
@@ -19,7 +19,7 @@ export const handleEmailInvites = (state) => {
       });
     } else if (!app.user.activeAccount) {
       app.modals.create({
-        modal: LoginModal,
+        modal: NewLoginModal,
       });
     }
   }
