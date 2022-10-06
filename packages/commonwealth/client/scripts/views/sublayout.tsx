@@ -51,6 +51,12 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
   }
 
+  oninit(vnode) {
+    if (localStorage.getItem('dark-mode-state') === 'on') {
+      document.getElementsByTagName('html')[0].classList.add('invert');
+    }
+  }
+
   view(vnode) {
     const {
       hideFooter = false,
