@@ -155,7 +155,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
               !isGloballyEditing && (
                 <>
                   <CWPopoverMenu
-                    popoverMenuItems={[
+                    menuItems={[
                       ...(hasEditPerms && !proposal.readOnly
                         ? [
                             {

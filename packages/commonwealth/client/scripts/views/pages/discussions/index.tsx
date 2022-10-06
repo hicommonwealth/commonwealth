@@ -102,7 +102,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
-      return <PageLoading title="Discussions" showNewProposalButton />;
+      return m(PageLoading);
     }
 
     this.topicName = vnode.attrs.topic;
@@ -118,7 +118,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       <Sublayout
         title="Discussions"
         description={this.getPageDescription()}
-        showNewProposalButton
         onscroll={
           !this.threadsOverview ? debounce(this.onscroll.bind(this), 400) : null
         }

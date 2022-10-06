@@ -14,7 +14,7 @@ export class SocialSharingCarat
 
     return (
       <CWPopoverMenu
-        popoverMenuItems={[
+        menuItems={[
           {
             iconName: 'copy',
             label: 'Copy URL',

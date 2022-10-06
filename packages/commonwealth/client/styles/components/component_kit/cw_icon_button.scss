@@ -5,18 +5,18 @@
 
   &.black {
     cursor: pointer;
-    color: $neutral-900;
+    color: $neutral-800;
 
     &:hover {
-      color: $neutral-600;
+      color: $neutral-900;
     }
 
     &:active {
-      color: $neutral-800;
+      color: $neutral-600;
     }
 
     &.selected {
-      color: $neutral-800;
+      color: $neutral-600;
     }
   }
 

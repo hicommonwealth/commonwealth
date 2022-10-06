@@ -98,7 +98,7 @@ export class DiscussionRowMenu
         }}
       >
         <CWPopoverMenu
-          popoverMenuItems={[
+          menuItems={[
             getThreadSubScriptionMenuItem(proposal),
             ...(hasAdminPermissions ? [{ type: 'divider' }] : []),
             ...(hasAdminPermissions

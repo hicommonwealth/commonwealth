@@ -574,6 +574,13 @@ const NotificationRow: m.Component<
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
+          onclick: (e) => {
+            // Graham TODO 22.10.05: Temporary fix while we wait for full
+            // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
+            // array
+            delete app.mobileMenu;
+            m.redraw();
+          },
         },
         null,
         () => app.user.notifications.markAsRead(notifications),

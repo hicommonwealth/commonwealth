@@ -135,7 +135,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                             iconSize="small"
                           />
                         }
-                        popoverMenuItems={[
+                        menuItems={[
                           {
                             label: 'Edit',
                             iconName: 'edit',
