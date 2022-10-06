@@ -19,7 +19,7 @@ import {
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import TokenBalanceProvider from 'token-balance-cache/src/provider';
 
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
@@ -56,11 +56,7 @@ class MockTokenBalanceProvider extends TokenBalanceProvider {
 }
 
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(
-  0,
-  0,
-  mockTokenBalanceProvider
-);
+const tokenBalanceCache = new TokenBalanceCache(0, 0, mockTokenBalanceProvider);
 const ruleCache = new RuleCache();
 let server;
 
@@ -177,7 +173,7 @@ const resetServer = (debug = false): Promise<void> => {
       const alexCommunityContract = await models.CommunityContract.create({
         chain_id: alex.id,
         contract_id: alexContract.id,
-      })
+      });
       const yearn = await models.Chain.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
@@ -293,24 +289,24 @@ const resetServer = (debug = false): Promise<void> => {
       });
       await models.NotificationCategory.create({
         name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread'
-      })
+        description: 'someone edited a thread',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.CommentEdit,
-        description: 'someoned edited a comment'
-      })
+        description: 'someoned edited a comment',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.NewRoleCreation,
-        description: 'someone created a role'
-      })
+        description: 'someone created a role',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred'
-      })
+        description: 'an entity-event as occurred',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.NewChatMention,
-        description: 'someone mentions a user in chat'
-      })
+        description: 'someone mentions a user in chat',
+      });
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({
@@ -372,7 +368,15 @@ const setupServer = () => {
 
 const banCache = new BanCache(models);
 setupPassport(models);
-setupAPI(app, models, viewCountCache, identityFetchCache, tokenBalanceCache, ruleCache, banCache);
+setupAPI(
+  app,
+  models,
+  viewCountCache,
+  identityFetchCache,
+  tokenBalanceCache,
+  ruleCache,
+  banCache
+);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

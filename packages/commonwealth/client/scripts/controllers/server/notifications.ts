@@ -32,11 +32,11 @@ const get = (route, args, callback) => {
       }
     })
     .catch((e) => console.error(e));
-}
+};
 
 interface NotifOptions {
-  chain_filter: string,
-  maxId: number
+  chain_filter: string;
+  maxId: number;
 }
 class NotificationsController {
   private _discussionStore: NotificationStore = new NotificationStore();
@@ -274,7 +274,7 @@ class NotificationsController {
   }
 
   public sortNotificationsStore(storeType: string) {
-    if (storeType == 'chain-events') {
+    if (storeType === 'chain-events') {
       const unsortedNotifications = this.chainEventNotifications;
       this._chainEventStore.clear();
       unsortedNotifications.sort((a, b) => b.id - a.id);
@@ -296,7 +296,7 @@ class NotificationsController {
 
     const options: NotifOptions = app.isCustomDomain()
       ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined};
+      : { chain_filter: undefined, maxId: undefined };
 
     if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
       options.maxId = this._maxChainEventNotificationId;
@@ -360,14 +360,16 @@ class NotificationsController {
           // the minimum id is the new max id for next page
           if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
             this._maxChainEventNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1) this._maxChainEventNotificationId = 0;
+            if (notificationsReadJSON.id === 1)
+              this._maxChainEventNotificationId = 0;
           }
         } else {
           if (!this._discussionStore.getById(notification.id))
             this._discussionStore.add(notification);
           if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
             this._maxDiscussionNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1) this._maxDiscussionNotificationId = 0;
+            if (notificationsReadJSON.id === 1)
+              this._maxDiscussionNotificationId = 0;
           }
         }
       }
@@ -381,9 +383,7 @@ class NotificationsController {
       this._subscriptions = [];
 
       const subs = result;
-      subs.forEach((sub) =>
-      this._subscriptions.push(modelFromServer(sub))
-    );
+      subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
 
