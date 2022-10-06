@@ -1,10 +1,11 @@
 import { assert } from 'chai';
 import { validateRule } from '../../../server/util/rules/ruleParser';
-import AdminOnlyRule from '../../../server/ruleTypes/adminOnly';
-import * as modelUtils from '../../util/modelUtils';
+import AnyRule from '../../../server/ruleTypes/any';
+import * as modelUtils from '../../util/integration/modelUtils';
 import models from '../../../server/database';
+import { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
 
-describe('AdminOnly rule tests', () => {
+describe('Any rule tests', () => {
   let loggedInAddr: string;
   let loggedInAddrId: number;
   const chain = 'ethereum';
@@ -34,41 +35,68 @@ describe('AdminOnly rule tests', () => {
     loggedInAddrId = addressObj.id;
   });
 
-  it('should validate correct adminOnly rule', () => {
-    const rule = { AdminOnlyRule: [] };
+  it('should validate correct any rule', () => {
+    const rule = { AnyRule: [ [
+      {
+        AdminOnlyRule: [] as [],
+      }, {
+        AllowListRule: [ [loggedInAddr] ] as [ string[] ],
+      },
+    ] ] };
     const sanitizedRule = validateRule(rule);
     assert.deepEqual(rule, sanitizedRule);
   });
 
-  it('should pass adminOnly rule on admin', async () => {
-    // assign admin role to loggedInAddr
+  it('should pass any rule on admin subRule', async () => {
     await models['Role'].create({
       address_id: loggedInAddrId,
       chain_id: chain,
       permission: 'admin',
     });
-    const rule = { AdminOnlyRule: [] as [] };
-    const ruleType = new AdminOnlyRule();
+    const rule = { AnyRule: [ [
+      {
+        AdminOnlyRule: [] as [],
+      }, {
+        AllowListRule: [ ['unknown'] ] as [ string[] ],
+      },
+    ] ] as [ Array<DefaultSchemaT> ] };
+    const ruleType = new AnyRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
     assert.isTrue(result);
   });
 
-  it('should fail adminOnly rule on member', async () => {
-    // assign member role to loggedInAddr
+  it('should pass any rule on allowList subRule', async () => {
     await models['Role'].create({
       address_id: loggedInAddrId,
       chain_id: chain,
       permission: 'member',
     });
-    const rule = { AdminOnlyRule: [] as [] };
-    const ruleType = new AdminOnlyRule();
+    const rule = { AnyRule: [ [
+      {
+        AdminOnlyRule: [] as [],
+      }, {
+        AllowListRule: [ [loggedInAddr] ] as [ string[] ],
+      },
+    ] ] as [ Array<DefaultSchemaT> ] };
+    const ruleType = new AnyRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
-    assert.isFalse(result);
+    assert.isTrue(result);
   });
 
-  it('should fail adminOnly rule when no role exists', async () => {
-    const rule = { AdminOnlyRule: [] as [] };
-    const ruleType = new AdminOnlyRule();
+  it('should fail all rule', async () => {
+    await models['Role'].create({
+      address_id: loggedInAddrId,
+      chain_id: chain,
+      permission: 'member',
+    });
+    const rule = { AnyRule: [ [
+      {
+        AdminOnlyRule: [] as [],
+      }, {
+        AllowListRule: [ ['unknown'] ] as [ string[] ],
+      },
+    ] ] as [ Array<DefaultSchemaT> ] };
+    const ruleType = new AnyRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
     assert.isFalse(result);
   });

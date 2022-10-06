@@ -11,14 +11,14 @@ import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
-const markdownComment = require('../../util/fixtures/markdownComment');
-const richTextThread = require('../../util/fixtures/richTextThread');
-const richTextComment = require('../../util/fixtures/richTextComment');
+const markdownThread = require('../../util/integration/fixtures/markdownThread');
+const markdownComment = require('../../util/integration/fixtures/markdownComment');
+const richTextThread = require('../../util/integration/fixtures/richTextThread');
+const richTextComment = require('../../util/integration/fixtures/richTextComment');
 
 const expectErrorOnResponse = (statusCode, errorMsg, response) => {
   expect(response.statusCode).to.be.equal(statusCode);

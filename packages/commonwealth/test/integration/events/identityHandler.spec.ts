@@ -11,7 +11,7 @@ import {
   SupportedNetwork,
 } from 'chain-events/src';
 
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import { resetDatabase, getIdentityFetchCache } from '../../../server-test';
 import models from '../../../server/database';
 import IdentityHandler from '../../../server/eventHandlers/identity';

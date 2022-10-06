@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { validateRule } from '../../../server/util/rules/ruleParser';
 import AllRule from '../../../server/ruleTypes/all';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import models from '../../../server/database';
 import { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
 

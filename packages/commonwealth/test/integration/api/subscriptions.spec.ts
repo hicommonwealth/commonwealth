@@ -8,7 +8,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/subscription/errors';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';

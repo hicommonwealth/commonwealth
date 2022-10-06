@@ -7,12 +7,12 @@ import jwt from 'jsonwebtoken';
 import { NotificationCategories } from 'common-common/src/types';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 
 import { Errors as createErrors } from '../../../server/routes/createRole';
 import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
-import { generateEthAddress } from '../../util/modelUtils';
+import { generateEthAddress } from '../../util/integration/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;

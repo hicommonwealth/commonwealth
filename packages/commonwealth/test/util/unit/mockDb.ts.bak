@@ -1,0 +1,46 @@
+import { Models } from "server/database";
+
+class MockInstance {
+  public async save() {
+
+  }
+
+  public async destroy() {
+
+  }
+}
+
+class MockModel<InstanceT extends MockInstance> {
+  public async create(): Promise<MockInstance> {
+
+  }
+
+  public async findOne(): Promise<MockInstance | undefined> {
+
+  }
+
+  public async findAll(): Promise<MockInstance[]> {
+
+  }
+
+  public async findOrCreate() {
+
+  }
+
+  public async destroy() {
+
+  }
+
+  public scope(scope: string) {
+    // TODO: implement scoping per DB
+    return this;
+  }
+}
+
+class MockDatabase {
+  public readonly models: Models = {} as unknown as Models;
+
+  public setModel<T>(name: keyof Models, data: T): void {
+
+  }
+}

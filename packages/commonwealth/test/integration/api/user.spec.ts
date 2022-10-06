@@ -6,13 +6,13 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownThread = require('../../util/fixtures/markdownThread');
+const markdownThread = require('../../util/integration/fixtures/markdownThread');
 
 describe('User Model Routes', () => {
   before('reset database', async () => {

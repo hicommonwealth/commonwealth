@@ -6,7 +6,7 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import app, { resetDatabase } from '../../../server-test';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import { constructTypedMessage } from '../../../shared/adapters/chain/ethereum/keys';
 
 chai.use(chaiHttp);

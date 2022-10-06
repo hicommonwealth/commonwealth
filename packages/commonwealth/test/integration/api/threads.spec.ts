@@ -15,11 +15,11 @@ import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadP
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownComment = require('../../util/fixtures/markdownComment');
+const markdownComment = require('../../util/integration/fixtures/markdownComment');
 
 describe('Thread Tests', () => {
   const chain = 'ethereum';
@@ -35,7 +35,7 @@ describe('Thread Tests', () => {
   const kind = 'discussion';
   const stage = 'discussion';
 
-  const markdownThread = require('../../util/fixtures/markdownThread');
+  const markdownThread = require('../../util/integration/fixtures/markdownThread');
   let adminJWT;
   let adminAddress;
   let adminAddressId;

@@ -9,7 +9,7 @@ import { Errors as CreateDraftErrors } from 'server/routes/drafts/createDraft';
 import { Errors as EditDraftErrors } from 'server/routes/drafts/editDraft';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;

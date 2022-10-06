@@ -8,11 +8,11 @@ import jwt from 'jsonwebtoken';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { resetDatabase, getTokenBalanceCache, getMockBalanceProvider } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownComment = require('../../util/fixtures/markdownComment');
+const markdownComment = require('../../util/integration/fixtures/markdownComment');
 
 describe('Token Forum tests', () => {
   const chain = 'alex';

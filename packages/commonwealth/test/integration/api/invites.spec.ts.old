@@ -9,7 +9,7 @@ import { Errors as CreateInviteErrors } from 'server/routes/createInvite';
 import { Errors as AcceptInviteErrors } from 'server/routes/acceptInvite';
 import { ChainCommunityErrors } from 'server/util/lookupCommunityIsVisibleToUser';
 import { JWT_SECRET } from 'server/config';
-import * as modelUtils from '../../util/modelUtils';
+import * as modelUtils from '../../util/integration/modelUtils';
 import app, { resetDatabase } from '../../../server-test';
 import { NotificationCategories } from 'common-common/src/types';
 
