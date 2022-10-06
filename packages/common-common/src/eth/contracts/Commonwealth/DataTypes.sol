@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// @title DataTypes
@@ -20,6 +20,10 @@ library DataTypes {
         uint8 fee;
         //    // @notice The address to send the protocol fee to
         address feeTo;
+        //    /// @notice address of the admin that can set the pauseGuardian address and unpause functions
+        address admin;
+        //    /// @notice address for the pauseGuardian
+        address pauseGuardian;
     }
 
     struct ProjectData {
@@ -33,4 +37,18 @@ library DataTypes {
         //    // @notice The only token this project accepts for funding
         address acceptedToken;
     }
+
+    enum RewardsTokenType {
+        TRANSFERABLE,
+        PARTIAL_SOUL_BOUND,
+        SOUL_BOUND
+    }
+
+    struct RewardsTokenData {
+        string name;
+        string description;
+        bool isNonFungible;
+        address projectAddress;
+    }
+
 }

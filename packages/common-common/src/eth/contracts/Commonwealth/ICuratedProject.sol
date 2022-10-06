@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 import "./IProjectBase.sol";
 
@@ -18,7 +18,7 @@ interface ICuratedProject is IProjectBase {
         DataTypes.ProjectMetaData memory _metaData,
         DataTypes.ProjectData memory _projectData,
         DataTypes.ProtocolData memory _protocolData,
-        uint256 _curatorFee,
+        uint8 _curatorFee,
         address _bToken,
         address _cToken
     ) external returns (bool);
