@@ -29,12 +29,22 @@
     padding: 16px;
   }
 
+  .browser-notifications {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 40px;
+
+    .browser-notif-text {
+      color: $neutral-500;
+    }
+  }
+
   .page-header-text.Text {
     margin-bottom: 16px;
   }
 
   .page-subheader-text.Text {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
   }
 
   .column-header-row {

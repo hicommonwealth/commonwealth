@@ -59,28 +59,36 @@ class NotificationSettingsPage implements m.ClassComponent {
             Notification settings for all new threads, comments, mentions,
             likes, an d chain events in the following communities.
           </CWText>
-          <CWToggle
-            checked={this.browserNotifsEnabled}
-            onchange={async () => {
-              if (!this.browserNotifsEnabled) {
-                const status =
-                  await app.user.notifications.requestBrowserNotifications();
-                if (status === 'granted') this.browserNotifsEnabled = true;
-                m.redraw();
-              } else {
-                try {
-                  await app.user.notifications.updateBrowserNotificationsStatus(
-                    false
-                  );
-                  this.browserNotifsEnabled = false;
-                } catch (e) {
-                  console.log(e);
-                }
+          <div className="browser-notifications">
+            <CWToggle
+              checked={this.browserNotifsEnabled}
+              onchange={async () => {
+                if (!this.browserNotifsEnabled) {
+                  const status =
+                    await app.user.notifications.requestBrowserNotifications();
+                  if (status === 'granted') this.browserNotifsEnabled = true;
+                  m.redraw();
+                } else {
+                  try {
+                    await app.user.notifications.updateBrowserNotificationsStatus(
+                      false
+                    );
+                    this.browserNotifsEnabled = false;
+                  } catch (e) {
+                    console.log(e);
+                  }
 
-                m.redraw();
-              }
-            }}
-          />
+                  m.redraw();
+                }
+              }}
+            />
+            <CWText className="browser-notif-text">
+              {this.browserNotifsEnabled
+                ? 'Disable Browser Notifications'
+                : 'Enable Browser Notifications'}
+            </CWText>
+          </div>
+
           <div class="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}

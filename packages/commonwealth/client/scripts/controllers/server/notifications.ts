@@ -9,6 +9,7 @@ import {
   ChainEventType,
 } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
+import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 
@@ -202,6 +203,44 @@ class NotificationsController {
     }
   }
 
+  public fireBrowserNotification(
+    title: string,
+    body: string,
+    tag: string,
+    onclick?: () => void
+  ) {
+    const notification = new Notification(title, {
+      body,
+      tag,
+      icon: `favicon.ico`,
+    });
+    notification.onclick = onclick;
+
+    // Close after 4 seconds
+    setTimeout(() => {
+      notification.close();
+    }, 6000);
+  }
+
+  public fireChainEventBrowserNotification(notification: CWNotification) {
+    const chainId = notification.chainEvent.type.chain;
+
+    // construct compatible CW event from DB by inserting network from type
+    const chainEvent: CWEvent = {
+      blockNumber: notification.chainEvent.blockNumber,
+      network: notification.chainEvent.type.eventNetwork,
+      data: notification.chainEvent.data,
+    };
+    const chainName = app.config.chains.getById(chainId)?.name;
+    const label = ChainEventLabel(chainId, chainEvent);
+
+    this.fireBrowserNotification(
+      `${label.heading} on ${chainName}`,
+      `Block ${notification.chainEvent.blockNumber}`,
+      'default_tag'
+    );
+  }
+
   public deleteSubscription(subscription: NotificationSubscription) {
     // TODO: Change to DELETE /subscription
     return post(
@@ -291,8 +330,12 @@ class NotificationsController {
   }
 
   public update(n: CWNotification) {
+    console.log('notif', n);
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
+      console.log('chain even notif came in', n);
+      if (app.user.browserNotificationsEnabled)
+        this.fireChainEventBrowserNotification(n);
       m.redraw();
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);
