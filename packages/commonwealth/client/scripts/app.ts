@@ -99,6 +99,7 @@ export async function initAppState(
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
+          console.log('whattt', app.user);
         } else if (
           app.loginState == LoginState.LoggedOut &&
           app.socket.isConnected

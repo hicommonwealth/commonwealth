@@ -57,7 +57,7 @@ class NotificationSettingsPage implements m.ClassComponent {
           </CWText>
           <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
-            likes, an d chain events in the following communities.
+            likes, and chain events in the following communities.
           </CWText>
           <div className="browser-notifications">
             <CWToggle

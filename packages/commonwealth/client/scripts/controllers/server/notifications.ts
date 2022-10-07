@@ -209,17 +209,21 @@ class NotificationsController {
     tag: string,
     onclick?: () => void
   ) {
-    const notification = new Notification(title, {
-      body,
-      tag,
-      icon: `favicon.ico`,
-    });
-    notification.onclick = onclick;
-
-    // Close after 4 seconds
-    setTimeout(() => {
-      notification.close();
-    }, 6000);
+    try {
+      const notification = new Notification(title, {
+        body,
+        tag,
+        icon: `favicon.ico`,
+      });
+      // notification.onclick = onclick;
+      // console.log('shooters shoot');
+      // Close after 4 seconds
+      setTimeout(() => {
+        notification.close();
+      }, 6000);
+    } catch (e) {
+      console.log('hmm', e);
+    }
   }
 
   public fireChainEventBrowserNotification(notification: CWNotification) {
@@ -233,6 +237,8 @@ class NotificationsController {
     };
     const chainName = app.config.chains.getById(chainId)?.name;
     const label = ChainEventLabel(chainId, chainEvent);
+
+    console.log('label', label);
 
     this.fireBrowserNotification(
       `${label.heading} on ${chainName}`,
@@ -334,8 +340,11 @@ class NotificationsController {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
       console.log('chain even notif came in', n);
-      if (app.user.browserNotificationsEnabled)
+      console.log('okayy', app.user.browserNotificationsEnabled);
+      if (app.user.browserNotificationsEnabled) {
+        console.log('i should be shooting');
         this.fireChainEventBrowserNotification(n);
+      }
       m.redraw();
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);

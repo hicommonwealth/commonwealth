@@ -3,6 +3,7 @@ import {
   WebsocketMessageNames,
   WebsocketNamespaces,
 } from 'types';
+import m from 'mithril';
 import app from 'state';
 import { Notification, NotificationSubscription } from 'models';
 import { io, Socket } from 'socket.io-client';
@@ -27,10 +28,14 @@ export class ChainEventsNamespace {
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
+    console.log('first subs', subs);
     if (this._isConnected) {
       const eventTypes = subs
         .map((x) => x.ChainEventType?.id)
         .filter((x) => !!x);
+
+      console.log('subs', subs);
+      console.log('eventTypes', eventTypes);
       const roomsToJoin = [];
       for (const eventType of eventTypes) {
         if (!this.subscriptionRoomsJoined.has(eventType)) {
@@ -70,6 +75,7 @@ export class ChainEventsNamespace {
   }
 
   private onChainEvent(notification: ChainEventNotification) {
+    console.log('notification initially', notification);
     const subscription = app.user.notifications.subscriptions.find(
       (sub) =>
         sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
@@ -85,6 +91,13 @@ export class ChainEventsNamespace {
 
   private onConnect() {
     this._isConnected = true;
+    console.log(
+      'onconnect',
+      app.user.notifications,
+      app.user.notifications.subscriptions
+    );
+    m.redraw();
+
     this.addChainEventSubscriptions(app.user.notifications.subscriptions);
     console.log('Chain events namespace connected!');
   }
