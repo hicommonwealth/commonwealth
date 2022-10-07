@@ -25,12 +25,14 @@ async function main() {
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
   app.use(cors({
-    origin: SERVER_URL,
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: true,
     optionsSuccessStatus: 200
   }));
 
   // cors pre-flight request
-  app.options('*', cors());
+  // app.options('*', cors());
 
   const router = setupRouter(models);
   app.use('/', router);
