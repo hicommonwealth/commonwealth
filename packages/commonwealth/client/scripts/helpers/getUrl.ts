@@ -27,7 +27,7 @@ export async function getFetch(url: string, queryParams?: { [key: string]: any }
   try {
     const response = await fetch(queryUrl || url, {
       method: 'GET',
-      mode: 'cors',
+      mode: 'no-cors',
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
