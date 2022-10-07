@@ -1,4 +1,5 @@
 import * as solw3 from '@solana/web3.js';
+import $ from 'jquery';
 import BN from 'bn.js';
 import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import { IApp } from 'state';
@@ -14,11 +15,11 @@ export default class Token extends Solana implements ITokenAdapter {
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-
     const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
       chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,
+      contract_address: this.contractAddress,
     });
     if (balanceResp.result) {
       const balance = new BN(balanceResp.result, 10);

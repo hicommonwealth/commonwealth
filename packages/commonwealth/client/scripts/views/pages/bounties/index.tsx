@@ -103,8 +103,7 @@ class BountiesPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Council" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Council" />}
         />
       );
     }
@@ -163,8 +162,7 @@ class BountiesPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Council" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Council" />}
       >
         <div class="BountiesPage">
           <GovExplainer

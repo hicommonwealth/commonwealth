@@ -143,7 +143,6 @@ class ChainInfo {
     bech32_prefix,
     type,
     chat_enabled,
-    decimals,
     substrate_spec,
     token_name,
     Contracts,
@@ -157,6 +156,7 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
+    const decimals = Contracts ? Contracts[0]?.decimals : 18;
     return new ChainInfo({
       id,
       network,

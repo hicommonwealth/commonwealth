@@ -160,7 +160,8 @@ const ConfirmInviteModal: m.Component<
                           const communityName =
                             invites[location].community_name;
                           if (vnode.state.selectedAddress) {
-                            app.roles.acceptInvite({
+                            app.roles
+                              .acceptInvite({
                                 address: vnode.state.selectedAddress,
                                 inviteCode: invites[location].id,
                               })
@@ -205,7 +206,8 @@ const ConfirmInviteModal: m.Component<
                             'Reject this invite? You will need to be invited again.'
                           )();
                           if (!confirmed) return;
-                          app.roles.rejectInvite({ inviteCode: invites[location].id })
+                          app.roles
+                            .rejectInvite({ inviteCode: invites[location].id })
                             .then(
                               (result) => {
                                 app.config.invites = app.config.invites.filter(
@@ -269,18 +271,18 @@ const ConfirmInviteModal: m.Component<
                       },
                       'Connect a new address'
                     ),
-                  addresses.length === 0 &&
-                    m(LoginWithWalletDropdown, {
-                      loggingInWithAddress: false,
-                      joiningChain: app.chain?.id || 'edgeware',
-                      label: 'Connect an address',
-                      onSuccess: (e) => {
-                        // $('.ConfirmInviteModal').trigger('modalexit');
-                        m.route.set(
-                          `/${invites[vnode.state.location].chain_id}`
-                        );
-                      },
-                    }),
+                  // addresses.length === 0 &&
+                  //   m(LoginWithWalletDropdown, {
+                  //     loggingInWithAddress: false,
+                  //     joiningChain: app.chain?.id || 'edgeware',
+                  //     label: 'Connect an address',
+                  //     onSuccess: (e) => {
+                  //       // $('.ConfirmInviteModal').trigger('modalexit');
+                  //       m.route.set(
+                  //         `/${invites[vnode.state.location].chain_id}`
+                  //       );
+                  //     },
+                  //   }),
                 ],
           ])
         : m('.compact-modal-body', [

@@ -6,7 +6,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _accounts: string[] = [];
   private _enabling = false;
-  private _extension = new Extension()
+  private _extension = new Extension();
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Terra Station';
@@ -53,7 +53,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
@@ -62,8 +62,8 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(account.validationToken)
-        })
+          bytes: Buffer.from(account.validationToken),
+        });
       } catch (error) {
         console.error(error);
       }
@@ -73,12 +73,19 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       signature: {
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key
+          value: result.public_key,
         },
-        signature: result.signature
-      }
+        signature: result.signature,
+      },
     };
-    return account.validate(JSON.stringify(signature));
+    return JSON.stringify(signature);
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 }
 
