@@ -28,14 +28,11 @@ export class ChainEventsNamespace {
   }
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
-    console.log('first subs', subs);
     if (this._isConnected) {
       const eventTypes = subs
         .map((x) => x.ChainEventType?.id)
         .filter((x) => !!x);
 
-      console.log('subs', subs);
-      console.log('eventTypes', eventTypes);
       const roomsToJoin = [];
       for (const eventType of eventTypes) {
         if (!this.subscriptionRoomsJoined.has(eventType)) {
@@ -75,7 +72,6 @@ export class ChainEventsNamespace {
   }
 
   private onChainEvent(notification: ChainEventNotification) {
-    console.log('notification initially', notification);
     const subscription = app.user.notifications.subscriptions.find(
       (sub) =>
         sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
@@ -89,15 +85,10 @@ export class ChainEventsNamespace {
     app.user.notifications.update(notificationObj);
   }
 
-  private onConnect() {
+  private async onConnect() {
     this._isConnected = true;
-    console.log(
-      'onconnect',
-      app.user.notifications,
-      app.user.notifications.subscriptions
-    );
     m.redraw();
-
+    await app.user.notifications.refresh();
     this.addChainEventSubscriptions(app.user.notifications.subscriptions);
     console.log('Chain events namespace connected!');
   }

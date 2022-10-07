@@ -215,14 +215,13 @@ class NotificationsController {
         tag,
         icon: `favicon.ico`,
       });
-      // notification.onclick = onclick;
-      // console.log('shooters shoot');
-      // Close after 4 seconds
+      notification.onclick = onclick;
+
       setTimeout(() => {
         notification.close();
-      }, 60000);
+      }, 6000);
     } catch (e) {
-      console.log('hmm', e);
+      console.log('browser notification error', e);
     }
   }
 
@@ -237,8 +236,6 @@ class NotificationsController {
     };
     const chainName = app.config.chains.getById(chainId)?.name;
     const label = ChainEventLabel(chainId, chainEvent);
-
-    console.log('label', label);
 
     this.fireBrowserNotification(
       `${label.heading} on ${chainName}`,
@@ -336,13 +333,10 @@ class NotificationsController {
   }
 
   public update(n: CWNotification) {
-    console.log('notif', n);
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
-      console.log('chain even notif came in', n);
-      console.log('okayy', app.user.browserNotificationsEnabled);
       if (app.user.browserNotificationsEnabled) {
-        console.log('i should be shooting');
+        console.log('should be firing the browser notification');
         this.fireChainEventBrowserNotification(n);
       }
       m.redraw();
@@ -469,7 +463,6 @@ class NotificationsController {
       this._subscriptions = [];
 
       const subs = result;
-      console.log('subs inside the mf', subs);
       subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
