@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && tsc --project server/mainConsumer/tsconfig.consumer.json && tsc-alias --project server/tsconfig.consumer.json",
+    "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && tsc --project server/mainConsumer/tsconfig.consumer.json && tsc-alias --project server/mainConsumer/tsconfig.consumer.json",
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-consumer": "tsc --project server/mainConsumer/tsconfig.consumer.json && tsc-alias --project server/mainConsumer/tsconfig.consumer.json",
     "build:css": "NODE_ENV=production build client/styles/shared.scss",
