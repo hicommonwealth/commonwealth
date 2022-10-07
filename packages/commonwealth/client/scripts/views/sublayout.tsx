@@ -5,7 +5,7 @@ import m from 'mithril';
 import 'sublayout.scss';
 
 import app from 'state';
-import { handleEmailInvites } from 'views/components/header/invites_menu';
+import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { SearchBar } from './components/search_bar';
 import { SublayoutHeaderLeft } from './sublayout_header_left';
@@ -13,15 +13,18 @@ import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
+import {
+  isWindowExtraSmall,
+  isWindowSmallInclusive,
+} from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
+import { MobileMenu } from './components/mobile_menu/mobile_menu';
 
+// Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
   onscroll: () => null; // lazy loading for page content
-  showNewProposalButton?: boolean;
-  title?: string; // displayed at the top of the layout
 };
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
@@ -54,13 +57,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   }
 
   view(vnode) {
-    const {
-      hideFooter = false,
-      hideSearch,
-      onscroll,
-      showNewProposalButton,
-      // title,
-    } = vnode.attrs;
+    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
@@ -81,6 +78,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       showQuickSwitcher,
     } = this;
 
+    if (!isWindowExtraSmall(window.innerWidth)) {
+      delete app.mobileMenu;
+    }
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
@@ -92,10 +92,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
               }}
             />
             {!hideSearch && <SearchBar />}
-            <SublayoutHeaderRight
-              chain={chain}
-              showNewProposalButton={showNewProposalButton}
-            />
+            <SublayoutHeaderRight chain={chain} />
           </div>
           <div class="sidebar-and-body-container">
             {showSidebarContainer && (
@@ -121,8 +118,14 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
               <div class="Body" onscroll={onscroll}>
-                {vnode.children}
-                {!app.isCustomDomain() && !hideFooter && <Footer />}
+                {app.mobileMenu ? (
+                  <MobileMenu />
+                ) : (
+                  <>
+                    {vnode.children}
+                    {!app.isCustomDomain() && !hideFooter && <Footer />}
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -1,37 +1,20 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, PopoverMenu, Icons, MenuItem } from 'construct-ui';
+import { Button, PopoverMenu, Icons } from 'construct-ui';
 
 import 'components/header/invites_menu.scss';
 
 import app from 'state';
-import { pluralize } from 'helpers';
-import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { getInvitesMenuItemAttrs } from '../menus/invites_menu';
 
-export const handleEmailInvites = (state) => {
-  if (!state.modalAutoTriggered && app.user) {
-    state.modalAutoTriggered = true;
-    if (app.config.invites?.length) {
-      app.modals.create({
-        modal: ConfirmInviteModal,
-        data: { community: m.route.param('inviteComm') },
-      });
-    } else if (!app.user.activeAccount) {
-      app.modals.create({
-        modal: LoginModal,
-      });
-    }
-  }
-};
-
-export class InvitesMenu implements m.ClassComponent {
+export class InvitesMenuPopover implements m.ClassComponent {
   view() {
     if (!app.config.invites?.length) return;
 
     return (
       <PopoverMenu
+        className="InvitesMenuPopover"
         hasArrow={false}
         transitionDuration={0}
         hoverCloseDelay={0}
@@ -61,12 +44,7 @@ export class InvitesMenu implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        content={
-          <MenuItem
-            label={`Show ${pluralize(app.config.invites?.length, 'invite')}...`}
-            onclick={() => app.modals.create({ modal: ConfirmInviteModal })}
-          />
-        }
+        content={getInvitesMenuItemAttrs()}
       />
     );
   }

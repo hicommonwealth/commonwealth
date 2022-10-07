@@ -24,34 +24,38 @@
   }
 }
 
+.NotificationsMenuPopover {
+  .unread-notifications {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .NotificationsMenu {
+    width: 296px;
+  }
+}
+
 .NotificationsMenu {
-  width: 296px;
+  width: 100%;
+  .NotificationsMenuHeader {
+    @include notificationsButton;
 
-  .cui-popover-content {
-    width: 100%;
+    border-bottom: 1px solid $neutral-300;
+    display: flex;
+  }
 
-    .cui-menu {
-      width: 100%;
+  .notification-list {
+    align-items: center;
+    height: 480px;
+    justify-content: center;
+  }
 
-      .NotificationsMenuHeader {
-        @include notificationsButton;
+  .NotificationsMenuFooter {
+    @include notificationsButton;
 
-        border-bottom: 1px solid $neutral-300;
-        display: flex;
-      }
-
-      .notification-list {
-        align-items: center;
-        height: 480px;
-        justify-content: center;
-      }
-
-      .NotificationsMenuFooter {
-        @include notificationsButton;
-
-        border-top: 1px solid $neutral-300;
-        display: flex;
-      }
-    }
+    border-top: 1px solid $neutral-300;
+    display: flex;
   }
 }

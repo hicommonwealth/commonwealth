@@ -42,18 +42,16 @@ class NotificationSettingsPage implements m.ClassComponent {
         />
       );
     } else if (!app.isLoggedIn()) {
-      return (
-        <ErrorPage
-          message="This page requires you to be logged in"
-          title={<BreadcrumbsTitleTag title="Notification Settings" />}
-        />
-      );
+      m.route.set('/', {}, { replace: true });
+      return <PageLoading />;
     }
 
     const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Notification Settings" />}
+      >
         <div class="NotificationSettingsPage">
           <CWText type="h3" fontWeight="semiBold" className="page-header-text">
             Notification Management
