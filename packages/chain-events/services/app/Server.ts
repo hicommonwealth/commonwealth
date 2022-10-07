@@ -25,7 +25,7 @@ async function main() {
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
   app.use(cors({
-    origin: "*",
+    origin: false,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: true,
     optionsSuccessStatus: 200
