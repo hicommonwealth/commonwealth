@@ -47,6 +47,7 @@ import {
 } from '../../components/proposal_card/helpers';
 import {
   ProposalHeaderBlockExplorerLink,
+  ProposalHeaderExternalLink,
   ProposalHeaderThreadLink,
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
@@ -95,6 +96,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
     };
 
     const hasBody = !!(proposal as AnyProposal).description;
+    const hasLink = !!(proposal as Thread).url;
 
     const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
 
@@ -307,6 +309,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           </div>
         </div>
         <CWDivider />
+        {hasLink && (<ProposalHeaderExternalLink proposal={proposal} />)}
         {proposal instanceof Thread && (
           <div class="proposal-content">
             {this.isEditingBody ? (

@@ -10,6 +10,27 @@ import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
+
+// Threads Kind.Link
+export class ProposalHeaderExternalLink
+  implements
+    m.ClassComponent<{
+      proposal: AnyProposal;
+    }>
+{
+  view(vnode) {
+    const { proposal } = vnode.attrs;
+
+    return (
+      <div class="ProposalHeaderLink">
+        {externalLink('a', proposal.url, [extractDomain(proposal.url)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
+      </div>
+    );
+  }
+}
+
+
 // "View in Subscan"
 export class ProposalHeaderBlockExplorerLink
   implements
