@@ -4,10 +4,14 @@
  * from the chain, writing the results back into the database.
  */
 
+import _ from 'underscore';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   SubstrateEvents,
   IStorageFetcher,
   CompoundEvents,
+  CosmosEvents,
   AaveEvents,
   IDisconnectedRange,
 } from 'chain-events/src';
@@ -16,8 +20,6 @@ import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainInstance } from '../models/chain';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,12 +36,12 @@ export async function migrateChainEntity(chain: string): Promise<void> {
   // query one node for each supported chain
   const chainInstance: ChainInstance = await models['Chain'].findOne({
     where: { id: chain },
-  })
+  });
   if (!chainInstance) {
     throw new Error('no chain found for chain entity migration');
   }
   const node = await models['ChainNode'].scope('withPrivateData').findOne({
-    where: { id: chainInstance.chain_node_id }
+    where: { id: chainInstance.chain_node_id },
   });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
@@ -60,21 +62,32 @@ export async function migrateChainEntity(chain: string): Promise<void> {
         chainInstance.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
+    } else if (chainInstance.base === ChainBase.CosmosSDK) {
+      const api = await CosmosEvents.createApi(
+        node.private_url || node.url
+      );
+      fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
       throw new Error('Moloch migration not yet implemented.');
     } else if (chainInstance.network === ChainNetwork.Compound) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
       const api = await CompoundEvents.createApi(
-        node.private_url || node.url,
-        chainInstance.address
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
       );
       fetcher = new CompoundEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.Aave) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
       const api = await AaveEvents.createApi(
-        node.private_url || node.url,
-        chainInstance.address
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
       );
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
@@ -104,7 +117,7 @@ export async function migrateChainEntities(): Promise<void> {
   const chains = await models.Chain.findAll({
     where: {
       active: true,
-      has_chain_events_listener: true,
+      // has_chain_events_listener: true,
     },
   });
   for (const { id } of chains) {
@@ -112,7 +125,7 @@ export async function migrateChainEntities(): Promise<void> {
   }
 }
 
-async function main() {
+export async function runMigrations() {
   // "all" means run for all supported chains, otherwise we pass in the name of
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');
@@ -126,5 +139,3 @@ async function main() {
     process.exit(1);
   }
 }
-
-main();

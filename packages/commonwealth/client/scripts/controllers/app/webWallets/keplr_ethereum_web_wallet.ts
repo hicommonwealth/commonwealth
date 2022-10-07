@@ -5,8 +5,11 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { Window as KeplrWindow, ChainInfo, EthSignType } from '@keplr-wallet/types';
-
+import {
+  Window as KeplrWindow,
+  ChainInfo,
+  EthSignType,
+} from '@keplr-wallet/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -59,12 +62,19 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signLoginToken(
       account.validationToken.trim(),
       account.address
     );
-    return account.validate(webWalletSignature);
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
@@ -114,21 +124,21 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.symbol,
-            coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+            coinDenom: app.chain.meta.default_symbol,
+            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },

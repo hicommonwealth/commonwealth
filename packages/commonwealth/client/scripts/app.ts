@@ -17,8 +17,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
-
 import {
   notifyError,
   notifyInfo,
@@ -28,9 +26,10 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
+import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -68,6 +67,7 @@ export async function initAppState(
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
+            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
@@ -109,7 +109,6 @@ export async function initAppState(
         app.user.setStarredCommunities(
           data.user ? data.user.starredCommunities : []
         );
-
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
@@ -155,7 +154,15 @@ export async function handleInviteLinkRedirect() {
       m.route.param('message') === 'Must be logged in to accept invites'
     ) {
       notifyInfo('Log in to join a community with an invite link');
-      app.modals.create({ modal: LoginModal });
+      app.modals.create({
+        modal: NewLoginModal,
+        data: {
+          modalType: isWindowMediumSmallInclusive(window.innerWidth)
+            ? 'fullScreen'
+            : 'centered',
+          breakpointFn: isWindowMediumSmallInclusive,
+        },
+      });
     } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
       notifyError(message);
@@ -649,6 +656,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
@@ -884,6 +892,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/web3login': importRoute('views/pages/web3login', {
+              scoped: false,
+              deferChain: true,
+            }),
             // Scoped routes
             //
 
@@ -893,12 +905,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
             '/:scope/projects': importRoute(

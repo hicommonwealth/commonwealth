@@ -4,6 +4,8 @@ import m from 'mithril';
 
 import { NotificationStore } from 'stores';
 import { NotificationSubscription, Notification, ChainEventType } from 'models';
+import { modelFromServer } from 'models/NotificationSubscription';
+
 import app from 'state';
 
 const post = (route, args, callback) => {
@@ -18,6 +20,19 @@ const post = (route, args, callback) => {
     })
     .catch((e) => console.error(e));
 };
+
+const get = (route, args, callback) => {
+  args['jwt'] = app.user.jwt;
+  return $.get(app.serverUrl() + route, args)
+    .then((resp) => {
+      if (resp.status === 'Success') {
+        callback(resp.result);
+      } else {
+        console.error(resp);
+      }
+    })
+    .catch((e) => console.error(e));
+}
 
 interface NotifOptions {
   chain_filter: string,
@@ -278,7 +293,6 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    
 
     const options: NotifOptions = app.isCustomDomain()
       ? { chain_filter: app.activeChainId(), maxId: undefined }
@@ -288,7 +302,6 @@ class NotificationsController {
       options.maxId = this._maxChainEventNotificationId;
 
     return post('/viewChainEventNotifications', options, (result) => {
-      this._subscriptions = [];
       this._numPages = result.numPages;
       this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
@@ -308,7 +321,6 @@ class NotificationsController {
       options.maxId = this._maxDiscussionNotificationId;
 
     return post('/viewDiscussionNotifications', options, (result) => {
-      this._subscriptions = [];
       this._numPages = result.numPages;
       this._numUnread = result.numUnread;
       this.parseNotifications(result.subscriptions);
@@ -320,9 +332,7 @@ class NotificationsController {
     const ceSubs = [];
 
     for (const subscriptionJSON of subscriptions) {
-      // save the subscription
       const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
-      this._subscriptions.push(subscription);
 
       // save the chainEventType for the subscription if the subscription type is chain-event
       let chainEventType = null;
@@ -366,10 +376,22 @@ class NotificationsController {
     app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
+  public getSubscriptions() {
+    return get('/viewSubscriptions', {}, (result) => {
+      this._subscriptions = [];
+
+      const subs = result;
+      subs.forEach((sub) =>
+      this._subscriptions.push(modelFromServer(sub))
+    );
+    });
+  }
+
   public async refresh() {
     return Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
+      this.getSubscriptions(),
     ]);
   }
 }

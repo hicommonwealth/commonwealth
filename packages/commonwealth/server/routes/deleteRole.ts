@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -12,9 +13,9 @@ export const Errors = {
 
 const deleteRole = async (models: DB, req, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
+  if (error) return next(new AppError(error));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
+  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -23,13 +24,13 @@ const deleteRole = async (models: DB, req, res: Response, next: NextFunction) =>
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) return next(new Error(Errors.InvalidAddress));
+  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
   const existingRole = await models.Role.findOne({ where: {
     address_id: req.body.address_id,
     chain_id: chain.id,
   } });
-  if (!existingRole) return next(new Error(Errors.RoleDNE));
+  if (!existingRole) return next(new AppError(Errors.RoleDNE));
 
   if (existingRole.permission === 'admin') {
     const otherExistingAdmin = await models.Role.findOne({ where: {
@@ -38,7 +39,7 @@ const deleteRole = async (models: DB, req, res: Response, next: NextFunction) =>
       id: { [Sequelize.Op.ne]: existingRole.id },
       permission: ['admin'],
     }});
-    if (!otherExistingAdmin) return next(new Error(Errors.OtherAdminDNE));
+    if (!otherExistingAdmin) return next(new AppError(Errors.OtherAdminDNE));
   }
 
   await existingRole.destroy();

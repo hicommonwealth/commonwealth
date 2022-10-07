@@ -91,7 +91,6 @@ const ProposalsPage: m.Component<{}> = {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Proposals" />}
-          showNewProposalButton
         />
       );
     }
@@ -310,8 +309,7 @@ const ProposalsPage: m.Component<{}> = {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Proposals" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Proposals" />}
       >
         <div class="ProposalsPage">
           {onSubstrate && (

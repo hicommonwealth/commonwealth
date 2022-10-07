@@ -38,7 +38,7 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../database';
 import { DynamicTemplate } from '../../shared/types';
-import { AppError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 
@@ -109,7 +109,8 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    (addressModel.wallet_id === WalletId.CosmosEvmMetamask || addressModel.wallet_id === WalletId.KeplrEthereum)
+    (addressModel.wallet_id === WalletId.CosmosEvmMetamask ||
+      addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
     //
     // ethereum address handling on cosmos chains via metamask
@@ -406,7 +407,7 @@ const processAddress = async (
       });
       if (!oldUser) {
         // users who register thru github don't have emails by default
-        throw new Error(Errors.NoEmail);
+        throw new AppError(Errors.NoEmail);
       }
       const msg = {
         to: user.email,
@@ -440,7 +441,7 @@ const verifyAddress = async (
     where: { id: req.body.chain },
   });
   if (!chain) {
-    return next(new Error(Errors.InvalidChain));
+    return next(new AppError(Errors.InvalidChain));
   }
 
   if (!req.body.address || !req.body.signature) {
@@ -454,6 +455,7 @@ const verifyAddress = async (
           currentPrefix: chain.ss58_prefix,
         })
       : req.body.address;
+
   await processAddress(
     models,
     chain,

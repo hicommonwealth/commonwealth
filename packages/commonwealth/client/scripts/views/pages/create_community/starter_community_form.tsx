@@ -149,7 +149,7 @@ export class StarterCommunityForm implements m.ClassComponent {
                 icon_url: iconUrl,
                 id,
                 name,
-                symbol,
+                default_symbol: symbol,
                 base,
                 description,
                 discord,

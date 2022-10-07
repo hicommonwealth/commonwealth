@@ -12,7 +12,6 @@ import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
@@ -102,7 +101,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain.id === app.activeChainId()
+        (a) =>
+          a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
         await app.roles.createRole({
@@ -156,13 +156,13 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             account.profile?.headline &&
               m('span.profile-headline', account.profile.headline),
             m('.space'),
-            isClaimable &&
-              m(LoginWithWalletDropdown, {
-                prepopulateAddress: account.address,
-                loggingInWithAddress: !app.isLoggedIn(),
-                joiningChain: app.activeChainId(),
-                label: 'Claim address',
-              }),
+            // isClaimable &&
+            //   m(LoginWithWalletDropdown, {
+            //     prepopulateAddress: account.address,
+            //     loggingInWithAddress: !app.isLoggedIn(),
+            //     joiningChain: app.activeChainId(),
+            //     label: 'Claim address',
+            //   }),
           ]),
         ]),
       ]),

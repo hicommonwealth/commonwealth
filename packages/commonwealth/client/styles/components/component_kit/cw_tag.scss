@@ -1,0 +1,49 @@
+@import 'shared';
+
+.Tag {
+  align-items: center;
+  background-color: $neutral-100;
+  border-radius: $border-radius-rounded-corners;
+  display: flex;
+  padding: 4px 12px;
+  width: fit-content;
+
+  .tag-icon.Icon {
+    margin-right: 4px;
+  }
+
+  .tag-text.Text,
+  .tag-icon.Icon {
+    color: $neutral-600;
+  }
+
+  &.passed {
+    background-color: $green-300;
+    color: $green-700;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $green-700;
+    }
+  }
+
+  &.failed {
+    background-color: $rorange-300;
+    color: $rorange-700;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $rorange-700;
+    }
+  }
+
+  &.active {
+    background-color: $primary-500;
+    color: $white;
+
+    .tag-text.Text,
+    .tag-icon.Icon {
+      color: $white;
+    }
+  }
+}
