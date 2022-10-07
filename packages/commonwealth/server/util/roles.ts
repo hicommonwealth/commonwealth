@@ -1,23 +1,21 @@
-import { Model, Transaction } from 'sequelize/types';
+import { Model, Transaction, Op } from 'sequelize/types';
 import { DB } from '../database';
 import { Permission } from '../models/role';
 import {
   RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-  RoleAssignmentModelStatic,
 } from '../models/role_assignment';
 
 export class RoleInstanceWithPermission {
-  _roleAssignmentInstance: RoleAssignmentInstance;
+  _roleAssignmentAttributes: RoleAssignmentAttributes;
   chain_id: string;
   permission: Permission;
 
   constructor(
-    _roleAssignmentInstance: RoleAssignmentInstance,
+    _roleAssignmentInstance: RoleAssignmentAttributes,
     chain_id: string,
     permission: Permission
   ) {
-    this._roleAssignmentInstance = _roleAssignmentInstance;
+    this._roleAssignmentAttributes = _roleAssignmentInstance;
     this.chain_id = chain_id;
     this.permission = permission;
   }
@@ -27,7 +25,7 @@ export class RoleInstanceWithPermission {
     permission: Permission;
   } {
     return {
-      ...this._roleAssignmentInstance.toJSON(),
+      ...this._roleAssignmentAttributes,
       chain_id: this.chain_id,
       permission: this.permission,
     };
@@ -88,31 +86,77 @@ export async function createRole(
   return new RoleInstanceWithPermission(roleAssignment, chain_id, role_name);
 }
 
-// const roleAssignmentFindOptions: any = {
-//   include: [
-//     {
-//       model: models.ChainEvent,
-//       order: [
-//         [ models.ChainEvent, 'id', 'asc' ]
-//       ],
-//       include: [ models.ChainEventType ],
-//     },
-//   ],
-//   order: [['created_at', 'DESC']],
-//   where: {
-//     chain: req.query.chain,
-//   }
-// };
+export async function findAllRoles(
+  models: DB,
+  findOptions: any,
+  chain_id: string,
+  permissions?: Permission[]
+): Promise<RoleInstanceWithPermission[]> {
+  let roleFindOptions: any;
+  if (permissions === undefined) {
+    roleFindOptions = {
+      where: {
+        chain_id,
+      },
+      include: {
+        model: models.RoleAssignment,
+      },
+    }
+  } else {
+    roleFindOptions = {
+      where: {
+        [Op.and]: [{ chain_id }, { permissions: { [Op.or]: permissions.map(x => ({
+          name: x,
+        })) } }],
+      },
+      include: {
+        model: models.RoleAssignment,
+      },
+    }
+  }
+  const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
+  const roles: RoleInstanceWithPermission[] = [];
+  for (const communityRole of communityRoles) {
+    const roleAssignments = await communityRole.getRoleAssignments()
+    if (roleAssignments.length > 0) {
+      for (const roleAssignment of roleAssignments) {
+        const role = new RoleInstanceWithPermission(roleAssignment, chain_id, communityRole.name)
+        roles.push(role);
+      }
+    }
+  }
+  return roles;
+}
 
-// export async function findAllRoles( models: DB, chain_id: string, permissions?: Permission[]): Promise<RoleInstanceWithPermission[]> {
-//   const roleAssignmentModel : RoleAssignmentModelStatic = models.RoleAssignment
-//   const roleAssignments = await roleAssignmentModel.findAll({});
-//   const roles = [];
-//   for (const roleAssignment of roleAssignments) {
-//     const community_role = await roleAssignment.CommunityRole();
-//   return;
-// }
+export async function findOneRole(
+  models: DB,
+  address_id : number,
+  chain_id: string,
+  permission?: Permission
+): Promise<RoleInstanceWithPermission> {
+  let roleFindOptions: any;
+  if (permission === undefined) {
+    roleFindOptions = {
+      where: {
+        chain_id,
+      },
+      include: {
+        model: models.RoleAssignment,
+      },
+    }
+  } else {
+    roleFindOptions = {
+      where: {
+        [Op.and]: [{ chain_id }, { name: permission }],
+      },
+      include: {
+        model: models.RoleAssignment,
+      },
+    }
+  }
+  const communityRoles = await models.CommunityRole.findOne(roleFindOptions);
 
-// export async function findOneRole(): Promise<RoleInstanceWithPerission> {
-//   return;
-// }
+
+
+  return;
+}

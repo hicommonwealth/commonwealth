@@ -17,12 +17,12 @@ export type CommunityRoleAttributes = {
   updated_at?: Date;
 
   // associations
-  RolePermissions?: RoleAssignmentAttributes[];
+  RoleAssignments?: RoleAssignmentAttributes[];
   Chain?: ChainAttributes;
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  getRolePermissions: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
 };
 
 export type CommunityRoleModelStatic = ModelStatic<CommunityRoleInstance>;
