@@ -98,8 +98,7 @@ class StatsPage implements m.Component {
       return (
         <PageLoading
           message="Loading analytics"
-          title={<BreadcrumbsTitleTag title="Analytics" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Analytics" />}
         />
       );
 
@@ -112,7 +111,9 @@ class StatsPage implements m.Component {
       );
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Analytics" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Analytics" />}
+      >
         <div class="StatsPage">
           <div class="stat-row">
             <CWText fontWeight="medium">Date</CWText>

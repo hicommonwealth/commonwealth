@@ -42,11 +42,11 @@ const migrateEvent = async (
 
   if (migrateAll && migrateAll === true) {
     try {
-      await runEntityMigrations();
+      migrateChainEntities();
     } catch (e) {
       throw new AppError(MigrateEventErrors.AllError);
     }
-    return success(res, { message: 'Migrated all events.' });
+    return success(res, { message: 'Started migration for all events.' });
   }
 
   if (!chain_id) {
@@ -54,13 +54,13 @@ const migrateEvent = async (
   }
 
   try {
-    await runEntityMigrations(chain_id);
+    migrateChainEntity(chain_id);
   } catch (e) {
     log.error(e.message);
     throw new AppError(MigrateEventErrors.ChainError);
   }
 
-  return success(res, { message: 'Migrated chain events.' });
+  return success(res, { message: `Started migration for ${chain_id}.` });
 };
 
 export default migrateEvent;

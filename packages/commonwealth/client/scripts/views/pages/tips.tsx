@@ -98,8 +98,7 @@ class TipsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Tips" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Tips" />}
         />
       );
     }
@@ -140,8 +139,7 @@ class TipsPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Tips" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Tips" />}
       >
         <div class="TipsPage">
           <GovExplainer

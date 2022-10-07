@@ -9,6 +9,7 @@ import * as Erc20Types from './chains/erc20/types';
 import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
+import * as CosmosTypes from './chains/cosmos/types';
 import { ApiPromise as SubstrateApi } from '@polkadot/api';
 import { Api as MolochApi } from './chains/moloch/types';
 import { IErc721Contracts as ERC721Api } from "./chains/erc721/types";
@@ -26,7 +27,8 @@ export type IChainEntityKind =
   | MolochTypes.EntityKind
   | CompoundTypes.EntityKind
   | AaveTypes.EntityKind
-  | CommonwealthTypes.EntityKind;
+  | CommonwealthTypes.EntityKind
+  | CosmosTypes.EntityKind;
 export type IChainEventData =
   | SubstrateTypes.IEventData
   | MolochTypes.IEventData
@@ -34,7 +36,8 @@ export type IChainEventData =
   | AaveTypes.IEventData
   | Erc20Types.IEventData
   | Erc721Types.IEventData
-  | CommonwealthTypes.IEventData;
+  | CommonwealthTypes.IEventData
+  | CosmosTypes.IEventData;
 export type IChainEventKind =
   | SubstrateTypes.EventKind
   | MolochTypes.EventKind
@@ -42,7 +45,8 @@ export type IChainEventKind =
   | AaveTypes.EventKind
   | Erc20Types.EventKind
   | Erc721Types.EventKind
-  | CommonwealthTypes.EventKind;
+  | CommonwealthTypes.EventKind
+  | CosmosTypes.EventKind;
 export type IAPIs =
   | SubstrateApi
   | MolochApi
@@ -53,7 +57,6 @@ export type IAPIs =
   | AaveApi;
 export type IAnyListener = Listener<IAPIs, IStorageFetcher<IAPIs>, IEventProcessor<IAPIs, any>, IEventSubscriber<IAPIs, any>, IChainEventKind>
 
-
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
@@ -62,6 +65,7 @@ export const ChainEventKinds = [
   ...Erc20Types.EventKinds,
   ...Erc721Types.EventKinds,
   ...CommonwealthTypes.EventKinds,
+  ...CosmosTypes.EventKinds,
 ];
 
 // eslint-disable-next-line no-shadow
@@ -73,6 +77,7 @@ export enum SupportedNetwork {
   ERC20 = 'erc20',
   ERC721 = 'erc721',
   Commonwealth = 'commonwealth',
+  Cosmos = 'cosmos',
 }
 
 // eslint-disable-next-line no-shadow
@@ -221,6 +226,9 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Commonwealth) {
     return 'id';
   }
+  if (network === SupportedNetwork.Cosmos) {
+    return 'id';
+  }
   switch (entityKind) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
       return 'proposalIndex';
@@ -310,6 +318,18 @@ export function eventToEntity(
       case AaveTypes.EventKind.ProposalCanceled: {
         return [AaveTypes.EntityKind.Proposal, EntityEventKind.Complete];
       }
+      default:
+        return null;
+    }
+  }
+  if (network === SupportedNetwork.Cosmos) {
+    switch (event) {
+      case CosmosTypes.EventKind.SubmitProposal: {
+        return [CosmosTypes.EntityKind.Proposal, EntityEventKind.Create];
+      }
+      case CosmosTypes.EventKind.Deposit:
+      case CosmosTypes.EventKind.Vote:
+        return [CosmosTypes.EntityKind.Proposal, EntityEventKind.Vote];
       default:
         return null;
     }

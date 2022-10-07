@@ -4,10 +4,14 @@
  * from the chain, writing the results back into the database.
  */
 
+import _ from 'underscore';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   SubstrateEvents,
   IStorageFetcher,
   CompoundEvents,
+  CosmosEvents,
   AaveEvents,
   IDisconnectedRange,
 } from 'chain-events/src';
@@ -16,8 +20,6 @@ import cwModels from '../database';
 import ceModels from 'chain-events/services/database/database'
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 import {BrokerConfig} from "rascal";
 import {RABBITMQ_URI} from "../config";
@@ -63,6 +65,11 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
         chainInstance.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
+    } else if (chainInstance.base === ChainBase.CosmosSDK) {
+      const api = await CosmosEvents.createApi(
+        node.private_url || node.url
+      );
+      fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
@@ -112,7 +119,8 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
 async function migrateChainEntities(rmqController: RabbitMQController): Promise<void> {
   const chains = await cwModels.Chain.findAll({
     where: {
-      active: true
+      active: true,
+      // has_chain_events_listener: true,
     },
   });
   for (const { id } of chains) {

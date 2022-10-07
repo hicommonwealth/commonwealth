@@ -24,7 +24,6 @@ import {
 
 import nacl from 'tweetnacl';
 
-
 import {
   ChainBase,
   NotificationCategories,
@@ -110,7 +109,8 @@ const verifySignature = async (
     }
   } else if (
     chain.base === ChainBase.CosmosSDK &&
-    (addressModel.wallet_id === WalletId.CosmosEvmMetamask || addressModel.wallet_id === WalletId.KeplrEthereum)
+    (addressModel.wallet_id === WalletId.CosmosEvmMetamask ||
+      addressModel.wallet_id === WalletId.KeplrEthereum)
   ) {
     //
     // ethereum address handling on cosmos chains via metamask
@@ -455,6 +455,7 @@ const verifyAddress = async (
           currentPrefix: chain.ss58_prefix,
         })
       : req.body.address;
+
   await processAddress(
     models,
     chain,
