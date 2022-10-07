@@ -68,6 +68,7 @@ export async function initAppState(
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
+            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
@@ -109,7 +110,6 @@ export async function initAppState(
         app.user.setStarredCommunities(
           data.user ? data.user.starredCommunities : []
         );
-
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
@@ -649,6 +649,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
@@ -884,6 +885,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/web3login': importRoute('views/pages/web3login', {
+              scoped: false,
+              deferChain: true,
+            }),
             // Scoped routes
             //
 
@@ -893,12 +898,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
             '/:scope/projects': importRoute(

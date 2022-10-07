@@ -14,29 +14,33 @@
 
     .header-container {
       align-items: center;
-      border-bottom: 1px solid $neutral-50;
+      border-bottom: 1px solid $neutral-200;
       display: flex;
       flex-direction: row;
-      height: $header-height;
+      height: $global-header-height;
       justify-content: space-between;
-      min-height: $header-height;
-      padding: 0 24px;
-
-      @include smallInclusive {
-        display: none;
-      }
+      min-height: $global-header-height;
+      padding: 0 8px;
     }
   }
 
   .sidebar-and-body-container {
     display: flex;
-    flex-direction: row;
     height: 100%;
     overflow: hidden;
     width: 100%;
 
-    @include smallInclusive {
-      margin-top: $header-height;
+    .sidebar-container {
+      display: flex;
+      flex-direction: column;
+      width: min-content;
+
+      .sidebar-inner-container {
+        display: flex;
+        height: 100%;
+        overflow: hidden;
+        width: min-content;
+      }
     }
 
     .body-and-sticky-headers-container {

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { uniqBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -21,7 +22,7 @@ const bulkReactions = async (models: DB, req: Request, res: Response, next: Next
       });
     }
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 
   return res.json({ status: 'Success', result: uniqBy(reactions.map((c) => c.toJSON()), 'id') });

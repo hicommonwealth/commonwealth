@@ -1,10 +1,8 @@
-import { WhereOptions } from 'sequelize/types';
-import { ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../database';
-import { ChainAttributes } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,24 +21,30 @@ const validateTopicThreshold = async (
           model: models.Chain,
           required: true,
           as: 'chain',
-          where: {
-            // only support thresholds on token forums
-            // TODO: can we support for token-backed DAOs as well?
-            type: ChainType.Token,
-          } as WhereOptions<ChainAttributes>
+          include: [{
+            model: models.ChainNode,
+            required: true,
+          }]
         },
       ]
     });
-    if (!topic?.chain) {
-      // if associated with an offchain community, or if not token forum, always allow
+    if (!topic?.chain?.ChainNode?.balance_type) {
+      // if we have no balance type for node, always approve
       return true;
     }
+
+    const communityContracts = await models.CommunityContract.findOne({
+      where: { chain_id: topic.chain.id },
+      include: [{ model: models.Contract, required: true }],
+    });
+    // TODO: @JAKE in the future, we will have more than one contract,
+      // need to handle this through the TBC Rule, passing in associated Contract.id
     const threshold = topic.token_threshold;
     if (threshold && threshold > 0) {
       const tokenBalance = await tbc.getBalance(
         topic.chain.chain_node_id,
         userAddress,
-        topic.chain.address,
+        communityContracts?.Contract?.address,
         topic.chain.network === ChainNetwork.ERC20
           ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
             ? 'erc721' : topic.chain.network === ChainNetwork.SPL

@@ -11,6 +11,10 @@ export async function createProvider(
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
   try {
     const web3Provider = new Web3.providers.WebsocketProvider(ethNetworkUrl, {
+      clientConfig: {
+        maxReceivedFrameSize: 2000000, // bytes - default: 1MiB, current: 2MiB
+        maxReceivedMessageSize: 10000000, // bytes - default: 8MiB, current: 10Mib
+      },
       reconnect: {
         auto: true,
         delay: 5000,

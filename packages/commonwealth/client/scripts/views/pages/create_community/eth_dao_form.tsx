@@ -197,7 +197,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { chainString, ethChainId, nodeUrl, tokenName } =
+            const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
               this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -215,6 +215,7 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
                 node_url: nodeUrl,
                 token_name: tokenName,
                 type: ChainType.DAO,
+                default_symbol: symbol,
                 ...this.state.form,
               });
               if (res.result.admin_address) {
