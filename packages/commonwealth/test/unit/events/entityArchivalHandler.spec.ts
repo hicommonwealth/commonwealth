@@ -11,15 +11,20 @@ import {
 } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
-import StorageHandler from '../../../server/eventHandlers/storage';
-import EntityArchivalHandler from '../../../server/eventHandlers/entityArchival';
+import models from 'chain-events/services/database/database';
+import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
+import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
+import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
+import {BrokerConfig} from "rascal";
+import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 chai.use(chaiHttp);
 const { assert } = chai;
 
+const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
+
 const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, 'edgeware');
+  const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
   return storageHandler.handle(event);
 };
 
@@ -44,17 +49,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     const dbEvent = await setupDbEvent(event);
     const dbEventType = await dbEvent.getChainEventType();
 
-    // set up wss expected results
-    const mockWssServer = new EventEmitter();
-    // mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
-    //   assert.equal(payload.event, WebsocketMessageNames.ChainEntity);
-    //   assert.deepEqual(payload.data.chainEvent, dbEvent.toJSON());
-    //   assert.deepEqual(payload.data.chainEventType, dbEventType.toJSON());
-    //   assert.equal(payload.data.chainEntity.chain, 'edgeware');
-    //   assert.equal(payload.data.chainEntity.type, SubstrateTypes.EntityKind.DemocracyReferendum);
-    //   assert.equal(payload.data.chainEntity.type_id, '3');
-    // });
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
+    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -120,7 +115,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     //   }
     //   nEmissions++;
     // });
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
+    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
 
     // process event
     const handleCreateEvent = await eventHandler.handle(createEvent, createDbEvent);
@@ -155,7 +150,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
     //   assert.fail('should not emit event');
     // });
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware', mockWssServer as any);
+    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -179,7 +174,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new EntityArchivalHandler(models, 'edgeware');
+    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
 
     // process event twice
     const handledDbEvent = await eventHandler.handle(event, dbEvent);

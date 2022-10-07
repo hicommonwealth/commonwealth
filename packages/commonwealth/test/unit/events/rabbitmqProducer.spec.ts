@@ -1,14 +1,15 @@
-import { BrokerConfig } from 'rascal';
-import { assert } from 'chai';
-import { CWEvent } from 'chain-events/src';
-import { RabbitMqHandler } from '../../../server/eventHandlers/rabbitMQ';
-import  RabbitMQConfig  from '../../../../common-common/src/rabbitmq/RabbitMQConfig';
+import {BrokerConfig} from 'rascal';
+import {assert} from 'chai';
+import {CWEvent} from 'chain-events/src';
+import {RabbitMqHandler} from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import {getRabbitMQConfig} from 'common-common/src/rabbitmq/RabbitMQConfig';
+import {RascalPublications} from "common-common/src/rabbitmq";
 
 describe.skip('RabbitMQ producer integration tests', () => {
   let controller
 
   beforeEach('Initialize RabbitMQ Controller', () => {
-    controller = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+    controller = new RabbitMqHandler(<BrokerConfig>getRabbitMQConfig('localhost'), RascalPublications.ChainEvents);
   })
 
   it('should initialize a RabbitMQ producer with the default config', async function () {

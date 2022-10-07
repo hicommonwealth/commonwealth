@@ -1,4 +1,4 @@
-import { BrokerConfig } from 'rascal';
+import {BrokerConfig} from 'rascal';
 import {
   RabbitMQSubscription,
   ServiceConsumer,
@@ -6,15 +6,15 @@ import {
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController, getRabbitMQConfig, RascalSubscriptions } from 'common-common/src/rabbitmq';
+import {factory, formatFilename} from 'common-common/src/logging';
+import {RabbitMQController, getRabbitMQConfig, RascalSubscriptions} from 'common-common/src/rabbitmq';
 import models from '../database/database';
-import { RABBITMQ_URI } from '../config';
+import {RABBITMQ_URI} from '../config';
 import {
   Ithis as ChainEventsProcessorContextType,
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
-import { SubstrateTypes } from '../../src';
+import {SubstrateTypes} from '../../src';
 import {RepublishMessages} from "./republishMessages";
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -40,7 +40,7 @@ async function setupChainEventConsumer() {
   }
 
   // writes events into the db as ChainEvents rows
-  const storageHandler = new EventStorageHandler(models);
+  const storageHandler = new EventStorageHandler(models, rmqController);
 
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(

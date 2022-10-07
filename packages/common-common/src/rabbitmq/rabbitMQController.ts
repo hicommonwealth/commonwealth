@@ -34,10 +34,10 @@ export class RabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];
   public readonly publishers: string[];
-  private readonly _rawVhost: any;
-  private _initialized: boolean = false;
+  protected readonly _rawVhost: any;
+  protected _initialized: boolean = false;
 
-  constructor(private readonly _rabbitMQConfig: Rascal.BrokerConfig) {
+  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
     // sets the first vhost config to _rawVhost
     this._rawVhost = _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
 
@@ -109,7 +109,7 @@ export class RabbitMQController {
           // if the message processor throws because of a message formatting error then we immediately deadLetter the
           // message to avoid re-queuing the message multiple times
           if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
-          ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+          else ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
         })
       });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -172,6 +172,9 @@ export class RabbitMQController {
     publication: RascalPublications,
     DB: { sequelize: Sequelize, model: SafeRmqPublishSupported }
   ) {
+    if (!this._initialized) {
+      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+    }
     const modelName = rmqMsgToName(publishData);
     try {
       await DB.sequelize.transaction(async (t) => {

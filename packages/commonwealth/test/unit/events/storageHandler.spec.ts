@@ -11,13 +11,19 @@ import {
 } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
-import StorageHandler from '../../../server/eventHandlers/storage';
+import models from 'chain-events/services/database/database';
+import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import * as modelUtils from '../../util/modelUtils';
+import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
+import {BrokerConfig} from "rascal";
+import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 chai.use(chaiHttp);
 const { assert } = chai;
 const chain = 'edgeware';
+
+const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
+
 let loggedInAddr, loggedInAddrId;
 
 describe('Event Storage Handler Tests', () => {
@@ -42,7 +48,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, chain);
+    const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -92,7 +98,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, chain);
+    const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -119,7 +125,7 @@ describe('Event Storage Handler Tests', () => {
       }
     };
 
-    const eventHandler = new StorageHandler(models, chain);
+    const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
@@ -151,7 +157,7 @@ describe('Event Storage Handler Tests', () => {
         amount: '10000',
       }
     };
-    const eventHandler = new StorageHandler(models, chain, { excludedEvents: [ SubstrateTypes.EventKind.Reward ] });
+    const eventHandler = new StorageHandler(models, rmqController, chain, { excludedEvents: [ SubstrateTypes.EventKind.Reward ] });
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
@@ -179,7 +185,7 @@ describe('Event Storage Handler Tests', () => {
       },
       includeAddresses: [ loggedInAddr, 'bob' ],
     };
-    const eventHandler = new StorageHandler(models, chain);
+    const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
@@ -208,7 +214,7 @@ describe('Event Storage Handler Tests', () => {
       },
       includeAddresses: [ 'alice', 'bob' ],
     };
-    const eventHandler = new StorageHandler(models, chain);
+    const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent);

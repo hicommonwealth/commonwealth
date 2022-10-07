@@ -30,9 +30,10 @@ export default class extends IEventHandler {
 
   constructor(
     private readonly _models: DB,
+    private readonly _rmqController: RabbitMQController,
     private readonly _chain?: string,
     private readonly _filterConfig: StorageFilterConfig = {},
-    private readonly _rmqController?: RabbitMQController
+
   ) {
     super();
     this.eventCache = new NodeCache({
