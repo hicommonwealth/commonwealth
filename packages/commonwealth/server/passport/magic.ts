@@ -13,7 +13,6 @@ import {
   WalletId,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { RoleName } from 'server/models/community_role';
 import { sequelize, DB } from '../database';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
@@ -292,7 +291,7 @@ export function useMagicAuth(models: DB) {
               );
 
               // Creating Role Assignment
-              await createRole(models, newAddress.id, 'ethereum', RoleName.Member, t);
+              await createRole(models, newAddress.id, 'ethereum', 'member', t);
             } else {
               newAddress = await models.Address.create(
                 {
@@ -327,7 +326,7 @@ export function useMagicAuth(models: DB) {
               );
 
               // Creating Role Assignment
-              await createRole(models, newAddress.id, 'edgeware', RoleName.Member, t);
+              await createRole(models, newAddress.id, 'edgeware', 'member', t);
             }
 
             if (req.body.chain) {
@@ -336,7 +335,7 @@ export function useMagicAuth(models: DB) {
                 models,
                 newAddress.id,
                 req.body.chain,
-                RoleName.Member,
+                'member',
                 t
               );
             }

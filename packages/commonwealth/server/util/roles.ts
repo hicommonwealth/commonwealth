@@ -88,10 +88,31 @@ export async function createRole(
   return new RoleInstanceWithPermission(roleAssignment, chain_id, role_name);
 }
 
-export async function findAllRoles(query: FindOptions<RoleAssignmentModelStatic>, chain_id: string, permissions?: Permission[]): Promise<RoleInstanceWithPermission[]> {
-  return;
-}
+// const roleAssignmentFindOptions: any = {
+//   include: [
+//     {
+//       model: models.ChainEvent,
+//       order: [
+//         [ models.ChainEvent, 'id', 'asc' ]
+//       ],
+//       include: [ models.ChainEventType ],
+//     },
+//   ],
+//   order: [['created_at', 'DESC']],
+//   where: {
+//     chain: req.query.chain,
+//   }
+// };
 
-export async function findOneRole(): Promise<RoleInstanceWithPerission> {
-  return;
-}
+// export async function findAllRoles( models: DB, chain_id: string, permissions?: Permission[]): Promise<RoleInstanceWithPermission[]> {
+//   const roleAssignmentModel : RoleAssignmentModelStatic = models.RoleAssignment
+//   const roleAssignments = await roleAssignmentModel.findAll({});
+//   const roles = [];
+//   for (const roleAssignment of roleAssignments) {
+//     const community_role = await roleAssignment.CommunityRole();
+//   return;
+// }
+
+// export async function findOneRole(): Promise<RoleInstanceWithPerission> {
+//   return;
+// }

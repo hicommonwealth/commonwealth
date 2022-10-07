@@ -66,7 +66,7 @@ const acceptInvite = async (
     models,
     addressObj.id,
     chain?.id,
-    RoleName.Member
+    'member'
   );
 
   if (!role) return next(new ServerError(Errors.RoleCreationFailure));

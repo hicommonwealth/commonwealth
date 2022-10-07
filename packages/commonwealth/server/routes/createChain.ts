@@ -21,7 +21,6 @@ import { RoleAttributes, RoleInstance } from '../models/role';
 
 import { AppError, ServerError } from '../util/errors';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
-import { RoleName } from 'server/models/community_role';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -385,7 +384,7 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    await createRole(models, addressToBeAdmin.id, chain.id, RoleName.Admin);
+    await createRole(models, addressToBeAdmin.id, chain.id, 'admin');
 
     const [ subscription ] = await models.Subscription.findOrCreate({
       where: {

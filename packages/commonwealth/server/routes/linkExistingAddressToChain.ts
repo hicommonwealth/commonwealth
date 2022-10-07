@@ -7,8 +7,7 @@ import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { RoleName } from 'server/models/community_role';
-import { createRole } from 'server/util/roles';
+import { createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -177,7 +176,7 @@ const linkExistingAddressToChain = async (
     });
 
     if (!role) {
-      await createRole(models, addressId, req.body.chain, RoleName.Member)
+      await createRole(models, addressId, req.body.chain, 'member')
     }
 
     return res.json({

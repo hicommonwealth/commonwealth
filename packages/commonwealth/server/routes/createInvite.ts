@@ -1,15 +1,14 @@
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
+import sgMail from '@sendgrid/mail';
+import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from '../util/errors';
 import { DB } from '../database';
-import { RoleName } from 'server/models/community_role';
-import { createRole } from 'server/util/roles';
-const sgMail = require('@sendgrid/mail');
+import { createRole } from '../util/roles';
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {
@@ -66,7 +65,7 @@ const createInvite = async (models: DB, req: Request, res: Response, next: NextF
       },
     });
     if (existingRole) return next(new AppError(Errors.IsAlreadyMember));
-    const role = await createRole(models, existingAddress.id, chain.id, RoleName.Member);
+    const role = await createRole(models, existingAddress.id, chain.id, 'member');
     // TODO: We need to notify added users; role creation shouldn't happen silently
     return res.json({ status: 'Success', result: role.toJSON() });
   }

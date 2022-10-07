@@ -3,18 +3,17 @@ import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from '../../shared/utils';
 import { DB } from '../database';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { AppError, ServerError } from '../util/errors';
-import { createRole } from 'server/util/roles';
-import { RoleName } from 'server/models/community_role';
+import { createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -143,7 +142,7 @@ const createAddress = async (
         where: { address_id: updatedObj.id, chain_id: req.body.community },
       });
       if (!role) {
-        await createRole(models, updatedObj.id, req.body.community, RoleName.Member);
+        await createRole(models, updatedObj.id, req.body.community, 'member');
       }
     }
     return success(res, updatedObj.toJSON());
@@ -180,7 +179,7 @@ const createAddress = async (
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await createRole(models, newObj.id, req.body.chain, RoleName.Member);
+        await createRole(models, newObj.id, req.body.chain, 'member');
       }
 
       if (process.env.NODE_ENV !== 'test') {
