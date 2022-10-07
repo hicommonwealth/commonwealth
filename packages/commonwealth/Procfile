@@ -1,6 +1,3 @@
 web: cd packages/commonwealth && USE_NEW_IDENTITY_CACHE=true ts-node -P tsconfig.node.json -T server.ts
-ceConsumer: cd packages/commonwealth && node build/commonwealth/server/scripts/chainEventsConsumer.js
-ceNode0: cd packages/commonwealth && WORKER_NUMBER=0 node build/commonwealth/server/scripts/dbNode.js
-ceNode1: cd packages/commonwealth && WORKER_NUMBER=1 node build/commonwealth/server/scripts/dbNode.js
-ceNode2: cd packages/commonwealth && WORKER_NUMBER=2 node build/commonwealth/server/scripts/dbNode.js
+consumer: cd packages/commonwealth && yarn start-consumer
 release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json
