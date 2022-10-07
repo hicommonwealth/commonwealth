@@ -125,7 +125,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
     ) : (
-      <Sublayout title="Snapshot Proposal">
+      <Sublayout
+      // title="Snapshot Proposal"
+      >
         <div class="SnapshotViewProposalPage">
           <div class="proposal-body-with-tabs">
             <CWTabBar>

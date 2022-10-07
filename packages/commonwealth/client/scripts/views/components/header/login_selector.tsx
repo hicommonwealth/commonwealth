@@ -3,6 +3,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import * as Cui from 'construct-ui';
+import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
 
@@ -19,10 +20,16 @@ import {
 import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import SelectAddressModal from 'views/modals/select_address_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/cw_button';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { AccountSelector } from '../component_kit/cw_wallets_list';
+import SelectAddressModal from '../../modals/select_address_modal';
+import { CWToggle } from '../component_kit/cw_toggle';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -100,26 +107,36 @@ export class LoginSelectorMenuLeft
             }}
             label={
               <div class="label-wrap">
-                {mobile && <CWIcon iconName="edit" />}
+                {mobile && <CWIcon iconName="write" />}
                 <span>Edit profile</span>
               </div>
             }
           />
         )}
         <Cui.MenuItem
-          onclick={() =>
-            app.modals.create({
-              modal: SelectAddressModal,
-            })
-          }
+          onclick={() => {
+            if (nAccountsWithoutRole > 0) {
+              app.modals.create({
+                modal: SelectAddressModal,
+              });
+            } else {
+              app.modals.create({
+                modal: NewLoginModal,
+                data: {
+                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                    ? 'fullScreen'
+                    : 'centered',
+                  breakpointFn: isWindowMediumSmallInclusive,
+                },
+              });
+            }
+          }}
           label={
             <div class="label-wrap">
               {mobile && <CWIcon iconName="wallet" />}
               <span>
                 {nAccountsWithoutRole > 0
                   ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                  : activeAddressesWithRole.length > 0
-                  ? 'Manage addresses'
                   : 'Connect a new address'}
               </span>
             </div>
@@ -137,7 +154,7 @@ export class LoginSelectorMenuRight
 {
   view(vnode) {
     const { mobile } = vnode.attrs;
-
+    const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
     return (
       <>
         <Cui.MenuItem
@@ -159,6 +176,28 @@ export class LoginSelectorMenuRight
             <div class="label-wrap">
               {mobile && <CWIcon iconName="person" />}
               <span>Account settings</span>
+            </div>
+          }
+        />
+        <Cui.MenuItem
+          class="dark-mode-toggle"
+          onclick={(e) => {
+            if (isDarkModeOn) {
+              localStorage.setItem('dark-mode-state', 'off');
+              document
+                .getElementsByTagName('html')[0]
+                .classList.remove('invert');
+            } else {
+              document.getElementsByTagName('html')[0].classList.add('invert');
+              localStorage.setItem('dark-mode-state', 'on');
+            }
+            e.stopPropagation();
+            m.redraw();
+          }}
+          label={
+            <div class="label-wrap">
+              <CWToggle checked={isDarkModeOn} onchange={(e) => {}} />
+              <span>Dark mode</span>
             </div>
           }
         />
@@ -197,6 +236,35 @@ export class LoginSelectorMenuRight
   }
 }
 
+type TOSModalAttrs = {
+  onAccept: () => void;
+};
+
+// TODO: Replace this with a proper TOS Compoment when we have one
+class TOSModal implements m.ClassComponent<TOSModalAttrs> {
+  view(vnode) {
+    return (
+      <div class="TOSModal">
+        <div class="close-button-wrapper">
+          <CWIconButton
+            iconButtonTheme="primary"
+            iconName="close"
+            iconSize="small"
+            className="close-icon"
+            onclick={() => $('.TOSModal').trigger('modalexit')}
+          />
+        </div>
+        <div class="content-wrapper">
+          <CWText>
+            By clicking accept you agree to the community's Terms of Service
+          </CWText>
+          <CWButton onclick={vnode.attrs.onAccept} label="Accept"></CWButton>{' '}
+        </div>
+      </div>
+    );
+  }
+}
+
 type LoginSelectorAttrs = { small?: boolean };
 
 export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
@@ -215,7 +283,17 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               label="Log in"
               compact={true}
               size={small ? 'sm' : 'default'}
-              onclick={() => app.modals.create({ modal: LoginModal })}
+              onclick={() => {
+                app.modals.create({
+                  modal: NewLoginModal,
+                  data: {
+                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                      ? 'fullScreen'
+                      : 'centered',
+                    breakpointFn: isWindowMediumSmallInclusive,
+                  },
+                });
+              }}
             />
           </div>
         </div>
@@ -246,7 +324,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
     // add all addresses if joining a community
     const activeBase = activeChainInfo?.base;
     const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
-    const samebaseAddresses = app.user.addresses.filter((a) => {
+    const samebaseAddresses = app.user.addresses.filter((a, idx) => {
       // if no active chain, add all addresses
       if (!activeBase) return true;
 
@@ -255,10 +333,11 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       if (addressChainInfo?.base !== activeBase) return false;
 
       // // ensure doesn't already exist
-      const addressExists = !!app.user.addresses.find(
+      const addressExists = !!app.user.addresses.slice(idx + 1).find(
         (prev) =>
           activeBase === ChainBase.Substrate &&
-          (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+          (app.config.chains.getById(prev.chain.id)?.base ===
+          ChainBase.Substrate
             ? addressSwapper({
                 address: prev.address,
                 currentPrefix: 42,
@@ -282,8 +361,139 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       return true;
     });
 
+    // Extract unique addresses
+    const uniqueAddresses = [];
+    const sameBaseAddressesRemoveDuplicates = samebaseAddresses.filter(
+      (addressInfo) => {
+        if (!uniqueAddresses.includes(addressInfo.address)) {
+          uniqueAddresses.push(addressInfo.address);
+          return true;
+        }
+        return false;
+      }
+    );
+
     const activeCommunityMeta = app.chain?.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
+
+    // Handles linking the existing address to the community
+    async function linkToCommunity(accountIndex: number) {
+      const originAddressInfo = sameBaseAddressesRemoveDuplicates[accountIndex];
+
+      if (originAddressInfo) {
+        try {
+          const targetChain = activeChainId || originAddressInfo.chain.id;
+
+          const address = originAddressInfo.address;
+
+          const res = await linkExistingAddressToChainOrCommunity(
+            address,
+            targetChain,
+            originAddressInfo.chain.id
+          );
+
+          if (res && res.result) {
+            const { verification_token, addresses, encodedAddress } =
+              res.result;
+            app.user.setAddresses(
+              addresses.map((a) => {
+                return new AddressInfo(
+                  a.id,
+                  a.address,
+                  a.chain,
+                  a.keytype,
+                  a.wallet_id
+                );
+              })
+            );
+            const addressInfo = app.user.addresses.find(
+              (a) => a.address === encodedAddress && a.chain.id === targetChain
+            );
+
+            const account = app.chain.accounts.get(
+              encodedAddress,
+              addressInfo.keytype
+            );
+            if (app.chain) {
+              account.setValidationToken(verification_token);
+              console.log('setting validation token');
+            }
+            if (
+              activeChainId &&
+              !app.roles.getRoleInCommunity({
+                account,
+                chain: activeChainId,
+              })
+            ) {
+              await app.roles.createRole({
+                address: _.omit(addressInfo, 'chain'),
+                chain: activeChainId,
+              });
+            }
+            await setActiveAccount(account);
+            if (
+              app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+                .length === 0
+            ) {
+              app.user.setActiveAccounts(
+                app.user.activeAccounts.concat([account])
+              );
+            }
+          } else {
+            // Todo: handle error
+          }
+
+          // If token forum make sure has token and add to app.chain obj
+          if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+            await app.chain.activeAddressHasToken(
+              app.user.activeAccount.address
+            );
+          }
+          m.redraw();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+
+    // Handles displaying the login modal or the account selector modal
+    // TODO: Replace with pretty modal
+    async function performJoinCommunityLinking() {
+      if (
+        sameBaseAddressesRemoveDuplicates.length > 1 &&
+        app.activeChainId() !== 'axie-infinity'
+      ) {
+        app.modals.create({
+          modal: AccountSelector,
+          data: {
+            accounts: sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
+              address: addressInfo.address,
+            })),
+            walletNetwork: activeChainInfo?.network,
+            walletChain: activeChainInfo?.base,
+            onSelect: async (accountIndex) => {
+              await linkToCommunity(accountIndex);
+              $('.AccountSelector').trigger('modalexit');
+            },
+          },
+        });
+      } else if (
+        sameBaseAddressesRemoveDuplicates.length === 1 &&
+        app.activeChainId() !== 'axie-infinity'
+      ) {
+        await linkToCommunity(0);
+      } else {
+        app.modals.create({
+          modal: NewLoginModal,
+          data: {
+            modalType: isWindowMediumSmallInclusive(window.innerWidth)
+              ? 'fullScreen'
+              : 'centered',
+            breakpointFn: isWindowMediumSmallInclusive,
+          },
+        });
+      }
+    }
 
     return (
       <Cui.ButtonGroup class="LoginSelector">
@@ -293,98 +503,24 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           !app.user.activeAccount && (
             <Cui.Button
               onclick={async () => {
-                if (samebaseAddresses.length === 1 && !hasTermsOfService) {
-                  const originAddressInfo = samebaseAddresses[0];
-
-                  if (originAddressInfo) {
-                    try {
-                      const targetChain =
-                        activeChainId || originAddressInfo.chain.id;
-
-                      const address = originAddressInfo.address;
-
-                      const res = await linkExistingAddressToChainOrCommunity(
-                        address,
-                        targetChain,
-                        originAddressInfo.chain.id
-                      );
-
-                      if (res && res.result) {
-                        const {
-                          verification_token,
-                          addresses,
-                          encodedAddress,
-                        } = res.result;
-                        app.user.setAddresses(
-                          addresses.map((a) => {
-                            return new AddressInfo(
-                              a.id,
-                              a.address,
-                              a.chain,
-                              a.keytype,
-                              a.wallet_id
-                            );
-                          })
-                        );
-                        const addressInfo = app.user.addresses.find(
-                          (a) =>
-                            a.address === encodedAddress &&
-                            a.chain.id === targetChain
-                        );
-
-                        const account = app.chain.accounts.get(
-                          encodedAddress,
-                          addressInfo.keytype
-                        );
-                        if (app.chain) {
-                          account.setValidationToken(verification_token);
-                        }
-                        if (
-                          activeChainId &&
-                          !app.roles.getRoleInCommunity({
-                            account,
-                            chain: activeChainId,
-                          })
-                        ) {
-                          await app.roles.createRole({
-                            address: addressInfo,
-                            chain: activeChainId,
-                          });
-                        }
-                        await setActiveAccount(account);
-                        if (
-                          app.user.activeAccounts.filter((a) =>
-                            isSameAccount(a, account)
-                          ).length === 0
-                        ) {
-                          app.user.setActiveAccounts(
-                            app.user.activeAccounts.concat([account])
-                          );
-                        }
-                      } else {
-                        // Todo: handle error
-                      }
-
-                      // If token forum make sure has token and add to app.chain obj
-                      if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-                        await app.chain.activeAddressHasToken(
-                          app.user.activeAccount.address
-                        );
-                      }
-                      m.redraw();
-                    } catch (err) {
-                      console.error(err);
-                    }
-                  }
-                } else {
+                if (hasTermsOfService) {
+                  // TODO: Replace this with a much prettier TOS
                   app.modals.create({
-                    modal: SelectAddressModal,
+                    modal: TOSModal,
+                    data: {
+                      onAccept: async () => {
+                        $('.TOSModal').trigger('modalexit');
+                        await performJoinCommunityLinking();
+                      },
+                    },
                   });
+                } else {
+                  await performJoinCommunityLinking();
                 }
               }}
               label={
                 <span class="hidden-sm">
-                  {samebaseAddresses.length === 0
+                  {sameBaseAddressesRemoveDuplicates.length === 0
                     ? `No ${
                         CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
                         CHAINBASE_SHORT[app.chain?.meta?.base] ||
@@ -427,6 +563,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
           transitionDuration={0}
           hoverCloseDelay={0}
           position="top-end"
+          overlayClass="LoginSelectorMenuRight"
           trigger={
             <Cui.Button
               class="login-selector-right-button"

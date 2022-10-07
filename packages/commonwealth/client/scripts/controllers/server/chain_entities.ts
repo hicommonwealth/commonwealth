@@ -24,6 +24,7 @@ export enum EntityRefreshOption {
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
+  if (c.base === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
   if (c.network === ChainNetwork.ERC20) return SupportedNetwork.ERC20;
   if (c.network === ChainNetwork.ERC721) return SupportedNetwork.ERC721;
   if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;

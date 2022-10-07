@@ -69,8 +69,7 @@ class TreasuryPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Referenda" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Referenda" />}
         />
       );
     }
@@ -110,8 +109,7 @@ class TreasuryPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Referenda" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
         <div class="TreasuryPage">
           {onSubstrate && (

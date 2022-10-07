@@ -14,7 +14,9 @@ class NewSnapshotProposalPage
 {
   view(vnode) {
     return (
-      <Sublayout title="New Snapshot Proposal" showNewProposalButton={true}>
+      <Sublayout
+      // title="New Snapshot Proposal"
+      >
         <div class="NewProposalPage">
           {m(NewProposalForm, { snapshotId: vnode.attrs.snapshotId })}
         </div>
