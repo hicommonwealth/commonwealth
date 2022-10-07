@@ -42,7 +42,7 @@ const migrateEvent = async (
 
   if (migrateAll && migrateAll === true) {
     try {
-      migrateChainEntities();
+      runEntityMigrations();
     } catch (e) {
       throw new AppError(MigrateEventErrors.AllError);
     }
@@ -54,7 +54,7 @@ const migrateEvent = async (
   }
 
   try {
-    migrateChainEntity(chain_id);
+    runEntityMigrations(chain_id);
   } catch (e) {
     log.error(e.message);
     throw new AppError(MigrateEventErrors.ChainError);
