@@ -29,8 +29,12 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 8px 0;
+    padding: 12px 0 8px;
     width: 100%;
+
+    .comment-text, .comment-footer {
+      padding-left: 30px;
+    }
 
     .comment-header {
       align-items: center;
