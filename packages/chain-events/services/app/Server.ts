@@ -32,14 +32,14 @@ async function main() {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
-  // app.use(allowCrossDomain);
+  app.use(allowCrossDomain);
 
-  app.use(cors({
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: true,
-    optionsSuccessStatus: 200
-  }));
+  // app.use(cors({
+  //   origin: "*",
+  //   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  //   preflightContinue: true,
+  //   optionsSuccessStatus: 200
+  // }));
 
   // cors pre-flight request
   // app.options('*', cors());
