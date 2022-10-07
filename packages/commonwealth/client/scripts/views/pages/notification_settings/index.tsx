@@ -23,6 +23,9 @@ import {
   SubscriptionRowMenu,
 } from './helper_components';
 import { bundleSubs } from './helpers';
+import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import { CWTooltip } from '../../components/component_kit/cw_popover/cw_tooltip';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 class NotificationSettingsPage implements m.ClassComponent {
   private browserNotifsEnabled: boolean;
@@ -87,6 +90,19 @@ class NotificationSettingsPage implements m.ClassComponent {
                 ? 'Disable Browser Notifications'
                 : 'Enable Browser Notifications'}
             </CWText>
+            <CWTooltip
+              trigger={<CWIcon iconName="infoEmpty" iconSize="small" />}
+              interactionType="hover"
+              tooltipType="bordered"
+              toSide={true}
+              persistOnHover={true}
+              hoverCloseDelay={300}
+              tooltipContent={
+                <div>
+                  Not working? Try checking your browser or machine settings.
+                </div>
+              }
+            />
           </div>
 
           <div class="column-header-row">

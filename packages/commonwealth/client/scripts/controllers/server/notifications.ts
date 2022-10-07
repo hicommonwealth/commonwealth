@@ -220,7 +220,7 @@ class NotificationsController {
       // Close after 4 seconds
       setTimeout(() => {
         notification.close();
-      }, 6000);
+      }, 60000);
     } catch (e) {
       console.log('hmm', e);
     }
@@ -469,6 +469,7 @@ class NotificationsController {
       this._subscriptions = [];
 
       const subs = result;
+      console.log('subs inside the mf', subs);
       subs.forEach((sub) => this._subscriptions.push(modelFromServer(sub)));
     });
   }
