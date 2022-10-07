@@ -14,7 +14,7 @@ export function getBaseUrl(service?: ServiceUrls) {
   } else {
     switch (service) {
       case ServiceUrls.chainEvents:
-        return 'https://www.commonwealth.chain-events.im'
+        return 'https://chain-events.herokuapp.com'
       default:
         return 'https://www.commonwealth.im'
     }
