@@ -162,7 +162,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Edit',
-                              iconName: 'edit',
+                              iconName: 'write',
                               onclick: async (e) => {
                                 e.preventDefault();
                                 this.savedEdits = localStorage.getItem(
@@ -191,7 +191,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Edit collaborators',
-                              iconName: 'edit',
+                              iconName: 'write',
                               onclick: async (e) => {
                                 e.preventDefault();
                                 app.modals.create({
@@ -208,7 +208,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Change topic',
-                              iconName: 'edit',
+                              iconName: 'write',
                               onclick: (e) => {
                                 e.preventDefault();
                                 app.modals.create({
