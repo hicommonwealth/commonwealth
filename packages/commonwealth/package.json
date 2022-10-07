@@ -15,7 +15,6 @@
     "lint-branch": "./scripts/lint-branch.sh",
     "listen": "RUN_AS_LISTENER=true ts-node --project tsconfig.node.json server.ts",
     "load-tokens": "ts-node --project tsconfig.node.json server/scripts/loadDatabaseFromTokenLists.ts",
-    "emit-events": "ts-node --project tsconfig.node.json server/scripts/emitChainEvents.ts",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
     "test-events": "nyc ts-mocha --project test/tsconfig.node.json ./test/unit/events/*.spec.ts",
     "test-ce-node": "nyc ts-mocha --project test/tsconfig.node.json ./test/integration/chain-events-nodes.spec.ts --delay",

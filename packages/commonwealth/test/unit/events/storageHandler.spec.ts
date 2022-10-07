@@ -12,11 +12,11 @@ import {
 
 import { resetDatabase } from '../../../server-test';
 import models from 'chain-events/services/database/database';
-import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import * as modelUtils from '../../util/modelUtils';
 import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
 import {BrokerConfig} from "rascal";
 import {getRabbitMQConfig} from "common-common/src/rabbitmq";
+import {StorageHandler} from "chain-events/services/ChainEventsConsumer/ChainEventHandlers";
 
 chai.use(chaiHttp);
 const { assert } = chai;

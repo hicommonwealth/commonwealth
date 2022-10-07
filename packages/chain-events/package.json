@@ -21,6 +21,7 @@
     "ganache": "ganache-cli -m \"Alice\" -p 9545 -l 800000000 --allowUnlimitedContractSize",
     "batch-poll": "ts-node -T ./scripts/batchPoller.ts",
     "preyalcpublish": "yarn build",
+    "emit-events": "ts-node --project tsconfig.json ./scripts/emitChainEvents.ts",
     "start-app": "ts-node --project services/tsconfig.json services/app/Server.ts",
     "start-consumer": "ts-node --project services/tsconfig.json services/ChainEventsConsumer/chainEventsConsumer.ts",
     "start-subscriber": "ts-node --project services/tsconfig.json services/ChainSubscriber/chainSubscriber.ts",

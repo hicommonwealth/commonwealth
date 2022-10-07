@@ -14,8 +14,7 @@ import { constructSubstrateUrl } from 'substrate';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow } from 'views/components/metadata_rows';
 import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
+  MixpanelCommunityCreationEvent
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';

@@ -6,7 +6,7 @@ import {Sequelize} from "sequelize";
 
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for
- * testing.
+ * testing and scripts that need to use eventHandlers without a live RabbitMQ instance.
  */
 export class MockRabbitMQController extends RabbitMQController {
   constructor(_rabbitMQConfig: Rascal.BrokerConfig) {
