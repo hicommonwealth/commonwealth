@@ -29,6 +29,9 @@ async function main() {
     optionsSuccessStatus: 200
   }));
 
+  // cors pre-flight request
+  app.options('*', cors());
+
   const router = setupRouter(models);
   app.use('/', router);
   app.set('port', port);
