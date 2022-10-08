@@ -5,10 +5,13 @@
  */
 
 import _ from 'underscore';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   SubstrateEvents,
   IStorageFetcher,
   CompoundEvents,
+  CosmosEvents,
   AaveEvents,
   IDisconnectedRange,
 } from 'chain-events/src';
@@ -17,8 +20,6 @@ import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import { ChainInstance } from '../models/chain';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -60,6 +61,11 @@ export async function migrateChainEntity(chain: string): Promise<void> {
         chainInstance.substrate_spec
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
+    } else if (chainInstance.base === ChainBase.CosmosSDK) {
+      const api = await CosmosEvents.createApi(
+        node.private_url || node.url
+      );
+      fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
       // TODO: construct dater
@@ -110,7 +116,7 @@ export async function migrateChainEntities(): Promise<void> {
   const chains = await models.Chain.findAll({
     where: {
       active: true,
-      has_chain_events_listener: true,
+      // has_chain_events_listener: true,
     },
   });
   for (const { id } of chains) {

@@ -1,0 +1,59 @@
+@import 'shared';
+
+.MobileMenu {
+  display: none;
+  @include extraSmall {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100vh - #{$global-header-height});
+    overflow-y: auto;
+  }
+
+  .mobile-menu-header {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    padding: 12px 16px;
+    .Icon {
+      margin-right: 12px;
+    }
+  }
+
+  .MobileMenuItem {
+    align-items: center;
+    border-bottom: 1px solid $neutral-100;
+    color: $neutral-800;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    .mobile-menu-item-left,
+    .mobile-menu-item-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .Text {
+      margin-left: 4px;
+    }
+
+    .unread-notifications-pip {
+      cursor: pointer;
+      border-radius: 100%;
+      position: relative;
+      background: #ec79de;
+      bottom: 10px;
+      height: 10px;
+      width: 10px;
+      content: '';
+      right: 10px;
+      top: -4px;
+    }
+  }
+}
