@@ -5,7 +5,6 @@ import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
 import LandingPageButton from '../landing/landing_page_button';
 import { Footer } from '../../footer';
-import { h } from 'cyano-mithril';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {
@@ -46,7 +45,7 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             m(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              h(LandingPageButton, {
+              m(LandingPageButton, {
                 href: 'https://docs.commonwealth.im/commonwealth/',
                 text: 'See docs',
               })

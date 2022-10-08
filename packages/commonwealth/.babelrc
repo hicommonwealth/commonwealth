@@ -12,7 +12,8 @@
     [
       "@babel/plugin-transform-react-jsx",
       {
-        "pragma": "jsx"
+        "pragma": "m",
+        "pragmaFrag": "Fragment"
       }
     ],
     "@babel/plugin-syntax-dynamic-import",

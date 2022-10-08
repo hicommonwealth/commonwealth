@@ -154,7 +154,7 @@ export class LoginSelectorMenuRight
 {
   view(vnode) {
     const { mobile } = vnode.attrs;
-
+    const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
     return (
       <>
         <Cui.MenuItem
@@ -176,6 +176,28 @@ export class LoginSelectorMenuRight
             <div class="label-wrap">
               {mobile && <CWIcon iconName="person" />}
               <span>Account settings</span>
+            </div>
+          }
+        />
+        <Cui.MenuItem
+          class="dark-mode-toggle"
+          onclick={(e) => {
+            if (isDarkModeOn) {
+              localStorage.setItem('dark-mode-state', 'off');
+              document
+                .getElementsByTagName('html')[0]
+                .classList.remove('invert');
+            } else {
+              document.getElementsByTagName('html')[0].classList.add('invert');
+              localStorage.setItem('dark-mode-state', 'on');
+            }
+            e.stopPropagation();
+            m.redraw();
+          }}
+          label={
+            <div class="label-wrap">
+              <CWToggle checked={isDarkModeOn} onchange={(e) => {}} />
+              <span>Dark mode</span>
             </div>
           }
         />
@@ -314,7 +336,8 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       const addressExists = !!app.user.addresses.slice(idx + 1).find(
         (prev) =>
           activeBase === ChainBase.Substrate &&
-          (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+          (app.config.chains.getById(prev.chain.id)?.base === 
+          ChainBase.Substrate
             ? addressSwapper({
                 address: prev.address,
                 currentPrefix: 42,
@@ -518,6 +541,7 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               transitionDuration={0}
               hoverCloseDelay={0}
               position="top-end"
+              overlayClass="LoginSelectorMenuRight"
               trigger={
                 <Cui.Button
                   label={m(User, {
