@@ -35,6 +35,7 @@ export const networkUrls = {
 
   erc20: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'eth-local': 'ws://127.0.0.1:8545',
+  osmosis: 'https://rpc-osmosis.blockapsis.com',
 } as const;
 
 export const networkSpecs: { [chain: string]: RegisteredTypes } = {

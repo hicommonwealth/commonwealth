@@ -241,9 +241,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
   view() {
     const LoadingPage = (
       <PageLoading
-        narrow
-        showNewProposalButton
-        title={<BreadcrumbsTitleTag title="Search" />}
+      // title={<BreadcrumbsTitleTag title="Search" />}
       />
     );
 
@@ -339,10 +337,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         title={<BreadcrumbsTitleTag title="Search" />}
       />
     ) : (
-      <Sublayout
-        title={['Search ', capitalize(scope) || 'Commonwealth']}
-        showNewProposalButton
-      >
+      <Sublayout>
         <div class="SearchPage">
           <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (

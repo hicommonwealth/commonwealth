@@ -132,7 +132,9 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
           <PopoverMenu
             transitionDuration={0}
             hasArrow={false}
-            trigger={<CWIconButton iconName="gear" iconButtonTheme="black" />}
+            trigger={
+              <CWIconButton iconName="compass" iconButtonTheme="black" />
+            }
             class="CommunitySelectList"
             content={communityList}
           />
