@@ -111,7 +111,6 @@
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",
-    "@types/mithril": "^2.0.7",
     "@types/mocha": "^7.0.2",
     "@types/node-sass": "^4.11.2",
     "@types/passport": "^1.0.5",

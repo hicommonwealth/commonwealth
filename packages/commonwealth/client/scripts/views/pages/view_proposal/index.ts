@@ -1046,29 +1046,29 @@ const ViewProposalPage: m.Component<
                     return m(PollCard, {
                       multiSelect: false,
                       pollEnded:
-                        poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                        (poll as Poll).endsAt && (poll as Poll).endsAt?.isBefore(moment().utc()),
                       hasVoted:
                         app.user.activeAccount &&
-                        poll.getUserVote(
+                        (poll as Poll).getUserVote(
                           app.user.activeAccount?.chain?.id,
                           app.user.activeAccount?.address
                         ),
                       disableVoteButton: !app.user.activeAccount,
-                      votedFor: poll.getUserVote(
+                      votedFor: (poll as Poll).getUserVote(
                         app.user.activeAccount?.chain?.id,
                         app.user.activeAccount?.address
                       )?.option,
-                      proposalTitle: poll.prompt,
+                      proposalTitle: (poll as Poll).prompt,
                       timeRemaining: getProposalPollTimestamp(
-                        poll,
-                        poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                        (poll as Poll),
+                        (poll as Poll).endsAt && (poll as Poll).endsAt?.isBefore(moment().utc())
                       ),
-                      totalVoteCount: poll.votes?.length,
-                      voteInformation: poll.options.map((option) => {
+                      totalVoteCount: (poll as Poll).votes?.length,
+                      voteInformation: (poll as Poll).options.map((option) => {
                         return {
                           label: option,
                           value: option,
-                          voteCount: poll.votes.filter(
+                          voteCount: (poll as Poll).votes.filter(
                             (v) => v.option === option
                           ).length,
                         };
@@ -1080,17 +1080,17 @@ const ViewProposalPage: m.Component<
                         : 'You must join this community to vote.',
                       onVoteCast: (option, isSelected, callback) =>
                         handleProposalPollVote(
-                          poll,
+                          (poll as Poll),
                           option,
                           isSelected,
                           callback
                         ),
                       onResultsClick: (e) => {
                         e.preventDefault();
-                        if (poll.votes.length > 0) {
+                        if ((poll as Poll).votes.length > 0) {
                           app.modals.create({
                             modal: OffchainVotingModal,
-                            data: { votes: poll.votes },
+                            data: { votes: (poll as Poll).votes },
                           });
                         }
                       },
@@ -1179,29 +1179,29 @@ const ViewProposalPage: m.Component<
                 return m(PollCard, {
                   multiSelect: false,
                   pollEnded:
-                    poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
+                  (poll as Poll).endsAt && (poll as Poll).endsAt?.isBefore(moment().utc()),
                   hasVoted:
                     app.user.activeAccount &&
-                    poll.getUserVote(
+                    (poll as Poll).getUserVote(
                       app.user.activeAccount?.chain?.id,
                       app.user.activeAccount?.address
                     ),
                   disableVoteButton: !app.user.activeAccount,
-                  votedFor: poll.getUserVote(
+                  votedFor: (poll as Poll).getUserVote(
                     app.user.activeAccount?.chain?.id,
                     app.user.activeAccount?.address
                   )?.option,
-                  proposalTitle: poll.prompt,
+                  proposalTitle: (poll as Poll).prompt,
                   timeRemaining: getProposalPollTimestamp(
-                    poll,
-                    poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+                    (poll as Poll),
+                    (poll as Poll).endsAt && (poll as Poll).endsAt?.isBefore(moment().utc())
                   ),
-                  totalVoteCount: poll.votes?.length,
-                  voteInformation: poll.options.map((option) => {
+                  totalVoteCount: (poll as Poll).votes?.length,
+                  voteInformation: (poll as Poll).options.map((option) => {
                     return {
                       label: option,
                       value: option,
-                      voteCount: poll.votes.filter((v) => v.option === option)
+                      voteCount: (poll as Poll).votes.filter((v) => v.option === option)
                         .length,
                     };
                   }),
@@ -1210,13 +1210,13 @@ const ViewProposalPage: m.Component<
                     ? null
                     : 'You must join this community to vote.',
                   onVoteCast: (option, isSelected, callback) =>
-                    handleProposalPollVote(poll, option, isSelected, callback),
+                    handleProposalPollVote((poll as Poll), option, isSelected, callback),
                   onResultsClick: (e) => {
                     e.preventDefault();
-                    if (poll.votes.length > 0) {
+                    if ((poll as Poll).votes.length > 0) {
                       app.modals.create({
                         modal: OffchainVotingModal,
-                        data: { votes: poll.votes },
+                        data: { votes: (poll as Poll).votes },
                       });
                     }
                   },

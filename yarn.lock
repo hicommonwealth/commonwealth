@@ -4230,11 +4230,6 @@
   resolved "https://registry.npmjs.org/@types/minimist/-/minimist-1.2.0.tgz"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/mithril@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.npmjs.org/@types/mithril/-/mithril-2.0.7.tgz"
-  integrity sha512-ByD422x0GnYh5MOEAWNyqfkw2QlKkK3Yf7y5e1CobDVPG9m+/ThblfrIHENihF7VnygT6sQRObPvY1J/fUZICg==
-
 "@types/mkdirp@^0.5.2":
   version "0.5.2"
   resolved "https://registry.npmjs.org/@types/mkdirp/-/mkdirp-0.5.2.tgz"
