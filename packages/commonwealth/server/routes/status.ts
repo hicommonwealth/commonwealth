@@ -7,6 +7,7 @@ import { JWT_SECRET } from '../config';
 import '../types';
 import { DB, sequelize } from '../database';
 import { ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,8 +39,8 @@ const status = async (
           {
             model: models.Contract,
             required: false,
-            include: [{ model: models.ContractAbi, required: false}],
-          }
+            include: [{ model: models.ContractAbi, required: false }],
+          },
         ],
       }),
       models.ChainNode.findAll(),
@@ -107,10 +108,9 @@ const status = async (
     const myAddressIds: number[] = Array.from(
       addresses.map((address) => address.id)
     );
-    const roles = await models.Role.findAll({
-      where: {
-        address_id: { [Op.in]: myAddressIds },
-      },
+
+    const roles = await findAllRoles(models, {
+      where: { address_id: { [Op.in]: myAddressIds } },
       include: [models.Address],
     });
     const discussionDrafts = await models.DiscussionDraft.findAll({

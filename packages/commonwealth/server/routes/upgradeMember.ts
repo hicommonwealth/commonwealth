@@ -4,6 +4,7 @@ import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +19,12 @@ export const Errors = {
 
 const ValidRoles = ['admin', 'moderator', 'member'];
 
-const upgradeMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const upgradeMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   const { address, new_role } = req.body;
@@ -26,28 +32,32 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   if (!new_role) return next(new AppError(Errors.InvalidRole));
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const requesterAdminRoles = await models.Role.findAll({
-    where: {
-      chain_id: chain.id,
-      address_id: { [Op.in]: requesterAddressIds },
-      permission: 'admin',
-    },
-  });
+  const requesterAddressIds = requesterAddresses
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  const requesterAdminRoles = await findAllRoles(
+    models,
+    { where: { address_id: { [Op.in]: requesterAddressIds } } },
+    chain.id,
+    ['admin']
+  );
 
-  if (requesterAdminRoles.length < 1 && !req.user.isAdmin) return next(new AppError(Errors.MustBeAdmin));
+  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
+    return next(new AppError(Errors.MustBeAdmin));
 
   const memberAddress = await models.Address.findOne({
     where: {
       address,
     },
-    include: [{
-      model: models.Role,
-      required: true,
-      where: {
-        chain_id: chain.id,
-      }
-    }]
+    include: [
+      {
+        model: models.Role,
+        required: true,
+        where: {
+          chain_id: chain.id,
+        },
+      },
+    ],
   });
   const roles = memberAddress?.Roles;
   if (!memberAddress || !roles) return next(new AppError(Errors.NoMember));
@@ -56,16 +66,11 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   const member = await models.Role.findOne({ where: { id: roles[0].id } });
   if (!member) return next(new AppError(Errors.NoMember));
 
-  const allCommunityAdmin = await models.Role.findAll({
-    where: {
-      chain_id: chain.id,
-      permission: 'admin',
-    },
-  });
+  const allCommunityAdmin = await findAllRoles(models, undefined, chain.id, ['admin']);
   const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
   const isLastAdmin = allCommunityAdmin.length < 2;
-  const adminSelfDemoting = requesterAdminAddressIds.includes(memberAddress.id)
-    && new_role !== 'admin';
+  const adminSelfDemoting =
+    requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
   if (isLastAdmin && adminSelfDemoting) {
     return next(new AppError(Errors.MustHaveAdmin));
   }

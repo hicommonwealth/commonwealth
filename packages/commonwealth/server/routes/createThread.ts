@@ -24,6 +24,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -317,14 +318,12 @@ const createThread = async (
 
     if (chain && chain.type === ChainType.Token) {
       // skip check for admins
-      const isAdmin = await models.Role.findAll({
-        where: {
-          address_id: author.id,
-          chain_id: chain.id,
-          permission: ['admin'],
-        },
-        transaction,
-      });
+      const isAdmin = await findAllRoles(
+        models,
+        { where: { address_id: author.id } },
+        chain.id,
+        ['admin']
+      );
       if (!req.user.isAdmin && isAdmin.length === 0) {
         const canReact = await validateTopicThreshold(
           tokenBalanceCache,

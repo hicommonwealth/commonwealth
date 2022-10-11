@@ -4,6 +4,7 @@ import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   InsufficientPermissions:
@@ -53,12 +54,14 @@ const updateLinkedThreads = async (
         },
       });
       if (!collaboration) {
-        const requesterIsAdminOrMod = await models.Role.findAll({
-          where: {
-            address_id: { [Op.in]: userOwnedAddressIds },
-            permission: ['admin', 'moderator'],
+        const requesterIsAdminOrMod = await findAllRoles(
+          models,
+          {
+            where: { address_id: { [Op.in]: userOwnedAddressIds } },
           },
-        });
+          chain.id,
+          ['admin', 'moderator']
+        );
         if (!requesterIsAdminOrMod) {
           return next(new AppError(Errors.InsufficientPermissions));
         }

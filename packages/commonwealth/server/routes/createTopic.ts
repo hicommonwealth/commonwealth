@@ -3,6 +3,7 @@ import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -39,13 +40,12 @@ const createTopic = async (
   const userAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
-  const adminRoles = await models.Role.findAll({
-    where: {
-      address_id: { [Op.in]: userAddressIds },
-      permission: { [Op.in]: ['admin', 'moderator'] },
-      chain_id: chain.id,
-    },
-  });
+  const adminRoles = await findAllRoles(
+    models,
+    { where: { address_id: { [Op.in]: userAddressIds } } },
+    chain.id,
+    ['admin', 'moderator']
+  );
   if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new AppError(Errors.MustBeAdmin));
   }

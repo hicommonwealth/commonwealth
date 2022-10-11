@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createRole } from 'server/util/roles';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { createRole, findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,7 +16,12 @@ export const Errors = {
   AlreadyMember: 'Already a member of this community',
 };
 
-const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const addMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!chain) return next(new AppError(Errors.InvalidCommunity));
@@ -30,13 +35,12 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
       user_id: req.user.id,
     },
   });
-  const requesterIsAdminOrMod = await models.Role.findAll({
-    where: {
-      address_id: adminAddress.id,
-      chain_id: chain.id,
-      permission: ['admin', 'moderator'],
-    },
-  });
+  const requesterIsAdminOrMod = await findAllRoles(
+    models,
+    { address_id: adminAddress.id },
+    chain.id,
+    ['admin', 'moderator']
+  );
   if (!requesterIsAdminOrMod) return next(new AppError(Errors.MustBeAdmin));
 
   const existingAddress = await models.Address.findOne({
@@ -55,7 +59,7 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
 
   if (existingRole) return next(new AppError(Errors.AlreadyMember));
 
-  const role = await createRole(models, existingAddress.id, chain.id, 'member')
+  const role = await createRole(models, existingAddress.id, chain.id, 'member');
 
   return res.json({ status: 'Success', result: role.toJSON() });
 };

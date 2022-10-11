@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -12,7 +13,12 @@ export const Errors = {
   InvalidSnapshotProposal: 'Invalid snapshot proposal hash',
 };
 
-const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateThreadLinkedSnapshotProposal = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!chain?.snapshot) {
@@ -35,14 +41,16 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
 
   if (!thread) return next(new AppError(Errors.NoThread));
   const userOwnedAddressIds = (await req.user.getAddresses())
-    .filter((addr) => !!addr.verified).map((addr) => addr.id);
-  if (!userOwnedAddressIds.includes(thread.address_id)) { // is not author
-    const roles = await models.Role.findAll({
-      where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      }
-    });
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  if (!userOwnedAddressIds.includes(thread.address_id)) {
+    // is not author
+    const roles = await findAllRoles(
+      models,
+      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+      chain.id,
+      ['admin', 'moderator']
+    );
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
     });
@@ -58,22 +66,22 @@ const updateThreadLinkedSnapshotProposal = async (models: DB, req: Request, res:
   await thread.save();
 
   const finalThread = await models.Thread.findOne({
-    where: { id: thread_id, },
+    where: { id: thread_id },
     include: [
       {
         model: models.Address,
-        as: 'Address'
+        as: 'Address',
       },
       {
         model: models.Address,
         // through: models.Collaboration,
-        as: 'collaborators'
+        as: 'collaborators',
       },
       models.Attachment,
       {
         model: models.Topic,
-        as: 'topic'
-      }
+        as: 'topic',
+      },
     ],
   });
 

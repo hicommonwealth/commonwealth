@@ -2,6 +2,7 @@
 import { Response, NextFunction } from 'express';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 enum UpdateTopicErrors {
   NoUser = 'Not logged in',
@@ -37,13 +38,12 @@ const updateTopic = async (
     },
   });
 
-  const roles: any[] = await models.Role.findAll({
-    where: {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-      chain_id: thread.chain,
-    },
-  });
+  const roles: any[] = await findAllRoles(
+    models,
+    { where: { address_id: userAddress.id } },
+    thread.chain,
+    ['admin', 'moderator']
+  );
   const isAdminOrMod = roles.length > 0;
   if (!isAdminOrMod) {
     return next(new AppError(UpdateTopicErrors.NoPermission));

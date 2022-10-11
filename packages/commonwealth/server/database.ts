@@ -75,7 +75,7 @@ import PollFactory, {
 } from './models/poll';
 import ProfileFactory, { ProfileModelStatic } from './models/profile';
 import RoleFactory, { RoleModelStatic } from './models/role';
-import RolePermissionFactory, { RoleAssignmentModelStatic, RolePermissionModelStatic } from './models/role_assignment';
+import RoleAssignmentFactory, { RoleAssignmentModelStatic } from './models/role_assignment';
 import CommunityRoleFactory, { CommunityRoleModelStatic } from './models/community_role';
 import RuleFactory, { RuleModelStatic } from './models/rule';
 import SocialAccountFactory, {

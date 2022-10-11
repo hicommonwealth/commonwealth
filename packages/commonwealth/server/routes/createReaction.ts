@@ -18,6 +18,7 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
@@ -84,7 +85,12 @@ const createReaction = async (
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address
+      );
       if (!passesRules) {
         return next(new AppError(Errors.RuleCheckFailed));
       }
@@ -95,7 +101,7 @@ const createReaction = async (
   if (chain) {
     const [canInteract, banError] = await banCache.checkBan({
       chain: chain.id,
-      address: req.body.address
+      address: req.body.address,
     });
     if (!canInteract) {
       return next(new AppError(banError));
@@ -104,13 +110,12 @@ const createReaction = async (
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
+    const isAdmin = await findAllRoles(
+      models,
+      { where: { address_id: author.id } },
+      chain.id,
+      ['admin']
+    );
     if (thread && !req.user.isAdmin && isAdmin.length === 0) {
       try {
         const canReact = await validateTopicThreshold(

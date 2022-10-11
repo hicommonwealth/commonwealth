@@ -16,6 +16,7 @@ import { ChatChannelInstance } from '../models/chat_channel';
 import { RuleInstance } from '../models/rule';
 import { CommunityBannerInstance } from '../models/community_banner';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -35,154 +36,162 @@ const bulkOffchain = async (
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules, communityBanner] =
-    await (<
-      Promise<
-        [
-          TopicInstance[],
-          unknown,
-          RoleInstance[],
-          unknown,
-          ThreadInstance[],
-          ChatChannelInstance[],
-          RuleInstance[],
-          CommunityBannerInstance,
-        ]
-      >
-    >Promise.all([
-      // topics
-      models.Topic.findAll({
-        where: { chain_id: chain.id },
-      }),
-      // threads, comments, reactions
-      new Promise(async (resolve, reject) => {
-        try {
-          const threadParams = Object.assign(replacements, { pinned: true });
-          const rawPinnedThreads = await models.Thread.findAll({
-            where: threadParams,
-            include: [
-              {
-                model: models.Address,
-                as: 'Address',
-              },
-              {
-                model: models.Address,
-                as: 'collaborators',
-              },
-              {
-                model: models.Topic,
-                as: 'topic',
-              },
-              {
-                model: models.ChainEntity,
-              },
-              {
-                model: models.LinkedThread,
-                as: 'linked_threads',
-              },
-              {
-                model: models.Reaction,
-                as: 'reactions',
-                include: [
-                  {
-                    model: models.Address,
-                    as: 'Address',
-                    required: true,
-                  },
-                ],
-              },
-            ],
-            attributes: { exclude: ['version_history'] },
-          });
+  const [
+    topics,
+    pinnedThreads,
+    admins,
+    mostActiveUsers,
+    threadsInVoting,
+    chatChannels,
+    rules,
+    communityBanner,
+  ] = await (<
+    Promise<
+      [
+        TopicInstance[],
+        unknown,
+        RoleInstanceWithPermission[],
+        unknown,
+        ThreadInstance[],
+        ChatChannelInstance[],
+        RuleInstance[],
+        CommunityBannerInstance
+      ]
+    >
+  >Promise.all([
+    // topics
+    models.Topic.findAll({
+      where: { chain_id: chain.id },
+    }),
+    // threads, comments, reactions
+    new Promise(async (resolve, reject) => {
+      try {
+        const threadParams = Object.assign(replacements, { pinned: true });
+        const rawPinnedThreads = await models.Thread.findAll({
+          where: threadParams,
+          include: [
+            {
+              model: models.Address,
+              as: 'Address',
+            },
+            {
+              model: models.Address,
+              as: 'collaborators',
+            },
+            {
+              model: models.Topic,
+              as: 'topic',
+            },
+            {
+              model: models.ChainEntity,
+            },
+            {
+              model: models.LinkedThread,
+              as: 'linked_threads',
+            },
+            {
+              model: models.Reaction,
+              as: 'reactions',
+              include: [
+                {
+                  model: models.Address,
+                  as: 'Address',
+                  required: true,
+                },
+              ],
+            },
+          ],
+          attributes: { exclude: ['version_history'] },
+        });
 
-          resolve(
-            rawPinnedThreads.map((t) => {
-              return t.toJSON();
-            })
-          );
-        } catch (e) {
-          console.log(e);
-          reject(new ServerError('Could not fetch threads, comments, or reactions'));
-        }
-      }),
-      // admins
-      models.Role.findAll({
-        where: {
-          chain_id: chain.id,
-          permission: { [Op.in]: ['admin', 'moderator'] },
-        },
-        include: [models.Address],
-        order: [['created_at', 'DESC']],
-      }),
-      // most active users
-      new Promise(async (resolve, reject) => {
-        try {
-          const thirtyDaysAgo = new Date(
-            (new Date() as any) - 1000 * 24 * 60 * 60 * 30
-          );
-          const activeUsers = {};
-          const where = {
-            updated_at: { [Op.gt]: thirtyDaysAgo },
-            chain: chain.id,
-          };
+        resolve(
+          rawPinnedThreads.map((t) => {
+            return t.toJSON();
+          })
+        );
+      } catch (e) {
+        console.log(e);
+        reject(
+          new ServerError('Could not fetch threads, comments, or reactions')
+        );
+      }
+    }),
+    // admins
+    findAllRoles(
+      models,
+      { include: [models.Address], order: [['created_at', 'DESC']] },
+      chain.id,
+      ['admin', 'moderator']
+    ),
+    // most active users
+    new Promise(async (resolve, reject) => {
+      try {
+        const thirtyDaysAgo = new Date(
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+        );
+        const activeUsers = {};
+        const where = {
+          updated_at: { [Op.gt]: thirtyDaysAgo },
+          chain: chain.id,
+        };
 
-          const monthlyComments = await models.Comment.findAll({
-            where,
-            include: [models.Address],
-          });
-          const monthlyThreads = await models.Thread.findAll({
-            where,
-            attributes: { exclude: ['version_history'] },
-            include: [{ model: models.Address, as: 'Address' }],
-          });
+        const monthlyComments = await models.Comment.findAll({
+          where,
+          include: [models.Address],
+        });
+        const monthlyThreads = await models.Thread.findAll({
+          where,
+          attributes: { exclude: ['version_history'] },
+          include: [{ model: models.Address, as: 'Address' }],
+        });
 
-          (monthlyComments as any).concat(monthlyThreads).forEach((post) => {
-            if (!post.Address) return;
-            const addr = post.Address.address;
-            if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
-            else
-              activeUsers[addr] = {
-                info: post.Address,
-                count: 1,
-              };
-          });
-          const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
-            return (b as any).count - (a as any).count;
-          });
-          resolve(mostActiveUsers_);
-        } catch (e) {
-          reject(new ServerError('Could not fetch most active users'));
-        }
-      }),
-      models.sequelize.query(
-        `
+        (monthlyComments as any).concat(monthlyThreads).forEach((post) => {
+          if (!post.Address) return;
+          const addr = post.Address.address;
+          if (activeUsers[addr]) activeUsers[addr]['count'] += 1;
+          else
+            activeUsers[addr] = {
+              info: post.Address,
+              count: 1,
+            };
+        });
+        const mostActiveUsers_ = Object.values(activeUsers).sort((a, b) => {
+          return (b as any).count - (a as any).count;
+        });
+        resolve(mostActiveUsers_);
+      } catch (e) {
+        reject(new ServerError('Could not fetch most active users'));
+      }
+    }),
+    models.sequelize.query(
+      `
      SELECT id, title, stage FROM "Threads"
      WHERE ${communityOptions} AND (stage = 'proposal_in_review' OR stage = 'voting')`,
-        {
-          replacements,
-          type: QueryTypes.SELECT,
-        }
-      ),
-      models.ChatChannel.findAll({
-        where: {
-          chain_id: chain.id
-        },
-        include: {
-          model: models.ChatMessage,
-          required: false // should return channels with no chat messages
-        }
-      }),
-      models.Rule.findAll({
-        where: {
-          chain_id: chain.id,
-        }
-      }),
-      models.CommunityBanner.findOne({
-        where: {
-          chain_id: chain.id,
-        }
-      }),
-    ]));
+      {
+        replacements,
+        type: QueryTypes.SELECT,
+      }
+    ),
+    models.ChatChannel.findAll({
+      where: {
+        chain_id: chain.id,
+      },
+      include: {
+        model: models.ChatMessage,
+        required: false, // should return channels with no chat messages
+      },
+    }),
+    models.Rule.findAll({
+      where: {
+        chain_id: chain.id,
+      },
+    }),
+    models.CommunityBanner.findOne({
+      where: {
+        chain_id: chain.id,
+      },
+    }),
+  ]));
 
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
