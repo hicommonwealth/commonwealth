@@ -47,7 +47,7 @@ async function main() {
   app.options('*', cors());
 
   const router = setupRouter(models);
-  app.use('/', router);
+  app.use('/api', router);
   app.set('port', port);
 
   const onError = (error) => {
