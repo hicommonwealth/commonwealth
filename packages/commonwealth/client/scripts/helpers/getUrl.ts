@@ -1,3 +1,4 @@
+import app from "state";
 
 export enum ServiceUrls {
   chainEvents = 'chain-events'
@@ -9,14 +10,15 @@ export function getBaseUrl(service?: ServiceUrls) {
       case ServiceUrls.chainEvents:
         return 'http://localhost:8081';
       default:
-        return 'http://localhost:8080';
+        return 'http://localhost:8080' + app.serverUrl();
     }
   } else {
     switch (service) {
       case ServiceUrls.chainEvents:
         return 'https://chain-events.herokuapp.com'
       default:
-        return 'https://www.commonwealth.im'
+        // e.g. https://commonwealth.im/api
+        return window.location.origin + app.serverUrl();
     }
   }
 }

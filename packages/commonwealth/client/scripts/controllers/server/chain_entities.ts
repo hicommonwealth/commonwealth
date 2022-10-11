@@ -87,7 +87,7 @@ class ChainEntityController {
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
       getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', options),
-      getFetch(getBaseUrl() + '/api/getEntityMeta', options)
+      getFetch(getBaseUrl() + '/getEntityMeta', options)
     ]);
 
     // save the chain-entity objects in the store
