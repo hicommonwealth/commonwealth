@@ -8,7 +8,7 @@ import { QueryTypes, Op } from 'sequelize';
 import { Response, NextFunction, Request } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TopicInstance } from '../models/topic';
 import { RoleInstance } from '../models/role';
 import { ThreadInstance } from '../models/thread';
