@@ -20,7 +20,7 @@ export default (
   dataTypes: typeof DataTypes,
 ): ChainEntityMetaModelStatic => {
   const ChainEntityMeta = <ChainEntityMetaModelStatic>sequelize.define<ChainEntityMetaInstance, ChainEntityMetaAttributes>('ChainEntityMeta', {
-    id: { type: dataTypes.INTEGER, primaryKey:true },
+    id: { type: dataTypes.INTEGER, primaryKey:true, autoIncrement: true },
     ce_id: { type: dataTypes.INTEGER, allowNull: false, unique: true },
     title: { type: dataTypes.STRING, allowNull: true },
     chain: { type: dataTypes.STRING, allowNull: false },

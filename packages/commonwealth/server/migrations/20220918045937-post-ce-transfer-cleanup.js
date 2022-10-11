@@ -9,32 +9,40 @@ module.exports = {
                                                    from "ChainEntities");
             `, {transaction: t});
 
-            // copy the id column to ce_id and add NOT NULL and UNIQUE constraints
-            await queryInterface.sequelize.query(`
-                ALTER TABLE "ChainEntityMeta"
-                    ADD COLUMN ce_id INTEGER UNIQUE;
-            `, {transaction: t});
-            await queryInterface.sequelize.query(`
-                UPDATE "ChainEntityMeta"
-                SET ce_id = id;
-            `, {transaction: t});
+            // rename exising column id => ce_id and add UNIQUE + NOT NULL constraints
+            await queryInterface.renameColumn(
+                'ChainEntityMeta',
+                'id',
+                'ce_id',
+                {transaction: t}
+            );
+            await queryInterface.addConstraint('ChainEntityMeta', {
+                type: 'unique',
+                fields: ['ce_id'],
+                transaction: t
+            });
             await queryInterface.sequelize.query(`
                 ALTER TABLE "ChainEntityMeta"
                     ALTER COLUMN ce_id SET NOT NULL;
             `, {transaction: t});
+            // create the new id serial primary key column
+            await queryInterface.sequelize.query(`
+                ALTER TABLE "ChainEntityMeta"
+                    ADD COLUMN id SERIAL PRIMARY KEY;
+            `, {transaction: t});
 
             // set id column as an auto-increment primary key
-            await queryInterface.sequelize.query(`
-                ALTER TABLE "ChainEntityMeta"
-                    ADD PRIMARY KEY (id);
-            `, {transaction: t});
-            await queryInterface.sequelize.query(`
-                CREATE SEQUENCE ChainEntityMeta_id_seq OWNED BY "ChainEntityMeta".id;
-            `, {transaction: t});
-            await queryInterface.sequelize.query(`
-                ALTER TABLE "ChainEntityMeta"
-                    ALTER id SET DEFAULT nextval('ChainEntityMeta_id_seq'::regclass);
-            `, {transaction: t});
+            // await queryInterface.sequelize.query(`
+            //     ALTER TABLE "ChainEntityMeta"
+            //         ADD PRIMARY KEY (id);
+            // `, {transaction: t});
+            // await queryInterface.sequelize.query(`
+            //     CREATE SEQUENCE ChainEntityMeta_id_seq OWNED BY "ChainEntityMeta".id;
+            // `, {transaction: t});
+            // await queryInterface.sequelize.query(`
+            //     ALTER TABLE "ChainEntityMeta"
+            //         ALTER id SET DEFAULT nextval('ChainEntityMeta_id_seq'::regclass);
+            // `, {transaction: t});
 
             // set the appropriate foreign keys
             await queryInterface.sequelize.query(`
@@ -48,7 +56,7 @@ module.exports = {
                         FOREIGN KEY (chain) REFERENCES "Chains";
             `, {transaction: t});
 
-            await queryInterface.dropTable('ChainEntity', {transaction: t});
+            await queryInterface.dropTable('ChainEntities', {cascade: true, transaction: t});
 
             // drop chain-events table
             await queryInterface.removeConstraint(
