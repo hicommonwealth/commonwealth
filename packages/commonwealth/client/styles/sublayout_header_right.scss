@@ -1,3 +1,5 @@
+@import 'shared';
+
 .SublayoutHeaderRight {
   align-items: center;
   display: flex;
@@ -7,16 +9,43 @@
   > :not(:first-child) {
     margin-left: 8px;
   }
-}
 
-.cui-menu {
-  .cui-menu-divider {
-    margin: 0;
+  .Icon {
+    cursor: pointer;
+    display: inline-block;
   }
 
-  .cui-button {
-    height: 40px;
-    min-height: 40px;
-    line-height: 40px;
+  .MobileIconPopover {
+    display: none;
+    @include extraSmall {
+      display: flex;
+    }
+  }
+
+  .DesktopIconWrap {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    @include extraSmall {
+      display: none;
+    }
+
+    > :not(:first-child) {
+      margin-left: 8px;
+    }
+
+    .unread-notifications-pip {
+      border-radius: 100%;
+      position: relative;
+      background: $pink-500;
+      content: '';
+      height: 10px;
+      width: 10px;
+      top: -3px;
+      right: 10px;
+      display: inline-block;
+    }
   }
 }

@@ -35,8 +35,8 @@ const authCallback = async (
     where: {
       // id: req.query.profile_id,
       user_id: req.user.id,
-    }
-  })
+    },
+  });
   if (!profile) {
     throw new ServerError('User profile should exist but missing');
   }
@@ -55,7 +55,7 @@ const authCallback = async (
   }
 
   // 3. persist token & reject if replay or if expired
-  if (Date.now() > (iat + TOKEN_EXPIRATION)) {
+  if (Date.now() > iat + TOKEN_EXPIRATION) {
     log.info(`Token issued at ${iat} expired.`);
     throw new AppError(Errors.RegistrationError);
   }
@@ -68,7 +68,7 @@ const authCallback = async (
       issued_at: Math.floor(iat / 1000), // convert to seconds
       created_at: new Date(),
       updated_at: new Date(),
-    }
+    },
   });
   if (!created) {
     log.warn(`Replay attack detected for SsoToken id ${ssoToken.id}!`);
@@ -80,7 +80,7 @@ const authCallback = async (
   const allAddresses = await models.Address.findAll({
     where: {
       profile_id: profile.id,
-    }
+    },
   });
 
   const responseObject = {

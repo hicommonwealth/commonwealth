@@ -475,9 +475,7 @@ const ViewProposalPage: m.Component<
     const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
     if (!app.chain?.meta && !isDiscussion) {
       return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: 'Loading...',
+        // title: 'Loading...',
       });
     }
     const type =
@@ -511,9 +509,7 @@ const ViewProposalPage: m.Component<
     // load app controller
     if (!app.threads.initialized) {
       return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: headerTitle,
+        // title: headerTitle,
       });
     }
 
@@ -548,16 +544,12 @@ const ViewProposalPage: m.Component<
             vnode.state.threadFetched = true;
           }
           return m(PageLoading, {
-            narrow: true,
-            showNewProposalButton: true,
-            title: headerTitle,
+            // title: headerTitle,
           });
         } else {
           if (!app.chain.loaded) {
             return m(PageLoading, {
-              narrow: true,
-              showNewProposalButton: true,
-              title: headerTitle,
+              // title: headerTitle,
             });
           }
           // check if module is still initializing
@@ -586,9 +578,7 @@ const ViewProposalPage: m.Component<
               app.chain.loadModules([c]);
             }
             return m(PageLoading, {
-              narrow: true,
-              showNewProposalButton: true,
-              title: headerTitle,
+              // title: headerTitle,
             });
           }
         }
@@ -722,16 +712,12 @@ const ViewProposalPage: m.Component<
 
     if (vnode.state.comments === undefined) {
       return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: headerTitle,
+        // title: headerTitle,
       });
     }
     if (vnode.state.viewCount === undefined) {
       return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: headerTitle,
+        // title: headerTitle,
       });
     }
 
@@ -758,9 +744,7 @@ const ViewProposalPage: m.Component<
       !vnode.state.prefetch[proposalIdAndType]['profilesFinished']
     ) {
       return m(PageLoading, {
-        narrow: true,
-        showNewProposalButton: true,
-        title: headerTitle,
+        // title: headerTitle,
       });
     }
     vnode.state.prefetch[proposalIdAndType]['profilesFinished'] = true;
@@ -832,10 +816,9 @@ const ViewProposalPage: m.Component<
       const contributors = proposal.getVotes();
       return m(
         Sublayout,
-        {
-          showNewProposalButton: true,
-          title: headerTitle,
-        },
+        // {
+        //   title: headerTitle,
+        // },
         [
           m('.TipDetailPage', [
             m('.tip-details', [
@@ -965,10 +948,9 @@ const ViewProposalPage: m.Component<
 
     return m(
       Sublayout,
-      {
-        showNewProposalButton: true,
-        title: headerTitle,
-      },
+      // {
+      //   title: headerTitle,
+      // },
       m('.ViewProposalPage', [
         sidebarCheck &&
           m('.view-proposal-body-with-tabs', [

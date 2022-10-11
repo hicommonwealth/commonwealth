@@ -13,11 +13,19 @@ interface IState {
 }
 
 // creates address, initializes account, and redirects to main page
-const validate = async (token: string, stateId: string, chain: string): Promise<void | string> => {
+const validate = async (
+  token: string,
+  stateId: string,
+  chain: string
+): Promise<void | string> => {
   // verifyAddress against token, returns user if not logged in
   let result;
   try {
-    result = await $.post(`${app.serverUrl()}/auth/sso/callback`, { token, issuer: 'AxieInfinity', stateId });
+    result = await $.post(`${app.serverUrl()}/auth/sso/callback`, {
+      token,
+      issuer: 'AxieInfinity',
+      stateId,
+    });
   } catch (e) {
     console.error(`Post request error: ${e.responseText}`);
     return `Login Error: ${e.responseText}`;
@@ -32,7 +40,7 @@ const validate = async (token: string, stateId: string, chain: string): Promise<
     console.error(`Got login error: ${JSON.stringify(result)}`);
     return `Login error: ${JSON.stringify(result)}`;
   }
-}
+};
 
 const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
   oninit: (vnode) => {
@@ -45,7 +53,7 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
         vnode.state.error = res;
         m.redraw();
       }
-    })
+    });
   },
   view: (vnode) => {
     console.log('finish axie login');
@@ -54,7 +62,7 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
     } else {
       return m(PageLoading);
     }
-  }
+  },
 };
 
 export default FinishAxieLogin;
