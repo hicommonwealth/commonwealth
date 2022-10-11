@@ -37,7 +37,9 @@ export class TipDetail
     const contributors = proposal.getVotes();
 
     return (
-      <Sublayout showNewProposalButton title={headerTitle}>
+      <Sublayout
+      // title={headerTitle}
+      >
         <div class="TipDetail">
           <div class="tip-details">
             <div class="title">{title}</div>

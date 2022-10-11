@@ -17,7 +17,7 @@ import {
   proposalSlugToClass,
 } from 'identifiers';
 import { slugify } from 'utils';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { notifyError } from 'controllers/app/notifications';
 import {
   Comment,
@@ -71,7 +71,11 @@ class ViewProposalPage
     const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
 
     if (!app.chain?.meta && !isDiscussion) {
-      return <PageLoading showNewProposalButton title="Loading..." />;
+      return (
+        <PageLoading
+        // title="Loading..."
+        />
+      );
     }
 
     const type =
@@ -83,7 +87,11 @@ class ViewProposalPage
     const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
 
     if (typeof identifier !== 'string')
-      return <PageNotFound title={headerTitle} />;
+      return (
+        <PageNotFound
+        // title={headerTitle}
+        />
+      );
 
     const proposalId = identifier.split('-')[0];
     const proposalType = type;
@@ -102,12 +110,20 @@ class ViewProposalPage
     }
 
     if (this.threadFetchFailed) {
-      return <PageNotFound title={headerTitle} />;
+      return (
+        <PageNotFound
+        // title={headerTitle}
+        />
+      );
     }
 
     // load app controller
     if (!app.threads.initialized) {
-      return <PageLoading showNewProposalButton title={headerTitle} />;
+      return (
+        <PageLoading
+        // title={headerTitle}
+        />
+      );
     }
 
     const proposalRecentlyEdited = this.recentlyEdited;
@@ -143,10 +159,18 @@ class ViewProposalPage
               });
             this.threadFetched = true;
           }
-          return <PageLoading showNewProposalButton title={headerTitle} />;
+          return (
+            <PageLoading
+            //  title={headerTitle}
+            />
+          );
         } else {
           if (!app.chain.loaded) {
-            return <PageLoading showNewProposalButton title={headerTitle} />;
+            return (
+              <PageLoading
+              //  title={headerTitle}
+              />
+            );
           }
           // check if module is still initializing
           const c = proposalSlugToClass().get(proposalType) as ProposalModule<
@@ -173,7 +197,11 @@ class ViewProposalPage
             } else {
               app.chain.loadModules([c]);
             }
-            return <PageLoading showNewProposalButton title={headerTitle} />;
+            return (
+              <PageLoading
+              // title={headerTitle}
+              />
+            );
           }
         }
         // proposal does not exist, 404
@@ -310,7 +338,11 @@ class ViewProposalPage
     }
 
     if (this.comments === undefined || this.viewCount === undefined) {
-      return <PageLoading showNewProposalButton title={headerTitle} />;
+      return (
+        <PageLoading
+        //  title={headerTitle}
+        />
+      );
     }
 
     // load profiles
@@ -333,7 +365,11 @@ class ViewProposalPage
       !app.profiles.allLoaded() &&
       !this.prefetch[proposalIdAndType]['profilesFinished']
     ) {
-      return <PageLoading showNewProposalButton title={headerTitle} />;
+      return (
+        <PageLoading
+        //  title={headerTitle}
+        />
+      );
     }
     this.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
@@ -434,7 +470,9 @@ class ViewProposalPage
         isAuthor);
 
     return (
-      <Sublayout showNewProposalButton title={headerTitle}>
+      <Sublayout
+      //  title={headerTitle}
+      >
         <div class="ViewProposalPage">
           <div
             class={getClasses<{ hasSidebar?: boolean }>(
