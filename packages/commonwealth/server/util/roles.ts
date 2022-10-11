@@ -1,9 +1,7 @@
 import { Model, Transaction, Op } from 'sequelize/types';
-import { DB } from '../database';
+import { DB, sequelize } from '../database';
 import { Permission } from '../models/role';
-import {
-  RoleAssignmentAttributes,
-} from '../models/role_assignment';
+import { RoleAssignmentAttributes } from '../models/role_assignment';
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -100,27 +98,40 @@ export async function findAllRoles(
       },
       include: {
         model: models.RoleAssignment,
+        where: { findOptions },
       },
-    }
+    };
   } else {
     roleFindOptions = {
       where: {
-        [Op.and]: [{ chain_id }, { permissions: { [Op.or]: permissions.map(x => ({
-          name: x,
-        })) } }],
+        [Op.and]: [
+          { chain_id },
+          {
+            permissions: {
+              [Op.or]: permissions.map((x) => ({
+                name: x,
+              })),
+            },
+          },
+        ],
       },
       include: {
         model: models.RoleAssignment,
+        where: { findOptions },
       },
-    }
+    };
   }
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
   const roles: RoleInstanceWithPermission[] = [];
   for (const communityRole of communityRoles) {
-    const roleAssignments = await communityRole.getRoleAssignments()
+    const roleAssignments = await communityRole.getRoleAssignments();
     if (roleAssignments.length > 0) {
       for (const roleAssignment of roleAssignments) {
-        const role = new RoleInstanceWithPermission(roleAssignment, chain_id, communityRole.name)
+        const role = new RoleInstanceWithPermission(
+          roleAssignment,
+          chain_id,
+          communityRole.name
+        );
         roles.push(role);
       }
     }
@@ -130,7 +141,8 @@ export async function findAllRoles(
 
 export async function findOneRole(
   models: DB,
-  address_id : number,
+  findOptions: any,
+  address_id: number,
   chain_id: string,
   permission?: Permission
 ): Promise<RoleInstanceWithPermission> {
@@ -142,8 +154,19 @@ export async function findOneRole(
       },
       include: {
         model: models.RoleAssignment,
+        where: {
+          address_id,
+          findOptions,
+        },
       },
-    }
+      order: sequelize.fn(
+        'field',
+        sequelize.col('name'),
+        'admin',
+        'moderator',
+        'member'
+      ),
+    };
   } else {
     roleFindOptions = {
       where: {
@@ -151,12 +174,28 @@ export async function findOneRole(
       },
       include: {
         model: models.RoleAssignment,
+        where: {
+          address_id,
+          findOptions,
+        },
       },
-    }
+      order: sequelize.fn(
+        'field',
+        sequelize.col('name'),
+        'admin',
+        'moderator',
+        'member'
+      ),
+    };
   }
-  const communityRoles = await models.CommunityRole.findOne(roleFindOptions);
+  const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
+  // Retrieve the first role as it will be the highest permission role for the address_id
+  const roleAssignment = await communityRoles[0].getRoleAssignments()[0];
+  const role: RoleInstanceWithPermission = new RoleInstanceWithPermission(
+    roleAssignment,
+    chain_id,
+    communityRoles[0].name
+  );
 
-
-
-  return;
+  return role;
 }
