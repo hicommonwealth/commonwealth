@@ -8,6 +8,18 @@
  */
 import models from '../database';
 
+async function notificationConsistency() {
+  // use dbLink for all queries here
+  // TODO: how to re-enable extensions on yarn reset-db i.e. re-enable dblink
+
+  // get all existing notification ce-ids from main db
+  // get all ce's from CE db that aren't in the fetched list above
+  // get all cet that have a subscription from main db
+  // filter all ce's from CE db that don't have an existing subscription
+  // filter all ce's from CE db that have a created_at data that is older than the oldest subscription with the matching cet
+  // run emitNotifications for every remaining ce
+}
+
 export async function enforceDataConsistency(
   ce_db_uri?: string,
   enforceTypes?: boolean,
