@@ -74,7 +74,7 @@ const upgradeMember = async (
   );
   if (!member) return next(new AppError(Errors.NoMember));
 
-  const allCommunityAdmin = await findAllRoles(models, undefined, chain.id, [
+  const allCommunityAdmin = await findAllRoles(models, {}, chain.id, [
     'admin',
   ]);
   const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);

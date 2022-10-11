@@ -86,7 +86,7 @@ export async function createRole(
 
 export async function findAllRoles(
   models: DB,
-  findOptions: FindOptions | undefined,
+  findOptions: FindOptions,
   chain_id?: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {

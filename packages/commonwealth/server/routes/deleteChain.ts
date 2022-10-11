@@ -71,7 +71,7 @@ const deleteChain = async (
       return next(new AppError(Errors.NoChain));
     }
 
-    const admin = await findOneRole(models, undefined, chain.id, ['admin']);
+    const admin = await findOneRole(models, {}, chain.id, ['admin']);
     if (!admin) {
       return next(new AppError(Errors.AdminPresent))
     }
