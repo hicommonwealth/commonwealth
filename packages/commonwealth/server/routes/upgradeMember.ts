@@ -4,7 +4,7 @@ import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,24 +49,34 @@ const upgradeMember = async (
     where: {
       address,
     },
-    include: [
-      {
-        model: models.Role,
-        required: true,
-        where: {
-          chain_id: chain.id,
-        },
-      },
-    ],
+    // include: [
+    //   {
+    //     model: models.Role,
+    //     required: true,
+    //     where: {
+    //       chain_id: chain.id,
+    //     },
+    //   },
+    // ],
   });
-  const roles = memberAddress?.Roles;
+  const roles = await findAllRoles(
+    models,
+    { where: { address_id: memberAddress.id } },
+    chain.id
+  );
   if (!memberAddress || !roles) return next(new AppError(Errors.NoMember));
 
   // There should only be one role per address per chain/community
-  const member = await models.Role.findOne({ where: { id: roles[0].id } });
+  const member = await findOneRole(
+    models,
+    { where: { id: roles[0].toJSON().id } },
+    chain.id
+  );
   if (!member) return next(new AppError(Errors.NoMember));
 
-  const allCommunityAdmin = await findAllRoles(models, undefined, chain.id, ['admin']);
+  const allCommunityAdmin = await findAllRoles(models, undefined, chain.id, [
+    'admin',
+  ]);
   const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
   const isLastAdmin = allCommunityAdmin.length < 2;
   const adminSelfDemoting =

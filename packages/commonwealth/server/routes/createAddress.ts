@@ -13,7 +13,7 @@ import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { AppError, ServerError } from '../util/errors';
-import { createRole } from '../util/roles';
+import { createRole, findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -138,9 +138,11 @@ const createAddress = async (
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
-      const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, chain_id: req.body.community },
-      });
+      const role = await findOneRole(
+        models,
+        { where: { address_id: updatedObj.id } },
+        req.body.community
+      );
       if (!role) {
         await createRole(models, updatedObj.id, req.body.community, 'member');
       }

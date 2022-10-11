@@ -8,7 +8,7 @@ import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from '../util/errors';
 import { DB } from '../database';
-import { createRole, findAllRoles } from '../util/roles';
+import { createRole, findAllRoles, findOneRole } from '../util/roles';
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {
@@ -63,12 +63,11 @@ const createInvite = async (
       },
     });
     if (!existingAddress) return next(new AppError(Errors.AddressNotFound));
-    const existingRole = await models.Role.findOne({
-      where: {
-        chain_id: chain.id,
-        address_id: existingAddress.id,
-      },
-    });
+    const existingRole = await findOneRole(
+      models,
+      { where: { address_id: existingAddress.id } },
+      chain.id
+    );
     if (existingRole) return next(new AppError(Errors.IsAlreadyMember));
     const role = await createRole(
       models,

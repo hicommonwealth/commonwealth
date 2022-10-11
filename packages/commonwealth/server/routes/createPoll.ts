@@ -6,6 +6,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -69,13 +70,13 @@ const createPoll = async (
 
     // check if admin_only flag is set
     if (thread.Chain?.admin_only_polling) {
-      const role = await models.Role.findOne({
-        where: {
-          address_id: thread.address_id,
-          chain_id: thread.Chain.id,
-        },
-      });
-      if (role?.permission !== 'admin' && !req.user.isAdmin) {
+      const role = await findOneRole(
+        models,
+        { where: { address_id: thread.address_id } },
+        thread.Chain.id,
+        ['admin']
+      );
+      if (role && !req.user.isAdmin) {
         return next(new AppError(Errors.MustBeAdmin));
       }
     }

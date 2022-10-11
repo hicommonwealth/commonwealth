@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { createRole, findAllRoles } from '../util/roles';
+import { createRole, findAllRoles, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,12 +50,12 @@ const addMember = async (
     },
   });
   if (!existingAddress) return next(new AppError(Errors.AddressNotFound));
-  const existingRole = await models.Role.findOne({
-    where: {
-      address_id: existingAddress.id,
-      chain_id: chain.id,
-    },
-  });
+
+  const existingRole = await findOneRole(
+    models,
+    { where: { address_id: existingAddress.id } },
+    chain.id
+  );
 
   if (existingRole) return next(new AppError(Errors.AlreadyMember));
 

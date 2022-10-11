@@ -7,6 +7,7 @@ import { DB } from '../database';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
+import { findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -51,13 +52,12 @@ const updateChain = async (
     const userAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
-    const userMembership = await models.Role.findOne({
-      where: {
-        address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id || null,
-        permission: 'admin',
-      },
-    });
+    const userMembership = await findOneRole(
+      models,
+      { where: { address_id: { [Op.in]: userAddressIds } } },
+      chain.id,
+      ['admin']
+    );
     if (!req.user.isAdmin && !userMembership) {
       return next(new AppError(Errors.NotAdmin));
     }

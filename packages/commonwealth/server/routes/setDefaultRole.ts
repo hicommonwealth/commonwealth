@@ -3,6 +3,7 @@ import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -26,10 +27,7 @@ const setDefaultRole = async (models: DB, req, res: Response, next: NextFunction
   });
   if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
-  const existingRole = await models.Role.findOne({ where: {
-    address_id: validAddress.id,
-    chain_id: chain.id,
-  } });
+  const existingRole = await findOneRole(models, { where: {address_id: validAddress.id}}, chain.id)
   if (!existingRole) return next(new AppError(Errors.RoleDNE));
 
   validAddress.last_active = new Date();

@@ -1,4 +1,6 @@
 import { Request } from 'express';
+import { Permission } from '../models/role';
+import { findOneRole } from './roles';
 
 // Roles hierarchically encompass the roles below them.
 // siteAdmins are granted permission to perform all actions allowed of chainAdmins, chainMods, and chainMembers.
@@ -23,18 +25,17 @@ const validateRoles = async (
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
 
-  const allowedRoles =
+  const allowedRoles: any[] =
     (minimum_role === 'member') ? ['admin, moderator, member']
     : (minimum_role === 'moderator') ? ['admin', 'moderator']
     : ['admin'];
 
-  const userRole = await models.Role.findOne({
-    where: {
-      address_id: userOwnedAddressIds,
-      chain_id,
-      permission: allowedRoles,
-    },
-  });
+  const userRole = await findOneRole(
+    models,
+    { where: { address_id: userOwnedAddressIds } },
+    chain_id,
+    allowedRoles
+  )
 
   return !!userRole;
 };

@@ -4,6 +4,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -69,12 +70,8 @@ const deleteChain = async (
     if (!chain) {
       return next(new AppError(Errors.NoChain));
     }
-    const admin = await models.Role.findOne({
-      where: {
-        chain_id: chain.id,
-        permission: 'admin',
-      }
-    });
+
+    const admin = await findOneRole(models, undefined, chain.id, ['admin']);
     if (!admin) {
       return next(new AppError(Errors.AdminPresent))
     }

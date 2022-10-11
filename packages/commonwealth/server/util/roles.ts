@@ -111,41 +111,24 @@ export async function findAllRoles(
       },
     };
   } else {
-    if (findOptions === undefined) {
-      roleFindOptions = {
-        where: {
-          [Op.and]: [
-            { chain_id },
-            {
-              permissions: {
-                [Op.or]: permissions.map((x) => ({
-                  name: x,
-                })),
-              },
+    roleFindOptions = {
+      where: {
+        [Op.and]: [
+          { chain_id },
+          {
+            permissions: {
+              [Op.or]: permissions.map((x) => ({
+                name: x,
+              })),
             },
-          ],
-        },
-      };
-    } else {
-      roleFindOptions = {
-        where: {
-          [Op.and]: [
-            { chain_id },
-            {
-              permissions: {
-                [Op.or]: permissions.map((x) => ({
-                  name: x,
-                })),
-              },
-            },
-          ],
-        },
-        include: {
-          model: models.RoleAssignment,
-          findOptions,
-        },
-      };
-    }
+          },
+        ],
+      },
+      include: {
+        model: models.RoleAssignment,
+        findOptions,
+      },
+    };
   }
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
   const roles: RoleInstanceWithPermission[] = [];
@@ -168,21 +151,17 @@ export async function findAllRoles(
 export async function findOneRole(
   models: DB,
   findOptions: FindOptions,
-  address_id: number,
   chain_id: string,
-  permission?: Permission
+  permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
   let roleFindOptions: any;
-  if (permission === undefined) {
+  if (permissions === undefined) {
     roleFindOptions = {
       where: {
         chain_id,
       },
       include: {
         model: models.RoleAssignment,
-        where: {
-          address_id,
-        },
         findOptions,
       },
       order: sequelize.fn(
@@ -196,13 +175,19 @@ export async function findOneRole(
   } else {
     roleFindOptions = {
       where: {
-        [Op.and]: [{ chain_id }, { name: permission }],
+        [Op.and]: [
+          { chain_id },
+          {
+            permissions: {
+              [Op.or]: permissions.map((x) => ({
+                name: x,
+              })),
+            },
+          },
+        ],
       },
       include: {
         model: models.RoleAssignment,
-        where: {
-          address_id,
-        },
         findOptions,
       },
       order: sequelize.fn(
