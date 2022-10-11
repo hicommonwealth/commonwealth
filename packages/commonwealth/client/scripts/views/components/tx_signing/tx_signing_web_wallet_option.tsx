@@ -7,7 +7,7 @@ import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';

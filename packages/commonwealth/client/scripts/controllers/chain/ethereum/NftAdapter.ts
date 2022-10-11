@@ -1,13 +1,13 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
 import { ERC721, ERC721__factory } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
-import Ethereum from 'controllers/chain/ethereum/main';
+import Ethereum from 'controllers/chain/ethereum/adapter';
 
 import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import { IApp } from 'state';
 import BN from 'bn.js';
 
-class NftApi extends ContractApi<ERC721> { }
+class NftApi extends ContractApi<ERC721> {}
 
 export default class Nft extends Ethereum implements ITokenAdapter {
   // required implementations for ITokenAdapter
@@ -21,8 +21,13 @@ export default class Nft extends Ethereum implements ITokenAdapter {
     const account = this.accounts.get(activeAddress);
 
     // query balance
-    const balanceBN = await this.contractApi.Contract.balanceOf(account.address);
-    const balance = new ERC721Token(this.contractAddress, new BN(balanceBN.toString(), 10));
+    const balanceBN = await this.contractApi.Contract.balanceOf(
+      account.address
+    );
+    const balance = new ERC721Token(
+      this.contractAddress,
+      new BN(balanceBN.toString(), 10)
+    );
     this.hasToken = balance && !balance.isZero();
     if (balance) this.tokenBalance = balance;
     return this.hasToken;
@@ -36,7 +41,11 @@ export default class Nft extends Ethereum implements ITokenAdapter {
 
   public async initApi() {
     await super.initApi();
-    const api = new NftApi(ERC721__factory.connect, this.meta.address, this.chain.api.currentProvider as any);
+    const api = new NftApi(
+      ERC721__factory.connect,
+      this.meta.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.contractApi = api;
   }
