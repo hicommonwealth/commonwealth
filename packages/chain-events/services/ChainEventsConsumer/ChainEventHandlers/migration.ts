@@ -91,7 +91,7 @@ export default class extends IEventHandler<ChainEventInstance> {
         where: queryArgs,
       });
       if (!existingEvent) {
-        log.trace('No existing event found, creating new event in db!');
+        log.info('No existing event found, creating new event in db!');
         const dbEvent = await this._models.ChainEvent.create({
           chain_event_type_id: dbEventType.id,
           block_number: event.blockNumber,
@@ -117,7 +117,7 @@ export default class extends IEventHandler<ChainEventInstance> {
       } else {
         existingEvent.event_data = event.data;
         await existingEvent.save();
-        log.trace('Existing event found and migrated successfully!');
+        log.info('Existing event found and migrated successfully!');
         return existingEvent;
       }
     };

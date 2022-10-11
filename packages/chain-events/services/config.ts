@@ -7,6 +7,17 @@ export const DATABASE_URI =
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'
     : process.env.DATABASE_URL;
 
+export const TEMP_DATABASE_URI = (() => {
+  // this supersedes all other urls - returned when the app is deployed on another service such as commonwealth-staging
+  if (process.env.CE_DATABASE_URL) return process.env.CE_DATABASE_URL;
+
+  if (!process.env.DATABASE_URL || process.env.NODE_ENV === 'development')
+    // this is returned locally
+    return 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'
+  // this is returned when the app is deployed on chain-events app
+  else return process.env.DATABASE_URL
+})()
+
 export const CW_DATABASE_URI = !process.env.CW_DATABASE_URL || process.env.NODE_ENV === 'development'
   ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
   : process.env.CW_DATABASE_URL;

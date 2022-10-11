@@ -59,7 +59,6 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.url);
-      console.log(chainInstance.substrate_spec)
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         chainInstance.substrate_spec
