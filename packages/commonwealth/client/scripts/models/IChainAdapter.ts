@@ -76,8 +76,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     if (
-      this.meta.id !==
-      (this.app.customDomainId() || m.route.param('scope'))
+      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
     ) {
       return false;
     }
@@ -90,7 +89,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numVotingThreads,
       chatChannels,
       rules, // TODO: store in rules controller
-      communityBanner
+      communityBanner,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);

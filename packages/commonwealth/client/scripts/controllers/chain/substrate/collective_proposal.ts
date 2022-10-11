@@ -5,10 +5,20 @@ import { ApiPromise } from '@polkadot/api';
 import { Votes } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
 
-import { ISubstrateCollectiveProposal, SubstrateCoin, formatCall } from 'adapters/chain/substrate/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType,
-  VotingUnit, ChainEntity, ChainEvent
+  ISubstrateCollectiveProposal,
+  SubstrateCoin,
+  formatCall,
+} from 'adapters/chain/substrate/types';
+import {
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  BinaryVote,
+  VotingType,
+  VotingUnit,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
@@ -17,19 +27,21 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateCollective from './collective';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import Substrate from './main';
+import Substrate from './adapter';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
     proposal: SubstrateCollectiveProposal,
     account: SubstrateAccount,
-    choice: boolean,
+    choice: boolean
   ) {
     super(account, choice);
   }
 }
 
-const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISubstrateCollectiveProposal => {
+const backportEventToAdapter = (
+  event: SubstrateTypes.ICollectiveProposed
+): ISubstrateCollectiveProposal => {
   return {
     identifier: event.proposalHash.toString(),
     index: event.proposalIndex,
@@ -38,16 +50,24 @@ const backportEventToAdapter = (event: SubstrateTypes.ICollectiveProposed): ISub
   };
 };
 
-export class SubstrateCollectiveProposal
-  extends Proposal<
-  ApiPromise, SubstrateCoin, ISubstrateCollectiveProposal, SubstrateCollectiveVote
+export class SubstrateCollectiveProposal extends Proposal<
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateCollectiveProposal,
+  SubstrateCollectiveVote
 > {
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
   }
-  public get description() { return null; }
-  public get author() { return null; }
-  public get call() { return this._call; }
+  public get description() {
+    return null;
+  }
+  public get author() {
+    return null;
+  }
+  public get call() {
+    return this._call;
+  }
 
   // MEMBERS
   public canVoteFrom(account: SubstrateAccount) {
@@ -79,7 +99,8 @@ export class SubstrateCollectiveProposal
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -97,18 +118,19 @@ export class SubstrateCollectiveProposal
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Collective: SubstrateCollective,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super(ProposalType.SubstrateCollectiveProposal, backportEventToAdapter(
-      entity.chainEvents
-        .find(
+    super(
+      ProposalType.SubstrateCollectiveProposal,
+      backportEventToAdapter(
+        entity.chainEvents.find(
           (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
         ).data as SubstrateTypes.ICollectiveProposed
-    ));
-    const eventData = entity.chainEvents
-      .find(
-        (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
-      ).data as SubstrateTypes.ICollectiveProposed;
+      )
+    );
+    const eventData = entity.chainEvents.find(
+      (e) => e.data.kind === SubstrateTypes.EventKind.CollectiveProposed
+    ).data as SubstrateTypes.ICollectiveProposed;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Collective = Collective;
@@ -123,11 +145,13 @@ export class SubstrateCollectiveProposal
     if (!this._completed) {
       const slug = chainEntityTypeToProposalSlug(entity.type);
       const uniqueId = `${slug}_${entity.typeId}`;
-      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
-        if (response.status === 'Success' && response.result?.length) {
-          this.title = response.result;
-        }
-      });
+      this._Chain.app.chain.chainEntities
+        ._fetchTitle(entity.chain, uniqueId)
+        .then((response) => {
+          if (response.status === 'Success' && response.result?.length) {
+            this.title = response.result;
+          }
+        });
       this._initialized = true;
       this.updateVoters();
       this._Collective.store.add(this);
@@ -153,7 +177,7 @@ export class SubstrateCollectiveProposal
     if (!this._Chain.app.isModuleReady) return;
 
     // search for same preimage/proposal hash
-    const chain = (this._Chain.app.chain as Substrate);
+    const chain = this._Chain.app.chain as Substrate;
     const referendum = chain.democracy?.store.getAll().find((p) => {
       return p.hash === this.data.hash;
     });
@@ -177,7 +201,9 @@ export class SubstrateCollectiveProposal
       }
       case SubstrateTypes.EventKind.CollectiveVoted: {
         const voter = this._Accounts.fromAddress(e.data.voter);
-        this.addOrUpdateVote(new SubstrateCollectiveVote(this, voter, e.data.vote));
+        this.addOrUpdateVote(
+          new SubstrateCollectiveVote(this, voter, e.data.vote)
+        );
         break;
       }
       case SubstrateTypes.EventKind.CollectiveDisapproved: {
@@ -205,22 +231,32 @@ export class SubstrateCollectiveProposal
   }
 
   public updateVoters = async () => {
-    const v = await this._Chain.api.query[this.collectiveName].voting<Option<Votes>>(this.data.hash);
+    const v = await this._Chain.api.query[this.collectiveName].voting<
+      Option<Votes>
+    >(this.data.hash);
     if (v.isSome) {
       const votes = v.unwrap();
       this.clearVotes();
-      votes.ayes.map(
-        (who) => this.addOrUpdateVote(
-          new SubstrateCollectiveVote(this, this._Accounts.fromAddress(who.toString()), true)
+      votes.ayes.map((who) =>
+        this.addOrUpdateVote(
+          new SubstrateCollectiveVote(
+            this,
+            this._Accounts.fromAddress(who.toString()),
+            true
+          )
         )
       );
-      votes.nays.map(
-        (who) => this.addOrUpdateVote(
-          new SubstrateCollectiveVote(this, this._Accounts.fromAddress(who.toString()), false)
+      votes.nays.map((who) =>
+        this.addOrUpdateVote(
+          new SubstrateCollectiveVote(
+            this,
+            this._Accounts.fromAddress(who.toString()),
+            false
+          )
         )
       );
     }
-  }
+  };
 
   // GETTERS AND SETTERS
   public get votingType() {
@@ -231,25 +267,27 @@ export class SubstrateCollectiveProposal
   }
   get isPassing() {
     if (this.completed) {
-      return this._approved
-        ? ProposalStatus.Passed
-        : ProposalStatus.Failed;
+      return this._approved ? ProposalStatus.Passed : ProposalStatus.Failed;
     }
-    return (this.accountsVotedYes.length >= this.data.threshold)
+    return this.accountsVotedYes.length >= this.data.threshold
       ? ProposalStatus.Passing
       : ProposalStatus.Failing;
   }
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     return { kind: 'threshold', threshold: this.data.threshold };
   }
 
   public get support() {
     return this.accountsVotedYes.length + this.accountsVotedNo.length === 0
-      ? 0 : this.accountsVotedYes.length / (this.accountsVotedYes.length + this.accountsVotedNo.length);
+      ? 0
+      : this.accountsVotedYes.length /
+          (this.accountsVotedYes.length + this.accountsVotedNo.length);
   }
   public get turnout() {
     return this._Collective.members.length === 0
-      ? 0 : (this.accountsVotedYes.length + this.accountsVotedNo.length) / this._Collective.members.length;
+      ? 0
+      : (this.accountsVotedYes.length + this.accountsVotedNo.length) /
+          this._Collective.members.length;
   }
 
   get approved() {
@@ -271,45 +309,58 @@ export class SubstrateCollectiveProposal
     return [
       {
         name: 'createExternalProposal',
-        label: 'Create council proposal (50% councillors, supermajority public approval)',
-        description: 'Introduces a council proposal. Requires approval from 1/2 of councillors, after which '
-          + 'it turns into a supermajority-required referendum.',
-      }, {
+        label:
+          'Create council proposal (50% councillors, supermajority public approval)',
+        description:
+          'Introduces a council proposal. Requires approval from 1/2 of councillors, after which ' +
+          'it turns into a supermajority-required referendum.',
+      },
+      {
         name: 'createExternalProposalMajority',
-        label: 'Create majority-approval council proposal (2/3 councillors, majority public approval)',
-        description: 'Introduces a council proposal. Requires approval from 2/3 of councillors, after which '
-          + 'it turns into a 50% approval referendum.',
-      // createExternalProposalDefault and createFastTrack not supported on edgeware
-      // XXX: support on Kusama
-      // }, {
-      //   name: 'createExternalProposalDefault',
-      //   label: 'Create negative-turnout-bias council proposal (100% councillors, supermajority public rejection)',
-      //   description: 'Introduces a council proposal. Requires approval from all councillors, after which ' +
-      //     'it turns into a supermajority rejection referendum (passes without supermajority voting "no").',
-      // }, {
-      //   name: 'createFastTrack',
-      //   label: 'Fast-track the current exteranlly-proposed majority-approval referendum',
-      //   description: 'Schedules a current democracy proposal for immediate consideration (i.e. a vote). ' +
-      //     'If there is no externally-proposed referendum currently, or it is not majority-carried, it fails.'
-      }, {
+        label:
+          'Create majority-approval council proposal (2/3 councillors, majority public approval)',
+        description:
+          'Introduces a council proposal. Requires approval from 2/3 of councillors, after which ' +
+          'it turns into a 50% approval referendum.',
+        // createExternalProposalDefault and createFastTrack not supported on edgeware
+        // XXX: support on Kusama
+        // }, {
+        //   name: 'createExternalProposalDefault',
+        //   label: 'Create negative-turnout-bias council proposal (100% councillors, supermajority public rejection)',
+        //   description: 'Introduces a council proposal. Requires approval from all councillors, after which ' +
+        //     'it turns into a supermajority rejection referendum (passes without supermajority voting "no").',
+        // }, {
+        //   name: 'createFastTrack',
+        //   label: 'Fast-track the current exteranlly-proposed majority-approval referendum',
+        //   description: 'Schedules a current democracy proposal for immediate consideration (i.e. a vote). ' +
+        //     'If there is no externally-proposed referendum currently, or it is not majority-carried, it fails.'
+      },
+      {
         name: 'createEmergencyCancellation',
         label: 'Emergency cancel referendum',
-        description: 'Cancels an active referendum. If reintroduced, the referendum cannot be canceled again. '
-          + 'Requires approval from 2/3 of councillors.',
-      }, {
+        description:
+          'Cancels an active referendum. If reintroduced, the referendum cannot be canceled again. ' +
+          'Requires approval from 2/3 of councillors.',
+      },
+      {
         name: 'vetoNextExternal',
         label: 'Veto next external proposal',
-        description: 'Vetoes a council proposal. If reintroduced after the cooldown period, '
-          + 'the same councillor cannot veto the proposal again.',
-      }, {
+        description:
+          'Vetoes a council proposal. If reintroduced after the cooldown period, ' +
+          'the same councillor cannot veto the proposal again.',
+      },
+      {
         name: 'createTreasuryApprovalMotion',
         label: 'Approve treasury proposal',
-        description: 'Approves a treasury proposal. This queues it up to be awarded in the next spend cycle as '
-          + 'soon as there are enough treasury funds. Requires approval from 4 councillors.',
-      }, {
+        description:
+          'Approves a treasury proposal. This queues it up to be awarded in the next spend cycle as ' +
+          'soon as there are enough treasury funds. Requires approval from 4 councillors.',
+      },
+      {
         name: 'createTreasuryRejectionMotion',
         label: 'Reject treasury proposal',
-        description: 'Rejects a treasury proposal, and burns any deposit. Requires approval from 2 councillors.',
+        description:
+          'Rejects a treasury proposal, and burns any deposit. Requires approval from 2 councillors.',
       },
     ];
   }
@@ -317,10 +368,11 @@ export class SubstrateCollectiveProposal
     // TODO: check council status
     return this._Chain.createTXModalData(
       vote.account as SubstrateAccount,
-      (api: ApiPromise) => api.tx.council.vote(this.data.hash, this.data.index, vote.choice),
+      (api: ApiPromise) =>
+        api.tx.council.vote(this.data.hash, this.data.index, vote.choice),
       'voteCouncilMotions',
       this.title,
-      cb,
+      cb
     );
   }
 }
