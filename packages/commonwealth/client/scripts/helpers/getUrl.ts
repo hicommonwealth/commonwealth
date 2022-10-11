@@ -30,11 +30,11 @@ export async function getFetch(url: string, queryParams?: { [key: string]: any }
     const response = await fetch(queryUrl || url, {
       method: 'GET',
       // mode: 'no-cors',
-      credentials: 'same-origin',
+      // credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
       },
-      referrerPolicy: 'strict-origin-when-cross-origin',
+      // referrerPolicy: 'strict-origin-when-cross-origin',
     });
     if (response.ok) {
       const {result} = await response.json();
