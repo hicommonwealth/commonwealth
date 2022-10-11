@@ -68,7 +68,7 @@ export class ProposalHeaderStage
 export class ProposalBodyAuthor
   implements
     m.Component<{
-      item: AnyProposal | Thread | Comment<any>;
+      item: AnyProposal | Thread;
     }>
 {
   view(vnode) {
@@ -76,28 +76,12 @@ export class ProposalBodyAuthor
 
     if (!item.author) return;
 
-    // Check for accounts on forums that originally signed up on a different base chain,
-    // Render them as anonymous as the forum is unable to support them.
-    if (
-      (item instanceof Comment || item instanceof Comment) &&
-      app.chain.meta.type === ChainType.Offchain
-    ) {
-      if (
-        item.authorChain !== app.chain.id &&
-        item.authorChain !== app.chain.base
-      ) {
-        return m(AnonymousUser, {
-          distinguishingKey: item.author,
-        });
-      }
-    }
-
     const author: Account =
-      item instanceof Thread || item instanceof Comment
+      item instanceof Thread
         ? app.chain.accounts.get(item.author)
         : item.author;
 
-    return (item as Comment<any>).deleted ? (
+    return item.deleted ? (
       <span>[deleted]</span>
     ) : (
       <>
@@ -126,6 +110,45 @@ export class ProposalBodyAuthor
           </>
         )}
       </>
+    );
+  }
+}
+
+export class ProposalCommentAuthor
+  implements
+    m.Component<{
+      item: Comment<any>;
+    }>
+{
+  view(vnode) {
+    const { item } = vnode.attrs;
+
+    if (!item.author) return;
+
+    // Check for accounts on forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+    if (app.chain.meta.type === ChainType.Offchain) {
+      if (
+        item.authorChain !== app.chain.id &&
+        item.authorChain !== app.chain.base
+      ) {
+        return m(AnonymousUser, {
+          distinguishingKey: item.author,
+        });
+      }
+    }
+
+    const author: Account = app.chain.accounts.get(item.author);
+
+    return item.deleted ? (
+      <span>[deleted]</span>
+    ) : (
+      m(User, {
+        avatarSize: 24,
+        user: author,
+        popover: true,
+        linkify: true,
+      })
     );
   }
 }

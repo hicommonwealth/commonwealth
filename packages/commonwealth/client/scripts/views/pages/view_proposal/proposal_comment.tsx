@@ -9,7 +9,7 @@ import app from 'state';
 import { Comment } from 'models';
 import { ContentType } from 'types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalBodyAuthor } from './proposal_components';
+import { ProposalCommentAuthor } from './proposal_components';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -70,40 +70,33 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
-      <div class={`ProposalComment comment-${comment.id}`}>
-        {threadLevel > 0 && (
-          <div class="thread-connectors-container">
-            {Array(threadLevel)
-              .fill(undefined)
-              .map(() => (
-                <div class="thread-connector" />
-              ))}
-          </div>
-        )}
-        <div class="comment-body">
-          <div class="comment-header">
-            <ProposalBodyAuthor item={comment} />
-            <CWText type="caption" className="published-text">
-              published on
-            </CWText>
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className="published-text"
-            >
-              {moment(comment.createdAt).format('l')}
-            </CWText>
-          </div>
-          {this.isEditingComment ? (
-            <EditComment
-              comment={comment}
-              savedEdits={this.savedEdits}
-              setIsEditing={setIsEditingComment}
-              shouldRestoreEdits={this.shouldRestoreEdits}
-              updatedCommentsCallback={updatedCommentsCallback}
-            />
-          ) : (
-            <>
+      <div
+        class={`ProposalComment comment-${comment.id} thread-level-${threadLevel}`}
+      >
+        <div class="comment-header">
+          <ProposalCommentAuthor item={comment} />
+          <CWText type="caption" className="published-text">
+            published on
+          </CWText>
+          <CWText type="caption" fontWeight="medium" className="published-text">
+            {moment(comment.createdAt).format('l')}
+          </CWText>
+        </div>
+        {this.isEditingComment ? (
+          <EditComment
+            comment={comment}
+            savedEdits={this.savedEdits}
+            setIsEditing={setIsEditingComment}
+            shouldRestoreEdits={this.shouldRestoreEdits}
+            updatedCommentsCallback={updatedCommentsCallback}
+          />
+        ) : (
+          <div class="comment-body">
+            {threadLevel > 0 &&
+              Array(threadLevel)
+                .fill(undefined)
+                .map(() => <div class="thread-connector" />)}
+            <div class="text-and-footer">
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
@@ -176,9 +169,9 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                   </div>
                 </div>
               )}
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
