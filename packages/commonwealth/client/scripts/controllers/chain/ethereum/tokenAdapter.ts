@@ -1,4 +1,4 @@
-import Ethereum from 'controllers/chain/ethereum/main';
+import Ethereum from 'controllers/chain/ethereum/adapter';
 
 import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import $ from 'jquery';

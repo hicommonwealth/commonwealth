@@ -8,7 +8,7 @@ import app, { ApiStatus } from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase } from 'common-common/src/types';
 import { pluralize } from 'helpers';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';

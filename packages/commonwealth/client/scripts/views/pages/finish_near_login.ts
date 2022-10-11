@@ -15,7 +15,7 @@ import {
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
 import { Account, AddressInfo } from 'models';
-import Near from 'controllers/chain/near/main';
+import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
