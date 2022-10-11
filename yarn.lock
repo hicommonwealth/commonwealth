@@ -4262,6 +4262,13 @@
   dependencies:
     moment "*"
 
+"@types/morgan@^1.9.3":
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.9.3.tgz#ae04180dff02c437312bc0cfb1e2960086b2f540"
+  integrity sha512-BiLcfVqGBZCyNCnCH3F4o2GmDLrpy0HeBVnNlyZG4fo88ZiE9SoiBe3C+2ezuwbjlEyT+PDZ17//TAlRxAn75Q==
+  dependencies:
+    "@types/node" "*"
+
 "@types/ms@*":
   version "0.7.31"
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.31.tgz#31b7ca6407128a3d2bbc27fe2d21b345397f6197"
@@ -5981,7 +5988,7 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-basic-auth@~2.0.0:
+basic-auth@~2.0.0, basic-auth@~2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/basic-auth/-/basic-auth-2.0.1.tgz"
   integrity sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==
@@ -14699,6 +14706,17 @@ moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
+
+morgan@^1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.10.0.tgz#091778abc1fc47cd3509824653dae1faab6b17d7"
+  integrity sha512-AbegBVI4sh6El+1gNwvD5YIck7nSA36weD7xvIxG4in80j/UoK8AEGaWnnz8v1GxonMCltmlNs5ZKbGvl9b1XQ==
+  dependencies:
+    basic-auth "~2.0.1"
+    debug "2.6.9"
+    depd "~2.0.0"
+    on-finished "~2.3.0"
+    on-headers "~1.0.2"
 
 morgan@^1.9.1:
   version "1.9.1"

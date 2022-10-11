@@ -6,6 +6,7 @@ import setupPassport from "./passport";
 import setupRouter from "./router";
 import models from "../database/database";
 import {DEFAULT_PORT, SERVER_URL} from "../config";
+import logger from 'morgan';
 import cors from 'cors'
 
 
@@ -28,10 +29,11 @@ const allowCrossDomain = function(req, res, next) {
  * Entry point for the ChainEvents App
  */
 async function main() {
+  app.use(logger('dev'));
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
-  app.use(allowCrossDomain);
+  // app.use(allowCrossDomain);
 
   // app.use(cors({
   //   origin: "*",
@@ -39,9 +41,10 @@ async function main() {
   //   preflightContinue: true,
   //   optionsSuccessStatus: 200
   // }));
+  app.use(cors());
 
   // cors pre-flight request
-  // app.options('*', cors());
+  app.options('*', cors());
 
   const router = setupRouter(models);
   app.use('/', router);
