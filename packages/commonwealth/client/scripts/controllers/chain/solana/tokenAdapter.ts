@@ -3,8 +3,7 @@ import $ from 'jquery';
 import BN from 'bn.js';
 import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
 import { IApp } from 'state';
-
-import Solana from './main';
+import Solana from './adapter';
 
 export default class Token extends Solana implements ITokenAdapter {
   public readonly contractAddress: string;

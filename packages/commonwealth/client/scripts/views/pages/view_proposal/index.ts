@@ -18,7 +18,7 @@ import {
   proposalSlugToClass,
 } from 'identifiers';
 import { slugify } from 'utils';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { notifyError } from 'controllers/app/notifications';
 import { CommentParent } from 'controllers/server/comments';
 import {
