@@ -1,0 +1,18 @@
+@import 'shared';
+
+.AttributeDisplay {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+  min-width: 496px;
+  margin: 16px;
+
+  .attribute-label {
+    color: $neutral-500;
+  }
+  .display-input {
+    min-width: fit-content;
+  }
+}

@@ -1,0 +1,29 @@
+@import 'shared';
+
+.RuleTable {
+  .title {
+    color: $neutral-500;
+    margin: 4px;
+    display: relative;
+  }
+
+  .table-section {
+    border: 1px $neutral-200 solid;
+    border-radius: $border-radius-corners;
+    overflow-y: auto;
+    max-height: 288px;
+
+    .table-row {
+      align-items: center;
+      height: 48px;
+      text-align: center;
+      display: flex;
+      padding: 16px;
+      min-width: 496px;
+
+      &:nth-child(odd) {
+        background-color: $neutral-50;
+      }
+    }
+  }
+}

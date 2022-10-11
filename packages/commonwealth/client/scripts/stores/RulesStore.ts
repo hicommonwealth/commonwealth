@@ -1,4 +1,3 @@
-import { RuleType } from 'server/util/rules/ruleTypes';
 import Rule from '../models/Rule';
 import IdStore from './IdStore';
 
