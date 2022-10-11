@@ -8,7 +8,6 @@ import CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
-import ChainEntityController from '../../server/chain_entities';
 
 class Cosmos
   extends IChainAdapter<CosmosToken, CosmosAccount>
@@ -17,7 +16,6 @@ class Cosmos
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
-  public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.CosmosSDK;
 

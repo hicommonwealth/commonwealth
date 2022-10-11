@@ -50,7 +50,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     let response;
-    console.log(this.chainEntities);
     if (this.chainEntities) {
       // if we're loading entities from chain, only pull completed
       const refresh = this.usingServerChainEntities

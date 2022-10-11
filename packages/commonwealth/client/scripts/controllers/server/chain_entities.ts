@@ -94,10 +94,8 @@ class ChainEntityController {
     if (refreshOption === EntityRefreshOption.CompletedEntities) {
       options.completed = true;
     }
-    console.log({ chain });
     // TODO: Change to GET /entities
     return get('/bulkEntities', options, (result) => {
-      console.log({ result });
       for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);

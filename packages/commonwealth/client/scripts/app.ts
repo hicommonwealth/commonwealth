@@ -356,6 +356,7 @@ export async function selectChain(
   } else {
     throw new Error('Invalid chain');
   }
+
   // Load server data without initializing modules/chain connection.
   const finalizeInitialization = await newChain.initServer();
 
