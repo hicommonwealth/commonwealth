@@ -18,13 +18,6 @@ const app = express();
 
 setupPassport();
 
-const allowCrossDomain = function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-}
-
 /**
  * Entry point for the ChainEvents App
  */
@@ -33,14 +26,7 @@ async function main() {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json({ limit: '1mb' }));
   app.use(passport.initialize());
-  // app.use(allowCrossDomain);
 
-  // app.use(cors({
-  //   origin: "*",
-  //   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  //   preflightContinue: true,
-  //   optionsSuccessStatus: 200
-  // }));
   app.use(cors());
 
   // cors pre-flight request
