@@ -61,6 +61,7 @@ export async function createRole(
   address_id: number,
   chain_id: string,
   role_name: Permission,
+  is_user_default?: boolean,
   transaction?: Transaction
 ): Promise<RoleInstanceWithPermission> {
   // Get the community role that has given chain_id and name
@@ -75,6 +76,7 @@ export async function createRole(
     {
       community_role_id: community_role.id,
       address_id,
+      is_user_default,
     },
     { transaction }
   );
@@ -154,51 +156,32 @@ export async function findOneRole(
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
-  let roleFindOptions: any;
-  if (permissions === undefined) {
-    roleFindOptions = {
-      where: {
-        chain_id,
-      },
-      include: {
-        model: models.RoleAssignment,
-        findOptions,
-      },
-      order: sequelize.fn(
-        'field',
-        sequelize.col('name'),
-        'admin',
-        'moderator',
-        'member'
-      ),
-    };
-  } else {
-    roleFindOptions = {
-      where: {
-        [Op.and]: [
-          { chain_id },
-          {
-            permissions: {
-              [Op.or]: permissions.map((x) => ({
-                name: x,
-              })),
-            },
+  const roleFindOptions = {
+    where: {
+      [Op.and]: [
+        { chain_id },
+        {
+          permissions: {
+            [Op.or]: permissions.map((x) => ({
+              name: x,
+            })),
           },
-        ],
-      },
-      include: {
-        model: models.RoleAssignment,
-        findOptions,
-      },
-      order: sequelize.fn(
-        'field',
-        sequelize.col('name'),
-        'admin',
-        'moderator',
-        'member'
-      ),
-    };
-  }
+        },
+      ],
+    },
+    include: {
+      model: models.RoleAssignment,
+      findOptions,
+    },
+    order: sequelize.fn(
+      'field',
+      sequelize.col('name'),
+      'admin',
+      'moderator',
+      'member'
+    ),
+  };
+
   const communityRole = await models.CommunityRole.findOne(roleFindOptions);
   // Retrieve the first role as it will be the highest permission role for the address_id
   const roleAssignment = await communityRole.getRoleAssignments()[0];

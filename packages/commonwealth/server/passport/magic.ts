@@ -291,7 +291,7 @@ export function useMagicAuth(models: DB) {
               );
 
               // Creating Role Assignment
-              await createRole(models, newAddress.id, 'ethereum', 'member', t);
+              await createRole(models, newAddress.id, 'ethereum', 'member', false, t);
             } else {
               newAddress = await models.Address.create(
                 {
@@ -326,7 +326,7 @@ export function useMagicAuth(models: DB) {
               );
 
               // Creating Role Assignment
-              await createRole(models, newAddress.id, 'edgeware', 'member', t);
+              await createRole(models, newAddress.id, 'edgeware', 'member', false, t);
             }
 
             if (req.body.chain) {
@@ -336,6 +336,7 @@ export function useMagicAuth(models: DB) {
                 newAddress.id,
                 req.body.chain,
                 'member',
+                false,
                 t
               );
             }

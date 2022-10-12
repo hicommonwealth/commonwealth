@@ -384,7 +384,7 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    await createRole(models, addressToBeAdmin.id, chain.id, 'admin');
+    await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
 
     const [ subscription ] = await models.Subscription.findOrCreate({
       where: {
