@@ -19,7 +19,6 @@ import {
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -294,7 +293,7 @@ export async function unlinkLogin(account: AddressInfo) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, {
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: [
       new PolkadotExtension({
         // we don't need a real node URL because we're only generating an address,
