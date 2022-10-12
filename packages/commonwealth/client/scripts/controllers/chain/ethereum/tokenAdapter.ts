@@ -1,9 +1,10 @@
 import Ethereum from 'controllers/chain/ethereum/adapter';
 
-import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
-import $ from 'jquery';
-import { IApp } from 'state';
 import BN from 'bn.js';
+import { ContractType } from 'common-common/src/types';
+import $ from 'jquery';
+import { ChainInfo, ITokenAdapter } from 'models';
+import { IApp } from 'state';
 
 export default class Token extends Ethereum implements ITokenAdapter {
   // required implementations for ITokenAdapter
@@ -36,7 +37,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     // iterate through selectedChain.Contracts for the erc20 type and return the address
-    const tokenContracts = app.contracts.getByType('erc20');
+    const tokenContracts = app.contracts.getByType(ContractType.ERC20);
     if (!tokenContracts || !tokenContracts.length) {
       throw new Error('No ERC20 contracts found');
     }
