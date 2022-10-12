@@ -83,9 +83,10 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
         <div class="comment-body">
           <div class="comment-header">
             <ProposalCommentAuthor item={comment} />
-            <CWText type="caption" className="published-text">
+            {/* don't need this distinction yet since we aren't showing "edited at" */}
+            {/* <CWText type="caption" className="published-text">
               published on
-            </CWText>
+            </CWText> */}
             <CWText
               type="caption"
               fontWeight="medium"
