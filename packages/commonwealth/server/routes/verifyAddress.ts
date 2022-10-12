@@ -36,7 +36,7 @@ import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { DB } from '../database';
+import { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
