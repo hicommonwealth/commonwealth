@@ -8,7 +8,7 @@ import {
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
 import IdentityFetchCache from '../util/identityFetchCache';
-import { DB } from '../database';
+import { DB } from '../models';
 import validateChain from '../util/validateChain';
 import { AppError, ServerError } from '../util/errors';
 

@@ -20,7 +20,7 @@ import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
-import { DB } from '../database';
+import { DB } from '../models';
 import { RedisCache, redisRetryStrategy } from '../util/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));

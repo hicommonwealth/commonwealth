@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 import { getStatsDInstance } from '../util/metrics';
