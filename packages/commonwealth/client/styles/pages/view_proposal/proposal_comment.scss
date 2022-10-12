@@ -5,12 +5,15 @@
 
   .thread-connectors-container {
     display: flex;
-    gap: 8px;
-    margin-right: 8px;
+    gap: 24px;
+    margin-right: 24px;
 
     .thread-connector {
       background-color: $neutral-200;
       height: 100%;
+      left: 36px;
+      position: relative;
+      top: 8px;
       width: 1px;
     }
   }
