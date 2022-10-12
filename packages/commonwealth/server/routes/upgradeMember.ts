@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
 import { findAllRoles, findOneRole } from '../util/roles';
@@ -77,7 +77,7 @@ const upgradeMember = async (
   const allCommunityAdmin = await findAllRoles(models, {}, chain.id, [
     'admin',
   ]);
-  const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
+  const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.toJSON().address_id);
   const isLastAdmin = allCommunityAdmin.length < 2;
   const adminSelfDemoting =
     requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
@@ -86,6 +86,58 @@ const upgradeMember = async (
   }
 
   if (ValidRoles.includes(new_role)) {
+    // “Demotion” should remove all RoleAssignments above the new role.
+    // “Promotion” should create new RoleAssignment above the existing role.
+    const currentRole = member.permission;
+    if (currentRole === "member") {
+      if (new_role === "member") {
+        return next(new AppError(Errors.InvalidRole));
+      } else {
+        // Promotion
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: new_role,
+          },
+        });
+        const newRoleAssignment = await models.RoleAssignment.create({
+          address_id: memberAddress.id,
+          community_role_id: communityRole.id,
+        });
+        return res.json({ status: 'Success', result: newRoleAssignment.toJSON() });
+      }
+    }
+    else if (currentRole === "moderator") {
+      if (new_role === "member") {
+        // Demotion
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: currentRole,
+          },
+        });
+        await models.RoleAssignment.destroy({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: communityRole.id,
+          },
+        });
+        return res.json({ status: 'Success', result: {} });
+      } else if (new_role === "moderator") {
+        return next(new AppError(Errors.InvalidRole));
+      } else {
+        // Promotion
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: new_role,
+          },
+        });
+        const newRoleAssignment = await models.RoleAssignment.create({
+          address_id: memberAddress.id,
+          community_role_id: communityRole.id,
+        });
+      }
     member.permission = new_role;
   } else {
     return next(new AppError(Errors.InvalidRole));
