@@ -2,12 +2,12 @@
 
 import app from 'state';
 import m from 'mithril';
-import { MenuItemAttrs } from '../../menus/types';
+import { MenuItem } from '../../menus/types';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
-export class CWMobileMenuItem implements m.ClassComponent<MenuItemAttrs> {
+export class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
   view(vnode: m.VnodeDOM<any, this>) {
     const {
       type,

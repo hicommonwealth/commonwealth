@@ -2,12 +2,13 @@
 
 .MobileMenu {
   display: none;
+
   @include extraSmall {
     display: flex;
     flex-direction: column;
-    width: 100%;
     height: calc(100vh - #{$global-header-height});
     overflow-y: auto;
+    width: 100%;
   }
 
   .mobile-menu-header {
@@ -15,6 +16,7 @@
     cursor: pointer;
     display: flex;
     padding: 12px 16px;
+
     .Icon {
       margin-right: 12px;
     }
@@ -44,16 +46,16 @@
     }
 
     .unread-notifications-pip {
-      cursor: pointer;
-      border-radius: 100%;
-      position: relative;
       background: #ec79de;
+      border-radius: 100%;
       bottom: 10px;
-      height: 10px;
-      width: 10px;
       content: '';
+      cursor: pointer;
+      height: 10px;
+      position: relative;
       right: 10px;
       top: -4px;
+      width: 10px;
     }
   }
 }

@@ -10,12 +10,12 @@ import NotificationRow from '../components/notification_row';
 const MAX_NOTIFS = 40;
 
 export class NotificationsMenu implements m.ClassComponent {
-  private selectedChainEvents: boolean;
   private init = false;
-  private showingDiscussionNotifications;
-  private showingChainEventNotifications;
-  private minDiscussionNotification = 0;
   private minChainEventsNotification = 0;
+  private minDiscussionNotification = 0;
+  private selectedChainEvents: boolean;
+  private showingChainEventNotifications;
+  private showingDiscussionNotifications;
 
   private _incrementAndRedraw(type: 'chain-event' | 'discussion') {
     if (type === 'chain-event') {

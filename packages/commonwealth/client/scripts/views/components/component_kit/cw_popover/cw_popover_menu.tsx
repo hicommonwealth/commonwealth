@@ -4,14 +4,14 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
-import { MenuItemAttrs } from 'views/menus/types';
+import { MenuItem } from 'views/menus/types';
 import { CWPopover, SharedPopoverAttrs } from './cw_popover';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
 import { CWPopoverMenuItem } from '../cw_popover_menu_item';
 
 type PopoverMenuAttrs = {
-  menuItems: Array<MenuItemAttrs>;
+  menuItems: Array<MenuItem>;
 } & SharedPopoverAttrs;
 
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {

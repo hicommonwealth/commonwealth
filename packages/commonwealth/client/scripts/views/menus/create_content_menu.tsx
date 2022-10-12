@@ -1,16 +1,17 @@
 /* @jsx m */
 
-import 'components/create_content_popover.scss';
-
 import m from 'mithril';
+
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { MenuItemAttrs } from './types';
+import { MenuItem } from './types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 
-export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
+const getCreateContentMenuItems = (): MenuItem[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -145,17 +146,38 @@ export class CreateContentMenu implements m.ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        className="MainMenu"
         menuHeader={{
           label: 'Create',
-          onclick: (e) => {
+          onclick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={getCreateContentMenuItemAttrs().map((attr) => ({
+        menuItems={getCreateContentMenuItems().map((attr) => ({
           ...attr,
           iconName: 'write',
         }))}
+      />
+    );
+  }
+}
+
+export class CreateContentPopover implements m.ClassComponent {
+  view() {
+    if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
+
+    return (
+      <CWPopoverMenu
+        trigger={
+          <CWIconButton
+            iconButtonTheme="black"
+            disabled={!app.user.activeAccount}
+            iconName="plusCircle"
+          />
+        }
+        menuAttrs={{
+          align: 'left',
+        }}
+        menuItems={getCreateContentMenuItems()}
       />
     );
   }

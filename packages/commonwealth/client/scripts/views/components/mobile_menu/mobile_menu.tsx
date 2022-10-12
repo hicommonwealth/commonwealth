@@ -7,10 +7,13 @@ import app from 'state';
 import { mobileMenuLookup } from './mobile_menu_lookup';
 
 export class MobileMenu implements m.ClassComponent {
-  view(vnode: m.VnodeDOM<{}, this>) {
+  view() {
     if (!app.mobileMenu) return;
+
     const ActiveMenu = mobileMenuLookup[app.mobileMenu];
+
     if (!ActiveMenu) return;
+
     return <ActiveMenu class="MobileMenu" />;
   }
 }

@@ -23,7 +23,7 @@ export type NotificationMenuItem = {
   type: 'notification';
 };
 
-export type MenuItemAttrs =
+export type MenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem
