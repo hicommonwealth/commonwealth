@@ -33,9 +33,7 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
             {iconLeft && <CWIcon iconName={iconLeft} />}
             <CWText type="b2">{label}</CWText>
           </div>
-          <div class="mobile-menu-item-right">
-            {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
-          </div>
+          {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
         </div>
       );
     } else if (vnode.attrs.type === 'notification') {
