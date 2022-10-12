@@ -2,18 +2,17 @@
 
 .ProposalComment {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 600px;
-  padding: 12px 0 8px;
-  width: 100%;
 
-  &.thread-level-1 {
-    margin-left: 32px;
-  }
+  .thread-connectors-container {
+    display: flex;
+    gap: 8px;
+    margin-right: 8px;
 
-  &.thread-level-2 {
-    margin-left: 64px;
+    .thread-connector {
+      background-color: $neutral-200;
+      height: 100%;
+      width: 1px;
+    }
   }
 
   &.highlighted {
@@ -26,87 +25,82 @@
     }
   }
 
-  .comment-header {
-    align-items: center;
-    display: flex;
-    gap: 8px;
-    height: 24px;
-
-    .username {
-      font-weight: 500;
-
-      @include caption;
-    }
-
-    .published-text.Text {
-      color: $neutral-500;
-    }
-  }
-
   .comment-body {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0 8px;
+    max-width: 600px;
+    width: 100%;
 
-    .thread-connector {
-      background-color: $neutral-200;
-      height: 100%;
-      margin: 0 12px;
-      width: 1px;
+    .comment-text,
+    .comment-footer {
+      padding-left: 30px;
     }
 
-    .text-and-footer {
+    .comment-header {
+      align-items: center;
       display: flex;
-      flex-direction: column;
       gap: 8px;
-      width: 100%;
 
-      .comment-footer {
+      .username {
+        font-weight: 500;
+
+        @include caption;
+      }
+
+      .published-text.Text {
+        color: $neutral-500;
+      }
+    }
+
+    .comment-footer {
+      display: flex;
+      justify-content: space-between;
+
+      .menu-buttons-left {
+        align-items: center;
         display: flex;
-        justify-content: space-between;
+        gap: 16px;
 
-        .menu-buttons-left {
+        .reply-button {
           align-items: center;
+          cursor: pointer;
           display: flex;
-          gap: 16px;
+          gap: 4px;
 
-          .reply-button {
-            align-items: center;
-            cursor: pointer;
-            display: flex;
-            gap: 4px;
+          .Icon,
+          .menu-buttons-text.Text {
+            color: $neutral-500;
+          }
 
+          &:hover {
             .Icon,
             .menu-buttons-text.Text {
-              color: $neutral-500;
+              color: $neutral-600;
             }
+          }
 
-            &:hover {
-              .Icon,
-              .menu-buttons-text.Text {
-                color: $neutral-600;
-              }
+          &:active {
+            .Icon,
+            .menu-buttons-text.Text {
+              color: $neutral-800;
             }
+          }
 
-            &:active {
-              .Icon,
-              .menu-buttons-text.Text {
-                color: $neutral-800;
-              }
-            }
-
-            &.selected {
-              .Icon,
-              .menu-buttons-text.Text {
-                color: $neutral-800;
-              }
+          &.selected {
+            .Icon,
+            .menu-buttons-text.Text {
+              color: $neutral-800;
             }
           }
         }
+      }
 
-        .menu-buttons-right {
-          align-items: center;
-          display: flex;
-          gap: 16px;
-        }
+      .menu-buttons-right {
+        align-items: center;
+        display: flex;
+        gap: 16px;
       }
     }
   }

@@ -70,33 +70,40 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
-      <div
-        class={`ProposalComment comment-${comment.id} thread-level-${threadLevel}`}
-      >
-        <div class="comment-header">
-          <ProposalCommentAuthor item={comment} />
-          <CWText type="caption" className="published-text">
-            published on
-          </CWText>
-          <CWText type="caption" fontWeight="medium" className="published-text">
-            {moment(comment.createdAt).format('l')}
-          </CWText>
-        </div>
-        {this.isEditingComment ? (
-          <EditComment
-            comment={comment}
-            savedEdits={this.savedEdits}
-            setIsEditing={setIsEditingComment}
-            shouldRestoreEdits={this.shouldRestoreEdits}
-            updatedCommentsCallback={updatedCommentsCallback}
-          />
-        ) : (
-          <div class="comment-body">
-            {threadLevel > 0 &&
-              Array(threadLevel)
-                .fill(undefined)
-                .map(() => <div class="thread-connector" />)}
-            <div class="text-and-footer">
+      <div class={`ProposalComment comment-${comment.id}`}>
+        {threadLevel > 0 && (
+          <div class="thread-connectors-container">
+            {Array(threadLevel)
+              .fill(undefined)
+              .map(() => (
+                <div class="thread-connector" />
+              ))}
+          </div>
+        )}
+        <div class="comment-body">
+          <div class="comment-header">
+            <ProposalCommentAuthor item={comment} />
+            <CWText type="caption" className="published-text">
+              published on
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="published-text"
+            >
+              {moment(comment.createdAt).format('l')}
+            </CWText>
+          </div>
+          {this.isEditingComment ? (
+            <EditComment
+              comment={comment}
+              savedEdits={this.savedEdits}
+              setIsEditing={setIsEditingComment}
+              shouldRestoreEdits={this.shouldRestoreEdits}
+              updatedCommentsCallback={updatedCommentsCallback}
+            />
+          ) : (
+            <>
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
@@ -169,9 +176,9 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
     );
   }
