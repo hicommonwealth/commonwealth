@@ -90,13 +90,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       chatChannels,
       rules, // TODO: store in rules controller
       communityBanner,
+      contracts
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    console.log('initializing banner', this.meta.communityBanner);
+    this.app.contracts.initialize(contracts, true);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));

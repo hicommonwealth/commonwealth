@@ -15,7 +15,7 @@ import moment from 'moment';
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import {
   notifyError,
@@ -67,13 +67,6 @@ export async function initAppState(
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
-            chain.Contracts.map((contract) => {
-              return app.contracts.addToStore(
-                Contract.fromJSON({
-                  ...contract
-                })
-              );
-            });
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
