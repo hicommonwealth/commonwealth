@@ -2,13 +2,66 @@
 
 import m from 'mithril';
 
-import { CWMobileMenuItem } from './cw_mobile_menu_item';
+import app from 'state';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
-import { MobileMenuName } from '../mobile_menu/mobile_menu_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
+import { MobileMenuName } from '../../app_mobile_menus';
+import { MenuItem } from '../../menus/types';
 
-export type MobileMenuAttrs = {
+class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
+  view(vnode: m.VnodeDOM<any, this>) {
+    const {
+      type,
+      label,
+      iconName,
+      onclick,
+      disabled,
+      isSecondary,
+      mobileCaret,
+      unreadNotifications,
+    } = vnode.attrs;
+
+    if (type === 'header') {
+      return (
+        <CWText className="menu-section-header-text" type="caption">
+          {label}
+        </CWText>
+      );
+    } else if (type === 'divider') {
+      return <div class="menu-section-divider" />;
+    } else {
+      return (
+        <div
+          class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
+            { disabled, isSecondary },
+            'MobileMenuItem'
+          )}
+          onclick={() => {
+            // Graham TODO 22.10.06: Temporary solution as we transition Notifications
+            app.mobileMenu = null;
+            onclick();
+          }}
+        >
+          <div class="mobile-menu-item-left">
+            {iconName && (
+              <CWIcon className="menu-item-icon" iconName={iconName} />
+            )}
+            {unreadNotifications && <div class="unread-notifications-pip" />}
+            <CWText type="b2" className="menu-item-text">
+              {label}
+            </CWText>
+          </div>
+          <div class="mobile-menu-item-right">
+            {mobileCaret && <CWIcon iconName="chevronRight" iconSize="small" />}
+          </div>
+        </div>
+      );
+    }
+  }
+}
+
+type MobileMenuAttrs = {
   className: MobileMenuName;
   menuHeader?: { label; onclick: (e) => void };
   menuItems: CWMobileMenuItem[];
