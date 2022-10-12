@@ -49,6 +49,8 @@ export function useMagicAuth(models: DB) {
           model: models.Address,
           where: { wallet_id: WalletId.Magic },
           required: false,
+        }, {
+          model: models.Profile
         }]
       });
 
