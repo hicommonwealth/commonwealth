@@ -3,9 +3,9 @@
 import m from 'mithril';
 
 import app from 'state';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { IconName } from '../components/component_kit/cw_icons/cw_icon_lookup';
-import { MenuItem } from './types';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { MenuItem } from '../components/component_kit/types';
 
 export const getMainMenuItems = (): Array<MenuItem> => {
   return [
@@ -23,8 +23,8 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       ? [
           {
             label: 'Create',
-            iconName: 'plusCircle' as IconName,
-            mobileCaret: true,
+            iconLeft: 'plusCircle' as IconName,
+            iconRight: 'chevronRight' as IconName,
             onclick: () => {
               app.mobileMenu = 'CreateContentMenu';
             },
@@ -33,8 +33,8 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       : []),
     {
       label: 'Help',
-      iconName: 'help',
-      mobileCaret: true,
+      iconLeft: 'help' as IconName,
+      iconRight: 'chevronRight' as IconName,
       onclick: () => {
         app.mobileMenu = 'HelpMenu';
       },
@@ -43,10 +43,10 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       ? [
           {
             label: 'Notifications',
-            mobileCaret: true,
-            iconName: 'bell' as const,
+            iconLeft: 'bell' as IconName,
+            iconRight: 'chevronRight' as IconName,
             type: 'notification' as const,
-            unreadNotifications: !!app.user?.notifications.numUnread,
+            hasUnreads: !!app.user?.notifications.numUnread,
             onclick: () => {
               app.mobileMenu = 'NotificationsMenu';
             },

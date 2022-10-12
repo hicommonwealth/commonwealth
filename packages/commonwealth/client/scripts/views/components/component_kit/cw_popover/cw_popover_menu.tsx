@@ -4,27 +4,24 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
-import { MenuItem } from 'views/menus/types';
 import { CWPopover, SharedPopoverAttrs } from './cw_popover';
-import { ComponentType } from '../types';
+import { ComponentType, MenuItem } from '../types';
 import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
 class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
-  view(vnode: m.VnodeDOM<any, this>) {
-    const { type, label, iconName, onclick, disabled, isSecondary } =
-      vnode.attrs;
-
-    if (type === 'header') {
+  view(vnode: m.VnodeDOM<MenuItem, this>) {
+    if (vnode.attrs.type === 'header') {
       return (
         <CWText className="menu-section-header-text" type="caption">
-          {label}
+          {vnode.attrs.label}
         </CWText>
       );
-    } else if (type === 'divider') {
+    } else if (vnode.attrs.type === 'divider') {
       return <div class="menu-section-divider" />;
-    } else {
+    } else if (vnode.attrs.type === 'default') {
+      const { disabled, isSecondary, iconLeft, label } = vnode.attrs;
       return (
         <div
           class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
@@ -33,10 +30,10 @@ class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
           )}
           onclick={onclick}
         >
-          {iconName && (
+          {iconLeft && (
             <CWIcon
               className="menu-item-icon"
-              iconName={iconName}
+              iconName={iconLeft}
               iconSize="small"
             />
           )}
@@ -67,7 +64,7 @@ export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
             )}
           >
             {menuItems.map((item) => (
-              <CWPopoverMenuItem {...item} />
+              <CWPopoverMenuItem type={item.type || 'default'} {...item} />
             ))}
           </div>
         }

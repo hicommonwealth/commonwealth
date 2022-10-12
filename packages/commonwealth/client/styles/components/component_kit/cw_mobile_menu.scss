@@ -13,14 +13,10 @@
     background-color: $primary-50;
   }
 
-  .mobile-menu-item-left,
-  .mobile-menu-item-right {
-    display: flex;
+  .mobile-menu-item-left {
     align-items: center;
-  }
-
-  .Text {
-    margin-left: 4px;
+    display: flex;
+    gap: 4px;
   }
 }
 

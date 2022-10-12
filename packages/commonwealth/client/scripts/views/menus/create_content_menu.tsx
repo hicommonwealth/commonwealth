@@ -6,10 +6,10 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { MenuItem } from './types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { MenuItem } from '../components/component_kit/types';
 
 const getCreateContentMenuItems = (): Array<MenuItem> => {
   const activeAccount = app.user.activeAccount;
@@ -154,7 +154,7 @@ export class CreateContentMenu implements m.ClassComponent {
         }}
         menuItems={getCreateContentMenuItems().map((attr) => ({
           ...attr,
-          iconName: 'write',
+          iconLeft: 'write',
         }))}
       />
     );
@@ -174,10 +174,10 @@ export class CreateContentPopover implements m.ClassComponent {
             iconName="plusCircle"
           />
         }
-        menuAttrs={{
-          align: 'left',
-        }}
-        menuItems={getCreateContentMenuItems()}
+        menuItems={getCreateContentMenuItems().map((attr) => ({
+          ...attr,
+          iconLeft: 'write',
+        }))}
       />
     );
   }

@@ -6,17 +6,14 @@ import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { MenuItem } from '../components/component_kit/types';
 import { FeedbackModal } from '../modals/feedback_modal';
-import { MenuItem } from './types';
 
 const gethelpMenuItems = (): Array<MenuItem> => {
   return [
     {
       label: 'Send Feedback',
       onclick: () => app.modals.create({ modal: FeedbackModal }),
-    },
-    {
-      type: 'divider',
     },
     {
       label: 'Help',
@@ -31,11 +28,10 @@ export class HelpMenu implements m.ClassComponent {
       <CWMobileMenu
         menuHeader={{
           label: 'Help',
-          onclick: (e) => {
+          onclick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        className="HelpMenu"
         menuItems={gethelpMenuItems()}
       />
     );
@@ -47,9 +43,6 @@ export class HelpMenuPopover implements m.ClassComponent {
     return (
       <CWPopoverMenu
         trigger={<CWIconButton iconButtonTheme="black" iconName="help" />}
-        menuAttrs={{
-          align: 'left',
-        }}
         menuItems={gethelpMenuItems()}
       />
     );

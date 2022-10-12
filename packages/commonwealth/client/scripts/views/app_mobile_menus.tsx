@@ -2,8 +2,6 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_mobile_menu.scss';
-
 import app from 'state';
 import { HelpMenu } from './menus/help_menu';
 import { CreateContentMenu } from './menus/create_content_menu';
@@ -23,6 +21,6 @@ export class AppMobileMenus implements m.ClassComponent {
   view() {
     const ActiveMenu = mobileMenuLookup[app.mobileMenu];
 
-    return <ActiveMenu class="MobileMenu" />;
+    return <ActiveMenu />;
   }
 }

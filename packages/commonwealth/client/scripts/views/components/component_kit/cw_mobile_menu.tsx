@@ -2,35 +2,21 @@
 
 import m from 'mithril';
 
+import 'components/component_kit/cw_mobile_menu.scss';
+
 import app from 'state';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
-import { MobileMenuName } from '../../app_mobile_menus';
-import { MenuItem } from '../../menus/types';
+import { CWCustomIcon } from './cw_icons/cw_custom_icon';
+import { ComponentType, MenuItem } from './types';
 
 class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
-  view(vnode: m.VnodeDOM<any, this>) {
-    const {
-      type,
-      label,
-      iconName,
-      onclick,
-      disabled,
-      isSecondary,
-      mobileCaret,
-      unreadNotifications,
-    } = vnode.attrs;
+  view(vnode: m.VnodeDOM<MenuItem, this>) {
+    if (vnode.attrs.type === 'default') {
+      const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
+        vnode.attrs;
 
-    if (type === 'header') {
-      return (
-        <CWText className="menu-section-header-text" type="caption">
-          {label}
-        </CWText>
-      );
-    } else if (type === 'divider') {
-      return <div class="menu-section-divider" />;
-    } else {
       return (
         <div
           class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
@@ -44,17 +30,36 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
           }}
         >
           <div class="mobile-menu-item-left">
-            {iconName && (
-              <CWIcon className="menu-item-icon" iconName={iconName} />
-            )}
-            {unreadNotifications && <div class="unread-notifications-pip" />}
-            <CWText type="b2" className="menu-item-text">
-              {label}
-            </CWText>
+            {iconLeft && <CWIcon iconName={iconLeft} />}
+            <CWText type="b2">{label}</CWText>
           </div>
           <div class="mobile-menu-item-right">
-            {mobileCaret && <CWIcon iconName="chevronRight" iconSize="small" />}
+            {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
           </div>
+        </div>
+      );
+    } else if (vnode.attrs.type === 'notification') {
+      const { hasUnreads, iconLeft, iconRight, label, onclick } = vnode.attrs;
+
+      return (
+        <div
+          class="MobileMenuItem"
+          onclick={() => {
+            // Graham TODO 22.10.06: Temporary solution as we transition Notifications
+            app.mobileMenu = null;
+            onclick();
+          }}
+        >
+          <div class="mobile-menu-item-left">
+            {iconLeft &&
+              (hasUnreads ? (
+                <CWCustomIcon iconName="unreads" />
+              ) : (
+                <CWIcon iconName={iconLeft} />
+              ))}
+            <CWText type="b2">{label}</CWText>
+          </div>
+          {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
         </div>
       );
     }
@@ -62,9 +67,9 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
 }
 
 type MobileMenuAttrs = {
-  className: MobileMenuName;
-  menuHeader?: { label; onclick: (e) => void };
-  menuItems: CWMobileMenuItem[];
+  className?: string;
+  menuHeader?: { label: string; onclick: (e) => void };
+  menuItems: Array<MenuItem>;
 };
 
 export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
@@ -72,7 +77,10 @@ export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
     const { className, menuHeader, menuItems } = vnode.attrs;
     return (
       <div
-        class={getClasses<{ className: string }>({ className }, 'MobileMenu')}
+        class={getClasses<{ className: string }>(
+          { className },
+          ComponentType.MobileMenu
+        )}
       >
         {menuHeader && (
           <div class="mobile-menu-header" onclick={menuHeader.onclick}>
@@ -82,8 +90,8 @@ export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
             </CWText>
           </div>
         )}
-        {menuItems.map((attrs) => (
-          <CWMobileMenuItem {...attrs} />
+        {menuItems.map((item) => (
+          <CWMobileMenuItem type={item.type || 'default'} {...item} />
         ))}
       </div>
     );
