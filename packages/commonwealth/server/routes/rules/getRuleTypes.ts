@@ -1,5 +1,5 @@
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { RuleMetadata } from '../../util/rules/ruleTypes';
 import RuleTypes from '../../ruleTypes';
 

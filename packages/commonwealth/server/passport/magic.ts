@@ -7,7 +7,8 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import '../types';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';

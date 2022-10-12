@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getStatsDInstance } from '../util/metrics';
-import { DB } from '../database';
+import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
