@@ -33,7 +33,7 @@ export default class Token extends Solana implements ITokenAdapter {
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     // iterate through selectedChain.Contracts for the Aave type and return the address
-    const solanaContracts = this.app.contracts.getByType('solana');
+    const solanaContracts = this.app.contracts.getByType('spl');
     if (!solanaContracts || !solanaContracts.length) {
       throw new Error('No Sol contracts found');
     }

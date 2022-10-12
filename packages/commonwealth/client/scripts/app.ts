@@ -70,8 +70,7 @@ export async function initAppState(
             chain.Contracts.map((contract) => {
               return app.contracts.addToStore(
                 Contract.fromJSON({
-                  ...contract,
-                  contract_abi: contract.ContractAbi,
+                  ...contract
                 })
               );
             });

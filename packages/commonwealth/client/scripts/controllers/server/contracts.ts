@@ -1,8 +1,3 @@
-// Create controller for contract model
-//
-// Language: typescript
-// Path: packages/commonwealth/client/scripts/controllers/server/contracts.ts
-
 import $ from 'jquery';
 import _ from 'lodash';
 
