@@ -3,7 +3,6 @@
 import m from 'mithril';
 
 import app from 'state';
-import { IconName } from '../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { MenuItem } from '../components/component_kit/types';
 
@@ -19,40 +18,40 @@ export const getMainMenuItems = (): Array<MenuItem> => {
     //     m.route.set('/search');
     //   },
     // },
-    ...(app.activeChainId()
+    ...((app.activeChainId()
       ? [
           {
             label: 'Create',
-            iconLeft: 'plusCircle' as IconName,
-            iconRight: 'chevronRight' as IconName,
+            iconLeft: 'plusCircle',
+            iconRight: 'chevronRight',
             onclick: () => {
               app.mobileMenu = 'CreateContentMenu';
             },
           },
         ]
-      : []),
+      : []) as Array<MenuItem>),
     {
       label: 'Help',
-      iconLeft: 'help' as IconName,
-      iconRight: 'chevronRight' as IconName,
+      iconLeft: 'help',
+      iconRight: 'chevronRight',
       onclick: () => {
         app.mobileMenu = 'HelpMenu';
       },
     },
-    ...(app.isLoggedIn()
+    ...((app.isLoggedIn()
       ? [
           {
             label: 'Notifications',
-            iconLeft: 'bell' as IconName,
-            iconRight: 'chevronRight' as IconName,
-            type: 'notification' as const,
+            iconLeft: 'bell',
+            iconRight: 'chevronRight',
+            type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
             onclick: () => {
               app.mobileMenu = 'NotificationsMenu';
             },
           },
         ]
-      : []),
+      : []) as Array<MenuItem>),
   ];
 };
 
