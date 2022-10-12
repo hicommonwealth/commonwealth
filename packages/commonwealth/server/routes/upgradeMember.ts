@@ -4,7 +4,11 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import { DB } from '../database';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles, findOneRole } from '../util/roles';
+import {
+  findAllRoles,
+  findOneRole,
+  RoleInstanceWithPermission,
+} from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -74,23 +78,23 @@ const upgradeMember = async (
   );
   if (!member) return next(new AppError(Errors.NoMember));
 
-  const allCommunityAdmin = await findAllRoles(models, {}, chain.id, [
-    'admin',
-  ]);
-  const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.toJSON().address_id);
+  const allCommunityAdmin = await findAllRoles(models, {}, chain.id, ['admin']);
+  const requesterAdminAddressIds = requesterAdminRoles.map(
+    (r) => r.toJSON().address_id
+  );
   const isLastAdmin = allCommunityAdmin.length < 2;
   const adminSelfDemoting =
     requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
   if (isLastAdmin && adminSelfDemoting) {
     return next(new AppError(Errors.MustHaveAdmin));
   }
-
+  let newMember: RoleInstanceWithPermission;
   if (ValidRoles.includes(new_role)) {
     // “Demotion” should remove all RoleAssignments above the new role.
     // “Promotion” should create new RoleAssignment above the existing role.
     const currentRole = member.permission;
-    if (currentRole === "member") {
-      if (new_role === "member") {
+    if (currentRole === 'member') {
+      if (new_role === 'member') {
         return next(new AppError(Errors.InvalidRole));
       } else {
         // Promotion
@@ -104,11 +108,14 @@ const upgradeMember = async (
           address_id: memberAddress.id,
           community_role_id: communityRole.id,
         });
-        return res.json({ status: 'Success', result: newRoleAssignment.toJSON() });
+        newMember = new RoleInstanceWithPermission(
+          newRoleAssignment.toJSON(),
+          chain.id,
+          new_role
+        );
       }
-    }
-    else if (currentRole === "moderator") {
-      if (new_role === "member") {
+    } else if (currentRole === 'moderator') {
+      if (new_role === 'member') {
         // Demotion
         const communityRole = await models.CommunityRole.findOne({
           where: {
@@ -122,8 +129,24 @@ const upgradeMember = async (
             community_role_id: communityRole.id,
           },
         });
-        return res.json({ status: 'Success', result: {} });
-      } else if (new_role === "moderator") {
+        const newCommunityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: 'member',
+          },
+        });
+        const newRoleAssignment = await models.RoleAssignment.findOne({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: newCommunityRole.id,
+          },
+        });
+        newMember = new RoleInstanceWithPermission(
+          newRoleAssignment.toJSON(),
+          chain.id,
+          'member'
+        );
+      } else if (new_role === 'moderator') {
         return next(new AppError(Errors.InvalidRole));
       } else {
         // Promotion
@@ -137,15 +160,18 @@ const upgradeMember = async (
           address_id: memberAddress.id,
           community_role_id: communityRole.id,
         });
+        newMember = new RoleInstanceWithPermission(
+          newRoleAssignment.toJSON(),
+          chain.id,
+          new_role
+        );
       }
-    member.permission = new_role;
+    }
   } else {
     return next(new AppError(Errors.InvalidRole));
   }
 
-  await member.save();
-
-  return res.json({ status: 'Success', result: member.toJSON() });
+  return res.json({ status: 'Success', result: newMember.toJSON() });
 };
 
 export default upgradeMember;
