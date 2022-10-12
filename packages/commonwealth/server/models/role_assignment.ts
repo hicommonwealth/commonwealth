@@ -11,6 +11,7 @@ export type RoleAssignmentAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
+  is_user_default?: boolean;
 
   // associations
   CommunityRole?: CommunityRoleAttributes;
@@ -37,6 +38,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
+      is_user_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     },
     {
       timestamps: true,

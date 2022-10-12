@@ -60,6 +60,11 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: { type: Sequelize.DATE, allowNull: true },
+          is_user_default: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+          },
         },
         { transaction: t }
       );
@@ -120,7 +125,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       // Migrate RoleAssignments for Current Roles
       const role_query = `
-      SELECT r.id as rid, cr.name as crname, r.address_id, r.permission, r.chain_id, cr.id as crid
+      SELECT r.id as rid, cr.name as crname, r.address_id, r.permission, r.chain_id, r.is_user_default, cr.id as crid
       FROM "Roles" r
       LEFT JOIN "CommunityRoles" cr
       ON r.chain_id = cr.chain_id AND CAST(r.permission AS TEXT) = CAST(cr.name AS TEXT)
@@ -142,6 +147,7 @@ module.exports = {
                 address_id: r.address_id,
                 created_at: new Date(),
                 updated_at: new Date(),
+                is_user_default: r.is_user_default,
               },
             ],
             { transaction: t }
