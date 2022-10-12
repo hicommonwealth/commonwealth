@@ -1,11 +1,17 @@
 /* @jsx m */
 
-import app from 'state';
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { navigateToSubpage } from 'app';
 import { Button } from 'construct-ui';
+
+import 'components/header/notifications_menu.scss';
+
+import app from 'state';
+import { navigateToSubpage } from 'app';
 import NotificationRow from '../components/notification_row';
+import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
 
 const MAX_NOTIFS = 40;
 
@@ -129,7 +135,8 @@ export class NotificationsMenu implements m.ClassComponent {
                       // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
                       // sortedFilteredNotifications.length
                       'chain'
-                      // TODO: add the length/num of total chain-events once notifications and notifications read table are split
+                      // TODO: add the length/num of total chain-events once
+                      // notifications and notifications read table are split
                     }
                     item={(data) => {
                       return m(NotificationRow, { notifications: [data] });
@@ -155,7 +162,9 @@ export class NotificationsMenu implements m.ClassComponent {
                     key={
                       // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
                       // sortedFilteredNotifications.length
-                      'discussion' // TODO: add the length/num of total chain-events once notifications and notifications read table are split
+                      'discussion'
+                      // TODO: add the length/num of total chain-events once
+                      // notifications and notifications read table are split
                     }
                     item={(data) => {
                       return m(NotificationRow, { notifications: [data] });
@@ -219,6 +228,25 @@ export class NotificationsMenu implements m.ClassComponent {
           />
         </div>
       </div>
+    );
+  }
+}
+
+export class NotificationsMenuPopover implements m.ClassComponent {
+  view() {
+    return (
+      <CWPopover
+        trigger={
+          app.user.notifications.numUnread > 0 ? (
+            <div class="unreads-icon">
+              <CWCustomIcon iconName="unreads" />
+            </div>
+          ) : (
+            <CWIconButton iconButtonTheme="black" iconName="bell" />
+          )
+        }
+        content={<NotificationsMenu />}
+      />
     );
   }
 }

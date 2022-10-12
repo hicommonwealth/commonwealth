@@ -8,8 +8,6 @@ import { mobileMenuLookup } from './mobile_menu_lookup';
 
 export class MobileMenu implements m.ClassComponent {
   view() {
-    if (!app.mobileMenu) return;
-
     const ActiveMenu = mobileMenuLookup[app.mobileMenu];
 
     if (!ActiveMenu) return;

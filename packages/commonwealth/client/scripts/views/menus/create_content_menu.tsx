@@ -11,7 +11,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 
-const getCreateContentMenuItems = (): MenuItem[] => {
+const getCreateContentMenuItems = (): Array<MenuItem> => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =

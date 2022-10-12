@@ -35,7 +35,7 @@ export class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
             { disabled, isSecondary },
             'MobileMenuItem'
           )}
-          onclick={(e) => {
+          onclick={() => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
             onclick();

@@ -28,12 +28,14 @@ export const handleEmailInvites = (state) => {
   }
 };
 
-export const invitesMenuItems = [
-  {
-    label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
-    onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-  },
-];
+export const getInvitesMenuItems = () => {
+  return [
+    {
+      label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
+      onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+    },
+  ];
+};
 
 export class InvitesMenu implements m.ClassComponent {
   view() {
@@ -45,7 +47,7 @@ export class InvitesMenu implements m.ClassComponent {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={invitesMenuItems}
+        menuItems={getInvitesMenuItems()}
       />
     );
   }
@@ -84,7 +86,7 @@ export class InvitesMenuPopover implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        content={invitesMenuItems}
+        content={getInvitesMenuItems()}
       />
     );
   }

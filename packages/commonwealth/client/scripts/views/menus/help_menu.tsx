@@ -7,20 +7,23 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
+import { MenuItem } from './types';
 
-const helpMenuItems = [
-  {
-    label: 'Send Feedback',
-    onclick: () => app.modals.create({ modal: FeedbackModal }),
-  },
-  {
-    type: 'divider',
-  },
-  {
-    label: 'Help',
-    onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
-  },
-];
+const gethelpMenuItems = (): Array<MenuItem> => {
+  return [
+    {
+      label: 'Send Feedback',
+      onclick: () => app.modals.create({ modal: FeedbackModal }),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      label: 'Help',
+      onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+    },
+  ];
+};
 
 export class HelpMenu implements m.ClassComponent {
   view() {
@@ -33,7 +36,7 @@ export class HelpMenu implements m.ClassComponent {
           },
         }}
         className="HelpMenu"
-        menuItems={helpMenuItems}
+        menuItems={gethelpMenuItems()}
       />
     );
   }
@@ -47,7 +50,7 @@ export class HelpMenuPopover implements m.ClassComponent {
         menuAttrs={{
           align: 'left',
         }}
-        menuItems={helpMenuItems}
+        menuItems={gethelpMenuItems()}
       />
     );
   }

@@ -6,11 +6,11 @@ import 'sublayout_header_right.scss';
 
 import app from 'state';
 import { LoginSelector } from 'views/components/header/login_selector';
-import { NotificationsMenuPopover } from './popovers/notifications_menu_popover';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { HelpMenuPopover } from './menus/help_menu';
 import { InvitesMenuPopover } from './menus/invites_menu';
+import { NotificationsMenuPopover } from './menus/notifications_menu';
 
 export class SublayoutHeaderRight implements m.ClassComponent {
   view() {
@@ -20,6 +20,7 @@ export class SublayoutHeaderRight implements m.ClassComponent {
         <div class="MobileMenuContainer">
           <CWIconButton
             iconName="dotsVertical"
+            iconButtonTheme="black"
             onclick={() => {
               app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
             }}

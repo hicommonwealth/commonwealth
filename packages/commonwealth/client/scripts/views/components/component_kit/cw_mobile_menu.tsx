@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+
 import { CWMobileMenuItem } from './cw_mobile_menu_item';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
