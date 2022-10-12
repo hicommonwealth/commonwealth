@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import { AddressAttributes } from './address';
-import { CommunityRoleAttributes } from './community_role';
+import { AddressAttributes, AddressInstance } from './address';
+import { CommunityRoleAttributes, CommunityRoleInstance } from './community_role';
 import { ModelStatic, ModelInstance } from './types';
 
 export type RoleAssignmentAttributes = {
@@ -17,7 +17,10 @@ export type RoleAssignmentAttributes = {
   Address?: AddressAttributes;
 };
 
-export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes>;
+export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes> & {
+  getCommunityRole: Sequelize.BelongsToGetAssociationMixin<CommunityRoleInstance>;
+  getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>
+};
 
 export type RoleAssignmentModelStatic = ModelStatic<RoleAssignmentInstance>;
 

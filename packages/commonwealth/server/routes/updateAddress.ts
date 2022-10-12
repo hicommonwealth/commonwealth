@@ -46,8 +46,8 @@ const updateAddress = async (models: DB, req: Request, res: Response, next: Next
         // update address in profile
         await models.OffchainProfile.update({ address_id: newAddressId }, { where: { address_id: ghostAddressId }, transaction });
 
-        // delete role by address
-        await models.Role.destroy({ where: { address_id: ghostAddressId }, transaction });
+        // delete role assignment by address
+        await models.RoleAssignment.destroy({ where: { address_id: ghostAddressId }, transaction });
 
         // delete ghost address from Address
         await models.Address.destroy({ where: { id: ghostAddressId }, transaction });

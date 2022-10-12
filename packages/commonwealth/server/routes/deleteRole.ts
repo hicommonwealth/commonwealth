@@ -53,7 +53,13 @@ const deleteRole = async (
     if (!otherExistingAdmin) return next(new AppError(Errors.OtherAdminDNE));
   }
 
-  await existingRole.destroy();
+  // Destroy all role assignments associated with the existing role and chain id and address provided
+  await models.RoleAssignment.destroy({
+    where: {
+      community_role_id: existingRole.toJSON().community_role_id,
+      address_id: req.body.address_id
+    }
+  });
 
   return res.json({ status: 'Success' });
 };
