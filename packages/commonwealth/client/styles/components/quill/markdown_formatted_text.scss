@@ -2,6 +2,8 @@
 @import 'quill_formatted_text.scss';
 
 .MarkdownFormattedText {
+  @include b1;
+
   position: relative;
   word-break: break-word;
 
@@ -24,9 +26,9 @@
     overflow-x: scroll;
     display: block;
 
-    box-shadow: -3px -1px 9px 0px rgba(255,255,255,0.5) inset;
-    -webkit-box-shadow: -3px -1px 9px 0px rgba(255,255,255,0.5) inset;
-    -moz-box-shadow: -3px -1px 9px 0px rgba(255,255,255,0.5) inset;
+    box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -moz-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
 
     thead {
       border-bottom: 1px solid $black;

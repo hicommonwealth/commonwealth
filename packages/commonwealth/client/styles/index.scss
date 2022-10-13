@@ -14,12 +14,10 @@ body {
 
 html {
   font-family: $fonts;
-  font-size: 14px;
+  font-size: 16px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background: $white;
-  line-height: 18px;
-
 
   // animate the transition of the darkmode
   -webkit-transition: 0.2s -webkit-filter ease-in-out;
@@ -32,7 +30,6 @@ html {
 
 // dark mode
 html.invert {
-
   filter: invert(90%);
   -webkit-filter: invert(90%);
   -moz-filter: invert(90%);

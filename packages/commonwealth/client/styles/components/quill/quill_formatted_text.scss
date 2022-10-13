@@ -1,6 +1,7 @@
 @import 'shared';
 
 @mixin formatted-text {
+  @include b1;
   // 1. block styles
   // 2. list styles
   // 3. inline styles
