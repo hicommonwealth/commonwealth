@@ -1028,7 +1028,7 @@ const ViewProposalPage: m.Component<
                       app.threads.fetchThreadsFromId([proposal.identifier]);
                       m.redraw();
                     },
-                    proposal,
+                    thread: proposal,
                     showAddProposalButton: isAuthor || isAdminOrMod,
                   }),
                 showLinkedThreadOptions &&
@@ -1161,7 +1161,7 @@ const ViewProposalPage: m.Component<
                   app.threads.fetchThreadsFromId([proposal.identifier]);
                   m.redraw();
                 },
-                proposal,
+                thread: proposal,
                 showAddProposalButton: isAuthor || isAdminOrMod,
               }),
             showLinkedThreadOptions &&

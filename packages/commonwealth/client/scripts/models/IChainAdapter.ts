@@ -51,6 +51,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     console.log(`Starting ${this.meta.name}`);
     let response;
     if (this.chainEntities) {
+      console.log(this.meta.name);
       // if we're loading entities from chain, only pull completed
       const refresh = this.usingServerChainEntities
         ? EntityRefreshOption.AllEntities
@@ -71,6 +72,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         jwt: this.app.user.jwt,
       });
     }
+    console.log({ response });
 
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
