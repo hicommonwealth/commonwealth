@@ -20,10 +20,7 @@
   }
 
   &.b1 {
-    font-family: $font-family-neue-haas-unica;
-    font-size: 16px;
-    letter-spacing: 0.02em;
-    line-height: 24px;
+    @include b1;
   }
 
   &.b2 {
