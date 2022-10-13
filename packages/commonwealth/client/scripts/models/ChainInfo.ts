@@ -15,7 +15,6 @@ import {
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
-  public readonly address: string;
   public readonly tokenName: string;
   public readonly default_symbol: string;
   public name: string;
@@ -82,7 +81,6 @@ class ChainInfo {
     substrateSpec,
     ChainNode,
     tokenName,
-    address,
     adminOnlyPolling,
   }) {
     this.id = id;
@@ -115,7 +113,6 @@ class ChainInfo {
     this.substrateSpec = substrateSpec;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
-    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
   }
@@ -189,7 +186,6 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      address: Contracts ? Contracts[0]?.address : '',
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -310,7 +306,7 @@ class ChainInfo {
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address || undefined, size });
+      : m(CWJdenticon, { address: undefined, size });
   }
 }
 
