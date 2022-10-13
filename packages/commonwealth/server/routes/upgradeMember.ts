@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { isAddress } from 'web3-utils';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import {
+  createRole,
   findAllRoles,
   findOneRole,
   RoleInstanceWithPermission,
@@ -48,32 +50,23 @@ const upgradeMember = async (
 
   if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
     return next(new AppError(Errors.MustBeAdmin));
-
   const memberAddress = await models.Address.findOne({
     where: {
       address,
     },
-    // include: [
-    //   {
-    //     model: models.Role,
-    //     required: true,
-    //     where: {
-    //       chain_id: chain.id,
-    //     },
-    //   },
-    // ],
   });
+  if (!memberAddress) return next(new AppError(Errors.NoMember));
   const roles = await findAllRoles(
     models,
     { where: { address_id: memberAddress.id } },
     chain.id
   );
-  if (!memberAddress || !roles) return next(new AppError(Errors.NoMember));
+  if (!roles) return next(new AppError(Errors.NoMember));
 
-  // There should only be one role per address per chain/community
+  // There should only need one role
   const member = await findOneRole(
     models,
-    { where: { id: roles[0].toJSON().id } },
+    { where: { address_id: memberAddress.id } },
     chain.id
   );
   if (!member) return next(new AppError(Errors.NoMember));
@@ -97,19 +90,9 @@ const upgradeMember = async (
       if (new_role === 'member') {
         return next(new AppError(Errors.InvalidRole));
       } else {
-        // Promotion
-        const communityRole = await models.CommunityRole.findOne({
-          where: {
-            chain_id: chain.id,
-            name: new_role,
-          },
-        });
-        const newRoleAssignment = await models.RoleAssignment.create({
-          address_id: memberAddress.id,
-          community_role_id: communityRole.id,
-        });
-        newMember = new RoleInstanceWithPermission(
-          newRoleAssignment.toJSON(),
+        newMember = await createRole(
+          models,
+          memberAddress.id,
           chain.id,
           new_role
         );
@@ -129,41 +112,78 @@ const upgradeMember = async (
             community_role_id: communityRole.id,
           },
         });
-        const newCommunityRole = await models.CommunityRole.findOne({
-          where: {
-            chain_id: chain.id,
-            name: 'member',
-          },
-        });
-        const newRoleAssignment = await models.RoleAssignment.findOne({
-          where: {
-            address_id: memberAddress.id,
-            community_role_id: newCommunityRole.id,
-          },
-        });
-        newMember = new RoleInstanceWithPermission(
-          newRoleAssignment.toJSON(),
+        newMember = await createRole(
+          models,
+          memberAddress.id,
           chain.id,
           'member'
         );
       } else if (new_role === 'moderator') {
         return next(new AppError(Errors.InvalidRole));
       } else {
-        // Promotion
+        newMember = await createRole(
+          models,
+          memberAddress.id,
+          chain.id,
+          new_role
+        );
+      }
+    } else {
+      // Handle demotions to moderator
+      if (new_role === 'moderator') {
+        // destroy admin role
         const communityRole = await models.CommunityRole.findOne({
           where: {
             chain_id: chain.id,
-            name: new_role,
+            name: 'admin',
           },
         });
-        const newRoleAssignment = await models.RoleAssignment.create({
-          address_id: memberAddress.id,
-          community_role_id: communityRole.id,
+        await models.RoleAssignment.destroy({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: communityRole.id,
+          },
         });
-        newMember = new RoleInstanceWithPermission(
-          newRoleAssignment.toJSON(),
+        newMember = await createRole(
+          models,
+          memberAddress.id,
           chain.id,
-          new_role
+          'moderator'
+        );
+      } else if (new_role === 'member') {
+        // destroy admin roles
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: 'admin',
+          },
+        });
+        await models.RoleAssignment.destroy({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: communityRole.id,
+          },
+        });
+        // destroy moderator role if it exists
+        const communityRole2 = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: 'moderator',
+          },
+        });
+        if (communityRole2) {
+          await models.RoleAssignment.destroy({
+            where: {
+              address_id: memberAddress.id,
+              community_role_id: communityRole2.id,
+            },
+          });
+        }
+        newMember = await createRole(
+          models,
+          memberAddress.id,
+          chain.id,
+          'member'
         );
       }
     }

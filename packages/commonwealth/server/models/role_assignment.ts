@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { AddressAttributes, AddressInstance } from './address';
 import { CommunityRoleAttributes, CommunityRoleInstance } from './community_role';
 import { ModelStatic, ModelInstance } from './types';
@@ -46,7 +46,7 @@ export default (
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
       paranoid: true,
-      tableName: 'RoleAssignment',
+      tableName: 'RoleAssignments',
       underscored: true,
       indexes: [{ fields: ['community_role_id'] }, { fields: ['address_id'] }],
     }

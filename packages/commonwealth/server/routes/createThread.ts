@@ -122,7 +122,7 @@ const dispatchHooks = async (
                 chain: mention[0] || null,
                 address: mention[1] || null,
               },
-              include: [models.User, models.Role],
+              include: [models.User, models.RoleAssignment],
             });
           } catch (err) {
             throw new ServerError(err);

@@ -225,7 +225,7 @@ const editThread = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.Role],
+              include: [models.User, models.RoleAssignment],
             });
             return user;
           } catch (err) {

@@ -20,10 +20,13 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
     models: DB,
     transaction?: Transaction
   ): Promise<boolean> {
+    const addressInstance = await models.Address.findOne({
+      where: { address, chain },
+    });
     const role = await findOneRole(
       models,
       {
-        include: { model: models.Address, where: { address }, required: true },
+        where: { address_id: addressInstance.id },
       },
       chain
     );

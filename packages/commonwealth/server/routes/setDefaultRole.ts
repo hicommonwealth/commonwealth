@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
@@ -58,9 +58,8 @@ const setDefaultRole = async (
     },
   });
 
-  const communityRoleToUpdate = await models.CommunityRole.findOne({
+  const communityRolesToUpdate = await models.CommunityRole.findAll({
     where: {
-      address_id: { [Sequelize.Op.in]: otherAddresses.map((addr) => addr.id) },
       chain_id: chain.id,
     },
   });
@@ -69,8 +68,8 @@ const setDefaultRole = async (
     { is_user_default: false },
     {
       where: {
-        address_id: { [Sequelize.Op.in]: otherAddresses.map((a) => a.id) },
-        community_role_id: communityRoleToUpdate.id,
+        address_id: { [Op.in]: otherAddresses.map((a) => a.id) },
+        community_role_id: { [Op.in]: communityRolesToUpdate.map((r) => r.id) },
       },
     }
   );

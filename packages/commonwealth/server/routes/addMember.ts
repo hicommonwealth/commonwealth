@@ -37,7 +37,7 @@ const addMember = async (
   });
   const requesterIsAdminOrMod = await findAllRoles(
     models,
-    { address_id: adminAddress.id },
+    { where: { address_id: adminAddress.id } },
     chain.id,
     ['admin', 'moderator']
   );
