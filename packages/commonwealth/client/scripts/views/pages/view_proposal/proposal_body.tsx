@@ -162,7 +162,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Edit',
-                              iconName: 'write',
+                              iconLeft: 'write',
                               onclick: async (e) => {
                                 e.preventDefault();
                                 this.savedEdits = localStorage.getItem(
@@ -309,7 +309,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           </div>
         </div>
         <CWDivider />
-        {hasLink && (<ProposalHeaderExternalLink proposal={proposal} />)}
+        {hasLink && <ProposalHeaderExternalLink proposal={proposal} />}
         {proposal instanceof Thread && (
           <div class="proposal-content">
             {this.isEditingBody ? (
