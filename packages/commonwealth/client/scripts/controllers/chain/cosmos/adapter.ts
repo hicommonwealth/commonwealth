@@ -9,16 +9,17 @@ import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 
-class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount> implements ITokenAdapter {
+class Cosmos
+  extends IChainAdapter<CosmosToken, CosmosAccount>
+  implements ITokenAdapter
+{
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
+
   public readonly base = ChainBase.CosmosSDK;
 
-  constructor(
-    meta: ChainInfo,
-    app: IApp,
-  ) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new CosmosChain(this.app);
     this.accounts = new CosmosAccounts(this.app);

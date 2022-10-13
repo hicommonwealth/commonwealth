@@ -6,7 +6,7 @@ import { PublicKey } from '@solana/web3.js';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
@@ -32,7 +32,7 @@ type CreateAddressReq = {
   keytype?: string;
 };
 
-type CreateAddressResp = AddressAttributes;
+type CreateAddressResp = AddressAttributes & { newly_created: boolean };
 
 const createAddress = async (
   models: DB,
@@ -147,7 +147,8 @@ const createAddress = async (
         await createRole(models, updatedObj.id, req.body.community, 'member');
       }
     }
-    return success(res, updatedObj.toJSON());
+    const output = { ...updatedObj.toJSON(), newly_created: false };
+    return success(res, output);
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -159,6 +160,7 @@ const createAddress = async (
       const last_active = new Date();
       let profile_id: number;
       const user_id = req.user ? req.user.id : null;
+
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],
@@ -191,8 +193,8 @@ const createAddress = async (
           isCustomDomain: null,
         });
       }
-
-      return success(res, newObj.toJSON());
+      const output = { ...newObj.toJSON(), newly_created: true };
+      return success(res, output);
     } catch (e) {
       return next(e);
     }

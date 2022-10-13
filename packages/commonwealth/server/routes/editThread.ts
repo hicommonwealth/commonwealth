@@ -6,12 +6,8 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import {
-  getProposalUrl,
-  renderQuillDeltaToText,
-  validURL,
-} from '../../shared/utils';
-import { DB } from '../database';
+import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
 import { findOneRole } from '../util/roles';

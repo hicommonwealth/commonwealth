@@ -7,13 +7,9 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import '../types';
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
+import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
 import { ProfileAttributes } from '../models/profile';
@@ -21,23 +17,51 @@ import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { AppError, ServerError } from '../util/errors';
 import { createRole } from '../util/roles';
-const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {
   // allow magic login if configured with key
   if (MAGIC_API_KEY) {
     // TODO: verify we are in a community that supports magic login
     const magic = new Magic(MAGIC_API_KEY);
-    passport.use(
-      new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
-        // determine login location
-        let chain, error;
-        if (req.body.chain || req.body.community) {
-          [chain, error] = await validateChain(models, req.body);
-          if (error) return cb(error);
-        }
-        const registrationChain = chain;
+    passport.use(new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
+      // determine login location
+      let chain, error;
+      if (req.body.chain || req.body.community) {
+        [ chain, error ] = await validateChain(models, req.body);
+        if (error) return cb(error);
+      }
+      const registrationChain = chain;
 
+      // fetch user data from magic backend
+      let userMetadata: MagicUserMetadata;
+      try {
+        userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
+      } catch (e) {
+        return cb(new ServerError(`Magic fetch failed: ${e.message} - ${JSON.stringify(e.data)}`));
+      }
+
+      // check if this is a new signup or a login
+      const existingUser = await models.User.scope('withPrivateData').findOne({
+        where: {
+          email: userMetadata.email,
+        },
+        include: [{
+          model: models.Address,
+          where: { wallet_id: WalletId.Magic },
+          required: false,
+        }, {
+          model: models.Profile
+        }]
+      });
+
+      // if not on root URL and we don't support the chain base for magic don't allow users to sign up
+      if (!existingUser && registrationChain?.base && !MAGIC_SUPPORTED_BASES.includes(registrationChain.base)) {
+        // unsupported chain -- client should send through old email flow
+        return cb(new AppError('Unsupported magic chain.'));
+      }
+
+      // if on root URL, no chain base, we allow users to sign up and generate a Substrate + Ethereum Address
+      if (!existingUser && !registrationChain?.base) {
         // fetch user data from magic backend
         let userMetadata: MagicUserMetadata;
         try {
@@ -83,7 +107,6 @@ export function useMagicAuth(models: DB) {
 
           try {
             const polkadotResp = await request
-              // eslint-disable-next-line max-len
               .get(
                 `https://api.magic.link/v1/admin/auth/user/public/address/get?issuer=did:ethr:${userMetadata.publicAddress}`
               )
@@ -424,13 +447,32 @@ export function useMagicAuth(models: DB) {
           console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
           return cb(null, existingUser);
         } else {
-          // error if email exists but not registered with magic
-          console.log('User already registered with old method.');
-          return cb(null, null, {
-            message: `Email for user ${user.issuer} already registered`,
-          });
-        }
-      })
-    );
+        // migrate to magic if email already exists
+        await sequelize.transaction(async (t) => {
+          const ethAddress = userMetadata.publicAddress;
+          const newAddress = await models.Address.create({
+            address: ethAddress,
+            chain: 'ethereum',
+            verification_token: 'MAGIC',
+            verification_token_expires: null,
+            verified: new Date(), // trust addresses from magic
+            last_active: new Date(),
+            user_id: existingUser.id,
+            profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+            wallet_id: WalletId.Magic
+          }, { transaction: t });
+
+          await models.SsoToken.create({
+            issuer: userMetadata.issuer,
+            issued_at: user.claim.iat,
+            address_id: newAddress.id, // always ethereum address
+            created_at: new Date(),
+            updated_at: new Date(),
+          }, { transaction: t });
+        });
+        console.log(`Migrated old email user to magic: ${existingUser.email}`);
+        return cb(null, existingUser);
+      }
+    }));
   }
 }

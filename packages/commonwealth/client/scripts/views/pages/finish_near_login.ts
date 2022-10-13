@@ -11,14 +11,18 @@ import {
   updateActiveAddresses,
   createUserWithAddress,
   setActiveAccount,
+  completeClientLogin,
 } from 'controllers/app/login';
-import Near from 'controllers/chain/near/main';
+import { isSameAccount } from 'helpers';
+import { Account, AddressInfo } from 'models';
+import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
-import LinkNewAddressModal from 'views/modals/link_new_address_modal';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
+import { NewLoginModal } from '../modals/login_modal';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
 interface IState {
   validating: boolean;
@@ -26,6 +30,8 @@ interface IState {
   validatedAccount: NearAccount | null;
   validationError: string;
   exitActionSelected: boolean;
+  isNewAccount: boolean;
+  account: Account;
 }
 
 // TODO:
@@ -68,11 +74,18 @@ const validate = async (
   try {
     // TODO: do we need to do this every time, or only on first connect?
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
-    const chain = app.user.selectedChain || app.config.chains.getById(app.activeChainId());
-    const newAcct = await createUserWithAddress(acct.address, WalletId.NearWallet, chain.id);
-    acct.setValidationToken(newAcct.validationToken);
+    const chain =
+      app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+    const newAcct = await createUserWithAddress(
+      acct.address,
+      WalletId.NearWallet,
+      chain.id
+    );
+    vnode.state.isNewAccount = newAcct.newlyCreated;
+    // vnode.state.account = newAcct.account;
+    acct.setValidationToken(newAcct.account.validationToken);
     acct.setWalletId(WalletId.NearWallet);
-    acct.setAddressId(newAcct.addressId);
+    acct.setAddressId(newAcct.account.addressId);
     const signature = await acct.signMessage(`${acct.validationToken}\n`);
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
@@ -147,7 +160,6 @@ const validate = async (
 };
 
 const FinishNearLogin: m.Component<Record<string, never>, IState> = {
-  oncreate: (vnode) => {},
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
       return m(PageLoading);
@@ -172,19 +184,34 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
     } else if (vnode.state.validationCompleted) {
       return m(Sublayout, [
         m('div', {
-          oncreate: (e) => {
+          oncreate: async (e) => {
             if (vnode.state.validatedAccount.profile.name) {
               redirectToNextPage();
             } else {
-              app.modals.create({
-                modal: LinkNewAddressModal,
-                data: {
-                  alreadyInitializedAccount: vnode.state.validatedAccount,
-                },
-                exitCallback: () => {
+              if (vnode.state.isNewAccount) {
+                if (!app.isLoggedIn()) {
+                  app.modals.create({
+                    modal: NewLoginModal,
+                    data: {
+                      initialBody: 'welcome',
+                      initialSidebar: 'newOrReturning',
+                      initialAccount: vnode.state.validatedAccount,
+                      modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                        ? 'fullScreen'
+                        : 'centered',
+                      breakpointFn: isWindowMediumSmallInclusive,
+                    },
+                    exitCallback: () => {
+                      redirectToNextPage();
+                    },
+                  });
+                } else {
+                  await completeClientLogin(vnode.state.validatedAccount);
                   redirectToNextPage();
-                },
-              });
+                }
+              } else {
+                redirectToNextPage();
+              }
             }
           },
         }),

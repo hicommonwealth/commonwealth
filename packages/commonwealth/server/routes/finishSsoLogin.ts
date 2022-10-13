@@ -1,14 +1,12 @@
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import {
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
+import { NotificationCategories, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 
@@ -20,7 +18,6 @@ import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { createRole } from '../util/roles';
-
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -266,10 +263,9 @@ const finishSsoLogin = async (
         return success(res, { user: existingUser });
       } else {
         // create new user if no user exists but address exists
-        const newUser = await models.User.createWithProfile(
-          models,
-          { email: null },
-        );
+        const newUser = await models.User.createWithProfile(models, {
+          email: null,
+        });
         existingAddress.user_id = newUser.id;
         await existingAddress.save();
         req.login(newUser, (err) => {
@@ -306,7 +302,10 @@ const finishSsoLogin = async (
         profile = user.Profiles[0];
       } else {
         user = reqUser;
-        profile = await models.Profile.findOne({ where: { user_id: user.id }, transaction: t });
+        profile = await models.Profile.findOne({
+          where: { user_id: user.id },
+          transaction: t,
+        });
       }
 
       // create new address

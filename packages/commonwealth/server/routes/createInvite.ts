@@ -7,8 +7,9 @@ import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from '../util/errors';
-import { DB } from '../database';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
+import { DB } from '../models';
+
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {

@@ -1,165 +1,57 @@
-import fs from 'fs';
-import path from 'path';
-import { Sequelize, DataTypes } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from './config';
 
-
-import AddressFactory, { AddressModelStatic } from './models/address';
-import BanFactory, { BanModelStatic } from './models/ban';
-import ChainFactory, { ChainModelStatic } from './models/chain';
-import ChainCategoryFactory, {
-  ChainCategoryModelStatic,
-} from './models/chain_category';
-import ChainCategoryTypeFactory, {
-  ChainCategoryTypeModelStatic,
-} from './models/chain_category_type';
-import ChainEntityFactory, {
-  ChainEntityModelStatic,
-} from './models/chain_entity';
-import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
-import ChainEventTypeFactory, {
-  ChainEventTypeModelStatic,
-} from './models/chain_event_type';
-import ChainNodeFactory, { ChainNodeModelStatic } from './models/chain_node';
-import ChatChannelFactory, { ChatChannelModelStatic } from './models/chat_channel';
-import ChatMessageFactory, {
-  ChatMessageModelStatic,
-} from './models/chat_message';
-import CommunityBannerFactory, { CommunityBannerModelStatic } from './models/community_banner';
-import CollaborationFactory, {
-  CollaborationModelStatic,
-} from './models/collaboration';
-import DiscussionDraftFactory, {
-  DiscussionDraftModelStatic,
-} from './models/discussion_draft';
-import IdentityCacheFactory, {
-  IdentityCacheStatic,
-} from './models/identity_cache';
-import InviteCodeFactory, { InviteCodeModelStatic } from './models/invite_code';
-import LinkedThread, { LinkedThreadModelStatic } from './models/linked_thread';
-import LoginTokenFactory, { LoginTokenModelStatic } from './models/login_token';
-import NotificationFactory, {
-  NotificationModelStatic,
-} from './models/notification';
-import NotificationCategoryFactory, {
-  NotificationCategoryModelStatic,
-} from './models/notification_category';
-import AttachmentFactory, {
-  AttachmentModelStatic,
-} from './models/attachment';
-import CommentFactory, {
-  CommentModelStatic,
-} from './models/comment';
-import OffchainProfileFactory, {
-  OffchainProfileModelStatic,
-} from './models/offchain_profile';
-import ReactionFactory, {
-  ReactionModelStatic,
-} from './models/reaction';
-import ThreadFactory, {
-  ThreadModelStatic,
-} from './models/thread';
-import TopicFactory, {
-  TopicModelStatic,
-} from './models/topic';
-import ViewCountFactory, {
-  ViewCountModelStatic,
-} from './models/viewcount';
-import VoteFactory, {
-  VoteModelStatic,
-} from './models/vote';
-import PollFactory, {
-  PollModelStatic,
-} from './models/poll';
-import ProfileFactory, { ProfileModelStatic } from './models/profile';
-import RoleFactory, { RoleModelStatic } from './models/role';
-import RoleAssignmentFactory, { RoleAssignmentModelStatic } from './models/role_assignment';
-import CommunityRoleFactory, { CommunityRoleModelStatic } from './models/community_role';
-import RuleFactory, { RuleModelStatic } from './models/rule';
-import SocialAccountFactory, {
-  SocialAccountModelStatic,
-} from './models/social_account';
-import SsoTokenFactory, { SsoTokenModelStatic } from './models/sso_token';
-import StarredCommunityFactory, {
-  StarredCommunityModelStatic,
-} from './models/starred_community';
-import SubscriptionFactory, {
-  SubscriptionModelStatic,
-} from './models/subscription';
-import TokenFactory, { TokenModelStatic } from './models/token';
-import TaggedThreadFactory, {
-  TaggedThreadModelStatic,
-} from './models/tagged_threads';
-import UserModelFactory, { UserModelStatic } from './models/user';
-import WaitlistRegistrationFactory, {
-  WaitlistRegistrationModelStatic,
-} from './models/waitlist_registration';
-import WebhookFactory, { WebhookModelStatic } from './models/webhook';
-import NotificationsReadFactory, {
-  NotificationsReadModelStatic,
-} from './models/notifications_read';
-import IpfsPinsFactory, { IpfsPinsModelStatic } from './models/ipfs_pins';
-import ContractFactory, { ContractModelStatic } from './models/contract';
-import ContractAbiFactory, { ContractAbiModelStatic } from './models/contract_abi';
-import CommunityContractFactory, { CommunityContractModelStatic } from './models/community_contract';
-
-export type Models = {
-  Address: AddressModelStatic;
-  Ban: BanModelStatic;
-  Chain: ChainModelStatic;
-  ChainCategory: ChainCategoryModelStatic;
-  ChainCategoryType: ChainCategoryTypeModelStatic;
-  ChainEntity: ChainEntityModelStatic;
-  ChainEvent: ChainEventModelStatic;
-  ChainEventType: ChainEventTypeModelStatic;
-  ChainNode: ChainNodeModelStatic;
-  ChatChannel: ChatChannelModelStatic;
-  ChatMessage: ChatMessageModelStatic;
-  Contract: ContractModelStatic;
-  ContractAbi: ContractAbiModelStatic;
-  CommunityContract: CommunityContractModelStatic;
-  CommunityRole: CommunityRoleModelStatic;
-  Collaboration: CollaborationModelStatic;
-  CommunityBanner: CommunityBannerModelStatic;
-  DiscussionDraft: DiscussionDraftModelStatic;
-  IdentityCache: IdentityCacheStatic;
-  InviteCode: InviteCodeModelStatic;
-  IpfsPins: IpfsPinsModelStatic;
-  LinkedThread: LinkedThreadModelStatic;
-  LoginToken: LoginTokenModelStatic;
-  Notification: NotificationModelStatic;
-  NotificationCategory: NotificationCategoryModelStatic;
-  NotificationsRead: NotificationsReadModelStatic;
-  Attachment: AttachmentModelStatic;
-  Comment: CommentModelStatic;
-  Poll: PollModelStatic;
-  OffchainProfile: OffchainProfileModelStatic;
-  Reaction: ReactionModelStatic;
-  Thread: ThreadModelStatic;
-  Topic: TopicModelStatic;
-  ViewCount: ViewCountModelStatic;
-  Vote: VoteModelStatic;
-  Profile: ProfileModelStatic;
-  Role: RoleModelStatic;
-  RoleAssignment: RoleAssignmentModelStatic;
-  Rule: RuleModelStatic;
-  SocialAccount: SocialAccountModelStatic;
-  SsoToken: SsoTokenModelStatic;
-  StarredCommunity: StarredCommunityModelStatic;
-  Subscription: SubscriptionModelStatic;
-  Token: TokenModelStatic;
-  TaggedThread: TaggedThreadModelStatic;
-  User: UserModelStatic;
-  WaitlistRegistration: WaitlistRegistrationModelStatic;
-  Webhook: WebhookModelStatic;
-};
-
-export interface DB extends Models {
-  sequelize: Sequelize;
-  Sequelize: typeof Sequelize;
-}
+import type { DB, Models } from './models';
+import AddressFactory from './models/address';
+import AttachmentFactory from './models/attachment';
+import BanFactory from './models/ban';
+import ChainFactory from './models/chain';
+import ChainCategoryFactory from './models/chain_category';
+import ChainCategoryTypeFactory from './models/chain_category_type';
+import ChainEntityFactory from './models/chain_entity';
+import ChainEventFactory from './models/chain_event';
+import ChainEventTypeFactory from './models/chain_event_type';
+import ChainNodeFactory from './models/chain_node';
+import ChatChannelFactory from './models/chat_channel';
+import ChatMessageFactory from './models/chat_message';
+import CollaborationFactory from './models/collaboration';
+import CommentFactory from './models/comment';
+import CommunityBannerFactory from './models/community_banner';
+import CommunityContractFactory from './models/community_contract';
+import CommunityRoleFactory from './models/community_role';
+import ContractFactory from './models/contract';
+import ContractAbiFactory from './models/contract_abi';
+import DiscussionDraftFactory from './models/discussion_draft';
+import IdentityCacheFactory from './models/identity_cache';
+import InviteCodeFactory from './models/invite_code';
+import IpfsPinsFactory from './models/ipfs_pins';
+import LinkedThread from './models/linked_thread';
+import LoginTokenFactory from './models/login_token';
+import NotificationFactory from './models/notification';
+import NotificationsReadFactory from './models/notifications_read';
+import NotificationCategoryFactory from './models/notification_category';
+import OffchainProfileFactory from './models/offchain_profile';
+import PollFactory from './models/poll';
+import ProfileFactory from './models/profile';
+import ReactionFactory from './models/reaction';
+import RoleAssignmentFactory from './models/role_assignment';
+import RoleFactory from './models/role';
+import RuleFactory from './models/rule';
+import SocialAccountFactory from './models/social_account';
+import SsoTokenFactory from './models/sso_token';
+import StarredCommunityFactory from './models/starred_community';
+import SubscriptionFactory from './models/subscription';
+import TaggedThreadFactory from './models/tagged_threads';
+import ThreadFactory from './models/thread';
+import TokenFactory from './models/token';
+import TopicFactory from './models/topic';
+import UserModelFactory from './models/user';
+import ViewCountFactory from './models/viewcount';
+import VoteFactory from './models/vote';
+import WaitlistRegistrationFactory from './models/waitlist_registration';
+import WebhookFactory from './models/webhook';
 
 const log = factory.getLogger(formatFilename(__filename));
 

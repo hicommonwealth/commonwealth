@@ -9,7 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../database';
+import { DB } from '../models';
 
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {

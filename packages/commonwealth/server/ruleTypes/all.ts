@@ -1,5 +1,5 @@
 import { Transaction } from 'sequelize/types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { RuleType, RuleArgumentType, DefaultSchemaT } from '../util/rules/ruleTypes';
 import RuleTypes from './index';
 

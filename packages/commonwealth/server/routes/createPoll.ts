@@ -4,7 +4,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getNextPollEndingTime } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { findOneRole } from '../util/roles';
 

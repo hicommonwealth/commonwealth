@@ -1,7 +1,7 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
-import { DB } from '../database';
+import { DB } from '../models';
 import {
   migrateChainEntities,
   migrateChainEntity,
@@ -43,11 +43,11 @@ const migrateEvent = async (
 
   if (migrateAll && migrateAll === true) {
     try {
-      await migrateChainEntities();
+      migrateChainEntities();
     } catch (e) {
       throw new AppError(MigrateEventErrors.AllError);
     }
-    return success(res, { message: 'Migrated all events.' });
+    return success(res, { message: 'Started migration for all events.' });
   }
 
   if (!chain_id) {
@@ -55,13 +55,13 @@ const migrateEvent = async (
   }
 
   try {
-    await migrateChainEntity(chain_id);
+    migrateChainEntity(chain_id);
   } catch (e) {
     log.error(e.message);
     throw new AppError(MigrateEventErrors.ChainError);
   }
 
-  return success(res, { message: 'Migrated chain events.' });
+  return success(res, { message: `Started migration for ${chain_id}.` });
 };
 
 export default migrateEvent;
