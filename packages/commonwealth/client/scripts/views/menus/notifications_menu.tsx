@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button } from 'construct-ui';
+import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
@@ -11,7 +11,6 @@ import { navigateToSubpage } from 'app';
 import NotificationRow from '../components/notification_row';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
 
 const MAX_NOTIFS = 40;
 
@@ -235,7 +234,13 @@ export class NotificationsMenu implements m.ClassComponent {
 export class NotificationsMenuPopover implements m.ClassComponent {
   view() {
     return (
-      <CWPopover
+      <PopoverMenu
+        closeOnContentClick={true}
+        closeOnOutsideClick={true}
+        hasArrow={false}
+        hoverCloseDelay={0}
+        position="bottom-end"
+        transitionDuration={0}
         trigger={
           app.user.notifications.numUnread > 0 ? (
             <div class="unreads-icon">
