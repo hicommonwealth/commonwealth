@@ -19,6 +19,7 @@ export const iconLookup = {
   cloud: Icons.CWCloud,
   collapse: Icons.CWCollapse,
   commonLogo: Icons.CWCommonLogo,
+  compass: Icons.CWCompass,
   copy: Icons.CWCopy,
   councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
@@ -28,9 +29,9 @@ export const iconLookup = {
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
   downvote: Icons.CWDownvote,
-  edit: Icons.CWEdit,
   element: Icons.CWElement,
   expand: Icons.CWExpand,
+  exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,
   feedback: Icons.CWFeedback,
   filter: Icons.CWFilter,
@@ -73,6 +74,7 @@ export const iconLookup = {
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
   website: Icons.CWWebsite,
+  write: Icons.CWWrite,
 };
 
 export const customIconLookup = {

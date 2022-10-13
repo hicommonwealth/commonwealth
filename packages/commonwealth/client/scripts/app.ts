@@ -17,8 +17,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
-import { WebSocketController } from 'controllers/server/socket';
-
 import {
   notifyError,
   notifyInfo,
@@ -223,7 +221,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-main" */
-        './controllers/chain/substrate/main'
+        './controllers/chain/substrate/adapter'
       )
     ).default;
     newChain = new Substrate(chain, app);
@@ -232,7 +230,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "cosmos-main" */
-        './controllers/chain/cosmos/main'
+        './controllers/chain/cosmos/adapter'
       )
     ).default;
     newChain = new Cosmos(chain, app);
@@ -241,7 +239,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -253,7 +251,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "near-main" */
-        './controllers/chain/near/main'
+        './controllers/chain/near/adapter'
       )
     ).default;
     newChain = new Near(chain, app);
@@ -330,7 +328,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "solana-main" */
-        './controllers/chain/solana/main'
+        './controllers/chain/solana/adapter'
       )
     ).default;
     newChain = new Solana(chain, app);
@@ -351,7 +349,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);

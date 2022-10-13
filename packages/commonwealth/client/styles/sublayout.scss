@@ -21,6 +21,12 @@
       justify-content: space-between;
       min-height: $global-header-height;
       padding: 0 8px;
+
+      .SearchBar {
+        @include extraSmall {
+          display: none;
+        }
+      }
     }
   }
 
