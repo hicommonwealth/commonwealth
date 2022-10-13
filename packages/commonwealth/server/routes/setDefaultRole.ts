@@ -11,24 +11,41 @@ export const Errors = {
   RoleDNE: 'Role does not exist',
 };
 
-const setDefaultRole = async (models: DB, req, res: Response, next: NextFunction) => {
+const setDefaultRole = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.address || !req.body.author_chain) return next(new AppError(Errors.InvalidAddress));
+  if (!req.body.address || !req.body.author_chain)
+    return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
     where: {
       address: req.body.address,
       chain: req.body.author_chain,
       user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    }
+      verified: { [Sequelize.Op.ne]: null },
+    },
   });
   if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
-  const existingRole = await findOneRole(models, { where: {address_id: validAddress.id}}, chain.id)
+  const existingRole = await findOneRole(
+    models,
+    { where: { address_id: validAddress.id } },
+    chain.id
+  );
   if (!existingRole) return next(new AppError(Errors.RoleDNE));
+
+  const existingRoleInstanceToUpdate = await models.RoleAssignment.findOne({
+    where: {
+      address_id: validAddress.id,
+      community_role_id: existingRole.toJSON().chain_id,
+    },
+  })
 
   validAddress.last_active = new Date();
   await validAddress.save();
@@ -37,16 +54,30 @@ const setDefaultRole = async (models: DB, req, res: Response, next: NextFunction
     where: {
       id: { [Sequelize.Op.ne]: validAddress.id },
       user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    }
+      verified: { [Sequelize.Op.ne]: null },
+    },
   });
 
-  await models.Role.update({ is_user_default: false }, { where: {
-    address_id: { [Sequelize.Op.in]: otherAddresses.map((a) => a.id) },
-    chain_id: chain.id,
-  }});
-  existingRole.is_user_default = true;
-  await existingRole.save();
+  const communityRoleToUpdate = await models.CommunityRole.findOne({
+    where: {
+      address_id: { [Sequelize.Op.in]: otherAddresses.map((addr) => addr.id) },
+      chain_id: chain.id,
+    },
+  });
+
+  await models.RoleAssignment.update(
+    { is_user_default: false },
+    {
+      where: {
+        address_id: { [Sequelize.Op.in]: otherAddresses.map((a) => a.id) },
+        community_role_id: communityRoleToUpdate.id,
+      },
+    }
+  );
+
+  existingRoleInstanceToUpdate.is_user_default = true;
+
+  await existingRoleInstanceToUpdate.save();
 
   return res.json({ status: 'Success' });
 };
