@@ -691,6 +691,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
+            '/overview': importRoute('views/pages/overview', {
+              scoped: true,
+              deferChain: true,
+            }),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
@@ -800,6 +804,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
+            '/:scope/overview': redirectRoute(() => '/overview'),
             '/:scope/projects': redirectRoute(() => '/projects'),
             '/:scope/backers': redirectRoute(() => '/backers'),
             '/:scope/collectives': redirectRoute(() => '/collectives'),

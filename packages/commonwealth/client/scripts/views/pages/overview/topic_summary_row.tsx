@@ -3,13 +3,12 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/discussions/threads_overview_topic_summary_row.scss';
+import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { getLastUpdated, isHot } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { renderQuillTextBody } from '../../components/quill/helpers';
@@ -17,15 +16,14 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { getLastUpdated, isHot } from '../discussions/helpers';
 
-type SummaryRowAttrs = {
+type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
   topic: Topic;
 };
 
-export class ThreadsOverviewTopicSummaryRow
-  implements m.ClassComponent<SummaryRowAttrs>
-{
+export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
   view(vnode) {
     const { monthlyThreads, topic } = vnode.attrs;
 
@@ -38,7 +36,7 @@ export class ThreadsOverviewTopicSummaryRow
       .slice(0, 5);
 
     return (
-      <div class="ThreadsOverviewTopicSummaryRow">
+      <div class="TopicSummaryRow">
         <div class="topic-column">
           <div class="name-and-count">
             <CWText
@@ -135,8 +133,8 @@ export class ThreadsOverviewTopicSummaryRow
                         <CWText type="caption">+4 others</CWText>
                       </div> */}
                     </div>
-                    {/* <div class="row-bottom-menu">
-                      <CWIconButton
+                    <div class="row-bottom-menu">
+                      {/* <CWIconButton
                         iconSize="small"
                         iconName="share"
                         onclick={(e) => e.stopPropagation()}
@@ -145,7 +143,7 @@ export class ThreadsOverviewTopicSummaryRow
                         iconSize="small"
                         iconName="flag"
                         onclick={(e) => e.stopPropagation()}
-                      />
+                      /> */}
                       <CWIconButton
                         iconSize="small"
                         iconName="bell"
@@ -156,7 +154,7 @@ export class ThreadsOverviewTopicSummaryRow
                         iconName="dotsVertical"
                         onclick={(e) => e.stopPropagation()}
                       />
-                    </div> */}
+                    </div>
                   </div>
                 </div>
                 {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}

@@ -7,10 +7,10 @@ import 'pages/discussions/index.scss';
 
 import app from 'state';
 import { PageLoading } from '../loading';
-import { ThreadsOverview } from './threads_overview';
 import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
+import OverviewPage from '../overview';
 
 // Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
@@ -129,7 +129,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
             parentState={this}
           />
           {this.threadsOverview ? (
-            <ThreadsOverview />
+            <OverviewPage />
           ) : (
             <RecentListing
               topicName={this.topicName}

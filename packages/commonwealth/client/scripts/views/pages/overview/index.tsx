@@ -2,15 +2,15 @@
 
 import m from 'mithril';
 
-import 'pages/discussions/threads_overview.scss';
+import 'pages/overview/index.scss';
 
 import app from 'state';
 import { LoadingRow } from '../../components/loading_row';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ThreadsOverviewTopicSummaryRow } from './threads_overview_topic_summary_row';
+import { TopicSummaryRow } from './topic_summary_row';
 
-export class ThreadsOverview implements m.ClassComponent {
+class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
 
   oninit() {
@@ -27,7 +27,7 @@ export class ThreadsOverview implements m.ClassComponent {
     const topics = app.topics.getByCommunity(app.activeChainId());
 
     return (
-      <div class="ThreadsOverview">
+      <div class="Overview">
         <div class="header-row">
           <CWText
             type="h5"
@@ -47,19 +47,21 @@ export class ThreadsOverview implements m.ClassComponent {
             {/* <CWButton buttonType="mini" label="Create Thread" iconName="plus" /> */}
           </div>
         </div>
-        {topics.sort((a, b) => a.order - b.order).filter((t) => t.featuredInSidebar).map((topic) => {
-          const monthlyThreads = app.threads.overviewStore
-            .getAll()
-            .filter((thread) => thread.topic.id === topic.id);
+        {topics
+          .sort((a, b) => a.order - b.order)
+          .filter((t) => t.featuredInSidebar)
+          .map((topic) => {
+            const monthlyThreads = app.threads.overviewStore
+              .getAll()
+              .filter((thread) => thread.topic.id === topic.id);
 
-          return (
-            <ThreadsOverviewTopicSummaryRow
-              monthlyThreads={monthlyThreads}
-              topic={topic}
-            />
-          );
-        })}
+            return (
+              <TopicSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
+            );
+          })}
       </div>
     );
   }
 }
+
+export default OverviewPage;
