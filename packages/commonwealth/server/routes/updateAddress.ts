@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
