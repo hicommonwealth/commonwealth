@@ -482,7 +482,6 @@ class ThreadsController {
     entities: ChainEntity[];
   }) {
     const { threadId, entities } = args;
-    console.log({ threadId, entities });
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
       type: 'POST',

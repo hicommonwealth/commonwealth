@@ -115,7 +115,6 @@ export class LinkedProposalsCard
 {
   view(vnode) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
-    console.log({ thread });
     return (
       <CWCard className="LinkedProposalsCard">
         {thread.chainEntities.length > 0 ||
