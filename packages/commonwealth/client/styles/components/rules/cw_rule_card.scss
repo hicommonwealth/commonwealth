@@ -13,21 +13,30 @@
     width: 100%;
     margin-bottom: 8px;
 
-    .title-section {
-      align-items: center;
+    .top-section {
       display: flex;
-      margin-bottom: 8px;
-      gap: 8px;
-    }
+      justify-content: space-between;
 
-    .published-text {
-      margin-top: 2px;
-      color: $neutral-500;
-    }
+      .title-section {
+        align-items: center;
+        display: flex;
+        margin-bottom: 8px;
+        gap: 8px;
+      }
 
+      .published-text {
+        margin-top: 2px;
+        color: $neutral-500;
+      }
+    }
     .description {
       margin: 8px 0px 8px 0px;
     }
+  }
+
+  .display-section {
+    width: 100%;
+    margin-bottom: 16px;
   }
 
   .footer-section {

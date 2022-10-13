@@ -70,87 +70,51 @@ export class ComponentShowcase implements m.ClassComponent {
       <div class="ComponentShowcase">
         <h1>Rule Card</h1>
         <div class="basic-gallery">
-          {/* <CWRuleCard
-            isNested={false}
-            rule={
-              new Rule({
-                id: 1,
-                chainId: 'test-chain',
-                rule: {
-                  AllRule: [
-                    [
-                      {
-                        AllowListRule: [
-                          ['0xE58E375Cc657e434e6981218A356fAC756b98097'],
-                        ],
-                      },
-                    ],
-                    [
-                      {
-                        AllowListRule: [
-                          ['0xE58E375Cc657e434e6981218A356fAC756b98097'],
-                        ],
-                      },
-                    ],
-                  ],
-                },
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              })
-            }
-            ruleTypeIdentifier="AllRule"
-            ruleMetadata={{
-              name: 'All Rule',
-              description: 'Passes if all of the provided rules pass',
-              arguments: [
-                {
-                  name: 'Rules',
-                  description: 'Rules to check',
-                  type: 'rule[]',
-                },
-              ],
-            }}
-          /> */}
           <CWRuleCard
             isNested={false}
-            rule={
-              new Rule({
-                id: 1,
-                chainId: 'test-chain',
-                rule: {
-                  AllowListRule: [
-                    [
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
+            rule={{
+              AllRule: [
+                [
+                  {
+                    AnyRule: [
+                      [
+                        {
+                          AllowListRule: [
+                            [
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                            ],
+                          ],
+                        },
+                      ],
+                      [
+                        {
+                          AdminOnlyRule: [],
+                        },
+                      ],
                     ],
-                  ],
-                },
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              })
-            }
-            ruleTypeIdentifier="AllowListRule"
-            ruleMetadata={{
-              name: 'Allow List Rule',
-              description:
-                'Only a specified list of addresses can perform action',
-              arguments: [
-                {
-                  description: 'Permitted addresses',
-                  name: 'Allow List',
-                  type: 'address[]',
-                },
+                  },
+                ],
+                [
+                  {
+                    TokenBalanceRule: [
+                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                      '500 AVAX',
+                    ],
+                  },
+                ],
               ],
             }}
+            ruleId={1}
+            chainId="test-chain"
+            ruleCreatedAt={new Date()}
+            ruleUpdatedAt={new Date()}
+            ruleTypeIdentifier="AllRule"
+            adminView={true}
           />
         </div>
+
         <h1>Spinner</h1>
         <div class="basic-gallery">
           <CWSpinner />

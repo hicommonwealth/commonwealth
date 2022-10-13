@@ -89,6 +89,8 @@ export async function initAppState(
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
+        await app.rules.getRuleTypes();
+
         // update the login status
         updateActiveUser(data.user);
         app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;

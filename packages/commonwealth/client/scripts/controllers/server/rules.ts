@@ -5,6 +5,11 @@ import { Rule } from 'models';
 
 class RulesController {
   private _rulesStore = new RuleStore();
+  private _ruleTypes = {};
+
+  public get ruleTypes() {
+    return this._ruleTypes;
+  }
 
   // Checks if a provided address passes a set of rules
   // Agnostic to chain; this will work even if the rule is not in the store
@@ -132,6 +137,7 @@ class RulesController {
   public async getRuleTypes() {
     try {
       const res = await $.get(`${app.serverUrl()}/getRuleTypes`);
+      this._ruleTypes = res.result;
       return res.result;
     } catch (e) {
       console.log(e);

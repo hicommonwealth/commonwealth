@@ -1,13 +1,19 @@
 @import 'shared';
 
 .AttributeDisplay {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
-  gap: 16px;
-  min-width: 496px;
+  gap: 8px;
+  max-width: 496px;
   margin: 16px;
+
+  @include smallInclusive {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 
   .attribute-label {
     color: $neutral-500;
