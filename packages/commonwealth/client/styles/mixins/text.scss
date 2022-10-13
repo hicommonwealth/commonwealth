@@ -11,6 +11,17 @@
   line-height: 24px;
 }
 
+@mixin b2 {
+  font-family: $font-family-neue-haas-unica;
+  font-size: 14px;
+  line-height: 20px;
+
+  &.bold,
+  &.italic {
+    letter-spacing: 0.02em;
+  }
+}
+
 @mixin caption {
   font-family: $font-family-neue-haas-unica;
   font-size: 12px;
