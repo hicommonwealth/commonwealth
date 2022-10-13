@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {

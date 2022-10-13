@@ -54,6 +54,9 @@ jobs:
       - name: Typecheck
         run: yarn check-types
 
+      - name: Run unit tests
+        run: yarn unit-test
+
       - name: Run API tests
         run: yarn test-api
         env:

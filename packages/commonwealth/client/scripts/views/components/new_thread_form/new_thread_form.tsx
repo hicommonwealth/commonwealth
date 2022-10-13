@@ -56,7 +56,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     author: Account,
     stage = ThreadStage.Discussion
   ) {
-    if (!this) throw new Error('no this');
     const body = quillEditorState.textContentsAsString;
     quillEditorState.disable();
     checkNewThreadErrors(form, body);
@@ -637,7 +636,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                           <div class="draft-title">
                             {fromDraft === draft.id ? (
                               <>
-                                <CWIcon iconName="edit" iconSize="small" />
+                                <CWIcon iconName="write" iconSize="small" />
                                 <CWText
                                   fontWeight="semiBold"
                                   noWrap
