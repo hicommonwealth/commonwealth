@@ -36,11 +36,6 @@ const status = async (
             model: models.ChainNode,
             required: true,
           },
-          {
-            model: models.Contract,
-            required: false,
-            include: [{ model: models.ContractAbi, required: false}],
-          }
         ],
       }),
       models.ChainNode.findAll(),
