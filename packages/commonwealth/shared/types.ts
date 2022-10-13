@@ -9,7 +9,7 @@ export enum WebsocketMessageNames {
   ChatMessage = 'chat-message',
   JoinChatChannel = 'join-chat-channel',
   LeaveChatChannel = 'leave-chat-channel',
-  Error = 'exception'
+  Error = 'exception',
 }
 
 export type ChainEventNotification = {
@@ -83,6 +83,20 @@ export interface IChatNotification {
   created_at: any;
 }
 
+export enum ContentType {
+  Thread = 'thread',
+  Comment = 'comment',
+  // Proposal = 'proposal',
+}
+
+export enum SearchContentType {
+  Thread = 'thread',
+  Comment = 'comment',
+  Chain = 'chain',
+  Token = 'token',
+  Member = 'member',
+}
+
 export const PROFILE_NAME_MAX_CHARS = 40;
 export const PROFILE_HEADLINE_MAX_CHARS = 80;
 export const PROFILE_BIO_MAX_CHARS = 1000;
@@ -108,5 +122,5 @@ export type TokenResponse = {
 };
 
 export enum RedisNamespaces {
-  Chat_Socket = 'chat_socket'
+  Chat_Socket = 'chat_socket',
 }

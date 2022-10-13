@@ -34,7 +34,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
-  public defaultSummaryView: boolean;
+  public defaultOverview: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -70,7 +70,7 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
-    defaultSummaryView,
+    defaultOverview,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -103,7 +103,7 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
-    this.defaultSummaryView = defaultSummaryView;
+    this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.chatEnabled = chatEnabled;
@@ -176,7 +176,7 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
-      defaultSummaryView: default_summary_view,
+      defaultOverview: default_summary_view,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -262,7 +262,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
-    defaultSummaryView,
+    defaultOverview,
     chatEnabled,
   }) {
     // TODO: Change to PUT /chain
@@ -282,7 +282,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
-      default_summary_view: defaultSummaryView,
+      default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -299,7 +299,7 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
-    this.defaultSummaryView = updatedChain.default_summary_view;
+    this.defaultOverview = updatedChain.default_summary_view;
     this.chatEnabled = updatedChain.chat_enabled;
   }
 

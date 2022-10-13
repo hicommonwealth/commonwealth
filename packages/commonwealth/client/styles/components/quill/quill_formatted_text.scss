@@ -1,6 +1,7 @@
 @import 'shared';
 
 @mixin formatted-text {
+  @include b2;
   // 1. block styles
   // 2. list styles
   // 3. inline styles
@@ -323,6 +324,7 @@
   flex-direction: column;
   height: 100%;
   justify-content: space-between;
+  word-break: break-word;
 
   @include formatted-text();
   @include collapsible();
