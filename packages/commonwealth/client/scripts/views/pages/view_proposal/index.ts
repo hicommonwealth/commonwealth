@@ -1022,7 +1022,7 @@ const ViewProposalPage: m.Component<
                     ) => {
                       proposal.stage = stage;
                       proposal.chainEntities = chainEntities;
-                      if (app.chain?.meta.snapshot) {
+                      if (app.chain?.meta.snapshot?.length) {
                         proposal.snapshotProposal = snapshotProposal[0]?.id;
                       }
                       app.threads.fetchThreadsFromId([proposal.identifier]);
@@ -1155,7 +1155,7 @@ const ViewProposalPage: m.Component<
                 ) => {
                   proposal.stage = stage;
                   proposal.chainEntities = chainEntities;
-                  if (app.chain?.meta.snapshot) {
+                  if (app.chain?.meta.snapshot?.length) {
                     proposal.snapshotProposal = snapshotProposal[0]?.id;
                   }
                   app.threads.fetchThreadsFromId([proposal.identifier]);

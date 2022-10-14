@@ -62,7 +62,7 @@ class ProposalSidebarLinkedSnapshot
   view(vnode) {
     const { thread } = vnode.attrs;
     if (!thread.snapshotProposal) return;
-    if (!app.chain?.meta?.snapshot) return;
+    if (!app.chain?.meta?.snapshot?.length) return;
 
     if (!this.initialized) {
       this.initialized = true;

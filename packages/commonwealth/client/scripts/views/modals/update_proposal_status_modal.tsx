@@ -43,7 +43,7 @@ export class UpdateProposalStatusModal
   view(vnode) {
     if (!app.chain?.meta) return;
 
-    const { customStages } = app.chain?.meta;
+    const { customStages } = app.chain.meta;
 
     const stages = !customStages
       ? [
@@ -54,6 +54,7 @@ export class UpdateProposalStatusModal
           ThreadStage.Failed,
         ]
       : parseCustomStages(customStages);
+    const showSnapshot = !!app.chain.meta.snapshot?.length;
 
     return (
       <div class="UpdateProposalStatusModal">
@@ -75,7 +76,7 @@ export class UpdateProposalStatusModal
               ))}
             </div>
           )}
-          {app.chain?.meta?.snapshot && (
+          {showSnapshot && (
             <SnapshotProposalSelector
               thread={vnode.attrs.thread}
               onSelect={(sn) => {
