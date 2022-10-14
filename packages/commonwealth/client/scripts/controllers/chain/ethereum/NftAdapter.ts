@@ -41,7 +41,7 @@ export default class Nft extends Ethereum implements ITokenAdapter {
 
   public async initApi() {
     // iterate through selectedChain.Contracts for the Nft type and return the address
-    const nftContracts = this.app.contracts.getByType(ContractType.ERC721).filter((c) => c.symbol === meta.default_symbol);
+    const nftContracts = this.app.contracts.getByType(ContractType.ERC721).filter((c) => c.symbol === this.meta.default_symbol);
     if (!nftContracts || !nftContracts.length) {
       throw new Error('No ERC721 contracts found');
     }

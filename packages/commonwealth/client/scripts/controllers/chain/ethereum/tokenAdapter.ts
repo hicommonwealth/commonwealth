@@ -40,7 +40,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
 
   public async initApi() {
     // iterate through selectedChain.Contracts for the erc20 type and return the address
-    const tokenContracts = this.app.contracts.getByType(ContractType.ERC20).filter((c) => c.symbol === meta.default_symbol);
+    const tokenContracts = this.app.contracts.getByType(ContractType.ERC20).filter((c) => c.symbol === this.meta.default_symbol);
     if (!tokenContracts || !tokenContracts.length) {
       throw new Error('No ERC20 contracts found');
     }
