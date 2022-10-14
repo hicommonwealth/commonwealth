@@ -67,14 +67,6 @@ export async function initAppState(
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
-            chain.Contracts.map((contract) => {
-              return app.contracts.addToStore(
-                Contract.fromJSON({
-                ...contract,
-                contract_abi: contract.ContractAbi
-              }));
-            });
-            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
