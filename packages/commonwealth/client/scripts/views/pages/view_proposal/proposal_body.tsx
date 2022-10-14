@@ -270,7 +270,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           ]
                         : []),
                       ...((isAuthor || isAdminOrMod) &&
-                      app.chain?.meta.snapshot.length > 0
+                      !!app.chain?.meta.snapshot.length
                         ? [
                             {
                               label: 'Snapshot proposal from thread',
@@ -309,7 +309,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
           </div>
         </div>
         <CWDivider />
-        {hasLink && (<ProposalHeaderExternalLink proposal={proposal} />)}
+        {hasLink && <ProposalHeaderExternalLink proposal={proposal} />}
         {proposal instanceof Thread && (
           <div class="proposal-content">
             {this.isEditingBody ? (

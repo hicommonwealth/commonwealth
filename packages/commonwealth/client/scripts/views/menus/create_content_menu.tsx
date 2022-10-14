@@ -14,7 +14,7 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
-    app.user.activeAccount && app.chain?.meta.snapshot.length > 0;
+    app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
   const topics = app.topics
     .getByCommunity(app.activeChainId())
