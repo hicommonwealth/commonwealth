@@ -312,10 +312,15 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       ) {
                         address = wallet.accounts[0];
                       } else if (wallet.chain === 'cosmos') {
-                        address = wallet.accounts[0].address;
+                        if (wallet.defaultNetwork === 'injective') {
+                          address = wallet.accounts[0];
+                        } else {
+                          address = wallet.accounts[0].address;
+                        }
                       } else if (wallet.defaultNetwork === 'terra') {
                         address = wallet.accounts[0].address;
                       }
+
                       await handleNormalWalletLogin(wallet, address);
                     }
                   }
