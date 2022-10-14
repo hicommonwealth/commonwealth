@@ -2,7 +2,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
@@ -20,18 +21,18 @@ const searchDiscussions = async (
   let bind = {};
 
   if (!req.query.search) {
-    return next(new Error(Errors.QueryMissing));
+    return next(new AppError(Errors.QueryMissing));
   }
   if (req.query.search.length < 4) {
-    return next(new Error(Errors.QueryTooShort));
+    return next(new AppError(Errors.QueryTooShort));
   }
 
   if (req.query.thread_title_only === 'true') {
     if (!req.query.chain) {
-      return next(new Error(Errors.NoChain));
+      return next(new AppError(Errors.NoChain));
     }
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
     const params = {
       chain: chain.id,
@@ -63,7 +64,7 @@ const searchDiscussions = async (
       });
     } catch (e) {
       console.log(e);
-      return next(new Error(Errors.UnexpectedError));
+      return next(new ServerError(Errors.UnexpectedError));
     }
   }
 
@@ -71,7 +72,7 @@ const searchDiscussions = async (
   let communityOptions = '';
   if (req.query.chain) {
     const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new Error(error));
+    if (error) return next(new AppError(error));
 
     // set up query parameters
     communityOptions = `AND "Threads".chain = $chain `;
@@ -117,7 +118,7 @@ const searchDiscussions = async (
     );
   } catch (e) {
     console.log(e);
-    return next(new Error(Errors.UnexpectedError));
+    return next(new ServerError(Errors.UnexpectedError)); 
   }
 
   return res.json({

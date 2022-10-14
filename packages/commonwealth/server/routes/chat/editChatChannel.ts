@@ -1,7 +1,8 @@
 import { NextFunction } from 'express';
 import validateRoles from '../../util/validateRoles';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { DB } from '../../database';
+import { DB } from '../../models';
+import { AppError, ServerError } from '../../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -24,15 +25,15 @@ export default async (
   res: TypedResponse<Record<string, never>>,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
 
-  if (!req.body.chain_id) return next(new Error(Errors.NoChainId));
+  if (!req.body.chain_id) return next(new AppError(Errors.NoChainId));
 
-  if (!req.body.channel_id) return next(new Error(Errors.NoChannelId));
+  if (!req.body.channel_id) return next(new AppError(Errors.NoChannelId));
 
   const requesterIsAdmin = await validateRoles(models, req.user, 'admin', req.body.chain_id);
   if (requesterIsAdmin === null) {
-    return next(new Error(Errors.NotAdmin));
+    return next(new AppError(Errors.NotAdmin));
   }
 
   const channel = await models.ChatChannel.findOne({
@@ -46,7 +47,7 @@ export default async (
   }
   if (req.body.rule_id) {
     const rule = await models.Rule.findOne({ where: { id: req.body.rule_id }});
-    if (!rule) return next(new Error(Errors.RuleNotFound));
+    if (!rule) return next(new AppError(Errors.RuleNotFound));
     channel.rule_id = req.body.rule_id;
   }
   await channel.save();

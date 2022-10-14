@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -12,10 +13,10 @@ export const Errors = {
 
 const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   if (req.query.offchain_threads_only && req.query.proposals_only) {
-    return next(new Error(Errors.MutuallyExclusive));
+    return next(new AppError(Errors.MutuallyExclusive));
   }
   const whereOptions: any = {};
   whereOptions.chain = chain.id;

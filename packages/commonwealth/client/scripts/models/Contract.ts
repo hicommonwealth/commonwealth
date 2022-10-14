@@ -12,7 +12,7 @@ class Contract {
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
-  public readonly abi?: string;
+  public readonly abi?: Record<string, unknown>;
 
   constructor(id, address, chainNodeId, type, createdAt, updatedAt, decimals?, tokenName?, symbol?, contractAbi?) {
     this.id = id;
@@ -37,7 +37,7 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    contract_abi
+    ContractAbi
   }) {
     return new Contract(
       id,
@@ -49,7 +49,7 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      contract_abi);
+      ContractAbi);
   }
 }
 

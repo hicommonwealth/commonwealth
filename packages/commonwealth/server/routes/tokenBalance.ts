@@ -2,7 +2,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
@@ -36,15 +36,34 @@ const tokenBalance = async (
   let contract: ContractInstance;
   try {
     [chain, error] = await validateChain(models, req.body);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err);
   }
   try {
     [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new Error(error);
+    if (error) throw new AppError(error);
   } catch (err) {
     throw new AppError(err)
+  }
+
+  let chain_node_id = chain.ChainNode.id;
+  if (
+    ['ethereum', 'near', 'solana'].includes(chain.ChainNode.chain_base) &&
+    chain.network !== ChainNetwork.AxieInfinity
+  ) {
+    try {
+      const { contract_address } = req.body;
+      contract = await models.Contract.findOne({
+        where: {
+          address: contract_address,
+        },
+        include: [{ model: models.ChainNode, required: true }],
+      });
+      chain_node_id = contract.ChainNode.id; // override based on Contract
+    } catch (err) {
+      throw new AppError(err);
+    }
   }
 
   try {
@@ -63,9 +82,9 @@ const tokenBalance = async (
 
   try {
     const balance = await tokenBalanceCache.getBalance(
-      contract.ChainNode.id,
+      chain_node_id,
       author.address,
-      contract.address,
+      contract?.address,
       chain.network === ChainNetwork.ERC20
         ? 'erc20' : chain.network === ChainNetwork.ERC721
           ? 'erc721' : chain.network === ChainNetwork.SPL

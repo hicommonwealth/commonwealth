@@ -5,7 +5,8 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { JWT_SECRET } from '../config';
 import '../types';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -35,11 +36,6 @@ const status = async (
             model: models.ChainNode,
             required: true,
           },
-          {
-            model: models.Contract,
-            required: false,
-            include: [{ model: models.ContractAbi, required: false}],
-          }
         ],
       }),
       models.ChainNode.findAll(),
@@ -63,8 +59,8 @@ const status = async (
           `
         SELECT "Threads".chain, COUNT("Threads".id) 
         FROM "Threads"
-        WHERE "Threads".deleted_at IS NULL
-        AND NOT "Threads".pinned
+        WHERE "Threads".created_at > :thirtyDaysAgo
+        AND "Threads".deleted_at IS NULL
         AND "Threads".chain IS NOT NULL
         GROUP BY "Threads".chain;
         `,
@@ -92,7 +88,10 @@ const status = async (
       disableRichText,
       lastVisited,
     ] = await Promise.all([
-      unfilteredAddresses.filter((address) => !!address.verified && chains.map((c) => c.id).includes(address.chain)),
+      unfilteredAddresses.filter(
+        (address) =>
+          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+      ),
       user.getSocialAccounts(),
       user.getSelectedChain(),
       user.isAdmin,
@@ -122,10 +121,9 @@ const status = async (
         `
       SELECT "Threads".chain, COUNT("Threads".id) 
       FROM "Threads"
-      WHERE 
-        "Threads".deleted_at IS NULL
-          AND NOT "Threads".pinned
-          AND "Threads".chain IS NOT NULL
+      WHERE "Threads".created_at > :thirtyDaysAgo
+      AND "Threads".deleted_at IS NULL
+      AND "Threads".chain IS NOT NULL
       GROUP BY "Threads".chain;
       `,
         {

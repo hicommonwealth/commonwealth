@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { DB } from '../../database';
+import { DB } from '../../models';
+import { AppError } from '../../util/errors';
 
 export const Errors = {
 	NoChannelId: 'No channel id given'
@@ -16,7 +17,7 @@ export const Errors = {
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
 	// check channel id
 	if (!req.query.channel_id) {
-		return next(new Error(Errors.NoChannelId))
+		return next(new AppError(Errors.NoChannelId))
 	}
 
   const channel = await models.ChatChannel.findOne({

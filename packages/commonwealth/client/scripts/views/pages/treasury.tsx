@@ -7,7 +7,7 @@ import 'pages/treasury.scss';
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
@@ -69,8 +69,7 @@ class TreasuryPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Referenda" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Referenda" />}
         />
       );
     }
@@ -110,8 +109,7 @@ class TreasuryPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Referenda" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
         <div class="TreasuryPage">
           {onSubstrate && (

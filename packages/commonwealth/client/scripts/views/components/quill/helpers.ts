@@ -24,20 +24,28 @@ export const countLinesMarkdown = (text: string) => {
   return text.split('\n').length - 1;
 };
 
-// TODO Graham 22-6-5: Add option to trim doc to param length
+// TODO Graham 2022.06.05: Add option to trim doc to param length
 // (will allow us to use helper for previews, drafts, etc)
-export const renderQuillTextBody = (textBody: any, params: QuillTextParams) => {
+
+// TODO Graham 2022.09.22: Investigate when and why decodeURIComponent fails,
+// and build a more reliable and transparent system for saving & rendering,
+// encoding and decoding
+export const renderQuillTextBody = (
+  textBody: any,
+  params?: QuillTextParams
+) => {
+  let decodedTextbody: string;
   try {
-    const doc = JSON.parse(decodeURIComponent(textBody));
+    decodedTextbody = decodeURIComponent(textBody);
+  } catch (e) {
+    decodedTextbody = textBody;
+  }
+
+  try {
+    const doc = JSON.parse(decodedTextbody);
     if (!doc.ops) throw new Error();
     return m(QuillFormattedText, { ...params, doc });
   } catch (e) {
-    let doc;
-    try {
-      doc = decodeURIComponent(textBody);
-    } catch (e2) {
-      return m(MarkdownFormattedText, { ...params, textBody });
-    }
-    return m(MarkdownFormattedText, { ...params, doc });
+    return m(MarkdownFormattedText, { ...params, doc: decodedTextbody });
   }
 };

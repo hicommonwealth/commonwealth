@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -13,10 +15,10 @@ export const Errors = {
 const updateAddress = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const { address, chain } = req.body
   if (!address) {
-    return next(new Error(Errors.NoAddress));
+    return next(new AppError(Errors.NoAddress));
   }
   if (!chain) {
-    return next(new Error(Errors.NoChain));
+    return next(new AppError(Errors.NoChain));
   }
   const transaction = await sequelize.transaction();
   try {

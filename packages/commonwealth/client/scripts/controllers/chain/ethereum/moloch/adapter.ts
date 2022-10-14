@@ -3,7 +3,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ContractType } from 'common-common/src/types';
 import { ChainInfo, IChainAdapter } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -34,7 +34,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.ethAccounts.init(this.chain);
-    const molContracts = this.app.contracts.getByType('moloch').filter((c) => c.symbol === this.meta.default_symbol);
+    const molContracts = this.app.contracts.getByType(ContractType.MOLOCH1).filter((c) => c.symbol === this.meta.default_symbol);
     if (!molContracts || !molContracts.length) {
       throw new Error('No Mol contracts found');
     }

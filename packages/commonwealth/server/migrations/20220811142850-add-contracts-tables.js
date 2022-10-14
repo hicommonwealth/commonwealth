@@ -20,6 +20,7 @@ module.exports = {
       await queryInterface.createTable('ContractAbis', {
         id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
         abi: { type: Sequelize.JSONB, unique: true },
+        verified: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
         created_at: { type: Sequelize.DATE, allowNull: false },
         updated_at: { type: Sequelize.DATE, allowNull: false },
       }, { transaction: t });
