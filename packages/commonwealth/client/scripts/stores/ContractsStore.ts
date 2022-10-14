@@ -35,17 +35,6 @@ class ContractsStore extends IdStore<Contract> {
         return this._storeAddress[address] || null;
     }
 
-    public getContractByAddress(address: string): Contract {
-        // filter through the _storeId map for a contract with a specified address
-        const contracts = this.getAll().filter((c) => c.address === address);
-        if (contracts.length > 0) {
-            return contracts[0];
-        } else {
-            console.log("No contract found with address: ", address);
-            return null;
-        }
-    }
-
 }
 
 export default ContractsStore;
