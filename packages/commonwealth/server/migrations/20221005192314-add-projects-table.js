@@ -55,7 +55,7 @@ module.exports = {
         id: 'common-protocol',
         default_symbol: 'CWP',
         name: 'Common Protocol',
-        type: 'token',
+        type: 'dao',
         network: 'common-protocol',
         base: 'ethereum',
         active: true,
