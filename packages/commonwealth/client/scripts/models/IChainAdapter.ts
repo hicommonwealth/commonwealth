@@ -90,7 +90,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       chatChannels,
       rules, // TODO: store in rules controller
       communityBanner,
-      contracts
+      contracts,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);

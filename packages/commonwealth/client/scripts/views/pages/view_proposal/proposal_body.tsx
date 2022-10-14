@@ -270,7 +270,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           ]
                         : []),
                       ...((isAuthor || isAdminOrMod) &&
-                      app.chain?.meta.snapshot.length > 0
+                      !!app.chain?.meta.snapshot.length
                         ? [
                             {
                               label: 'Snapshot proposal from thread',
