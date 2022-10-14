@@ -48,13 +48,13 @@ export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
             ) => {
               proposal.stage = stage;
               proposal.chainEntities = chainEntities;
-              if (app.chain?.meta.snapshot) {
+              if (app.chain?.meta.snapshot.length) {
                 proposal.snapshotProposal = snapshotProposal[0]?.id;
               }
               app.threads.fetchThreadsFromId([proposal.identifier]);
               m.redraw();
             }}
-            proposal={proposal}
+            thread={proposal}
             showAddProposalButton={isAuthor || isAdminOrMod}
           />
         )}
