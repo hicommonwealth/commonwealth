@@ -119,7 +119,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loaded = false;
           }}
           textarea
-        />,
+        />
         <SelectRow
           title="Contract Type"
           options={[
