@@ -114,6 +114,7 @@ export class AccountSelector
 {
   view(vnode) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
+
     return (
       <div class="AccountSelector">
         <div class="close-button-wrapper">
@@ -243,7 +244,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           let address;
                           if (app.chain) {
                             address = addressSwapper({
-                              address: wallet.accounts[0].address,
+                              address: wallet.accounts[accountIndex].address,
                               currentPrefix: (app.chain as Substrate).chain
                                 .ss58Format,
                             });
