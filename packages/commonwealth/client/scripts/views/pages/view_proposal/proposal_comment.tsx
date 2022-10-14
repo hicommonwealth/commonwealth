@@ -139,7 +139,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                         menuItems={[
                           {
                             label: 'Edit',
-                            iconName: 'write',
+                            iconLeft: 'write',
                             onclick: async (e) => {
                               e.preventDefault();
                               this.savedEdits = localStorage.getItem(
@@ -164,7 +164,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                           },
                           {
                             label: 'Delete',
-                            iconName: 'trash',
+                            iconLeft: 'trash',
                             onclick: () => {
                               app.comments.delete(comment).then(() => {
                                 m.redraw();

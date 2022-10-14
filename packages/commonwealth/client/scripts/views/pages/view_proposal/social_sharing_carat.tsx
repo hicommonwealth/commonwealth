@@ -16,7 +16,7 @@ export class SocialSharingCarat
       <CWPopoverMenu
         menuItems={[
           {
-            iconName: 'copy',
+            iconLeft: 'copy',
             label: 'Copy URL',
             onclick: async () => {
               const currentRouteSansCommentParam = m.route
@@ -34,7 +34,7 @@ export class SocialSharingCarat
             },
           },
           {
-            iconName: 'twitter',
+            iconLeft: 'twitter',
             label: 'Share on Twitter',
             onclick: async () => {
               if (!vnode.attrs.commentId) {
