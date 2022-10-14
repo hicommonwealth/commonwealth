@@ -1,16 +1,17 @@
 /* @jsx m */
 
-import 'components/create_content_popover.scss';
-
 import m from 'mithril';
+
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { MenuItemAttrs } from './types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
+import { MenuItem } from '../components/component_kit/types';
 
-export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
+const getCreateContentMenuItems = (): Array<MenuItem> => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -37,15 +38,10 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
-  return [
-    {
-      label: 'New Thread',
-      onclick: () => {
-        navigateToSubpage('/new/discussion');
-      },
-    },
-    ...topics.map((t) => ({
+  const getTopicThreads = (): Array<MenuItem> =>
+    topics.map((t) => ({
       label: `New ${t.name} Thread`,
+      iconLeft: 'write',
       onclick: () => {
         // TODO Graham 7-19-22: Let's find a non-localStorage solution
         localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
@@ -61,24 +57,32 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
         }
         navigateToSubpage('/new/discussion');
       },
-    })),
-    ...(showOnChainProposalItem
+    }));
+
+  const getOnChainProposalItem = (): Array<MenuItem> =>
+    showOnChainProposalItem
       ? [
           {
             label: 'New On-Chain Proposal',
             onclick: () => navigateToSubpage('/new/proposal'),
+            iconLeft: 'star',
           },
         ]
-      : []),
-    ...(showSputnikProposalItem
+      : [];
+
+  const getSputnikProposalItem = (): Array<MenuItem> =>
+    showSputnikProposalItem
       ? [
           {
             label: 'New Sputnik proposal',
             onclick: () => navigateToSubpage('/new/proposal'),
+            iconLeft: 'democraticProposal',
           },
         ]
-      : []),
-    ...(showSubstrateProposalItems
+      : [];
+
+  const getSubstrateProposalItems = (): Array<MenuItem> =>
+    showSubstrateProposalItems
       ? [
           {
             label: 'New treasury proposal',
@@ -86,6 +90,7 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
               }),
+            iconLeft: 'treasuryProposal',
           },
           {
             label: 'New democracy proposal',
@@ -93,8 +98,9 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
+            iconLeft: 'democraticProposal',
           },
-          ...((activeAccount as SubstrateAccount)?.isCouncillor
+          ...(((activeAccount as SubstrateAccount)?.isCouncillor
             ? [
                 {
                   label: 'New council motion',
@@ -102,15 +108,17 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
                     navigateToSubpage('/new/proposal/:type', {
                       type: ProposalType.SubstrateCollectiveProposal,
                     }),
+                  iconLeft: 'councilProposal',
                 },
               ]
-            : []),
+            : []) as Array<MenuItem>),
           {
             label: 'New bounty proposal',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateBountyProposal,
               }),
+            iconLeft: 'badge',
           },
           {
             label: 'New tip',
@@ -118,13 +126,17 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
+            iconLeft: 'jar',
           },
         ]
-      : []),
-    ...(showSnapshotOptions
+      : [];
+
+  const getSnapshotProposalItem = (): Array<MenuItem> =>
+    showSnapshotOptions
       ? [
           {
             label: 'New Snapshot Proposal',
+            iconLeft: 'democraticProposal',
             onclick: () => {
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
@@ -137,7 +149,21 @@ export const getCreateContentMenuItemAttrs = (): MenuItemAttrs[] => {
             },
           },
         ]
-      : []),
+      : [];
+
+  return [
+    {
+      label: 'New Thread',
+      onclick: () => {
+        navigateToSubpage('/new/discussion');
+      },
+      iconLeft: 'write',
+    },
+    ...getTopicThreads(),
+    ...getOnChainProposalItem(),
+    ...getSputnikProposalItem(),
+    ...getSubstrateProposalItems(),
+    ...getSnapshotProposalItem(),
   ];
 };
 
@@ -145,17 +171,32 @@ export class CreateContentMenu implements m.ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        className="MainMenu"
         menuHeader={{
           label: 'Create',
-          onclick: (e) => {
+          onclick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={getCreateContentMenuItemAttrs().map((attr) => ({
-          ...attr,
-          iconName: 'write',
-        }))}
+        menuItems={getCreateContentMenuItems()}
+      />
+    );
+  }
+}
+
+export class CreateContentPopover implements m.ClassComponent {
+  view() {
+    if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
+
+    return (
+      <CWPopoverMenu
+        trigger={
+          <CWIconButton
+            iconButtonTheme="black"
+            disabled={!app.user.activeAccount}
+            iconName="plusCircle"
+          />
+        }
+        menuItems={getCreateContentMenuItems()}
       />
     );
   }

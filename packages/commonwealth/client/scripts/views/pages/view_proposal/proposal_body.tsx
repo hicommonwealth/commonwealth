@@ -162,7 +162,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Edit',
-                              iconName: 'write',
+                              iconLeft: 'write',
                               onclick: async (e) => {
                                 e.preventDefault();
                                 this.savedEdits = localStorage.getItem(

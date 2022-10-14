@@ -23,7 +23,7 @@ import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
-import { MobileMenuName } from './views/components/mobile_menu/mobile_menu_lookup';
+import { MobileMenuName } from './views/app_mobile_menus';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
