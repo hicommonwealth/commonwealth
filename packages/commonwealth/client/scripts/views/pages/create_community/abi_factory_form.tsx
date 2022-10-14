@@ -14,7 +14,6 @@ import {
   ChainType,
   WalletId,
 } from 'common-common/src/types';
-import Ethereum from 'controllers/chain/ethereum/main';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -49,11 +48,11 @@ import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
+import { Spinner } from 'construct-ui';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { Spinner } from 'construct-ui';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
