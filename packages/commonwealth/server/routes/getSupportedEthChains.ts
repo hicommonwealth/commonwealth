@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 
 type GetSupportedEthChainsResp = { [id: number]: { url: string, alt_wallet_url: string } };
 

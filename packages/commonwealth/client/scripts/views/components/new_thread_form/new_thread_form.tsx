@@ -56,7 +56,6 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     author: Account,
     stage = ThreadStage.Discussion
   ) {
-    if (!this) throw new Error('no this');
     const body = quillEditorState.textContentsAsString;
     quillEditorState.disable();
     checkNewThreadErrors(form, body);
@@ -68,8 +67,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
         stage,
         app.activeChainId(),
         form.title,
-        form.topicName,
-        form.topicId,
+        form.topic,
         body,
         form.url
       );
@@ -91,8 +89,8 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     ) as HTMLInputElement;
     titleEle.value = draft.title;
     this.form.title = draft.title;
-    this.form.topicName = draft.topic;
-    this.activeTopic = draft.topic;
+    this.form.topic = app.topics.getByName(draft.topic, draft.chain);
+    this.activeTopic = this.form.topic;
     this.fromDraft = draft.id;
 
     localStorage.setItem(
@@ -119,7 +117,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     const draftParams: DraftParams = {
       title: form.title,
       body: quillEditorState.textContentsAsString,
-      topicName: form.topicName,
+      topicName: form.topic.name,
       attachments: [], // TODO: Hookup attachments
     };
 
@@ -173,18 +171,16 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  private _updateTopicState(topicName: string, topicId?: number) {
-    localStorage.setItem(`${app.activeChainId()}-active-topic`, topicName);
-    this.activeTopic = topicName;
-    this.form.topicName = topicName;
-    this.form.topicId = topicId;
+  private _updateTopicState(topic: Topic) {
+    localStorage.setItem(`${app.activeChainId()}-active-topic`, topic.name);
+    this.activeTopic = topic;
+    this.form.topic = topic;
   }
 
   oninit(vnode: m.VnodeDOM<NewThreadFormAttrs, this>) {
     const { isModal } = vnode.attrs;
     this.form = {
-      topicName: null,
-      topicId: null,
+      topic: null,
       title: null,
       kind: ThreadKind.Discussion,
     };
@@ -274,7 +270,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
       `${chainId}-active-topic-default-template`
     );
 
-    const topicMissing = hasTopics && !this.form?.topicName;
+    const topicMissing = hasTopics && !this.form?.topic;
 
     const linkContentMissing =
       this.form.kind === ThreadKind.Link && !this.form.url;
@@ -640,7 +636,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
                           <div class="draft-title">
                             {fromDraft === draft.id ? (
                               <>
-                                <CWIcon iconName="edit" iconSize="small" />
+                                <CWIcon iconName="write" iconSize="small" />
                                 <CWText
                                   fontWeight="semiBold"
                                   noWrap

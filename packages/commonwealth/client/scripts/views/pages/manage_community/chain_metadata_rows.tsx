@@ -48,9 +48,10 @@ export class ChainMetadataRows
   iconUrl: string;
   stagesEnabled: boolean;
   customStages: string;
+  chatEnabled: boolean;
   customDomain: string;
   terms: string;
-  defaultSummaryView: boolean;
+  defaultOverview: boolean;
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
@@ -71,13 +72,14 @@ export class ChainMetadataRows
     this.github = vnode.attrs.chain.github;
     this.stagesEnabled = vnode.attrs.chain.stagesEnabled;
     this.customStages = vnode.attrs.chain.customStages;
+    this.chatEnabled = vnode.attrs.chain.chatEnabled;
     this.customDomain = vnode.attrs.chain.customDomain;
     this.terms = vnode.attrs.chain.terms;
     this.iconUrl = vnode.attrs.chain.iconUrl;
     this.network = vnode.attrs.chain.network;
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
-    this.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
+    this.defaultOverview = vnode.attrs.chain.defaultOverview;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
@@ -174,14 +176,26 @@ export class ChainMetadataRows
         />
         <ToggleRow
           title="Summary view"
-          defaultValue={vnode.attrs.chain.defaultSummaryView}
+          defaultValue={vnode.attrs.chain.defaultOverview}
           onToggle={(checked) => {
-            this.defaultSummaryView = checked;
+            this.defaultOverview = checked;
           }}
           caption={(checked) =>
             checked
               ? 'Discussion listing defaults to summary view'
               : 'Discussion listing defaults to latest activity view'
+          }
+        />
+        <ToggleRow
+          title="Chat Enabled"
+          defaultValue={vnode.attrs.chain.chatEnabled}
+          onToggle={(checked) => {
+            this.chatEnabled = checked;
+          }}
+          caption={(checked) =>
+            checked
+              ? "Don't enable chat feature for this community"
+              : 'Enable chat feature for this community '
           }
         />
         <InputRow
@@ -291,10 +305,11 @@ export class ChainMetadataRows
               stagesEnabled,
               customStages,
               customDomain,
+              chatEnabled,
               snapshot,
               terms,
               iconUrl,
-              defaultSummaryView,
+              defaultOverview,
             } = this;
 
             for (const space of snapshot) {
@@ -354,7 +369,8 @@ export class ChainMetadataRows
                 snapshot,
                 terms,
                 iconUrl,
-                defaultSummaryView,
+                defaultOverview,
+                chatEnabled,
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');

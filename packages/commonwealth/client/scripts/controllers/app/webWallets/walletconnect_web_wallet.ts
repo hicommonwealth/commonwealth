@@ -42,7 +42,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(this._chainInfo.node.ethChainId, message);
+    const msgParams = constructTypedMessage(
+      this._chainInfo.node.ethChainId,
+      message
+    );
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
       JSON.stringify(msgParams),
@@ -50,10 +53,26 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // TODO: test whether signTypedData works on WC
-    const webWalletSignature = await this.signLoginToken(account.validationToken);
-    return account.validate(webWalletSignature);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationToken
+    );
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
+  }
+
+  public async reset() {
+    console.log('Attempting to reset WalletConnect');
+    const ks = await this._provider.wc.killSession();
+    this._provider.disconnect();
+    this._enabled = false;
   }
 
   public async enable() {
@@ -61,11 +80,15 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      this._chainInfo = app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+      this._chainInfo =
+        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
       const chainId = this._chainInfo.node.ethChainId;
 
       // use alt wallet url if available
-      const rpc = { [chainId]: this._chainInfo.node.altWalletUrl || this._chainInfo.node.url }
+      const rpc = {
+        [chainId]:
+          this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
+      };
       this._provider = new WalletConnectProvider({ rpc, chainId });
 
       //  Enable session (triggers QR Code modal)
@@ -87,14 +110,14 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      const updatedAddress = app.user.activeAccounts.find(
+        (addr) => addr.address === accounts[0]
+      );
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
     });
     // TODO: chainChanged, disconnect events
   }
-
-  // TODO: disconnect
 }
 
 export default WalletConnectWebWalletController;

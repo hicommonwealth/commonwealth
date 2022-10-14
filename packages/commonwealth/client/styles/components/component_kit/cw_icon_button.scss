@@ -3,6 +3,23 @@
 .IconButton {
   @include baseIconStyles;
 
+  &.black {
+    cursor: pointer;
+    color: $neutral-800;
+
+    &:hover {
+      color: $neutral-900;
+    }
+
+    &:active {
+      color: $neutral-600;
+    }
+
+    &.selected {
+      color: $neutral-600;
+    }
+  }
+
   &.neutral {
     color: $neutral-500;
     cursor: pointer;
@@ -46,5 +63,10 @@
       background-color: $neutral-700;
       color: $neutral-300;
     }
+  }
+
+  &.disabled {
+    color: $neutral-200;
+    pointer-events: none;
   }
 }

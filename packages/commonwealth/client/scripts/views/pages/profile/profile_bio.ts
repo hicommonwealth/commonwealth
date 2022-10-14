@@ -113,7 +113,8 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       if (!app.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
-        (a) => a.address === account.address && a.chain.id === app.activeChainId()
+        (a) =>
+          a.address === account.address && a.chain.id === app.activeChainId()
       );
       try {
         await app.roles.createRole({
@@ -185,13 +186,13 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]
       ),
-      isClaimable &&
-        m(LoginWithWalletDropdown, {
-          prepopulateAddress: account.address,
-          loggingInWithAddress: !app.isLoggedIn(),
-          joiningChain: app.activeChainId(),
-          label: 'Claim address',
-        }),
+      // isClaimable &&
+      //   m(LoginWithWalletDropdown, {
+      //     prepopulateAddress: account.address,
+      //     loggingInWithAddress: !app.isLoggedIn(),
+      //     joiningChain: app.activeChainId(),
+      //     label: 'Claim address',
+      //   }),
       m('.bio-actions-right', [
         onOwnProfile
           ? [

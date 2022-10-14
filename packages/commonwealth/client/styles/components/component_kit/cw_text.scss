@@ -20,21 +20,11 @@
   }
 
   &.b1 {
-    font-family: $font-family-neue-haas-unica;
-    font-size: 16px;
-    letter-spacing: 0.02em;
-    line-height: 24px;
+    @include b1;
   }
 
   &.b2 {
-    font-family: $font-family-neue-haas-unica;
-    font-size: 14px;
-    line-height: 20px;
-
-    &.bold,
-    &.italic {
-      letter-spacing: 0.02em;
-    }
+    @include b2;
   }
 
   &.h1 {
@@ -82,10 +72,7 @@
   }
 
   &.caption {
-    font-family: $font-family-neue-haas-unica;
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    line-height: 16px;
+    @include caption;
 
     &.uppercase {
       font-weight: 500;

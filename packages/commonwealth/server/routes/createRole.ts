@@ -2,7 +2,8 @@ import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { NotificationCategories } from 'common-common/src/types';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -19,9 +20,9 @@ const createRole = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
 
-  if (error) return next(new Error(error));
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new Error(Errors.InvalidAddress));
+  if (error) return next(new AppError(error));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
+  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -30,7 +31,7 @@ const createRole = async (
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) return next(new Error(Errors.InvalidAddress));
+  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
   const [ role ] = await models.Role.findOrCreate({ where: {
     address_id: validAddress.id,

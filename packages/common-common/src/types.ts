@@ -44,6 +44,19 @@ export enum ChainBase {
   Solana = 'solana',
 }
 
+export enum ContractType {
+  DAOFACTORY = 'dao-factory',
+  AAVE = 'aave',
+  COMPOUND = 'compound',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  MARLINTESTNET = 'marlin-testnet',
+  SPL = 'spl',
+  MOLOCH1 = 'moloch1', // unused
+  MOLOCH2 = 'moloch2', // unused
+  COMMONPROTOCOL = 'common-protocol'
+}
+
 export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
@@ -111,14 +124,6 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
-}
-
-export enum ContractType {
-  ERC20 = 'erc20',
-  ERC721 = 'erc721',
-  SPL = 'spl', // solana token
-  Compound = 'compound',
-  Aave = 'aave',
 }
 
 export enum BalanceType {

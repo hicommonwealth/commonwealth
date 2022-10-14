@@ -7,8 +7,8 @@ import 'pages/proposals.scss';
 import app from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
+import Substrate from 'controllers/chain/substrate/adapter';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
@@ -91,7 +91,6 @@ const ProposalsPage: m.Component<{}> = {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Proposals" />}
-          showNewProposalButton
         />
       );
     }
@@ -310,8 +309,7 @@ const ProposalsPage: m.Component<{}> = {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Proposals" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Proposals" />}
       >
         <div class="ProposalsPage">
           {onSubstrate && (

@@ -37,6 +37,7 @@
     "no-restricted-syntax": "off",
     "no-underscore-dangle": "off",
     "no-useless-constructor": "off",
-    "class-methods-use-this": "off"
+    "class-methods-use-this": "off",
+    "import/no-extraneous-dependencies": "off"
   }
 }

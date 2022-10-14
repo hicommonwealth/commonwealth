@@ -16,6 +16,7 @@ import {
   ChainEntity,
   NotificationSubscription,
   Poll,
+  Topic,
 } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -57,9 +58,7 @@ export const modelFromServer = (thread) => {
   } = thread;
 
   const attachments = Attachments
-    ? Attachments.map(
-        (a) => new Attachment(a.url, a.description)
-      )
+    ? Attachments.map((a) => new Attachment(a.url, a.description))
     : [];
 
   if (reactions) {
@@ -199,7 +198,7 @@ export interface VersionHistory {
 class ThreadsController {
   private _store = new ProposalStore<Thread>();
   private _listingStore: RecentListingStore = new RecentListingStore();
-  private _summaryStore = new ProposalStore<Thread>();
+  private _overviewStore = new ProposalStore<Thread>();
 
   public get store() {
     return this._store;
@@ -207,8 +206,8 @@ class ThreadsController {
   public get listingStore() {
     return this._listingStore;
   }
-  public get summaryStore() {
-    return this._summaryStore;
+  public get overviewStore() {
+    return this._overviewStore;
   }
 
   private _initialized = false;
@@ -242,8 +241,7 @@ class ThreadsController {
     stage: string,
     chainId: string,
     title: string,
-    topicName: string,
-    topicId: number,
+    topic: Topic,
     body?: string,
     url?: string,
     attachments?: string[],
@@ -261,8 +259,8 @@ class ThreadsController {
         kind,
         stage,
         'attachments[]': attachments,
-        topic_name: topicName,
-        topic_id: topicId,
+        topic_name: topic.name,
+        topic_id: topic.id,
         url,
         readOnly,
         jwt: app.user.jwt,
@@ -293,7 +291,8 @@ class ThreadsController {
         NotificationSubscription.fromJSON(subscriptionJSON)
       );
       return result;
-    } catch (err) {
+    } 
+    catch (err) {
       console.log('Failed to create thread');
       throw new Error(
         err.responseJSON && err.responseJSON.error
@@ -332,10 +331,8 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Update counters
-        if (proposal.stage === ThreadStage.Voting)
-          this.numVotingThreads--;
-        if (result.stage === ThreadStage.Voting)
-          this.numVotingThreads++;
+        if (proposal.stage === ThreadStage.Voting) this.numVotingThreads--;
+        if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.add(result);
@@ -375,10 +372,7 @@ class ThreadsController {
     });
   }
 
-  public async setStage(args: {
-    threadId: number;
-    stage: ThreadStage;
-  }) {
+  public async setStage(args: { threadId: number; stage: ThreadStage }) {
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadStage`,
       type: 'POST',
@@ -392,8 +386,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Update counters
         if (args.stage === ThreadStage.Voting) this.numVotingThreads--;
-        if (result.stage === ThreadStage.Voting)
-          this.numVotingThreads++;
+        if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);

@@ -1,7 +1,8 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -11,9 +12,9 @@ export const Errors = {
 
 const setDefaultRole = async (models: DB, req, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.address || !req.body.author_chain) return next(new Error(Errors.InvalidAddress));
+  if (error) return next(new AppError(error));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
+  if (!req.body.address || !req.body.author_chain) return next(new AppError(Errors.InvalidAddress));
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -23,13 +24,13 @@ const setDefaultRole = async (models: DB, req, res: Response, next: NextFunction
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) return next(new Error(Errors.InvalidAddress));
+  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
   const existingRole = await models.Role.findOne({ where: {
     address_id: validAddress.id,
     chain_id: chain.id,
   } });
-  if (!existingRole) return next(new Error(Errors.RoleDNE));
+  if (!existingRole) return next(new AppError(Errors.RoleDNE));
 
   validAddress.last_active = new Date();
   await validAddress.save();

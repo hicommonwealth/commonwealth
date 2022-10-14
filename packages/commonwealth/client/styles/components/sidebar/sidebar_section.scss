@@ -6,16 +6,30 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   .section-group-title-container {
     align-items: center;
+    color: $neutral-800;
     display: flex;
-    justify-content: space-between;
-    padding: 8px 8px 8px 16px;
+    justify-content: left;
+    padding: 8px;
+    @include small {
+      padding: 12px 32px 12px 40px;
+    }
+    @include extraSmall {
+      padding: 10px 12px;
+    }
 
-    .title-text {
-      font-size: 18px;
-      font-weight: 600;
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    .Icon {
+      margin-right: 4px;
+      @include smallInclusive {
+        margin-right: 14px;
+      }
     }
   }
 
@@ -26,34 +40,30 @@
 }
 
 .SubSectionGroup {
-  .SubSectionGroupTitle {
+  .sub-section-group-title {
+    padding: 4px 8px 4px 28px;
     align-items: center;
     display: flex;
-    height: 32px;
     min-width: 0;
-    padding: 0 8px;
+
+    @include small {
+      padding: 12px 32px 12px 78px;
+    }
+
+    @include extraSmall {
+      padding: 12px 8px 12px 44px;
+    }
 
     .title-text {
-      font-size: 14px;
-      font-weight: 400;
+      color: $neutral-600;
       overflow: hidden;
-      padding-right: 16px;
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
     }
 
-    &.section-title-text-active {
-      font-weight: 500;
-      color: $purple-500;
-    }
-
-    &.section-title-text-stale {
-      color: $neutral-500;
-    }
-
     &.background {
-      background-color: $purple-50;
+      background-color: $primary-100;
     }
 
     &.no-background {
@@ -62,11 +72,7 @@
 
     &.active,
     &:hover {
-      background-color: $purple-50;
-    }
-
-    .no-carat {
-      width: 24px;
+      background-color: $primary-50;
     }
 
     .carat {
@@ -86,7 +92,6 @@
   padding: 0 8px 0 32px;
 
   .title-active {
-    color: $purple-400;
     font-weight: 500;
     margin-right: 8px;
     overflow: hidden;
@@ -101,9 +106,12 @@
     white-space: nowrap;
   }
 
-  &.active,
+  &.active {
+    background-color: $primary-100;
+  }
+
   &:hover {
-    background-color: $purple-50;
+    background-color: $primary-50;
   }
 }
 

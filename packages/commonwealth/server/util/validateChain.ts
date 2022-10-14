@@ -1,7 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import { DB } from '../database';
+import { DB } from '../models';
 import { ChainInstance } from '../models/chain';
 
 export const ChainCommunityErrors = {
@@ -26,6 +26,10 @@ const validateChain = async (
         required: false,
         attributes: ['id', 'name', 'chain_id'],
       },
+      {
+        model: models.ChainNode,
+        required: true,
+      }
     ],
   });
   // searching for chain that doesn't exist
