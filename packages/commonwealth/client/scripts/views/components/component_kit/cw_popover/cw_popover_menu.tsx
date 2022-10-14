@@ -21,7 +21,7 @@ class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
     } else if (vnode.attrs.type === 'divider') {
       return <div class="menu-section-divider" />;
     } else if (vnode.attrs.type === 'default') {
-      const { disabled, isSecondary, iconLeft, label } = vnode.attrs;
+      const { disabled, isSecondary, iconLeft, label, onclick } = vnode.attrs;
       return (
         <div
           class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
