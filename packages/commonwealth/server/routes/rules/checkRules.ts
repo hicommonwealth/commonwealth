@@ -1,5 +1,5 @@
 import { success, TypedRequestBody, TypedResponse } from '../../types';
-import { DB } from '../../database';
+import { DB } from '../../models';
 import RuleCache from '../../util/rules/ruleCache';
 import { AppError } from '../../util/errors';
 import checkRule from '../../util/rules/checkRule';

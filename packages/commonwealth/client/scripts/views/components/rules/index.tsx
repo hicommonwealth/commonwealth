@@ -156,19 +156,22 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
                 menuItems={[
                   {
                     label: 'Edit',
-                    iconName: 'plusCircle',
+                    iconLeft: 'plusCircle',
                     onclick: onEdit,
+                    type: 'default',
                   },
                   {
                     label: 'Add Rule',
-                    iconName: 'write',
+                    iconLeft: 'write',
                     onclick: onAddRule,
+                    type: 'default',
                   },
                   { type: 'divider' },
                   {
                     label: 'Delete',
-                    iconName: 'trash',
+                    iconLeft: 'trash',
                     onclick: onDelete,
+                    type: 'default',
                   },
                 ]}
               />

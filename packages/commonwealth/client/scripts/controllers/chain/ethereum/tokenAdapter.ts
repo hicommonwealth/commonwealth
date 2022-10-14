@@ -1,13 +1,14 @@
-import Ethereum from 'controllers/chain/ethereum/main';
+import Ethereum from 'controllers/chain/ethereum/adapter';
 
-import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
-import $ from 'jquery';
-import { IApp } from 'state';
 import BN from 'bn.js';
+import { ContractType } from 'common-common/src/types';
+import $ from 'jquery';
+import { ChainInfo, ITokenAdapter } from 'models';
+import { IApp } from 'state';
 
 export default class Token extends Ethereum implements ITokenAdapter {
   // required implementations for ITokenAdapter
-  public readonly contractAddress: string;
+  public contractAddress: string;
   public hasToken = false;
   public tokenBalance: BN = new BN(0);
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
@@ -35,10 +36,17 @@ export default class Token extends Ethereum implements ITokenAdapter {
   // Extensions of Ethereum
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
-    this.contractAddress = meta.address;
   }
 
   public async initApi() {
+    // iterate through selectedChain.Contracts for the erc20 type and return the address
+    const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
+    if (!tokenContracts || !tokenContracts.length) {
+      throw new Error('No ERC20 contracts found');
+    }
+    const tokenContract = tokenContracts[0];
+    this.contractAddress = tokenContract.address;
+
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     this._apiInitialized = true;

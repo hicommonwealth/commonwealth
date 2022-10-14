@@ -1,4 +1,4 @@
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { AppError, ServerError } from '../../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { validateRule } from '../../util/rules/ruleParser';

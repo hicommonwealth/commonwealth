@@ -16,6 +16,7 @@ export { default as NotificationSubscription } from './NotificationSubscription'
 export { default as Attachment } from './Attachment';
 export { default as Comment } from './Comment';
 export { default as Reaction } from './Reaction';
+export { default as Contract } from './Contract'
 export { default as Topic } from './Topic';
 export { default as Thread } from './Thread';
 export { default as Poll } from './Poll';

@@ -1,6 +1,6 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { AppError, ServerError } from '../../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { RuleAttributes } from '../../models/rule';

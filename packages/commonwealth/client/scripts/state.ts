@@ -18,12 +18,13 @@ import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
+import ContractsController from './controllers/server/contracts';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import RulesController from './controllers/server/rules';
-import { MobileMenuName } from './views/components/mobile_menu/mobile_menu_lookup';
+import { MobileMenuName } from './views/app_mobile_menus';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -68,6 +69,9 @@ export interface IApp {
   // Community
   topics: TopicsController;
   communities: CommunitiesController;
+
+  // Contracts
+  contracts: ContractsController;
 
   // User
   user: UserController;
@@ -147,6 +151,9 @@ const app: IApp = {
   // Community
   communities: new CommunitiesController(),
   topics: new TopicsController(),
+
+  // Contracts
+  contracts: new ContractsController(),
 
   // Search
   search: new SearchController(),

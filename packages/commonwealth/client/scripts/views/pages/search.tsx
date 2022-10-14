@@ -14,7 +14,7 @@ import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { ContentType } from 'controllers/server/search';
+import { SearchContentType } from 'types';
 import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
@@ -62,9 +62,9 @@ const getMemberResult = (addr, searchTerm) => {
 
 const getCommunityResult = (community) => {
   const params =
-    community.contentType === ContentType.Token
+    community.contentType === SearchContentType.Token
       ? { community }
-      : community.contentType === ContentType.Chain
+      : community.contentType === SearchContentType.Chain
       ? { community }
       : null;
 

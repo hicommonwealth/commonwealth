@@ -11,8 +11,8 @@ import 'components/component_kit/cw_wallets_list.scss';
 import { Account, AddressInfo, IWebWallet } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
-import Near from 'controllers/chain/near/main';
-import Substrate from 'controllers/chain/substrate/main';
+import Near from 'controllers/chain/near/adapter';
+import Substrate from 'controllers/chain/substrate/adapter';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
@@ -114,6 +114,7 @@ export class AccountSelector
 {
   view(vnode) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
+
     return (
       <div class="AccountSelector">
         <div class="close-button-wrapper">
@@ -243,7 +244,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                           let address;
                           if (app.chain) {
                             address = addressSwapper({
-                              address: wallet.accounts[0].address,
+                              address: wallet.accounts[accountIndex].address,
                               currentPrefix: (app.chain as Substrate).chain
                                 .ss58Format,
                             });
@@ -311,10 +312,15 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                       ) {
                         address = wallet.accounts[0];
                       } else if (wallet.chain === 'cosmos') {
-                        address = wallet.accounts[0].address;
+                        if (wallet.defaultNetwork === 'injective') {
+                          address = wallet.accounts[0];
+                        } else {
+                          address = wallet.accounts[0].address;
+                        }
                       } else if (wallet.defaultNetwork === 'terra') {
                         address = wallet.accounts[0].address;
                       }
+
                       await handleNormalWalletLogin(wallet, address);
                     }
                   }

@@ -2,7 +2,7 @@ import { AppError } from '../../util/errors';
 import validateChain from '../../util/validateChain';
 import { RuleAttributes } from '../../models/rule';
 import { success, TypedRequestBody, TypedResponse } from '../../types';
-import { DB } from '../../database';
+import { DB } from '../../models';
 
 const GetRulesError = {
   NoChain: 'No Chain specified',
