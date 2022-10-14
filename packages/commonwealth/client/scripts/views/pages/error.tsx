@@ -14,7 +14,9 @@ class ErrorPage implements m.ClassComponent<ErrorPageAttrs> {
     const { message, title } = vnode.attrs;
 
     return (
-      <Sublayout title={title}>
+      <Sublayout
+      // title={title}
+      >
         <div class="ErrorPage">
           <EmptyState
             icon={Icons.ALERT_TRIANGLE}

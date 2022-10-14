@@ -6,7 +6,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -34,12 +34,13 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
-  public defaultSummaryView: boolean;
   public contractsViewable: ContractsViewable;
+  public defaultOverview: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
+  public chatEnabled: boolean;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -70,13 +71,14 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
-    defaultSummaryView,
     contractsViewable,
+    defaultOverview,
     adminsAndMods,
     base,
     ss58_prefix,
     bech32_prefix,
     type,
+    chatEnabled,
     decimals,
     substrateSpec,
     ChainNode,
@@ -103,10 +105,11 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
-    this.defaultSummaryView = defaultSummaryView;
     this.contractsViewable = contractsViewable;
+    this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.chatEnabled = chatEnabled;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
@@ -143,7 +146,7 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    decimals,
+    chat_enabled,
     substrate_spec,
     token_name,
     Contracts,
@@ -157,6 +160,7 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
+    const decimals = Contracts ? Contracts[0]?.decimals : 18;
     return new ChainInfo({
       id,
       network,
@@ -176,17 +180,17 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
-      defaultSummaryView: default_summary_view,
       contractsViewable: contracts_viewable,
+      defaultOverview: default_summary_view,
       adminsAndMods,
       base,
       ss58_prefix,
       bech32_prefix,
       type,
+      chatEnabled: chat_enabled,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      // address: Contracts[0]?.address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -263,8 +267,9 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
-    defaultSummaryView,
     contractsViewable,
+    defaultOverview,
+    chatEnabled,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -279,11 +284,12 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
+      chat_enabled: chatEnabled,
       snapshot,
       terms,
       icon_url: iconUrl,
-      default_summary_view: defaultSummaryView,
       contracts_viewable: contractsViewable,
+      default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -300,8 +306,9 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
-    this.defaultSummaryView = updatedChain.default_summary_view;
     this.contractsViewable = updatedChain.contracts_viewable;
+    this.defaultOverview = updatedChain.default_summary_view;
+    this.chatEnabled = updatedChain.chat_enabled;
   }
 
   public getAvatar(size: number) {

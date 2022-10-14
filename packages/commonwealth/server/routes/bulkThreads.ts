@@ -4,8 +4,9 @@ import { QueryTypes, Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -16,7 +17,7 @@ const bulkThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
@@ -99,7 +100,7 @@ const bulkThreads = async (
       });
     } catch (e) {
       console.log(e);
-      return next(new Error('Could not fetch threads'));
+      return next(new ServerError('Could not fetch threads'));
     }
 
     const root_ids = [];

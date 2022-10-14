@@ -35,14 +35,10 @@ import {
 } from '../create_community/types';
 
 type ContractFormFields = {
-  eth_chain_id: number;
-  abi: JSON;
-  contractType:
-    | ContractType.Aave
-    | ContractType.Compound
-    | ContractType.ERC20
-    | ContractType.ERC721
-    | ContractType.SPL;
+  eth_chain_id: number,
+  abi: JSON,
+  contractType: ContractType.DAOFACTORY | ContractType.AAVE |ContractType.COMPOUND |
+  ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
   decimals: number;
   token_name: string;
 };
@@ -66,7 +62,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       eth_chain_id: 1,
       name: '',
       abi: JSON.parse('[]'),
-      contractType: ContractType.ERC20,
+      contractType: ContractType.DAOFACTORY,
       nodeUrl: '',
       symbol: '',
       token_name: '',
@@ -97,11 +93,9 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         <SelectRow
           title="Contract Type"
           options={[
-            ContractType.ERC20,
-            ContractType.ERC721,
-            ContractType.SPL,
-            ContractType.Aave,
-            ContractType.Compound,
+            ContractType.DAOFACTORY, ContractType.ERC20,
+            ContractType.ERC721, ContractType.SPL,
+            ContractType.AAVE, ContractType.COMPOUND
           ]}
           value={this.state.form.contractType}
           onchange={(value) => {

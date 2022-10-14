@@ -3,9 +3,10 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -40,12 +41,12 @@ const updateChain = async (
   res: TypedResponse<UpdateChainResp>,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new Error(Errors.NotLoggedIn));
-  if (!req.body.id) return next(new Error(Errors.NoChainId));
-  if (req.body.network) return next(new Error(Errors.CantChangeNetwork));
+  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
+  if (!req.body.id) return next(new AppError(Errors.NoChainId));
+  if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
 
   const chain = await models.Chain.findOne({ where: { id: req.body.id } });
-  if (!chain) return next(new Error(Errors.NoChainFound));
+  if (!chain) return next(new AppError(Errors.NoChainFound));
   else {
     const userAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
@@ -58,7 +59,7 @@ const updateChain = async (
       },
     });
     if (!req.user.isAdmin && !userMembership) {
-      return next(new Error(Errors.NotAdmin));
+      return next(new AppError(Errors.NotAdmin));
     }
   }
 
@@ -77,6 +78,7 @@ const updateChain = async (
     stages_enabled,
     custom_stages,
     custom_domain,
+    chat_enabled,
     default_summary_view,
     contracts_viewable,
     terms,
@@ -92,17 +94,17 @@ const updateChain = async (
   }
 
   if (website && !urlHasValidHTTPPrefix(website)) {
-    return next(new Error(Errors.InvalidWebsite));
+    return next(new AppError(Errors.InvalidWebsite));
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
-    return next(new Error(Errors.InvalidDiscord));
+    return next(new AppError(Errors.InvalidDiscord));
   } else if (element && !urlHasValidHTTPPrefix(element)) {
-    return next(new Error(Errors.InvalidElement));
+    return next(new AppError(Errors.InvalidElement));
   } else if (telegram && !telegram.startsWith('https://t.me/')) {
-    return next(new Error(Errors.InvalidTelegram));
+    return next(new AppError(Errors.InvalidTelegram));
   } else if (github && !github.startsWith('https://github.com/')) {
-    return next(new Error(Errors.InvalidGithub));
+    return next(new AppError(Errors.InvalidGithub));
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
-    return next(new Error(Errors.InvalidCustomDomain));
+    return next(new AppError(Errors.InvalidCustomDomain));
   } else if (
     snapshot.some(
       (snapshot_space) =>
@@ -110,11 +112,11 @@ const updateChain = async (
         snapshot_space.slice(snapshot_space.length - 4) !== '.eth'
     )
   ) {
-    return next(new Error(Errors.InvalidSnapshot));
+    return next(new AppError(Errors.InvalidSnapshot));
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
-    return next(new Error(Errors.SnapshotOnlyOnEthereum));
+    return next(new AppError(Errors.SnapshotOnlyOnEthereum));
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
-    return next(new Error(Errors.InvalidTerms));
+    return next(new AppError(Errors.InvalidTerms));
   }
 
   if (name) chain.name = name;
@@ -132,6 +134,7 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
+  if (chat_enabled) chain.chat_enabled = chat_enabled;
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?

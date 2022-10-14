@@ -2,8 +2,9 @@ import type { Express } from 'express';
 import axios from 'axios';
 import bodyParser from 'body-parser';
 
-import { DB } from '../database';
+import { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from './errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {
@@ -17,7 +18,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         include: models.ChainNode
       });
       if (!chain) {
-        throw new Error('Invalid chain');
+        throw new AppError('Invalid chain');
       }
       log.trace(`Found cosmos endpoint: ${chain.ChainNode.url}`);
       const response = await axios.post(chain.ChainNode.url, req.body, {

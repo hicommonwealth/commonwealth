@@ -23,6 +23,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       abi: { type: dataTypes.JSONB, allowNull: false, unique: true },
+      verified: {type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

@@ -3,3 +3,28 @@
   padding-bottom: 4px;
   width: fit-content;
 }
+
+@mixin b1 {
+  font-family: $font-family-neue-haas-unica;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  line-height: 24px;
+}
+
+@mixin b2 {
+  font-family: $font-family-neue-haas-unica;
+  font-size: 14px;
+  line-height: 20px;
+
+  &.bold,
+  &.italic {
+    letter-spacing: 0.02em;
+  }
+}
+
+@mixin caption {
+  font-family: $font-family-neue-haas-unica;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 16px;
+}

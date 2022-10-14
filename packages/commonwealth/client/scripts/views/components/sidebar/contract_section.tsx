@@ -21,7 +21,6 @@ import { Contract } from 'models';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   ToggleTree,
-  MobileSidebarSectionAttrs,
   SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
@@ -34,7 +33,7 @@ enum Errors {
   NotLoggedIn = 'Must be logged in to read chat',
 }
 export class ContractSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
+  implements m.ClassComponent<SidebarSectionAttrs>
 {
   contracts: Contract[];
   channels: {

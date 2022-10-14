@@ -4,8 +4,8 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractAttributes } from '../../models/contract';
-import { DB } from '../../database';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { DB } from '../../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

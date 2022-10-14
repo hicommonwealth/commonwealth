@@ -4,16 +4,10 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
-import { navigateToSubpage } from 'app';
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import {
-  MobileSidebarSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-  ToggleTree,
-} from './types';
+import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
@@ -35,7 +29,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 }
 
 export class DiscussionSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
+  implements m.ClassComponent<SidebarSectionAttrs>
 {
   view(vnode) {
     // Conditional Render Details +
@@ -54,12 +48,6 @@ export class DiscussionSection
         p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`
       );
     };
-    const onDiscussionsPage = (p) =>
-      p === `/${app.activeChainId()}` ||
-      p === `/${app.activeChainId()}/` ||
-      p.startsWith(`/${app.activeChainId()}/discussions/`) ||
-      p.startsWith(`/${app.activeChainId()}/proposal/discussion/`) ||
-      p.startsWith(`/${app.activeChainId()}?`);
 
     const onFeaturedDiscussionPage = (p, topic) => {
       const identifier = m.route.param('identifier');
@@ -73,9 +61,7 @@ export class DiscussionSection
       }
       return decodeURI(p).endsWith(`/discussions/${topic}`);
     };
-    const onMembersPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/members`) ||
-      p.startsWith(`/${app.activeChainId()}/account/`);
+
     const onSputnikDaosPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/sputnik-daos`);
 
@@ -88,12 +74,12 @@ export class DiscussionSection
     const discussionsLabel = ['vesuvius', 'olympus'].includes(
       app.activeChainId()
     )
-      ? 'FORUMS'
-      : 'DISCUSSIONS';
+      ? 'Forum'
+      : 'Discussion';
 
     // Build Toggle Tree
     const discussionsDefaultToggleTree: ToggleTree = {
-      toggledState: true,
+      toggledState: false,
       children: {},
     };
 
@@ -117,24 +103,17 @@ export class DiscussionSection
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
-      console.log("setting discussions toggle tree since it doesn't exist");
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
         JSON.stringify(discussionsDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
     ) {
-      console.log(
-        'setting discussions toggle tree since the cached version differs from the updated version'
-      );
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
         JSON.stringify(discussionsDefaultToggleTree);
     }
-    let toggleTreeState = JSON.parse(
+    const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`]
     );
-    if (vnode.attrs.mobile) {
-      toggleTreeState = discussionsDefaultToggleTree;
-    }
 
     const discussionsGroupData: SectionGroupAttrs[] = [
       {
@@ -146,17 +125,9 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(
-            e,
-            `/`,
-            app.activeChainId(),
-            () => {
-              setDiscussionsToggleTree(
-                `children.All.toggledState`,
-                toggle
-              );
-            }
-          );
+          handleRedirectClicks(e, `/`, app.activeChainId(), () => {
+            setDiscussionsToggleTree(`children.All.toggledState`, toggle);
+          });
         },
         displayData: null,
       },
@@ -171,14 +142,12 @@ export class DiscussionSection
           (app.chain ? app.chain.serverLoaded : true),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(
-            e,
-            `/sputnik-daos`,
-            app.activeChainId(),
-            () => {
-              setDiscussionsToggleTree(`children.SputnikDAOs.toggledState`, toggle);
-            }
-          );
+          handleRedirectClicks(e, `/sputnik-daos`, app.activeChainId(), () => {
+            setDiscussionsToggleTree(
+              `children.SputnikDAOs.toggledState`,
+              toggle
+            );
+          });
         },
         displayData: null,
       },
@@ -216,6 +185,7 @@ export class DiscussionSection
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: discussionsLabel,
+      className: 'DiscussionSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -223,7 +193,6 @@ export class DiscussionSection
       },
       displayData: discussionsGroupData,
       isActive: true,
-      toggleDisabled: vnode.attrs.mobile,
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;

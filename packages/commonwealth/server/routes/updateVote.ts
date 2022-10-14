@@ -3,7 +3,8 @@ import { NextFunction } from 'express';
 import TokenBalanceCache from 'token-balance-cache/src/index';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedRequestBody, TypedResponse, success } from '../types';
@@ -13,6 +14,7 @@ import {
 } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -43,19 +45,19 @@ const updateVote = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (!author) return next(new Error(Errors.InvalidUser));
-  if (authorError) return next(new Error(authorError));
+  if (!author) return next(new AppError(Errors.InvalidUser));
+  if (authorError) return next(new AppError(authorError));
 
   const { poll_id, address, author_chain, option } = req.body;
 
   const poll = await models.Poll.findOne({
     where: { id: poll_id, chain_id: chain.id },
   });
-  if (!poll) return next(new Error(Errors.NoPoll));
+  if (!poll) return next(new AppError(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
-    return next(new Error(Errors.PollingClosed));
+    return next(new AppError(Errors.PollingClosed));
   }
 
   // Ensure user has passed a valid poll response
@@ -63,15 +65,15 @@ const updateVote = async (
   try {
     const pollOptions = JSON.parse(poll.options);
     selected_option = pollOptions.find((o: string) => o === option);
-    if (!option) throw new Error();
+    if (!option) throw new AppError(Errors.InvalidOption);
   } catch (e) {
-    return next(new Error(Errors.InvalidOption));
+    return next(new AppError(Errors.InvalidOption));
   }
 
   const thread = await models.Thread.findOne({
     where: { id: poll.thread_id },
   });
-  if (!thread) return next(new Error(Errors.NoThread));
+  if (!thread) return next(new AppError(Errors.NoThread));
 
   // check token balance threshold if needed
   const canVote = await validateTopicThreshold(
@@ -81,7 +83,7 @@ const updateVote = async (
     address
   );
   if (!canVote) {
-    return next(new Error(Errors.BalanceCheckFailed));
+    return next(new AppError(Errors.BalanceCheckFailed));
   }
 
   const topic = await models.Topic.findOne({
@@ -91,7 +93,7 @@ const updateVote = async (
   if (topic?.rule_id) {
     const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
     if (!passesRules) {
-      return next(new Error(Errors.RuleCheckFailed));
+      return next(new AppError(Errors.RuleCheckFailed));
     }
   }
 

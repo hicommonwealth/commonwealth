@@ -5,7 +5,6 @@ import m from 'mithril';
 import 'components/component_kit/cw_wallet_option_row.scss';
 
 import { WalletId } from 'common-common/src/types';
-
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
@@ -18,7 +17,7 @@ type WalletOptionRowStyleAttrs = {
 
 type WalletOptionRowAttrs = {
   onclick?: () => void;
-  walletName: WalletId;
+  walletName: string;
 } & WalletOptionRowStyleAttrs;
 
 const getWalletKeyFromValue = (value: string) => {

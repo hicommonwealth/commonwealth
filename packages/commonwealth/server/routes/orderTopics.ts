@@ -3,7 +3,8 @@ import { Response, NextFunction } from 'express';
 import { TopicInstance } from 'server/models/topic';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',
@@ -22,16 +23,16 @@ const OrderTopics = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
-  if (!req.user) return next(new Error(OrderTopicsErrors.NoUser));
+  if (!req.user) return next(new AppError(OrderTopicsErrors.NoUser));
   const isAdminOrMod: boolean = await validateRoles(
     models,
     req.user,
     'moderator',
     chain.id
   );
-  if (!isAdminOrMod) return next(new Error(OrderTopicsErrors.NoPermission));
+  if (!isAdminOrMod) return next(new AppError(OrderTopicsErrors.NoPermission));
 
   const newTopicOrder: string[] = req.body['order[]'];
   if (!newTopicOrder?.length) {
@@ -48,7 +49,7 @@ const OrderTopics = async (
             where: { id, featured_in_sidebar: true },
           });
           if (!topic) {
-            throw new Error(OrderTopicsErrors.InvalidTopic);
+            throw new AppError(OrderTopicsErrors.InvalidTopic);
           }
           topic.order = idx + 1;
           await topic.save();
@@ -62,7 +63,7 @@ const OrderTopics = async (
       result: topics.map((t) => t.toJSON()),
     });
   } catch (err) {
-    return next(new Error(err));
+    return next(new ServerError(err));
   }
 };
 
