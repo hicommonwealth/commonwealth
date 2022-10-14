@@ -38,15 +38,10 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
-  return [
-    {
-      label: 'New Thread',
-      onclick: () => {
-        navigateToSubpage('/new/discussion');
-      },
-    },
-    ...topics.map((t) => ({
+  const getTopicThreads = (): Array<MenuItem> =>
+    topics.map((t) => ({
       label: `New ${t.name} Thread`,
+      iconLeft: 'write',
       onclick: () => {
         // TODO Graham 7-19-22: Let's find a non-localStorage solution
         localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
@@ -62,24 +57,32 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         }
         navigateToSubpage('/new/discussion');
       },
-    })),
-    ...(showOnChainProposalItem
+    }));
+
+  const getOnChainProposalItem = (): Array<MenuItem> =>
+    showOnChainProposalItem
       ? [
           {
             label: 'New On-Chain Proposal',
             onclick: () => navigateToSubpage('/new/proposal'),
+            iconLeft: 'democraticProposal',
           },
         ]
-      : []),
-    ...(showSputnikProposalItem
+      : [];
+
+  const getSputnikProposalItem = (): Array<MenuItem> =>
+    showSputnikProposalItem
       ? [
           {
             label: 'New Sputnik proposal',
             onclick: () => navigateToSubpage('/new/proposal'),
+            iconLeft: 'democraticProposal',
           },
         ]
-      : []),
-    ...(showSubstrateProposalItems
+      : [];
+
+  const getSubstrateProposalItems = (): Array<MenuItem> =>
+    showSubstrateProposalItems
       ? [
           {
             label: 'New treasury proposal',
@@ -87,6 +90,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
               }),
+            iconLeft: 'treasuryProposal',
           },
           {
             label: 'New democracy proposal',
@@ -94,8 +98,9 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
+            iconLeft: 'democraticProposal',
           },
-          ...((activeAccount as SubstrateAccount)?.isCouncillor
+          ...(((activeAccount as SubstrateAccount)?.isCouncillor
             ? [
                 {
                   label: 'New council motion',
@@ -103,15 +108,17 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
                     navigateToSubpage('/new/proposal/:type', {
                       type: ProposalType.SubstrateCollectiveProposal,
                     }),
+                  iconLeft: 'councilProposal',
                 },
               ]
-            : []),
+            : []) as Array<MenuItem>),
           {
             label: 'New bounty proposal',
             onclick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateBountyProposal,
               }),
+            iconLeft: 'democraticProposal',
           },
           {
             label: 'New tip',
@@ -119,13 +126,17 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
+            iconLeft: 'jar',
           },
         ]
-      : []),
-    ...(showSnapshotOptions
+      : [];
+
+  const getSnapshotProposalItem = (): Array<MenuItem> =>
+    showSnapshotOptions
       ? [
           {
             label: 'New Snapshot Proposal',
+            iconLeft: 'democraticProposal',
             onclick: () => {
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
@@ -138,7 +149,21 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
             },
           },
         ]
-      : []),
+      : [];
+
+  return [
+    {
+      label: 'New Thread',
+      onclick: () => {
+        navigateToSubpage('/new/discussion');
+      },
+      iconLeft: 'write',
+    },
+    ...getTopicThreads(),
+    ...getOnChainProposalItem(),
+    ...getSputnikProposalItem(),
+    ...getSubstrateProposalItems(),
+    ...getSnapshotProposalItem(),
   ];
 };
 
@@ -152,10 +177,7 @@ export class CreateContentMenu implements m.ClassComponent {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={getCreateContentMenuItems().map((attr) => ({
-          ...attr,
-          iconLeft: 'write',
-        }))}
+        menuItems={getCreateContentMenuItems()}
       />
     );
   }
@@ -174,10 +196,7 @@ export class CreateContentPopover implements m.ClassComponent {
             iconName="plusCircle"
           />
         }
-        menuItems={getCreateContentMenuItems().map((attr) => ({
-          ...attr,
-          iconLeft: 'write',
-        }))}
+        menuItems={getCreateContentMenuItems()}
       />
     );
   }
