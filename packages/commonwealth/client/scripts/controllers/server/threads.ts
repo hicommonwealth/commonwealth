@@ -198,7 +198,7 @@ export interface VersionHistory {
 class ThreadsController {
   private _store = new ProposalStore<Thread>();
   private _listingStore: RecentListingStore = new RecentListingStore();
-  private _summaryStore = new ProposalStore<Thread>();
+  private _overviewStore = new ProposalStore<Thread>();
 
   public get store() {
     return this._store;
@@ -206,8 +206,8 @@ class ThreadsController {
   public get listingStore() {
     return this._listingStore;
   }
-  public get summaryStore() {
-    return this._summaryStore;
+  public get overviewStore() {
+    return this._overviewStore;
   }
 
   private _initialized = false;
