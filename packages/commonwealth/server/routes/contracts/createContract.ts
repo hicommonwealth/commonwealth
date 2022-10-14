@@ -34,7 +34,7 @@ export const Errors = {
 type CreateContractReq = ContractAttributes & Omit<ChainNodeAttributes, 'id'> & {
   node_url: string;
   address: string;
-  abi: Record<string, unknown>,
+  abi: string,
   contractType: ContractType;
 };
 
