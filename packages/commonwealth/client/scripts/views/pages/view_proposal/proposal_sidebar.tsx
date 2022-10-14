@@ -54,7 +54,7 @@ export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
               app.threads.fetchThreadsFromId([proposal.identifier]);
               m.redraw();
             }}
-            proposal={proposal}
+            thread={proposal}
             showAddProposalButton={isAuthor || isAdminOrMod}
           />
         )}
