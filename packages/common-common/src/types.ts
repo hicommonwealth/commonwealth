@@ -45,6 +45,7 @@ export enum ChainBase {
 }
 
 export enum ContractType {
+  DAOFACTORY = 'dao-factory',
   AAVE = 'aave',
   COMPOUND = 'compound',
   ERC20 = 'erc20',
@@ -123,15 +124,6 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
-}
-
-export enum ContractType {
-  DaoFactory = 'Dao Factory',
-  ERC20 = 'erc20',
-  ERC721 = 'erc721',
-  SPL = 'spl', // solana token
-  Compound = 'compound',
-  Aave = 'aave',
 }
 
 export enum BalanceType {
