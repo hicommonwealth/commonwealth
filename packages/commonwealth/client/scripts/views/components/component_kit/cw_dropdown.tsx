@@ -4,12 +4,12 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_dropdown.scss';
 
-import { MenuItemAttrs } from '../../menus/types';
-import { CWPopoverMenuItem } from './cw_popover_menu_item';
 import { CWTextInput } from './cw_text_input';
+import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { MenuItem } from './types';
 
 export type DropdownInputAttrs = {
-  inputOptions: Array<MenuItemAttrs>;
+  inputOptions: Array<MenuItem>;
   onSelect?: (optionLabel: string, index?: number) => void;
   initialValue?: string;
 };
@@ -46,6 +46,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
               return (
                 <CWPopoverMenuItem
                   {...item}
+                  type="default"
                   onclick={() => {
                     this.showDropdown = false;
                     this.selectedValue = item.label;

@@ -10,7 +10,7 @@ import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
-class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
+export class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
   view(vnode: m.VnodeDOM<MenuItem, this>) {
     if (vnode.attrs.type === 'header') {
       return (
@@ -21,7 +21,7 @@ class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
     } else if (vnode.attrs.type === 'divider') {
       return <div class="menu-section-divider" />;
     } else if (vnode.attrs.type === 'default') {
-      const { disabled, isSecondary, iconLeft, label } = vnode.attrs;
+      const { disabled, isSecondary, iconLeft, label, onclick } = vnode.attrs;
       return (
         <div
           class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
