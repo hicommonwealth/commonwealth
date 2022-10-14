@@ -65,7 +65,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
           {
             label: 'New On-Chain Proposal',
             onclick: () => navigateToSubpage('/new/proposal'),
-            iconLeft: 'democraticProposal',
+            iconLeft: 'star',
           },
         ]
       : [];
@@ -118,7 +118,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateBountyProposal,
               }),
-            iconLeft: 'democraticProposal',
+            iconLeft: 'badge',
           },
           {
             label: 'New tip',
