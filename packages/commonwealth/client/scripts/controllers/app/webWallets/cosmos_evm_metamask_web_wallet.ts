@@ -71,10 +71,12 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return webWalletSignature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
     // Sign with the method on eth_webwallet, because we don't have access to the private key
-    const webWalletSignature = await this.signMessage(account.validationToken);
-    return account.validate(webWalletSignature);
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
