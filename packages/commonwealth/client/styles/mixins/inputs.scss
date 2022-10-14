@@ -44,6 +44,16 @@
       color: $neutral-500;
     }
   }
+
+  &.displayOnly {
+    background-color: $neutral-25;
+    border-color: $neutral-200;
+    color: $neutral-600;
+
+    &::placeholder {
+      color: $neutral-500;
+    }
+  }
 }
 
 @mixin darkModeInputStyles {
