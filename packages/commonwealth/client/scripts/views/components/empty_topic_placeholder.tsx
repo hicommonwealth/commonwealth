@@ -6,8 +6,8 @@ import 'components/empty_topic_placeholder.scss';
 
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
-import { CreateContentPopover } from '../popovers/create_content_menu_popover';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CreateContentPopover } from '../menus/create_content_menu';
 
 type EmptyListingPlaceholderAttrs = {
   communityName?: string;
@@ -48,7 +48,7 @@ export class EmptyListingPlaceholder
         </h1>
         <p>There are no threads here yet.</p>
         {!app.isLoggedIn() && <p>Log in to create a new thread.</p>}
-        <CreateContentPopover fluid={false} threadOnly={true} />
+        <CreateContentPopover />
       </div>
     );
   }
