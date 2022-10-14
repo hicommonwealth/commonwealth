@@ -11,7 +11,10 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
-  return bech32.encode(bech32Prefix, bech32.toWords(Address.fromString(address).toBuffer()));
+  return bech32.encode(
+    bech32Prefix,
+    bech32.toWords(Address.fromString(address).toBuffer())
+  );
 }
 
 class CosmosEvmWebWalletController implements IWebWallet<string> {
@@ -30,7 +33,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   public readonly specificChains = ['injective', 'evmos'];
 
   public get available() {
-    return !!(window.ethereum);
+    return !!window.ethereum;
   }
 
   public get provider() {
@@ -50,7 +53,11 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.personal.sign(message, this._ethAccounts[0], '');
+    const signature = await this._web3.eth.personal.sign(
+      message,
+      this._ethAccounts[0],
+      ''
+    );
     return signature;
   }
 
@@ -59,10 +66,17 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return rlpEncodedTx;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
-    // Sign with the method on eth_webwallet, because we don't have access to the private key
+  public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signMessage(account.validationToken);
-    return account.validate(webWalletSignature);
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    // Sign with the method on eth_webwallet, because we don't have access to the private key
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
@@ -80,7 +94,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
         throw new Error('Could not fetch accounts from Metamask');
       } else {
         for (const acc of this._ethAccounts) {
-          this._accounts.push(encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc));
+          this._accounts.push(
+            encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc)
+          );
         }
       }
 
@@ -94,12 +110,19 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   }
 
   public async initAccountsChanged() {
-    await this._web3.givenProvider.on('accountsChanged', async (accounts: string[]) => {
-      const encodedAccounts = accounts.map((a) => encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a));
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === encodedAccounts[0]);
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
+    await this._web3.givenProvider.on(
+      'accountsChanged',
+      async (accounts: string[]) => {
+        const encodedAccounts = accounts.map((a) =>
+          encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a)
+        );
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === encodedAccounts[0]
+        );
+        if (!updatedAddress) return;
+        await setActiveAccount(updatedAddress);
+      }
+    );
     // TODO: chainChanged, disconnect events
   }
 

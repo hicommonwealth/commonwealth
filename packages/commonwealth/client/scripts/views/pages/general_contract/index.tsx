@@ -5,7 +5,6 @@ import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
 import EthereumChain from 'controllers/chain/ethereum/chain';
-import Ethereum from 'controllers/chain/ethereum/main';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
@@ -16,6 +15,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
+import Ethereum from 'controllers/chain/ethereum/adapter';
 import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,

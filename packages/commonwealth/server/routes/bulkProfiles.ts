@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -12,7 +13,7 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
   } else if (req.body['chains[]']) {
     chains = req.body['chains[]'];
   } else {
-    return next(new Error('Must specify chain'));
+    return next(new AppError('Must specify chain'));
   }
 
   if (req.body['addresses[]'] && typeof req.body['addresses[]'] === 'string') {
@@ -20,11 +21,11 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
   } else if (req.body['addresses[]']) {
     addrs = req.body['addresses[]'];
   } else {
-    return next(new Error('Must specify addresses'));
+    return next(new AppError('Must specify addresses'));
   }
 
   if (chains.length !== addrs.length) {
-    return next(new Error('Must specify exactly one address for each one chain'));
+    return next(new AppError('Must specify exactly one address for each one chain'));
   }
 
   let addrObjs;

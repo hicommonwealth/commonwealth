@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { ServerError } from '../util/errors';
+import { AppError, ServerError } from '../util/errors';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 
 const getThreads = async (
   models: DB,
@@ -11,7 +11,7 @@ const getThreads = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   let threads;
   try {

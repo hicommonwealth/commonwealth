@@ -44,6 +44,11 @@ import {
   Title as CommonwealthTitle,
   Label as CommonwealthLabel,
 } from './chains/commonwealth';
+import {
+  Listener as CosmosListener,
+  Title as CosmosTitle,
+  Label as CosmosLabel,
+} from './chains/cosmos';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
 
@@ -66,6 +71,8 @@ export function Title(
       return MolochTitle(kind);
     case SupportedNetwork.Commonwealth:
       return CommonwealthTitle(kind);
+    case SupportedNetwork.Cosmos:
+      return CosmosTitle(kind);
     default:
       throw new Error(`Invalid network: ${network}`);
   }
@@ -87,6 +94,8 @@ export function Label(chain: string, event: CWEvent): IEventLabel {
       return MolochLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Commonwealth:
       return CommonwealthLabel(event.blockNumber, chain, event.data);
+    case SupportedNetwork.Cosmos:
+      return CosmosLabel(event.blockNumber, chain, event.data);
     default:
       throw new Error(`Invalid network: ${event.network}`);
   }
@@ -113,6 +122,7 @@ export async function createListener(
     spec?: Record<string, unknown>;
     url?: string;
     enricherConfig?: any;
+    pollTime?: number;
     discoverReconnectRange?: (c: string) => Promise<IDisconnectedRange>;
   }
 ): Promise<
@@ -200,6 +210,15 @@ export async function createListener(
       !!options.verbose,
       options.discoverReconnectRange
     );
+  } else if (network === SupportedNetwork.Cosmos) {
+    listener = new CosmosListener(
+      chain,
+      options.url,
+      !!options.skipCatchup,
+      options.pollTime,
+      options.verbose,
+      options.discoverReconnectRange
+    );
   } else {
     throw new Error(`Invalid network: ${network}`);
   }
@@ -213,4 +232,29 @@ export async function createListener(
   }
 
   return listener;
+}
+
+export function populateRange(
+  range: IDisconnectedRange,
+  currentBlock: number
+): IDisconnectedRange {
+  // populate range fully if not given
+  if (!range) {
+    range = { startBlock: 0 };
+  } else if (!range.startBlock) {
+    range.startBlock = 0;
+  } else if (range.startBlock >= currentBlock) {
+    throw new Error(
+      `Start block ${range.startBlock} greater than current block ${currentBlock}!`
+    );
+  }
+  if (!range.endBlock) {
+    range.endBlock = currentBlock;
+  }
+  if (range.startBlock >= range.endBlock) {
+    throw new Error(
+      `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
+    );
+  }
+  return range;
 }

@@ -192,8 +192,8 @@ const setupChainEventListeners = async (
           });
         } else if (node.network === ChainNetwork.Compound) {
           // @TODO: @JAKE @CONTRACTS: fetch governance contract specifically
-          const contracts = await node.getContracts(); // should 'includes' ChainNode from contract too
-          const api = await CompoundEvents.createApi(node.ChainNode.url, contracts[0].address);
+          const contracts = await node.getContracts({ include: [{ model: models.ChainNode, required: true, }]});
+          const api = await CompoundEvents.createApi(contracts[0].ChainNode.url, contracts[0].address);
           const handlers = generateHandlers(node, wss);
           subscriber = await CompoundEvents.subscribeEvents({
             chain: node.id,
@@ -204,8 +204,8 @@ const setupChainEventListeners = async (
           });
         } else if (node.network === ChainNetwork.Aave) {
           // @TODO: @JAKE @CONTRACTS: fetch governance contract specifically
-          const contracts = await node.getContracts();
-          const api = await AaveEvents.createApi(node.ChainNode.url, contracts[0].address);
+          const contracts = await node.getContracts({ include: [{ model: models.ChainNode, required: true, }]});
+          const api = await AaveEvents.createApi(contracts[0].ChainNode.url, contracts[0].address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
             chain: node.id,

@@ -8,7 +8,7 @@ import app from 'state';
 import { pluralize, externalLink } from 'helpers';
 import { ChainBase } from 'common-common/src/types';
 import { AddressInfo } from 'models';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
@@ -73,8 +73,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Validators" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Validators" />}
         />
       );
     }
@@ -106,8 +105,7 @@ class ValidatorsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Loading validators"
-          title={<BreadcrumbsTitleTag title="Validators" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Validators" />}
         />
       );
     }
@@ -125,8 +123,7 @@ class ValidatorsPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Validators" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Validators" />}
       >
         <div class="ValidatorsPage">
           <GovExplainer

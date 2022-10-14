@@ -38,7 +38,7 @@ export class CWProfileRow implements m.ClassComponent<ProfileRowAttrs> {
             className="profile-row-text"
             noWrap
           >
-            {name}
+            {name ?? 'Your Profile'}
           </CWText>
         </div>
         {isSelected && <CWIcon iconName="check" />}

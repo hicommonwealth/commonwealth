@@ -121,7 +121,9 @@ class CreateCommunity implements m.ClassComponent {
     return this.state.loadingEthChains ? (
       <PageLoading />
     ) : (
-      <Sublayout title="Create Community">
+      <Sublayout
+      // title="Create Community"
+      >
         <div class="CreateCommunityIndex">
           <CWText type="h3" fontWeight="semiBold">
             New Commonwealth Community

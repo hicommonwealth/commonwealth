@@ -1,8 +1,9 @@
-import BN from 'bn.js';
-import { ChainInfo } from 'models';
-import { ERC20Votes } from 'common-common/src/eth/types';
-import { BigNumber } from 'ethers';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import BN from 'bn.js';
+import { ERC20Votes } from 'common-common/src/eth/types';
+import { ContractType } from 'common-common/src/types';
+import { BigNumber } from 'ethers';
+import { ChainInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';
@@ -21,7 +22,7 @@ export default class CompoundChain extends EthereumChain {
     await super.resetApi(selectedChain);
     await super.initMetadata();
     // iterate through selectedChain.Contracts for the Compound type and return the address
-    const compoundContracts = this.app.contracts.getByType('compound').filter(
+    const compoundContracts = this.app.contracts.getByType(ContractType.COMPOUND).filter(
       (c) => c.symbol === selectedChain.default_symbol
     );
     if (!compoundContracts || !compoundContracts.length) {

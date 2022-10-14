@@ -11,15 +11,11 @@
 //     if (!app.chain || !app.chain.loaded) {
 //       return m(PageLoading, {
 //         message: 'Connecting to chain',
-//         title: 'Backers',
-//         showNewProposalButton: true,
 //       });
 //     }
 
 //     return m(Sublayout, {
 //       class: 'BackersPage',
-//       title: 'Backers',
-//       showNewProposalButton: true,
 //     }, [
 //       'backers go here'
 //     ]);

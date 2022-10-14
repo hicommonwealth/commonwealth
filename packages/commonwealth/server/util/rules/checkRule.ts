@@ -3,7 +3,7 @@ import { Transaction } from 'sequelize';
 import type { RuleType, DefaultSchemaT } from './ruleTypes'
 import RuleTypes from '../../ruleTypes';
 import RuleCache from './ruleCache';
-import { DB } from '../../database';
+import { DB } from '../../models';
 
 export default async function checkRule(
   ruleCache: RuleCache,

@@ -22,7 +22,6 @@ import {
 } from './admin_modals';
 import {
   ToggleTree,
-  MobileSidebarSectionAttrs,
   SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
@@ -53,9 +52,7 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class ChatSection
-  implements m.ClassComponent<MobileSidebarSectionAttrs>
-{
+export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
   channels: {
     [category: string]: IChannel[];
   };
@@ -181,25 +178,23 @@ export class ChatSection
         : (this.channels[metadata.category] = [metadata]);
     });
 
-    const channelToggleTree: ToggleTree = {
-      toggledState: true,
+    const chatDefaultToggleTree: ToggleTree = {
+      toggledState: false,
       children: this.categoryToToggleTree(Object.keys(this.channels), true),
     };
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-chat-toggle-tree`]) {
-      console.log('setting toggle tree from scratch');
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
-    } else if (!verifyCachedToggleTree('chat', channelToggleTree)) {
-      console.log(
-        'setting chat toggle tree since the cached version differs from the updated version'
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
       );
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
-        JSON.stringify(channelToggleTree);
+    } else if (!verifyCachedToggleTree('chat', chatDefaultToggleTree)) {
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+        chatDefaultToggleTree
+      );
     }
     const toggleTreeState = vnode.attrs.mobile
-      ? channelToggleTree
+      ? chatDefaultToggleTree
       : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
 
     // ---------- Build Section Props ---------- //
@@ -428,7 +423,8 @@ export class ChatSection
     ) : null;
 
     const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'CHAT',
+      title: 'Chat',
+      className: 'ChatSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

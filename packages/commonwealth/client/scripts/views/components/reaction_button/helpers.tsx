@@ -1,19 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
-import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 
 import app from 'state';
-import {
-  Comment,
-  Thread,
-  AddressInfo,
-  ChainInfo,
-} from 'models';
+import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { LoginModal } from '../../modals/login_modal';
-import SelectAddressModal from '../../modals/select_address_modal';
+import { NewLoginModal } from '../../modals/login_modal';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
@@ -34,19 +29,27 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
         Address: { address, chain },
       } = rxn;
 
-      return m(User, {
-        user: new AddressInfo(null, address, chain?.id || chain, null),
-        linkify: true,
-      });
+      return (
+        <div style="display: flex; width: 120px;">
+          <CWText noWrap>
+            {m(User, {
+              user: new AddressInfo(null, address, chain?.id || chain, null),
+              linkify: true,
+            })}
+          </CWText>
+        </div>
+      );
     });
 
   if (slicedReactors.length < likes) {
     const diff = likes - slicedReactors.length;
 
-    slicedReactors.push(<>{`and ${diff} more`}</>);
+    slicedReactors.push(<CWText>{`and ${diff} more`}</CWText>);
   }
 
-  return slicedReactors;
+  return (
+    <div style="display: flex; flex-direction: column;">{slicedReactors}</div>
+  );
 };
 
 export const fetchReactionsByPost = async (post: Post) => {
@@ -71,19 +74,20 @@ export const onReactionClick = (
   e: MouseEvent,
   hasReacted: boolean,
   dislike: (userAddress: string) => void,
-  like: (chain: ChainInfo, chainId: string, userAddress: string) => void,
-  post: Post
+  like: (chain: ChainInfo, chainId: string, userAddress: string) => void
 ) => {
   e.preventDefault();
   e.stopPropagation();
 
-  if (!app.isLoggedIn()) {
+  if (!app.isLoggedIn() || !app.user.activeAccount) {
     app.modals.create({
-      modal: LoginModal,
-    });
-  } else if (!app.user.activeAccount) {
-    app.modals.create({
-      modal: SelectAddressModal,
+      modal: NewLoginModal,
+      data: {
+        modalType: isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'fullScreen'
+          : 'centered',
+        breakpointFn: isWindowMediumSmallInclusive,
+      },
     });
   } else {
     const { address: userAddress, chain } = app.user.activeAccount;

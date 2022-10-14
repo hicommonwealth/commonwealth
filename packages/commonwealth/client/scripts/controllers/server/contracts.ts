@@ -1,8 +1,3 @@
-// Create controller for contract model
-//
-// Language: typescript
-// Path: packages/commonwealth/client/scripts/controllers/server/contracts.ts
-
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -39,10 +34,6 @@ class ContractsController {
   }
   public getByCommunity(communityId: string) {
     return this._store.getContractByCommunity(communityId);
-  }
-
-  public addToStore(contract: Contract) {
-    return this._store.add(contract);
   }
 
   public async addContractAbi(contract: Contract, abi: JSON) {
@@ -109,6 +100,27 @@ class ContractsController {
           : 'Failed to create contract'
       );
     }
+  }
+  public addToStore(contract: Contract) {
+    return this._store.add(contract);
+  }
+  public initialize(contracts = [], reset = true) {
+    if (reset) {
+      this._store.clear();
+    }
+    contracts.forEach((contract) => {
+      try {
+        this._store.add(
+          Contract.fromJSON({
+            ...contract,
+          })
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    this._initialized = true;
   }
 }
 

@@ -1,0 +1,35 @@
+@import 'shared';
+
+.AddressInputTypeahead {
+  .item-container {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    width: 328px;
+
+    .item-and-address {
+      display: flex;
+      flex-direction: column;
+      width: 312px;
+
+      .address-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
+}
+
+.AddressInputTypeaheadPopoverPortal {
+  .cui-popover-content {
+    .cui-list {
+      height: 200px;
+      width: 368px;
+
+      @include extraSmall {
+        width: 100%;
+      }
+    }
+
+    padding: 0;
+  }
+}

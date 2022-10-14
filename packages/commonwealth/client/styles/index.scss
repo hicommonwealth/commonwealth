@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 // page layout
 * {
@@ -8,7 +8,7 @@
 html,
 body {
   box-sizing: border-box;
-  height: 100%;
+  height: 100vh;
   width: 100%;
 }
 
@@ -18,6 +18,31 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background: $white;
+
+  // animate the transition of the darkmode
+  -webkit-transition: 0.2s -webkit-filter ease-in-out;
+  -moz-transition: 0.2s -moz-filter ease-in-out;
+  -moz-transition: 0.2s filter ease-in-out;
+  -ms-transition: 0.2s -ms-filter ease-in-out;
+  -o-transition: 0.2s -o-filter ease-in-out;
+  transition: 0.2s filter ease-in-out, 0.2s -webkit-filter ease-in-out;
+}
+
+// dark mode
+html.invert {
+  filter: invert(90%);
+  -webkit-filter: invert(90%);
+  -moz-filter: invert(90%);
+  -o-filter: invert(90%);
+  -ms-filter: invert(90%);
+
+  img {
+    filter: invert(90%);
+    -webkit-filter: invert(90%);
+    -moz-filter: invert(90%);
+    -o-filter: invert(90%);
+    -ms-filter: invert(90%);
+  }
 }
 
 // global css
