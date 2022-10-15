@@ -8,23 +8,11 @@
  */
 import models from '../database';
 
-async function notificationConsistency() {
-  // use dbLink for all queries here
-  // TODO: how to re-enable extensions on yarn reset-db i.e. re-enable dblink
-
-  // get all existing notification ce-ids from main db
-  // get all ce's from CE db that aren't in the fetched list above
-  // get all cet that have a subscription from main db
-  // filter all ce's from CE db that don't have an existing subscription
-  // filter all ce's from CE db that have a created_at data that is older than the oldest subscription with the matching cet
-  // run emitNotifications for every remaining ce
-}
 
 export async function enforceDataConsistency(
   ce_db_uri?: string,
   enforceTypes?: boolean,
-  enforceEntities?: boolean,
-  enforceEventNotifications?: boolean
+  enforceEntities?: boolean
 ) {
   // if the function is called with run-as-script i.e. yarn runEnforceDataConsistency ensure that CONFIRM=true is passed
   if (process.argv[2] === 'run-as-script' && process.env.confirm != 'true') {
@@ -66,36 +54,9 @@ export async function enforceDataConsistency(
       WHERE "AllChainEntities".id NOT IN (SELECT * FROM existingCeIds);
   `;
 
-  // const ceNotificationSync = `
-  //     INSERT INTO "Notifications"
-  //     SELECT jsonb_build_object('id', "ALE".id, 'entity_id', "ALE".entity_id, 'created_at', "ALE".created_at,
-  //                               'event_data', "ALE".event_data, 'updated_at', "ALE".updated_at, 'block_number',
-  //                               "ALE".block_number,
-  //                               'ChainEventType',
-  //                               jsonb_build_object('id', "ALE".chain_event_type_id, 'chain', "ALE".chain,
-  //                                                  'event_name', "ALE".event_name, 'event_network',
-  //                                                  "ALE".event_network), 'chain_event_type_id',
-  //                               "ALE".chain_event_type_id) as notification_data,
-  //            CURRENT_TIMESTAMP                             as created_at,
-  //            CURRENT_TIMESTAMP                             as updated_at,
-  //            "ALE".id                                      as chain_event_id,
-  //            "ALE".chain                                   as chain_id,
-  //            'chain-event'                                 as category_id
-  //     FROM dblink('${CE_DB_URI}',
-  //                 'SELECT CE.id, CE.block_number, CE.event_data, CE.entity_id, CE.created_at, CE.updated_at,
-  //                     CET.id as chain_event_type_id, CET.event_network, CET.event_name, CET.chain
-  //                 FROM "ChainEvents" CE JOIN "ChainEventTypes" CET ON CE.chain_event_type_id = CET.id')
-  //              as "ALE"(id int, block_number int, event_data jsonb, entity_id int, created_at timestamp with time zone,
-  //                       updated_at timestamp with time zone, chain_event_type_id varchar(255),
-  //                       event_network varchar(255),
-  //                       event_name varchar(255), chain varchar(255))
-  //     ON CONFLICT DO NOTHING;
-  // `;
-
   await models.sequelize.transaction(async (t) => {
     if (enforceTypes) await models.sequelize.query(chainEventTypeSync, {transaction: t});
     if (enforceEntities) await models.sequelize.query(chainEntitySync, {transaction: t});
-    // if (enforceEventNotifications) await models.sequelize.query(ceNotificationSync, {transaction: t});
   });
 }
 
