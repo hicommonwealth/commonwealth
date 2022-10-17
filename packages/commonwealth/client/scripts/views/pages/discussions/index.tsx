@@ -10,12 +10,9 @@ import { PageLoading } from '../loading';
 import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
-import OverviewPage from '../overview';
 
 // Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
-  private threadsOverview: boolean;
-  private threadsOverviewInitialized: boolean;
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
@@ -58,21 +55,6 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     }
   }
 
-  initializeSummaryView() {
-    // Admin has set summary view as community default
-    if (app.chain.meta.defaultOverview) {
-      this.threadsOverview = true;
-    }
-
-    // User is returning to a summary-toggled listing page
-    if (app.lastNavigatedBack()) {
-      const summaryToggled = localStorage.getItem('discussion-summary-toggle');
-      this.threadsOverview = summaryToggled === 'true';
-    }
-
-    this.threadsOverviewInitialized = true;
-  }
-
   async onscroll() {
     localStorage[`${app.activeChainId()}-discussions-scrollY`] =
       this.scrollEle.scrollTop;
@@ -108,35 +90,23 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
 
-    if (!this.threadsOverviewInitialized) this.initializeSummaryView();
-    if (this.topicName || this.stageName) this.threadsOverview = false;
-    if (!this.threadsOverview) {
-      localStorage.setItem('discussion-summary-toggle', 'false');
-    }
-
     return (
       <Sublayout
         title="Discussions"
         description={this.getPageDescription()}
-        onscroll={
-          !this.threadsOverview ? debounce(this.onscroll.bind(this), 400) : null
-        }
+        onscroll={debounce(this.onscroll.bind(this), 400)}
       >
-        {this.threadsOverview ? (
-          <OverviewPage />
-        ) : (
-          <div class="DiscussionsPage">
-            <DiscussionFilterBar
-              topic={this.topicName}
-              stage={this.stageName}
-              parentState={this}
-            />
-            <RecentListing
-              topicName={this.topicName}
-              stageName={this.stageName}
-            />
-          </div>
-        )}
+        <div class="DiscussionsPage">
+          <DiscussionFilterBar
+            topic={this.topicName}
+            stage={this.stageName}
+            parentState={this}
+          />
+          <RecentListing
+            topicName={this.topicName}
+            stageName={this.stageName}
+          />
+        </div>
       </Sublayout>
     );
   }

@@ -29,7 +29,13 @@ class OverviewPage implements m.ClassComponent {
       return LoadingRow;
     }
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+    const sortedTopics = app.topics
+      .getByCommunity(app.activeChainId())
+      .sort((a, b) => a.order - b.order);
+
+    const topicsToDisplay = sortedTopics.some((t) => t.featuredInSidebar)
+      ? sortedTopics.filter((t) => t.featuredInSidebar)
+      : sortedTopics;
 
     return (
       <Sublayout>
@@ -76,21 +82,15 @@ class OverviewPage implements m.ClassComponent {
             </div>
           </div>
           <CWDivider />
-          {topics
-            .sort((a, b) => a.order - b.order)
-            // .filter((t) => t.featuredInSidebar)
-            .map((topic) => {
-              const monthlyThreads = app.threads.overviewStore
-                .getAll()
-                .filter((thread) => thread.topic.id === topic.id);
+          {topicsToDisplay.map((topic) => {
+            const monthlyThreads = app.threads.overviewStore
+              .getAll()
+              .filter((thread) => thread.topic.id === topic.id);
 
-              return (
-                <TopicSummaryRow
-                  monthlyThreads={monthlyThreads}
-                  topic={topic}
-                />
-              );
-            })}
+            return (
+              <TopicSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
+            );
+          })}
         </div>
       </Sublayout>
     );

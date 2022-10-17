@@ -62,6 +62,7 @@ export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
       m.redraw();
     },
     label: bothActive ? 'Unsubscribe' : 'Subscribe',
+    iconLeft: 'bell',
   };
 };
 

@@ -6,6 +6,7 @@ import moment from 'moment';
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
@@ -17,7 +18,9 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import { SocialSharingCarat } from '../view_proposal/social_sharing_carat';
+import { SharePopover } from '../view_proposal/share_popover';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -35,6 +38,19 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
         return bLastUpdated.valueOf() - aLastUpdated.valueOf();
       })
       .slice(0, 5);
+
+    const isAdmin =
+      app.roles.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      }) || app.user.isSiteAdmin;
+
+    const isAdminOrMod =
+      isAdmin ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+      });
 
     return (
       <div class="TopicSummaryRow">
@@ -73,7 +89,6 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
 
             const user = app.chain.accounts.get(thread.author);
             const commentsCount = app.comments.nComments(thread);
-            // const gallery = [user, user, user, user];
 
             return (
               <>
@@ -135,12 +150,50 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       </div> */}
                     </div>
                     <div class="row-bottom-menu">
-                      <SocialSharingCarat />
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="dotsVertical"
-                        onclick={(e) => e.stopPropagation()}
-                      />
+                      <SharePopover />
+                      {isAdminOrMod && (
+                        <CWPopoverMenu
+                          menuItems={[
+                            {
+                              label: 'Delete',
+                              iconLeft: 'trash',
+                              onclick: async (e) => {
+                                e.preventDefault();
+
+                                const confirmed =
+                                  await confirmationModalWithText(
+                                    'Delete this entire thread?'
+                                  )();
+
+                                if (!confirmed) return;
+
+                                app.threads.delete(thread).then(() => {
+                                  navigateToSubpage('/');
+                                });
+                              },
+                            },
+                            {
+                              label: thread.readOnly
+                                ? 'Unlock thread'
+                                : 'Lock thread',
+                              iconLeft: 'lock',
+                              onclick: (e) => {
+                                e.preventDefault();
+                                app.threads.setPrivacy({
+                                  threadId: thread.id,
+                                  readOnly: !thread.readOnly,
+                                });
+                              },
+                            },
+                          ]}
+                          trigger={
+                            <CWIconButton
+                              iconSize="small"
+                              iconName="dotsVertical"
+                            />
+                          }
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

@@ -30,7 +30,7 @@ import {
   ProposalBodyText,
   ProposalHeaderStage,
 } from './proposal_components';
-import { SocialSharingCarat } from './social_sharing_carat';
+import { SharePopover } from './share_popover';
 import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -151,160 +151,159 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
               proposal.stage !== ThreadStage.Discussion && (
                 <ProposalHeaderStage proposal={proposal} />
               )}
+            <SharePopover />
             {app.isLoggedIn() &&
               proposal instanceof Thread &&
               hasEditPerms &&
               !isGloballyEditing && (
-                <>
-                  <CWPopoverMenu
-                    menuItems={[
-                      ...(hasEditPerms && !proposal.readOnly
-                        ? [
-                            {
-                              label: 'Edit',
-                              iconLeft: 'write',
-                              onclick: async (e) => {
-                                e.preventDefault();
-                                this.savedEdits = localStorage.getItem(
-                                  `${app.activeChainId()}-edit-thread-${
-                                    proposal.id
-                                  }-storedText`
+                <CWPopoverMenu
+                  menuItems={[
+                    ...(hasEditPerms && !proposal.readOnly
+                      ? [
+                          {
+                            label: 'Edit',
+                            iconLeft: 'write',
+                            onclick: async (e) => {
+                              e.preventDefault();
+                              this.savedEdits = localStorage.getItem(
+                                `${app.activeChainId()}-edit-thread-${
+                                  proposal.id
+                                }-storedText`
+                              );
+
+                              if (this.savedEdits) {
+                                clearEditingLocalStorage(
+                                  proposal.id,
+                                  ContentType.Thread
                                 );
-                                if (this.savedEdits) {
-                                  clearEditingLocalStorage(
-                                    proposal.id,
-                                    ContentType.Thread
-                                  );
-                                  this.shouldRestoreEdits =
-                                    await confirmationModalWithText(
-                                      'Previous changes found. Restore edits?',
-                                      'Yes',
-                                      'No'
-                                    )();
-                                }
-                                setIsEditingBody(true);
-                              },
-                            },
-                          ]
-                        : []),
-                      ...(isAuthor
-                        ? [
-                            {
-                              label: 'Edit collaborators',
-                              iconLeft: 'write',
-                              onclick: async (e) => {
-                                e.preventDefault();
-                                app.modals.create({
-                                  modal: EditCollaboratorsModal,
-                                  data: {
-                                    thread: proposal,
-                                  },
-                                });
-                              },
-                            },
-                          ]
-                        : []),
-                      ...(isAdminOrMod
-                        ? [
-                            {
-                              label: 'Change topic',
-                              iconLeft: 'write',
-                              onclick: (e) => {
-                                e.preventDefault();
-                                app.modals.create({
-                                  modal: ChangeTopicModal,
-                                  data: {
-                                    onChangeHandler: (topic: Topic) => {
-                                      proposal.topic = topic;
-                                      m.redraw();
-                                    },
-                                    thread: proposal,
-                                  },
-                                });
-                              },
-                            },
-                          ]
-                        : []),
-                      ...(isAuthor || isAdminOrMod || app.user.isSiteAdmin
-                        ? [
-                            {
-                              label: 'Delete',
-                              iconLeft: 'trash',
-                              onclick: async (e) => {
-                                e.preventDefault();
-
-                                const confirmed =
+                                this.shouldRestoreEdits =
                                   await confirmationModalWithText(
-                                    'Delete this entire thread?'
+                                    'Previous changes found. Restore edits?',
+                                    'Yes',
+                                    'No'
                                   )();
+                              }
 
-                                if (!confirmed) return;
-
-                                app.threads.delete(proposal).then(() => {
-                                  navigateToSubpage('/');
-                                });
-                              },
+                              setIsEditingBody(true);
                             },
-                          ]
-                        : []),
-                      ...(isAuthor || isAdminOrMod
-                        ? [
-                            {
-                              label: proposal.readOnly
-                                ? 'Unlock thread'
-                                : 'Lock thread',
-                              iconLeft: 'lock',
-                              onclick: (e) => {
-                                e.preventDefault();
-                                app.threads
-                                  .setPrivacy({
-                                    threadId: proposal.id,
-                                    readOnly: !proposal.readOnly,
-                                  })
-                                  .then(() => {
-                                    setIsEditingBody(false);
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor
+                      ? [
+                          {
+                            label: 'Edit collaborators',
+                            iconLeft: 'write',
+                            onclick: async (e) => {
+                              e.preventDefault();
+                              app.modals.create({
+                                modal: EditCollaboratorsModal,
+                                data: {
+                                  thread: proposal,
+                                },
+                              });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAdminOrMod
+                      ? [
+                          {
+                            label: 'Change topic',
+                            iconLeft: 'write',
+                            onclick: (e) => {
+                              e.preventDefault();
+                              app.modals.create({
+                                modal: ChangeTopicModal,
+                                data: {
+                                  onChangeHandler: (topic: Topic) => {
+                                    proposal.topic = topic;
                                     m.redraw();
-                                  });
-                              },
+                                  },
+                                  thread: proposal,
+                                },
+                              });
                             },
-                          ]
-                        : []),
-                      ...((isAuthor || isAdminOrMod) &&
-                      !!app.chain?.meta.snapshot.length
-                        ? [
-                            {
-                              label: 'Snapshot proposal from thread',
-                              iconLeft: 'democraticProposal',
-                              onclick: () => {
-                                const snapshotSpaces = app.chain.meta.snapshot;
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor || isAdminOrMod || app.user.isSiteAdmin
+                      ? [
+                          {
+                            label: 'Delete',
+                            iconLeft: 'trash',
+                            onclick: async (e) => {
+                              e.preventDefault();
 
-                                if (snapshotSpaces.length > 1) {
-                                  navigateToSubpage('/multiple-snapshots', {
-                                    action: 'create-from-thread',
-                                    proposal,
-                                  });
-                                } else {
-                                  navigateToSubpage(
-                                    `/snapshot/${snapshotSpaces}`
-                                  );
-                                }
-                              },
+                              const confirmed = await confirmationModalWithText(
+                                'Delete this entire thread?'
+                              )();
+
+                              if (!confirmed) return;
+
+                              app.threads.delete(proposal).then(() => {
+                                navigateToSubpage('/');
+                              });
                             },
-                          ]
-                        : []),
-                      ...(isAuthor || isAdminOrMod
-                        ? [
-                            { type: 'divider' },
-                            getThreadSubScriptionMenuItem(proposal),
-                          ]
-                        : []),
-                    ]}
-                    trigger={
-                      <CWIconButton iconName="chevronDown" iconSize="small" />
-                    }
-                  />
-                  <SocialSharingCarat />
-                </>
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor || isAdminOrMod
+                      ? [
+                          {
+                            label: proposal.readOnly
+                              ? 'Unlock thread'
+                              : 'Lock thread',
+                            iconLeft: 'lock',
+                            onclick: (e) => {
+                              e.preventDefault();
+                              app.threads
+                                .setPrivacy({
+                                  threadId: proposal.id,
+                                  readOnly: !proposal.readOnly,
+                                })
+                                .then(() => {
+                                  setIsEditingBody(false);
+                                  m.redraw();
+                                });
+                            },
+                          },
+                        ]
+                      : []),
+                    ...((isAuthor || isAdminOrMod) &&
+                    !!app.chain?.meta.snapshot.length
+                      ? [
+                          {
+                            label: 'Snapshot proposal from thread',
+                            iconLeft: 'democraticProposal',
+                            onclick: () => {
+                              const snapshotSpaces = app.chain.meta.snapshot;
+
+                              if (snapshotSpaces.length > 1) {
+                                navigateToSubpage('/multiple-snapshots', {
+                                  action: 'create-from-thread',
+                                  proposal,
+                                });
+                              } else {
+                                navigateToSubpage(
+                                  `/snapshot/${snapshotSpaces}`
+                                );
+                              }
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(isAuthor || isAdminOrMod
+                      ? [
+                          { type: 'divider' },
+                          getThreadSubScriptionMenuItem(proposal),
+                        ]
+                      : []),
+                  ]}
+                  trigger={
+                    <CWIconButton iconName="dotsVertical" iconSize="small" />
+                  }
+                />
               )}
           </div>
         </div>
