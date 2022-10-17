@@ -5,6 +5,7 @@
 
   &.disabled {
     color: $neutral-200;
+    pointer-events: none;
   }
 }
 

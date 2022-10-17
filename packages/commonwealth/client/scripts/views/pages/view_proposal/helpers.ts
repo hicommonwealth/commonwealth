@@ -1,43 +1,34 @@
 import m from 'mithril';
-import $ from 'jquery';
 import moment from 'moment';
 import app from 'state';
-import { Poll } from 'models';
+import { ContentType } from 'types';
+import { Comment, Poll, Thread } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
+import {
+  countLinesQuill,
+  countLinesMarkdown,
+} from '../../components/quill/helpers';
+import {
+  QUILL_PROPOSAL_LINES_CUTOFF_LENGTH,
+  MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
+} from './constants';
 
 // highlight the header/body of a parent thread, or the body of a comment
-export const jumpHighlightComment = (
-  commentId,
-  shouldScroll = true,
-  animationDelayTime = 2000
-) => {
-  const $div =
-    commentId === 'parent' || commentId === 'body'
-      ? $('html, body').find('.ProposalHeader')
-      : $('html, body').find(`.comment-${commentId}`);
+export const jumpHighlightComment = (commentId: number) => {
+  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[1];
 
-  if ($div.length === 0) return; // if the passed comment was invalid, abort
-
-  const divTop = $div.position().top;
-
-  const scrollTime = 500; // time to scroll
-
-  // clear any previous animation
-  $div.removeClass('highlighted highlightAnimationComplete');
-
-  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
-  if (shouldScroll) {
-    $('html, body').animate({ scrollTop: divTop }, scrollTime);
-    $div.addClass('highlighted');
+  if (commentEle) {
+    // clear any previous animation
+    commentEle.classList.remove('highlighted');
+    commentEle.classList.remove('highlightAnimationComplete');
+    // scroll to comment
+    commentEle.scrollIntoView();
+    // add new highlight classes
+    commentEle.classList.add('highlighted');
     setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime + scrollTime);
-  } else {
-    $div.addClass('highlighted');
-    setTimeout(() => {
-      $div.addClass('highlightAnimationComplete');
-    }, animationDelayTime);
+      commentEle.classList.add('highlightAnimationComplete');
+    }, 2000 + 500);
   }
 };
 
@@ -78,14 +69,57 @@ export const handleProposalPollVote = async (
     });
 };
 
-export const getProposalPollTimestamp = (
-  poll: Poll,
-  pollingEnded: boolean
-) => {
+export const getProposalPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
   if (!poll.endsAt.isValid()) {
     return 'No end date';
   }
   return pollingEnded
     ? `Ended ${poll.endsAt?.format('lll')}`
     : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
+};
+
+export const clearEditingLocalStorage = (
+  id: number | string,
+  contentType: ContentType
+) => {
+  localStorage.removeItem(
+    `${app.activeChainId()}-edit-${contentType}-${id}-storedText`
+  );
+};
+
+export const activeQuillEditorHasText = () => {
+  // TODO: Better lookup than document.getElementsByClassName[0]
+  // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
+  // However, threading is overdue for a refactor anyway, so we'll handle this then
+  return (
+    (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)
+      ?.innerText.length > 1
+  );
+};
+
+export const formatBody = (vnode, updateCollapse) => {
+  const { item } = vnode.attrs;
+  if (!item) return;
+
+  const body =
+    item instanceof Comment
+      ? item.text
+      : item instanceof Thread
+      ? item.body
+      : item.description;
+  if (!body) return;
+
+  vnode.state.body = body;
+  if (updateCollapse) {
+    try {
+      const doc = JSON.parse(body);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
+    } catch (e) {
+      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        vnode.state.collapsed = true;
+      }
+    }
+  }
 };

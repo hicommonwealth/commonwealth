@@ -1,20 +1,21 @@
 /* @jsx m */
 
+import m from 'mithril';
+import { debounce } from 'lodash';
+
 import 'pages/discussions/index.scss';
 
 import app from 'state';
-import { debounce } from 'lodash';
-import m from 'mithril';
 import { PageLoading } from '../loading';
-import { SummaryListing } from './summary_listing';
+import { ThreadsOverview } from './threads_overview';
 import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 
 // Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
-  private summaryView: boolean;
-  private summaryViewInitialized: boolean;
+  private threadsOverview: boolean;
+  private threadsOverviewInitialized: boolean;
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
@@ -59,17 +60,17 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   initializeSummaryView() {
     // Admin has set summary view as community default
-    if (app.chain.meta.defaultSummaryView) {
-      this.summaryView = true;
+    if (app.chain.meta.defaultOverview) {
+      this.threadsOverview = true;
     }
 
     // User is returning to a summary-toggled listing page
     if (app.lastNavigatedBack()) {
       const summaryToggled = localStorage.getItem('discussion-summary-toggle');
-      this.summaryView = summaryToggled === 'true';
+      this.threadsOverview = summaryToggled === 'true';
     }
 
-    this.summaryViewInitialized = true;
+    this.threadsOverviewInitialized = true;
   }
 
   async onscroll() {
@@ -107,9 +108,9 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
 
-    if (!this.summaryViewInitialized) this.initializeSummaryView();
-    if (this.topicName || this.stageName) this.summaryView = false;
-    if (!this.summaryView) {
+    if (!this.threadsOverviewInitialized) this.initializeSummaryView();
+    if (this.topicName || this.stageName) this.threadsOverview = false;
+    if (!this.threadsOverview) {
       localStorage.setItem('discussion-summary-toggle', 'false');
     }
 
@@ -118,7 +119,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
         title="Discussions"
         description={this.getPageDescription()}
         onscroll={
-          !this.summaryView ? debounce(this.onscroll.bind(this), 400) : null
+          !this.threadsOverview ? debounce(this.onscroll.bind(this), 400) : null
         }
       >
         <div class="DiscussionsPage">
@@ -127,8 +128,9 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
             stage={this.stageName}
             parentState={this}
           />
-          {this.summaryView && <SummaryListing />}
-          {!this.summaryView && (
+          {this.threadsOverview ? (
+            <ThreadsOverview />
+          ) : (
             <RecentListing
               topicName={this.topicName}
               stageName={this.stageName}

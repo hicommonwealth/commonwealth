@@ -15,7 +15,6 @@ import {
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
-  public readonly address: string;
   public readonly tokenName: string;
   public readonly default_symbol: string;
   public name: string;
@@ -35,7 +34,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
-  public defaultSummaryView: boolean;
+  public defaultOverview: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
@@ -71,7 +70,7 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
-    defaultSummaryView,
+    defaultOverview,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -82,7 +81,6 @@ class ChainInfo {
     substrateSpec,
     ChainNode,
     tokenName,
-    address,
     adminOnlyPolling,
   }) {
     this.id = id;
@@ -105,7 +103,7 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
-    this.defaultSummaryView = defaultSummaryView;
+    this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
     this.chatEnabled = chatEnabled;
@@ -115,7 +113,6 @@ class ChainInfo {
     this.substrateSpec = substrateSpec;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
-    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
   }
@@ -179,7 +176,7 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
-      defaultSummaryView: default_summary_view,
+      defaultOverview: default_summary_view,
       adminsAndMods,
       base,
       ss58_prefix,
@@ -189,7 +186,6 @@ class ChainInfo {
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      address: Contracts ? Contracts[0]?.address : '',
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -266,7 +262,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
-    defaultSummaryView,
+    defaultOverview,
     chatEnabled,
   }) {
     // TODO: Change to PUT /chain
@@ -286,7 +282,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
-      default_summary_view: defaultSummaryView,
+      default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -303,14 +299,14 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
-    this.defaultSummaryView = updatedChain.default_summary_view;
+    this.defaultOverview = updatedChain.default_summary_view;
     this.chatEnabled = updatedChain.chat_enabled;
   }
 
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address || undefined, size });
+      : m(CWJdenticon, { address: undefined, size });
   }
 }
 
