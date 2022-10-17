@@ -1,11 +1,17 @@
 @import 'shared';
 
-.Overview {
+.OverviewPage {
   display: flex;
+  flex: 1;
   flex-direction: column;
   padding: 56px;
+  width: 100%;
 
-  @include mediumSmallInclusive {
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
     padding: 32px;
   }
 
@@ -15,11 +21,16 @@
 
   .header-row {
     align-items: center;
-    border-bottom: 1px solid $neutral-300;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .column-headers-row {
+    align-items: center;
     display: grid;
     gap: 32px;
     grid-template-columns: 352px 1fr;
-    padding-bottom: 16px;
 
     @include mediumSmallInclusive {
       display: none;

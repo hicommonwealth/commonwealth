@@ -5,10 +5,14 @@ import m from 'mithril';
 import 'pages/overview/index.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { LoadingRow } from '../../components/loading_row';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
@@ -27,8 +31,31 @@ class OverviewPage implements m.ClassComponent {
     const topics = app.topics.getByCommunity(app.activeChainId());
 
     return (
-      <div class="Overview">
+      <div class="OverviewPage">
         <div class="header-row">
+          <CWText type="h3" fontWeight="semiBold">
+            Overview
+          </CWText>
+          {isWindowExtraSmall(window.innerWidth) ? (
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
+              onclick={() => {
+                navigateToSubpage('/new/discussion');
+              }}
+            />
+          ) : (
+            <CWButton
+              buttonType="mini"
+              label="Create Thread"
+              iconName="plus"
+              onclick={() => {
+                navigateToSubpage('/new/discussion');
+              }}
+            />
+          )}
+        </div>
+        <div class="column-headers-row">
           <CWText
             type="h5"
             fontWeight="semiBold"
@@ -44,9 +71,9 @@ class OverviewPage implements m.ClassComponent {
             >
               Recent threads
             </CWText>
-            {/* <CWButton buttonType="mini" label="Create Thread" iconName="plus" /> */}
           </div>
         </div>
+        <CWDivider />
         {topics
           .sort((a, b) => a.order - b.order)
           .filter((t) => t.featuredInSidebar)

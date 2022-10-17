@@ -63,7 +63,8 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
         chain: app.activeChainId(),
       });
 
-    const canReply = !isLast && !isLocked;
+    const canReply =
+      !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
 
     const canEditAndDelete =
       !isLocked &&

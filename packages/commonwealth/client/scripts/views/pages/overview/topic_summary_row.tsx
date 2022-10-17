@@ -17,6 +17,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { getLastUpdated, isHot } from '../discussions/helpers';
+import { SocialSharingCarat } from '../view_proposal/social_sharing_carat';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -76,13 +77,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
 
             return (
               <>
-                <div
-                  class="recent-thread-row"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    m.route.set(discussionLink);
-                  }}
-                >
+                <div class="recent-thread-row">
                   <div class="row-top">
                     <div class="user-and-date-row">
                       {m(User, {
@@ -100,13 +95,19 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       </CWText>
                     </div>
                     <div class="row-top-icons">
-                      {isHot(thread) && (
-                        <CWIcon iconName="flame" className="hot" />
-                      )}
+                      {isHot(thread) && <div class="flame" />}
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
-                  <CWText type="b2" fontWeight="bold">
+                  <CWText
+                    type="b2"
+                    fontWeight="bold"
+                    className="thread-title-text"
+                    onclick={(e) => {
+                      e.stopPropagation();
+                      m.route.set(discussionLink);
+                    }}
+                  >
                     {thread.title}
                   </CWText>
                   <CWText
@@ -134,21 +135,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       </div> */}
                     </div>
                     <div class="row-bottom-menu">
-                      {/* <CWIconButton
-                        iconSize="small"
-                        iconName="share"
-                        onclick={(e) => e.stopPropagation()}
-                      />
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="flag"
-                        onclick={(e) => e.stopPropagation()}
-                      /> */}
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="bell"
-                        onclick={(e) => e.stopPropagation()}
-                      />
+                      <SocialSharingCarat />
                       <CWIconButton
                         iconSize="small"
                         iconName="dotsVertical"

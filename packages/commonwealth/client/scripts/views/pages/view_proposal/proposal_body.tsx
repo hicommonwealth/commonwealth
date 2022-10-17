@@ -191,7 +191,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Edit collaborators',
-                              iconName: 'write',
+                              iconLeft: 'write',
                               onclick: async (e) => {
                                 e.preventDefault();
                                 app.modals.create({
@@ -208,7 +208,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Change topic',
-                              iconName: 'write',
+                              iconLeft: 'write',
                               onclick: (e) => {
                                 e.preventDefault();
                                 app.modals.create({
@@ -229,7 +229,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Delete',
-                              iconName: 'trash',
+                              iconLeft: 'trash',
                               onclick: async (e) => {
                                 e.preventDefault();
 
@@ -253,7 +253,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                               label: proposal.readOnly
                                 ? 'Unlock thread'
                                 : 'Lock thread',
-                              iconName: 'lock',
+                              iconLeft: 'lock',
                               onclick: (e) => {
                                 e.preventDefault();
                                 app.threads
@@ -274,7 +274,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                         ? [
                             {
                               label: 'Snapshot proposal from thread',
-                              iconName: 'democraticProposal',
+                              iconLeft: 'democraticProposal',
                               onclick: () => {
                                 const snapshotSpaces = app.chain.meta.snapshot;
 
@@ -293,10 +293,10 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                           ]
                         : []),
                       ...(isAuthor || isAdminOrMod
-                        ? [{ type: 'divider' }]
-                        : []),
-                      ...(isAuthor || isAdminOrMod
-                        ? [getThreadSubScriptionMenuItem(proposal)]
+                        ? [
+                            { type: 'divider' },
+                            getThreadSubScriptionMenuItem(proposal),
+                          ]
                         : []),
                     ]}
                     trigger={

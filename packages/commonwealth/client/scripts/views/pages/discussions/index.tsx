@@ -122,21 +122,21 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
           !this.threadsOverview ? debounce(this.onscroll.bind(this), 400) : null
         }
       >
-        <div class="DiscussionsPage">
-          <DiscussionFilterBar
-            topic={this.topicName}
-            stage={this.stageName}
-            parentState={this}
-          />
-          {this.threadsOverview ? (
-            <OverviewPage />
-          ) : (
+        {this.threadsOverview ? (
+          <OverviewPage />
+        ) : (
+          <div class="DiscussionsPage">
+            <DiscussionFilterBar
+              topic={this.topicName}
+              stage={this.stageName}
+              parentState={this}
+            />
             <RecentListing
               topicName={this.topicName}
               stageName={this.stageName}
             />
-          )}
-        </div>
+          </div>
+        )}
       </Sublayout>
     );
   }
