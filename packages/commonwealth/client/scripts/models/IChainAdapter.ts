@@ -196,7 +196,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     return this.meta.network;
   }
   get currency() {
-    return this.meta.default_symbol;
+    return this.meta.defaultSymbol;
   }
 }
 

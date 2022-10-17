@@ -53,7 +53,7 @@ export class CompoundProposalStats
   view(vnode) {
     const { chain } = vnode.attrs;
 
-    const symbol = chain.meta.symbol;
+    const symbol = chain.meta.defaultSymbol;
 
     return (
       <GovExplainer

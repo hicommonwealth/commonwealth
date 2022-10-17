@@ -3,7 +3,7 @@ import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
 import { ChainInfo } from 'models';
 import EthereumChain from '../chain';
-import { attachSigner } from '../contractApi';
+import { attachSigner } from '../commonwealth/contractApi';
 import AaveApi from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
@@ -13,7 +13,7 @@ export default class AaveChain extends EthereumChain {
 
   public coins(n: number, inDollars?: boolean) {
     return new EthereumCoin(
-      this.app?.chain?.meta.default_symbol || '???',
+      this.app?.chain?.meta.defaultSymbol || '???',
       n,
       inDollars
     );

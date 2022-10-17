@@ -16,7 +16,7 @@ export default class CompoundChain extends EthereumChain {
 
   public coins(n: number, inDollars?: boolean) {
     return new EthereumCoin(
-      this.app?.chain?.meta.default_symbol || '???',
+      this.app?.chain?.meta.defaultSymbol || '???',
       n,
       inDollars
     );

@@ -42,7 +42,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
   public format(): string {
     return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${
-      this.account.chain.default_symbol
+      this.account.chain.defaultSymbol
     }`;
   }
 }
@@ -283,7 +283,9 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.post(`https://cloudflare-ipfs.com/ipfs/${this._ipfsAddress}#x-ipfs-companion-no-redirect`)
+    $.post(
+      `https://cloudflare-ipfs.com/ipfs/${this._ipfsAddress}#x-ipfs-companion-no-redirect`
+    )
       .then((ipfsData) => {
         if (typeof ipfsData === 'string') {
           this._ipfsData = JSON.parse(ipfsData);

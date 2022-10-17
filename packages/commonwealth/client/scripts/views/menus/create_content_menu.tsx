@@ -151,6 +151,18 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         ]
       : [];
 
+  const getCrowdfundProposalItems = (): Array<MenuItem> =>
+    app.chain.base === ChainBase.Ethereum
+      ? [
+          { type: 'divider' },
+          {
+            label: 'New crowdfund',
+            iconLeft: 'wallet',
+            onclick: () => null, // navigateToSubpage('/new/project'),
+          },
+        ]
+      : [];
+
   return [
     {
       label: 'New Thread',
