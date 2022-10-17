@@ -22,8 +22,10 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 
-export const VotingResults: m.Component<{ proposal: AnyProposal }> = {
-  view: (vnode) => {
+export class VotingResults
+  implements m.ClassComponent<{ proposal: AnyProposal }>
+{
+  view(vnode) {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
 
@@ -166,5 +168,5 @@ export const VotingResults: m.Component<{ proposal: AnyProposal }> = {
       // to be implemented
       return null;
     }
-  },
-};
+  }
+}

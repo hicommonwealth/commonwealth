@@ -88,6 +88,7 @@ export const customIconLookup = {
   polkadot: CustomIcons.CWPolkadot,
   ronin: CustomIcons.CWRonin,
   terrastation: CustomIcons.CWTerraStation,
+  unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
 };
 

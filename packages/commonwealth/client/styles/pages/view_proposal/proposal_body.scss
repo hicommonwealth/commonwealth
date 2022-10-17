@@ -1,0 +1,100 @@
+@import 'shared';
+
+.ProposalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 40px;
+  max-width: 768px;
+  width: 100%;
+
+  .user-avatar {
+    margin: -6px 6px -6px 0;
+  }
+
+  @include mediumSmallInclusive {
+    margin: 0 40px 0 0;
+  }
+
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .info-and-menu-row {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .username {
+        font-weight: 500;
+
+        @include caption;
+      }
+
+      .header-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
+
+  .proposal-links {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .proposal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    .callout-text.Text {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+      padding: 16px;
+    }
+
+    .proposal-response-row {
+      width: 100%;
+      display: flex;
+      max-width: 300px;
+      align-items: center;
+      margin-top: 16px;
+
+      > * {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .onchain-status-text.Text {
+    &.pass {
+      color: $green-600;
+    }
+
+    &.fail {
+      color: $rorange-600;
+    }
+  }
+
+  .thread-footer-row {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+
+    .comments-count {
+      align-items: center;
+      display: flex;
+      gap: 4px;
+
+      .Text,
+      .Icon {
+        color: $neutral-500;
+      }
+    }
+  }
+}
