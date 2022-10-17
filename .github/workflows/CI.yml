@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn
 
       - name: Typecheck
         run: yarn check-types
@@ -97,7 +97,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn
 
       - name: Run unit tests
         run: yarn unit-test
