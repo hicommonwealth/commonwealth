@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const common = require('./webpack.common.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -15,7 +15,7 @@ module.exports = merge(common, {
   output: {
     publicPath: '/build/',
     path: path.join(__dirname, '../build'),
-    filename: 'js/[name].[hash:8].js',
+    filename: 'js/[name].[contenthash:8].js',
     chunkFilename: 'js/[name].[chunkhash:8].chunk.js'
   },
   plugins: [
@@ -37,7 +37,7 @@ module.exports = merge(common, {
     rules: [
       {
         test: /\.s?css/i,
-        use : [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
+        use : [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
       }
     ]
   }

@@ -50,7 +50,7 @@ jobs:
 
       - name: Install dependencies
         run: yarn
-        
+
       - name: Typecheck
         run: yarn check-types
 
@@ -105,7 +105,7 @@ jobs:
       # TODO: fix integration tests -- they currently fail
       # - name: Run integration tests
       #  run: yarn integration-test
-      
+
       # TODO: reintegrate code coverage once we get nyc working with hardhat
 
       # TODO: fix linter and then reintegrate using current ts version
