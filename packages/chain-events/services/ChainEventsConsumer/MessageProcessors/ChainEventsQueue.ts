@@ -16,6 +16,7 @@ export type Ithis = {
  * @param event {CWEvent} The chain-event to pass to all the handlers
  */
 export async function processChainEvents(this: Ithis, event: CWEvent) {
+  console.log("Handling message", event);
   let prevResult = null;
   for (const handler of this.allChainEventHandlers) {
     try {

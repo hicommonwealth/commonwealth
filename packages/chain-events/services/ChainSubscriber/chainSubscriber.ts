@@ -70,9 +70,9 @@ async function mainProcess(
                                             ON cc.chain_id = "Chains".id
                                   LEFT JOIN "Contracts"
                                             ON "Contracts".id = cc.contract_id
-                         WHERE "Chains"."has_chain_events_listener" = true
-                           AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
-                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
+                         WHERE "Chains"."has_chain_events_listener" = true)
+--                            AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
+--                                 ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
       SELECT allChains.id,
              allChains.substrate_spec,
              allChains.address                                                 as contract_address,
@@ -154,20 +154,24 @@ async function initializer(): Promise<void> {
   }
 }
 
-initializer()
-  .then(() => {
-    return mainProcess(producer, pool);
-  })
-  .then(() => {
-    // re-run this function every [REPEAT_TIME] minutes
-    setInterval(
-      mainProcess,
-      REPEAT_TIME * 60000,
-      producer,
-      pool,
-    );
-  })
-  .catch((err) => {
-    log.error("Fatal error occurred", err);
-    rollbar?.critical("Fatal error occurred", err);
-  });
+if (process.argv[2] === 'run-as-script') {
+  initializer()
+    .then(() => {
+      return mainProcess(producer, pool);
+    })
+    .then(() => {
+      // re-run this function every [REPEAT_TIME] minutes
+      setInterval(
+        mainProcess,
+        REPEAT_TIME * 60000,
+        producer,
+        pool,
+      );
+    })
+    .catch((err) => {
+      log.error("Fatal error occurred", err);
+      rollbar?.critical("Fatal error occurred", err);
+    });
+}
+
+

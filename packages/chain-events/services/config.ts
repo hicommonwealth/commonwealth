@@ -30,7 +30,13 @@ export const RABBITMQ_URI = (() => {
       return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`
     } else return 'amqp://guest:guest@localhost:5672'
   } else return process.env.CLOUDAMQP_URL
-})()
+})();
+
+export const RABBITMQ_API_URI = (() => {
+  if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT)
+    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`
+  else return 'http://guest:guest@localhost:15672/api'
+})();
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
 

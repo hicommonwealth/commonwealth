@@ -2,7 +2,7 @@ import {CWEvent} from "chain-events/src";
 import {isTRmqMsgEntityCUD, TRmqMsgEntityCUD} from './chainEntityCUD'
 import {isTRmqMsgCENotificationsCUD, TRmqMsgCENotificationsCUD} from "./chainEventNotificationsCUD";
 import {ChainEventNotification} from "commonwealth/shared/types";
-import {isTRmqMsgCETypeCUD, TRmqMsgCETypeCUD} from "./chainEventTypeCUD";
+import {isRmqMsgCETypeCUD, TRmqMsgCETypeCUD} from "./chainEventTypeCUD";
 
 
 export * from './chainEntityCUD';
@@ -17,7 +17,7 @@ export class RmqMsgFormatError extends Error {
 export function rmqMsgToName(data: TRmqMessages) {
   if (isTRmqMsgEntityCUD(data)) return 'ChainEntity'
   else if (isTRmqMsgCENotificationsCUD(data)) return 'ChainEvent'
-  else if (isTRmqMsgCETypeCUD(data)) return 'ChainEventType'
+  else if (isRmqMsgCETypeCUD(data)) return 'ChainEventType'
 }
 
 export type TRmqMessages =

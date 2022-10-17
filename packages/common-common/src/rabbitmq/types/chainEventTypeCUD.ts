@@ -1,6 +1,6 @@
 export type TRmqMsgCETypeCUD = IRmqMsgCreateCETypeCUD;
 
-export function isTRmqMsgCETypeCUD(data: any): data is TRmqMsgCETypeCUD {
+export function isRmqMsgCETypeCUD(data: any): data is TRmqMsgCETypeCUD {
   return IRmqMsgCreateCETypeCUD(data);
 }
 
