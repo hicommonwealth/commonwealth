@@ -15,9 +15,42 @@ import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { jumpHighlightComment } from '../pages/view_proposal/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
+
+const jumpHighlightNotification = (
+  commentId,
+  shouldScroll = true,
+  animationDelayTime = 2000
+) => {
+  const $div =
+    commentId === 'parent' || commentId === 'body'
+      ? $('html, body').find('.ProposalHeader')
+      : $('html, body').find(`.comment-${commentId}`);
+
+  if ($div.length === 0) return; // if the passed comment was invalid, abort
+
+  const divTop = $div.position().top;
+
+  const scrollTime = 500; // time to scroll
+
+  // clear any previous animation
+  $div.removeClass('highlighted highlightAnimationComplete');
+
+  // scroll to comment if necessary, set highlight, wait, then fade out the highlight
+  if (shouldScroll) {
+    $('html, body').animate({ scrollTop: divTop }, scrollTime);
+    $div.addClass('highlighted');
+    setTimeout(() => {
+      $div.addClass('highlightAnimationComplete');
+    }, animationDelayTime + scrollTime);
+  } else {
+    $div.addClass('highlighted');
+    setTimeout(() => {
+      $div.addClass('highlightAnimationComplete');
+    }, animationDelayTime);
+  }
+};
 
 const getCommentPreview = (comment_text) => {
   let decoded_comment_text;
@@ -134,8 +167,8 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     : [root_type, pseudoProposal];
   const path = (getProposalUrl as any)(...args);
   const pageJump = comment_id
-    ? () => jumpHighlightComment(comment_id)
-    : () => jumpHighlightComment('parent');
+    ? () => jumpHighlightNotification(comment_id)
+    : () => jumpHighlightNotification('parent');
 
   return {
     authorInfo: [[author_chain, author_address]],
@@ -256,8 +289,8 @@ const getBatchNotificationFields = (
       ? (getCommunityUrl as any)(chain_id)
       : (getProposalUrl as any)(...args);
   const pageJump = comment_id
-    ? () => jumpHighlightComment(comment_id)
-    : () => jumpHighlightComment('parent');
+    ? () => jumpHighlightNotification(comment_id)
+    : () => jumpHighlightNotification('parent');
   return {
     authorInfo,
     createdAt: moment.utc(created_at),

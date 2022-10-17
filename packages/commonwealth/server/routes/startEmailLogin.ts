@@ -8,7 +8,7 @@ import { DynamicTemplate } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

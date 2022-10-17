@@ -10,7 +10,7 @@ import app from 'state';
 import { formatDuration } from 'helpers';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import Near from 'controllers/chain/near/main';
+import Near from 'controllers/chain/near/adapter';
 import { IDaoInfo } from 'controllers/chain/near/chain';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';

@@ -139,7 +139,7 @@ import getSupportedEthChains from './routes/getSupportedEthChains';
 import editSubstrateSpec from './routes/editSubstrateSpec';
 import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
-import { DB } from './database';
+import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';

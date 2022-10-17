@@ -1,6 +1,6 @@
 import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { BanAttributes, BanInstance } from '../models/ban';

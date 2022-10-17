@@ -11,7 +11,7 @@ import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,

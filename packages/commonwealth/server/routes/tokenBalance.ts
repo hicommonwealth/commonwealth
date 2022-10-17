@@ -2,7 +2,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';

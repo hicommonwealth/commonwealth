@@ -30,7 +30,10 @@ export const countLinesMarkdown = (text: string) => {
 // TODO Graham 2022.09.22: Investigate when and why decodeURIComponent fails,
 // and build a more reliable and transparent system for saving & rendering,
 // encoding and decoding
-export const renderQuillTextBody = (textBody: any, params: QuillTextParams) => {
+export const renderQuillTextBody = (
+  textBody: any,
+  params?: QuillTextParams
+) => {
   let decodedTextbody: string;
   try {
     decodedTextbody = decodeURIComponent(textBody);

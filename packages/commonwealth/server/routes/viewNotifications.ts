@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
 import { performance, PerformanceObserver } from 'perf_hooks';
 import { AppError, ServerError } from 'common-common/src/errors';
 

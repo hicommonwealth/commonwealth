@@ -25,22 +25,21 @@ import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_m
 class ProposalSidebarLinkedChainEntity
   implements
     m.ClassComponent<{
-      proposal: Thread;
+      thread: Thread;
       chainEntity;
     }>
 {
   view(vnode) {
-    const { proposal, chainEntity } = vnode.attrs;
+    const { thread, chainEntity } = vnode.attrs;
 
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
-
     if (!slug) return;
 
-    const proposalLink = `${
-      app.isCustomDomain() ? '' : `/${proposal.chain}`
+    const threadLink = `${
+      app.isCustomDomain() ? '' : `/${thread.chain}`
     }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
 
-    return link('a', proposalLink, [
+    return link('a', threadLink, [
       `${chainEntityTypeToProposalName(chainEntity.type)} #${
         chainEntity.typeId
       }`,
@@ -52,7 +51,7 @@ class ProposalSidebarLinkedChainEntity
 class ProposalSidebarLinkedSnapshot
   implements
     m.ClassComponent<{
-      proposal: Thread;
+      thread: Thread;
     }>
 {
   private initialized: boolean;
@@ -61,9 +60,9 @@ class ProposalSidebarLinkedSnapshot
   private space: SnapshotSpace;
 
   view(vnode) {
-    const { proposal } = vnode.attrs;
-    if (!proposal.snapshotProposal) return;
-    if (!app.chain?.meta?.snapshot) return;
+    const { thread } = vnode.attrs;
+    if (!thread.snapshotProposal) return;
+    if (!app.chain?.meta?.snapshot?.length) return;
 
     if (!this.initialized) {
       this.initialized = true;
@@ -71,7 +70,7 @@ class ProposalSidebarLinkedSnapshot
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space, proposals } of data) {
           const matching_snapshot = proposals.find(
-            (sn) => sn.id === proposal.snapshotProposal
+            (sn) => sn.id === thread.snapshotProposal
           );
           if (matching_snapshot) {
             this.snapshot = matching_snapshot;
@@ -88,14 +87,14 @@ class ProposalSidebarLinkedSnapshot
 
     if (this.space && this.snapshot) {
       proposalLink = `${
-        app.isCustomDomain() ? '' : `/${proposal.chain}`
+        app.isCustomDomain() ? '' : `/${thread.chain}`
       }/snapshot/${this.space.id}/${this.snapshot.id}`;
     }
 
     return link('a', proposalLink, [
       `Snapshot: ${
         !this.snapshotProposalsLoaded
-          ? proposal.snapshotProposal
+          ? thread.snapshotProposal
           : this.snapshot?.title
       }`,
     ]);
@@ -110,17 +109,16 @@ export class LinkedProposalsCard
         chainEntities?: ChainEntity[],
         snapshotProposal?: SnapshotProposal[]
       ) => void;
-      proposal: Thread;
+      thread: Thread;
       showAddProposalButton: boolean;
     }>
 {
   view(vnode) {
-    const { onChangeHandler, proposal, showAddProposalButton } = vnode.attrs;
-
+    const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
     return (
       <CWCard className="LinkedProposalsCard">
-        {proposal.chainEntities.length > 0 ||
-        proposal.snapshotProposal?.length > 0 ? (
+        {thread.chainEntities.length > 0 ||
+        thread.snapshotProposal?.length > 0 ? (
           <CWText type="h5" className="header-text">
             Proposals for Thread
           </CWText>
@@ -132,20 +130,20 @@ export class LinkedProposalsCard
           </CWText>
         )}
         <div class="links-container">
-          {proposal.chainEntities.length > 0 && (
+          {thread.chainEntities.length > 0 && (
             <div class="proposal-chain-entities">
-              {proposal.chainEntities.map((chainEntity) => {
+              {thread.chainEntities.map((chainEntity) => {
                 return (
                   <ProposalSidebarLinkedChainEntity
-                    proposal={proposal}
+                    thread={thread}
                     chainEntity={chainEntity}
                   />
                 );
               })}
             </div>
           )}
-          {proposal.snapshotProposal?.length > 0 && (
-            <ProposalSidebarLinkedSnapshot proposal={proposal} />
+          {thread.snapshotProposal?.length > 0 && (
+            <ProposalSidebarLinkedSnapshot thread={thread} />
           )}
         </div>
         {showAddProposalButton && (
@@ -157,7 +155,7 @@ export class LinkedProposalsCard
                 modal: UpdateProposalStatusModal,
                 data: {
                   onChangeHandler,
-                  thread: proposal,
+                  thread,
                 },
               });
             }}

@@ -1,4 +1,4 @@
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateRoles from '../../util/validateRoles';
 import { TypedResponse, success, TypedRequestBody } from '../../types';

@@ -167,7 +167,7 @@ export class SubscriptionRowMenu
         menuItems={[
           {
             label: 'Unsubscribe',
-            iconName: 'close',
+            iconLeft: 'close',
             isSecondary: true,
             onclick: () =>
               app.user.notifications

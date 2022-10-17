@@ -1,4 +1,4 @@
-import {  DB } from '../database';
+import {  DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedResponse, success, TypedRequestBody } from '../types';

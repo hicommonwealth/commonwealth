@@ -1,5 +1,5 @@
-import {NextFunction, Request, Response} from "express";
-import {DB} from "../../database";
+import { NextFunction, Request, Response } from 'express';
+import { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

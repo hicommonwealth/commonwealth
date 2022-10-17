@@ -4,7 +4,7 @@ import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

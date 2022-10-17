@@ -1,5 +1,5 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 
 enum UpdatePriorityErrors {

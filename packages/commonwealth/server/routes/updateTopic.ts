@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 enum UpdateTopicErrors {

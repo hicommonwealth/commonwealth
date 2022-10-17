@@ -5,7 +5,8 @@ import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { JWT_SECRET } from '../config';
 import '../types';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -35,11 +36,6 @@ const status = async (
             model: models.ChainNode,
             required: true,
           },
-          {
-            model: models.Contract,
-            required: false,
-            include: [{ model: models.ContractAbi, required: false}],
-          }
         ],
       }),
       models.ChainNode.findAll(),

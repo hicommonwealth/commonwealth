@@ -3,7 +3,7 @@ import { Response, NextFunction } from 'express';
 import { TopicInstance } from 'server/models/topic';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 enum OrderTopicsErrors {

@@ -27,17 +27,21 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;
   if (c.network === ChainNetwork.Aave) return SupportedNetwork.Aave;
   if (c.network === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
-  throw new Error(`Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`);
+  throw new Error(
+    `Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`
+  );
 }
 
 const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
+  return $.get(app.serverUrl() + route, args)
+    .then((resp) => {
+      if (resp.status === 'Success') {
+        callback(resp.result);
+      } else {
+        console.error(resp);
+      }
+    })
+    .catch((e) => console.error(e));
 };
 
 
@@ -48,7 +52,6 @@ class ChainEntityController {
   public get store() {
     return this._store;
   }
-
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
@@ -57,16 +60,21 @@ class ChainEntityController {
   }
 
   public getPreimage(hash: string) {
-    const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
+    const preimage = this.store
+      .getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
       .find((preimageEntity) => {
-        return preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0;
+        return (
+          preimageEntity.typeId === hash &&
+          preimageEntity.chainEvents.length > 0
+        );
       });
     if (preimage) {
       const notedEvent = preimage.chainEvents.find(
         (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
       );
       if (notedEvent && notedEvent.data) {
-        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted)
+          .preimage;
         return result;
       } else {
         return null;
@@ -151,7 +159,11 @@ class ChainEntityController {
       );
 
       // create event
-      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
+      const event = new ChainEvent(
+        cwEvent.blockNumber,
+        cwEvent.data,
+        eventType
+      );
 
       // create entity
       const fieldName = getUniqueEntityKey(network, entityKind);
@@ -186,10 +198,10 @@ class ChainEntityController {
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
-        'jwt': app.user.jwt,
-        'chain_entity_id': chainEntity.id,
-        'title': title,
-        'chain': app.activeChainId(),
+        jwt: app.user.jwt,
+        chain_entity_id: chainEntity.id,
+        title: title,
+        chain: app.activeChainId(),
       },
       success: (response) => {
         chainEntity.title = title;
@@ -205,7 +217,7 @@ class ChainEntityController {
     chain: string,
     network: SupportedNetwork,
     subscriber: IEventSubscriber<Api, RawEvent>,
-    processor: IEventProcessor<Api, RawEvent>,
+    processor: IEventProcessor<Api, RawEvent>
   ): Promise<void> {
     this._subscriber = subscriber;
 

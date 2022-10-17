@@ -5,7 +5,7 @@ import { ThreadAttributes } from '../models/thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { AppError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
-import { DB } from '../database';
+import { DB } from '../models';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',

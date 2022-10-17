@@ -381,6 +381,31 @@ export const CWTerraStation: m.Component<CustomIconAttrs> = {
   },
 };
 
+export const CWUnreads: m.Component<CustomIconAttrs> = {
+  view: (vnode) => {
+    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path
+          fill="#342E37"
+          fillRule="evenodd"
+          d="M17.675 5.653a2.247 2.247 0 10-3.55-.057c-4.416.763-7.775 4.59-7.775 9.194v6.417a.585.585 0 01-.587.583H4.588a.585.585 0 00-.588.584v1.166c0 .322.263.584.588.584H13.281a3.456 3.456 0 104.936 0h8.694a.585.585 0 00.588-.584v-1.166a.585.585 0 00-.587-.584h-1.175a.585.585 0 01-.588-.583V14.79c0-4.5-3.207-8.255-7.474-9.137z"
+          clipRule="evenodd"
+        ></path>
+        <circle cx="23.75" cy="9" r="4" fill="#EC79DE"></circle>
+      </svg>
+    );
+  },
+};
+
 export const CWWalletConnect: m.Component<CustomIconAttrs> = {
   view: (vnode) => {
     const { componentType, iconSize, ...domAttrs } = vnode.attrs;

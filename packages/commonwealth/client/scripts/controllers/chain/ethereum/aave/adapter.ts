@@ -3,7 +3,13 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase } from 'common-common/src/types';
-import { IChainAdapter, ChainEntity, ChainEvent, NodeInfo, ChainInfo } from 'models';
+import {
+  IChainAdapter,
+  ChainEntity,
+  ChainEvent,
+  NodeInfo,
+  ChainInfo,
+} from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -18,6 +24,7 @@ export default class Aave extends IChainAdapter<EthereumCoin, EthereumAccount> {
   public chain: AaveChain;
   public accounts: EthereumAccounts;
   public governance: AaveGovernance;
+
   public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: ChainInfo, app: IApp) {

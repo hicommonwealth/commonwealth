@@ -67,7 +67,6 @@ export async function initAppState(
           .filter((chain) => chain.active)
           .map((chain) => {
             delete chain.ChainNode;
-            // add chain.Contracts to ContractsController here (can be one at a time, in the loop like below)
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
@@ -221,7 +220,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-main" */
-        './controllers/chain/substrate/main'
+        './controllers/chain/substrate/adapter'
       )
     ).default;
     newChain = new Substrate(chain, app);
@@ -230,7 +229,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "cosmos-main" */
-        './controllers/chain/cosmos/main'
+        './controllers/chain/cosmos/adapter'
       )
     ).default;
     newChain = new Cosmos(chain, app);
@@ -239,7 +238,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -251,7 +250,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "near-main" */
-        './controllers/chain/near/main'
+        './controllers/chain/near/adapter'
       )
     ).default;
     newChain = new Near(chain, app);
@@ -328,7 +327,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "solana-main" */
-        './controllers/chain/solana/main'
+        './controllers/chain/solana/adapter'
       )
     ).default;
     newChain = new Solana(chain, app);
@@ -349,7 +348,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -599,20 +598,24 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             : // false => scope is null
               null;
 
-        if (scope) {
-          const scopeIsEthereumAddress =
-            scope.startsWith('0x') && scope.length === 42;
-          if (scopeIsEthereumAddress) {
-            const chains = app.config.chains.getAll();
-            const chain = chains.find((o) => o.address === scope);
-            if (chain) {
-              const pagePath = window.location.href.substr(
-                window.location.href.indexOf(scope) + scope.length
-              );
-              m.route.set(`/${chain.id}${pagePath}`);
-            }
-          }
-        }
+        /* Deprecating the contract_address => community pipeline.
+        This breaks our mental model of where our site is going. 
+        */
+
+        // if (scope) {
+        //   const scopeIsEthereumAddress =
+        //     scope.startsWith('0x') && scope.length === 42;
+        //   if (scopeIsEthereumAddress) {
+        //     const chains = app.config.chains.getAll();
+        //     const chain = chains.find((o) => o.address === scope);
+        //     if (chain) {
+        //       const pagePath = window.location.href.substr(
+        //         window.location.href.indexOf(scope) + scope.length
+        //       );
+        //       m.route.set(`/${chain.id}${pagePath}`);
+        //     }
+        //   }
+        // }
 
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
         // a special case because Threads and on-chain proposals are all viewed through the

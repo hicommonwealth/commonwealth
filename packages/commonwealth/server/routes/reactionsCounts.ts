@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ReactionInstance } from '../models/reaction';
 import { AppError, ServerError } from 'common-common/src/errors';
 

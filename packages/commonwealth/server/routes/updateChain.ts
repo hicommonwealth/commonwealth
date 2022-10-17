@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from 'common-common/src/errors';

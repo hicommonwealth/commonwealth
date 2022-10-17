@@ -6,7 +6,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from 'common-common/src/errors';
-import { DB } from '../database';
+import { DB } from '../models';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 

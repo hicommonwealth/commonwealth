@@ -16,17 +16,6 @@ export interface ListenerOptions {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RawEvent = TypedEvent<any>;
 
-export enum ContractType {
-  AAVE = 'aave',
-  COMPOUND = 'compound',
-  ERC20 = 'erc20',
-  ERC721 = 'erc721',
-  MARLINTESTNET = 'marlin-testnet',
-  SPL = 'spl',
-  MOLOCH1 = 'moloch1', // unused
-  MOLOCH2 = 'moloch2', // unused
-}
-
 export enum CommonContractType {
   Factory,
   Project,

@@ -1,5 +1,5 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { validURL } from '../../shared/utils';
 

@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

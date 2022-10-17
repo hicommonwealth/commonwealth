@@ -1,7 +1,7 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../database';
+import { DB } from '../models';
 import {
   runEntityMigrations,
 } from '../scripts/migrateChainEntities';

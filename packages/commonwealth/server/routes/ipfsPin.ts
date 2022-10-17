@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { DB } from '../database';
+import { DB } from '../models';
 import pinIpfsBlob from '../util/pinIpfsBlob';
 import { AppError } from 'common-common/src/errors';
 export const Errors = {

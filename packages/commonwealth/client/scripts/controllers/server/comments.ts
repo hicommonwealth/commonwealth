@@ -4,7 +4,6 @@ import moment from 'moment';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
-
 import { CommentsStore } from 'stores';
 import {
   Comment,
@@ -19,11 +18,6 @@ import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 // tslint:disable: object-literal-key-quotes
 
-export enum CommentParent {
-  Proposal = 'proposal',
-  Comment = 'comment',
-}
-
 export enum CommentRefreshOption {
   ResetAndLoadComments = 'ResetAndLoadComments',
   LoadProposalComments = 'LoadProposalComments',
@@ -31,9 +25,7 @@ export enum CommentRefreshOption {
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
-    ? comment.Attachments.map(
-        (a) => new Attachment(a.url, a.description)
-      )
+    ? comment.Attachments.map((a) => new Attachment(a.url, a.description))
     : [];
 
   const { reactions } = comment;

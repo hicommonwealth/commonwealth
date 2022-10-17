@@ -22,7 +22,7 @@ import {
 } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
-import { DB } from '../database';
+import { DB } from '../models';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));

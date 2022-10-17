@@ -11,7 +11,7 @@ import {urlHasValidHTTPPrefix} from '../../shared/utils';
 import {ChainAttributes} from '../models/chain';
 import {ChainNodeAttributes} from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import {DB} from '../database';
+import {DB} from '../models';
 import {success, TypedRequestBody, TypedResponse} from '../types';
 
 import {AddressInstance} from '../models/address';

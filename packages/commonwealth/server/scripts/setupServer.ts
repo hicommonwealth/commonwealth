@@ -1,10 +1,11 @@
-import http from 'http';
-import { Express } from 'express-serve-static-core';
-import Rollbar from "rollbar";
-import { DEFAULT_PORT } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Express } from 'express-serve-static-core';
+import http from 'http';
+import Rollbar from 'rollbar';
+
+import { DEFAULT_PORT } from '../config';
+import { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
-import { DB } from "../database";
 import {RabbitMQController} from "common-common/src/rabbitmq";
 
 const log = factory.getLogger(formatFilename(__filename));

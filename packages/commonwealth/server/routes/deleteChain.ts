@@ -2,7 +2,7 @@ import {Request, Response, NextFunction} from 'express';
 import {QueryTypes} from 'sequelize';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {TypedRequestBody, TypedResponse, success} from '../types';
-import {DB} from '../database';
+import {DB} from '../models';
 import {AppError, ServerError} from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -27,11 +27,14 @@ type deleteChainReq = {
 };
 
 type deleteChainResp = { result: string };
-const deleteChain = async (models: DB, req: TypedRequestBody<deleteChainReq>,
-                           res: TypedResponse<deleteChainResp>,
-                           next: NextFunction
+
+const deleteChain = async (
+  models: DB,
+  req: TypedRequestBody<deleteChainReq>,
+  res: TypedResponse<deleteChainResp>,
+  next: NextFunction
 ) => {
-  const {id, airplaneSecret, airplaneManualSecret} = req.body;
+  const { id, airplaneSecret, airplaneManualSecret } = req.body;
 
   if (
     !process.env.AIRPLANE_DELETE_COMMUNITY_SECRET ||
@@ -214,9 +217,7 @@ const deleteChain = async (models: DB, req: TypedRequestBody<deleteChainReq>,
     );
 
     await models.sequelize.query(
-      `DELETE
-       FROM "Threads"
-       WHERE chain = '${chain.id}';`,
+      `DELETE FROM "Threads" WHERE chain='${chain.id}';`,
       {
         type: QueryTypes.DELETE,
         transaction: t,
@@ -309,7 +310,7 @@ const deleteChain = async (models: DB, req: TypedRequestBody<deleteChainReq>,
     );
   });
 
-  return success(res, {result: 'Deleted Chain'});
+  return success(res, { result: 'Deleted Chain' });
 };
 
 export default deleteChain;

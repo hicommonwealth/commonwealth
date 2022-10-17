@@ -4,7 +4,7 @@ import { QueryTypes, Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
 import { AppError, ServerError } from 'common-common/src/errors';
 
