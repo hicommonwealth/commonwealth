@@ -1,5 +1,5 @@
 import { Response, NextFunction, Request } from 'express';
-import { DB } from '../database';
+import { DB } from '../models';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
