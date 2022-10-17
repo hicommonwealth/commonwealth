@@ -133,7 +133,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
 
     return (
       <div class="CreateComment">
-        {!app.user.activeAccount?.profile.name ? (
+        {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
           <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
             <a
