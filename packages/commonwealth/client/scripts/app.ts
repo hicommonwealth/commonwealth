@@ -635,7 +635,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
-    const { defaultOverview } = app.chain.meta;
+    const defaultOverview = false; // TODO: fix this
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
@@ -656,10 +656,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Custom domain routes
             //
-            '/': importRoute('views/pages/discussions', {
-              scoped: true,
-              deferChain: true,
-            }),
+            '/': redirectRoute((attrs) =>
+              defaultOverview ? `/${attrs.scope}/overview` : `/${attrs.scope}/discussions`
+            ),
             '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
@@ -692,14 +691,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
-            '/overview': importRoute('views/pages/overview', {
+            // Discussions
+            '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
+            '/discussions': importRoute('views/pages/discussions', {
               scoped: true,
               deferChain: true,
             }),
-            // Discussions
-            '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions/:topic': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
@@ -948,22 +950,22 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
+            '/:scope': redirectRoute((attrs) =>
+              defaultOverview ? `/${attrs.scope}/overview` : `/${attrs.scope}/discussions`
+            ),
             '/:scope/discussions': importRoute('views/pages/discussions', {
               scoped: true,
               deferChain: true,
             }),
-            '/:scope': redirectRoute(() =>
-              defaultOverview ? `/:scope/overview` : `/:scope/discussions`
-            ),
+            '/:scope/overview': importRoute('views/pages/overview', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
               { scoped: true, deferChain: true }
             ),
             '/:scope/search': importRoute('views/pages/search', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
