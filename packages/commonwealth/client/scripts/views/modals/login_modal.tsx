@@ -15,10 +15,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
-import {
-  breakpointFnValidator,
-  isWindowMediumSmallInclusive,
-} from '../components/component_kit/helpers';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
@@ -32,7 +29,7 @@ type LoginModalAttrs = {
   onSuccess?: () => void;
 };
 
-export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
+export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
@@ -77,7 +74,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.bodyType = 'walletList';
     }
 
-    this.showMobile = isWindowMediumSmallInclusive(window.innerWidth);
+    this.showMobile = isWindowMediumSmallInclusive;
 
     // Override if initial data is provided (needed for redirecting wallets + CommonBot)
     if (vnode.attrs.initialBody) {
@@ -96,30 +93,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     if (vnode.attrs.initialWallets) {
       this.wallets = vnode.attrs.initialWallets;
     }
-
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener('resize', () =>
-      breakpointFnValidator(
-        this.showMobile,
-        (state: boolean) => {
-          this.showMobile = state;
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
-  }
-
-  onremove() {
-    // eslint-disable-next-line no-restricted-globals
-    removeEventListener('resize', () =>
-      breakpointFnValidator(
-        this.showMobile,
-        (state: boolean) => {
-          this.showMobile = state;
-        },
-        isWindowMediumSmallInclusive
-      )
-    );
   }
 
   view(vnode) {
@@ -141,7 +114,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         await loginWithMagicLink(this.email);
         this.magicLoading = false;
         if (onSuccess) onSuccess();
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        if (isWindowMediumSmallInclusive) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -166,7 +139,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       if (app.isLoggedIn()) {
         completeClientLogin(account);
         if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          if (isWindowMediumSmallInclusive) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
@@ -184,7 +157,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
           await updateActiveAddresses(chain);
         }
         if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive(window.innerWidth)) {
+          if (isWindowMediumSmallInclusive) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
@@ -269,7 +242,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        if (isWindowMediumSmallInclusive) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -317,7 +290,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         if (this.username || this.avatarUrl) {
           await app.profiles.updateProfileForAccount(this.primaryAccount, data);
         }
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        if (isWindowMediumSmallInclusive) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -327,7 +300,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');
-        if (isWindowMediumSmallInclusive(window.innerWidth)) {
+        if (isWindowMediumSmallInclusive) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');

@@ -30,7 +30,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
       <>
         <div class="header-row" onclick={() => m.route.set(threadUrl)}>
           <CWText
-            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+            type={isWindowExtraSmall ? 'caption' : 'b2'}
             className="attribution-text"
             noWrap
           >
@@ -70,13 +70,13 @@ const getTextRows = (subscription: NotificationSubscription) => {
       <>
         <div class="header-row">
           <CWText
-            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+            type={isWindowExtraSmall ? 'caption' : 'b2'}
             className="attribution-text"
           >
             {getNotificationTypeText(subscription.category)}
           </CWText>
           <CWText
-            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+            type={isWindowExtraSmall ? 'caption' : 'b2'}
             fontWeight="bold"
           >
             {m(User, {
@@ -91,7 +91,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             's
           </CWText>
           <CWText
-            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+            type={isWindowExtraSmall ? 'caption' : 'b2'}
             className="attribution-text"
           >
             comment
@@ -116,15 +116,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
         onclick={() => m.route.set(subscription.Chain.id)}
       >
         <CWText
-          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
+          type={isWindowExtraSmall ? 'caption' : 'b2'}
           className="attribution-text"
         >
           New Threads in
         </CWText>
-        <CWText
-          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-          fontWeight="bold"
-        >
+        <CWText type={isWindowExtraSmall ? 'caption' : 'b2'} fontWeight="bold">
           {subscription.Chain?.name}
         </CWText>
       </div>

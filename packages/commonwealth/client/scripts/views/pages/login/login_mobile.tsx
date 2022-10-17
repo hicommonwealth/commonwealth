@@ -198,9 +198,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             </div>
           )}
         </div>
-        {hasBoilerplate && !isWindowExtraSmall(window.innerWidth) && (
-          <LoginBoilerplate darkMode />
-        )}
+        {hasBoilerplate && !isWindowExtraSmall && <LoginBoilerplate darkMode />}
       </div>
     );
   }

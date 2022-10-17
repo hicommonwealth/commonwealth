@@ -6,7 +6,7 @@ import $ from 'jquery';
 import app from 'state';
 import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
-import { NewLoginModal } from '../../modals/login_modal';
+import { LoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 
@@ -81,12 +81,9 @@ export const onReactionClick = (
 
   if (!app.isLoggedIn() || !app.user.activeAccount) {
     app.modals.create({
-      modal: NewLoginModal,
+      modal: LoginModal,
       data: {
-        modalType: isWindowMediumSmallInclusive(window.innerWidth)
-          ? 'fullScreen'
-          : 'centered',
-        breakpointFn: isWindowMediumSmallInclusive,
+        modalType: isWindowMediumSmallInclusive ? 'fullScreen' : 'centered',
       },
     });
   } else {

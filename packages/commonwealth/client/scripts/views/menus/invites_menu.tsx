@@ -9,7 +9,7 @@ import 'components/header/invites_menu.scss';
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import ConfirmInviteModal from '../modals/confirm_invite_modal';
-import { NewLoginModal } from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 
 export const handleEmailInvites = (state) => {
   if (!state.modalAutoTriggered && app.user) {
@@ -22,7 +22,7 @@ export const handleEmailInvites = (state) => {
       });
     } else if (!app.user.activeAccount) {
       app.modals.create({
-        modal: NewLoginModal,
+        modal: LoginModal,
       });
     }
   }

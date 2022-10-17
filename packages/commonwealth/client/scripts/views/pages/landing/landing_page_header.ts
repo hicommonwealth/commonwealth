@@ -1,7 +1,7 @@
 import m from 'mithril';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
-import { NewLoginModal } from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
 interface IAttrs {
@@ -114,14 +114,11 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                     style: 'padding: 8px 16px',
                     onclick: () =>
                       app.modals.create({
-                        modal: NewLoginModal,
+                        modal: LoginModal,
                         data: {
-                          modalType: isWindowMediumSmallInclusive(
-                            window.innerWidth
-                          )
+                          modalType: isWindowMediumSmallInclusive
                             ? 'fullScreen'
                             : 'centered',
-                          breakpointFn: isWindowMediumSmallInclusive,
                         },
                       }),
                   },

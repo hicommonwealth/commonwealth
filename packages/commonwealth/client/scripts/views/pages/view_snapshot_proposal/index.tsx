@@ -109,10 +109,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
 
     window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.activeTab !== 'proposals'
-      ) {
+      if (isWindowMediumSmallInclusive && this.activeTab !== 'proposals') {
         this.activeTab = 'proposals';
         m.redraw();
       }

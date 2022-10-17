@@ -115,7 +115,6 @@ export class AppModals implements m.ClassComponent {
           oncreatemodal={oncreate}
           onclick={onclickoverlay}
           modalType={spec.data?.modalType}
-          breakpointFn={spec.data?.breakpointFn}
         >
           {m(spec.modal, spec.data)}
         </CWModal>

@@ -26,7 +26,7 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
@@ -154,12 +154,9 @@ export async function handleInviteLinkRedirect() {
     ) {
       notifyInfo('Log in to join a community with an invite link');
       app.modals.create({
-        modal: NewLoginModal,
+        modal: LoginModal,
         data: {
-          modalType: isWindowMediumSmallInclusive(window.innerWidth)
-            ? 'fullScreen'
-            : 'centered',
-          breakpointFn: isWindowMediumSmallInclusive,
+          modalType: isWindowMediumSmallInclusive ? 'fullScreen' : 'centered',
         },
       });
     } else if (inviteMessage === 'failure') {

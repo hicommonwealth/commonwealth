@@ -211,7 +211,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
         (w) => w instanceof WalletConnectWebWalletController
       );
       await wallet.reset();
-      if (isWindowMediumSmallInclusive(window.innerWidth)) {
+      if (isWindowMediumSmallInclusive) {
         $('.LoginMobile').trigger('modalexit');
       } else {
         $('.LoginDesktop').trigger('modalexit');

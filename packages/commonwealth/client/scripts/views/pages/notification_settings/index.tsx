@@ -53,21 +53,21 @@ class NotificationSettingsPage implements m.ClassComponent {
           </CWText>
           <div class="column-header-row">
             <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+              type={isWindowExtraSmall ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Community
             </CWText>
             <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+              type={isWindowExtraSmall ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Email
             </CWText>
             <CWText
-              type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+              type={isWindowExtraSmall ? 'caption' : 'h5'}
               fontWeight="medium"
               className="last-column-header-text"
             >

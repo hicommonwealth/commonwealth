@@ -1,5 +1,3 @@
-import m from 'mithril';
-
 import breakpoints from 'mixins/breakpoints.scss';
 
 import { isBoolean, isNotNil } from 'helpers/typeGuards';
@@ -21,42 +19,39 @@ export const getClasses = <T>(
   return type.concat(classes).join(' ');
 };
 
-export const isWindowLarge = (width: number) =>
-  width > breakpoints.breakpointLargeM;
+export const isWindowLarge = window.matchMedia(
+  `(min-width: ${breakpoints.breakpointLargeMinPx})`
+).matches;
 
-export const isWindowMediumInclusive = (width: number) =>
-  width < breakpoints.breakpointMediumMax;
+export const isWindowMediumInclusive = window.matchMedia(
+  `(max-width: ${breakpoints.breakpointMediumMaxPx})`
+).matches;
 
-export const isWindowMedium = (width: number) =>
-  width < breakpoints.breakpointMediumMax &&
-  width > breakpoints.breakpointMediumMin;
+export const isWindowMedium =
+  window.matchMedia(`(max-width: ${breakpoints.breakpointMediumMaxPx})`)
+    .matches &&
+  window.matchMedia(`(min-width: ${breakpoints.breakpointMediumMinPx})`)
+    .matches;
 
-export const isWindowMediumSmallInclusive = (width: number) =>
-  width < breakpoints.breakpointMediumSmallMax;
+export const isWindowMediumSmallInclusive = window.matchMedia(
+  `(max-width: ${breakpoints.breakpointMediumSmallMaxPx})`
+).matches;
 
-export const isWindowMediumSmall = (width: number) =>
-  width < breakpoints.breakpointMediumSmallMax &&
-  width > breakpoints.breakpointMediumSmallMin;
+export const isWindowMediumSmall =
+  window.matchMedia(`(max-width: ${breakpoints.breakpointMediumSmallMaxPx})`)
+    .matches &&
+  window.matchMedia(`(min-width: ${breakpoints.breakpointMediumSmallMinPx})`)
+    .matches;
 
-export const isWindowSmallInclusive = (width: number) =>
-  width < breakpoints.breakpointSmallMax;
+export const isWindowSmallInclusive = window.matchMedia(
+  `(max-width: ${breakpoints.breakpointSmallMaxPx})`
+).matches;
 
-export const isWindowSmall = (width: number) =>
-  width < breakpoints.breakpointSmallMax &&
-  width > breakpoints.breakpointSmallMin;
+export const isWindowSmall =
+  window.matchMedia(`(max-width: ${breakpoints.breakpointSmallMaxPx})`)
+    .matches &&
+  window.matchMedia(`(min-width: ${breakpoints.breakpointSmallMinPx})`).matches;
 
-export const isWindowExtraSmall = (width: number) =>
-  width < breakpoints.breakpointExtraSmallMax;
-
-export const breakpointFnValidator = (
-  widthState: boolean,
-  setWidthState: (state: boolean) => void,
-  breakpointFn: (width: number) => boolean
-) => {
-  const breakPointState = breakpointFn(window.innerWidth);
-
-  if (widthState !== breakPointState) {
-    setWidthState(breakPointState);
-    m.redraw();
-  }
-};
+export const isWindowExtraSmall = window.matchMedia(
+  `(max-width: ${breakpoints.breakpointExtraSmallMaxPx})`
+).matches;

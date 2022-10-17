@@ -31,11 +31,11 @@ export class SublayoutHeaderLeft
             m.route.set('/');
           }}
         />
-        {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
+        {isWindowSmallInclusive && <CWDivider isVertical />}
         {!isSidebarToggled && app.activeChainId() && (
           <CWCommunityAvatar size="large" community={app.chain.meta} />
         )}
-        {isWindowSmallInclusive(window.innerWidth) && app.chain && (
+        {isWindowSmallInclusive && app.chain && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}

@@ -453,10 +453,7 @@ class ViewProposalPage
       isAdminOrMod;
 
     window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.tabSelected !== 'viewProposal'
-      ) {
+      if (isWindowMediumSmallInclusive && this.tabSelected !== 'viewProposal') {
         this.tabSelected = 'viewProposal';
         m.redraw();
       }

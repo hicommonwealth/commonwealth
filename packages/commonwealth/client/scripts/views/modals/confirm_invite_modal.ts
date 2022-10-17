@@ -60,7 +60,7 @@ const ConfirmInviteModal: m.Component<
   oncreate: () => {},
   view: (vnode) => {
     const SelectAddress = (account) => {
-      const isMobile = isWindowSmallInclusive(window.innerWidth);
+      const isMobile = isWindowSmallInclusive;
       return m(
         '.SwitchAddress.account-menu-item',
         {

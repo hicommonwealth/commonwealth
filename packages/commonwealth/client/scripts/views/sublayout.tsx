@@ -35,7 +35,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private showSidebarContainer: boolean;
 
   checkSidebarToggles() {
-    const isOnMobile = isWindowSmallInclusive(window.innerWidth);
+    const isOnMobile = isWindowSmallInclusive;
     const storedSidebarToggleState =
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
     if (!app.chain) {
@@ -78,9 +78,10 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       showQuickSwitcher,
     } = this;
 
-    if (!isWindowExtraSmall(window.innerWidth)) {
+    if (!isWindowExtraSmall) {
       delete app.mobileMenu;
     }
+
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">

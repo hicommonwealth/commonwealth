@@ -21,7 +21,7 @@ import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
-import { NewLoginModal } from '../modals/login_modal';
+import { LoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
 interface IState {
@@ -191,15 +191,14 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
               if (vnode.state.isNewAccount) {
                 if (!app.isLoggedIn()) {
                   app.modals.create({
-                    modal: NewLoginModal,
+                    modal: LoginModal,
                     data: {
                       initialBody: 'welcome',
                       initialSidebar: 'newOrReturning',
                       initialAccount: vnode.state.validatedAccount,
-                      modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                      modalType: isWindowMediumSmallInclusive
                         ? 'fullScreen'
                         : 'centered',
-                      breakpointFn: isWindowMediumSmallInclusive,
                     },
                     exitCallback: () => {
                       redirectToNextPage();

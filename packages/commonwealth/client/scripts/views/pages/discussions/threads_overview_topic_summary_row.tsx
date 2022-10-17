@@ -64,7 +64,7 @@ export class ThreadsOverviewTopicSummaryRow
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        {isWindowMediumSmallInclusive(window.innerWidth) && <CWDivider />}
+        {isWindowMediumSmallInclusive && <CWDivider />}
         <div class="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(

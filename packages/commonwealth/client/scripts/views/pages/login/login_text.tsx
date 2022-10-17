@@ -27,13 +27,7 @@ export class LoginText implements m.ClassComponent<LoginTextAttrs> {
       >
         <div class="header-container">
           <CWText
-            type={
-              isWindowExtraSmall(window.innerWidth)
-                ? 'h3'
-                : isMobile
-                ? 'h2'
-                : 'h4'
-            }
+            type={isWindowExtraSmall ? 'h3' : isMobile ? 'h2' : 'h4'}
             fontWeight="semiBold"
             isCentered={isMobile}
             className="header-text"

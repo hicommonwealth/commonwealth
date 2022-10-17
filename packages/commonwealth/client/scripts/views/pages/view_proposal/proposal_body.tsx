@@ -52,6 +52,7 @@ import {
   ProposalHeaderVotingInterfaceLink,
 } from './proposal_header_links';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { mediaQuerySm } from '../../components/component_kit/helpers';
 
 type ProposalBodyAttrs = {
   commentCount: number;

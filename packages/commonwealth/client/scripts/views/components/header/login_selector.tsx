@@ -20,7 +20,7 @@ import {
 import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
+import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
@@ -121,12 +121,11 @@ export class LoginSelectorMenuLeft
               });
             } else {
               app.modals.create({
-                modal: NewLoginModal,
+                modal: LoginModal,
                 data: {
-                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                  modalType: isWindowMediumSmallInclusive
                     ? 'fullScreen'
                     : 'centered',
-                  breakpointFn: isWindowMediumSmallInclusive,
                 },
               });
             }
@@ -285,12 +284,11 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               size={small ? 'sm' : 'default'}
               onclick={() => {
                 app.modals.create({
-                  modal: NewLoginModal,
+                  modal: LoginModal,
                   data: {
-                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                    modalType: isWindowMediumSmallInclusive
                       ? 'fullScreen'
                       : 'centered',
-                    breakpointFn: isWindowMediumSmallInclusive,
                   },
                 });
               }}
@@ -484,12 +482,9 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
         await linkToCommunity(0);
       } else {
         app.modals.create({
-          modal: NewLoginModal,
+          modal: LoginModal,
           data: {
-            modalType: isWindowMediumSmallInclusive(window.innerWidth)
-              ? 'fullScreen'
-              : 'centered',
-            breakpointFn: isWindowMediumSmallInclusive,
+            modalType: isWindowMediumSmallInclusive ? 'fullScreen' : 'centered',
           },
         });
       }
