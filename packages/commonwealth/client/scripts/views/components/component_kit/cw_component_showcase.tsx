@@ -32,6 +32,7 @@ import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWRuleCard } from '../rules';
 import { CWDropdown } from './cw_dropdown';
+import RuleModal from '../rules/rule_modal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -69,8 +70,28 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Create Rule</h1>
+        <div class="form-gallery">
+          <CWButton
+            iconName="plus"
+            buttonType="mini"
+            label="Create Rule"
+            onclick={() => {
+              app.modals.create({
+                modal: RuleModal,
+                data: {
+                  onFinish: (rule) => {
+                    console.log('what am i here', rule);
+                    notifySuccess('Rule created!');
+                  },
+                },
+              });
+            }}
+          />
+        </div>
+
         <h1>Rule Card</h1>
-        <div class="basic-gallery">
+        <div class="form-gallery">
           <CWRuleCard
             isNested={false}
             rule={{

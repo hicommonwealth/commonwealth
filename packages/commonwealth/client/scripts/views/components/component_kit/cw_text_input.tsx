@@ -30,6 +30,7 @@ export type TextInputAttrs = {
   onclick?: (e) => void;
   placeholder?: string;
   tabindex?: number;
+  clearOnEnter?: boolean;
 };
 
 type InputStyleAttrs = {
@@ -110,6 +111,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       size = 'large',
       tabindex,
       displayOnly,
+      clearOnEnter,
     } = vnode.attrs;
 
     return (
@@ -192,6 +194,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             onkeydown={(e) => {
               if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
                 onenterkey(e);
+                if (clearOnEnter) e.target.value = '';
               }
             }}
             value={value}
