@@ -105,12 +105,17 @@ export class RabbitMQController {
       subscription.on('message', (message, content, ackOrNack) => {
         // TODO: fix error handling - to test run the chain-events subscriber + consumer and then run the main service
         //  consumer. To test an 'error' change isRmqMsgCreateCENotificationsCUD ChainEvent.id to be 'string' instead of 'number'
-        messageProcessor.call({rmqController: this, ...msgProcessorContext}, content).catch((e) => {
-          // if the message processor throws because of a message formatting error then we immediately deadLetter the
-          // message to avoid re-queuing the message multiple times
-          if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
-          else ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
-        })
+        messageProcessor.call({rmqController: this, ...msgProcessorContext}, content)
+          .then(() => {
+            ackOrNack();
+          })
+          .catch((e) => {
+            // if the message processor throws because of a message formatting error then we immediately deadLetter the
+            // message to avoid re-queuing the message multiple times
+            if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
+            else ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+
+          })
       });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -182,12 +187,13 @@ export class RabbitMQController {
         // We don't get types on the model anyway but at least this way the model above is typed to facilitate calling
         // this 'safPublish' function (arguably more important to ensure this function is not used with incompatible
         // models).
-       (<any>(await DB.model)).update({
+        (<any>(await DB.model)).update({
           queued: -1
         }, {
           where: {
             id: objectId
-          }
+          },
+          transaction: t
         });
         await this.publish(publishData, publication);
       });
@@ -200,6 +206,11 @@ export class RabbitMQController {
         log.error(`Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`, e)
       }
     }
+  }
+
+  public async shutdown() {
+    await this.broker.shutdown();
+    this._initialized = false;
   }
 
   public get initialized(): boolean {

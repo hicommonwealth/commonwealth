@@ -7,6 +7,7 @@
  * Requires having the dbLink extension created/enabled by a superuser on each of the involved databases `create extension dblink;`
  */
 import models from '../database';
+import {DATABASE_URI as CE_DB_URI} from "chain-events/services/config";
 
 
 export async function enforceDataConsistency(
@@ -60,8 +61,8 @@ export async function enforceDataConsistency(
   });
 }
 
-// lets script run as
+// enables running the enforceDataConsistency function as a standalone script
 if (process.argv[2] == 'run-as-script') {
-  enforceDataConsistency();
+  enforceDataConsistency(CE_DB_URI, true, true);
 }
 

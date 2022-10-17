@@ -22,10 +22,10 @@ const log = factory.getLogger(formatFilename(__filename));
 /**
  * This functions initializes a single RabbitMQController instance and then subscribes to ChainCUD messages coming
  * from the {@link RascalSubscriptions.ChainEvents}
- * subscriptions. This is equivalent The function also runs RepublishMessages which periodically republishes data stored in the database
+ * subscriptions. The function also runs RepublishMessages which periodically republishes data stored in the database
  * that was previously unsuccessfully published.
  */
-async function setupChainEventConsumer() {
+export async function setupChainEventConsumer() {
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
@@ -88,6 +88,8 @@ async function setupChainEventConsumer() {
   await republishMessages.run();
 
   log.info('Consumer started');
+
+  return serviceConsumer;
 }
 
 /**
@@ -102,4 +104,4 @@ async function main() {
   }
 }
 
-main();
+if (process.argv[2] === 'run-as-script') main();

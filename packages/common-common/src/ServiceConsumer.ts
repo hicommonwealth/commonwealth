@@ -16,6 +16,7 @@ export class ServiceConsumer {
   public readonly serviceId: string;
   public readonly rabbitMQController: RabbitMQController;
   public readonly subscriptions: RabbitMQSubscription[];
+  private _initialized = false;
 
   constructor(
     _serviceName: string,
@@ -59,5 +60,24 @@ export class ServiceConsumer {
       log.error("A critical error occurred.", e);
       // TODO: rollbar error reporting
     }
+
+    this._initialized = true;
+  }
+
+  public async shutdown(): Promise<void> {
+    log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`);
+    if (this.rabbitMQController.initialized) {
+      log.info("Attempting to shutdown RabbitMQ Broker...")
+      await this.rabbitMQController.shutdown();
+    }
+
+    // any other future clean-up + logging
+
+    this._initialized = false;
+    log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shut down successful`);
+  }
+
+  public get initialized(): boolean {
+    return this._initialized;
   }
 }
