@@ -5,6 +5,8 @@ import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
 
+import { MixpanelPageViewEvent } from 'analytics/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { ChainInfo } from 'models';
 import HeaderLandingPage from './landing_page_header';
 import JoinCommonWealthSection from './landing_page_pre_footer';
@@ -17,14 +19,9 @@ import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 // Logged In Homepage View
 import 'pages/landing/index.scss';
 
-import { handleEmailInvites } from '../../components/header/invites_menu';
+import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
-import {
-  MixpanelPageViewEvent,
-  MixpanelPageViewPayload,
-} from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 export interface Chain {
   img: string;

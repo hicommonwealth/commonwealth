@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { DB } from '../../database';
+import { DB } from '../../models';
+import { AppError } from '../../util/errors';
 
 export const Errors = {
 	NotLoggedIn: 'Not logged in',
@@ -17,7 +18,7 @@ export const Errors = {
  */
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
 	if (!req.user) {
-		return next(new Error(Errors.NotLoggedIn));
+		return next(new AppError(Errors.NotLoggedIn));
 	}
 
 	// check address
@@ -28,12 +29,12 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
 		}
 	});
 	if (!addressAccount) {
-		return next(new Error(Errors.NoValidAddress))
+		return next(new AppError(Errors.NoValidAddress))
 	}
 
 	// check community id
 	if (!req.query.chain_id) {
-		return next(new Error(Errors.NoCommunityId))
+		return next(new AppError(Errors.NoCommunityId))
 	}
 
 	// get all messages

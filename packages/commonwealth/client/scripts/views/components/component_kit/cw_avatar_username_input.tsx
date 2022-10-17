@@ -14,7 +14,7 @@ import { getClasses } from './helpers';
 type Orientation = 'horizontal' | 'vertical';
 
 type AvatarUsernameInputAttrs = {
-  account?: Account<any>;
+  account?: Account;
   address: string;
   darkMode?: boolean;
   value: string;
@@ -65,7 +65,7 @@ export class CWAvatarUsernameInput
           <CWTextInput
             darkMode={darkMode}
             size="small"
-            iconRight="edit"
+            iconRight="write"
             value={value}
             oninput={(e) => {
               onUsernameChangeHandler((e.target as any).value);

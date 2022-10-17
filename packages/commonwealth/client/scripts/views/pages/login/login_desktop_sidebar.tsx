@@ -1,30 +1,67 @@
 /* @jsx m */
 
 import m from 'mithril';
+import app from 'state';
 
 import 'pages/login/login_desktop_sidebar.scss';
 
+import { IWebWallet } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
 
+function generateText(wallets: Array<IWebWallet<any>>) {
+  if (wallets.length === 0) {
+    const chainbase = app.chain?.meta?.base;
+
+    if (chainbase) {
+      return `Please install a ${
+        chainbase.charAt(0).toUpperCase() + chainbase.slice(1)
+      } Wallet`;
+    } else {
+      return 'Please install a Web3 Wallet';
+    }
+  }
+  const wallet = wallets[0];
+  const startsWithVowel = wallet.chain === 'ethereum';
+
+  return `This Community requires a${startsWithVowel ? 'n' : ''} ${
+    wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
+  } Wallet`;
+}
+
 export class LoginDesktopSidebar
-  implements m.ClassComponent<{ sidebarType: LoginSidebarType }>
+  implements
+    m.ClassComponent<{
+      sidebarType: LoginSidebarType;
+      createNewAccountCallback: () => void;
+      linkExistingAccountCallback: () => void;
+      wallets: Array<IWebWallet<any>>;
+    }>
 {
   view(vnode) {
-    const { sidebarType } = vnode.attrs;
+    const {
+      sidebarType,
+      createNewAccountCallback,
+      linkExistingAccountCallback,
+      wallets,
+    } = vnode.attrs;
     return (
       <div class="LoginDesktopSidebar">
         {sidebarType === 'connectWallet' && (
           <div class="connect-wallet">
             <div class="sidebar-content">
               <LoginText
-                headerText="Connect Your Wallet"
-                bodyText={`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                imperdiet velit fringilla lorem et. Integer accumsan lobortis
-                cursus amet. Dictum sit morbi elementum.`}
+                headerText={
+                  wallets.length > 0
+                    ? 'Connect Your Wallet'
+                    : 'Please Install a Wallet to Login'
+                }
+                bodyText={`Many communities require different wallets 
+                            based on the chain they are built on and 
+                            the types of tokens members hold.`}
               />
             </div>
           </div>
@@ -34,28 +71,21 @@ export class LoginDesktopSidebar
             <CWText type="h4" fontWeight="semiBold" className="header-text">
               New or Returning?
             </CWText>
-            <CWAccountCreationButton
-              onclick={() => {
-                // fill in
-              }}
-            />
+            <CWAccountCreationButton onclick={createNewAccountCallback} />
             <CWAccountCreationButton
               creationType="linkAccount"
-              onclick={() => {
-                // fill in
-              }}
+              onclick={linkExistingAccountCallback}
             />
           </div>
         )}
-        {sidebarType === 'ethWallet' && (
+        {sidebarType === 'communityWalletOptions' && (
           <div class="eth-wallet">
             <CWText type="h4" fontWeight="semiBold" className="header-text">
-              This Community requires an Ethereum Wallet
+              {generateText(wallets)}
             </CWText>
             <CWText type="b2" className="sidebar-body-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-              imperdiet velit fringilla lorem et. Integer accumsan lobortis
-              cursus amet. Dictum sit morbi elementum.
+              Many communities require different wallets based on the chain they
+              are built on and the types of tokens members hold.
             </CWText>
           </div>
         )}

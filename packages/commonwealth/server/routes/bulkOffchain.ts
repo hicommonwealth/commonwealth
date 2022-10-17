@@ -4,17 +4,20 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { QueryTypes, Op } from 'sequelize';
-import { Response, NextFunction, Request } from 'express';
+import { contracts } from '@polkadot/types/interfaces/definitions';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../util/validateChain';
-import { DB } from '../database';
-import { TopicInstance } from '../models/topic';
-import { RoleInstance } from '../models/role';
-import { ThreadInstance } from '../models/thread';
+import { NextFunction, Request, Response } from 'express';
+import { Op, QueryTypes } from 'sequelize';
+import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
-import { RuleInstance } from '../models/rule';
 import { CommunityBannerInstance } from '../models/community_banner';
+import { ContractInstance } from '../models/contract';
+import { RoleInstance } from '../models/role';
+import { RuleInstance } from '../models/rule';
+import { ThreadInstance } from '../models/thread';
+import { TopicInstance } from '../models/topic';
+import { AppError, ServerError } from '../util/errors';
+import validateChain from '../util/validateChain';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -27,14 +30,14 @@ const bulkOffchain = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';
   const replacements = { chain: chain.id };
 
   // parallelized queries
-  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules, communityBanner] =
+  const [topics, pinnedThreads, admins, mostActiveUsers, threadsInVoting, chatChannels, rules, communityBanner, contracts] =
     await (<
       Promise<
         [
@@ -46,6 +49,7 @@ const bulkOffchain = async (
           ChatChannelInstance[],
           RuleInstance[],
           CommunityBannerInstance,
+          ContractInstance[]
         ]
       >
     >Promise.all([
@@ -101,7 +105,7 @@ const bulkOffchain = async (
           );
         } catch (e) {
           console.log(e);
-          reject(new Error('Could not fetch threads, comments, or reactions'));
+          reject(new ServerError('Could not fetch threads, comments, or reactions'));
         }
       }),
       // admins
@@ -150,7 +154,7 @@ const bulkOffchain = async (
           });
           resolve(mostActiveUsers_);
         } catch (e) {
-          reject(new Error('Could not fetch most active users'));
+          reject(new ServerError('Could not fetch most active users'));
         }
       }),
       models.sequelize.query(
@@ -181,7 +185,25 @@ const bulkOffchain = async (
           chain_id: chain.id,
         }
       }),
+      new Promise(async (resolve, reject) => {
+        try {
+          const communityContracts = await models.CommunityContract.findAll({
+            where: {
+              chain_id: chain.id,
+            }
+          });
+          const contractsPromise = models.Contract.findAll({
+            where: {
+              id: { [Op.in]: communityContracts.map((cc) => cc.contract_id) }
+            },
+            include: [{ model: models.ContractAbi, required: false}],
+          });
+          resolve(contractsPromise);
+      } catch (e) {
+        reject(new ServerError('Could not fetch contracts'));
+      }}),
     ]));
+
 
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
@@ -198,6 +220,7 @@ const bulkOffchain = async (
       chatChannels: JSON.stringify(chatChannels),
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
+      contracts: contracts.map((c) => c.toJSON()),
     },
   });
 };

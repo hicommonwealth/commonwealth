@@ -33,8 +33,8 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import Substrate from 'controllers/chain/substrate/main';
-import Cosmos from 'controllers/chain/cosmos/main';
+import Substrate from 'controllers/chain/substrate/adapter';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
@@ -710,7 +710,7 @@ const NewProposalForm = {
           hasAction && m(EdgewareFunctionPicker),
           hasTopics &&
             m(TopicSelector, {
-              topics: app.chain.meta.topics,
+              topics: app.topics.getByCommunity(app.chain.id),
               updateFormData: (topicName: string, topicId?: number) => {
                 vnode.state.form.topicName = topicName;
                 vnode.state.form.topicId = topicId;

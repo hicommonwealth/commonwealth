@@ -14,7 +14,7 @@ import User, { AnonymousUser } from './user';
 
 const UserGallery: m.Component<
   {
-    users: Account<any>[] | AddressInfo[];
+    users: Account[] | AddressInfo[];
     addressesCount?: number;
     class?: string;
     avatarSize: number;
@@ -32,8 +32,8 @@ const UserGallery: m.Component<
 
     return m('.UserGallery', { class: vnode.attrs.class }, [
       (users).slice(0, Math.min(userCount, maxUsers))
-        .map((user: Account<any> | AddressInfo) => {
-          if (user.chain !== app.chain?.id && user.chain !== app.chain?.base) {
+        .map((user: Account | AddressInfo) => {
+          if (user.chain.id !== app.chain?.id && user.chain.id !== app.chain?.base) {
             return m(AnonymousUser, {
               avatarOnly: true,
               avatarSize: 40,

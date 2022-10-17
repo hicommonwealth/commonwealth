@@ -1,9 +1,9 @@
-import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
-import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
+import { ContractType } from 'common-common/src/types';
+import $ from 'jquery';
+import { ChainInfo, ITokenAdapter } from 'models';
 import { IApp } from 'state';
-
-import Solana from './main';
+import Solana from './adapter';
 
 export default class Token extends Solana implements ITokenAdapter {
   public readonly contractAddress: string;
@@ -14,11 +14,11 @@ export default class Token extends Solana implements ITokenAdapter {
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-
     const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
       chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,
+      contract_address: this.contractAddress,
     });
     if (balanceResp.result) {
       const balance = new BN(balanceResp.result, 10);
@@ -32,7 +32,13 @@ export default class Token extends Solana implements ITokenAdapter {
   // Extensions of Solana
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
-    this.contractAddress = meta.address;
+    // iterate through selectedChain.Contracts for the Aave type and return the address
+    const solanaContracts = this.app.contracts.getByType(ContractType.SPL);
+    if (!solanaContracts || !solanaContracts.length) {
+      throw new Error('No Sol contracts found');
+    }
+    const solanaContract = solanaContracts[0];
+    this.contractAddress = solanaContract.address;
   }
 
   public async initData() {

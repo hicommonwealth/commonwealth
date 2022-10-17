@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
-import { DB } from '../database';
+import { DB } from '../models';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -59,13 +59,32 @@ const getTokenForum = async (
           network: chain_network,
           type: ChainType.Token,
           icon_url: token.icon_url,
-          symbol: token.symbol,
+          default_symbol: token.symbol,
           name: token.name,
-          decimals: token.decimals,
           base: ChainBase.Ethereum,
           has_chain_events_listener: false,
         },
       });
+      // Create Contract + Association
+      const [contract] = await models.Contract.findOrCreate({
+        where: {
+          address,
+          chain_node_id: node.id,
+        },
+        defaults: {
+          address,
+          chain_node_id: node.id,
+          decimals: token.decimals,
+          symbol: token.symbol,
+          type: chain.network, // TODO: Make better query param and validation for this
+        }
+      });
+      await models.CommunityContract.create({
+        chain_id: chain.id,
+        contract_id: contract.id,
+      });
+      chain.Contract = contract.toJSON();
+
       const nodeJSON = node.toJSON();
       delete nodeJSON.private_url;
       return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: nodeJSON }});

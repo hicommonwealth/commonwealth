@@ -28,7 +28,7 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
     const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
       chain.id
     );
-    const isMember = app.user.isMember({
+    const isMember = app.roles.isMember({
       account: app.user.activeAccount,
       chain: chain.id,
     });
@@ -54,12 +54,7 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
         {!!monthlyThreadCount && (
           <>
             <CWText className="card-subtext" type="b2" fontWeight="medium">
-              {monthlyThreadCount > 20
-                ? `${pluralize(
-                    Math.floor(monthlyThreadCount / 5),
-                    'thread'
-                  )} this week`
-                : `${pluralize(monthlyThreadCount, 'thread')} this month`}
+              {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
               <>

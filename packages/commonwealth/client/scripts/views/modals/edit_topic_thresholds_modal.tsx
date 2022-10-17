@@ -93,7 +93,7 @@ export class EditTopicThresholdsModal
   view(vnode) {
     if (
       !app.user.isSiteAdmin &&
-      !app.user.isAdminOfEntity({ chain: app.activeChainId() })
+      !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
     )
       return null;
     const { id, name, description, tokenThreshold } = vnode.attrs;

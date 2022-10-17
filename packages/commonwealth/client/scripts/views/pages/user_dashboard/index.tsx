@@ -45,8 +45,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
         this.fyNotifications = activity.result
           .map((notification) =>
             DashboardActivityNotification.fromJSON(notification)
-          )
-          .reverse();
+          );
         this.loadingData = false;
         m.redraw();
       });

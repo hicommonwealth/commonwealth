@@ -1,5 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import pinIpfsBlob from '../util/pinIpfsBlob';
 import { AppError } from '../util/errors';
 import { TypedRequestBody, TypedResponse, success } from '../types';

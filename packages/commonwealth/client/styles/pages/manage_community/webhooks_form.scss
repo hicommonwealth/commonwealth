@@ -1,50 +1,46 @@
+@import 'shared';
+
 .WebhooksForm {
-  .cui-list-item {
-    margin-bottom: 16px;
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 
-    .cui-list-item-content-left .webhook-row {
+  .webhooks-container {
+    border: 1px solid $neutral-300;
+    border-radius: $border-radius-corners;
+    display: flex;
+    flex-direction: column;
+    max-height: 120px;
+    overflow-y: auto;
+
+    @include visibleScrollbar(light);
+
+    .webhook-row {
+      align-items: center;
       display: flex;
-      flex-direction: column;
-      margin-bottom: 8px;
-      padding: 0;
+      justify-content: space-between;
+      padding: 8px;
 
-      .url {
-        font-size: 19px;
-        margin-bottom: 8px;
-      }
-
-      .label-and-tags {
+      .webhook-info {
         align-items: center;
         display: flex;
-        flex-direction: row;
+        gap: 8px;
 
-        .settings-button {
-          height: 32px;
-          line-height: 32px;
-          min-height: 32px;
-          padding: 0;
-          width: 32px;
-        }
-
-        > * {
-          margin-right: 8px;
+        .webhook-tag-text {
+          background-color: $neutral-100;
+          padding: 4px 8px;
         }
       }
-    }
 
-    .cui-list-item-content-right {
-      svg {
-        cursor: pointer;
+      .buttons {
+        align-items: center;
+        display: flex;
+        gap: 4px;
       }
     }
   }
 
-  .cui-form-group {
-    margin-bottom: 16px;
-
-    .cui-input {
-      margin-bottom: 16px;
-    }
+  .no-webhooks-text.Text {
+    display: inline-block;
   }
 }

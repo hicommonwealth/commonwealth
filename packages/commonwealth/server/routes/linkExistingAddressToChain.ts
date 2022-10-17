@@ -5,7 +5,8 @@ import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -26,16 +27,16 @@ const linkExistingAddressToChain = async (
   next: NextFunction
 ) => {
   if (!req.body.address) {
-    return next(new Error(Errors.NeedAddress));
+    return next(new AppError(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
   if (!req.body.originChain) {
-    return next(new Error(Errors.NeedOriginChain));
+    return next(new AppError(Errors.NeedOriginChain));
   }
   if (!req.user?.id) {
-    return next(new Error(Errors.NeedLoggedIn));
+    return next(new AppError(Errors.NeedLoggedIn));
   }
   const userId = req.user.id;
 
@@ -44,7 +45,7 @@ const linkExistingAddressToChain = async (
   });
 
   if (!chain) {
-    return next(new Error(Errors.InvalidChain));
+    return next(new AppError(Errors.InvalidChain));
   }
 
   // check if the original address is verified and is owned by the user
@@ -53,7 +54,7 @@ const linkExistingAddressToChain = async (
   });
 
   if (!originalAddress) {
-    return next(new Error(Errors.NotVerifiedAddressOrUser));
+    return next(new AppError(Errors.NotVerifiedAddressOrUser));
   }
 
   const originalProfile = await models.OffchainProfile.findOne({

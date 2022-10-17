@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { CreateOptions, DataTypes, Model } from 'sequelize';
+import { CreateOptions, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -8,8 +8,7 @@ import {
   SocialAccountInstance,
   SocialAccountAttributes,
 } from './social_account';
-import { DB } from '../database';
-import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
+import { DB } from '../models';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 

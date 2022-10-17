@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
+import { AppError, ServerError } from '../../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,11 +16,11 @@ export const Errors = {
 
 const editDraft = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
   if (!req.body.id) {
-    return next(new Error(Errors.NoId));
+    return next(new AppError(Errors.NoId));
   }
 
   const { id, title, body, topic } = req.body;
@@ -54,7 +55,7 @@ const editDraft = async (models, req: Request, res: Response, next: NextFunction
         models.Attachment
       ]
     });
-    if (!draft) return next(new Error(Errors.NotFound));
+    if (!draft) return next(new AppError(Errors.NotFound));
     if (body) draft.body = body;
     if (title) draft.title = title;
     if (topic) draft.topic = topic;

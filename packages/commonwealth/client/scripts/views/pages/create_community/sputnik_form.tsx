@@ -63,7 +63,7 @@ export class SputnikForm implements m.ClassComponent {
               communityType: CommunityType.SputnikDao,
             });
           }}
-          label={(checked) => {
+          caption={(checked) => {
             if (checked !== this.state.form.isMainnet) {
               return 'Unknown network!';
             }

@@ -1,5 +1,5 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { validURL } from '../../shared/utils';
 
@@ -34,12 +34,12 @@ const updateChainCustomDomain = async (
   });
   if (!chain) throw new ServerError(UpdateCustomDomainErrors.NoChain);
 
-  if (!process.env.CUSTOM_DOMAIN_UPDATE_SECRET) {
+  if (!process.env.AIRPLANE_SECRET) {
     throw new AppError(UpdateCustomDomainErrors.Failed);
   }
 
   // Check secret
-  if (process.env.CUSTOM_DOMAIN_UPDATE_SECRET !== secret) {
+  if (process.env.AIRPLANE_SECRET !== secret) {
     throw new AppError(UpdateCustomDomainErrors.Failed);
   }
 

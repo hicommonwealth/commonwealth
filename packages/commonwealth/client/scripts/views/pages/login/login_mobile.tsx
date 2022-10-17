@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import { Spinner } from 'construct-ui';
 import m from 'mithril';
 
 import 'pages/login/login_mobile.scss';
@@ -28,62 +29,81 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
     const {
       address,
       bodyType,
+      setBodyType,
       handleSetAvatar,
       handleSetUsername,
       profiles,
+      setProfiles,
+      handleSetEmail,
+      setSidebarType,
       username,
       wallets,
+      setSelectedWallet,
+      createNewAccountCallback,
+      linkExistingAccountCallback,
+      accountVerifiedCallback,
+      handleEmailLoginCallback,
+      saveProfileInfoCallback,
+      performLinkingCallback,
+      setSelectedLinkingWallet,
+      magicLoading,
+      showResetWalletConnect,
     } = vnode.attrs;
-
-    const hasEthAlert =
-      bodyType === 'connectWithEmail' || bodyType === 'ethWalletList';
 
     const hasBoilerplate =
       bodyType === 'walletList' ||
       bodyType === 'connectWithEmail' ||
       bodyType === 'ethWalletList';
 
-    const hasCreationButtons =
-      bodyType === 'selectAccountType' ||
-      bodyType === 'selectPrevious' ||
-      bodyType === 'welcome';
-
-    const hasWalletList =
-      bodyType === 'walletList' ||
-      bodyType === 'selectPrevious' ||
-      bodyType === 'ethWalletList';
+    const hasCreationButtons = bodyType === 'selectAccountType';
 
     const { headerText, bodyText } = getText(bodyType);
 
     return (
       <div class="LoginMobile">
         <ModalExitButton iconButtonTheme="hasBackground" />
-        {hasEthAlert && <LoginEthAlert />}
+        {bodyType === 'ethWalletList' && <LoginEthAlert />}
         <div class={bodyType}>
           <LoginText headerText={headerText} bodyText={bodyText} isMobile />
           {hasCreationButtons && (
             <div class="account-creation-buttons-row">
-              <CWAccountCreationButton
-                onclick={() => {
-                  // fill in
-                }}
-              />
+              <CWAccountCreationButton onclick={createNewAccountCallback} />
               <CWAccountCreationButton
                 creationType="linkAccount"
-                onclick={() => {
-                  // fill in
-                }}
+                onclick={linkExistingAccountCallback}
               />
             </div>
           )}
-          {hasWalletList && (
+          {bodyType === 'walletList' && (
             <CWWalletsList
               connectAnotherWayOnclick={() => {
-                // this.sidebarType = 'ethWallet';
-                // this.bodyType = 'connectWithEmail';
+                setBodyType('connectWithEmail');
               }}
-              darkMode
               wallets={wallets}
+              darkMode={true}
+              setSelectedWallet={setSelectedWallet}
+              setProfiles={setProfiles}
+              setSidebarType={setSidebarType}
+              setBodyType={setBodyType}
+              accountVerifiedCallback={accountVerifiedCallback}
+              showResetWalletConnect={showResetWalletConnect}
+              linking={false}
+            />
+          )}
+          {bodyType === 'selectPrevious' && (
+            <CWWalletsList
+              connectAnotherWayOnclick={() => {
+                setBodyType('connectWithEmail');
+              }}
+              wallets={wallets}
+              darkMode={true}
+              setProfiles={setProfiles}
+              setSidebarType={setSidebarType}
+              setSelectedWallet={setSelectedLinkingWallet}
+              setBodyType={setBodyType}
+              accountVerifiedCallback={accountVerifiedCallback}
+              showResetWalletConnect={showResetWalletConnect}
+              linking={true}
             />
           )}
           {bodyType === 'welcome' && (
@@ -100,7 +120,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                 }}
                 orientation="vertical"
               />
-              <CWButton label="Finish" />
+              <CWButton label="Finish" onclick={saveProfileInfoCallback} />
             </div>
           )}
           {bodyType === 'selectProfile' && (
@@ -123,21 +143,32 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                 </CWText>
                 <CWProfilesList profiles={profiles} darkMode />
               </div>
-              <CWButton label="Finish" />
+              <CWButton label="Finish" onclick={performLinkingCallback} />
             </div>
           )}
           {bodyType === 'connectWithEmail' && (
             <div class="inner-body-container">
-              <CWTextInput
-                containerClassName="connect-with-email-input"
-                label="email address"
-                placeholder="your-email@email.com"
-              />
+              {!magicLoading ? (
+                <CWTextInput
+                  label="email address"
+                  placeholder="your-email@email.com"
+                  oninput={handleSetEmail}
+                  onenterkey={handleEmailLoginCallback}
+                />
+              ) : (
+                <Spinner active={true} size="xl" position="inherit" />
+              )}
               <div class="buttons-row">
-                <CWButton label="Back" buttonType="secondary-blue-dark" />
+                <CWButton
+                  label="Back"
+                  buttonType="secondary-blue-dark"
+                  onclick={() => {
+                    setBodyType('walletList');
+                  }}
+                />
                 <CWButton
                   label="Connect"
-                  disabled // not sure of conditional
+                  onclick={handleEmailLoginCallback}
                   buttonType="primary-blue-dark"
                 />
               </div>

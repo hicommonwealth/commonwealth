@@ -10,7 +10,7 @@ import { CWLabel } from './cw_label';
 import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
-import { CWAvatar } from './cw_avatar';
+import { CWIconButton } from './cw_icon_button';
 
 type TextInputSize = 'small' | 'large';
 
@@ -19,12 +19,15 @@ export type TextInputAttrs = {
   autofocus?: boolean;
   containerClassName?: string;
   value?: string;
-  iconRight?: string | CWAvatar;
+  iconRight?: string;
+  iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   maxlength?: number;
   name: string;
   oninput?: (e) => void;
+  onenterkey?: (e) => void;
+  onclick?: (e) => void;
   placeholder?: string;
   tabindex?: number;
 };
@@ -35,6 +38,7 @@ type InputStyleAttrs = {
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
+  displayOnly?: boolean;
 };
 
 type InputInternalStyleAttrs = {
@@ -51,7 +55,8 @@ type MessageRowAttrs = {
 
 export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   view(vnode) {
-    const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
+    const { hasFeedback, label, statusMessage, validationStatus, displayOnly } =
+      vnode.attrs;
 
     return (
       <div
@@ -92,15 +97,19 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       value,
       disabled,
       iconRight,
+      iconRightonclick,
       inputClassName,
       inputValidationFn,
       label,
       maxlength,
       name,
       oninput,
+      onenterkey,
+      onclick,
       placeholder,
       size = 'large',
       tabindex,
+      displayOnly,
     } = vnode.attrs;
 
     return (
@@ -115,6 +124,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           },
           ComponentType.TextInput
         )}
+        onclick={onclick}
       >
         {label && (
           <MessageRow
@@ -132,12 +142,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               size,
               validationStatus: this.validationStatus,
               disabled,
+              displayOnly,
               isTyping: this.isTyping,
               hasRightIcon: !!iconRight,
               darkMode,
               inputClassName,
             })}
-            disabled={disabled}
+            disabled={disabled || displayOnly}
             tabindex={tabindex}
             maxlength={maxlength}
             name={name}
@@ -178,20 +189,29 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 }
               }
             }}
+            onkeydown={(e) => {
+              if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
+                onenterkey(e);
+              }
+            }}
             value={value}
           />
-          {!!iconRight &&
-            !disabled &&
-            (typeof iconRight === 'string' ? (
-              <CWIcon
+          {iconRightonclick && !!iconRight && !disabled ? (
+            <div class="text-input-right-onclick-icon">
+              <CWIconButton
                 iconName={iconRight}
                 iconSize="small"
-                className="text-input-right-icon"
+                onclick={iconRightonclick}
+                theme="primary"
               />
-            ) : (
-              // Custom icons and avatars passed in should typically be 24x24
-              <div class="text-input-right-icon">{iconRight}</div>
-            ))}
+            </div>
+          ) : !!iconRight && !disabled ? (
+            <CWIcon
+              iconName={iconRight}
+              iconSize="small"
+              className="text-input-right-icon"
+            />
+          ) : null}
         </div>
       </div>
     );

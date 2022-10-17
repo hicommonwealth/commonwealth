@@ -49,7 +49,6 @@ class MembersPage implements m.ClassComponent {
         <PageLoading
           message="Loading members"
           title={<BreadcrumbsTitleTag title="Members" />}
-          showNewProposalButton
         />
       );
 
@@ -97,7 +96,6 @@ class MembersPage implements m.ClassComponent {
         <PageLoading
           message="Loading members"
           title={<BreadcrumbsTitleTag title="Members" />}
-          showNewProposalButton
         />
       );
 
@@ -197,7 +195,6 @@ class MembersPage implements m.ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Members" />}
-        showNewProposalButton
         onscroll={this.onscroll}
       >
         <div class="MembersPage">

@@ -17,7 +17,7 @@ import { WebSocketController } from '../controllers/server/socket';
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
 // TODO: move this from `app.chain` or else rename `chain`?
-abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
+abstract class IChainAdapter<C extends Coin, A extends Account> {
   protected _apiInitialized = false;
   public get apiInitialized() {
     return this._apiInitialized;
@@ -76,8 +76,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     if (
-      this.meta.id !==
-      (this.app.customDomainId() || m.route.param('scope'))
+      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
     ) {
       return false;
     }
@@ -90,14 +89,15 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
       numVotingThreads,
       chatChannels,
       rules, // TODO: store in rules controller
-      communityBanner
+      communityBanner,
+      contracts,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    console.log('initializing banner', this.meta.communityBanner);
+    this.app.contracts.initialize(contracts, true);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
@@ -196,7 +196,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account<C>> {
     return this.meta.network;
   }
   get currency() {
-    return this.meta.symbol;
+    return this.meta.default_symbol;
   }
 }
 

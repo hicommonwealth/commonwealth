@@ -10,7 +10,7 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 class NewThreadModal implements m.ClassComponent {
   view() {
-    const hasTopics = !!app.chain?.meta.topics.length;
+    const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
 
     return (
       <div class="NewThreadModal">

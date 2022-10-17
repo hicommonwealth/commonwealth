@@ -1,8 +1,9 @@
-import { ChainInfo, NodeInfo } from 'models';
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
+import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { ContractType } from 'common-common/src/types';
+import { ChainInfo } from 'models';
 import EthereumChain from '../chain';
+import { attachSigner } from '../contractApi';
 import AaveApi from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
@@ -12,7 +13,7 @@ export default class AaveChain extends EthereumChain {
 
   public coins(n: number, inDollars?: boolean) {
     return new EthereumCoin(
-      this.app?.chain?.meta.symbol || '???',
+      this.app?.chain?.meta.default_symbol || '???',
       n,
       inDollars
     );
@@ -21,9 +22,15 @@ export default class AaveChain extends EthereumChain {
   public async init(selectedChain: ChainInfo) {
     await super.resetApi(selectedChain);
     await super.initMetadata();
+    // iterate through selectedChain.Contracts for the Aave type and return the address
+    const aaveContracts = this.app.contracts.getByType(ContractType.AAVE);
+    if (!aaveContracts || !aaveContracts.length) {
+      throw new Error('No Aave contracts found');
+    }
+    const aaveContract = aaveContracts[0];
     this.aaveApi = new AaveApi(
       IAaveGovernanceV2__factory.connect,
-      selectedChain.address,
+      aaveContract.address,
       this.api.currentProvider as any
     );
     await this.aaveApi.init();

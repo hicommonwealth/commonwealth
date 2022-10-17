@@ -1,0 +1,41 @@
+@import 'shared';
+
+.ThreadsOverview {
+  display: flex;
+  flex-direction: column;
+  padding: 56px;
+
+  @include mediumSmallInclusive {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
+
+  .header-row {
+    align-items: center;
+    border-bottom: 1px solid $neutral-300;
+    display: grid;
+    gap: 32px;
+    grid-template-columns: 352px 1fr;
+    padding-bottom: 16px;
+
+    @include mediumSmallInclusive {
+      display: none;
+    }
+
+    .threads-header-row-text.Text {
+      color: $neutral-500;
+    }
+
+    .threads-header-container {
+      display: flex;
+      justify-content: space-between;
+
+      .threads-header-row-text.Text {
+        color: $neutral-500;
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import app, { ApiStatus } from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase } from 'common-common/src/types';
 import { pluralize } from 'helpers';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
@@ -133,7 +133,6 @@ class CouncilPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Council" />}
-          showNewProposalButton
         />
       );
     }
@@ -148,7 +147,7 @@ class CouncilPage implements m.ClassComponent {
     const activeAccountIsCandidate =
       app.chain &&
       app.user.activeAccount &&
-      app.user.activeAccount.chainBase === ChainBase.Substrate &&
+      app.user.activeAccount.chain.base === ChainBase.Substrate &&
       !!candidates.find(
         ([who]) => who.address === app.user.activeAccount.address
       );
@@ -161,8 +160,7 @@ class CouncilPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Council" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Council" />}
       >
         <div class="CouncilPage">
           <GovExplainer

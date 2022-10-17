@@ -1,11 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Select, Switch } from 'construct-ui';
+import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
 import { CWTextArea } from './component_kit/cw_text_area';
+import { CWToggle } from './component_kit/cw_toggle';
+import { CWText } from './component_kit/cw_text';
 
 type InputRowAttrs = {
   value: string;
@@ -36,7 +38,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
           <CWTextArea
             value={value}
             placeholder={placeholder}
-            disabled={disabled || false}
+            disabled={!!disabled}
             maxlength={maxlength}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
@@ -48,7 +50,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
             value={value}
             placeholder={placeholder}
             maxlength={maxlength}
-            disabled={disabled || false}
+            disabled={!!disabled}
             oninput={(e) => {
               onChangeHandler((e.target as any).value);
             }}
@@ -60,7 +62,7 @@ export class InputRow implements m.ClassComponent<InputRowAttrs> {
 }
 
 type ToggleRowAttrs = {
-  label?: (e) => void;
+  caption?: (e) => void;
   defaultValue: boolean;
   disabled?: boolean;
   onToggle: (e) => void;
@@ -75,21 +77,21 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
   }
 
   view(vnode) {
-    const { label, disabled, onToggle, title } = vnode.attrs;
+    const { caption, disabled, onToggle, title } = vnode.attrs;
 
     return (
       <div class="ToggleRow">
         <CWLabel label={title} />
-        <div class="toggle-and-label">
-          <Switch
+        <div class="toggle-and-caption">
+          <CWToggle
             checked={this.checked}
-            disabled={disabled || false}
+            disabled={!!disabled}
             onchange={() => {
               this.checked = !this.checked;
               onToggle(this.checked);
             }}
           />
-          {label && <div class="switch-label">{label(this.checked)}</div>}
+          {caption && <CWText type="caption">{caption(this.checked)}</CWText>}
         </div>
       </div>
     );

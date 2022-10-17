@@ -63,8 +63,8 @@ export class SubstratePhragmenElection extends Proposal<
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
-  public canVoteFrom(account: Account<any>) {
-    return account.chainBase === ChainBase.Substrate;
+  public canVoteFrom(account: Account) {
+    return account.chain.base === ChainBase.Substrate;
   }
   get isPassing() {
     return ProposalStatus.None;

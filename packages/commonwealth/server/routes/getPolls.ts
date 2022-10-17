@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,9 +17,9 @@ const getPolls = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const { thread_id } = req.query;
-  if (!thread_id) return next(new Error(Errors.NoThreadId));
+  if (!thread_id) return next(new AppError(Errors.NoThreadId));
 
   const polls = await models.Poll.findAll({
     where: { thread_id },

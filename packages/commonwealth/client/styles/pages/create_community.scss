@@ -35,10 +35,13 @@
     .ToggleRow {
       display: flex;
       flex-direction: column;
+    }
 
-      .toggle-and-label {
+    .ToggleRow {
+      .toggle-and-caption {
+        align-items: center;
         display: flex;
-        flex-direction: row;
+        gap: 8px;
       }
     }
 

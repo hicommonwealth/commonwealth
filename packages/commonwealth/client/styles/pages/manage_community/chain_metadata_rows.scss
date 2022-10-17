@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 24px;
   width: 100%;
 
   .InputRow {
@@ -24,6 +23,14 @@
     .toggle-and-label {
       display: flex;
       flex-direction: row;
+    }
+  }
+
+  .ToggleRow {
+    .toggle-and-caption {
+      align-items: center;
+      display: flex;
+      gap: 8px;
     }
   }
 

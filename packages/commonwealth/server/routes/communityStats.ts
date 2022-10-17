@@ -1,14 +1,15 @@
 import { QueryTypes, Op }  from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const communityStats = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    return next(new AppError('Not logged in'));
   }
 
   // TODO: factor this pattern into a util
@@ -21,7 +22,7 @@ const communityStats = async (models: DB, req: Request, res: Response, next: Nex
     },
   });
   if (!req.user.isAdmin && adminRoles.length === 0) {
-    return next(new Error('Must be admin'));
+    return next(new AppError('Must be admin'));
   }
 
   // get new objects created over the last 14 days

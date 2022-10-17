@@ -67,7 +67,7 @@ enum NewThreadErrors {
 const newThread = async (
   form: IThreadForm,
   quillEditorState: QuillEditor,
-  author: Account<any>,
+  author: Account,
   space: SnapshotSpace,
   snapshotId: string
 ) => {
@@ -135,7 +135,7 @@ const newThread = async (
 const newLink = async (
   form: IThreadForm,
   quillEditorState: QuillEditor,
-  author: Account<any>,
+  author: Account,
   space: SnapshotSpace,
   snapshotId: string
 ) => {

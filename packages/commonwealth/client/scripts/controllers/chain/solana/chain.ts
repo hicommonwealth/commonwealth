@@ -29,7 +29,7 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
   public async init(chain: ChainInfo, reset = false) {
     // default to 9 decimals
     this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
-    this._denom = chain.symbol;
+    this._denom = chain.default_symbol;
 
     let url: string;
     try {

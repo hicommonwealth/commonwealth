@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button, Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
+import { Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
 
 import 'components/sidebar/community_selector.scss';
 
@@ -9,12 +9,12 @@ import app from 'state';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import User from '../widgets/user';
 import { CommunityLabel } from '../community_label';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 const renderCommunity = (item) => {
   const roles: RoleInfo[] = [];
   if (item instanceof ChainInfo) {
-    roles.push(...app.user.getAllRolesInCommunity({ chain: item.id }));
+    roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
   }
 
   return (
@@ -40,13 +40,14 @@ const renderCommunity = (item) => {
             }}
           >
             {roles.map((role) => {
+              // TODO: sometimes address_chain is null here -- why??
               return m(User, {
                 avatarSize: 18,
                 avatarOnly: true,
                 user: new AddressInfo(
-                  null,
+                  role.address_id,
                   role.address,
-                  role.address_chain,
+                  role.address_chain || role.chain_id,
                   null
                 ),
               });
@@ -71,7 +72,7 @@ const homeButton = (
   >
     <img
       class="mobile-logo"
-      src="https://commonwealth.im/static/img/logo.png"
+      src="https://commonwealth.im/static/brand_assets/logo_stacked.png"
       style="height:18px; width:18px;"
     />
     <span>Home</span>
@@ -91,7 +92,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
 
     const isInCommunity = (item) => {
       if (item instanceof ChainInfo) {
-        return app.user.getAllRolesInCommunity({ chain: item.id }).length > 0;
+        return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
       } else {
         return false;
       }
@@ -131,10 +132,7 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
             transitionDuration={0}
             hasArrow={false}
             trigger={
-              <Button
-                rounded={true}
-                label={<CWIcon iconName="hamburger" iconSize="small" />}
-              />
+              <CWIconButton iconName="compass" iconButtonTheme="black" />
             }
             class="CommunitySelectList"
             content={communityList}

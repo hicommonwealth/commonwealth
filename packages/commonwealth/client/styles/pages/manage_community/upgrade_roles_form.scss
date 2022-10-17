@@ -3,57 +3,23 @@
 .UpgradeRolesForm {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 
-  .cui-radio-group.members-radio-buttons {
-    border-radius: 4px;
-    border: 2px solid $neutral-200;
+  .members-container {
+    border: 1px solid $neutral-300;
+    border-radius: $border-radius-corners;
     display: flex;
     flex-direction: column;
-    height: 324px;
-    margin-bottom: 16px;
+    height: 200px;
     overflow-y: auto;
+    padding: 0 8px;
 
-    .cui-control.cui-radio {
-      margin: 0;
-      padding-left: 32px;
-
-      .cui-control-indicator {
-        top: 6px;
-        left: 6px;
-      }
-    }
-
-    .cui-radio {
-      align-items: center;
-      display: flex;
-      flex-direction: row;
-      font-size: 15px;
-      height: 32px;
-      line-height: 32px;
-      min-height: 32px;
-    }
+    @include visibleScrollbar(light);
   }
 
-  .upgrade-buttons-wrap {
+  .upgrade-buttons-container {
     display: flex;
     flex-direction: column;
-
-    .cui-radio-group.roles-radio-buttons {
-      display: flex;
-      flex-direction: column;
-
-      .cui-radio {
-        align-items: center;
-        display: flex;
-        height: 32px;
-        margin: 0 0 8px 0;
-        padding-left: 32px;
-
-        .cui-control-indicator {
-          top: 6px;
-          left: 6px;
-        }
-      }
-    }
+    gap: 8px;
   }
 }

@@ -12,13 +12,13 @@ import Sublayout from 'views/sublayout';
 type PageNotFoundAttrs = { title?: string; message?: string };
 
 export class PageNotFound implements m.ClassComponent<PageNotFoundAttrs> {
-  oncreate() {}
-
   view(vnode) {
-    const { message, title } = vnode.attrs;
+    const { message } = vnode.attrs;
 
     return (
-      <Sublayout title={title}>
+      <Sublayout
+      // title={title}
+      >
         <div class="PageNotFound">
           <EmptyState
             icon={Icons.HELP_CIRCLE}

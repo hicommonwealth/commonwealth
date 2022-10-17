@@ -1,27 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { NotificationCategories } from 'common-common/src/types';
+import { AppError, ServerError } from '../../util/errors';
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
 
   if (!req.body.subscription_id) {
-    return next(new Error(Errors.NoSubscriptionId));
+    return next(new AppError(Errors.NoSubscriptionId));
   }
 
   const subscription = await models.Subscription.findOne({
     where: { id: req.body.subscription_id }
   });
   if (!subscription) {
-    return next(new Error(Errors.NoSubscription));
+    return next(new AppError(Errors.NoSubscription));
   }
   if (req.user.id !== subscription.subscriber_id) {
-    return next(new Error(Errors.NotUsersSubscription));
+    return next(new AppError(Errors.NotUsersSubscription));
   }
   if (subscription.category_id === NotificationCategories.NewMention) {
-    return next(new Error(Errors.NoMentionDelete));
+    return next(new AppError(Errors.NoMentionDelete));
   }
 
   // we don't delete all associated notifications -- since Subscriptions is set to paranoid mode,

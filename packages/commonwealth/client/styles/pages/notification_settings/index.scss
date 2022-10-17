@@ -1,0 +1,175 @@
+@import 'shared';
+
+@mixin communityBundleColumns {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr;
+}
+
+@mixin subscriptionColumns {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
+}
+
+.NotificationSettingsPage {
+  flex: 1;
+
+  @include large {
+    padding: 24px 176px;
+  }
+
+  @include mediumInclusive {
+    padding: 24px 72px;
+  }
+
+  @include small {
+    padding: 24px 56px;
+  }
+
+  @include extraSmall {
+    padding: 16px;
+  }
+
+  .page-header-text.Text {
+    margin-bottom: 16px;
+  }
+
+  .page-subheader-text.Text {
+    margin-bottom: 40px;
+  }
+
+  .column-header-row {
+    @include communityBundleColumns;
+
+    border-bottom: 1px solid $neutral-200;
+    padding: 0 0 8px 40px;
+
+    .column-header-text.Text {
+      color: $neutral-500;
+    }
+
+    .last-column-header-text.Text {
+      color: $neutral-500;
+      justify-self: end;
+    }
+  }
+
+  .notification-row {
+    align-items: center;
+    border-bottom: 1px solid $neutral-100;
+    display: flex;
+    gap: 16px;
+
+    .notification-row-header {
+      @include communityBundleColumns;
+
+      height: 80px;
+      width: 100%;
+
+      @include extraSmall {
+        .Checkbox {
+          margin-left: 24px;
+
+          .checkbox-label {
+            display: none;
+          }
+        }
+      }
+
+      .left-content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .avatar-and-name {
+          align-items: center;
+          display: flex;
+          gap: 4px;
+        }
+
+        .subscriptions-count-text.Text {
+          color: $neutral-500;
+          margin-left: 28px;
+        }
+      }
+
+      .Toggle {
+        align-self: center;
+        justify-self: end;
+      }
+    }
+
+    .subscriptions-list-container {
+      display: flex;
+      flex-direction: column;
+
+      .subscriptions-list-header {
+        @include subscriptionColumns;
+
+        border-bottom: 1px solid $neutral-100;
+        padding-bottom: 4px;
+
+        .subscription-list-header-text.Text {
+          color: $neutral-500;
+        }
+
+        @include smallInclusive {
+          .subscription-list-header-text.Text {
+            display: none;
+          }
+        }
+      }
+
+      .subscription-row-desktop {
+        @include subscriptionColumns;
+
+        align-items: center;
+        height: 72px;
+
+        .trigger-wrapper {
+          justify-self: end;
+        }
+
+        @include smallInclusive {
+          display: none;
+        }
+      }
+
+      .subscription-row-mobile {
+        @include large {
+          display: none;
+        }
+
+        @include mediumInclusive {
+          display: none;
+        }
+
+        @include smallInclusive {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          height: 80px;
+          justify-content: center;
+
+          .subscription-row-mobile-top {
+            display: flex;
+            justify-content: space-between;
+          }
+
+          .subscription-row-mobile-bottom {
+            align-items: baseline;
+            display: flex;
+            gap: 8px;
+
+            .username {
+              @include caption;
+            }
+
+            .subscription-list-header-text.Text {
+              color: $neutral-500;
+            }
+          }
+        }
+      }
+    }
+  }
+}

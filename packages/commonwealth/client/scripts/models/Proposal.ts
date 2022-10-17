@@ -29,12 +29,12 @@ abstract class Proposal<
 
   public abstract title: string;
   public abstract get description(): string;
-  public abstract get author(): Account<C>;
+  public abstract get author(): Account;
 
   // voting
   public abstract get votingType(): VotingType;
   public abstract get votingUnit(): VotingUnit;
-  public abstract canVoteFrom(account: Account<C>): boolean;
+  public abstract canVoteFrom(account: Account): boolean;
 
   protected votes: { [account: string] : VoteT } = {};
   public abstract get endTime(): ProposalEndTime;
@@ -79,7 +79,7 @@ abstract class Proposal<
   public addOrUpdateVote(vote: VoteT) {
     this.votes[vote.account.address] = vote;
   }
-  public removeVote(account: Account<C>) {
+  public removeVote(account: Account) {
     if (this.hasVoted(account)) {
       delete this.votes[account.address];
     }
@@ -88,10 +88,10 @@ abstract class Proposal<
     this.votes = {};
   }
   // TODO: these can be observables, if we want
-  public hasVoted(account: Account<C>) {
+  public hasVoted(account: Account) {
     return this.votes[account.address] !== undefined;
   }
-  public getVotes(fromAccount?: Account<C>) {
+  public getVotes(fromAccount?: Account) {
     if (fromAccount) {
       return this.votes[fromAccount.address] !== undefined
         ? [this.votes[fromAccount.address]]

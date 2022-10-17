@@ -21,40 +21,22 @@ import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
-function createAccount(
-  account: Account<any>,
-  walletId: WalletId,
-  community?: string
-) {
-  return $.post(`${app.serverUrl()}/createAddress`, {
-    address: account.address,
-    keytype:
-      account.chainBase === ChainBase.Substrate && (account as any).isEd25519
-        ? 'ed25519'
-        : undefined,
-    chain: account.chain.id,
-    community,
-    jwt: app.user.jwt,
-    wallet_id: walletId,
-  });
-}
-
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
   originChain: string
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
-    address: address,
-    chain: chain,
-    originChain: originChain,
+    address,
+    chain,
+    originChain,
     jwt: app.user.jwt,
   });
 }
 
-export async function setActiveAccount(account: Account<any>): Promise<void> {
+export async function setActiveAccount(account: Account): Promise<void> {
   const chain = app.activeChainId();
-  const role = app.user.getRoleInCommunity({ account, chain });
+  const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
     app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
@@ -88,7 +70,7 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
   }
 
   // update is_user_default
-  app.user.getAllRolesInCommunity({ chain }).forEach((r) => {
+  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
     r.is_user_default = false;
   });
   role.is_user_default = true;
@@ -98,6 +80,57 @@ export async function setActiveAccount(account: Account<any>): Promise<void> {
     0
   ) {
     app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+  }
+}
+
+export async function completeClientLogin(account: Account) {
+  try {
+    let addressInfo = app.user.addresses.find(
+      (a) => a.address === account.address && a.chain.id === account.chain.id
+    );
+
+    if (!addressInfo && account.addressId) {
+      addressInfo = new AddressInfo(
+        account.addressId,
+        account.address,
+        account.chain.id,
+        account.walletId
+      );
+      app.user.addresses.push(addressInfo);
+    }
+
+    // link the address to the community
+    if (app.chain) {
+      try {
+        if (
+          !app.roles.getRoleInCommunity({
+            account,
+            chain: app.activeChainId(),
+          })
+        ) {
+          await app.roles.createRole({
+            address: addressInfo,
+            chain: app.activeChainId(),
+          });
+        }
+      } catch (e) {
+        // this may fail if the role already exists, e.g. if the address is being migrated from another user
+        console.error('Failed to create role');
+      }
+    }
+
+    // set the address as active
+    await setActiveAccount(account);
+
+    if (
+      app.user.activeAccounts.filter((a) => isSameAccount(a, account))
+        .length === 0
+    ) {
+      app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
+    }
+    m.redraw();
+  } catch (e) {
+    console.trace(e);
   }
 }
 
@@ -128,14 +161,14 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
-      .filter((a) => a.chain === chain.id)
+      .filter((a) => a.chain.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
       .filter((addr) => addr)
   );
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.user.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ chain: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -144,14 +177,14 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.user.getDefaultAddressInCommunity({
+    const existingAddress = app.roles.getDefaultAddressInCommunity({
       chain: chain.id,
     });
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.chain.id === existingAddress.chain &&
+          a.chain.id === existingAddress.chain.id &&
           a.address === existingAddress.address
         );
       });
@@ -214,25 +247,32 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  keytype?: string,
-  community?: string
-): Promise<Account<any>> {
-  const account = app.chain.accounts.get(address, keytype);
-  const response = await createAccount(account, walletId, community);
-  const token = response.result.verification_token;
-  const newAccount = app.chain.accounts.get(response.result.address, keytype);
-  newAccount.setValidationToken(token);
-  newAccount.setAddressId(response.result.id);
-  newAccount.setWalletId(walletId);
-  return newAccount;
+  chain: string
+): Promise<{ account: Account; newlyCreated: boolean }> {
+  const response = await $.post(`${app.serverUrl()}/createAddress`, {
+    address,
+    chain,
+    jwt: app.user.jwt,
+    wallet_id: walletId,
+  });
+  const id = response.result.id;
+  const chainInfo = app.config.chains.getById(chain);
+  const account = new Account({
+    addressId: id,
+    address,
+    chain: chainInfo,
+    validationToken: response.result.verification_token,
+    walletId,
+  });
+  return { account, newlyCreated: response.result.newly_created };
 }
 
-export async function unlinkLogin(account) {
+export async function unlinkLogin(account: AddressInfo) {
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
   await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
-    chain: account.chain,
+    chain: account.chain.id,
     auth: true,
     jwt: app.user.jwt,
   });

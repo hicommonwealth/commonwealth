@@ -8,10 +8,10 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressInfo }, { loading: boolean }> = {
+const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo }, { loading: boolean }> = {
   view: (vnode) => {
     const { account, addressInfo } = vnode.attrs;
-    const addrShort = formatAddressShort(addressInfo.address, addressInfo.chain);
+    const addrShort = formatAddressShort(addressInfo.address, addressInfo.chain.id);
 
     const createRole = async (e) => {
       vnode.state.loading = true;
@@ -26,7 +26,7 @@ const ProfileBanner: m.Component<{ account: Account<any>, addressInfo: AddressIn
         return;
       }
 
-      app.user.createRole({
+      app.roles.createRole({
         address: addressInfo,
         chain: app.activeChainId(),
       }).then(() => {

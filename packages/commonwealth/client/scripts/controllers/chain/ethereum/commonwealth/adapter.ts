@@ -2,8 +2,8 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
-import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter } from 'models';
+import { ChainBase, ContractType } from 'common-common/src/types';
+import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
@@ -36,9 +36,16 @@ export default class Commonwealth extends IChainAdapter<
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
+    const commonContracts = this.app.contracts.getByType(
+      ContractType.COMMONPROTOCOL
+    );
+    if (!commonContracts || !commonContracts.length) {
+      throw new Error('No Common contracts found');
+    }
+    const commonContract = commonContracts[0];
     const api = new CommonwealthAPI(
       () => null,
-      this.meta.address,
+      commonContract.address,
       this.chain.api.currentProvider as any
     );
     await api.init();

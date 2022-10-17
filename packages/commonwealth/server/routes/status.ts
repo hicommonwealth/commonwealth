@@ -1,11 +1,12 @@
-import { QueryTypes, Op } from 'sequelize';
+import { QueryTypes, Op, Sequelize } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
-import { JWT_SECRET } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { JWT_SECRET } from '../config';
 import '../types';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -20,7 +21,6 @@ const status = async (
     const [
       chains,
       nodes,
-      contractCategories,
       notificationCategories,
       chainCategories,
       chainCategoryTypes,
@@ -34,11 +34,11 @@ const status = async (
           },
           {
             model: models.ChainNode,
+            required: true,
           },
         ],
       }),
       models.ChainNode.findAll(),
-      models.ContractCategory.findAll(),
       models.NotificationCategory.findAll(),
       models.ChainCategory.findAll(),
       models.ChainCategoryType.findAll(),
@@ -59,8 +59,8 @@ const status = async (
           `
         SELECT "Threads".chain, COUNT("Threads".id) 
         FROM "Threads"
-        WHERE "Threads".deleted_at IS NULL
-        AND NOT "Threads".pinned
+        WHERE "Threads".created_at > :thirtyDaysAgo
+        AND "Threads".deleted_at IS NULL
         AND "Threads".chain IS NOT NULL
         GROUP BY "Threads".chain;
         `,
@@ -70,7 +70,6 @@ const status = async (
       return res.json({
         chains,
         nodes,
-        contractCategories,
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
@@ -89,7 +88,10 @@ const status = async (
       disableRichText,
       lastVisited,
     ] = await Promise.all([
-      unfilteredAddresses.filter((address) => !!address.verified),
+      unfilteredAddresses.filter(
+        (address) =>
+          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+      ),
       user.getSocialAccounts(),
       user.getSelectedChain(),
       user.isAdmin,
@@ -119,10 +121,9 @@ const status = async (
         `
       SELECT "Threads".chain, COUNT("Threads".id) 
       FROM "Threads"
-      WHERE 
-        "Threads".deleted_at IS NULL
-          AND NOT "Threads".pinned
-          AND "Threads".chain IS NOT NULL
+      WHERE "Threads".created_at > :thirtyDaysAgo
+      AND "Threads".deleted_at IS NULL
+      AND "Threads".chain IS NOT NULL
       GROUP BY "Threads".chain;
       `,
         {
@@ -285,7 +286,6 @@ const status = async (
     return res.json({
       chains,
       nodes,
-      contractCategories,
       notificationCategories,
       chainCategories,
       chainCategoryTypes,

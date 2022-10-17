@@ -27,7 +27,7 @@
   flex-direction: column;
   gap: 16px;
 
-  @include smallInclusive {
+  @include mediumSmallInclusive {
     display: none;
   }
 

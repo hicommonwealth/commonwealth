@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import { performance, PerformanceObserver } from 'perf_hooks';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { AppError } from '../util/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
@@ -23,7 +23,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new Error(Errors.NotLoggedIn));
+    return next(new AppError(Errors.NotLoggedIn));
   }
 
   // locate active subscriptions, filter by category if specified
@@ -106,15 +106,19 @@ export default async (
     nest: true,
   });
 
-  const subscriptionsPromise = models.Subscription.findAll({
-    where: {
-      subscriber_id: req.user.id,
-    },
-  });
+  // NOTE: Zak commenting this out (and promise below). getting more enriched subscriptions in /viewSubscriptions
+  // const subscriptionsPromise = models.Subscription.findAll({
+  //   where: {
+  //     subscriber_id: req.user.id,
+  //   },
+  // });
 
-  const [notificationsRead, allSubscriptions] = await Promise.all([
+  const [
+    notificationsRead,
+    // allSubscriptions
+  ] = await Promise.all([
     notificationsReadPromise,
-    subscriptionsPromise,
+    // subscriptionsPromise,
   ]);
 
   const subscriptionsObj = {};
@@ -123,7 +127,7 @@ export default async (
      iterate through the notification read instances which contain a Notification instance as well as a Chain
      Event instance embedded in the notification data if the Notification is a chain-event notification. The
      NotificationsRead instance also contains the associated subscription instance
-    
+
       NotificationsRead instance:
       {
          notification_id,
@@ -173,13 +177,15 @@ export default async (
 
   // The front-end expects to receive ALL of a users subscriptions regardless if there exist any associated
   // NotificationsRead instances so here we add all of those subscriptions that don't have NRs
-  for (const sub of allSubscriptions) {
-    if (!subscriptionsObj[sub.id]) {
-      const subObj = sub.toJSON();
-      subObj['NotificationsReads'] = [];
-      subscriptionsObj[sub.id] = subObj;
-    }
-  }
+  // NOTE: ZAK commenting this out as it's unnecessary, we're removing the "all subscriptions" from this route
+  // NOTE: see /viewSubscription to return more enriched subscriptions for the user
+  // for (const sub of allSubscriptions) {
+  //   if (!subscriptionsObj[sub.id]) {
+  //     const subObj = sub.toJSON();
+  //     subObj['NotificationsReads'] = [];
+  //     subscriptionsObj[sub.id] = subObj;
+  //   }
+  // }
 
   // convert the object to an array which is what the front-end expects
   const subscriptions = [];
