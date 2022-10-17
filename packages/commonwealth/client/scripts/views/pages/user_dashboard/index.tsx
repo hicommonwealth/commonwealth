@@ -42,10 +42,9 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
       fetchActivity(tab).then((activity) => {
-        this.fyNotifications = activity.result
-          .map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
+        this.fyNotifications = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
         this.loadingData = false;
         m.redraw();
       });
@@ -111,6 +110,10 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     if (!this.activePage || this.activePage !== subpage) {
       this.activePage = subpage;
       this.handleToggle();
+    }
+
+    if (loggedIn) {
+      console.log(app.user);
     }
 
     // Scroll

@@ -176,6 +176,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
     ...getSputnikProposalItem(),
     ...getSubstrateProposalItems(),
     ...getSnapshotProposalItem(),
+    ...getCrowdfundProposalItems(),
   ];
 };
 

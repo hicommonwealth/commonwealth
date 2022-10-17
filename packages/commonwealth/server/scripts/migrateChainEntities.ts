@@ -16,8 +16,6 @@ import {
   IDisconnectedRange,
   CommonwealthEvents,
 } from 'chain-events/src';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 import models from '../database';
 import MigrationHandler from '../eventHandlers/migration';
@@ -67,9 +65,7 @@ export async function migrateChainEntity(chain: string): Promise<void> {
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
     } else if (chainInstance.base === ChainBase.CosmosSDK) {
-      const api = await CosmosEvents.createApi(
-        node.private_url || node.url
-      );
+      const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
