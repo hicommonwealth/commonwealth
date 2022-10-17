@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { DB } from '../database';
+import { DB } from '../models';
 
 export const Errors = {
   NoAddressProvided: 'No address provided in query',
