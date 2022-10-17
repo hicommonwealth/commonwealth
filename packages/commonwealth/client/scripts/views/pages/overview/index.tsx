@@ -13,6 +13,7 @@ import { TopicSummaryRow } from './topic_summary_row';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
+import Sublayout from '../../sublayout';
 
 class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
@@ -31,62 +32,67 @@ class OverviewPage implements m.ClassComponent {
     const topics = app.topics.getByCommunity(app.activeChainId());
 
     return (
-      <div class="OverviewPage">
-        <div class="header-row">
-          <CWText type="h3" fontWeight="semiBold">
-            Overview
-          </CWText>
-          {isWindowExtraSmall(window.innerWidth) ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onclick={() => {
-                navigateToSubpage('/new/discussion');
-              }}
-            />
-          ) : (
-            <CWButton
-              buttonType="mini"
-              label="Create Thread"
-              iconName="plus"
-              onclick={() => {
-                navigateToSubpage('/new/discussion');
-              }}
-            />
-          )}
-        </div>
-        <div class="column-headers-row">
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="threads-header-row-text"
-          >
-            Topic
-          </CWText>
-          <div class="threads-header-container">
+      <Sublayout>
+        <div class="OverviewPage">
+          <div class="header-row">
+            <CWText type="h3" fontWeight="semiBold">
+              Overview
+            </CWText>
+            {isWindowExtraSmall(window.innerWidth) ? (
+              <CWIconButton
+                iconName="plusCircle"
+                iconButtonTheme="black"
+                onclick={() => {
+                  navigateToSubpage('/new/discussion');
+                }}
+              />
+            ) : (
+              <CWButton
+                buttonType="mini"
+                label="Create Thread"
+                iconName="plus"
+                onclick={() => {
+                  navigateToSubpage('/new/discussion');
+                }}
+              />
+            )}
+          </div>
+          <div class="column-headers-row">
             <CWText
               type="h5"
               fontWeight="semiBold"
               className="threads-header-row-text"
             >
-              Recent threads
+              Topic
             </CWText>
+            <div class="threads-header-container">
+              <CWText
+                type="h5"
+                fontWeight="semiBold"
+                className="threads-header-row-text"
+              >
+                Recent threads
+              </CWText>
+            </div>
           </div>
-        </div>
-        <CWDivider />
-        {topics
-          .sort((a, b) => a.order - b.order)
-          .filter((t) => t.featuredInSidebar)
-          .map((topic) => {
-            const monthlyThreads = app.threads.overviewStore
-              .getAll()
-              .filter((thread) => thread.topic.id === topic.id);
+          <CWDivider />
+          {topics
+            .sort((a, b) => a.order - b.order)
+            // .filter((t) => t.featuredInSidebar)
+            .map((topic) => {
+              const monthlyThreads = app.threads.overviewStore
+                .getAll()
+                .filter((thread) => thread.topic.id === topic.id);
 
-            return (
-              <TopicSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
-            );
-          })}
-      </div>
+              return (
+                <TopicSummaryRow
+                  monthlyThreads={monthlyThreads}
+                  topic={topic}
+                />
+              );
+            })}
+        </div>
+      </Sublayout>
     );
   }
 }

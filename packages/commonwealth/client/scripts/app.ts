@@ -635,6 +635,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
+    const { defaultOverview } = app.chain.meta;
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
@@ -947,16 +948,22 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions', {
+            '/:scope/discussions': importRoute('views/pages/discussions', {
               scoped: true,
               deferChain: true,
             }),
+            '/:scope': redirectRoute(() =>
+              defaultOverview ? `/:scope/overview` : `/:scope/discussions`
+            ),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
               { scoped: true, deferChain: true }
             ),
             '/:scope/search': importRoute('views/pages/search', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
