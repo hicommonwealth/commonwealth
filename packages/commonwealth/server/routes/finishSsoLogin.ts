@@ -1,14 +1,12 @@
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import {
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
+import { NotificationCategories, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 
@@ -100,7 +98,7 @@ const finishSsoLogin = async (
     if (isAxieInfinityJwt(decoded)) {
       jwtPayload = decoded;
     } else {
-      throw new Error('Could not decode token');
+      throw new AppError('Could not decode token');
     }
   } catch (e) {
     log.info(`Axie token decoding error: ${e.message}`);
@@ -202,7 +200,7 @@ const finishSsoLogin = async (
           where: { id: existingAddress.user_id },
         });
         if (!oldUser) {
-          throw new Error('User should exist');
+          throw new AppError('User should exist');
         }
         const msg = {
           to: oldUser.email,
@@ -264,10 +262,9 @@ const finishSsoLogin = async (
         return success(res, { user: existingUser });
       } else {
         // create new user if no user exists but address exists
-        const newUser = await models.User.createWithProfile(
-          models,
-          { email: null },
-        );
+        const newUser = await models.User.createWithProfile(models, {
+          email: null,
+        });
         existingAddress.user_id = newUser.id;
         await existingAddress.save();
         req.login(newUser, (err) => {
@@ -304,7 +301,10 @@ const finishSsoLogin = async (
         profile = user.Profiles[0];
       } else {
         user = reqUser;
-        profile = await models.Profile.findOne({ where: { user_id: user.id }, transaction: t });
+        profile = await models.Profile.findOne({
+          where: { user_id: user.id },
+          transaction: t,
+        });
       }
 
       // create new address

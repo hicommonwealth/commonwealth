@@ -34,8 +34,14 @@ export class UpgradeRolesForm
     });
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
+      // Graham 9.19.23: Temporary patch while Addresses are unreliable.
+      // @TODO: @Profiles upgrade, clean this up
+      const chainId =
+        role.chain_id || typeof role.Address.chain === 'string'
+          ? role.Address.chain
+          : role.Address.chain?.id;
       const displayName = app.profiles.getProfile(
-        role.Address.chain.id,
+        chainId as string,
         role.Address.address
       ).displayName;
 

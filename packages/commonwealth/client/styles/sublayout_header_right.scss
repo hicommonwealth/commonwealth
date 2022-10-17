@@ -1,22 +1,25 @@
+@import 'shared';
+
 .SublayoutHeaderRight {
   align-items: center;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  gap: 8px;
 
-  > :not(:first-child) {
-    margin-left: 8px;
-  }
-}
+  .MobileMenuContainer {
+    display: none;
 
-.cui-menu {
-  .cui-menu-divider {
-    margin: 0;
+    @include extraSmall {
+      display: flex;
+    }
   }
 
-  .cui-button {
-    height: 40px;
-    min-height: 40px;
-    line-height: 40px;
+  .DesktopMenuContainer {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    @include extraSmall {
+      display: none;
+    }
   }
 }

@@ -13,7 +13,7 @@ type TopicSelectorAttrs = {
   defaultTopic?: Topic | string | boolean;
   tabindex?: number;
   topics: Topic[];
-  updateFormData: (topic: Topic, topicId?: string) => void;
+  updateFormData: (topic: Topic) => void;
 };
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
@@ -49,13 +49,13 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
 
     const oncreate = () => {
       if (selectedTopic) {
-        updateFormData(selectedTopic.name, selectedTopic.id);
+        updateFormData(selectedTopic);
       }
     };
 
     const onSelect = (item: Topic) => {
       selectedTopic = item;
-      updateFormData(item.name, item.id);
+      updateFormData(selectedTopic);
     };
 
     const sortTopics = (topics_: Topic[]) => {

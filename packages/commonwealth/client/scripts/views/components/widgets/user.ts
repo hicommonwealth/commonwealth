@@ -66,7 +66,7 @@ const User: m.Component<
     let profile: Profile;
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
     let role;

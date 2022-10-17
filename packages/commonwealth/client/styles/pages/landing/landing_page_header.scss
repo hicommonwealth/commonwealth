@@ -48,8 +48,21 @@
   width: 30px;
   height: 30px;
   position: absolute;
-  right: 35px;
-  top: 20px;
+
+  @include extraSmall {
+    right: 36px;
+    top: 45px;
+  }
+
+  @include small {
+    right: 146px;
+    top: 30px;
+  }
+
+  @include mediumSmall {
+    right: 296px;
+    top: 49px;
+  }
 }
 
 .tokenSectionContainer {
@@ -62,6 +75,7 @@
 
 .LandingPageHeaderLoginButton {
   cursor: pointer;
+  white-space: nowrap;
   img {
     position: relative;
     top: -2px;
@@ -72,7 +86,6 @@
   }
 }
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
-  white-space: nowrap;
   a.btn-primary.pb-3.text-white {
     padding-top: 14px;
     padding-bottom: 9px;
@@ -122,6 +135,10 @@ header {
 }
 
 header {
+  .logoWithText {
+    max-height: 38px;
+  }
+
   @include small {
     border-radius: 33px;
     &.fixed-header {
@@ -131,10 +148,6 @@ header {
 }
 
 @include small {
-  .menuButton {
-    display: none;
-  }
-
   #landing-page {
     margin: 0;
   }

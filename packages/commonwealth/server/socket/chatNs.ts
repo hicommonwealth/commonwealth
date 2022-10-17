@@ -11,7 +11,7 @@ import {
 } from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
-import { DB } from '../database';
+import { DB } from '../models';
 import { RedisCache } from '../util/redisCache';
 
 

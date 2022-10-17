@@ -53,11 +53,9 @@ export class DiscussionFilterBar
         ]
       : parseCustomStages(customStages);
 
-    const selectedStage = stages.find(
-      (s) => s === (stage as ThreadStage)
-    );
+    const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+    const overviewEnabled = vnode.attrs.parentState.threadsOverview;
 
     return (
       <div class="DiscussionFilterBar">
@@ -85,7 +83,7 @@ export class DiscussionFilterBar
             <Button
               rounded={true}
               compact={true}
-              class={`${summaryViewEnabled ? 'active' : ''}`}
+              class={`${overviewEnabled ? 'active' : ''}`}
               label="Summary"
               size="sm"
               disabled={disabled}
@@ -94,7 +92,7 @@ export class DiscussionFilterBar
                 navigateToSubpage('/');
                 localStorage.setItem('discussion-summary-toggle', 'true');
                 setTimeout(() => {
-                  parentState.summaryView = true;
+                  parentState.threadsOverview = true;
                   m.redraw();
                 }, 0);
               }}
@@ -102,7 +100,7 @@ export class DiscussionFilterBar
             <Button
               rounded={true}
               compact={true}
-              class={`${!summaryViewEnabled ? 'active' : ''}`}
+              class={`${!overviewEnabled ? 'active' : ''}`}
               label="Latest"
               size="sm"
               disabled={disabled}
@@ -111,7 +109,7 @@ export class DiscussionFilterBar
                 localStorage.setItem('discussion-summary-toggle', 'false');
                 navigateToSubpage('/');
                 setTimeout(() => {
-                  parentState.summaryView = false;
+                  parentState.threadsOverview = false;
                   m.redraw();
                 }, 0);
               }}

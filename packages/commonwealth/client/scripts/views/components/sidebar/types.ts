@@ -8,6 +8,7 @@ export type BaseSidebarAttrs = {
   onhover?: () => void;
   rightIcon?: m.Vnode;
   title: string;
+  className?: string;
 };
 
 export type SubSectionAttrs = {
@@ -26,8 +27,6 @@ export type SidebarSectionAttrs = {
   extraComponents?: m.Vnode;
   toggleDisabled?: boolean;
 } & BaseSidebarAttrs;
-
-export type MobileSidebarSectionAttrs = { mobile: boolean };
 
 export type ToggleTree = {
   toggledState: boolean;

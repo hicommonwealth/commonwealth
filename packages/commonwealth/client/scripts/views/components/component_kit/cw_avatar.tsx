@@ -27,7 +27,7 @@ export class CWAvatar
 }
 
 export class CWJdenticon
-  implements m.ClassComponent<AvatarAttrs & { address: string }>
+  implements m.ClassComponent<AvatarAttrs & { address?: string }>
 {
   view(vnode) {
     const { address, size } = vnode.attrs;

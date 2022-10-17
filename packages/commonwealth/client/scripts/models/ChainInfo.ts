@@ -15,9 +15,8 @@ import {
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
-  public readonly address: string;
   public readonly tokenName: string;
-  public readonly symbol: string;
+  public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
   public readonly base: ChainBase;
@@ -35,11 +34,12 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
-  public defaultSummaryView: boolean;
+  public defaultOverview: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
+  public chatEnabled: boolean;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -54,7 +54,7 @@ class ChainInfo {
   constructor({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     iconUrl,
     description,
@@ -70,23 +70,23 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
-    defaultSummaryView,
+    defaultOverview,
     adminsAndMods,
     base,
     ss58_prefix,
     bech32_prefix,
     type,
+    chatEnabled,
     decimals,
     substrateSpec,
     ChainNode,
     tokenName,
-    address,
     adminOnlyPolling,
   }) {
     this.id = id;
     this.network = network;
     this.base = base;
-    this.symbol = symbol;
+    this.default_symbol = default_symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
@@ -103,16 +103,16 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
-    this.defaultSummaryView = defaultSummaryView;
+    this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.chatEnabled = chatEnabled;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
-    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
   }
@@ -120,7 +120,7 @@ class ChainInfo {
   public static fromJSON({
     id,
     network,
-    symbol,
+    default_symbol,
     name,
     icon_url,
     description,
@@ -142,10 +142,10 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    decimals,
+    chat_enabled,
     substrate_spec,
     token_name,
-    address,
+    Contracts,
     ChainNode,
     admin_only_polling,
   }) {
@@ -156,10 +156,11 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
+    const decimals = Contracts ? Contracts[0]?.decimals : 18;
     return new ChainInfo({
       id,
       network,
-      symbol,
+      default_symbol,
       name,
       iconUrl: icon_url,
       description,
@@ -175,16 +176,16 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
-      defaultSummaryView: default_summary_view,
+      defaultOverview: default_summary_view,
       adminsAndMods,
       base,
       ss58_prefix,
       bech32_prefix,
       type,
+      chatEnabled: chat_enabled,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
-      address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -261,7 +262,8 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
-    defaultSummaryView,
+    defaultOverview,
+    chatEnabled,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -276,10 +278,11 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
+      chat_enabled: chatEnabled,
       snapshot,
       terms,
       icon_url: iconUrl,
-      default_summary_view: defaultSummaryView,
+      default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
     const updatedChain: ChainInstance = r.result;
@@ -296,13 +299,14 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
-    this.defaultSummaryView = updatedChain.default_summary_view;
+    this.defaultOverview = updatedChain.default_summary_view;
+    this.chatEnabled = updatedChain.chat_enabled;
   }
 
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      : m(CWJdenticon, { address: undefined, size });
   }
 }
 

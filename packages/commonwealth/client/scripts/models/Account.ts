@@ -16,7 +16,9 @@ class Account {
   private _walletId?: WalletId;
 
   private _profile?: Profile;
-  public get profile() { return this._profile; }
+  public get profile() {
+    return this._profile;
+  }
 
   constructor({
     chain,
@@ -29,18 +31,18 @@ class Account {
     ignoreProfile,
   }: {
     // required args
-    chain: ChainInfo,
-    address: string,
+    chain: ChainInfo;
+    address: string;
 
     // optional args
-    addressId?: number,
-    walletId?: WalletId,
-    validationToken?: string,
-    profile?: Profile,
+    addressId?: number;
+    walletId?: WalletId;
+    validationToken?: string;
+    profile?: Profile;
 
     // flags
-    ghostAddress?: boolean,
-    ignoreProfile?: boolean,
+    ghostAddress?: boolean;
+    ignoreProfile?: boolean;
   }) {
     // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
@@ -64,7 +66,9 @@ class Account {
     this._addressId = id;
   }
 
-  get walletId() { return this._walletId; }
+  get walletId() {
+    return this._walletId;
+  }
   public setWalletId(walletId: WalletId) {
     this._walletId = walletId;
   }
@@ -95,17 +99,24 @@ class Account {
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
-          ghostAddress && this.chain.id === chain.id &&
+      const hasGhostAddress = app.user.addresses.some(
+        ({ address, ghostAddress, chain }) =>
+          ghostAddress &&
+          this.chain.id === chain.id &&
           app.user.activeAccounts.some((account) => account.address === address)
-      ))
+      );
       if (hasGhostAddress) {
-        const { success, ghostAddressId } = await $.post(`${app.serverUrl()}/updateAddress`, params);
+        const { success, ghostAddressId } = await $.post(
+          `${app.serverUrl()}/updateAddress`,
+          params
+        );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
-          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-            return !ghostAddress
-          }));
+          app.user.setAddresses(
+            app.user.addresses.filter(({ ghostAddress }) => {
+              return !ghostAddress;
+            })
+          );
           app.user.setActiveAccounts([]);
         }
       }

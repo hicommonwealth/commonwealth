@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AppError } from '../util/errors';
 import { success, TypedRequestBody } from '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { CommunityBannerInstance } from '../models/community_banner';

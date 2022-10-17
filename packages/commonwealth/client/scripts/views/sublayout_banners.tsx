@@ -39,7 +39,7 @@ export class SublayoutBanners
           ITokenAdapter.instanceOf(app.chain) &&
           !app.user.activeAccount && (
             <CWBanner
-              bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
+              bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
             />
           )}
         {isNonEmptyString(terms) && tosStatus !== 'off' && (

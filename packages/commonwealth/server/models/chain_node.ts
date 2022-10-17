@@ -12,6 +12,7 @@ export type ChainNodeAttributes = {
   balance_type?: BalanceType;
   name?: string;
   description?: string;
+  chain_base: string;
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
@@ -35,6 +36,7 @@ export default (
       balance_type: { type: dataTypes.STRING, allowNull: true },
       name: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
+      chain_base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
     },
     {
       tableName: 'ChainNodes',

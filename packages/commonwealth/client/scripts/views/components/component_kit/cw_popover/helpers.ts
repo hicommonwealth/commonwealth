@@ -1,4 +1,4 @@
-import { TooltipType } from '../cw_tooltip';
+import { TooltipType } from './cw_tooltip';
 
 export const getPosition = ({
   trigger,

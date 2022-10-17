@@ -4,29 +4,6 @@
   align-items: center;
   display: flex;
   flex-direction: row;
-
-  .CommunityAvatar {
-    margin-right: 8px;
-  }
-
-  h4 {
-    margin-right: 4px;
-
-    a {
-      color: $neutral-800;
-    }
-  }
-
-  .slash {
-    color: $neutral-400;
-    margin: 0 8px;
-  }
-
-  svg {
-    cursor: pointer;
-  }
-
-  @include smallInclusive {
-    display: none;
-  }
+  gap: 8px;
+  height: $global-header-height;
 }

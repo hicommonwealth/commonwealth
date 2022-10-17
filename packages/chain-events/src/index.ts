@@ -13,6 +13,8 @@ export * as AaveEvents from './chains/aave/index';
 export * as AaveTypes from './chains/aave/types';
 export * as CommonwealthEvents from './chains/commonwealth/index';
 export * as CommonwealthTypes from './chains/commonwealth/types';
+export * as CosmosEvents from './chains/cosmos/index';
+export * as CosmosTypes from './chains/cosmos/types';
 
 export { Listener } from './Listener';
 export * from './handlers';

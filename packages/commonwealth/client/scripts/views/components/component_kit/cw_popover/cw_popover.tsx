@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_popover.scss';
+import 'components/component_kit/cw_popover/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
 import {
@@ -13,7 +13,7 @@ import {
 } from './helpers';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
-import { TooltipType } from '../cw_tooltip';
+import { TooltipType } from './cw_tooltip';
 
 export type PopoverInteractionType = 'click' | 'hover';
 
@@ -204,7 +204,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               >
                 {content}
               </div>
-              {tooltipType && <div id={this.arrowId}></div>}
+              {tooltipType && <div id={this.arrowId} />}
             </div>
           </CWPortal>
         ) : null}

@@ -13,6 +13,7 @@ import {
 import { SnapshotVotesTable } from './snapshot_votes_table';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 type SnapshotProposalContentAttrs = {
   proposal: SnapshotProposal;
@@ -52,7 +53,8 @@ export class SnapshotProposalContent
           )}
         </div>
         <CWDivider />
-        <MarkdownFormattedText doc={proposal.body} />
+        {renderQuillTextBody(proposal.body, {})}
+        {/* <MarkdownFormattedText doc={proposal.body} /> */}
         {votes.length > 0 && (
           <>
             <CWDivider />

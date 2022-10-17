@@ -1,5 +1,5 @@
 import { ChainStore, NodeStore } from 'stores';
-import { ContractCategory, IChainAdapter, NotificationCategory } from 'models';
+import { IChainAdapter, NotificationCategory } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -18,9 +18,12 @@ import ReactionCountsController from './controllers/server/reactionCounts';
 import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddressesCount';
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
-import UserController from './controllers/server/user/index';
+import ContractsController from './controllers/server/contracts';
+import { UserController } from './controllers/server/user';
+import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import { MobileMenuName } from './views/app_mobile_menus';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -63,8 +66,12 @@ export interface IApp {
   topics: TopicsController;
   communities: CommunitiesController;
 
+  // Contracts
+  contracts: ContractsController;
+
   // User
   user: UserController;
+  roles: RolesController;
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
 
@@ -74,12 +81,12 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+  mobileMenu: MobileMenuName;
   loginState: LoginState;
   // stored on server-side
   config: {
     chains: ChainStore;
     nodes: NodeStore;
-    contractCategories?: ContractCategory[];
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     invites: InviteCodeAttributes[];
@@ -105,6 +112,11 @@ export interface IApp {
   cachedIdentityWidget: any; // lazy loaded substrate identity widget
 }
 
+// INJECT DEPENDENCIES
+const user = new UserController();
+const roles = new RolesController(user);
+
+// INITIALIZE MAIN APP
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
@@ -133,6 +145,9 @@ const app: IApp = {
   communities: new CommunitiesController(),
   topics: new TopicsController(),
 
+  // Contracts
+  contracts: new ContractsController(),
+
   // Search
   search: new SearchController(),
   searchAddressCache: {},
@@ -142,12 +157,14 @@ const app: IApp = {
   wallets: new WebWalletController(),
 
   // User
-  user: new UserController(),
+  user,
+  roles,
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
 
   toasts: getToastStore(),
   modals: getModalStore(),
+  mobileMenu: null,
   loginState: LoginState.NotLoaded,
   config: {
     chains: new ChainStore(),

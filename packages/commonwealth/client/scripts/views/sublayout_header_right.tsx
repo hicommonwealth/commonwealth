@@ -5,39 +5,36 @@ import m from 'mithril';
 import 'sublayout_header_right.scss';
 
 import app from 'state';
-import {
-  NewProposalButton,
-  MobileNewProposalButton,
-} from 'views/components/new_proposal_button';
-import { ChainInfo } from 'models';
-import { NotificationsMenu } from 'views/components/header/notifications_menu';
-import { InvitesMenu } from 'views/components/header/invites_menu';
 import { LoginSelector } from 'views/components/header/login_selector';
-import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import { CWIconButton } from './components/component_kit/cw_icon_button';
+import { CreateContentPopover } from './menus/create_content_menu';
+import { HelpMenuPopover } from './menus/help_menu';
+import { InvitesMenuPopover } from './menus/invites_menu';
+import { NotificationsMenuPopover } from './menus/notifications_menu';
 
-type SublayoutHeaderRightAttrs = {
-  chain: ChainInfo;
-  showNewProposalButton?: boolean;
-};
-
-export class SublayoutHeaderRight
-  implements m.ClassComponent<SublayoutHeaderRightAttrs>
-{
-  view(vnode) {
-    const { chain, showNewProposalButton } = vnode.attrs;
-
+export class SublayoutHeaderRight implements m.ClassComponent {
+  view() {
     return (
       <div class="SublayoutHeaderRight">
+        {/* Only visible in mobile browser widths */}
+        <div class="MobileMenuContainer">
+          <CWIconButton
+            iconName="dotsVertical"
+            iconButtonTheme="black"
+            onclick={() => {
+              app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
+            }}
+          />
+        </div>
         {/* threadOnly option assumes all chains have proposals beyond threads */}
-        {showNewProposalButton &&
-          (isWindowMediumSmallInclusive(window.innerWidth) ? (
-            <MobileNewProposalButton />
-          ) : (
-            <NewProposalButton fluid={false} threadOnly={!chain} />
-          ))}
-        {app.isLoggedIn() && <NotificationsMenu />}
-        {app.isLoggedIn() && <InvitesMenu />}
-        <InvitesMenu />
+        <div class="DesktopMenuContainer">
+          <CreateContentPopover />
+          <HelpMenuPopover />
+          {app.isLoggedIn() && <NotificationsMenuPopover />}
+          {app.isLoggedIn() && app.config.invites?.length > 0 && (
+            <InvitesMenuPopover />
+          )}
+        </div>
         <LoginSelector />
       </div>
     );

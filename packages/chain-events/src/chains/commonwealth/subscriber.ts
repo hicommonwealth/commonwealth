@@ -12,7 +12,7 @@ import {
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api, ProjectApi, ContractType } from './types';
+import { RawEvent, Api, ProjectApi, CommonContractType } from './types';
 
 export async function constructProjectApi(
   projectFactory: IProjectBaseFactory,
@@ -69,7 +69,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   ): Promise<void> {
     this._listener = (
       contractAddress: string,
-      contractType: ContractType,
+      contractType: CommonContractType,
       event: RawEvent
     ): void => {
       const log = factory.getLogger(
@@ -84,7 +84,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
       this._verbose ? log.info(logStr) : log.trace(logStr);
 
       if (
-        contractType === ContractType.Factory &&
+        contractType === CommonContractType.Factory &&
         event.event === 'ProjectCreated'
       ) {
         // factories only emit create events, which require us to produce a new subscription
@@ -97,7 +97,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
               this._listener.bind(
                 this,
                 project.project.address,
-                ContractType.Project
+                CommonContractType.Project
               )
             );
 
@@ -109,7 +109,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
               this._listener.bind(
                 this,
                 project.bToken.address,
-                ContractType.bToken
+                CommonContractType.bToken
               )
             );
             if (project.cToken && project.isCurated) {
@@ -118,7 +118,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
                 this._listener.bind(
                   this,
                   project.cToken.address,
-                  ContractType.cToken
+                  CommonContractType.cToken
                 )
               );
             }
@@ -131,13 +131,13 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
     // create subscription for factory
     this._api.factory.on('*', (args) =>
-      this._listener(this._api.factory.address, ContractType.Factory, args)
+      this._listener(this._api.factory.address, CommonContractType.Factory, args)
     );
 
     // create subscriptions for all projects
     for (const project of this._api.projects) {
       project.project.on('*', (args) =>
-        this._listener(project.project.address, ContractType.Project, args)
+        this._listener(project.project.address, CommonContractType.Project, args)
       );
     }
   }

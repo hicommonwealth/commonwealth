@@ -18,6 +18,8 @@ export const iconLookup = {
   close: Icons.CWClose,
   cloud: Icons.CWCloud,
   collapse: Icons.CWCollapse,
+  commonLogo: Icons.CWCommonLogo,
+  compass: Icons.CWCompass,
   copy: Icons.CWCopy,
   councilProposal: Icons.CWCouncilProposal,
   cow: Icons.CWCow,
@@ -25,10 +27,11 @@ export const iconLookup = {
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   dots: Icons.CWDots,
+  dotsVertical: Icons.CWDotsVertical,
   downvote: Icons.CWDownvote,
-  edit: Icons.CWEdit,
   element: Icons.CWElement,
   expand: Icons.CWExpand,
+  exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,
   feedback: Icons.CWFeedback,
   filter: Icons.CWFilter,
@@ -49,6 +52,7 @@ export const iconLookup = {
   lock: Icons.CWLock,
   logout: Icons.CWLogout,
   mail: Icons.CWMail,
+  mute: Icons.CWMute,
   people: Icons.CWPeople,
   person: Icons.CWPerson,
   pin: Icons.CWPin,
@@ -58,6 +62,8 @@ export const iconLookup = {
   send: Icons.CWSend,
   share: Icons.CWShare,
   share2: Icons.CWShare2,
+  sidebarCollapse: Icons.CWSidebarCollapse,
+  sidebarExpand: Icons.CWSidebarExpand,
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
@@ -68,9 +74,11 @@ export const iconLookup = {
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
   website: Icons.CWWebsite,
+  write: Icons.CWWrite,
 };
 
 export const customIconLookup = {
+  'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
@@ -80,6 +88,7 @@ export const customIconLookup = {
   polkadot: CustomIcons.CWPolkadot,
   ronin: CustomIcons.CWRonin,
   terrastation: CustomIcons.CWTerraStation,
+  unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
 };
 

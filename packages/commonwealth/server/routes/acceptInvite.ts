@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,7 +24,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
       used: false,
     }
   });
-  if (!code) return next(new Error(Errors.NoInviteCodeFound(inviteCode)));
+  if (!code) return next(new AppError(Errors.NoInviteCodeFound(inviteCode)));
 
   if (reject === 'true') {
     const rejectedCode = await code.update({
@@ -37,7 +38,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
       address,
     }
   });
-  if (!addressObj) return next(new Error(Errors.NoAddressFound(address)));
+  if (!addressObj) return next(new AppError(Errors.NoAddressFound(address)));
 
   const userAddresses = await req.user.getAddresses();
   const isUser = userAddresses
@@ -45,14 +46,14 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
     .filter((add) => add.address === addressObj.address);
 
   if (isUser.length === 0) {
-    return next(new Error(Errors.WrongOwner));
+    return next(new AppError(Errors.WrongOwner));
   }
 
   const chain = await models.Chain.findOne({
     where: { id: code.chain_id }
   });
   if (!chain) {
-    return next(new Error(Errors.NoCommunityFound(code.chain_id)));
+    return next(new AppError(Errors.NoCommunityFound(code.chain_id)));
   }
 
   const role = await models.Role.create({
@@ -60,12 +61,12 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
     chain_id: chain?.id,
     permission: 'member',
   });
-  if (!role) return next(new Error(Errors.RoleCreationFailure));
+  if (!role) return next(new ServerError(Errors.RoleCreationFailure));
 
   const updatedCode = await code.update({
     used: true,
   });
-  if (!updatedCode) return next(new Error(Errors.CodeUpdateFailure));
+  if (!updatedCode) return next(new ServerError(Errors.CodeUpdateFailure));
 
   const subscription = await models.Subscription.create({
     subscriber_id: req.user.id,
