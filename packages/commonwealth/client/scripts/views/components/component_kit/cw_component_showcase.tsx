@@ -29,6 +29,7 @@ import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
+import { CWDropdown } from './cw_dropdown';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -66,6 +67,19 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Dropdown</h1>
+        <div class="form-gallery">
+          <CWDropdown
+            inputOptions={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            onSelect={(optionLabel) =>
+              console.log('Selected option: ', optionLabel)
+            }
+          />
+        </div>
         <h1>Spinner</h1>
         <div class="basic-gallery">
           <CWSpinner />
