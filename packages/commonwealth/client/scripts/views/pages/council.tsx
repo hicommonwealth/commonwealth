@@ -133,7 +133,6 @@ class CouncilPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Council" />}
-          showNewProposalButton
         />
       );
     }
@@ -161,8 +160,7 @@ class CouncilPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Council" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Council" />}
       >
         <div class="CouncilPage">
           <GovExplainer

@@ -5,6 +5,8 @@
 .idea
 /venv
 /build
+/ios
+/android
 node_modules/
 jsconfig.json
 .vscode

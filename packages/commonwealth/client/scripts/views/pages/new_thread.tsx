@@ -22,7 +22,9 @@ class NewThreadPage implements m.ClassComponent {
     const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
 
     return (
-      <Sublayout title="New Thread">
+      <Sublayout
+      // title="New Thread"
+      >
         <NewThreadForm isModal={false} hasTopics={hasTopics} />
       </Sublayout>
     );

@@ -14,7 +14,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //
 // (1) New icon components should be added to this page alphabetically.
 // (2) All icons should extend the boilerplate/template provided below.
-// (3) Use an SVG to JSX converter such as https://svg2jsx.com/
+// (3) You may want to use an SVG to JSX converter such as https://svg2jsx.com/
 // (4) Ensure that path and svg tag property casings conform with Mozilla docs
 //     For instance:
 //       - "fill-rule" over "fillRule"
@@ -28,7 +28,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 
 // ICON TEMPLATE
 // export const CWIconName: m.Component<IconAttrs> = {
-//   view: (vnode) => {
+//   view: (vnode: m.VnodeDOM<IconAttrs>) => {
 // const {
 //   className,
 //   componentType,
@@ -57,7 +57,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // };
 
 export const CWArrowLeft: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -91,7 +91,7 @@ export const CWArrowLeft: m.Component<IconAttrs> = {
 };
 
 export const CWArrowRight: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -125,7 +125,7 @@ export const CWArrowRight: m.Component<IconAttrs> = {
 };
 
 export const CWBacker: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -166,7 +166,7 @@ export const CWBacker: m.Component<IconAttrs> = {
 };
 
 export const CWBadge: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -197,7 +197,7 @@ export const CWBadge: m.Component<IconAttrs> = {
 };
 
 export const CWBell: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -232,7 +232,7 @@ export const CWBell: m.Component<IconAttrs> = {
 };
 
 export const CWCautionCircle: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -268,7 +268,7 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
 };
 
 export const CWCautionTriangle: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -304,7 +304,7 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
 };
 
 export const CWCheck: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -338,7 +338,7 @@ export const CWCheck: m.Component<IconAttrs> = {
 };
 
 export const CWChevronDown: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -372,7 +372,7 @@ export const CWChevronDown: m.Component<IconAttrs> = {
 };
 
 export const CWChevronLeft: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -406,7 +406,7 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
 };
 
 export const CWChevronRight: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -440,7 +440,7 @@ export const CWChevronRight: m.Component<IconAttrs> = {
 };
 
 export const CWChevronUp: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -474,7 +474,7 @@ export const CWChevronUp: m.Component<IconAttrs> = {
 };
 
 export const CWClock: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -508,7 +508,7 @@ export const CWClock: m.Component<IconAttrs> = {
 };
 
 export const CWClose: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -546,7 +546,7 @@ export const CWClose: m.Component<IconAttrs> = {
 };
 
 export const CWCloud: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -584,7 +584,7 @@ export const CWCloud: m.Component<IconAttrs> = {
 };
 
 export const CWCollapse: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -618,7 +618,7 @@ export const CWCollapse: m.Component<IconAttrs> = {
 };
 
 export const CWCommonLogo: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -647,8 +647,43 @@ export const CWCommonLogo: m.Component<IconAttrs> = {
   },
 };
 
+export const CWCompass: m.Component<IconAttrs> = {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path d="M16 18.428c1.657 0 3-1.303 3-2.91 0-1.606-1.343-2.909-3-2.909s-3 1.303-3 2.91c0 1.606 1.343 2.909 3 2.909z"></path>
+        <path
+          fill-rule="evenodd"
+          d="M30 15.52c0 7.497-6.268 13.575-14 13.575S2 23.017 2 15.519 8.268 1.943 16 1.943 30 8.021 30 15.52zM16.21 6.63c-.092-.208-.32-.208-.411 0l-2.674 6.094-6.292 2.596c-.215.088-.215.31 0 .398l6.291 2.596 2.674 6.096c.092.208.32.208.41 0l2.677-6.1 6.283-2.591c.215-.09.215-.31 0-.399l-6.283-2.592L16.21 6.63zm2.875 5.378l-.263-.813a.191.191 0 01.091-.226l2.834-1.57c.184-.103.384.106.265.277l-1.813 2.59a.203.203 0 01-.22.077l-.758-.207a.197.197 0 01-.136-.128zm-5.898-.813l-.263.813a.197.197 0 01-.137.128l-.758.207a.203.203 0 01-.22-.078l-1.812-2.59c-.12-.17.08-.379.265-.277l2.833 1.57c.082.046.12.14.092.227zm6.148 7.58l-.263.812a.191.191 0 00.091.227l2.834 1.57c.184.102.384-.107.265-.277l-1.813-2.59a.203.203 0 00-.22-.078l-.758.207a.197.197 0 00-.136.128zm-6.336.812l-.263-.812a.197.197 0 00-.137-.13l-.758-.206a.203.203 0 00-.22.078l-1.812 2.59c-.119.17.081.379.265.277l2.834-1.57a.191.191 0 00.091-.227z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
 export const CWCopy: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -683,7 +718,7 @@ export const CWCopy: m.Component<IconAttrs> = {
 };
 
 export const CWCouncilProposal: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -713,7 +748,7 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
 };
 
 export const CWCow: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -747,7 +782,7 @@ export const CWCow: m.Component<IconAttrs> = {
 };
 
 export const CWCurator: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -783,7 +818,7 @@ export const CWCurator: m.Component<IconAttrs> = {
 };
 
 export const CWDemocraticProposal: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -817,7 +852,7 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
 };
 
 export const CWDiscord: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -847,7 +882,7 @@ export const CWDiscord: m.Component<IconAttrs> = {
 };
 
 export const CWDots: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -877,7 +912,7 @@ export const CWDots: m.Component<IconAttrs> = {
 };
 
 export const CWDotsVertical: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -907,7 +942,7 @@ export const CWDotsVertical: m.Component<IconAttrs> = {
 };
 
 export const CWDownvote: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -936,42 +971,8 @@ export const CWDownvote: m.Component<IconAttrs> = {
   },
 };
 
-export const CWEdit: m.Component<IconAttrs> = {
-  view: (vnode) => {
-    const {
-      className,
-      componentType,
-      disabled,
-      iconButtonTheme,
-      iconSize,
-      selected,
-      ...domAttrs
-    } = vnode.attrs;
-    return (
-      <svg
-        class={getClasses<IconStyleAttrs>(
-          { className, disabled, iconButtonTheme, iconSize, selected },
-          componentType
-        )}
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="none"
-        viewBox="0 0 32 32"
-        {...domAttrs}
-      >
-        <path
-          fill-rule="evenodd"
-          d="M5.946 27.517a.5.5 0 01-.607-.567l1.193-7.269-.002-.002L20.867 4.335a2 2 0 012.827-.095l3.654 3.413a2 2 0 01.095 2.827L13.107 25.822l.013.012-7.174 1.683zm5.927-3.445l-3.685.865-.422-.428.642-3.911.064-.069 3.401 3.543zm8.427-16.2l3.71 3.352 1.972-2.11-3.653-3.413L20.3 7.87z"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
-    );
-  },
-};
-
 export const CWElement: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1005,7 +1006,7 @@ export const CWElement: m.Component<IconAttrs> = {
 };
 
 export const CWExpand: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1038,8 +1039,43 @@ export const CWExpand: m.Component<IconAttrs> = {
   },
 };
 
+export const CWExploreCommunities: m.Component<IconAttrs> = {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M25.84 12.665a9.529 9.529 0 01-1.038 4.34c-.24.437-.649 1.069-.947 1.496l-6.22 9.514c-.62.95-2.012.95-2.633 0L8.901 18.5c-1.064-1.848-2.198-3.392-2.198-5.836a9.569 9.569 0 0119.138 0zm-9.568 6.163a6.163 6.163 0 100-12.326 6.163 6.163 0 000 12.326z"
+          clip-rule="evenodd"
+        ></path>
+        <path d="M18.561 12.813a2.303 2.303 0 11-4.607 0 2.303 2.303 0 014.607 0z"></path>
+      </svg>
+    );
+  },
+};
+
 export const CWExternalLink: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1073,7 +1109,7 @@ export const CWExternalLink: m.Component<IconAttrs> = {
 };
 
 export const CWFeedback: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1107,7 +1143,7 @@ export const CWFeedback: m.Component<IconAttrs> = {
 };
 
 export const CWFilter: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1141,7 +1177,7 @@ export const CWFilter: m.Component<IconAttrs> = {
 };
 
 export const CWFlag: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1175,7 +1211,7 @@ export const CWFlag: m.Component<IconAttrs> = {
 };
 
 export const CWFlame: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1205,7 +1241,7 @@ export const CWFlame: m.Component<IconAttrs> = {
 };
 
 export const CWGear: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1289,7 +1325,7 @@ export const CWGear: m.Component<IconAttrs> = {
 };
 
 export const CWGithub: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1323,7 +1359,7 @@ export const CWGithub: m.Component<IconAttrs> = {
 };
 
 export const CWHamburger: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1352,7 +1388,7 @@ export const CWHamburger: m.Component<IconAttrs> = {
 };
 
 export const CWHash: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1386,7 +1422,7 @@ export const CWHash: m.Component<IconAttrs> = {
 };
 
 export const CWHeartEmpty: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1420,7 +1456,7 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
 };
 
 export const CWHeartFilled: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1454,7 +1490,7 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
 };
 
 export const CWHelp: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1488,7 +1524,7 @@ export const CWHelp: m.Component<IconAttrs> = {
 };
 
 export const CWHome: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1522,7 +1558,7 @@ export const CWHome: m.Component<IconAttrs> = {
 };
 
 export const CWInfoEmpty: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1557,7 +1593,7 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
 };
 
 export const CWInfoFilled: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1591,7 +1627,7 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
 };
 
 export const CWJar: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1626,7 +1662,7 @@ export const CWJar: m.Component<IconAttrs> = {
 };
 
 export const CWLink: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1660,7 +1696,7 @@ export const CWLink: m.Component<IconAttrs> = {
 };
 
 export const CWLock: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1694,7 +1730,7 @@ export const CWLock: m.Component<IconAttrs> = {
 };
 
 export const CWLogout: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1733,7 +1769,7 @@ export const CWLogout: m.Component<IconAttrs> = {
 };
 
 export const CWMail: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1767,7 +1803,7 @@ export const CWMail: m.Component<IconAttrs> = {
 };
 
 export const CWMute: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1802,7 +1838,7 @@ export const CWMute: m.Component<IconAttrs> = {
 };
 
 export const CWPeople: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1837,7 +1873,7 @@ export const CWPeople: m.Component<IconAttrs> = {
 };
 
 export const CWPerson: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1871,7 +1907,7 @@ export const CWPerson: m.Component<IconAttrs> = {
 };
 
 export const CWPin: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1903,7 +1939,7 @@ export const CWPin: m.Component<IconAttrs> = {
 };
 
 export const CWPlus: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1934,7 +1970,7 @@ export const CWPlus: m.Component<IconAttrs> = {
 };
 
 export const CWPlusCircle: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -1968,7 +2004,7 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
 };
 
 export const CWSearch: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2002,7 +2038,7 @@ export const CWSearch: m.Component<IconAttrs> = {
 };
 
 export const CWSend: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2036,7 +2072,7 @@ export const CWSend: m.Component<IconAttrs> = {
 };
 
 export const CWShare: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2070,7 +2106,7 @@ export const CWShare: m.Component<IconAttrs> = {
 };
 
 export const CWShare2: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2104,7 +2140,7 @@ export const CWShare2: m.Component<IconAttrs> = {
 };
 
 export const CWSidebarCollapse: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2138,7 +2174,7 @@ export const CWSidebarCollapse: m.Component<IconAttrs> = {
 };
 
 export const CWSidebarExpand: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2172,7 +2208,7 @@ export const CWSidebarExpand: m.Component<IconAttrs> = {
 };
 
 export const CWStar: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2202,7 +2238,7 @@ export const CWStar: m.Component<IconAttrs> = {
 };
 
 export const CWSun: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2282,7 +2318,7 @@ export const CWSun: m.Component<IconAttrs> = {
 };
 
 export const CWTelegram: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2316,7 +2352,7 @@ export const CWTelegram: m.Component<IconAttrs> = {
 };
 
 export const CWTrash: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2351,7 +2387,7 @@ export const CWTrash: m.Component<IconAttrs> = {
 };
 
 export const CWTreasuryProposal: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2385,7 +2421,7 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
 };
 
 export const CWTwitter: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2415,7 +2451,7 @@ export const CWTwitter: m.Component<IconAttrs> = {
 };
 
 export const CWUpvote: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2445,7 +2481,7 @@ export const CWUpvote: m.Component<IconAttrs> = {
 };
 
 export const CWViews: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2480,7 +2516,7 @@ export const CWViews: m.Component<IconAttrs> = {
 };
 
 export const CWWallet: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2520,7 +2556,7 @@ export const CWWallet: m.Component<IconAttrs> = {
 };
 
 export const CWWebsite: m.Component<IconAttrs> = {
-  view: (vnode) => {
+  view: (vnode: m.VnodeDOM<IconAttrs>) => {
     const {
       className,
       componentType,
@@ -2546,6 +2582,40 @@ export const CWWebsite: m.Component<IconAttrs> = {
         <path
           fill-rule="evenodd"
           d="M18.011 15.459a.2.2 0 00.2-.203 57.497 57.497 0 00-.293-5.119.2.2 0 00-.199-.178h-3.503a.2.2 0 00-.198.178 57.497 57.497 0 00-.293 5.12.2.2 0 00.2.202h4.086zm1.9 0a.2.2 0 01-.2-.198 59.446 59.446 0 00-.281-5.081.2.2 0 01.2-.221h3.46c.086 0 .162.054.19.136.51 1.558.833 3.301.916 5.157a.199.199 0 01-.199.207h-4.086zM19.2 8.286a.2.2 0 00.199.173h2.936c.146 0 .242-.15.18-.282-.25-.52-.521-1.008-.813-1.462-.935-1.455-2.053-2.524-3.265-3.142-.16-.082-.326.082-.264.25.245.663.462 1.45.65 2.329.14.654.267 1.369.378 2.134zm6.7 7.173a.201.201 0 01-.2-.194 21.196 21.196 0 00-.812-5.047.202.202 0 01.193-.26h3.295c.076 0 .145.043.179.111a13.917 13.917 0 011.382 5.18.198.198 0 01-.198.21h-3.839zm-1.673-7.125a.201.201 0 00.185.125h2.845c.16 0 .254-.178.162-.308a14.049 14.049 0 00-6.132-4.897c-.21-.087-.376.215-.209.37.698.647 1.331 1.417 1.886 2.28.475.74.899 1.554 1.263 2.43zM14.58 6.466a29.903 29.903 0 00-.32 1.764.199.199 0 00.198.229h3.02a.2.2 0 00.197-.23 29.9 29.9 0 00-.32-1.763c-.265-1.24-.572-2.193-.889-2.818-.158-.314-.301-.507-.412-.613a.124.124 0 00-.173 0c-.11.106-.253.3-.412.613-.317.625-.623 1.578-.89 2.818zm-1.467-.314a32.23 32.23 0 00-.377 2.134.2.2 0 01-.198.173H9.6a.197.197 0 01-.179-.282c.249-.52.52-1.008.813-1.462.935-1.455 2.053-2.524 3.265-3.142.16-.082.326.082.264.25a17.21 17.21 0 00-.65 2.329zm-5.175 9.307a.199.199 0 01-.199-.207c.084-1.856.407-3.599.917-5.157a.199.199 0 01.19-.136h3.46a.2.2 0 01.2.22 59.405 59.405 0 00-.281 5.082.2.2 0 01-.2.198H7.937zm-1.901 0a.201.201 0 00.2-.194c.074-1.783.356-3.485.811-5.047a.202.202 0 00-.193-.26H3.561a.198.198 0 00-.179.111A13.916 13.916 0 002 15.25a.198.198 0 00.199.21h3.838zm2.936-9.555c-.476.74-.9 1.554-1.263 2.43a.201.201 0 01-.186.125H4.68a.196.196 0 01-.162-.308 14.048 14.048 0 016.131-4.897c.21-.086.376.215.209.37a11.813 11.813 0 00-1.885 2.28zm8.505 18.055a.2.2 0 01.197.228c-.096.631-.203 1.221-.32 1.764-.265 1.24-.572 2.194-.889 2.819-.158.313-.301.506-.412.612a.124.124 0 01-.173 0c-.11-.106-.253-.299-.412-.613-.317-.624-.623-1.578-.89-2.818a29.9 29.9 0 01-.318-1.764.199.199 0 01.197-.228h3.02zm1.92 0a.2.2 0 00-.198.172c-.111.765-.237 1.48-.378 2.134a17.18 17.18 0 01-.65 2.329c-.062.168.104.332.264.25 1.212-.617 2.33-1.687 3.265-3.141.292-.455.564-.944.813-1.463a.197.197 0 00-.18-.281h-2.936zm3.881-1.637a.199.199 0 01-.189.137h-3.46a.2.2 0 01-.2-.221 59.45 59.45 0 00.281-5.082.2.2 0 01.2-.197h4.086c.114 0 .204.094.2.207a19.426 19.426 0 01-.918 5.156zm1.132 1.637a.201.201 0 00-.185.124c-.364.876-.788 1.69-1.263 2.43a11.81 11.81 0 01-1.885 2.28c-.168.155-.002.457.208.37a14.048 14.048 0 006.132-4.896.196.196 0 00-.162-.308H24.41zm4.143-1.611a.198.198 0 01-.179.11H25.08a.202.202 0 01-.193-.259c.456-1.562.738-3.264.811-5.047a.201.201 0 01.201-.193h3.838c.115 0 .206.096.199.21a13.917 13.917 0 01-1.382 5.179zm-10.636-.068a.2.2 0 01-.199.179h-3.503a.2.2 0 01-.198-.179 57.497 57.497 0 01-.293-5.119.2.2 0 01.2-.202h4.086a.2.2 0 01.2.202 57.497 57.497 0 01-.293 5.12zm-5.612.179a.2.2 0 00.2-.221 59.41 59.41 0 01-.281-5.082.2.2 0 00-.2-.197H7.937a.199.199 0 00-.199.207c.084 1.855.407 3.598.917 5.156a.199.199 0 00.19.137h3.46zm-2.705 1.5a.197.197 0 00-.179.28c.249.52.52 1.01.813 1.464.935 1.454 2.053 2.524 3.265 3.142.16.081.326-.083.264-.251a17.21 17.21 0 01-.65-2.329 32.223 32.223 0 01-.378-2.134.2.2 0 00-.198-.172H9.6zm-2.077 0c.082 0 .155.049.186.124.364.876.787 1.69 1.263 2.43a11.812 11.812 0 001.885 2.28c.167.155.002.456-.21.37a14.049 14.049 0 01-6.13-4.896.196.196 0 01.163-.308h2.843zm-.669-1.5c.135 0 .231-.13.193-.26a21.196 21.196 0 01-.81-5.047.201.201 0 00-.201-.193H2.199a.198.198 0 00-.199.21 13.917 13.917 0 001.382 5.179c.034.068.103.11.179.11h3.294z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  },
+};
+
+export const CWWrite: m.Component<IconAttrs> = {
+  view: (vnode) => {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M5.946 27.517a.5.5 0 01-.607-.567l1.193-7.269-.002-.002L20.867 4.335a2 2 0 012.827-.095l3.654 3.413a2 2 0 01.095 2.827L13.107 25.822l.013.012-7.174 1.683zm5.927-3.445l-3.685.865-.422-.428.642-3.911.064-.069 3.401 3.543zm8.427-16.2l3.71 3.352 1.972-2.11-3.653-3.413L20.3 7.87z"
           clip-rule="evenodd"
         ></path>
       </svg>

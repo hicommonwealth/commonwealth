@@ -1,5 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet, NodeInfo } from 'models';
+import { Account, ChainInfo, IWebWallet, NodeInfo } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -13,12 +13,14 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _node: NodeInfo;
   private _provider: WalletConnectProvider;
   private _web3: Web3;
+  private _chainInfo: ChainInfo;
 
   public readonly name = WalletId.WalletConnect;
   public readonly label = 'WalletConnect';
   public readonly chain = ChainBase.Ethereum;
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Ethereum;
+  
 
   public get provider() {
     return this._provider;
@@ -40,13 +42,20 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._node;
   }
 
+  public get chainInfo() {
+    return this._chainInfo;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(message, this.accounts[0]);
     return signature;
   }
 
   public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(this._node.ethChainId, message);
+    const msgParams = constructTypedMessage(
+      this._chainInfo.node.ethChainId,
+      message
+    );
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
       JSON.stringify(msgParams),
@@ -54,10 +63,19 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // TODO: test whether signTypedData works on WC
-    const webWalletSignature = await this.signLoginToken(account.validationToken);
-    return account.validate(webWalletSignature);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationToken
+    );
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   public async reset() {
@@ -67,16 +85,20 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabled = false;
   }
 
-  public async enable(node?: NodeInfo) {
+  public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      this._node = node || app.chain?.meta.node || app.config.chains.getById(this.defaultNetwork).node;
-      const chainId = this._node.ethChainId;
+      this._chainInfo =
+        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+      const chainId = this._chainInfo.node.ethChainId;
 
       // use alt wallet url if available
-      const rpc = { [chainId]: this._node.altWalletUrl || this._node.url }
+      const rpc = {
+        [chainId]:
+          this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
+      };
       this._provider = new WalletConnectProvider({ rpc, chainId });
 
       //  Enable session (triggers QR Code modal)
@@ -98,7 +120,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find((addr) => addr.address === accounts[0]);
+      const updatedAddress = app.user.activeAccounts.find(
+        (addr) => addr.address === accounts[0]
+      );
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);
     });

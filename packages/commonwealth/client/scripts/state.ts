@@ -23,6 +23,7 @@ import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import ProjectsController from './controllers/chain/ethereum/commonwealth/projects';
+import { MobileMenuName } from './views/components/mobile_menu/mobile_menu_lookup';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -78,6 +79,7 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+  mobileMenu: MobileMenuName;
   loginState: LoginState;
   // stored on server-side
   config: {
@@ -158,6 +160,7 @@ const app: IApp = {
 
   toasts: getToastStore(),
   modals: getModalStore(),
+  mobileMenu: null,
   loginState: LoginState.NotLoaded,
   config: {
     chains: new ChainStore(),
