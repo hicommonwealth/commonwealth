@@ -30,7 +30,7 @@ export async function enforceDataConsistency(
   }
 
   // if not run as a script then at least one of the enforced datatypes must be true
-  if (process.argv[2] != 'run-as-script' && !enforceTypes && !enforceEntities && !enforceEventNotifications) {
+  if (process.argv[2] != 'run-as-script' && !enforceTypes && !enforceEntities) {
     throw new Error("At least one of enforceTypes, enforceEntities, enforceEventNotifications must be true");
   }
 

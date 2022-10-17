@@ -63,7 +63,7 @@ describe('Tests for enforceDataConsistency script', () => {
     });
 
     // run consistency script
-    await enforceDataConsistency(CE_DB_URI, false, true, false);
+    await enforceDataConsistency(CE_DB_URI, false, true);
 
     // ensure type id has been transferred to cw db
     const newResults = await cwModels.ChainEntityMeta.findAll({
