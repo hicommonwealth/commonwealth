@@ -5,11 +5,11 @@ import {
   Provider,
 } from '@ethersproject/providers';
 import { ethers, Contract } from 'ethers';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import WebWalletController from 'controllers/app/web_wallets';
 import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { Account } from 'models';
+import { Account, IWebWallet, NodeInfo } from 'models';
 
 export type ContractFactoryT<ContractT> = (
   address: string,
@@ -18,23 +18,44 @@ export type ContractFactoryT<ContractT> = (
 
 export async function attachSigner<CT extends Contract>(
   wallets: WebWalletController,
-  sender: Account,
+  sender?: Account,
   contract?: CT,
+  node?: NodeInfo,
   factory?: ContractFactoryT<CT>,
   address?: string
 ): Promise<CT> {
-  const signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
+  let signingWallet: IWebWallet<any>;
+  if (sender) {
+    signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);
+  } else {
+    // hack to work around no sender provided
+    signingWallet = wallets.getByName(WalletId.Metamask);
+  }
   let signer: JsonRpcSigner;
   if (
     signingWallet instanceof MetamaskWebWalletController ||
     signingWallet instanceof WalletConnectWebWalletController
   ) {
+    if (signingWallet.enabled && node && signingWallet.node !== node) {
+      await signingWallet.reset();
+    }
+    if (!signingWallet.enabled) {
+      await signingWallet.enable(node);
+    }
     const walletProvider = new ethers.providers.Web3Provider(
       signingWallet.provider as any
     );
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;
-    signer = walletProvider.getSigner(sender.address);
+    if (sender) {
+      signer = walletProvider.getSigner(sender.address);
+    } else {
+      // hack to work around no sender provided
+      if (signingWallet.accounts.length === 0) {
+        throw new Error('No signing account available on Metamask');
+      }
+      signer = walletProvider.getSigner(signingWallet.accounts[0]);
+    }
   } else {
     throw new Error('Unsupported wallet');
   }

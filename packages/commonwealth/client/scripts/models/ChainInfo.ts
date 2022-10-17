@@ -4,7 +4,6 @@ import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
-import { ChainInstance } from 'server/models/chain';
 import NodeInfo from './NodeInfo';
 
 import {
@@ -292,7 +291,7 @@ class ChainInfo {
       default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInstance = r.result;
+    const updatedChain = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;

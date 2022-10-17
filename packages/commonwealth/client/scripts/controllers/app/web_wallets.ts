@@ -1,4 +1,4 @@
-import { Account, IWebWallet } from 'models';
+import { Account, IWebWallet, NodeInfo } from 'models';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import app from 'state';
 import $ from 'jquery';
@@ -52,6 +52,7 @@ export default class WebWalletController {
         wallet_id: wallet,
         jwt: app.user.jwt
       });
+      account.setWalletId(wallet);
     } catch (e) {
       console.error(`Failed to set wallet for address: ${e.message}`);
     }

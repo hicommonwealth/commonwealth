@@ -200,7 +200,6 @@ export class ChainMetadataRows
               : 'Projects are hidden from sidebar'
           }
         />
-        ,
         <ToggleRow
           title="Chat Enabled"
           defaultValue={vnode.attrs.chain.chatEnabled}

@@ -10,7 +10,10 @@ import {
   MolochEvents,
   CompoundEvents,
   AaveEvents,
+  CommonwealthEvents,
 } from 'chain-events/src';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import { ChainAttributes, ChainInstance } from '../models/chain';
 import EventStorageHandler, {
@@ -19,13 +22,12 @@ import EventStorageHandler, {
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
+import ProjectHandler from '../eventHandlers/project';
 import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { default as models, sequelize } from '../database';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainNodeInstance } from '../models/chain_node';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // emit globally any transfer over 1% of total issuance
@@ -98,6 +100,10 @@ export const generateHandlers = (
     const userFlagsHandler = new UserFlagsHandler(models, chain.id);
 
     handlers.push(identityHandler, userFlagsHandler);
+  }
+  if (chain.network === ChainNetwork.CommonProtocol) {
+    const projectHandler = new ProjectHandler(models);
+    handlers.push(projectHandler)
   }
 
   return handlers;
@@ -208,6 +214,19 @@ const setupChainEventListeners = async (
           const api = await AaveEvents.createApi(contracts[0].ChainNode.url, contracts[0].address);
           const handlers = generateHandlers(node, wss);
           subscriber = await AaveEvents.subscribeEvents({
+            chain: node.id,
+            handlers,
+            skipCatchup,
+            discoverReconnectRange: () => discoverReconnectRange(node.id),
+            api,
+            verbose: true,
+          });
+        } else if (node.network === ChainNetwork.CommonProtocol) {
+          // @TODO: @JAKE @CONTRACTS: fetch governance contract specifically
+          const contracts = await node.getContracts({ include: [{ model: models.ChainNode, required: true, }]});
+          const api = await CommonwealthEvents.createApi(contracts[0].ChainNode.url, contracts[0].address);
+          const handlers = generateHandlers(node, wss);
+          subscriber = await CommonwealthEvents.subscribeEvents({
             chain: node.id,
             handlers,
             skipCatchup,

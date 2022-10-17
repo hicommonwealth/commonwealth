@@ -49,7 +49,9 @@ async function handleFatalError(
 ): Promise<void> {
   switch (type) {
     case 'rabbitmq':
-      log.error(`Rascal broker setup failed. Check the Rascal configuration file for errors.\n${error.stack}`);
+      log.error(
+        `Rascal broker setup failed. Check the Rascal configuration file for errors.\n${error.stack}`
+      );
       // TODO: shutdown dyno with heroku api
       process.exit(1);
       break;
@@ -76,7 +78,7 @@ async function handleFatalError(
 }
 
 class ErcLoggingHandler extends IEventHandler {
-  private logger = {}
+  private logger = {};
   constructor(public network: ChainNetwork, public tokenNames: string[]) {
     super();
   }
@@ -84,10 +86,13 @@ class ErcLoggingHandler extends IEventHandler {
     if (this.tokenNames.includes(event.chain)) {
       // if logger for this specific token doesn't exist, create it - decreases computational cost of logging
       if (!this.logger[event.chain])
-        this.logger[event.chain] =
-          factory.getLogger(addPrefix(__filename, [`Erc${this.network.slice(3)}`, event.chain]));
+        this.logger[event.chain] = factory.getLogger(
+          addPrefix(__filename, [`Erc${this.network.slice(3)}`, event.chain])
+        );
 
-      this.logger[event.chain].info(`Received event: ${JSON.stringify(event, null, 2)}`);
+      this.logger[event.chain].info(
+        `Received event: ${JSON.stringify(event, null, 2)}`
+      );
     }
     return null;
   }
@@ -110,21 +115,28 @@ async function mainProcess(
     ++runCount;
   }
 
-  const activeChains: string[] = Object.keys(listeners).map((listenerName): string => {
-    if (!listenerName.startsWith(ChainNetwork.ERC20) &&
-      !listenerName.startsWith(ChainNetwork.ERC721)) return listenerName;
-    else {
-      return listeners[listenerName].options.tokenNames;
+  const activeChains: string[] = Object.keys(listeners).map(
+    (listenerName): string => {
+      if (
+        !listenerName.startsWith(ChainNetwork.ERC20) &&
+        !listenerName.startsWith(ChainNetwork.ERC721)
+      )
+        return listenerName;
+      else {
+        return listeners[listenerName].options.tokenNames;
+      }
     }
-  });
+  );
   if (activeChains.length > 0)
     log.info(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      `Starting scheduled process. Active chains: ${JSON.stringify(activeChains.flat())}`
+      `Starting scheduled process. Active chains: ${JSON.stringify(
+        activeChains.flat()
+      )}`
     );
 
-  let query =`
+  let query = `
   SELECT
     c."id",
     c."substrate_spec",
@@ -143,9 +155,9 @@ async function mainProcess(
     LEFT JOIN "Contracts" con
       ON con.id = cc.contract_id
   WHERE c."has_chain_events_listener" = true
-    AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
-      (c.base = 'substrate' AND c.type ='chain') OR
-      (c.base = 'cosmos' AND (c.type='token' OR c.type='chain')));
+    AND (con.type IN ('marlin-testnet', 'aave', 'compound', 'common-protocol') OR
+      (c.base = 'substrate' AND c.type ='chain')) OR
+      (c.base = 'cosmos' AND (c.type='token' OR c.type='chain')));;
   `;
   const allChains = (await pool.query(query)).rows;
 
@@ -202,37 +214,47 @@ async function mainProcess(
   };
 
   // group erc20 and erc721 tokens together by URL in order to minimize number of listeners
-  const erc20Tokens = myChainData.filter(
-    (chain) =>
-      chain.network === ChainNetwork.ERC20 && chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  ).map((chain) => {
-    // replace url with private_url if available
-    chain.url = chain.private_url || chain.url;
-    return chain;
-  });
+  const erc20Tokens = myChainData
+    .filter(
+      (chain) =>
+        chain.network === ChainNetwork.ERC20 &&
+        chain.type === ChainType.Token &&
+        chain.base === ChainBase.Ethereum
+    )
+    .map((chain) => {
+      // replace url with private_url if available
+      chain.url = chain.private_url || chain.url;
+      return chain;
+    });
 
-  const erc721Tokens = myChainData.filter(
-    (chain) =>
-      chain.network === ChainNetwork.ERC721 && chain.type === ChainType.Token && chain.base === ChainBase.Ethereum
-  ).map((chain) => {
-    // replace url with private_url if available
-    chain.url = chain.private_url || chain.url;
-    return chain;
-  });
+  const erc721Tokens = myChainData
+    .filter(
+      (chain) =>
+        chain.network === ChainNetwork.ERC721 &&
+        chain.type === ChainType.Token &&
+        chain.base === ChainBase.Ethereum
+    )
+    .map((chain) => {
+      // replace url with private_url if available
+      chain.url = chain.private_url || chain.url;
+      return chain;
+    });
 
   const erc20ByUrl = _.groupBy(erc20Tokens, 'url');
   const erc721ByUrl = _.groupBy(erc721Tokens, 'url');
 
-  async function createErcListener(network: ChainNetwork,
-    groupedTokens: _.Dictionary<any[]>, logger: ErcLoggingHandler) {
-
+  async function createErcListener(
+    network: ChainNetwork,
+    groupedTokens: _.Dictionary<any[]>,
+    logger: ErcLoggingHandler
+  ) {
     for (const [url, tokens] of Object.entries(groupedTokens)) {
       const tokenKey = `${network}_${url}`;
       const ercTokenAddresses = tokens.map((chain) => chain.address);
       const ercTokenNames = tokens.map((chain) => chain.id);
 
       let supportedNetwork: SupportedNetwork;
-      switch(network) {
+      switch (network) {
         case ChainNetwork.ERC20:
           supportedNetwork = SupportedNetwork.ERC20;
           break;
@@ -281,7 +303,9 @@ async function mainProcess(
             );
 
             // add the rabbitmq handler for this chain
-            listeners[tokenKey].eventHandlers['rabbitmq'] = { handler: producer };
+            listeners[tokenKey].eventHandlers['rabbitmq'] = {
+              handler: producer,
+            };
             listeners[tokenKey].eventHandlers['logger'] = { handler: logger };
           } catch (error) {
             delete listeners[tokenKey];
@@ -294,7 +318,12 @@ async function mainProcess(
               // subscribe to the chain to begin listening for events
               await listeners[tokenKey].subscribe();
             } catch (error) {
-              await handleFatalError(error, pool, tokenKey, 'listener-subscribe');
+              await handleFatalError(
+                error,
+                pool,
+                tokenKey,
+                'listener-subscribe'
+              );
             }
           }
         } else if (listeners[tokenKey] && tokens.length === 0) {
@@ -324,7 +353,11 @@ async function mainProcess(
   // delete listeners for chains that are no longer assigned to this node (skip erc20 and erc721)
   const myChains = myChainData.map((row) => row.id);
   Object.keys(listeners).forEach((chain) => {
-    if (!myChains.includes(chain) && !chain.startsWith(ChainNetwork.ERC20) && !chain.startsWith(ChainNetwork.ERC721)) {
+    if (
+      !myChains.includes(chain) &&
+      !chain.startsWith(ChainNetwork.ERC20) &&
+      !chain.startsWith(ChainNetwork.ERC721)
+    ) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
       delete listeners[chain];
@@ -351,6 +384,8 @@ async function mainProcess(
         network = SupportedNetwork.Aave;
       else if (chain.network === ChainNetwork.Moloch)
         network = SupportedNetwork.Moloch;
+      else if (chain.network === ChainNetwork.CommonProtocol)
+        network = SupportedNetwork.Commonwealth;
 
       try {
         listeners[chain.id] = await createListener(chain.id, network, {
@@ -361,7 +396,7 @@ async function mainProcess(
           skipCatchup: false,
           verbose: false, // using this will print event before chain is added to it
           enricherConfig: { balanceTransferThresholdPermill: 10_000 },
-          discoverReconnectRange
+          discoverReconnectRange,
         });
       } catch (error) {
         delete listeners[chain.id];
@@ -509,9 +544,12 @@ async function initializer(): Promise<void> {
   // setup sql client pool
   pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: process.env.NODE_ENV !== 'production' ? false : {
-      rejectUnauthorized: false,
-    },
+    ssl:
+      process.env.NODE_ENV !== 'production'
+        ? false
+        : {
+            rejectUnauthorized: false,
+          },
     max: 3,
   });
 
@@ -520,7 +558,11 @@ async function initializer(): Promise<void> {
   });
 
   // these requests cannot work locally
-  if ((process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') && process.env.USE_SLIDER_SCALING === 'true') {
+  if (
+    (process.env.NODE_ENV === 'production' ||
+      process.env.NODE_ENV === 'staging') &&
+    process.env.USE_SLIDER_SCALING === 'true'
+  ) {
     log.info('Connecting to Heroku API');
     // get all dyno's list
     const res = await fetch(
@@ -594,25 +636,37 @@ async function initializer(): Promise<void> {
       }
     }
   } else {
-    workerNumber = process.env.WORKER_NUMBER ? Number(process.env.WORKER_NUMBER) : 0;
+    workerNumber = process.env.WORKER_NUMBER
+      ? Number(process.env.WORKER_NUMBER)
+      : 0;
     numWorkers = process.env.NUM_WORKERS ? Number(process.env.NUM_WORKERS) : 1;
   }
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(
+    <BrokerConfig>RabbitMQConfig,
+    'ChainEventsHandlersPublication'
+  );
   erc20Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   erc721Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   try {
     await producer.init();
   } catch (e) {
-    handleFatalError(e, pool, null, 'rabbitmq')
+    handleFatalError(e, pool, null, 'rabbitmq');
   }
 }
 
 initializer()
   .then(() => {
-    return mainProcess(producer, erc20Logger, erc721Logger, pool, workerNumber, numWorkers);
+    return mainProcess(
+      producer,
+      erc20Logger,
+      erc721Logger,
+      pool,
+      workerNumber,
+      numWorkers
+    );
   })
   .then(() => {
     setInterval(

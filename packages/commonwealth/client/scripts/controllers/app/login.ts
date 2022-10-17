@@ -162,7 +162,11 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => {
+        const acct: Account = app.chain?.accounts.get(addr.address, addr.keytype);
+        if (acct) acct.setWalletId(addr.walletId);
+        return acct;
+      })
       .filter((addr) => addr)
   );
 

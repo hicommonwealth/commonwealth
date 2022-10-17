@@ -9,6 +9,7 @@ import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
 import { BigNumberish, ContractReceipt } from 'ethers';
 import { attachSigner } from './contractApi';
+import { formatBytes32String } from 'ethers/lib/utils';
 
 export type IProjectCreationData = {
   title: string; // TODO length limits for contract side
@@ -145,10 +146,12 @@ export default class ProjectsController {
     }
 
     // instantiate contract (TODO: additional validation, or do this earlier)
+    console.log(this._factoryInfo.node);
     const contract = await attachSigner(
       this._app.wallets,
       creator,
       null,
+      this._factoryInfo.node,
       ICuratedProjectFactory__factory.connect,
       this._factoryInfo.address
     );
@@ -157,26 +160,27 @@ export default class ProjectsController {
     console.log({ projectId });
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
-    console.log({
-      title: title.slice(0, 32),
-      ipfsHash,
-      cwUrl,
-      beneficiary,
-      token,
-      threshold,
-      deadline,
-      curatorFee,
-    });
-
-    const tx = await contract.createProject(
-      title.slice(0, 32),
-      ipfsHash,
-      cwUrl,
+    console.log([
+      formatBytes32String(title.slice(0, 30)),
+      formatBytes32String(ipfsHash.slice(0, 30)),
+      formatBytes32String(cwUrl.slice(0, 30)),
       beneficiary,
       token,
       threshold.toString(),
       deadline,
-      curatorFee.toString()
+      curatorFee.toString(),
+    ]);
+
+    const tx = await contract.createProject(
+      formatBytes32String(title.slice(0, 30)),
+      formatBytes32String(ipfsHash.slice(0, 30)),
+      formatBytes32String(cwUrl.slice(0, 30)),
+      beneficiary,
+      token,
+      threshold.toString(),
+      deadline,
+      curatorFee.toString(),
+      { gasLimit: 2000000 }
     );
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
@@ -215,11 +219,12 @@ export default class ProjectsController {
       this._app.wallets,
       backer,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
 
-    const tx = await contract.back(value, { from: backer.address });
+    const tx = await contract.back(value);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to back');
@@ -241,11 +246,12 @@ export default class ProjectsController {
       this._app.wallets,
       curator,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
 
-    const tx = await contract.curate(value, { from: curator.address });
+    const tx = await contract.curate(value);
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to curate');
@@ -270,13 +276,12 @@ export default class ProjectsController {
       this._app.wallets,
       beneficiary,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
 
-    const tx = await contract.beneficiaryWithdraw({
-      from: beneficiary.address,
-    });
+    const tx = await contract.beneficiaryWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
@@ -301,11 +306,12 @@ export default class ProjectsController {
       this._app.wallets,
       backer,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
 
-    const tx = await contract.backersWithdraw({ from: backer.address });
+    const tx = await contract.backersWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
@@ -332,11 +338,12 @@ export default class ProjectsController {
       this._app.wallets,
       curator,
       null,
+      this._factoryInfo.node,
       ICuratedProject__factory.connect,
       project.address
     );
 
-    const tx = await contract.curatorsWithdraw({ from: curator.address });
+    const tx = await contract.curatorsWithdraw();
     const txReceipt = await tx.wait();
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
