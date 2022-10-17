@@ -1,4 +1,4 @@
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { Logger } from 'typescript-logging';
 import {IRmqMsgCreateCETypeCUD, TRmqMsgCETypeCUD} from "common-common/src/rabbitmq/types/chainEventTypeCUD";
 

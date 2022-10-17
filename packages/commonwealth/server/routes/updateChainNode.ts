@@ -1,4 +1,4 @@
-import {DB} from "../database";
+import {DB} from "../models";
 import {NextFunction, Request, Response} from "express";
 import {RabbitMQController, RascalPublications} from "common-common/src/rabbitmq";
 import {success} from "../types";

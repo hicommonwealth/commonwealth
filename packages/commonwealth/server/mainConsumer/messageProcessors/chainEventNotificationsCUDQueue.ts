@@ -1,4 +1,4 @@
-import { DB } from '../../database';
+import { DB } from '../../models';
 import { Logger } from 'typescript-logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
