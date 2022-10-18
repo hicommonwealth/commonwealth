@@ -49,7 +49,7 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
         app.chain.network === ChainNetwork.Commonwealth ||
-        app.chain.meta.snapshot);
+        app.chain.meta.snapshot?.length);
     if (!hasProposals) return;
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
@@ -74,7 +74,7 @@ export class GovernanceSection
       app.chain?.network === ChainNetwork.Aave;
     const showSnapshotOptions =
       app.chain?.base === ChainBase.Ethereum &&
-      app.chain?.meta.snapshot?.length > 0;
+      !!app.chain?.meta.snapshot?.length;
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&

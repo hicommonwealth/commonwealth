@@ -291,8 +291,7 @@ class ThreadsController {
         NotificationSubscription.fromJSON(subscriptionJSON)
       );
       return result;
-    } 
-    catch (err) {
+    } catch (err) {
       console.log('Failed to create thread');
       throw new Error(
         err.responseJSON && err.responseJSON.error
@@ -482,20 +481,21 @@ class ThreadsController {
     threadId: number;
     entities: ChainEntity[];
   }) {
+    const { threadId, entities } = args;
     await $.ajax({
       url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        thread_id: args.threadId,
-        chain_entity_id: args.entities.map((ce) => ce.id),
+        thread_id: threadId,
+        chain_entity_id: entities.map((ce) => ce.id),
         jwt: app.user.jwt,
       },
       success: () => {
-        const thread = this._store.getByIdentifier(args.threadId);
+        const thread = this._store.getByIdentifier(threadId);
         if (!thread) return;
         thread.chainEntities.splice(0);
-        args.entities.forEach((ce) =>
+        entities.forEach((ce) =>
           thread.chainEntities.push({
             id: ce.id,
             type: ce.type,

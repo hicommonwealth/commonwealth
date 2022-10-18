@@ -18,7 +18,7 @@ import {
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
-import { MobileMenu } from './components/mobile_menu/mobile_menu';
+import { AppMobileMenus } from './app_mobile_menus';
 
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
@@ -50,7 +50,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
   }
 
-  oninit(vnode) {
+  oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
@@ -117,16 +117,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 tosStatus={tosStatus}
                 bannerStatus={bannerStatus}
               />
-              <div class="Body" onscroll={onscroll}>
-                {app.mobileMenu ? (
-                  <MobileMenu />
-                ) : (
-                  <>
-                    {vnode.children}
-                    {!app.isCustomDomain() && !hideFooter && <Footer />}
-                  </>
-                )}
-              </div>
+
+              {app.mobileMenu ? (
+                <AppMobileMenus />
+              ) : (
+                <div class="Body" onscroll={onscroll}>
+                  {vnode.children}
+                  {!app.isCustomDomain() && !hideFooter && <Footer />}
+                </div>
+              )}
             </div>
           </div>
         </div>
