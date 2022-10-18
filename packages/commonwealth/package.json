@@ -52,7 +52,7 @@
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "repository": {
     "type": "git",
@@ -182,7 +182,7 @@
     "morgan": "^1.9.1",
     "near-api-js": "^0.42.0",
     "node-jose": "^2.1.1",
-    "node-sass": "^5.0.0",
+    "node-sass": "^6.0.0",
     "node-statsd": "^0.1.1",
     "nodemon": "^1.18.10",
     "numeral": "^2.0.6",
