@@ -53,10 +53,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    if (!isWindowExtraSmallMax.matches) {
-      delete app.mobileMenu;
-    }
-
     const storedSidebarToggleState =
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
 
@@ -64,13 +60,16 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       this.isSidebarToggled = false;
       this.showQuickSwitcher = true;
     } else {
-      this.isSidebarToggled =
+      const toggleSidebar =
         !isWindowSmallMax.matches || storedSidebarToggleState;
-      this.showQuickSwitcher = this.isSidebarToggled;
+      this.isSidebarToggled = toggleSidebar;
+      this.showQuickSwitcher = toggleSidebar;
     }
 
     this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
+
     this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
+
     this.showBodyContainer = !(
       isWindowSmallMax.matches && storedSidebarToggleState
     );
