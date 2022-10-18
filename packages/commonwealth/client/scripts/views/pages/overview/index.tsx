@@ -18,19 +18,7 @@ import { PageLoading } from '../loading';
 class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
 
-  oninit() {
-    // this.initializing = true;
-    app.recentActivity.getRecentTopicActivity().then(() => {
-      // this.initializing = false;
-      m.redraw();
-    });
-  }
-
   view() {
-    if (this.initializing) {
-      return <PageLoading />;
-    }
-
     const sortedTopics = app.topics
       .getByCommunity(app.activeChainId())
       .sort((a, b) => a.order - b.order);
@@ -87,7 +75,7 @@ class OverviewPage implements m.ClassComponent {
           {topicsToDisplay.map((topic) => {
             const monthlyThreads = app.threads.overviewStore
               .getAll()
-              .filter((thread) => thread.topic.id === topic.id);
+              .filter((thread) => topic.id === thread.topic.id);
 
             return (
               <TopicSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
