@@ -16,7 +16,6 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { SharePopover } from '../view_proposal/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
@@ -79,7 +78,6 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        {isWindowMediumSmallInclusive(window.innerWidth) && <CWDivider />}
         <div class="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
@@ -108,6 +106,9 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       >
                         {moment(getLastUpdated(thread)).format('l')}
                       </CWText>
+                      {thread.readOnly && (
+                        <CWIcon iconName="lock" iconSize="small" />
+                      )}
                     </div>
                     <div class="row-top-icons">
                       {isHot(thread) && <div class="flame" />}
@@ -179,10 +180,14 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                               iconLeft: 'lock',
                               onclick: (e) => {
                                 e.preventDefault();
-                                app.threads.setPrivacy({
-                                  threadId: thread.id,
-                                  readOnly: !thread.readOnly,
-                                });
+                                app.threads
+                                  .setPrivacy({
+                                    threadId: thread.id,
+                                    readOnly: !thread.readOnly,
+                                  })
+                                  .then(() => {
+                                    m.redraw();
+                                  });
                               },
                             },
                           ]}
