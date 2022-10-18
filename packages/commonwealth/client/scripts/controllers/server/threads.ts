@@ -418,6 +418,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
+        this._overviewStore.update(result);
         return result;
       },
       error: (err) => {
