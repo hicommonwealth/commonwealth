@@ -27,7 +27,8 @@
     "./client/scripts",
     "./shared",
     "./test",
-    "./globals.d.ts"
+    "./globals.d.ts",
+    "server.ts"
   ],
   "exclude": ["./node_modules"]
 }
