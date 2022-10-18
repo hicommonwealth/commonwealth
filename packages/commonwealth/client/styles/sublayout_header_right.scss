@@ -3,49 +3,23 @@
 .SublayoutHeaderRight {
   align-items: center;
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  gap: 8px;
 
-  > :not(:first-child) {
-    margin-left: 8px;
-  }
-
-  .Icon {
-    cursor: pointer;
-    display: inline-block;
-  }
-
-  .MobileIconPopover {
+  .MobileMenuContainer {
     display: none;
+
     @include extraSmall {
       display: flex;
     }
   }
 
-  .DesktopIconWrap {
+  .DesktopMenuContainer {
     align-items: center;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+    gap: 8px;
 
     @include extraSmall {
       display: none;
-    }
-
-    > :not(:first-child) {
-      margin-left: 8px;
-    }
-
-    .unread-notifications-pip {
-      border-radius: 100%;
-      position: relative;
-      background: $pink-500;
-      content: '';
-      height: 10px;
-      width: 10px;
-      top: -3px;
-      right: 10px;
-      display: inline-block;
     }
   }
 }

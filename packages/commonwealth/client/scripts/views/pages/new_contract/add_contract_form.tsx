@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import Web3 from 'web3';
 
 import 'pages/create_community.scss';
 
@@ -35,10 +34,9 @@ import {
 } from '../create_community/types';
 
 type ContractFormFields = {
-  eth_chain_id: number,
-  abi: JSON,
-  contractType: ContractType.DAOFACTORY | ContractType.AAVE |ContractType.COMPOUND |
-  ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
+  chain_node_id: number;
+  abi: JSON;
+  contractType: ContractType;
   decimals: number;
   token_name: string;
 };
@@ -59,10 +57,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     form: {
       address: '',
       chainString: 'Ethereum Mainnet',
-      eth_chain_id: 1,
+      // For Now we hard code the chain node id until we have a better way to distinguish between chains
+      chain_node_id: 37,
       name: '',
       abi: JSON.parse('[]'),
-      contractType: ContractType.DAOFACTORY,
+      contractType: ContractType.ERC20,
       nodeUrl: '',
       symbol: '',
       token_name: '',
@@ -93,9 +92,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         <SelectRow
           title="Contract Type"
           options={[
-            ContractType.DAOFACTORY, ContractType.ERC20,
-            ContractType.ERC721, ContractType.SPL,
-            ContractType.AAVE, ContractType.COMPOUND
+            ContractType.ERC20,
+            ContractType.ERC721,
+            ContractType.SPL,
+            ContractType.AAVE,
+            ContractType.COMPOUND,
           ]}
           value={this.state.form.contractType}
           onchange={(value) => {
@@ -132,28 +133,31 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.eth_chain_id ||
+            !this.state.form.chain_node_id ||
             this.state.loading
           }
           onclick={async () => {
-            const { eth_chain_id, nodeUrl } =
+            const { altWalletUrl, chainString, chain_node_id, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
             try {
-              const res = await app.contracts.add(
-                app.activeChainId(),
-                ChainBase.Ethereum,
-                eth_chain_id,
-                nodeUrl,
-                this.state.form.address,
-                this.state.form.abi,
-                this.state.form.contractType,
-                this.state.form.symbol,
-                this.state.form.token_name,
-                this.state.form.decimals
-              );
-              notifySuccess(`Contract ${res.address} for Community ${app.activeChainId()} created successfully!`);
-              m.redraw();
+              const res = await $.post(`${app.serverUrl()}/createContract`, {
+                alt_wallet_url: altWalletUrl,
+                chain_base: ChainBase.Ethereum,
+                chain_string: chainString,
+                chain_node_id,
+                jwt: app.user.jwt,
+                network: ChainNetwork.ERC20,
+                node_url: nodeUrl,
+                default_symbol: symbol,
+                ...this.state.form,
+              });
+              if (res.status === 'Success') {
+                this.state.status = 'success';
+                this.state.message = `Contract with Address ${res.result.contract.address} saved successfully`;
+                this.state.loading = false;
+                m.redraw();
+              }
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new contract with community failed'
