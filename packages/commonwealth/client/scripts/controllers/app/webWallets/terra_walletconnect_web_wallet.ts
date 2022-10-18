@@ -1,18 +1,19 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet } from 'models';
-import app from 'state';
-import Web3 from 'web3';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import {
+  ConnectedWallet,
+  ConnectType,
+  getChainOptions,
+  WalletController,
+} from '@terra-money/wallet-controller';
+import { Account, IWebWallet } from 'models';
 
+// TODO: ensure this only opens on mobile
 class TerraWalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _chainInfo: ChainInfo;
-  private _provider: WalletConnectProvider;
-  private _web3: Web3;
+  private _controller: WalletController;
+  private _wallet: ConnectedWallet;
 
   public readonly name = WalletId.TerraWalletConnect;
   public readonly label = 'Terra Station WalletConnect';
@@ -20,10 +21,6 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Terra;
   public readonly specificChains = ['terra'];
-
-  public get provider() {
-    return this._provider;
-  }
 
   public get enabled() {
     return this.available && this._enabled;
@@ -37,29 +34,27 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
-    return signature;
-  }
-
-  public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(
-      this._chainInfo.node.ethChainId,
-      message
-    );
-    const signature = await this._provider.wc.signTypedData([
-      this.accounts[0],
-      JSON.stringify(msgParams),
-    ]);
-    return signature;
-  }
-
   public async signWithAccount(account: Account): Promise<string> {
-    // TODO: test whether signTypedData works on WC
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken
-    );
-    return webWalletSignature;
+    try {
+      const result = await this._wallet.signBytes(Buffer.from(account.validationToken));
+      if (!result.success) {
+        throw new Error('SignBytes unsuccessful');
+      }
+      const signature = {
+        signature: {
+          pub_key: {
+            type: 'tendermint/PubKeySecp256k1',
+            // TODO: ensure single signature
+            value: result.result.public_key.toAmino().value,
+          },
+          signature: Buffer.from(result.result.signature).toString('base64'),
+        },
+      };
+      return JSON.stringify(signature);
+    } catch (error) {
+      console.error(error);
+      throw new Error(`Failed to sign with account: ${error.message}`);
+    }
   }
 
   public async validateWithAccount(
@@ -71,8 +66,7 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
 
   public async reset() {
     console.log('Attempting to reset WalletConnect');
-    const ks = await this._provider.wc.killSession();
-    this._provider.disconnect();
+    this._controller.disconnect();
     this._enabled = false;
   }
 
@@ -81,43 +75,30 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // Create WalletConnect Provider
-      this._chainInfo =
-        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node.ethChainId;
-
-      // use alt wallet url if available
-      const rpc = {
-        [chainId]:
-          this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
-      };
-      this._provider = new WalletConnectProvider({ rpc, chainId });
+      const chainOptions = await getChainOptions();
+      this._controller = new WalletController({
+        ...chainOptions,
+      });
 
       //  Enable session (triggers QR Code modal)
-      await this._provider.enable();
-      this._web3 = new Web3(this._provider as any);
-      this._accounts = await this._web3.eth.getAccounts();
+      await this._controller.connect(ConnectType.WALLETCONNECT);
+
+      const connectedWallet = await this._controller.connectedWallet().toPromise();
+      if (connectedWallet) {
+        this._accounts = [ connectedWallet.terraAddress ];
+      } else {
+        this._accounts = [];
+      }
       if (this._accounts.length === 0) {
         throw new Error('WalletConnect fetched no accounts.');
       }
 
-      await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
       this._enabling = false;
       throw new Error(`Failed to enable WalletConnect: ${error.message}`);
     }
-  }
-
-  public async initAccountsChanged() {
-    await this._provider.on('accountsChanged', async (accounts: string[]) => {
-      const updatedAddress = app.user.activeAccounts.find(
-        (addr) => addr.address === accounts[0]
-      );
-      if (!updatedAddress) return;
-      await setActiveAccount(updatedAddress);
-    });
-    // TODO: chainChanged, disconnect events
   }
 }
 
