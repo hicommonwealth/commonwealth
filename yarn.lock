@@ -18233,10 +18233,10 @@ rlp@^2.2.4:
   dependencies:
     bn.js "^4.11.1"
 
-rollbar@^2.25.1:
-  version "2.25.1"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.25.1.tgz#4d03270256fd9696d604e0494d588de19860bf6a"
-  integrity sha512-xDUZqktjtnI/Vv530C5lQKPR8SR8tdlAs0/OeiyBNdfqnL/ngpTHmmrYhgFn4rpEXcs+OzYp3jLquaozBlaCgg==
+rollbar@^2.25.2:
+  version "2.25.2"
+  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.25.2.tgz#2501875ec1bedbbaa6660ecc8d1dc1868d9aefde"
+  integrity sha512-aZIr/wXaVgkY73ynIpgQNyPhS04WwWUF7BGW7sOS0sU04+C39vDoloqIAOxTCU8MLgGQIiGMKIpQ8hYTl2obAA==
   dependencies:
     async "~3.2.3"
     console-polyfill "0.3.0"
