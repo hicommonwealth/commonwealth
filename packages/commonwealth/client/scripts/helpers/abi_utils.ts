@@ -1,6 +1,5 @@
 import { chain } from 'web3-core/types';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { AbiFunction, AbiEvent } from './types';
 
 export function parseAbiItemsFromABI(abiString: string): AbiItem[] {
   try {
@@ -10,6 +9,7 @@ export function parseAbiItemsFromABI(abiString: string): AbiItem[] {
     return [];
   }
 }
+
 export function parseFunctionsFromABI(abiString: string): AbiItem[] {
   let fns: AbiItem[] = [];
   if (abiString) {
@@ -20,6 +20,27 @@ export function parseFunctionsFromABI(abiString: string): AbiItem[] {
   return fns;
 }
 
+export function parseWriteFunctionsFromABI(abiString: string): AbiItem[] {
+  let fns: AbiItem[] = [];
+  if (abiString) {
+    const abiItems = parseAbiItemsFromABI(abiString)
+    fns = abiItems.filter((x) => x.type === "function" && x.stateMutability !== "view"
+    && x.stateMutability !== "pure" && x.constant !== true)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return fns;
+}
+
+export function parseFunctionFromABI(abiString: string, functionName: string): AbiItem {
+  const abiFunctions = parseFunctionsFromABI(abiString);
+  const functionItem = abiFunctions.find((abiItem) => abiItem.name === functionName);
+  if (!functionItem) {
+    throw new Error(`Could not find function ${functionName} in ABI`);
+  }
+  return functionItem;
+}
+
+
 export function parseEventsFromABI(abiString: string): AbiItem[] {
   let events: AbiItem[] = [];
   if (abiString) {
@@ -28,6 +49,15 @@ export function parseEventsFromABI(abiString: string): AbiItem[] {
     .sort((a, b) => a.name.localeCompare(b.name));
   }
   return events;
+}
+
+export function parseEventFromABI(abiString: string, eventName: string): AbiItem {
+  const abiEvents = parseEventsFromABI(abiString);
+  const eventItem = abiEvents.find((abiItem) => abiItem.name === eventName);
+  if (!eventItem) {
+    throw new Error(`Could not find event ${eventName} in ABI`);
+  }
+  return eventItem;
 }
 
 function getSourceCodeEnpoint(network: chain, address: string): string {
