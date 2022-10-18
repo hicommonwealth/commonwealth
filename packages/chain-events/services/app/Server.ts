@@ -5,7 +5,7 @@ import passport from "passport";
 import setupPassport from "./passport";
 import setupRouter from "./router";
 import models from "../database/database";
-import {DEFAULT_PORT, SERVER_URL} from "../config";
+import {DEFAULT_PORT} from "../config";
 import logger from 'morgan';
 import cors from 'cors'
 
@@ -14,7 +14,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const port = process.env.PORT || DEFAULT_PORT;
 
-const app = express();
+export const app = express();
 
 setupPassport();
 

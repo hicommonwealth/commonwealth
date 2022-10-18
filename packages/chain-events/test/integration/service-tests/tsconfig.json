@@ -25,6 +25,6 @@
         "common-common/*": ["../../../../packages/common-common/*"]
     },
     "include": [
-        "chainEventsConsumer.test.ts"
+        "./*"
     ]
 }

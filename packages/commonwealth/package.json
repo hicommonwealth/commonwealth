@@ -24,7 +24,7 @@
     "test-api": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/integration/api/*.spec.ts",
     "test-rules": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/integration/rules/*.spec.ts",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project test/tsconfig.node.json ./test/**/*.spec.ts",
-    "test-consumer": "ts-mocha --project test/tsconfig.node.json test/unit/consumer.test.ts --timeout 20000",
+    "test-consumer": "ts-mocha --project test/tsconfig.node.json test/systemTests/consumer.test.ts --timeout 20000",
     "start": "NODE_OPTIONS=--max_old_space_size=4096 nodemon --delay 0.25 --watch 'server/**/*.ts' --ignore 'server/**/*.spec.ts' --exec 'ts-node --project server/tsconfig.json' server.ts webpack -d --watch",
     "start-consumer": "ts-node --project server/CommonwealthConsumer/tsconfig.consumer.json server/CommonwealthConsumer/mainConsumer.ts run-as-script",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",

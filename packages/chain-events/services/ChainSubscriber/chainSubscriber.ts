@@ -144,7 +144,7 @@ async function mainProcess(
   }
 }
 
-async function initializer(): Promise<void> {
+export async function chainEventsSubscriberInitializer(): Promise<void> {
   // begin process
   log.info('Initializing ChainEventsSubscriber');
 
@@ -180,7 +180,7 @@ async function initializer(): Promise<void> {
 }
 
 if (process.argv[2] === 'run-as-script') {
-  initializer()
+  chainEventsSubscriberInitializer()
     .then(() => {
       return mainProcess(producer, pool);
     })
