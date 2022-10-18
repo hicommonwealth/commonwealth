@@ -45,7 +45,6 @@ export enum ChainBase {
 }
 
 export enum ContractType {
-  DAOFACTORY = 'dao-factory',
   AAVE = 'aave',
   COMPOUND = 'compound',
   ERC20 = 'erc20',
