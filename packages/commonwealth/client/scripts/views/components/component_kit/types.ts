@@ -1,3 +1,5 @@
+import { IconName } from './cw_icons/cw_icon_lookup';
+
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
   AddressTooltip = 'AddressTooltip',
@@ -21,6 +23,7 @@ export enum ComponentType {
   IconButton = 'IconButton',
   Label = 'Label',
   MessageBanner = 'MessageBanner',
+  MobileMenu = 'MobileMenu',
   Modal = 'Modal',
   Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
@@ -44,3 +47,24 @@ export type StyleAttrs = {
   disabled?: boolean;
   className?: string;
 };
+
+export type MenuItem =
+  | { type: 'divider' }
+  | { type: 'header'; label: string }
+  | {
+      disabled?: boolean;
+      iconLeft?: IconName;
+      iconRight?: IconName;
+      isSecondary?: boolean;
+      label: string;
+      onclick: () => void;
+      type?: 'default';
+    }
+  | {
+      hasUnreads: boolean;
+      iconLeft?: IconName;
+      iconRight?: IconName;
+      label: string;
+      onclick: () => void;
+      type: 'notification';
+    };

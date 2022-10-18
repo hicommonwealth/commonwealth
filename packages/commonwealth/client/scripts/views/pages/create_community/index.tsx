@@ -24,7 +24,6 @@ import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { AddContractForm } from '../new_contract/add_contract_form';
 import { AbiFactoryForm } from './abi_factory_form';
 
 export enum CommunityType {

@@ -3,7 +3,6 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
-import { ChainAttributes } from '../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 

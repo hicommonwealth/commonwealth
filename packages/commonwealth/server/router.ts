@@ -30,7 +30,6 @@ import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
 import createContract from './routes/contracts/createContract';
-import createContractAbi from './routes/contractAbis/createContractAbi';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
@@ -93,8 +92,6 @@ import createDraft from './routes/drafts/createDraft';
 import deleteDraft from './routes/drafts/deleteDraft';
 import editDraft from './routes/drafts/editDraft';
 import getDrafts from './routes/drafts/getDrafts';
-import updateContract from './routes/contracts/updateContract';
-import deleteContract from './routes/contracts/deleteContract';
 import deleteChain from './routes/deleteChain';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
@@ -233,21 +230,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
   );
-  router.post(
-    '/deleteContract',
-    passport.authenticate('jwt', { session: false }),
-    deleteContract.bind(this, models)
-  );
-  router.post(
-    '/updateContract',
-    passport.authenticate('jwt', { session: false }),
-    updateContract.bind(this, models)
-  );
-  router.post(
-    '/createContractAbi',
-    passport.authenticate('jwt', { session: false }),
-    createContractAbi.bind(this, models)
-  )
 
   router.post(
     '/starCommunity',

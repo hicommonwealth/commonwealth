@@ -22,9 +22,7 @@ export default class CompoundChain extends EthereumChain {
     await super.resetApi(selectedChain);
     await super.initMetadata();
     // iterate through selectedChain.Contracts for the Compound type and return the address
-    const compoundContracts = this.app.contracts.getByType(ContractType.COMPOUND).filter(
-      (c) => c.symbol === selectedChain.default_symbol
-    );
+    const compoundContracts = this.app.contracts.getByType(ContractType.COMPOUND);
     if (!compoundContracts || !compoundContracts.length) {
       throw new Error('No Compound contracts found');
     }

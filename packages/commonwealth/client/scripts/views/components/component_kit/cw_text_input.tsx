@@ -27,6 +27,7 @@ export type TextInputAttrs = {
   name: string;
   oninput?: (e) => void;
   onenterkey?: (e) => void;
+  onclick?: (e) => void;
   placeholder?: string;
   tabindex?: number;
 };
@@ -37,6 +38,7 @@ type InputStyleAttrs = {
   disabled?: boolean;
   size: TextInputSize;
   validationStatus?: ValidationStatus;
+  displayOnly?: boolean;
 };
 
 type InputInternalStyleAttrs = {
@@ -53,7 +55,8 @@ type MessageRowAttrs = {
 
 export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   view(vnode) {
-    const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
+    const { hasFeedback, label, statusMessage, validationStatus, displayOnly } =
+      vnode.attrs;
 
     return (
       <div
@@ -102,9 +105,11 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       name,
       oninput,
       onenterkey,
+      onclick,
       placeholder,
       size = 'large',
       tabindex,
+      displayOnly,
     } = vnode.attrs;
 
     return (
@@ -119,6 +124,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
           },
           ComponentType.TextInput
         )}
+        onclick={onclick}
       >
         {label && (
           <MessageRow
@@ -136,12 +142,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               size,
               validationStatus: this.validationStatus,
               disabled,
+              displayOnly,
               isTyping: this.isTyping,
               hasRightIcon: !!iconRight,
               darkMode,
               inputClassName,
             })}
-            disabled={disabled}
+            disabled={disabled || displayOnly}
             tabindex={tabindex}
             maxlength={maxlength}
             name={name}

@@ -4,52 +4,26 @@ import m from 'mithril';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Spinner } from 'construct-ui';
 import {
-  ProposalType,
   ChainBase,
-  ChainNetwork,
-  ChainType,
 } from 'common-common/src/types';
 
 import 'components/sidebar/index.scss';
 
-import { navigateToSubpage } from 'app';
 import app from 'state';
-import { IChannel } from 'controllers/server/socket/chatNs';
-import { WebsocketMessageNames } from 'types';
 import { handleRedirectClicks } from 'helpers';
 import { Contract } from 'models';
 import { SidebarSectionGroup } from './sidebar_section';
 import {
   ToggleTree,
-  SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,
 } from './types';
-import { verifyCachedToggleTree } from './helpers';
-
-enum Errors {
-  None = '',
-  NotEnabled = 'Chat is not enabled',
-  NotLoggedIn = 'Must be logged in to read chat',
-}
 export class ContractSection
   implements m.ClassComponent<SidebarSectionAttrs>
 {
   contracts: Contract[];
-  channels: {
-    [category: string]: IChannel[];
-  };
   loaded: boolean;
-  error: Errors;
-  channelToToggleTree: any;
-  categoryToToggleTree: any;
-  menuToggleTree: ToggleTree;
-  adminModals: { [modal: string]: boolean };
-  adminCategory: string;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  adminChannel: IChannel | {};
   chain: string;
-  activeChannel: number;
 
   async oninit(vnode) {
     this.loaded = false;
