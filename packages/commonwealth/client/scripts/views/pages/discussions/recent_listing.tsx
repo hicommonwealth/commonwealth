@@ -13,8 +13,8 @@ import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholde
 import { CWText } from '../../components/component_kit/cw_text';
 
 interface RecentListingAttrs {
-  topicName: string;
   stageName: string;
+  topicName: string;
 }
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;

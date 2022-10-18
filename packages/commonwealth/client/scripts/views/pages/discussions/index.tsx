@@ -23,40 +23,6 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     return document.getElementsByClassName('Body')[0];
   }
 
-  // Helpers
-
-  getLastSeenDivider(hasText = true) {
-    return (
-      <div class="LastSeenDivider">
-        {hasText ? (
-          <>
-            <hr />
-            <span>Last visit</span>
-            <hr />
-          </>
-        ) : (
-          <hr />
-        )}
-      </div>
-    );
-  }
-
-  getPageDescription() {
-    if (!this.topicName) return;
-    const topic = app.topics.getByName(this.topicName, app.activeChainId());
-    return topic.description;
-  }
-
-  handleScrollback() {
-    const storedScrollYPos =
-      localStorage[`${app.activeChainId()}-discussions-scrollY`];
-    if (app.lastNavigatedBack() && storedScrollYPos) {
-      setTimeout(() => {
-        this.scrollEle.scrollTo(0, Number(storedScrollYPos));
-      }, 100);
-    }
-  }
-
   async onscroll() {
     localStorage[`${app.activeChainId()}-discussions-scrollY`] =
       this.scrollEle.scrollTop;
@@ -89,7 +55,14 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
   // Lifecycle methods
 
   oncreate() {
-    this.handleScrollback();
+    const storedScrollYPos =
+      localStorage[`${app.activeChainId()}-discussions-scrollY`];
+
+    if (app.lastNavigatedBack() && storedScrollYPos) {
+      setTimeout(() => {
+        this.scrollEle.scrollTo(0, Number(storedScrollYPos));
+      }, 100);
+    }
   }
 
   view(vnode: m.VnodeDOM<DiscussionPageAttrs, this>) {
@@ -103,7 +76,9 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     return (
       <Sublayout
         title="Discussions"
-        description={this.getPageDescription()}
+        description={
+          app.topics.getByName(this.topicName, app.activeChainId()) || ''
+        }
         onscroll={debounce(this.onscroll.bind(this), 400)}
       >
         <div class="DiscussionsPage">
