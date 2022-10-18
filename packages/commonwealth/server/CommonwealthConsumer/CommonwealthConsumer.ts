@@ -4,27 +4,37 @@ import {
   ServiceConsumer,
 } from 'common-common/src/ServiceConsumer';
 import { BrokerConfig } from 'rascal';
-import { RABBITMQ_URI } from '../config';
+import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
+import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+      rollbar
     );
     await rmqController.init();
   } catch (e) {
     log.error(
       'Rascal consumer setup failed. Please check the Rascal configuration'
     );
+    rollbar.critical('Rascal consumer setup failed. Please check the Rascal configuration', e);
     throw e;
   }
   const context = {

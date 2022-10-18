@@ -6,6 +6,7 @@ import {ChainEntityModelStatic} from "chain-events/services/database/models/chai
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
 import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
 import {ChainModelStatic} from "commonwealth/server/models/chain";
+import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -36,8 +37,9 @@ export class RabbitMQController {
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
   protected _initialized: boolean = false;
+  protected rollbar: Rollbar;
 
-  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig) {
+  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig, rollbar?: Rollbar) {
     // sets the first vhost config to _rawVhost
     this._rawVhost = _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
 
@@ -46,6 +48,8 @@ export class RabbitMQController {
 
     // array of publishers
     this.publishers = Object.keys(this._rawVhost.publications);
+
+    this.rollbar = rollbar;
   }
 
   public async init(): Promise<void> {
@@ -110,6 +114,7 @@ export class RabbitMQController {
             ackOrNack();
           })
           .catch((e) => {
+            this.rollbar?.warn(`Failed to process message: ${JSON.stringify(content)}`, e)
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
@@ -120,12 +125,14 @@ export class RabbitMQController {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       subscription.on('error', (err, messageId, ackOrNack) => {
-        log.error(`Publisher error: ${err} ${messageId}`);
-        ackOrNack(err, {strategy: 'nack'})
+        log.error(`Subscriber error: ${err} ${messageId}`);
+        ackOrNack(err, {strategy: 'nack'});
+        this.rollbar?.warn(`Publisher error: ${err} ${messageId}`);
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
-        ackOrNack(err, {strategy: 'nack'})
+        ackOrNack(err, {strategy: 'nack'});
+        this.rollbar?.warn(`Invalid content`, err);
       });
     } catch (err) {
       throw new RabbitMQControllerError(`${err.message}`);
@@ -150,6 +157,7 @@ export class RabbitMQController {
       publication = await this.broker.publish(publisherName, data);
       publication.on('error', (err, messageId) => {
         log.error(`Publisher error ${messageId}`, err);
+        this.rollbar?.warn(`Publisher error ${messageId}`, err);
         throw new PublishError(err.message);
       });
     } catch (err) {
@@ -202,8 +210,16 @@ export class RabbitMQController {
         log.error(`RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${publication}.`, e);
         // if this fails once not much damage is done since the message is re-queued later again anyway
         (<any>(await DB.model)).increment("queued", {where: {id: objectId}});
+        this.rollbar?.warn(
+          `RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${publication}.`,
+          e
+        );
       } else {
         log.error(`Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`, e)
+        this.rollbar?.warn(
+          `Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`,
+          e
+        );
       }
     }
   }

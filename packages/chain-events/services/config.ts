@@ -47,4 +47,4 @@ export const NUM_WORKERS = process.env.NUM_WORKERS ? Number(process.env.NUM_WORK
 // The number of minutes to wait between each run -- rounded to the nearest whole number
 export const REPEAT_TIME = Math.round(Number(process.env.REPEAT_TIME)) || 1;
 
-export const SERVER_URL = process.env.SERVER_URL || "http://localhost:8080"
+export const SERVER_URL = process.env.SERVER_URL || "http://localhost:8080";

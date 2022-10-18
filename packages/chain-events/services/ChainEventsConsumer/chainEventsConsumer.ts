@@ -9,13 +9,14 @@ import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {RabbitMQController, getRabbitMQConfig, RascalSubscriptions} from 'common-common/src/rabbitmq';
 import models from '../database/database';
-import {RABBITMQ_URI} from '../config';
+import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import {
   Ithis as ChainEventsProcessorContextType,
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
 import {SubstrateTypes} from '../../src';
 import {RepublishMessages} from "./republishMessages";
+import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -26,10 +27,18 @@ const log = factory.getLogger(formatFilename(__filename));
  * that was previously unsuccessfully published.
  */
 export async function setupChainEventConsumer() {
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: process.env.NODE_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+      rollbar
     );
     await rmqController.init();
   } catch (e) {
