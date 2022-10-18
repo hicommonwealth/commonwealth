@@ -30,11 +30,14 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
   view(vnode) {
     const { topicName, stageName } = vnode.attrs;
+
     const { listingStore } = app.threads;
+
     const listingInitialized = listingStore.isInitialized({
       topicName,
       stageName,
     });
+
     const listingDepleted = listingStore.isDepleted({ topicName, stageName });
     // Fetch first 20 unpinned threads
     if (!listingInitialized) {
@@ -44,6 +47,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
         m.redraw();
       });
     }
+
     if (this.initializing) {
       return LoadingRow;
     }
@@ -53,6 +57,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       stageName,
       pinned: true,
     });
+
     const unpinnedThreads = listingStore.getThreads({
       topicName,
       stageName,
@@ -60,6 +65,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
     });
 
     const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
+
     if (!totalThreadCount) {
       return <EmptyListingPlaceholder stageName={topicName} />;
     }

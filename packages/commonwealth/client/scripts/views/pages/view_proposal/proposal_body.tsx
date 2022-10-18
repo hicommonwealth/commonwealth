@@ -242,7 +242,7 @@ export class ProposalBody implements m.ClassComponent<ProposalBodyAttrs> {
                               if (!confirmed) return;
 
                               app.threads.delete(proposal).then(() => {
-                                navigateToSubpage('/');
+                                navigateToSubpage('/discussions');
                               });
                             },
                           },

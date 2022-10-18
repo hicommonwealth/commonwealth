@@ -1,12 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/discussions/discussion_filter_bar.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { parseCustomStages } from 'helpers';
 import { ThreadStage } from 'models';
 import { TopicsMenu } from './topics_menu';
@@ -74,24 +72,6 @@ export class DiscussionFilterBar
             selectedState={selectedStage}
             stage={stage}
             stages={stages}
-          />
-        )}
-        {topics.length > 0 && (
-          <Button
-            rounded
-            compact
-            class="active"
-            label="Latest"
-            size="sm"
-            disabled={disabled}
-            onclick={(e) => {
-              e.preventDefault();
-
-              navigateToSubpage('/');
-              setTimeout(() => {
-                m.redraw();
-              }, 0);
-            }}
           />
         )}
       </div>

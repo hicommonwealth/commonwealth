@@ -168,7 +168,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                                 if (!confirmed) return;
 
                                 app.threads.delete(thread).then(() => {
-                                  navigateToSubpage('/');
+                                  navigateToSubpage('/overview');
                                 });
                               },
                             },

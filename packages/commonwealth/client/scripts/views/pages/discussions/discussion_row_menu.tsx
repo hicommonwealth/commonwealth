@@ -190,7 +190,7 @@ export class DiscussionRowMenu
                       if (!confirmed) return;
 
                       app.threads.delete(proposal).then(() => {
-                        navigateToSubpage('/');
+                        navigateToSubpage('/discussions');
                       });
                     },
                     label: 'Delete',

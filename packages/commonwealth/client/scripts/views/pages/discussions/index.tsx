@@ -60,19 +60,27 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
       this.scrollEle.scrollTop;
 
     const { fetchingThreads, topicName, stageName } = this;
+
     if (fetchingThreads) return;
 
     const params = { topicName, stageName };
+
     const noThreadsRemaining = app.threads.listingStore.isDepleted(params);
+
     if (noThreadsRemaining) return;
 
     const { scrollHeight, scrollTop } = this.scrollEle;
+
     const fetchpointNotReached = scrollHeight - 1000 >= scrollTop;
+
     if (fetchpointNotReached) return;
 
     this.fetchingThreads = true;
+
     await app.threads.loadNextPage({ topicName, stageName });
+
     this.fetchingThreads = false;
+
     m.redraw();
   }
 
@@ -84,7 +92,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
 
   view(vnode) {
     if (!app.chain || !app.chain.serverLoaded) {
-      return m(PageLoading);
+      return <PageLoading />;
     }
 
     this.topicName = vnode.attrs.topic;

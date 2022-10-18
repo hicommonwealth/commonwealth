@@ -6,7 +6,6 @@ import 'pages/overview/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { LoadingRow } from '../../components/loading_row';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';
@@ -14,19 +13,22 @@ import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import Sublayout from '../../sublayout';
+import { PageLoading } from '../loading';
 
 class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
 
   oninit() {
+    this.initializing = true;
     app.recentActivity.getRecentTopicActivity().then(() => {
+      this.initializing = false;
       m.redraw();
     });
   }
 
   view() {
     if (this.initializing) {
-      return LoadingRow;
+      return <PageLoading />;
     }
 
     const sortedTopics = app.topics
