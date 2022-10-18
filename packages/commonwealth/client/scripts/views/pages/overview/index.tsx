@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'pages/overview/index.scss';
 
 import app from 'state';
+import { Thread, Topic } from 'models';
 import { navigateToSubpage } from 'app';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -16,9 +17,9 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 
 class OverviewPage implements m.ClassComponent {
-  private initializing: boolean;
-
   view() {
+    const allMonthlyThreads = app.threads.overviewStore.getAll();
+
     const sortedTopics = app.topics
       .getByCommunity(app.activeChainId())
       .sort((a, b) => a.order - b.order);
@@ -27,7 +28,20 @@ class OverviewPage implements m.ClassComponent {
       ? sortedTopics.filter((t) => t.featuredInSidebar)
       : sortedTopics;
 
-    return (
+    const topicSummaryRows: Array<{
+      monthlyThreads: Array<Thread>;
+      topic: Topic;
+    }> = topicsToDisplay.map((topic) => {
+      const monthlyThreads = allMonthlyThreads.filter(
+        (thread) => topic.id === thread.topic.id
+      );
+
+      return { monthlyThreads, topic };
+    });
+
+    return !topicSummaryRows.length ? (
+      <PageLoading />
+    ) : (
       <Sublayout>
         <div class="OverviewPage">
           <div class="header-row">
@@ -72,15 +86,9 @@ class OverviewPage implements m.ClassComponent {
             </div>
           </div>
           <CWDivider />
-          {topicsToDisplay.map((topic) => {
-            const monthlyThreads = app.threads.overviewStore
-              .getAll()
-              .filter((thread) => topic.id === thread.topic.id);
-
-            return (
-              <TopicSummaryRow monthlyThreads={monthlyThreads} topic={topic} />
-            );
-          })}
+          {topicSummaryRows.map((row) => (
+            <TopicSummaryRow {...row} />
+          ))}
         </div>
       </Sublayout>
     );

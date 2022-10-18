@@ -109,7 +109,6 @@ export const modelFromServer = (thread) => {
   let topicFromStore = null;
   if (topic?.id) {
     topicFromStore = app.topics.store.getById(topic.id);
-    console.log('topic from store?: ', topicFromStore)
   }
 
   let decodedTitle;
