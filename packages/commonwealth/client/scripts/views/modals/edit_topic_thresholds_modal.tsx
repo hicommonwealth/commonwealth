@@ -7,7 +7,7 @@ import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
 import { Topic } from 'models';
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
@@ -31,6 +31,8 @@ class EditTopicThresholdsRow
       ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
+      : app.chain.base === ChainBase.CosmosSDK
+      ? 6
       : 18;
 
     return (
