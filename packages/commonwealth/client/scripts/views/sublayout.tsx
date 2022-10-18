@@ -34,25 +34,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private showQuickSwitcher: boolean;
   private showSidebarContainer: boolean;
 
-  checkSidebarToggles() {
-    const isOnMobile = isWindowSmallMax.matches;
-
-    const storedSidebarToggleState =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-
-    if (!app.chain) {
-      this.isSidebarToggled = false;
-      this.showQuickSwitcher = true;
-    } else {
-      this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
-      this.showQuickSwitcher = this.isSidebarToggled;
-    }
-
-    this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
-    this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
-    this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
-  }
-
   oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
@@ -72,48 +53,56 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    this.checkSidebarToggles();
-
-    const {
-      showBodyContainer,
-      showSidebarContainer,
-      showCommunityHeader,
-      isSidebarToggled,
-      showQuickSwitcher,
-    } = this;
-
     if (!isWindowExtraSmallMax.matches) {
       delete app.mobileMenu;
     }
+
+    const storedSidebarToggleState =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+
+    if (!app.chain) {
+      this.isSidebarToggled = false;
+      this.showQuickSwitcher = true;
+    } else {
+      this.isSidebarToggled =
+        !isWindowSmallMax.matches || storedSidebarToggleState;
+      this.showQuickSwitcher = this.isSidebarToggled;
+    }
+
+    this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
+    this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
+    this.showBodyContainer = !(
+      isWindowSmallMax.matches && storedSidebarToggleState
+    );
 
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
           <div class="header-container">
             <SublayoutHeaderLeft
-              isSidebarToggled={isSidebarToggled}
+              isSidebarToggled={this.isSidebarToggled}
               toggleSidebar={() => {
-                this.isSidebarToggled = !isSidebarToggled;
+                this.isSidebarToggled = !this.isSidebarToggled;
               }}
             />
             {!hideSearch && <SearchBar />}
             <SublayoutHeaderRight chain={chain} />
           </div>
           <div class="sidebar-and-body-container">
-            {showSidebarContainer && (
+            {this.showSidebarContainer && (
               <div class="sidebar-container">
-                {showCommunityHeader && (
+                {this.showCommunityHeader && (
                   <CommunityHeader meta={app.chain.meta} />
                 )}
                 <div class="sidebar-inner-container">
-                  {showQuickSwitcher && <SidebarQuickSwitcher />}
-                  {isSidebarToggled && <Sidebar />}
+                  {this.showQuickSwitcher && <SidebarQuickSwitcher />}
+                  {this.isSidebarToggled && <Sidebar />}
                 </div>
               </div>
             )}
             <div
               class="body-and-sticky-headers-container"
-              style={showBodyContainer ? 'display:flex' : 'display:none'}
+              style={this.showBodyContainer ? 'display:flex' : 'display:none'}
             >
               <SublayoutBanners
                 banner={banner}
