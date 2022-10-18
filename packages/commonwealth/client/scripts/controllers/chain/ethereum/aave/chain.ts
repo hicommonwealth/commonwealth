@@ -19,7 +19,7 @@ export default class AaveChain extends EthereumChain {
     await super.resetApi(selectedChain);
     await super.initMetadata();
     // iterate through selectedChain.Contracts for the Aave type and return the address
-    const aaveContracts = this.app.contracts.getByType(ContractType.AAVE).filter((c) => c.symbol === selectedChain.default_symbol);;
+    const aaveContracts = this.app.contracts.getByType(ContractType.AAVE);
     if (!aaveContracts || !aaveContracts.length) {
       throw new Error('No Aave contracts found');
     }
