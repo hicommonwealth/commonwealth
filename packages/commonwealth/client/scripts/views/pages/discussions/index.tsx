@@ -11,8 +11,10 @@ import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 
+type DiscussionPageAttrs = { topic?: string };
+
 // Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
-class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
+class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
@@ -90,7 +92,7 @@ class DiscussionsPage implements m.ClassComponent<{ topicName?: string }> {
     this.handleScrollback();
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<DiscussionPageAttrs, this>) {
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }

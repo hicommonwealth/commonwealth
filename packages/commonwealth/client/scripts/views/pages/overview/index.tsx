@@ -19,9 +19,9 @@ class OverviewPage implements m.ClassComponent {
   private initializing: boolean;
 
   oninit() {
-    this.initializing = true;
+    // this.initializing = true;
     app.recentActivity.getRecentTopicActivity().then(() => {
-      this.initializing = false;
+      // this.initializing = false;
       m.redraw();
     });
   }

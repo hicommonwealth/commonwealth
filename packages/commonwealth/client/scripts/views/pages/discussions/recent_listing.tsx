@@ -1,25 +1,16 @@
 /* @jsx m */
 
+import m from 'mithril';
+import { Spinner } from 'construct-ui';
+
 import 'pages/discussions/recent_listing.scss';
 
-import m from 'mithril';
-
 import app from 'state';
-import { Thread } from 'models';
+import { pluralize } from 'helpers';
 import { LoadingRow } from '../../components/loading_row';
 import { DiscussionRow } from './discussion_row';
 import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholder';
-import { ListingScroll } from './listing_scroll';
-
-export class DiscussionListing
-  implements m.ClassComponent<{ threads: Thread[] }>
-{
-  view(vnode) {
-    return vnode.attrs.threads.map((t) => {
-      return <DiscussionRow proposal={t} />;
-    });
-  }
-}
+import { CWText } from '../../components/component_kit/cw_text';
 
 interface RecentListingAttrs {
   topicName: string;
@@ -28,7 +19,7 @@ interface RecentListingAttrs {
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<RecentListingAttrs, this>) {
     const { topicName, stageName } = vnode.attrs;
 
     const { listingStore } = app.threads;
@@ -39,6 +30,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
     });
 
     const listingDepleted = listingStore.isDepleted({ topicName, stageName });
+
     // Fetch first 20 unpinned threads
     if (!listingInitialized) {
       this.initializing = true;
@@ -70,15 +62,28 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
       return <EmptyListingPlaceholder stageName={topicName} />;
     }
 
+    const subpage = topicName || stageName;
+
     return (
       <div class="RecentListing">
-        <DiscussionListing threads={pinnedThreads} />
-        <DiscussionListing threads={unpinnedThreads} />
-        <ListingScroll
-          listingDepleted={listingDepleted}
-          subpageName={topicName || stageName}
-          totalThreadCount={totalThreadCount}
-        />
+        {pinnedThreads.map((t) => (
+          <DiscussionRow proposal={t} />
+        ))}
+        {unpinnedThreads.map((t) => (
+          <DiscussionRow proposal={t} />
+        ))}
+        <div class="listing-scroll">
+          {listingDepleted ? (
+            <CWText className="thread-count-text">
+              {`Showing ${totalThreadCount} of ${pluralize(
+                totalThreadCount,
+                'thread'
+              )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
+            </CWText>
+          ) : (
+            <Spinner active size="lg" />
+          )}
+        </div>
       </div>
     );
   }
