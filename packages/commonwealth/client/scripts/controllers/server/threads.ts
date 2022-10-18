@@ -361,6 +361,7 @@ class ThreadsController {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
+          this._overviewStore.remove(proposal);
           m.redraw();
           resolve(result);
         })
