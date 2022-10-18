@@ -2,25 +2,20 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import Web3 from 'web3';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
-import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType, ContractType } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+  ContractType,
+} from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
-import CompoundAPI, {
-  GovernorTokenType,
-  GovernorType,
-} from 'controllers/chain/ethereum/compound/api';
-import AaveApi from 'controllers/chain/ethereum/aave/api';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
@@ -28,23 +23,22 @@ import { CWValidationText } from 'views/components/component_kit/cw_validation_t
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 
 import {
-    initChainForm,
-    defaultChainRows,
-    ethChainRows,
+  initChainForm,
+  defaultChainRows,
+  ethChainRows,
 } from '../create_community/chain_input_rows';
 
 import {
-ChainFormFields,
-ChainFormState,
-EthChainAttrs,
-EthFormFields,
+  ChainFormFields,
+  ChainFormState,
+  EthChainAttrs,
+  EthFormFields,
 } from '../create_community/types';
 
 type ContractFormFields = {
-  eth_chain_id: number,
-  abi: JSON,
-  contractType: ContractType.DAOFACTORY | ContractType.AAVE |ContractType.COMPOUND |
-  ContractType.ERC20 | ContractType.ERC721 | ContractType.SPL;
+  chain_node_id: number;
+  abi: JSON;
+  contractType: ContractType;
   decimals: number;
   token_name: string;
 };
@@ -63,10 +57,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     form: {
       address: '',
       chainString: 'Ethereum Mainnet',
-      eth_chain_id: 1,
+      // For Now we hard code the chain node id until we have a better way to distinguish between chains
+      chain_node_id: 37,
       name: '',
       abi: JSON.parse('[]'),
-      contractType: ContractType.DAOFACTORY,
+      contractType: ContractType.ERC20,
       nodeUrl: '',
       symbol: '',
       token_name: '',
@@ -81,31 +76,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
 
   view(vnode) {
     const validAddress = isAddress(this.state.form.address);
-    const disableField = !validAddress || !this.state.loaded;
-
-    const generateABIUI = async () => {
-      if (
-        !this.state.form.address ||
-        !this.state.form.ethChainId ||
-        !this.state.form.nodeUrl
-      )
-        return;
-      this.state.loading = true;
-      this.state.status = undefined;
-      this.state.message = '';
-      try {
-        this.state.status = 'success';
-      } catch (e) {
-        this.state.status = 'failure';
-        this.state.message = e.message;
-        this.state.loading = false;
-        m.redraw();
-        return;
-      }
-      this.state.loaded = true;
-      this.state.loading = false;
-      m.redraw();
-    };
 
     return (
       <div class="CreateCommunityForm">
@@ -123,9 +93,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         <SelectRow
           title="Contract Type"
           options={[
-            ContractType.DAOFACTORY, ContractType.ERC20,
-            ContractType.ERC721, ContractType.SPL,
-            ContractType.AAVE, ContractType.COMPOUND
+            ContractType.ERC20,
+            ContractType.ERC721,
+            ContractType.SPL,
+            ContractType.AAVE,
+            ContractType.COMPOUND,
           ]}
           value={this.state.form.contractType}
           onchange={(value) => {
@@ -162,11 +134,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
-            !this.state.form.eth_chain_id ||
+            !this.state.form.chain_node_id ||
             this.state.loading
           }
           onclick={async () => {
-            const { altWalletUrl, chainString, eth_chain_id, nodeUrl, symbol } =
+            const { altWalletUrl, chainString, chain_node_id, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
             try {
@@ -174,22 +146,19 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 alt_wallet_url: altWalletUrl,
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
-                eth_chain_id,
+                chain_node_id,
                 jwt: app.user.jwt,
                 network: ChainNetwork.ERC20,
                 node_url: nodeUrl,
                 default_symbol: symbol,
                 ...this.state.form,
               });
-              if (res.result.admin_address) {
-                await linkExistingAddressToChainOrCommunity(
-                  res.result.admin_address,
-                  res.result.role.chain_id,
-                  res.result.role.chain_id
-                );
+              if (res.status === 'Success') {
+                this.state.status = 'success';
+                this.state.message = `Contract with Address ${res.result.contract.address} saved successfully`;
+                this.state.loading = false;
+                m.redraw();
               }
-              // await initAppState(false);
-              // m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new ERC20 community failed'
@@ -200,18 +169,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           }}
         />
 
-        <CWButton
-          label="Generate UI for ABI"
-          disabled={
-            this.state.saving ||
-            !validAddress ||
-            !this.state.form.ethChainId ||
-            this.state.loading
-          }
-          onclick={async () => {
-            await generateABIUI();
-          }}
-        />
         {this.state.message && (
           <CWValidationText
             message={this.state.message}

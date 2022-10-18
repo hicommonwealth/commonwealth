@@ -17,7 +17,12 @@ export const Errors = {
   QueryFailed: 'Balance query failed',
 };
 
-type TokenBalanceReq = { address: string, author_chain: string, chain: string, contract_address: string };
+type TokenBalanceReq = {
+  address: string;
+  author_chain: string;
+  chain: string;
+  contract_address: string;
+};
 type TokenBalanceResp = string;
 
 const tokenBalance = async (
@@ -27,7 +32,7 @@ const tokenBalance = async (
   res: TypedResponse<TokenBalanceResp>
 ) => {
   if (!req.body.address) {
-    throw new AppError(Errors.InvalidAddress)
+    throw new AppError(Errors.InvalidAddress);
   }
 
   let chain: ChainInstance;
@@ -44,7 +49,7 @@ const tokenBalance = async (
     [author, error] = await lookupAddressIsOwnedByUser(models, req);
     if (error) throw new AppError(error);
   } catch (err) {
-    throw new AppError(err)
+    throw new AppError(err);
   }
 
   let chain_node_id = chain.ChainNode.id;
@@ -67,28 +72,17 @@ const tokenBalance = async (
   }
 
   try {
-    const { contract_address } = req.body;
-    contract = await models.Contract.findOne({
-      where: {
-        address: contract_address,
-      },
-      include: [{ model: models.ChainNode, required: true }],
-    });
-  } catch (err) {
-    throw new AppError(err);
-  }
-
-
-
-  try {
     const balance = await tokenBalanceCache.getBalance(
       chain_node_id,
       author.address,
       contract?.address,
       chain.network === ChainNetwork.ERC20
-        ? 'erc20' : chain.network === ChainNetwork.ERC721
-          ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined,
+        ? 'erc20'
+        : chain.network === ChainNetwork.ERC721
+        ? 'erc721'
+        : chain.network === ChainNetwork.SPL
+        ? 'spl-token'
+        : undefined
     );
     return success(res, balance.toString());
   } catch (err) {
