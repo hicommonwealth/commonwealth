@@ -5,7 +5,7 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
+import { constructTypedMessage, validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 import { StdSignature } from '@cosmjs/amino';
 
@@ -49,33 +49,47 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock() {
-    return null;
+    const url = `${window.location.origin}/cosmosAPI/${
+      app.chain?.id || this.defaultNetwork
+    }`;
+    const client = await StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height);
+
+    return {
+      number: block.header.height,
+      hash: block.id,
+      // seconds since epoch
+      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+    };
   }
 
   public async signLoginToken(
-    message: string,
-    address: string
+    validationBlockInfo: string
   ): Promise<StdSignature> {
-    const signature = await window.keplr.signArbitrary(
-      this._chainId,
-      address,
-      message
+    // TODO: Does this need to have a different id? Something specific to cosmos?
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
+
+    const msgParams = await constructTypedMessage(
+      this.accounts[0].address,
+      app.chain?.meta.node.ethChainId || 1,
+      sessionPublicAddress,
+      validationBlockInfo,
     );
-    return signature;
+
+    const signDoc = {
+      bodyBytes: msgParams,
+      authInfoBytes: null,
+      chainId: this._chainId,
+      accountNumber: null
+    };
+    const stdSignature = await window.keplr.signDirect(this._chainId, this.accounts[0].address, signDoc);
+    return stdSignature.signature;
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken.trim(),
-      account.address
-    );
-    const signature = {
-      signature: {
-        pub_key: webWalletSignature.pub_key,
-        signature: webWalletSignature.signature,
-      },
-    };
-    return JSON.stringify(signature);
+    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
+    return JSON.stringify(webWalletSignature);
   }
 
   public async validateWithAccount(
