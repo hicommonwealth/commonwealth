@@ -63,19 +63,19 @@ We define 6 queues:
 - ChainEntityCUDMain
   - Carries chain-entity creation messages from the chain-events service to the main service
   - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival.ts)
-  - [Message processor](../../../commonwealth/server/mainConsumer/messageProcessors/chainEntityCUDQueue.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEntityCUDQueue.ts)
 - ChainEventNotificationsCUDMain
   - Carries chain-event creation messages from the chain-events service to the main service consumer
   - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/notification.ts)
-  - [Message processor](../../../commonwealth/server/mainConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
 - ChainEventNotifications
   - Carries chain event notifications from the main service consumer to the main service socket.io servers
-  - [Message producer](../../../commonwealth/server/mainConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
+  - [Message producer](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
   - [Message processor](../../../commonwealth/server/socket/index.ts)
 - ChainEventTypeCUDMain
   - Carries chain-event-type creation messages from the chain-events service to the main service
   - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage.ts)
-  - [Message processor](../../../commonwealth/server/mainConsumer/messageProcessors/chainEventTypeCUDQueue.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventTypeCUDQueue.ts)
 - DeadLetter
   - Dead-letter messages are faulty messages that are rerouted from other queues after repeated processing failure.
 

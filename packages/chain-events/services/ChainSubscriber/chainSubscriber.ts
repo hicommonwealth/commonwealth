@@ -37,10 +37,13 @@ let rollbar: Rollbar;
  * listen to and then creates, updates, or deletes the listeners.
  * @param producer {RabbitMqHandler} Used by the ChainEvents Listeners to push the messages to a queue
  * @param pool {Pool} Used by the function query the database
+ * @param chain {String} An optional chain-id to start a listener for. Used for running a single listener quickly when
+ * developing locally or when testing.
  */
 async function mainProcess(
   producer: RabbitMqHandler,
   pool: Pool,
+  chain?: string
 ) {
   // TODO: post this data somewhere?
   log.info("Starting scheduled process...")
@@ -52,7 +55,8 @@ async function mainProcess(
   }
 
   let query: string;
-  if (process.env.CHAIN) {
+  if (process.env.CHAIN || chain) {
+    const selectedChain = process.env.CHAIN || chain;
     // gets the data needed to start a single listener for the chain specified by the CHAIN environment variable
     // this query will ignore all network types, token types, contract types, as well has_chain_events_listener
     // use this ONLY if you know what you are doing (must be a compatible chain)
@@ -68,7 +72,7 @@ async function mainProcess(
                  JOIN "ChainNodes" CN on C.chain_node_id = CN.id
                  LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
                  LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
-        WHERE C.id = '${process.env.CHAIN}';
+        WHERE C.id = '${selectedChain}';
     `
   } else {
     // selects the chain data needed to create the listeners for the current chainSubscriber

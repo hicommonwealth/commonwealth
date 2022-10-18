@@ -14,7 +14,7 @@ import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQue
 
 const log = factory.getLogger(formatFilename(__filename));
 
-async function setupMainConsumer() {
+export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
@@ -66,15 +66,19 @@ async function setupMainConsumer() {
   log.info(
     `Consumer started. Name: ${serviceConsumer.serviceName}, id: ${serviceConsumer.serviceId}`
   );
+
+  return serviceConsumer;
 }
 
 async function main() {
   try {
     log.info('Starting main consumer');
-    await setupMainConsumer();
+    await setupCommonwealthConsumer();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
 }
 
-main();
+if (process.argv[2] === 'run-as-script') {
+  main();
+}

@@ -12,9 +12,10 @@ import * as AaveTypes from "../../../src/chains/aave/types";
 import {EventKind, IProposalCreated, ITransfer} from "../../../src/chains/aave/types";
 import models from "../../../services/database/database";
 import {ServiceConsumer} from "../../../../common-common/src/ServiceConsumer";
-import {getQueueStats, getRmqMessage, publishRmqMsg} from "./util";
+import {getQueueStats, getRmqMessage, publishRmqMsg} from "../../../../common-common/src/rabbitmq/util";
 import {v4 as uuidv4} from 'uuid';
 import {QueryTypes} from "sequelize";
+import {RABBITMQ_API_URI} from "../../../services/config";
 
 const {expect} = chai;
 
@@ -36,7 +37,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
   let serviceConsumer: ServiceConsumer;
 
   beforeEach(async () => {
-    const preQueueStats = await getQueueStats(RascalQueues.ChainEvents);
+    const preQueueStats = await getQueueStats(RABBITMQ_API_URI, RascalQueues.ChainEvents);
     expect(preQueueStats.consumers).to.equal(0, "Ensure all other RabbitMQ connections are inactive");
 
     serviceConsumer = await startConsumer();
@@ -52,7 +53,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
   });
 
   it.skip("Should consume from the chain-events queue", async () => {
-    const postQueueStats = await getQueueStats(RascalQueues.ChainEvents);
+    const postQueueStats = await getQueueStats(RABBITMQ_API_URI, RascalQueues.ChainEvents);
 
     expect(postQueueStats.consumers).to.equal(1, "The consumer did not properly connect to RabbitMQ");
   });
@@ -73,7 +74,12 @@ describe("Tests for the ChainEventsConsumer service", () => {
       chain: 'aave'
     }
 
-    const publishJson = await publishRmqMsg(RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
+    const publishJson = await publishRmqMsg(
+      RABBITMQ_API_URI,
+      RascalExchanges.ChainEvents,
+      RascalRoutingKeys.ChainEvents,
+      chainEvent
+    );
     // ensure the event was properly published
     expect(publishJson.routed, "Failed to publish test chain-event").to.be.true;
 
@@ -128,7 +134,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
       chain
     }
 
-    const publishJson = await publishRmqMsg(RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
+    const publishJson = await publishRmqMsg(RABBITMQ_API_URI, RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
     // ensure the event was properly published
     expect(publishJson.routed, "Failed to publish test chain-event").to.be.true;
 
@@ -152,7 +158,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
     expect(dbResult).to.not.be.null;
 
     // check whether the new chain-event-type was pushed to the appropriate queue
-    const message = await getRmqMessage(RascalQueues.ChainEventTypeCUDMain, false);
+    const message = await getRmqMessage(RABBITMQ_API_URI, RascalQueues.ChainEventTypeCUDMain, false);
     expect(message).to.have.property("length");
     expect(message.length).to.equal(1);
     expect(JSON.parse(message[0].payload)).to.deep.equal({chainEventTypeId: 'random-chain-transfer', cud: 'create'});
@@ -192,7 +198,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
       chain: 'aave'
     }
 
-    const publishJson = await publishRmqMsg(RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
+    const publishJson = await publishRmqMsg(RABBITMQ_API_URI, RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
     // ensure the event was properly published
     expect(publishJson.routed, "Failed to publish test chain-event").to.be.true;
 
@@ -212,11 +218,10 @@ describe("Tests for the ChainEventsConsumer service", () => {
         }
       },
     });
-
     expect(dbResult).to.not.be.null;
 
     // check that a message was added to the chain-event notifications queue
-    const message = await getRmqMessage(RascalQueues.ChainEventNotificationsCUDMain, false);
+    const message = await getRmqMessage(RABBITMQ_API_URI, RascalQueues.ChainEventNotificationsCUDMain, false);
     expect(message).to.have.property("length");
     expect(message.length).to.equal(1);
     expect(isRmqMsgCreateCENotificationsCUD(JSON.parse(message[0].payload))).to.be.true;
@@ -264,7 +269,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
       chain: 'aave'
     }
 
-    const publishJson = await publishRmqMsg(RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
+    const publishJson = await publishRmqMsg(RABBITMQ_API_URI, RascalExchanges.ChainEvents, RascalRoutingKeys.ChainEvents, chainEvent);
     // ensure the event was properly published
     expect(publishJson.routed, "Failed to publish test chain-event").to.be.true;
 
@@ -295,7 +300,7 @@ describe("Tests for the ChainEventsConsumer service", () => {
     expect(cetResult).to.not.be.null;
 
     // check that a message was added to the chain-entity cud queue
-    const message = await getRmqMessage(RascalQueues.ChainEntityCUDMain, false);
+    const message = await getRmqMessage(RABBITMQ_API_URI, RascalQueues.ChainEntityCUDMain, false);
     expect(message).to.have.property("length");
     expect(message.length).to.equal(1);
     expect(isRmqMsgCreateEntityCUD(JSON.parse(message[0].payload)), "The message has an incorrect type").to.be.true;

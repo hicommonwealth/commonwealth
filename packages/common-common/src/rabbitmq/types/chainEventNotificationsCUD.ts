@@ -23,8 +23,13 @@ export function isRmqMsgCreateCENotificationsCUD(data: any): data is IRmqMsgCrea
     && typeof data.ChainEvent.block_number === 'number'
     && data.ChainEvent.event_data
     && typeof data.event.blockNumber === 'number'
-    && data.event.data // type would be computationally expensive to check
+    && data.event.data
     && Object.values(SupportedNetwork).includes(data.event.network)
     && data.cud === 'create'
+    && data.ChainEvent.ChainEventType
+    && data.ChainEvent.ChainEventType.id
+    && data.ChainEvent.ChainEventType.chain
+    && data.ChainEvent.ChainEventType.event_network
+    && data.ChainEvent.ChainEventType.event_name
   );
 }

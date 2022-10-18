@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
-import {RABBITMQ_API_URI} from "../../../services/config";
-import {RascalQueues, RascalExchanges, RascalRoutingKeys} from '../../../../common-common/src/rabbitmq/types';
+import {RascalQueues, RascalExchanges, RascalRoutingKeys} from './types';
 
 
 /*
@@ -11,12 +10,14 @@ https://rawcdn.githack.com/rabbitmq/rabbitmq-server/v3.11.1/deps/rabbitmq_manage
 /**
  * This function publishes a message containing the given data to the given exchange. In the event of a 400 Bad Request
  * error ensure ALL nested objects in the data object are stringified BEFORE calling this function.
+ * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param exchangeName The name of the exchange to publish the message to
  * @param routingKey The routing key which defines what queue a message is routed to from the given exchange
  * @param data The object to publish (WARNING: all nested objects must be individually json stringified)
  * @returns {routed: boolean} If routed is false the message was not queued and if routed is true the message was queued
  */
 export async function publishRmqMsg(
+  rabbitMQUri: string,
   exchangeName: RascalExchanges,
   routingKey: RascalRoutingKeys,
   data: any
@@ -30,7 +31,7 @@ export async function publishRmqMsg(
     },
     payload_encoding: "string"
   });
-  const publishResult = await fetch(`${RABBITMQ_API_URI}/exchanges/%2f/${exchangeName}/publish`, {
+  const publishResult = await fetch(`${rabbitMQUri}/exchanges/%2f/${exchangeName}/publish`, {
     method: 'post',
     body: publishBody,
     headers: {'Content-Type': 'application/json'}
@@ -40,20 +41,23 @@ export async function publishRmqMsg(
 
 /**
  * This function fetches queue stats for the given queue.
+ * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param queueName
  */
-export async function getQueueStats(queueName: RascalQueues): Promise<any> {
-  let result = await fetch(`${RABBITMQ_API_URI}/queues/%2f/${queueName}`);
+export async function getQueueStats(rabbitMQUri: string, queueName: RascalQueues): Promise<any> {
+  let result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
   return await result.json();
 }
 
 /**
  * This functions retrieves a number of messages from the specified RabbitMQ queue
+ * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param queueName The name of the queue to retrieve messages from
  * @param requeue [Default true] A boolean variable indicating whether the message(s) should be left in the queue
  * @param numMessages The number of messages to fetch from the queue
  */
 export async function getRmqMessage(
+  rabbitMQUri: string,
   queueName: RascalQueues,
   requeue = true,
   numMessages = 1
@@ -62,7 +66,7 @@ export async function getRmqMessage(
   if (requeue) body = {count: numMessages, ackmode: "ack_requeue_true", encoding: "auto"}
   else body = {count: numMessages, ackmode: "ack_requeue_false", encoding: "auto"}
 
-  const result = await fetch(`${RABBITMQ_API_URI}/queues/%2f/${queueName}/get`, {
+  const result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}/get`, {
     method: 'post',
     body: JSON.stringify(body),
     headers: {'Content-Type': 'application/json'}
