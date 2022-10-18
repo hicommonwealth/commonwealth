@@ -333,6 +333,11 @@ const createChain = async (
     category: 'General',
   });
 
+  const topics = await models.Topic.create({
+    chain_id: chain.id,
+    name: 'General'
+  })
+
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
   let role: RoleInstance | undefined;
