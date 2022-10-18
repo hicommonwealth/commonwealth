@@ -8,7 +8,7 @@ import app from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { CWDivider } from './components/component_kit/cw_divider';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
+import { isWindowSmallMax } from './components/component_kit/helpers';
 
 type SublayoutHeaderLeftAttrs = {
   isSidebarToggled: boolean;
@@ -31,11 +31,11 @@ export class SublayoutHeaderLeft
             m.route.set('/');
           }}
         />
-        {isWindowSmallInclusive && <CWDivider isVertical />}
+        {isWindowSmallMax.matches && <CWDivider isVertical />}
         {!isSidebarToggled && app.activeChainId() && (
           <CWCommunityAvatar size="large" community={app.chain.meta} />
         )}
-        {isWindowSmallInclusive && app.chain && (
+        {isWindowSmallMax.matches && app.chain && (
           <CWIconButton
             iconButtonTheme="black"
             iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}

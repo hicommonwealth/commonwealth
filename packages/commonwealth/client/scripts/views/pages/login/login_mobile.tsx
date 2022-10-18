@@ -17,7 +17,7 @@ import {
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { isWindowExtraSmallMax } from '../../components/component_kit/helpers';
 import { getText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
@@ -198,7 +198,9 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
             </div>
           )}
         </div>
-        {hasBoilerplate && !isWindowExtraSmall && <LoginBoilerplate darkMode />}
+        {hasBoilerplate && !isWindowExtraSmallMax.matches && (
+          <LoginBoilerplate darkMode />
+        )}
       </div>
     );
   }

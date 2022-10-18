@@ -35,7 +35,7 @@ import { activeQuillEditorHasText } from './helpers';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import {
   getClasses,
-  isWindowMediumSmallInclusive,
+  isWindowMediumSmallMax,
 } from '../../components/component_kit/helpers';
 import { Prefetch } from './types';
 import { TipDetail } from '../tip_detail';
@@ -453,7 +453,10 @@ class ViewProposalPage
       isAdminOrMod;
 
     window.onresize = () => {
-      if (isWindowMediumSmallInclusive && this.tabSelected !== 'viewProposal') {
+      if (
+        isWindowMediumSmallMax.matches &&
+        this.tabSelected !== 'viewProposal'
+      ) {
         this.tabSelected = 'viewProposal';
         m.redraw();
       }

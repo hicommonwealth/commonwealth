@@ -14,8 +14,8 @@ import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switche
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import {
-  isWindowExtraSmall,
-  isWindowSmallInclusive,
+  isWindowExtraSmallMax,
+  isWindowSmallMax,
 } from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
 import { AppMobileMenus } from './app_mobile_menus';
@@ -35,9 +35,11 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private showSidebarContainer: boolean;
 
   checkSidebarToggles() {
-    const isOnMobile = isWindowSmallInclusive;
+    const isOnMobile = isWindowSmallMax.matches;
+
     const storedSidebarToggleState =
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+
     if (!app.chain) {
       this.isSidebarToggled = false;
       this.showQuickSwitcher = true;
@@ -45,6 +47,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
       this.showQuickSwitcher = this.isSidebarToggled;
     }
+
     this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
     this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
     this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
@@ -70,6 +73,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     this.checkSidebarToggles();
+
     const {
       showBodyContainer,
       showSidebarContainer,
@@ -78,7 +82,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       showQuickSwitcher,
     } = this;
 
-    if (!isWindowExtraSmall) {
+    if (!isWindowExtraSmallMax.matches) {
       delete app.mobileMenu;
     }
 

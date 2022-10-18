@@ -7,7 +7,6 @@ import app from 'state';
 import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { LoginModal } from '../../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -82,9 +81,6 @@ export const onReactionClick = (
   if (!app.isLoggedIn() || !app.user.activeAccount) {
     app.modals.create({
       modal: LoginModal,
-      data: {
-        modalType: isWindowMediumSmallInclusive ? 'fullScreen' : 'centered',
-      },
     });
   } else {
     const { address: userAddress, chain } = app.user.activeAccount;

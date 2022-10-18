@@ -15,7 +15,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { isWindowMediumSmallMax } from '../components/component_kit/helpers';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
@@ -45,7 +45,6 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
   private magicLoading: boolean;
-  private showMobile: boolean;
 
   oninit(vnode) {
     // Determine if in a community
@@ -73,8 +72,6 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.sidebarType = 'connectWallet';
       this.bodyType = 'walletList';
     }
-
-    this.showMobile = isWindowMediumSmallInclusive;
 
     // Override if initial data is provided (needed for redirecting wallets + CommonBot)
     if (vnode.attrs.initialBody) {
@@ -114,7 +111,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
         await loginWithMagicLink(this.email);
         this.magicLoading = false;
         if (onSuccess) onSuccess();
-        if (isWindowMediumSmallInclusive) {
+        if (isWindowMediumSmallMax.matches) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -139,7 +136,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       if (app.isLoggedIn()) {
         completeClientLogin(account);
         if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive) {
+          if (isWindowMediumSmallMax.matches) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
@@ -157,7 +154,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
           await updateActiveAddresses(chain);
         }
         if (exitOnComplete) {
-          if (isWindowMediumSmallInclusive) {
+          if (isWindowMediumSmallMax.matches) {
             $('.LoginMobile').trigger('modalexit');
           } else {
             $('.LoginDesktop').trigger('modalexit');
@@ -242,7 +239,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       } catch (e) {
         console.log(e);
         notifyError('Failed to create account. Please try again.');
-        if (isWindowMediumSmallInclusive) {
+        if (isWindowMediumSmallMax.matches) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -290,7 +287,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
         if (this.username || this.avatarUrl) {
           await app.profiles.updateProfileForAccount(this.primaryAccount, data);
         }
-        if (isWindowMediumSmallInclusive) {
+        if (isWindowMediumSmallMax.matches) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -300,7 +297,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');
-        if (isWindowMediumSmallInclusive) {
+        if (isWindowMediumSmallMax.matches) {
           $('.LoginMobile').trigger('modalexit');
         } else {
           $('.LoginDesktop').trigger('modalexit');
@@ -308,7 +305,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
-    return this.showMobile ? (
+    return isWindowMediumSmallMax.matches ? (
       <LoginMobile
         address={this.address}
         currentlyInCommunityPage={this.currentlyInCommunityPage}

@@ -18,7 +18,7 @@ import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import { getClasses, isWindowMediumSmallMax } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
 
@@ -211,7 +211,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
         (w) => w instanceof WalletConnectWebWalletController
       );
       await wallet.reset();
-      if (isWindowMediumSmallInclusive) {
+      if (isWindowMediumSmallMax.matches) {
         $('.LoginMobile').trigger('modalexit');
       } else {
         $('.LoginDesktop').trigger('modalexit');

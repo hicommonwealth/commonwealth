@@ -21,37 +21,32 @@ export const getClasses = <T>(
 
 export const isWindowLarge = window.matchMedia(
   `(min-width: ${breakpoints.breakpointLargeMinPx})`
-).matches;
+);
 
-export const isWindowMediumInclusive = window.matchMedia(
+export const isWindowMediumMax = window.matchMedia(
   `(max-width: ${breakpoints.breakpointMediumMaxPx})`
-).matches;
+);
 
-export const isWindowMedium =
-  window.matchMedia(`(max-width: ${breakpoints.breakpointMediumMaxPx})`)
-    .matches &&
-  window.matchMedia(`(min-width: ${breakpoints.breakpointMediumMinPx})`)
-    .matches;
+export const isWindowMediumMin = window.matchMedia(
+  `(min-width: ${breakpoints.breakpointMediumMinPx})`
+);
 
-export const isWindowMediumSmallInclusive = window.matchMedia(
+export const isWindowMediumSmallMax = window.matchMedia(
   `(max-width: ${breakpoints.breakpointMediumSmallMaxPx})`
-).matches;
+);
 
-export const isWindowMediumSmall =
-  window.matchMedia(`(max-width: ${breakpoints.breakpointMediumSmallMaxPx})`)
-    .matches &&
-  window.matchMedia(`(min-width: ${breakpoints.breakpointMediumSmallMinPx})`)
-    .matches;
+export const isWindowMediumSmallMin = window.matchMedia(
+  `(min-width: ${breakpoints.breakpointMediumSmallMinPx})`
+);
 
-export const isWindowSmallInclusive = window.matchMedia(
+export const isWindowSmallMax = window.matchMedia(
   `(max-width: ${breakpoints.breakpointSmallMaxPx})`
-).matches;
+);
 
-export const isWindowSmall =
-  window.matchMedia(`(max-width: ${breakpoints.breakpointSmallMaxPx})`)
-    .matches &&
-  window.matchMedia(`(min-width: ${breakpoints.breakpointSmallMinPx})`).matches;
+export const isWindowSmallMin = window.matchMedia(
+  `(min-width: ${breakpoints.breakpointSmallMinPx})`
+);
 
-export const isWindowExtraSmall = window.matchMedia(
+export const isWindowExtraSmallMax = window.matchMedia(
   `(max-width: ${breakpoints.breakpointExtraSmallMaxPx})`
-).matches;
+);

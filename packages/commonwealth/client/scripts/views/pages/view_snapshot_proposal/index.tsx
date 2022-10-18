@@ -17,7 +17,7 @@ import {
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { isWindowMediumSmallMax } from '../../components/component_kit/helpers';
 import { SnapshotProposalCards } from './snapshot_proposal_cards';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 
@@ -109,7 +109,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
 
     window.onresize = () => {
-      if (isWindowMediumSmallInclusive && this.activeTab !== 'proposals') {
+      if (isWindowMediumSmallMax.matches && this.activeTab !== 'proposals') {
         this.activeTab = 'proposals';
         m.redraw();
       }

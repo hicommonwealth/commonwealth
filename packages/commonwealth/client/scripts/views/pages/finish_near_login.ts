@@ -13,8 +13,7 @@ import {
   setActiveAccount,
   completeClientLogin,
 } from 'controllers/app/login';
-import { isSameAccount } from 'helpers';
-import { Account, AddressInfo } from 'models';
+import { Account } from 'models';
 import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -22,7 +21,6 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { LoginModal } from '../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
 interface IState {
   validating: boolean;
@@ -196,9 +194,6 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
                       initialBody: 'welcome',
                       initialSidebar: 'newOrReturning',
                       initialAccount: vnode.state.validatedAccount,
-                      modalType: isWindowMediumSmallInclusive
-                        ? 'fullScreen'
-                        : 'centered',
                     },
                     exitCallback: () => {
                       redirectToNextPage();

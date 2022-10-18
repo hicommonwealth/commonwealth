@@ -7,7 +7,7 @@ import 'pages/login/login_text.scss';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   getClasses,
-  isWindowExtraSmall,
+  isWindowExtraSmallMax,
 } from '../../components/component_kit/helpers';
 
 type LoginTextAttrs = {
@@ -27,7 +27,7 @@ export class LoginText implements m.ClassComponent<LoginTextAttrs> {
       >
         <div class="header-container">
           <CWText
-            type={isWindowExtraSmall ? 'h3' : isMobile ? 'h2' : 'h4'}
+            type={isWindowExtraSmallMax.matches ? 'h3' : isMobile ? 'h2' : 'h4'}
             fontWeight="semiBold"
             isCentered={isMobile}
             className="header-text"

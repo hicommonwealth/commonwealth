@@ -9,7 +9,6 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
-import ErrorPage from '../error';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -17,7 +16,7 @@ import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 import User from '../../components/widgets/user';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { isWindowExtraSmallMax } from '../../components/component_kit/helpers';
 import {
   SubscriptionRowTextContainer,
   SubscriptionRowMenu,
@@ -53,21 +52,21 @@ class NotificationSettingsPage implements m.ClassComponent {
           </CWText>
           <div class="column-header-row">
             <CWText
-              type={isWindowExtraSmall ? 'caption' : 'h5'}
+              type={isWindowExtraSmallMax.matches ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Community
             </CWText>
             <CWText
-              type={isWindowExtraSmall ? 'caption' : 'h5'}
+              type={isWindowExtraSmallMax.matches ? 'caption' : 'h5'}
               fontWeight="medium"
               className="column-header-text"
             >
               Email
             </CWText>
             <CWText
-              type={isWindowExtraSmall ? 'caption' : 'h5'}
+              type={isWindowExtraSmallMax.matches ? 'caption' : 'h5'}
               fontWeight="medium"
               className="last-column-header-text"
             >

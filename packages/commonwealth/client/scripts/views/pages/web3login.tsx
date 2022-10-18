@@ -12,7 +12,6 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageLoading } from './loading';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
 
 class Web3LoginPage implements m.ClassComponent {
@@ -74,9 +73,6 @@ class Web3LoginPage implements m.ClassComponent {
                     modal: LoginModal,
                     data: {
                       onSuccess,
-                      modalType: isWindowMediumSmallInclusive
-                        ? 'fullScreen'
-                        : 'centered',
                     },
                   });
                 }

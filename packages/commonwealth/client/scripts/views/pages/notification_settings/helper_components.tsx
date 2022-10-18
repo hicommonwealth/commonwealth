@@ -15,7 +15,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import User from '../../components/widgets/user';
 import { getNotificationTypeText } from './helpers';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { isWindowExtraSmallMax } from '../../components/component_kit/helpers';
 
 const getTextRows = (subscription: NotificationSubscription) => {
   if (subscription.Thread) {
@@ -30,7 +30,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
       <>
         <div class="header-row" onclick={() => m.route.set(threadUrl)}>
           <CWText
-            type={isWindowExtraSmall ? 'caption' : 'b2'}
+            type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
             className="attribution-text"
             noWrap
           >
@@ -70,13 +70,13 @@ const getTextRows = (subscription: NotificationSubscription) => {
       <>
         <div class="header-row">
           <CWText
-            type={isWindowExtraSmall ? 'caption' : 'b2'}
+            type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
             className="attribution-text"
           >
             {getNotificationTypeText(subscription.category)}
           </CWText>
           <CWText
-            type={isWindowExtraSmall ? 'caption' : 'b2'}
+            type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
             fontWeight="bold"
           >
             {m(User, {
@@ -91,7 +91,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             's
           </CWText>
           <CWText
-            type={isWindowExtraSmall ? 'caption' : 'b2'}
+            type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
             className="attribution-text"
           >
             comment
@@ -116,12 +116,15 @@ const getTextRows = (subscription: NotificationSubscription) => {
         onclick={() => m.route.set(subscription.Chain.id)}
       >
         <CWText
-          type={isWindowExtraSmall ? 'caption' : 'b2'}
+          type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
           className="attribution-text"
         >
           New Threads in
         </CWText>
-        <CWText type={isWindowExtraSmall ? 'caption' : 'b2'} fontWeight="bold">
+        <CWText
+          type={isWindowExtraSmallMax.matches ? 'caption' : 'b2'}
+          fontWeight="bold"
+        >
           {subscription.Chain?.name}
         </CWText>
       </div>

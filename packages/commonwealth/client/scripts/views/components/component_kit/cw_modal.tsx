@@ -7,20 +7,16 @@ import 'components/component_kit/cw_modal.scss';
 
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
-import { getClasses } from './helpers';
 import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onclick: () => void;
   oncreatemodal: () => void;
-  modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
 };
 
 export class CWModal implements m.ClassComponent<ModalAttrs> {
-  private modalTypeState: string;
-
   oncreate(vnode) {
     const { spec, oncreatemodal } = vnode.attrs;
     const completeCallback = spec.completeCallback || (() => undefined);
@@ -28,11 +24,6 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     const confirmExit = spec.modal.confirmExit || (() => true);
 
     oncreatemodal(spec, confirmExit, completeCallback, exitCallback, vnode);
-  }
-
-  oninit(vnode) {
-    const { modalType } = vnode.attrs;
-    this.modalTypeState = modalType || 'centered';
   }
 
   view(vnode) {
@@ -48,10 +39,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
           onclick={() => onclick(spec, confirmExit, exitCallback)}
         >
           <div
-            class={getClasses<{ isFullScreen: boolean }>(
-              { isFullScreen: this.modalTypeState === 'fullScreen' },
-              'modal-container'
-            )}
+            class="modal-container"
             onclick={(e) => {
               e.stopPropagation();
             }}

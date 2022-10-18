@@ -23,7 +23,6 @@ import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -122,11 +121,6 @@ export class LoginSelectorMenuLeft
             } else {
               app.modals.create({
                 modal: LoginModal,
-                data: {
-                  modalType: isWindowMediumSmallInclusive
-                    ? 'fullScreen'
-                    : 'centered',
-                },
               });
             }
           }}
@@ -285,11 +279,6 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               onclick={() => {
                 app.modals.create({
                   modal: LoginModal,
-                  data: {
-                    modalType: isWindowMediumSmallInclusive
-                      ? 'fullScreen'
-                      : 'centered',
-                  },
                 });
               }}
             />
@@ -483,9 +472,6 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       } else {
         app.modals.create({
           modal: LoginModal,
-          data: {
-            modalType: isWindowMediumSmallInclusive ? 'fullScreen' : 'centered',
-          },
         });
       }
     }
