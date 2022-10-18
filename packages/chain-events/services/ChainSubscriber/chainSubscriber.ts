@@ -32,7 +32,6 @@ let producer: RabbitMqHandler;
 let rollbar: Rollbar;
 
 
-
 /**
  * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
  * listen to and then creates, updates, or deletes the listeners.
@@ -52,8 +51,28 @@ async function mainProcess(
     log.info("No active listeners");
   }
 
-  // selects the chain data needed to create the listeners for the current chainSubscriber
-  const query = `
+  let query: string;
+  if (process.env.CHAIN) {
+    // gets the data needed to start a single listener for the chain specified by the CHAIN environment variable
+    // this query will ignore all network types, token types, contract types, as well has_chain_events_listener
+    // use this ONLY if you know what you are doing (must be a compatible chain)
+    query = `
+        SELECT C.id,
+               C.substrate_spec,
+               C2.address                                                              as contract_address,
+               C.network,
+               C.base,
+               C.ce_verbose                                                            as verbose_logging,
+               JSON_BUILD_OBJECT('id', CN.id, 'url', COALESCE(CN.private_url, CN.url)) as "ChainNode"
+        FROM "Chains" C
+                 JOIN "ChainNodes" CN on C.chain_node_id = CN.id
+                 LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
+                 LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
+        WHERE C.id = '${process.env.CHAIN}';
+    `
+  } else {
+    // selects the chain data needed to create the listeners for the current chainSubscriber
+    query = `
       WITH allChains AS (SELECT "Chains".id,
                                 "Chains".substrate_spec,
                                 "Chains".network,
@@ -70,9 +89,9 @@ async function mainProcess(
                                             ON cc.chain_id = "Chains".id
                                   LEFT JOIN "Contracts"
                                             ON "Contracts".id = cc.contract_id
-                         WHERE "Chains"."has_chain_events_listener" = true)
---                            AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
---                                 ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
+                         WHERE "Chains"."has_chain_events_listener" = true
+                           AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
+                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
       SELECT allChains.id,
              allChains.substrate_spec,
              allChains.address                                                 as contract_address,
@@ -82,8 +101,10 @@ async function mainProcess(
              JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
                                COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
       FROM allChains
-      WHERE MOD(allChains.index, 1) = 0;
+      WHERE MOD(allChains.index, ${NUM_WORKERS}) = ${WORKER_NUMBER};
   `;
+  }
+
   const allChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
 
   const erc20Tokens = [];
