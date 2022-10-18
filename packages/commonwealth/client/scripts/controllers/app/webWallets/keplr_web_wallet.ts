@@ -64,9 +64,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
-  public async signLoginToken(
-    validationBlockInfo: string
-  ): Promise<StdSignature> {
+  public async signLoginToken(validationBlockInfo: string): Promise<string> {
     // TODO: Does this need to have a different id? Something specific to cosmos?
     const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
 
@@ -84,12 +82,12 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       accountNumber: null
     };
     const stdSignature = await window.keplr.signDirect(this._chainId, this.accounts[0].address, signDoc);
-    return stdSignature.signature;
+    return JSON.stringify(stdSignature.signature);
   }
 
   public async signWithAccount(account: Account): Promise<string> {
     const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
-    return JSON.stringify(webWalletSignature);
+    return webWalletSignature;
   }
 
   public async validateWithAccount(
