@@ -15,7 +15,6 @@ import User from '../../components/widgets/user';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { isWindowMediumSmallMax } from '../../components/component_kit/helpers';
 
 type SummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -63,7 +62,6 @@ export class ThreadsOverviewTopicSummaryRow
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        {isWindowMediumSmallMax.matches && <CWDivider />}
         <div class="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
