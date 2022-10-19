@@ -37,7 +37,7 @@ type CreateContractReq = ContractAttributes &
   Omit<ChainNodeAttributes, 'id'> & {
     node_url: string;
     address: string;
-    abi: Record<string, unknown>;
+    abi: Array<Record<string, unknown>>;
     contractType: ContractType;
   };
 
