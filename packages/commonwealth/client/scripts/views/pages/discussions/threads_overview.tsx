@@ -24,10 +24,12 @@ export class ThreadsOverview implements m.ClassComponent {
       return LoadingRow;
     }
 
-    let topics = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(app.activeChainId());
     const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
-    topics = anyTopicsFeatured ? topics.filter((t) => t.featuredInSidebar) : topics;
-    const filteredTopics = topics.sort((a, b) => a.order - b.order);
+    const topicsFiltered = anyTopicsFeatured ? topics.filter((t) => t.featuredInSidebar) : topics;
+    const topicsSorted = anyTopicsFeatured
+      ? topicsFiltered.sort((a, b) => a.order - b.order)
+      : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
 
     return (
       <div class="ThreadsOverview">
@@ -50,7 +52,7 @@ export class ThreadsOverview implements m.ClassComponent {
             {/* <CWButton buttonType="mini" label="Create Thread" iconName="plus" /> */}
           </div>
         </div>
-        {filteredTopics.map((topic) => {
+        {topicsSorted.map((topic) => {
           const monthlyThreads = app.threads.overviewStore
             .getAll()
             .filter((thread) => thread.topic.id === topic.id);
