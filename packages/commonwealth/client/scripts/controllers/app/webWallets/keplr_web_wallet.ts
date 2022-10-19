@@ -5,9 +5,8 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { constructTypedMessage, validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
+import { constructKeplrMessage } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-import { StdSignature } from '@cosmjs/amino';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -65,24 +64,17 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    // TODO: Does this need to have a different id? Something specific to cosmos?
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
+    const address = this.accounts[0].address
 
-    const msgParams = await constructTypedMessage(
-      this.accounts[0].address,
-      app.chain?.meta.node.ethChainId || 1,
-      sessionPublicAddress,
+    const msgParams = await constructKeplrMessage(
+      address,
+      this._chainId,
+      address,
       validationBlockInfo,
     );
 
-    const signDoc = {
-      bodyBytes: msgParams,
-      authInfoBytes: null,
-      chainId: this._chainId,
-      accountNumber: null
-    };
-    const stdSignature = await window.keplr.signDirect(this._chainId, this.accounts[0].address, signDoc);
-    return JSON.stringify(stdSignature.signature);
+    const stdSignature = await window.keplr.signArbitrary(this._chainId, address, msgParams)
+    return JSON.stringify({signature: stdSignature});
   }
 
   public async signWithAccount(account: Account): Promise<string> {

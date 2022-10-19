@@ -34,7 +34,7 @@ import { addressSwapper } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
-import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { constructKeplrMessage, validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
@@ -212,21 +212,22 @@ const verifySignature = async (
         generatedAddress === addressModel.address ||
         generatedAddressWithCosmosPrefix === addressModel.address
       ) {
-        let generatedSignDoc: StdSignDoc;
-
         try {
           // Generate sign doc from token and verify it against the signature
-          generatedSignDoc = validationTokenToSignDoc(
-            Buffer.from(addressModel.verification_token.trim()),
-            generatedAddress
-          );
+          const keplrMessage = await constructKeplrMessage(
+            addressModel.address,
+            // TODO: get chain id dynamically
+            "osmosis-1",
+            addressModel.address,
+            addressModel.block_info
+          )
+          const generatedSignDoc = validationTokenToSignDoc(Buffer.from(keplrMessage), generatedAddress)
 
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
             serializeSignDoc(generatedSignDoc)
           ).digest();
-
           isValid = await Secp256k1.verifySignature(
             secpSignature,
             messageHash,

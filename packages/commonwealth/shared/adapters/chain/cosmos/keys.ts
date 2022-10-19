@@ -35,7 +35,7 @@ export const validationTokenToSignDoc = (
   return signDoc;
 };
 
-export const constructTypedMessage = async (fromAddress: string, fromChainId: number, sessionPublicAddress: string, validationBlockInfoString: string) => {
+export const constructKeplrMessage = async (fromAddress: string, fromChainId: string, sessionPublicAddress: string, validationBlockInfoString: string) => {
   const placeholderMultihash = '/commonwealth'; // TODO
 
   const validationBlockInfo = JSON.parse(validationBlockInfoString)
@@ -64,12 +64,5 @@ export const constructTypedMessage = async (fromAddress: string, fromChainId: nu
     registerSessionDuration: payload.duration.toString(),
     timestamp: payload.timestamp.toString(),
   };
-
-  // what goes here?
-  // do we need to use TypedDataDomain and TypedDataField?
-  // a lot of this stuff seems like it could be shared between the different chains, but i don't know what
-
-  // canvas uses ethers' signTypedData types while commonwealth uses eth-sig-util's
-  // so we have to coerce the types here
-  return { types, primaryType: 'Message', domain, message } as any;
+  return JSON.stringify(message);
 }
