@@ -1,6 +1,5 @@
 import moment from 'moment';
 
-
 class Contract {
   public readonly id: number;
   public readonly address: string;
@@ -13,8 +12,25 @@ class Contract {
   public readonly tokenName?: string;
   public readonly symbol?: string;
   public readonly abi?: string;
+  public readonly community?: string;
+  public readonly isFactory?: boolean;
+  public readonly nickname?: string;
 
-  constructor(id, address, chainNodeId, type, createdAt, updatedAt, decimals?, tokenName?, symbol?, contractAbi?) {
+  constructor(
+    id,
+    address,
+    chainNodeId,
+    type,
+    createdAt,
+    updatedAt,
+    decimals?,
+    tokenName?,
+    symbol?,
+    contractAbi?,
+    community?,
+    isFactory?,
+    nickname?,
+  ) {
     this.id = id;
     this.address = address;
     this.chainNodeId = chainNodeId;
@@ -25,6 +41,9 @@ class Contract {
     this.tokenName = tokenName;
     this.symbol = symbol;
     this.abi = contractAbi;
+    this.community = community;
+    this.isFactory = isFactory;
+    this.nickname = nickname;
   }
 
   public static fromJSON({
@@ -37,7 +56,10 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    ContractAbi
+    contract_abi,
+    community,
+    is_factory,
+    nickname,
   }) {
     return new Contract(
       id,
@@ -49,9 +71,12 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      ContractAbi);
+      contract_abi,
+      community,
+      is_factory,
+      nickname,
+    );
   }
 }
 
 export default Contract;
-
