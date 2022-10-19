@@ -13,10 +13,7 @@ import { SublayoutHeaderRight } from './sublayout_header_right';
 import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import {
-  isWindowExtraSmallMax,
-  isWindowSmallMax,
-} from './components/component_kit/helpers';
+import { isWindowSmallMax } from './components/component_kit/helpers';
 import { CommunityHeader } from './components/sidebar/community_header';
 import { AppMobileMenus } from './app_mobile_menus';
 

@@ -10,7 +10,7 @@ import { navigateToSubpage } from 'app';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { isWindowExtraSmallMax } from '../../components/component_kit/helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import Sublayout from '../../sublayout';
@@ -52,7 +52,7 @@ class OverviewPage implements m.ClassComponent {
             <CWText type="h3" fontWeight="semiBold">
               Overview
             </CWText>
-            {isWindowExtraSmall(window.innerWidth) ? (
+            {isWindowExtraSmallMax.matches ? (
               <CWIconButton
                 iconName="plusCircle"
                 iconButtonTheme="black"
