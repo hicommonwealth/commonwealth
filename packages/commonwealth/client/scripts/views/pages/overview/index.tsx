@@ -20,18 +20,26 @@ class OverviewPage implements m.ClassComponent {
   view() {
     const allMonthlyThreads = app.threads.overviewStore.getAll();
 
-    const sortedTopics = app.topics
-      .getByCommunity(app.activeChainId())
-      .sort((a, b) => a.order - b.order);
+    // const sortedTopics = app.topics
+    //   .getByCommunity(app.activeChainId())
+    //   .sort((a, b) => a.order - b.order);
 
-    const topicsToDisplay = sortedTopics.some((t) => t.featuredInSidebar)
-      ? sortedTopics.filter((t) => t.featuredInSidebar)
-      : sortedTopics;
+    // const topicsToDisplay = sortedTopics.some((t) => t.featuredInSidebar)
+    //   ? sortedTopics.filter((t) => t.featuredInSidebar)
+    //   : sortedTopics;
+
+    const topics = app.topics.getByCommunity(app.activeChainId());
+    const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
+    const topicsFiltered = anyTopicsFeatured ? topics.filter((t) => t.featuredInSidebar) : topics;
+    const topicsSorted = anyTopicsFeatured
+      ? topicsFiltered.sort((a, b) => a.order - b.order)
+      : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
+
 
     const topicSummaryRows: Array<{
       monthlyThreads: Array<Thread>;
       topic: Topic;
-    }> = topicsToDisplay.map((topic) => {
+    }> = topicsSorted.map((topic) => {
       const monthlyThreads = allMonthlyThreads.filter(
         (thread) => topic.id === thread.topic.id
       );
