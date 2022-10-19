@@ -29,7 +29,6 @@ export const constructCanvasMessage = (
 
   const block: Block = {
     chain: chain,
-    // @ts-ignore
     chainId: chainId,
     blocknum: validationBlockInfo.number,
     blockhash: validationBlockInfo.hash,
