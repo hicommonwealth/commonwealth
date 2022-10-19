@@ -6,9 +6,7 @@ import { int } from 'aws-sdk/clients/datapipeline';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
-export class SocialSharingCarat
-  implements m.ClassComponent<{ commentId?: int }>
-{
+export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
   view(vnode) {
     const domain = document.location.origin;
 
@@ -53,7 +51,7 @@ export class SocialSharingCarat
             },
           },
         ]}
-        trigger={<CWIconButton iconName="share2" iconSize="small" />}
+        trigger={<CWIconButton iconName="share" iconSize="small" />}
       />
     );
   }
