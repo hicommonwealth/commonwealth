@@ -42,9 +42,9 @@ class ContractsStore extends IdStore<Contract> {
     return this._storeType[type] || [];
   }
 
-  public getContractByCommunity(community: string): Array<Contract> {
+  public getCommunityContracts(): Array<Contract> {
     // filter through the _storeId map for all contracts with a specified chain
-    return this.getAll().filter((c) => c.community === community);
+    return this.getAll();
   }
 
   public getContractFactories(): Array<Contract> {

@@ -38,8 +38,8 @@ class ContractsController {
   public getContractFactories() {
     return this._store.getContractFactories();
   }
-  public getByCommunity(communityId: string) {
-    return this._store.getContractByCommunity(communityId);
+  public getCommunityContracts() {
+    return this._store.getCommunityContracts();
   }
 
   public async addContractAbi(contract: Contract, abi: JSON) {
