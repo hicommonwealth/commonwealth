@@ -99,6 +99,10 @@ const createContract = async (
     },
   });
 
+  if (!node) {
+    return next(new Error('Node not found'));
+  }
+
   const contract_abi = await models.ContractAbi.create({
     abi,
   });
