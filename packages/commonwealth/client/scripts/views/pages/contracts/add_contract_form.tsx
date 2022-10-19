@@ -160,7 +160,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new ERC20 community failed'
+                err.responseJSON?.error || 'Creating new contract failed'
               );
             } finally {
               this.state.saving = false;
