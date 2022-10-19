@@ -64,7 +64,7 @@ class GeneralContractPage
   async oninit(vnode) {
     const { contractAddress } = vnode.attrs;
     const contract: Contract =
-      app.contracts.store.getContractByAddress(contractAddress);
+      app.contracts.getByAddress(contractAddress);
     console.log('the contract is ', contract);
     if (contract.abi === undefined || contract.abi === '') {
       this.loadAbiFromEtherscan(contract.address).then((abi) => {
