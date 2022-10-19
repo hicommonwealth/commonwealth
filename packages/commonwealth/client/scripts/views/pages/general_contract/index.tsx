@@ -4,6 +4,7 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
+import { Spinner } from 'construct-ui';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
@@ -20,7 +21,9 @@ import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
   getEtherscanABI,
-} from '../../../helpers/abi_utils';
+  parseEventFromABI,
+} from 'helpers/abi_utils';
+import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -31,56 +34,63 @@ type CreateContractForm = {
 };
 
 type CreateContractState = ChainFormState & {
-  functionNameToFunctionOutput: Map<string, any>;
+  functionNameToFunctionOutput: Map<string, any[]>;
   form: CreateContractForm;
 };
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
+  generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
     message: '',
     loaded: false,
     loading: false,
     saving: false,
     status: undefined,
-    functionNameToFunctionOutput: new Map<string, any>(),
+    functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     },
   };
 
-  view(vnode) {
-    // Payable functions are not supported in this implementation
-
-    const getWeb3 = async (): Promise<Web3> => {
-      // Initialize Chain
-      const ethChain = app.chain.chain as EthereumChain;
-
-      const currChain = app.chain;
-      const currNode = currChain.meta.ChainNode;
-      const web3Api = await ethChain.initApi(currNode);
-      return web3Api;
+  loadAbiFromEtherscan = async (contractAddress: string): Promise<JSON> => {
+    try {
+      return await getEtherscanABI('mainnet', contractAddress);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-      const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
-      const web3Api = await getWeb3();
-      const web3Contract: Web3Contract = new web3Api.eth.Contract(
-        parseAbiItemsFromABI(contract.abi),
-        contractAddress
-      );
-      return web3Contract;
-    };
+  async oninit(vnode) {
+    const { contractAddress } = vnode.attrs;
+    const contract: Contract =
+      app.contracts.store.getContractByAddress(contractAddress);
+    console.log('the contract is ', contract);
+    if (contract.abi === undefined || contract.abi === '') {
+      this.loadAbiFromEtherscan(contract.address).then((abi) => {
+        // Populate Abi Table
+        app.contracts.addContractAbi(contract, abi);
+      });
+    }
+    this.state.loaded = true;
+  }
+
+  view(vnode) {
+    const Bytes32 = ethers.utils.formatBytes32String;
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      this.state.loading = true;
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
+        if (type.substring(0, 4) === 'byte')
+          return Bytes32(
             this.state.form.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
@@ -91,125 +101,67 @@ class GeneralContractPage
               .get(fn.name)
               .get(index)
           );
-        console.log(
-          this.state.form.functionNameToFunctionInputArgs
-            .get(fn.name)
-            .get(index)
-        );
         return this.state.form.functionNameToFunctionInputArgs
           .get(fn.name)
           .get(index);
       });
 
-      // This is for testing only
-      // contractAddress = '0xdb355da657A3795bD6Faa9b63915cEDbE4fAdb00';
+      const contract = app.contracts.getByAddress(contractAddress);
+      let tx;
+      try {
+        // initialize daoFactory Controller
+        const ethChain = app.chain.chain as EthereumChain;
 
-      console.log(processedArgs);
+        this.generalContractsController = new GeneralContractsController(
+          ethChain,
+          contract
+        );
 
-      const functionContract = await getWeb3Contract();
+        const sender = app.user.activeAccount;
+        //   // get querying wallet
+        const signingWallet = await app.wallets.locateWallet(
+          sender,
+          ChainBase.Ethereum
+        );
 
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
-
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
-
-      // } else {
-
-      // }
-
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
-
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
-      const sender = app.user.activeAccount;
-      //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
-      );
-
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
-
-      const web3Api = await getWeb3();
-      let tx: string;
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        // Sign Tx with PK if not view function
-        tx = await chain.makeContractTx(
-          contractAddress,
-          functionTx.encodeABI(),
+        tx = await this.generalContractsController.callContractFunction(
+          fn,
+          processedArgs,
           signingWallet
         );
-      } else {
-        console.log('view function called');
-        // send transaction
-        tx = await chain.makeContractCall(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
+        console.log('tx is ', tx);
+      } catch (err) {
+        notifyError(
+          err.responseJSON?.error || `Calling Function ${fn.name} failed`
         );
-      }
-      console.log('Tx successful with hash:', tx);
-
-      // simple return type
-      if (!Array.isArray(tx)) {
-        const decodedTx = web3Api.eth.abi.decodeParameter(fn.outputs[0].type, tx);
-        console.log('decodedTx:', decodedTx);
-        this.state.functionNameToFunctionOutput.set(fn.name, decodedTx);
+        this.state.status = 'failure';
+        this.state.message = err.message;
+        this.state.loading = false;
+        m.redraw();
         return;
       }
 
-      // complex return type
-      const processArray = (arr) => {
-        const newArr = [];
-        for (let i = 0; i < arr.length; i++) {
-          const val = Array.isArray(arr[i])
-            ? processArray(arr[i])
-            : arr[i].toString();
-          newArr.push(val);
-        }
-        return newArr;
-      };
+      this.state.saving = false;
+      const result = this.generalContractsController.decodeTransactionData(
+        fn,
+        tx
+      );
+      this.state.functionNameToFunctionOutput.set(fn.name, result);
 
-      const processed = processArray([...tx]);
-
-      this.state.functionNameToFunctionOutput.set(fn.name, JSON.stringify(processed, null, 2));
-    };
-
-    // TODO: figure out when to use this method properly
-    const loadAbiFromEtherscan = async () => {
-      const { contractAddress } = vnode.attrs;
-      try {
-        const etherscanAbi = await getEtherscanABI('mainnet', contractAddress);
-        const abiString = JSON.stringify(etherscanAbi);
-        return parseFunctionsFromABI(abiString);
-      } catch (error) {
-        console.log(error);
-      }
+      this.state.loaded = true;
+      this.state.loading = false;
+      m.redraw();
     };
 
     const loadContractAbi = () => {
       const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
       const abiFunctions = parseFunctionsFromABI(contract.abi);
-      if (abiFunctions) {
-        return abiFunctions;
-      } else {
-        loadAbiFromEtherscan();
-      }
+      return abiFunctions;
     };
 
     const { contractAddress } = vnode.attrs;
-    if (!app.contracts || !app.chain) {
+    if (!app.contracts || !app.chain || !this.state.loaded) {
       return <PageLoading title="General Contract" />;
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
@@ -260,7 +212,6 @@ class GeneralContractPage
                                     fn.name,
                                     new Map<number, string>()
                                   );
-                                  console.log('setting new map');
                                   const inputArgMap =
                                     this.state.form.functionNameToFunctionInputArgs.get(
                                       fn.name
@@ -347,6 +298,8 @@ class GeneralContractPage
                   </div>
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
+                      const fnOutputArray =
+                        this.state.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div class="function-outputs">
@@ -355,7 +308,12 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
-                            <CWText>{this.state.functionNameToFunctionOutput.get(fn.name)}</CWText>
+                            {this.state.loading && <Spinner active />}
+                            <CWText>
+                              {fnOutputArray && fnOutputArray[i].toString()
+                                ? fnOutputArray[i].toString()
+                                : ''}
+                            </CWText>
                           </div>
                         </div>
                       );
