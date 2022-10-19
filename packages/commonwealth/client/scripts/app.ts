@@ -635,7 +635,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     });
 
     const isCustomDomain = !!customDomain;
-    const defaultOverview = false; // TODO: fix this
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
@@ -656,9 +655,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Custom domain routes
             //
-            '/': redirectRoute((attrs) =>
-              defaultOverview ? `/${attrs.scope}/overview` : `/${attrs.scope}/discussions`
-            ),
+            '/': importRoute('views/pages/discussions_redirect', {
+              scoped: true,
+            }),
             '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
@@ -950,9 +949,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': redirectRoute((attrs) =>
-              defaultOverview ? `/${attrs.scope}/overview` : `/${attrs.scope}/discussions`
-            ),
+            '/:scope': importRoute('views/pages/discussions_redirect', { 
+              scoped: true,
+            }),
             '/:scope/discussions': importRoute('views/pages/discussions', {
               scoped: true,
               deferChain: true,
