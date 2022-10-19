@@ -95,7 +95,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           options={[
             ContractType.ERC20,
             ContractType.ERC721,
-            ContractType.SPL,
             ContractType.AAVE,
             ContractType.COMPOUND,
           ]}
