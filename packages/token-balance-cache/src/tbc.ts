@@ -18,19 +18,37 @@ import { default as BalanceProviders } from './providers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const DATABASE_URI =
+function getKey(...args: string[]) {
+  return args.join('-');
+}
+
+async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainNode[]> {
+  const query = `SELECT * FROM "ChainNodes" WHERE updated_at >= to_timestamp (${lastQueryUnixTime})::date;`
+  
+  const DATABASE_URI =
   !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
 
-function getKey(...args: string[]) {
-  return args.join('-');
+  const db = new Client({
+    connectionString: DATABASE_URI,
+    ssl: process.env.NODE_ENV !== 'production' ? false : {
+      rejectUnauthorized: false,
+    },
+  });
+  await db.connect();
+  const nodeQuery = await db.query<IChainNode>(query);
+  const nodeArray = nodeQuery.rows;
+  await db.end();
+  return nodeArray;
 }
 
 export default class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanceCache {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
+  private _lastQueryTime: number = 0;
   constructor(
+    private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB, 
     providers: BalanceProvider[] = BalanceProviders,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
@@ -126,21 +144,19 @@ export default class TokenBalanceCache extends JobRunner<ICache> implements ITok
     return results;
   }
 
-  public async start() {
-    // fetch node id map from database at startup
-    const db = new Client({
-      connectionString: DATABASE_URI,
-      ssl: process.env.NODE_ENV !== 'production' ? false : {
-        rejectUnauthorized: false,
-      },
-    });
-    await db.connect();
-    const nodeQuery = await db.query<IChainNode>(`SELECT * FROM "ChainNodes";`);
-    const nodeArray = nodeQuery.rows;
-    for (const n of nodeArray) {
+  private async _refreshNodes() {
+    const lastQueryTime = this._lastQueryTime;
+    this._lastQueryTime = Math.floor(Date.now() / 1000);
+    const nodes = await this._nodesProvider(lastQueryTime);
+    for (const n of nodes) {
       this._nodes[n.id] = n;
     }
-    await db.end();
+  }
+
+  public async start() {
+    // all nodes at startup
+    this._nodes = {};
+    await this._refreshNodes();
 
     // kick off job
     super.start();
@@ -159,6 +175,7 @@ export default class TokenBalanceCache extends JobRunner<ICache> implements ITok
 
   // prune cache job
   protected async _job(cache: ICache): Promise<void> {
+    // clear stale cache members
     for (const key of Object.keys(cache)) {
       if (new BN(cache[key].balance).eqn(0)) {
         // 5 minute lifetime (i.e. one job run) if no token balance
@@ -172,5 +189,8 @@ export default class TokenBalanceCache extends JobRunner<ICache> implements ITok
         }
       }
     }
+
+    // run update query
+    await this._refreshNodes();
   }
 }
