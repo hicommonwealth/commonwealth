@@ -11,7 +11,11 @@
   },
   "keywords": [],
   "scripts": {
+    "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts ./test/**/*.spec.ts"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "ts-mocha": "^10.0.0"
   }
 }
