@@ -928,6 +928,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/:scope/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/:scope/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
               { scoped: true, deferChain: true }
