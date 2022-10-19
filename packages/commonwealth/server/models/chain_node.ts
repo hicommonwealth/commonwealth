@@ -36,11 +36,17 @@ export default (
       balance_type: { type: dataTypes.STRING, allowNull: true },
       name: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
+      ss58: { type: dataTypes.INTEGER, allowNull: true },
+      bech32: { type: dataTypes.STRING, allowNull: true },
       chain_base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'ChainNodes',
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       underscored: true,
       defaultScope: {
         attributes: {
