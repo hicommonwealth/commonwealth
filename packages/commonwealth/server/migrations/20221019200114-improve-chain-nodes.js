@@ -2,14 +2,9 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
      return queryInterface.sequelize.transaction(async (t) => {
 
+      // Add Columns
       await queryInterface.addColumn('ChainNodes', 'ss58', {
         type: Sequelize.INTEGER,
         allowNull: true
@@ -19,7 +14,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       }, { transaction: t });
-
 
       await queryInterface.addColumn('ChainNodes', 'created_at', {
         type: Sequelize.DATE,
@@ -33,24 +27,19 @@ module.exports = {
         defaultValue: new Date(),
       }, { transaction: t });
 
+
+      // Add entry names
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(
-        `UPDATE "ChainNodes" SET name=LTRIM(RTRIM(name));`
-      );
-      await queryInterface.removeColumn('ChainNodes', 'ss58');
-      await queryInterface.removeColumn('ChainNodes', 'bech32');
-      await queryInterface.removeColumn('ChainNodes', 'created_at');
-      await queryInterface.removeColumn('ChainNodes', 'updated_at');
+     return queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query( `UPDATE "ChainNodes" SET name=NULL;`, { transaction });
+      await queryInterface.sequelize.query( `UPDATE "ChainNodes" SET description=NULL;`, { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'ss58', { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'bech32', { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'created_at', { transaction });
+      await queryInterface.removeColumn('ChainNodes', 'updated_at', { transaction });
      });
 
   }
