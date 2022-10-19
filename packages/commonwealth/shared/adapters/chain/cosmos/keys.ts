@@ -2,8 +2,9 @@
 // we insert our account registration token into a proposal message, and then verify against the
 // generated signature. But first we need the message to insert.
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
-import type { Block, SessionPayload } from '@canvas-js/interfaces';
 import { toBase64 } from '@cosmjs/encoding';
+import { constructCanvasMessage } from '../../shared';
+
 export const validationTokenToSignDoc = (
   token: Uint8Array,
   address: string
@@ -36,33 +37,6 @@ export const validationTokenToSignDoc = (
 };
 
 export const constructKeplrMessage = async (fromAddress: string, fromChainId: string, sessionPublicAddress: string, validationBlockInfoString: string) => {
-  const placeholderMultihash = '/commonwealth'; // TODO
-
-  const validationBlockInfo = JSON.parse(validationBlockInfoString)
-  const block: Block = {
-    chain: 'cosmos',
-    chainId: fromChainId,
-    blocknum: validationBlockInfo.number,
-    blockhash: validationBlockInfo.hash,
-    timestamp: validationBlockInfo.timestamp,
-  };
-
-  // use the block timestamp as the message timestamp, since the block should
-  // have been requested recently
-  const payload: SessionPayload = {
-    from: fromAddress,
-    spec: placeholderMultihash,
-    address: sessionPublicAddress,
-    duration: 86400 * 1000,
-    timestamp: block.timestamp,
-    block,
-  };
-
-  const message = {
-    loginTo: payload.spec,
-    registerSessionAddress: payload.address,
-    registerSessionDuration: payload.duration.toString(),
-    timestamp: payload.timestamp.toString(),
-  };
+  const message = constructCanvasMessage("cosmos", fromChainId, fromAddress, sessionPublicAddress, validationBlockInfoString);
   return JSON.stringify(message);
 }

@@ -253,7 +253,7 @@ const verifySignature = async (
     //
     try {
       const node = await chain.getChainNode();
-      const typedMessage = await constructTypedMessage(
+      const typedMessage = constructTypedMessage(
         addressModel.address,
         node.eth_chain_id || 1,
         sessionPublicAddress,
