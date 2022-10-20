@@ -29,7 +29,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     this.isSidebarToggled =
-      !app.chain ||
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
   }
 

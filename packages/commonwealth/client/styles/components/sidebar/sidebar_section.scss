@@ -21,10 +21,6 @@
 
     .Icon {
       margin-right: 4px;
-
-      @include smallInclusive {
-        margin-right: 14px;
-      }
     }
   }
 
@@ -40,10 +36,6 @@
     align-items: center;
     display: flex;
     min-width: 0;
-
-    @include smallInclusive {
-      padding: 12px 8px 12px 44px;
-    }
 
     .title-text {
       color: $neutral-600;

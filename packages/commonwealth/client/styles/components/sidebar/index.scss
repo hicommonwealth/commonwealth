@@ -27,6 +27,10 @@
         &.isSidebarToggled {
           display: flex;
           width: calc(100vw - 56px);
+
+          .sub-section-group-title {
+            padding: 12px 8px 12px 44px;
+          }
         }
       }
 
