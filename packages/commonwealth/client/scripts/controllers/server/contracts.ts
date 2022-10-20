@@ -113,10 +113,11 @@ class ContractsController {
     }
     contracts.forEach((contract) => {
       try {
+        const result: Array<Record<string, unknown>> = JSON.parse(contract.ContractAbi.abi);
         this._store.add(
           Contract.fromJSON({
             ...contract,
-            abi: contract.ContractAbi.abi,
+            abi: result,
           })
         );
       } catch (e) {

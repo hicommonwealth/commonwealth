@@ -53,7 +53,7 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    contract_abi,
+    abi,
     is_factory,
     nickname,
   }) {
@@ -67,7 +67,7 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      contract_abi,
+      abi,
       is_factory,
       nickname,
     );
