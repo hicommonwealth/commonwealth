@@ -72,6 +72,7 @@ class Web3LoginPage implements m.ClassComponent {
                   app.modals.create({
                     modal: LoginModal,
                     data: {
+                      isFullScreen: true,
                       onSuccess,
                     },
                   });

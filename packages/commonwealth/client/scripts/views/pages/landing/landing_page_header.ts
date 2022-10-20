@@ -116,6 +116,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                     onclick: () =>
                       app.modals.create({
                         modal: LoginModal,
+                        data: { isFullScreen: true },
                       }),
                   },
                   [

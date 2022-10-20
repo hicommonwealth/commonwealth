@@ -121,6 +121,9 @@ export class LoginSelectorMenuLeft
             } else {
               app.modals.create({
                 modal: LoginModal,
+                data: {
+                  isFullScreen: true,
+                },
               });
             }
           }}
@@ -279,6 +282,9 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
               onclick={() => {
                 app.modals.create({
                   modal: LoginModal,
+                  data: {
+                    isFullScreen: true,
+                  },
                 });
               }}
             />
@@ -472,6 +478,9 @@ export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
       } else {
         app.modals.create({
           modal: LoginModal,
+          data: {
+            isFullScreen: true,
+          },
         });
       }
     }

@@ -45,7 +45,6 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
   private magicLoading: boolean;
-  private isMobile: boolean;
 
   oninit(vnode) {
     // Determine if in a community
@@ -91,18 +90,6 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
     if (vnode.attrs.initialWallets) {
       this.wallets = vnode.attrs.initialWallets;
     }
-
-    // eslint-disable-next-line no-restricted-globals
-    addEventListener('resize', () => {
-      this.isMobile = isWindowMediumSmallMax.matches;
-    });
-  }
-
-  onremove() {
-    // eslint-disable-next-line no-restricted-globals
-    removeEventListener('resize', () => {
-      this.isMobile = isWindowMediumSmallMax.matches;
-    });
   }
 
   view(vnode) {
@@ -318,7 +305,7 @@ export class LoginModal implements m.ClassComponent<LoginModalAttrs> {
       }
     };
 
-    return this.isMobile ? (
+    return isWindowMediumSmallMax.matches ? (
       <LoginMobile
         address={this.address}
         currentlyInCommunityPage={this.currentlyInCommunityPage}

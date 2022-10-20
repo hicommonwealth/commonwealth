@@ -191,6 +191,7 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
                   app.modals.create({
                     modal: LoginModal,
                     data: {
+                      isFullScreen: true,
                       initialBody: 'welcome',
                       initialSidebar: 'newOrReturning',
                       initialAccount: vnode.state.validatedAccount,

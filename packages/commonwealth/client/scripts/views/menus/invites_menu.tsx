@@ -23,6 +23,7 @@ export const handleEmailInvites = (state) => {
     } else if (!app.user.activeAccount) {
       app.modals.create({
         modal: LoginModal,
+        data: { isFullScreen: true },
       });
     }
   }

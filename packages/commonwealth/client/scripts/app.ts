@@ -154,6 +154,7 @@ export async function handleInviteLinkRedirect() {
       notifyInfo('Log in to join a community with an invite link');
       app.modals.create({
         modal: LoginModal,
+        data: { isFullScreen: true },
       });
     } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
@@ -942,7 +943,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions_redirect', { 
+            '/:scope': importRoute('views/pages/discussions_redirect', {
               scoped: true,
             }),
             '/:scope/discussions': importRoute('views/pages/discussions', {

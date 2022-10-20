@@ -26,10 +26,12 @@ $modal-padding: 16px;
     position: relative;
     z-index: 20;
 
-    @include mediumSmallInclusive {
-      border-radius: 0;
-      height: 100%;
-      width: 100%;
+    &.isFullScreen {
+      @include mediumSmallInclusive {
+        border-radius: 0;
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 

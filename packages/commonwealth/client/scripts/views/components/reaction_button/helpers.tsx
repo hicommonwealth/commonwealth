@@ -81,6 +81,7 @@ export const onReactionClick = (
   if (!app.isLoggedIn() || !app.user.activeAccount) {
     app.modals.create({
       modal: LoginModal,
+      data: { isFullScreen: true },
     });
   } else {
     const { address: userAddress, chain } = app.user.activeAccount;
