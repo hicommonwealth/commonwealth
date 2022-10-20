@@ -24,6 +24,16 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
+
+    .header-row-left {
+      display: flex;
+      flex-direction: row;
+
+      .latest-button {
+        margin: auto; 
+        margin-left: 16px;
+      }
+    }
   }
 
   .column-headers-row {
