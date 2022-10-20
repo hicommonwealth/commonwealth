@@ -13,7 +13,6 @@ import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import Ethereum from 'controllers/chain/ethereum/adapter';
@@ -22,6 +21,7 @@ import {
   parseFunctionsFromABI,
   getEtherscanABI,
   parseEventFromABI,
+  validateAbiInput,
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { PageNotFound } from '../404';
@@ -253,62 +253,9 @@ class GeneralContractPage
                                 }
                                 this.state.loaded = true;
                               }}
-                              inputValidationFn={(
-                                val: string
-                              ): [ValidationStatus, string] => {
-                                // TODO Array Validation will be complex. Check what cases we want to cover here
-                                if (input.type.slice(-2) === '[]') {
-                                  if (
-                                    val[0] !== '[' ||
-                                    val[val.length - 1] !== ']'
-                                  ) {
-                                    return [
-                                      'failure',
-                                      'Input must be an array',
-                                    ];
-                                  } else {
-                                    return ['success', ''];
-                                  }
-                                }
-                                if (input.type === 'bool') {
-                                  if (val !== 'true' && val !== 'false') {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                }
-                                if (input.type.substring(0, 4) === 'uint') {
-                                  if (!Number.isNaN(Number(val))) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a number',
-                                    ];
-                                  }
-                                } else if (input.type === 'bool') {
-                                  if (val === 'true' || val === 'false') {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                } else if (input.type === 'address') {
-                                  if (val.length === 42) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be an address',
-                                    ];
-                                  }
-                                } else {
-                                  return ['success', ''];
-                                }
-                              }}
+                              inputValidationFn={(val) =>
+                                validateAbiInput(val, input)
+                              }
                             />
                           </div>
                         </div>
