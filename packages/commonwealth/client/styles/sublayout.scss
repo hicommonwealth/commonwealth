@@ -11,23 +11,6 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-
-    .header-container {
-      align-items: center;
-      border-bottom: 1px solid $neutral-200;
-      display: flex;
-      flex-direction: row;
-      height: $global-header-height;
-      justify-content: space-between;
-      min-height: $global-header-height;
-      padding: 0 8px;
-
-      .SearchBar {
-        @include extraSmall {
-          display: none;
-        }
-      }
-    }
   }
 
   .sidebar-and-body-container {
@@ -53,6 +36,12 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+
+      &.isSidebarToggled {
+        @include smallInclusive {
+          display: none;
+        }
+      }
 
       .Body {
         display: flex;

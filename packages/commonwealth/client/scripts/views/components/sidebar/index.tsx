@@ -20,7 +20,8 @@ type SidebarAttrs = {
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
   view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
     const { isSidebarToggled } = vnode.attrs;
-    const hideChat = !app.chain.meta.chatEnabled;
+
+    const hideChat = !app.chain?.meta?.chatEnabled;
 
     return (
       <div

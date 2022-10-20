@@ -1,0 +1,48 @@
+@import 'shared';
+
+.SublayoutHeader {
+  align-items: center;
+  border-bottom: 1px solid $neutral-200;
+  display: flex;
+  gap: 8px;
+  height: $global-header-height;
+  justify-content: space-between;
+  min-height: $global-header-height;
+  padding: 0 8px;
+
+  .sidebar-left {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+  }
+
+  .SearchBar {
+    @include extraSmall {
+      display: none;
+    }
+  }
+
+  .sidebar-right {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .MobileMenuContainer {
+      display: none;
+
+      @include extraSmall {
+        display: flex;
+      }
+    }
+
+    .DesktopMenuContainer {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+
+      @include extraSmall {
+        display: none;
+      }
+    }
+  }
+}
