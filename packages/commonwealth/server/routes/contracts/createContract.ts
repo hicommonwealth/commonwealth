@@ -104,13 +104,16 @@ const createContract = async (
         chain_base,
       },
     });
+    if (!node) {
+      return next(new Error('Node not found'));
+    }
 
     let contract;
     if (abi != null) {
       const contract_abi = await models.ContractAbi.create({
         abi,
       });
-      [contract,] = await models.Contract.findOrCreate({
+      [contract] = await models.Contract.findOrCreate({
         where: {
           address,
           chain_node_id: node.id,
@@ -122,7 +125,7 @@ const createContract = async (
         },
       });
     } else {
-      [contract,] = await models.Contract.findOrCreate({
+      [contract] = await models.Contract.findOrCreate({
         where: {
           address,
           token_name,

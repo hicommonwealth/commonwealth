@@ -94,7 +94,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           options={[
             ContractType.ERC20,
             ContractType.ERC721,
-            ContractType.SPL,
             ContractType.AAVE,
             ContractType.COMPOUND,
           ]}
@@ -165,8 +164,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error ||
-                  'Creating new contract with community failed'
+                err.responseJSON?.error || 'Creating new contract failed'
               );
             } finally {
               this.state.saving = false;
