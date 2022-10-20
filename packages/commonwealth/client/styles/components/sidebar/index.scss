@@ -21,8 +21,11 @@
       overflow-y: auto;
       width: $sidebar-width;
 
-      &.isSidebarToggled {
-        @include smallInclusive {
+      &.isSidebarToggleable {
+        display: none;
+
+        &.isSidebarToggled {
+          display: flex;
           width: calc(100vw - 56px);
         }
       }

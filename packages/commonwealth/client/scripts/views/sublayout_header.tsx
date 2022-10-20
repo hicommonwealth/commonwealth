@@ -18,13 +18,15 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
+  isSidebarToggleable: boolean;
   isSidebarToggled: boolean;
   toggleSidebar: () => void;
 };
 
 export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
   view(vnode) {
-    const { hideSearch, isSidebarToggled, toggleSidebar } = vnode.attrs;
+    const { hideSearch, isSidebarToggleable, isSidebarToggled, toggleSidebar } =
+      vnode.attrs;
 
     return (
       <div class="SublayoutHeader">
@@ -43,7 +45,7 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
           {!isSidebarToggled && app.activeChainId() && (
             <CWCommunityAvatar size="large" community={app.chain.meta} />
           )}
-          {isWindowSmallInclusive(window.innerWidth) && app.chain && (
+          {isSidebarToggleable && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}

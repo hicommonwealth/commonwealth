@@ -11,27 +11,35 @@ import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
-import { getClasses } from '../component_kit/helpers';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CommunityHeader } from './community_header';
+import { getClasses } from '../component_kit/helpers';
 
 type SidebarAttrs = {
+  isSidebarToggleable?: boolean;
   isSidebarToggled?: boolean;
 };
 
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
   view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
-    // const { isSidebarToggled } = vnode.attrs;
+    const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
 
     const hideChat = !app.chain?.meta?.chatEnabled;
 
     return (
       <div class="Sidebar">
-        {app.chain && <CommunityHeader meta={app.chain.meta} />}
+        {app.chain && isSidebarToggleable && isSidebarToggled ? (
+          <CommunityHeader meta={app.chain.meta} />
+        ) : null}
         <div class="quickswitcher-and-sidebar-inner">
           <SidebarQuickSwitcher />
           {app.chain && (
-            <div class="sidebar-inner">
+            <div
+              class={getClasses<{
+                isSidebarToggleable: boolean;
+                isSidebarToggled: boolean;
+              }>({ isSidebarToggleable, isSidebarToggled }, 'sidebar-inner')}
+            >
               <AdminSection />
               <DiscussionSection />
               <GovernanceSection />

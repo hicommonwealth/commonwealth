@@ -9,10 +9,7 @@ import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import {
-  getClasses,
-  isWindowSmallInclusive,
-} from './components/component_kit/helpers';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { AppMobileMenus } from './app_mobile_menus';
 import { SublayoutHeader } from './sublayout_header';
 
@@ -31,14 +28,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 
-    if (!app.chain) {
-      this.isSidebarToggled = false;
-    } else {
-      this.isSidebarToggled =
-        !isWindowSmallInclusive(window.innerWidth) ||
-        localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) ===
-          'true';
-    }
+    this.isSidebarToggled =
+      !app.chain ||
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
   }
 
   view(vnode) {
@@ -54,18 +46,25 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
+    const isSidebarToggleable =
+      app.chain && isWindowSmallInclusive(window.innerWidth);
+
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
+            isSidebarToggleable={isSidebarToggleable}
             isSidebarToggled={this.isSidebarToggled}
             toggleSidebar={() => {
               this.isSidebarToggled = !this.isSidebarToggled;
             }}
           />
           <div class="sidebar-and-body-container">
-            <Sidebar isSidebarToggled={this.isSidebarToggled} />
+            <Sidebar
+              isSidebarToggleable={isSidebarToggleable}
+              isSidebarToggled={this.isSidebarToggled}
+            />
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
