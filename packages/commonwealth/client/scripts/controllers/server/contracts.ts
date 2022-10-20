@@ -42,13 +42,13 @@ class ContractsController {
     return this._store.getContractByCommunity(communityId);
   }
 
-  public async addContractAbi(contract: Contract, abi: JSON) {
+  public async addContractAbi(contract: Contract, abi: Array<Record<string, unknown>>) {
     const response: TypedResponse<CreateContractResp> = await $.post(
       `${app.serverUrl()}/createContractAbi`,
       {
         jwt: app.user.jwt,
         contractId: contract.id,
-        abi: JSON.stringify(abi),
+        abi,
       }
     );
     return response;

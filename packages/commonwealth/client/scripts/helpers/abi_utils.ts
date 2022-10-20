@@ -80,14 +80,13 @@ function getSourceCodeEnpoint(network: chain, address: string): string {
   return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
 }
 
-export async function getEtherscanABI(network: chain, address: string): Promise<JSON> {
+export async function getEtherscanABI(network: chain, address: string): Promise<Array<Record<string,unknown>>> {
   try {
     console.log("fetching from etherscan...");
     const resp = await fetch(getSourceCodeEnpoint(network, address));
     const data = await resp.json();
     const respResult = data.result[0];
-    const respABI = JSON.parse(respResult.ABI);
-    return respABI;
+    return respResult.ABI;
   } catch (e) {
     console.log("error", e);
   }

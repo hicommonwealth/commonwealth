@@ -53,7 +53,9 @@ class GeneralContractPage
     },
   };
 
-  loadAbiFromEtherscan = async (contractAddress: string): Promise<JSON> => {
+  loadAbiFromEtherscan = async (
+    contractAddress: string
+  ): Promise<Array<Record<string, unknown>>> => {
     try {
       return await getEtherscanABI('mainnet', contractAddress);
     } catch (error) {
@@ -61,27 +63,26 @@ class GeneralContractPage
     }
   };
 
-  async oninit(vnode) {
-    const { contractAddress } = vnode.attrs;
-    console.log('contractAddress', contractAddress);
-    if (app.contracts.store.getAll().length > 0) {
+  view(vnode) {
+    const Bytes32 = ethers.utils.formatBytes32String;
+
+    const fetchContractAbi = async (contractAddress: string) => {
+      console.log('contractAddress', contractAddress);
       const contract = app.contracts.getByAddress(contractAddress);
       if (contract) {
         this.state.loaded = true;
         this.state.status = 'success';
         this.state.message = 'Contract loaded';
       }
-      console.log("contract is", contract)
+      console.log('contract is', contract);
       if (contract.abi === undefined || contract.abi.length === 0) {
         const abiJson = await this.loadAbiFromEtherscan(contract.address);
         app.contracts.addContractAbi(contract, abiJson);
+        // Sleep for a little bit to let the contract be added to the store
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        m.redraw();
       }
-      m.redraw();
-    }
-  }
-
-  view(vnode) {
-    const Bytes32 = ethers.utils.formatBytes32String;
+    };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       this.state.loading = true;
@@ -166,6 +167,11 @@ class GeneralContractPage
     };
 
     const { contractAddress } = vnode.attrs;
+
+    if (app.contracts.store.getAll().length > 0) {
+      fetchContractAbi(contractAddress);
+    }
+
     if (!app.contracts || !app.chain || !this.state.loaded) {
       return <PageLoading title="General Contract" />;
     } else {
