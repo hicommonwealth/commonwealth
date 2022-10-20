@@ -11,13 +11,24 @@ import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
+import { getClasses } from '../component_kit/helpers';
 
-export class Sidebar implements m.ClassComponent {
-  view() {
+type SidebarAttrs = {
+  isSidebarToggled?: boolean;
+};
+
+export class Sidebar implements m.ClassComponent<SidebarAttrs> {
+  view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
+    const { isSidebarToggled } = vnode.attrs;
     const hideChat = !app.chain.meta.chatEnabled;
 
     return (
-      <div class="Sidebar">
+      <div
+        class={getClasses<{ isSidebarToggled: boolean }>(
+          { isSidebarToggled },
+          'Sidebar'
+        )}
+      >
         <AdminSection />
         <DiscussionSection />
         <GovernanceSection />

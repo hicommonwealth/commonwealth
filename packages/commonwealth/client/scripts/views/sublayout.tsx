@@ -102,7 +102,9 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 )}
                 <div class="sidebar-inner-container">
                   {showQuickSwitcher && <SidebarQuickSwitcher />}
-                  {isSidebarToggled && <Sidebar />}
+                  {isSidebarToggled && (
+                    <Sidebar isSidebarToggled={isSidebarToggled} />
+                  )}
                 </div>
               </div>
             )}

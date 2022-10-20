@@ -10,8 +10,10 @@
   overflow-y: auto;
   width: $sidebar-width;
 
-  @include smallInclusive {
-    width: calc(100vw - 56px);
+  &.isSidebarToggled {
+    @include smallInclusive {
+      width: calc(100vw - 56px);
+    }
   }
 
   .buttons-container {
