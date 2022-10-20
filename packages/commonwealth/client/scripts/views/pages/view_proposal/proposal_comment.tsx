@@ -15,7 +15,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
-import { SocialSharingCarat } from './social_sharing_carat';
+import { SharePopover } from './share_popover';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
@@ -63,7 +63,8 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
         chain: app.activeChainId(),
       });
 
-    const canReply = !isLast && !isLocked;
+    const canReply =
+      !isLast && !isLocked && app.isLoggedIn() && app.user.activeAccount;
 
     const canEditAndDelete =
       !isLocked &&
@@ -127,7 +128,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
                     )}
                   </div>
                   <div class="menu-buttons-right">
-                    <SocialSharingCarat commentId={comment.id} />
+                    <SharePopover commentId={comment.id} />
                     {canEditAndDelete && (
                       <CWPopoverMenu
                         trigger={

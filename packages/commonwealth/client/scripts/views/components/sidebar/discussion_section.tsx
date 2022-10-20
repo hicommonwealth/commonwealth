@@ -31,7 +31,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 export class DiscussionSection
   implements m.ClassComponent<SidebarSectionAttrs>
 {
-  view(vnode) {
+  view() {
     // Conditional Render Details +
     const onAllDiscussionPage = (p) => {
       const identifier = m.route.param('identifier');
@@ -47,6 +47,20 @@ export class DiscussionSection
       return (
         p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`
       );
+    };
+
+    const onOverviewDiscussionPage = (p) => {
+      const identifier = m.route.param('identifier');
+      if (identifier) {
+        const thread = app.threads.store.getByIdentifier(
+          identifier.slice(0, identifier.indexOf('-'))
+        );
+        if (thread && !thread.topic) {
+          return true;
+        }
+      }
+
+      return p === `/${app.activeChainId()}/overview`;
     };
 
     const onFeaturedDiscussionPage = (p, topic) => {
@@ -125,8 +139,23 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/`, app.activeChainId(), () => {
+          handleRedirectClicks(e, `/discussions`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.All.toggledState`, toggle);
+          });
+        },
+        displayData: null,
+      },
+      {
+        title: 'Overview',
+        containsChildren: false,
+        hasDefaultToggle: false,
+        isVisible: true,
+        isUpdated: true,
+        isActive: onOverviewDiscussionPage(m.route.get()),
+        onclick: (e, toggle: boolean) => {
+          e.preventDefault();
+          handleRedirectClicks(e, `/overview`, app.activeChainId(), () => {
+            setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
           });
         },
         displayData: null,
