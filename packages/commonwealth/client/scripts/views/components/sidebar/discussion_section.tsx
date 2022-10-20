@@ -139,7 +139,7 @@ export class DiscussionSection
         isActive: onAllDiscussionPage(m.route.get()),
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/`, app.activeChainId(), () => {
+          handleRedirectClicks(e, `/discussions`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.All.toggledState`, toggle);
           });
         },
