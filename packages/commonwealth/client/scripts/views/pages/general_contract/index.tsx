@@ -63,14 +63,21 @@ class GeneralContractPage
 
   async oninit(vnode) {
     const { contractAddress } = vnode.attrs;
-    const contract: Contract = app.contracts.getByAddress(contractAddress);
-    if (contract.abi === undefined || contract.abi.length === 0) {
-      this.loadAbiFromEtherscan(contract.address).then((abi) => {
-        // Populate Abi Table
-        app.contracts.addContractAbi(contract, abi);
-      });
+    console.log('contractAddress', contractAddress);
+    if (app.contracts.store.getAll().length > 0) {
+      const contract = app.contracts.getByAddress(contractAddress);
+      if (contract) {
+        this.state.loaded = true;
+        this.state.status = 'success';
+        this.state.message = 'Contract loaded';
+      }
+      console.log("contract is", contract)
+      if (contract.abi === undefined || contract.abi.length === 0) {
+        const abiJson = await this.loadAbiFromEtherscan(contract.address);
+        app.contracts.addContractAbi(contract, abiJson);
+      }
+      m.redraw();
     }
-    this.state.loaded = true;
   }
 
   view(vnode) {
