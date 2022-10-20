@@ -38,9 +38,6 @@ class ContractsController {
   public getContractFactories() {
     return this._store.getContractFactories();
   }
-  public getByCommunity(communityId: string) {
-    return this._store.getContractByCommunity(communityId);
-  }
 
   public async addContractAbi(contract: Contract, abi: Array<Record<string, unknown>>) {
     const response: TypedResponse<CreateContractResp> = await $.post(
