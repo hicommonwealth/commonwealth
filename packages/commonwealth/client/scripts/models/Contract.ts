@@ -11,7 +11,7 @@ class Contract {
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
-  public readonly abi?: string;
+  public readonly abi?: Array<Record<string, unknown>>;
   public readonly community?: string;
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
