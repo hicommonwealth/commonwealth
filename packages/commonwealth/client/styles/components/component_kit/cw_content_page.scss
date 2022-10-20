@@ -1,0 +1,38 @@
+@import 'shared';
+
+.ContentPage {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
+  .body-with-tabs {
+    display: none;
+
+    &.showSidebar {
+      display: flex;
+      flex-direction: column;
+
+      @include medium {
+        display: none;
+      }
+
+      @include large {
+        display: none;
+      }
+    }
+  }
+
+  .body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+
+    &.showSidebar {
+      @include mediumSmallInclusive {
+        display: none;
+      }
+    }
+  }
+}
