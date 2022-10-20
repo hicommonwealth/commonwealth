@@ -26,13 +26,23 @@ type RuleEditSectionAttrs = {
   argumentIdx: number;
 };
 
+// Handles the details of displaying a rule
 class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
   private subRuleResolved: boolean;
-  private subRules: Array<RuleMetadata>;
+  private subRules: Array<RuleMetadata | any>;
+  private subRuleEditState: Array<boolean>;
 
   oninit(vnode) {
-    this.subRuleResolved = false;
-    this.subRules = [];
+    const { internalBuiltRule, ruleTypeIdentifier } = vnode.attrs;
+
+    this.subRuleResolved = true;
+    this.subRules = internalBuiltRule[ruleTypeIdentifier]; // Only applicable for compound rules
+    this.subRuleEditState = this.subRules.map(() => false);
+  }
+
+  onupdate(vnode) {
+    const { internalBuiltRule, ruleTypeIdentifier, argumentIdx } = vnode.attrs;
+    this.subRules = internalBuiltRule[ruleTypeIdentifier];
   }
 
   view(vnode) {
@@ -75,25 +85,47 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
         </div>
       );
     } else if (ruleArgument.type === 'rule[]') {
+      // If i have a rule argument, I need to
+      // 1. check if it already has subrules defined. If so, I should display them as COMPLETED
+      // 2. If it doesnt have subrules defined, I should show a new sub modal to create one
       return (
         <div class="display-section">
-          {internalBuiltRule[ruleTypeIdentifier][argumentIdx].map(
-            (rule, idx) => {
+          {internalBuiltRule[ruleTypeIdentifier].map((subRule, idx) => {
+            if (this.subRuleEditState[idx]) {
+              return (
+                <RuleModal
+                  isNested
+                  onFinish={(rule) => {
+                    internalBuiltRule[ruleTypeIdentifier][idx] = [rule];
+                    this.subRuleEditState[idx] = false;
+                  }}
+                  rule={subRule[0]}
+                />
+              );
+            } else {
               return (
                 <div class="completed-rule-display">
-                  <CWText type="h5">{Object.keys(rule)[0]}</CWText>
+                  <CWText type="h5">{Object.keys(subRule[0])[0]}</CWText>
                   <div class="icons-display">
-                    <CWIcon iconName="write" />
+                    <CWIcon
+                      iconName="write"
+                      onclick={() => {
+                        this.subRuleEditState[idx] = true;
+                        m.redraw();
+                      }}
+                    />
                     <CWIcon
                       iconName="trash"
                       onclick={() => {
-                        console.log(
-                          '2',
-                          internalBuiltRule,
-                          internalBuiltRule[ruleTypeIdentifier],
-                          internalBuiltRule[ruleTypeIdentifier][argumentIdx]
+                        this.subRules = this.subRules.filter((val, i) => {
+                          return i !== idx;
+                        });
+                        this.subRuleEditState = this.subRuleEditState.filter(
+                          (val, i) => {
+                            return i !== idx;
+                          }
                         );
-                        // internalBuiltRule[ruleTypeIdentifier] = [];
+                        internalBuiltRule[ruleTypeIdentifier] = this.subRules;
                         m.redraw();
                       }}
                     />
@@ -101,23 +133,16 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
                 </div>
               );
             }
-          )}
-          {!this.subRuleResolved ? (
-            <RuleModal
-              isNested
-              onFinish={(rule) => {
-                internalBuiltRule[ruleTypeIdentifier][argumentIdx].push(rule);
-                this.subRuleResolved = true;
-              }}
-            />
-          ) : (
-            <CWButton
-              onclick={() => {
-                this.subRuleResolved = false;
-              }}
-              label="add rule"
-            />
-          )}
+          })}
+          <CWButton
+            onclick={() => {
+              this.subRules.push([{}]);
+              this.subRuleEditState.push(true);
+              internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+              m.redraw();
+            }}
+            label="add rule"
+          />
         </div>
       );
     }
@@ -138,11 +163,16 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
   private showRuleOptions: boolean;
   private internalBuiltRule: Record<string, unknown>;
   private ruleMetadata: RuleMetadata;
+  private readyForReview: boolean;
+  private readyForSubmit: boolean;
 
   oninit(vnode) {
-    this.editingRule = vnode.attrs.rule !== undefined;
+    this.editingRule =
+      vnode.attrs.rule !== undefined &&
+      Object.keys(vnode.attrs.rule).length > 0;
     if (this.editingRule) {
       this.internalBuiltRule = vnode.attrs.rule;
+      console.log('at the stRt', this.internalBuiltRule);
       this.showSelectRule = false;
       this.showRuleOptions = true;
       // TODO: Should this ever not be index 0?
@@ -150,8 +180,9 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
     } else {
       this.internalBuiltRule = {};
       this.showSelectRule = true;
-      this.showRuleOptions = false;
     }
+    this.readyForReview = false;
+    this.readyForSubmit = false;
   }
 
   view(vnode) {
@@ -168,9 +199,15 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
       >
         <div class="title-section">
           <CWText type="h3" fontStyle="semiBold">
-            Title
+            {this.ruleMetadata && !this.readyForReview
+              ? this.ruleMetadata.name
+              : this.readyForReview
+              ? 'Review Your Rule'
+              : 'Select Rule Type'}
           </CWText>
-          <CWText type="b1">Subheader message text</CWText>
+          <CWText type="b1">
+            {this.ruleMetadata ? this.ruleMetadata.description : ''}
+          </CWText>
         </div>
         {this.showSelectRule && (
           <CWDropdown
@@ -179,14 +216,15 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
               // Clear out the internal built rule in event of switch
               this.internalBuiltRule = {};
               this.ruleMetadata = app.rules.ruleTypes[optionLabel];
+              this.readyForReview = false;
+              this.readyForSubmit = false;
 
               // Create correct structure for rule
               const ruleValue = [];
               for (const argument of this.ruleMetadata.arguments) {
                 if (
                   argument.type === 'address[]' ||
-                  argument.type === 'balance[]' ||
-                  argument.type === 'rule[]'
+                  argument.type === 'balance[]'
                 ) {
                   ruleValue.push([]);
                 } else if (
@@ -199,6 +237,7 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
               this.internalBuiltRule[optionLabel] = ruleValue;
 
               this.showRuleOptions = true;
+              m.redraw();
             }}
             initialValue="Select Rule Type"
           />
@@ -215,12 +254,23 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
             );
           })}
         <div class="footer-section">
-          <CWButton
-            label="Finish"
-            onclick={() => {
-              onFinish(this.internalBuiltRule);
-            }}
-          />
+          {this.readyForSubmit ? (
+            <CWButton
+              label="Finish"
+              onclick={() => {
+                onFinish(this.internalBuiltRule);
+              }}
+            />
+          ) : (
+            <CWButton
+              label="Next"
+              onclick={() => {
+                this.readyForReview = true;
+                this.readyForSubmit = true;
+                m.redraw();
+              }}
+            />
+          )}
         </div>
       </CWCard>
     );

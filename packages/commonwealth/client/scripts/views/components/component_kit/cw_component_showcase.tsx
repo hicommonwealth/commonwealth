@@ -75,6 +75,70 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             iconName="plus"
             buttonType="mini"
+            label="Edit Rule"
+            onclick={() => {
+              app.modals.create({
+                modal: RuleModal,
+                data: {
+                  onFinish: (rule) => {
+                    console.log('what am i here', rule);
+                    notifySuccess('Rule created!');
+                  },
+                  rule: {
+                    AllowListRule: [
+                      [
+                        '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                        '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                        '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                      ],
+                    ],
+                  },
+                },
+              });
+            }}
+          />
+          <CWButton
+            iconName="plus"
+            buttonType="mini"
+            label="Edit Rule"
+            onclick={() => {
+              app.modals.create({
+                modal: RuleModal,
+                data: {
+                  onFinish: (rule) => {
+                    console.log('what am i here', rule);
+                    notifySuccess('Rule created!');
+                  },
+                  rule: {
+                    AllRule: [
+                      [
+                        {
+                          AllowListRule: [
+                            [
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                            ],
+                          ],
+                        },
+                      ],
+                      [
+                        {
+                          TokenBalanceRule: [
+                            '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                            '500 AVAX',
+                          ],
+                        },
+                      ],
+                    ],
+                  },
+                },
+              });
+            }}
+          />
+          <CWButton
+            iconName="plus"
+            buttonType="mini"
             label="Create Rule"
             onclick={() => {
               app.modals.create({
@@ -84,6 +148,15 @@ export class ComponentShowcase implements m.ClassComponent {
                     console.log('what am i here', rule);
                     notifySuccess('Rule created!');
                   },
+                  // rule: {
+                  //   AllowListRule: [
+                  //     [
+                  //       '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                  //       '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                  //       '0xE58E375Cc657e434e6981218A356fAC756b98097',
+                  //     ],
+                  //   ],
+                  // },
                 },
               });
             }}
