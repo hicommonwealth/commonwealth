@@ -45,7 +45,7 @@ export class DiscussionSection
       }
 
       return (
-        p === `/${app.activeChainId()}/` || p === `/${app.activeChainId()}`
+        p === `/${app.activeChainId()}/discussions` || p === `/${app.activeChainId()}discussions/`
       );
     };
 
