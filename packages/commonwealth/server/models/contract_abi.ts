@@ -5,7 +5,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type ContractAbiAttributes = {
   id: number;
-  abi: string;
+  abi: Array<Record<string, unknown>>;
 };
 
 export type ContractAbiInstance = ModelInstance<ContractAbiAttributes> & {

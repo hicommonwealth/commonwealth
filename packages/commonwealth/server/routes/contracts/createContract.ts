@@ -38,7 +38,7 @@ type CreateContractReq = ContractAttributes &
     community: string;
     node_url: string;
     address: string;
-    abi: string;
+    abi: Array<Record<string, unknown>>;
     contractType: ContractType;
   };
 
