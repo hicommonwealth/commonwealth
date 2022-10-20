@@ -36,6 +36,7 @@ type CreateContractForm = {
 type CreateContractState = ChainFormState & {
   functionNameToFunctionOutput: Map<string, any[]>;
   form: CreateContractForm;
+  loadingEtherscanAbi: boolean;
 };
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
@@ -47,6 +48,7 @@ class GeneralContractPage
     loading: false,
     saving: false,
     status: undefined,
+    loadingEtherscanAbi: false,
     functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
@@ -66,21 +68,14 @@ class GeneralContractPage
   view(vnode) {
     const Bytes32 = ethers.utils.formatBytes32String;
 
-    const fetchContractAbi = async (contractAddress: string) => {
-      console.log('contractAddress', contractAddress);
-      const contract = app.contracts.getByAddress(contractAddress);
-      if (contract) {
-        this.state.loaded = true;
-        this.state.status = 'success';
-        this.state.message = 'Contract loaded';
-      }
-      console.log('contract is', contract);
-      if (contract.abi === undefined || contract.abi.length === 0) {
-        const abiJson = await this.loadAbiFromEtherscan(contract.address);
-        app.contracts.addContractAbi(contract, abiJson);
-        // Sleep for a little bit to let the contract be added to the store
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        m.redraw();
+    const fetchContractAbi = async (contract: Contract) => {
+      if (contract.abi === undefined) {
+        if (contract.abi === undefined) {
+          const abiJson = await this.loadAbiFromEtherscan(contract.address);
+          await app.contracts.addContractAbi(contract, abiJson);
+          // TODO The UI Should In One Go show the abi form after successfully fetching the abi from etherscan
+          m.redraw();
+        }
       }
     };
 
@@ -168,12 +163,25 @@ class GeneralContractPage
 
     const { contractAddress } = vnode.attrs;
 
-    if (app.contracts.store.getAll().length > 0) {
-      fetchContractAbi(contractAddress);
+    if (app.contracts.getCommunityContracts().length > 0) {
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
+      if (contract) {
+        this.state.loaded = true;
+        this.state.status = 'success';
+        this.state.message = 'Contract loaded';
+      }
+      fetchContractAbi(contract);
     }
 
-    if (!app.contracts || !app.chain || !this.state.loaded) {
+    if (!app.contracts || !app.chain) {
       return <PageLoading title="General Contract" />;
+    } else if (this.state.loadingEtherscanAbi) {
+      return (
+        <PageLoading
+          title="Loading ABI from Etherscan"
+          message="Loading ABI from Etherscan"
+        />
+      );
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
         return (

@@ -1,5 +1,5 @@
+import { Contract } from 'models';
 import IdStore from './IdStore';
-import { Contract } from '../models';
 
 // Models a store of all the contracts
 class ContractsStore extends IdStore<Contract> {
@@ -40,6 +40,11 @@ class ContractsStore extends IdStore<Contract> {
   }
   public getContractByType(type: string): Array<Contract> {
     return this._storeType[type] || [];
+  }
+
+  public getCommunityContracts(): Array<Contract> {
+    // filter through the _storeId map for all contracts with a specified chain
+    return this.getAll();
   }
 
   public getContractFactories(): Array<Contract> {

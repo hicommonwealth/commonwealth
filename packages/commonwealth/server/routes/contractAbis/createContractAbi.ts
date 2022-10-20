@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from 'server/models';
+import { ContractAbiAttributes } from 'server/models/contract_abi';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -26,7 +27,7 @@ type CreateContractAbiReq = {
 };
 
 type CreateContractAbiResp = {
-  contractAbi: any;
+  contractAbi: ContractAbiAttributes;
   contract: ContractAttributes;
 };
 
@@ -40,10 +41,6 @@ const createContractAbi = async (
 
   if (!req.user) {
     return next(new Error('Not logged in'));
-  }
-  // require Admin privilege for creating Contract
-  if (!req.user.isAdmin) {
-    return next(new Error(Errors.NotAdmin));
   }
 
   if (!contractId) {

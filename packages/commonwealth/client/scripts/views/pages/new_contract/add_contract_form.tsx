@@ -137,34 +137,38 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           }
           onclick={async () => {
             const {
-              altWalletUrl,
-              chainString,
+              address,
+              abi,
+              contractType,
               chain_node_id,
               nodeUrl,
               symbol,
+              token_name,
+              decimals,
             } = this.state.form;
             this.state.saving = true;
             try {
-              const res = await $.post(`${app.serverUrl()}/createContract`, {
-                alt_wallet_url: altWalletUrl,
-                chain_base: ChainBase.Ethereum,
-                chain_string: chainString,
+              const res = await app.contracts.add(
+                app.activeChainId(),
+                ChainBase.Ethereum,
                 chain_node_id,
-                jwt: app.user.jwt,
-                network: ChainNetwork.ERC20,
-                node_url: nodeUrl,
-                default_symbol: symbol,
-                ...this.state.form,
-              });
-              if (res.status === 'Success') {
+                nodeUrl,
+                address,
+                abi,
+                contractType,
+                symbol,
+                token_name,
+                decimals
+              );
+              if (res) {
                 this.state.status = 'success';
-                this.state.message = `Contract with Address ${res.result.contract.address} saved successfully`;
+                this.state.message = `Contract with Address ${res.address} saved successfully`;
                 this.state.loading = false;
                 m.redraw();
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || 'Creating new contract failed'
+                err.responseJSON?.error || `Creating new contract with community ${app.activeChainId()} failed`
               );
             } finally {
               this.state.saving = false;

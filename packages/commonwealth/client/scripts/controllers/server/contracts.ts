@@ -9,10 +9,15 @@ import { ChainBase, ContractType } from 'common-common/src/types';
 import { TypedResponse } from 'server/types';
 import { ChainNodeAttributes } from 'server/models/chain_node';
 import { ContractAttributes } from 'server/models/contract';
+import { ContractAbiAttributes } from 'server/models/contract_abi';
 
 type CreateContractResp = {
   contract: ContractAttributes;
   node: ChainNodeAttributes;
+};
+type CreateContractAbiResp = {
+  contractAbi: ContractAbiAttributes;
+  contract: ContractAttributes;
 };
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
@@ -38,9 +43,15 @@ class ContractsController {
   public getContractFactories() {
     return this._store.getContractFactories();
   }
+  public getCommunityContracts() {
+    return this._store.getCommunityContracts();
+  }
 
-  public async addContractAbi(contract: Contract, abi: Array<Record<string, unknown>>) {
-    const response: TypedResponse<CreateContractResp> = await $.post(
+  public async addContractAbi(
+    contract: Contract,
+    abi: Array<Record<string, unknown>>
+  ) {
+    const response: TypedResponse<CreateContractAbiResp> = await $.post(
       `${app.serverUrl()}/createContractAbi`,
       {
         jwt: app.user.jwt,
@@ -48,13 +59,42 @@ class ContractsController {
         abi,
       }
     );
+    const resultContract: ContractAttributes = response['result']['contract'];
+    const resultAbi: ContractAbiAttributes =
+      response['result']['contractAbi'];
+    this.update(resultAbi.abi, resultContract);
     return response;
+  }
+  public async update(
+    contractAbi: Array<Record<string, unknown>>,
+    contractAttributes: ContractAttributes
+  ) {
+    // Update contract in store
+    if (this._store.getById(contractAttributes.id)) {
+      this._store.remove(this._store.getById(contractAttributes.id));
+    }
+    this._store.add(
+      new Contract(
+        contractAttributes.id,
+        contractAttributes.address,
+        contractAttributes.chain_node_id,
+        contractAttributes.type,
+        contractAttributes.createdAt,
+        contractAttributes.updatedAt,
+        contractAttributes.decimals,
+        contractAttributes.token_name,
+        contractAttributes.symbol,
+        contractAbi,
+        contractAttributes.is_factory,
+        contractAttributes.nickname,
+      )
+    );
   }
 
   public async add(
     community: string,
     chain_base: ChainBase,
-    eth_chain_id: number,
+    chain_node_id: number,
     node_url: string,
     address: string,
     abi: JSON,
@@ -69,7 +109,7 @@ class ContractsController {
         {
           community,
           chain_base,
-          eth_chain_id,
+          chain_node_id,
           jwt: app.user.jwt,
           node_url,
           address,
@@ -113,11 +153,14 @@ class ContractsController {
     }
     contracts.forEach((contract) => {
       try {
-        const result: Array<Record<string, unknown>> = JSON.parse(contract.ContractAbi.abi);
+        let abiJson: Array<Record<string, unknown>>;
+        if (contract.ContractAbi) {
+          abiJson = JSON.parse(contract.ContractAbi.abi);
+        }
         this._store.add(
           Contract.fromJSON({
             ...contract,
-            abi: result,
+            abi: abiJson,
           })
         );
       } catch (e) {
