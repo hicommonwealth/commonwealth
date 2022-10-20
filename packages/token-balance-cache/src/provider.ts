@@ -110,15 +110,9 @@ export default class TokenBalanceProvider {
    *  Special balances for unique chain networks.
    */
   private async _getTerraTokenBalance(url: string, userAddress: string): Promise<BN> {
-    if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {
-      throw new Error('No API key found for terra endpoint');
-    }
-
     // make balance query
     const queryUrl = `${url}/cosmos/bank/v1beta1/balances/${
       userAddress
-    }?key=${
-      process.env.TERRA_SETTEN_PHOENIX_API_KEY
     }`;
 
     let bankBalance = new BN(0);
@@ -140,8 +134,6 @@ export default class TokenBalanceProvider {
     let stakedBalance = new BN(0);
     const stakedQueryUrl = `${url}/cosmos/staking/v1beta1/delegations/${
       userAddress
-    }?key=${
-      process.env.TERRA_SETTEN_PHOENIX_API_KEY
     }`;
 
     try {
