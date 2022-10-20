@@ -22,6 +22,10 @@
       padding: 16px;
       min-width: 496px;
 
+      .no-data {
+        color: $neutral-500;
+      }
+
       @include smallInclusive {
         min-width: none;
       }

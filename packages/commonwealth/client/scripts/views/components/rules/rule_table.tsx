@@ -29,6 +29,7 @@ export class CWRuleTable implements m.ClassComponent<RuleTableAttrs> {
               </div>
             );
           })}
+          {data.length === 0 && <div class="table-row"></div>}
         </div>
       </div>
     );

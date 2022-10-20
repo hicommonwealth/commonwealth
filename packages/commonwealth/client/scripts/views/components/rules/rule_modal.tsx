@@ -2,6 +2,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import $ from 'jquery';
 
 import 'components/rules/rule_modal.scss';
 
@@ -100,6 +101,25 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
                     this.subRuleEditState[idx] = false;
                   }}
                   rule={subRule[0]}
+                  onCancel={(
+                    internalRule: Record<string, unknown>,
+                    ruleValid: boolean
+                  ) => {
+                    if (Object.keys(internalRule).length > 0 && ruleValid) {
+                      this.subRuleEditState[idx] = false;
+                    } else {
+                      this.subRules = this.subRules.filter((val, i) => {
+                        return i !== idx;
+                      });
+                      this.subRuleEditState = this.subRuleEditState.filter(
+                        (val, i) => {
+                          return i !== idx;
+                        }
+                      );
+                      internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+                      m.redraw();
+                    }
+                  }}
                 />
               );
             } else {
@@ -134,15 +154,19 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
               );
             }
           })}
-          <CWButton
-            onclick={() => {
-              this.subRules.push([{}]);
-              this.subRuleEditState.push(true);
-              internalBuiltRule[ruleTypeIdentifier] = this.subRules;
-              m.redraw();
-            }}
-            label="add rule"
-          />
+          <div className="add-button-wrapper">
+            <CWButton
+              onclick={() => {
+                this.subRules.push([{}]);
+                this.subRuleEditState.push(true);
+                internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+                m.redraw();
+              }}
+              label="add subrule"
+              iconName="plus"
+              buttonType="mini"
+            />
+          </div>
         </div>
       );
     }
@@ -155,6 +179,7 @@ type RuleModalAttrs = {
   isNested?: boolean;
   rule?: Record<string, unknown>;
   className?: string;
+  onCancel?: () => void;
 };
 
 class RuleModal implements m.ClassComponent<RuleModalAttrs> {
@@ -165,6 +190,7 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
   private ruleMetadata: RuleMetadata;
   private readyForReview: boolean;
   private readyForSubmit: boolean;
+  private ruleInitiallyValid: boolean;
 
   oninit(vnode) {
     this.editingRule =
@@ -172,21 +198,21 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
       Object.keys(vnode.attrs.rule).length > 0;
     if (this.editingRule) {
       this.internalBuiltRule = vnode.attrs.rule;
-      console.log('at the stRt', this.internalBuiltRule);
       this.showSelectRule = false;
       this.showRuleOptions = true;
-      // TODO: Should this ever not be index 0?
       this.ruleMetadata = app.rules.ruleTypes[Object.keys(vnode.attrs.rule)[0]];
+      this.ruleInitiallyValid = true;
     } else {
       this.internalBuiltRule = {};
       this.showSelectRule = true;
+      this.ruleInitiallyValid = false;
     }
     this.readyForReview = false;
     this.readyForSubmit = false;
   }
 
   view(vnode) {
-    const { onFinish, isNested } = vnode.attrs;
+    const { onFinish, isNested, onCancel } = vnode.attrs;
 
     const ruleOptions = Object.keys(app.rules.ruleTypes).map((ruleType) => {
       return { label: ruleType };
@@ -197,77 +223,98 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
         elevation="elevation-3"
         className={`RuleModal${isNested ? ` child-modal` : ''}`}
       >
-        <div class="title-section">
-          <CWText type="h3" fontStyle="semiBold">
-            {this.ruleMetadata && !this.readyForReview
-              ? this.ruleMetadata.name
-              : this.readyForReview
-              ? 'Review Your Rule'
-              : 'Select Rule Type'}
-          </CWText>
-          <CWText type="b1">
-            {this.ruleMetadata ? this.ruleMetadata.description : ''}
-          </CWText>
-        </div>
-        {this.showSelectRule && (
-          <CWDropdown
-            inputOptions={ruleOptions}
-            onSelect={(optionLabel: string) => {
-              // Clear out the internal built rule in event of switch
-              this.internalBuiltRule = {};
-              this.ruleMetadata = app.rules.ruleTypes[optionLabel];
-              this.readyForReview = false;
-              this.readyForSubmit = false;
+        <div className="top-section">
+          <div class="title-section">
+            <CWText type="h3" fontStyle="semiBold">
+              {this.ruleMetadata && !this.readyForReview
+                ? this.ruleMetadata.name
+                : this.readyForReview
+                ? 'Review Your Rule'
+                : `Select ${isNested ? 'Subr' : 'R'}ule Type`}
+            </CWText>
+            <CWText type="b1">
+              {this.ruleMetadata ? this.ruleMetadata.description : ''}
+            </CWText>
+          </div>
+          {this.showSelectRule && (
+            <CWDropdown
+              inputOptions={ruleOptions}
+              onSelect={(optionLabel: string) => {
+                // Clear out the internal built rule in event of switch
+                this.internalBuiltRule = {};
+                this.ruleMetadata = app.rules.ruleTypes[optionLabel];
+                this.readyForReview = false;
+                this.readyForSubmit = false;
 
-              // Create correct structure for rule
-              const ruleValue = [];
-              for (const argument of this.ruleMetadata.arguments) {
-                if (
-                  argument.type === 'address[]' ||
-                  argument.type === 'balance[]'
-                ) {
-                  ruleValue.push([]);
-                } else if (
-                  argument.type === 'address' ||
-                  argument.type === 'balance'
-                ) {
-                  ruleValue.push('');
+                // Create correct structure for rule
+                const ruleValue = [];
+                for (const argument of this.ruleMetadata.arguments) {
+                  if (
+                    argument.type === 'address[]' ||
+                    argument.type === 'balance[]'
+                  ) {
+                    ruleValue.push([]);
+                  } else if (
+                    argument.type === 'address' ||
+                    argument.type === 'balance'
+                  ) {
+                    ruleValue.push('');
+                  }
                 }
-              }
-              this.internalBuiltRule[optionLabel] = ruleValue;
+                this.internalBuiltRule[optionLabel] = ruleValue;
 
-              this.showRuleOptions = true;
-              m.redraw();
-            }}
-            initialValue="Select Rule Type"
-          />
-        )}
-        {this.showRuleOptions &&
-          this.ruleMetadata.arguments.map((argument, idx) => {
-            return (
-              <RuleEditSection
-                ruleArgument={argument}
-                argumentIdx={idx}
-                internalBuiltRule={this.internalBuiltRule}
-                ruleTypeIdentifier={Object.keys(this.internalBuiltRule)[0]}
-              />
-            );
-          })}
+                this.showRuleOptions = true;
+                m.redraw();
+              }}
+              initialValue="Select Rule Type"
+            />
+          )}
+          {this.showRuleOptions &&
+            this.ruleMetadata.arguments.map((argument, idx) => {
+              return (
+                <RuleEditSection
+                  ruleArgument={argument}
+                  argumentIdx={idx}
+                  internalBuiltRule={this.internalBuiltRule}
+                  ruleTypeIdentifier={Object.keys(this.internalBuiltRule)[0]}
+                />
+              );
+            })}
+        </div>
+
         <div class="footer-section">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary-black"
+            onclick={() => {
+              if (isNested && onCancel) {
+                onCancel(this.internalBuiltRule, this.ruleInitiallyValid);
+              } else {
+                $('.RuleModal').trigger('modalexit');
+              }
+            }}
+            className="cancel-button"
+          />
           {this.readyForSubmit ? (
             <CWButton
               label="Finish"
               onclick={() => {
                 onFinish(this.internalBuiltRule);
+                if (!isNested) {
+                  $('.RuleModal').trigger('modalexit');
+                }
               }}
             />
           ) : (
             <CWButton
               label="Next"
+              buttonType="primary-black"
               onclick={() => {
-                this.readyForReview = true;
-                this.readyForSubmit = true;
-                m.redraw();
+                if (Object.keys(this.internalBuiltRule).length > 0) {
+                  this.readyForReview = true;
+                  this.readyForSubmit = true;
+                  m.redraw();
+                }
               }}
             />
           )}
