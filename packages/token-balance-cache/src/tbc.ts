@@ -43,15 +43,15 @@ async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainN
   return nodeArray;
 }
 
-export default class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanceCache {
+export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanceCache {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
   private _lastQueryTime: number = 0;
   constructor(
-    private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB, 
-    providers: BalanceProvider[] = BalanceProviders,
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
+    providers: BalanceProvider[] = BalanceProviders,
+    private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB,
   ) {
     super({}, noBalancePruneTimeS);
     for (const provider of providers) {
@@ -89,11 +89,11 @@ export default class TokenBalanceCache extends JobRunner<ICache> implements ITok
     }];
   }
 
-  public async getBalances(
+  public async getBalancesForAddresses(
     nodeId: number,
     addresses: string[],
     balanceProvider: string,
-    opts: Record<string, string>,
+    opts: Record<string, string | undefined>,
   ): Promise<TokenBalanceResp> {
     const node = this._nodes[nodeId];
     if (!node) {

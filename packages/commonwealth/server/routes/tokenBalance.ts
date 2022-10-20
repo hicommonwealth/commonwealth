@@ -1,4 +1,4 @@
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache, TokenBalanceResp as TBCResp } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
@@ -47,7 +47,19 @@ const tokenBalance = async (
     throw new AppError(err)
   }
 
-  let chain_node_id = chain.ChainNode.id;
+  let chain_node_id = chain?.ChainNode?.id;
+  if (!chain_node_id) {
+    throw new ServerError(`No chain node found for chain ${chain.id}`)
+  }
+
+  let bp: string;
+  try {
+    const providersResult = tokenBalanceCache.getBalanceProviders(chain_node_id);
+    bp = providersResult[0].bp;
+  } catch (e) {
+    throw new AppError(`No token balance provider found for ${chain.id}`);
+  }
+
   if (
     ['ethereum', 'near', 'solana'].includes(chain.ChainNode.chain_base) &&
     chain.network !== ChainNetwork.AxieInfinity
@@ -66,19 +78,29 @@ const tokenBalance = async (
     }
   }
 
+  let balancesResp: TBCResp;
   try {
-    const balance = await tokenBalanceCache.getBalance(
+    balancesResp = await tokenBalanceCache.getBalancesForAddresses(
       chain_node_id,
-      author.address,
-      contract?.address,
-      chain.network === ChainNetwork.ERC20
-        ? 'erc20' : chain.network === ChainNetwork.ERC721
-          ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined,
+      [ author.address ],
+      bp,
+      {
+        contractAddress: contract?.address,
+        contractType: chain.network === ChainNetwork.ERC20
+          ? 'erc20' : chain.network === ChainNetwork.ERC721
+            ? 'erc721' : undefined,
+      },
     );
-    return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
+    throw new ServerError(Errors.QueryFailed);
+  }
+
+  if (balancesResp.balances[author.address]) {
+    return success(res, balancesResp.balances[author.address]);
+  } else if (balancesResp.errors[author.address]) {
+    throw new AppError(`Error querying balance: ${balancesResp.errors[author.address]}`);
+  } else {
     throw new ServerError(Errors.QueryFailed);
   }
 };

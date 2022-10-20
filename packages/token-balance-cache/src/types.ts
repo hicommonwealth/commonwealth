@@ -50,7 +50,7 @@ export type TokenBalanceResp = {
 export type ITokenBalanceCache = {
   getChainNodes(): Promise<ChainNodeResp[]>;
   getBalanceProviders(nodeId: number): Promise<BalanceProviderResp[]>;
-  getBalances(
+  getBalancesForAddresses(
     nodeId: number,
     addresses: string[],
     balanceProvider: string,

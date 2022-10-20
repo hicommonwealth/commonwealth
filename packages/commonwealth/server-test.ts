@@ -16,8 +16,7 @@ import {
   ChainType,
   BalanceType,
 } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
-import TokenBalanceProvider from 'token-balance-cache/src/provider';
+import { TokenBalanceCache, BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
@@ -38,17 +37,18 @@ const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(10 * 60);
 
 // always prune both token and non-token holders asap
-class MockTokenBalanceProvider extends TokenBalanceProvider {
+class MockTokenBalanceProvider implements BalanceProvider {
+  public name = 'eth-token'
+  public opts = {
+    tokenAddress: 'string',
+    contractType: 'string',
+  }
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
-  public async getEthTokenBalance(
-    address: string,
-    network: string,
-    tokenAddress?: string,
-    userAddress?: string
-  ): Promise<BN> {
+  public async getBalance(node: IChainNode, address: string, opts: Record<string, string>): Promise<string> {
     if (this.balanceFn) {
-      return this.balanceFn(tokenAddress, userAddress);
+      const bal = await this.balanceFn(opts.tokenAddress, address);
+      return bal.toString();
     } else {
       throw new Error('unable to fetch token balance');
     }
@@ -59,7 +59,7 @@ const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(
   0,
   0,
-  mockTokenBalanceProvider
+  [ mockTokenBalanceProvider ],
 );
 const ruleCache = new RuleCache();
 let server;
