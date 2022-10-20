@@ -116,6 +116,7 @@ class ContractsController {
         this._store.add(
           Contract.fromJSON({
             ...contract,
+            abi: contract.ContractAbi.abi,
           })
         );
       } catch (e) {
