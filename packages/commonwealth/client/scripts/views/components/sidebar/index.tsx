@@ -30,9 +30,9 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
 
     return (
       <div class="Sidebar">
-        {app.chain && isSidebarToggleable && isSidebarToggled ? (
+        {app.chain && isSidebarToggleable && isSidebarToggled && (
           <CommunityHeader meta={app.chain.meta} />
-        ) : null}
+        )}
         <div class="quickswitcher-and-sidebar-inner">
           {showQuickSwitcher && <SidebarQuickSwitcher />}
           {app.chain && (
