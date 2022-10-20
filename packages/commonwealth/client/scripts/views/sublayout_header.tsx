@@ -60,7 +60,6 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
         </div>
         {!hideSearch && <SearchBar />}
         <div class="sidebar-right">
-          {/* Only visible in mobile browser widths */}
           <div class="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
@@ -70,7 +69,6 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
               }}
             />
           </div>
-          {/* threadOnly option assumes all chains have proposals beyond threads */}
           <div class="DesktopMenuContainer">
             <CreateContentPopover />
             <HelpMenuPopover />

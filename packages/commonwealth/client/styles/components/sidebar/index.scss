@@ -1,101 +1,114 @@
 @import 'shared';
 
 .Sidebar {
-  background-color: $neutral-25;
-  border-right: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
-  height: auto;
-  min-width: $sidebar-width;
-  overflow-y: auto;
-  width: $sidebar-width;
+  width: min-content;
 
-  &.isSidebarToggled {
-    @include smallInclusive {
-      width: calc(100vw - 56px);
-    }
-  }
-
-  .buttons-container {
-    margin-top: 24px;
-
-    .subscription-button {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-  }
-}
-
-.powered-by {
-  background-image: url(/static/img/powered-by.svg);
-  background-position: center;
-  background-repeat: no-repeat;
-  border-color: $neutral-50;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  height: 104px;
-  width: 100%;
-
-  &:hover {
-    background-image: url('/static/img/powered-by-2.svg');
-  }
-}
-
-.cui-popover.community-options-popover .cui-menu,
-.cui-popover.community-options-popover .cui-menu {
-  padding: 4px 0;
-}
-
-.chatAdminOverlay {
-  align-items: center;
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-
-  .Card {
-    cursor: default;
-    max-width: none;
-    position: relative;
-    width: 500px;
-    z-index: 100;
-
+  .quickswitcher-and-sidebar-inner {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    height: 100%;
+    overflow: hidden;
+    width: min-content;
 
-    .header {
-      align-items: center;
+    .sidebar-inner {
+      background-color: $neutral-25;
+      border-right: 1px solid $neutral-200;
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      width: 100%;
+      flex-direction: column;
+      height: auto;
+      min-width: $sidebar-width;
+      overflow-y: auto;
+      width: $sidebar-width;
 
-      svg {
-        cursor: pointer;
+      &.isSidebarToggled {
+        @include smallInclusive {
+          width: calc(100vw - 56px);
+        }
+      }
+
+      .buttons-container {
+        margin-top: 24px;
+
+        .subscription-button {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 16px;
+        }
       }
     }
 
-    .TextInput {
+    .powered-by {
+      background-image: url(/static/img/powered-by.svg);
+      background-position: center;
+      background-repeat: no-repeat;
+      border-color: $neutral-50;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      height: 104px;
       width: 100%;
+
+      &:hover {
+        background-image: url('/static/img/powered-by-2.svg');
+      }
     }
 
-    .cui-icon-x {
-      color: $neutral-600;
-      left: calc(100% - 35px);
-      position: absolute;
-      top: 15px;
+    .cui-popover.community-options-popover .cui-menu,
+    .cui-popover.community-options-popover .cui-menu {
+      padding: 4px 0;
     }
 
-    .button-bar {
+    .chatAdminOverlay {
+      align-items: center;
       display: flex;
-      flex-direction: row;
-      justify-content: flex-end;
-      width: 100%;
+      height: 100vh;
+      justify-content: center;
 
-      button {
-        margin-left: 8px;
+      .Card {
+        cursor: default;
+        max-width: none;
+        position: relative;
+        width: 500px;
+        z-index: 100;
+
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .header {
+          align-items: center;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          width: 100%;
+
+          svg {
+            cursor: pointer;
+          }
+        }
+
+        .TextInput {
+          width: 100%;
+        }
+
+        .cui-icon-x {
+          color: $neutral-600;
+          left: calc(100% - 35px);
+          position: absolute;
+          top: 15px;
+        }
+
+        .button-bar {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          width: 100%;
+
+          button {
+            margin-left: 8px;
+          }
+        }
       }
     }
   }

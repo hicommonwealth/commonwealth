@@ -7,14 +7,12 @@ import 'sublayout.scss';
 import app from 'state';
 import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
-import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import {
   getClasses,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { CommunityHeader } from './components/sidebar/community_header';
 import { AppMobileMenus } from './app_mobile_menus';
 import { SublayoutHeader } from './sublayout_header';
 
@@ -27,11 +25,19 @@ type SublayoutAttrs = {
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
-  private showQuickSwitcher: boolean;
 
   oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
+    }
+
+    if (!app.chain) {
+      this.isSidebarToggled = false;
+    } else {
+      this.isSidebarToggled =
+        !isWindowSmallInclusive(window.innerWidth) ||
+        localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) ===
+          'true';
     }
   }
 
@@ -48,22 +54,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    const storedSidebarToggleState =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-
-    if (!app.chain) {
-      this.isSidebarToggled = false;
-      this.showQuickSwitcher = true;
-    } else {
-      this.isSidebarToggled =
-        !isWindowSmallInclusive(window.innerWidth) || storedSidebarToggleState;
-      this.showQuickSwitcher = this.isSidebarToggled;
-    }
-
-    if (!isWindowSmallInclusive(window.innerWidth)) {
-      delete app.mobileMenu;
-    }
-
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
@@ -75,23 +65,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
             }}
           />
           <div class="sidebar-and-body-container">
-            {(this.isSidebarToggled || this.showQuickSwitcher) && (
-              <div class="sidebar-container">
-                {this.isSidebarToggled && this.showQuickSwitcher && (
-                  <CommunityHeader meta={app.chain.meta} />
-                )}
-                <div class="sidebar-inner-container">
-                  {this.showQuickSwitcher && <SidebarQuickSwitcher />}
-                  <Sidebar isSidebarToggled={this.isSidebarToggled} />
-                </div>
-              </div>
-            )}
-            <div
-              class={getClasses<{ isSidebarToggled: boolean }>(
-                { isSidebarToggled: this.isSidebarToggled },
-                'body-and-sticky-headers-container'
-              )}
-            >
+            <Sidebar isSidebarToggled={this.isSidebarToggled} />
+            <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
                 chain={chain}
@@ -100,7 +75,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
 
-              {app.mobileMenu ? (
+              {isWindowSmallInclusive(window.innerWidth) && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
                 <div class="Body" onscroll={onscroll}>

@@ -19,29 +19,10 @@
     overflow: hidden;
     width: 100%;
 
-    .sidebar-container {
-      display: flex;
-      flex-direction: column;
-      width: min-content;
-
-      .sidebar-inner-container {
-        display: flex;
-        height: 100%;
-        overflow: hidden;
-        width: min-content;
-      }
-    }
-
     .body-and-sticky-headers-container {
       display: flex;
       flex-direction: column;
       width: 100%;
-
-      &.isSidebarToggled {
-        @include smallInclusive {
-          display: none;
-        }
-      }
 
       .Body {
         display: flex;
