@@ -63,9 +63,7 @@ class GeneralContractPage
 
   async oninit(vnode) {
     const { contractAddress } = vnode.attrs;
-    const contract: Contract =
-      app.contracts.store.getContractByAddress(contractAddress);
-    console.log('the contract is ', contract);
+    const contract: Contract = app.contracts.getByAddress(contractAddress);
     if (contract.abi === undefined || contract.abi === '') {
       this.loadAbiFromEtherscan(contract.address).then((abi) => {
         // Populate Abi Table
