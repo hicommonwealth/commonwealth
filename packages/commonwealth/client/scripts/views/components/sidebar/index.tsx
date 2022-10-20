@@ -26,13 +26,15 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
 
     const hideChat = !app.chain?.meta?.chatEnabled;
 
+    const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
+
     return (
       <div class="Sidebar">
         {app.chain && isSidebarToggleable && isSidebarToggled ? (
           <CommunityHeader meta={app.chain.meta} />
         ) : null}
         <div class="quickswitcher-and-sidebar-inner">
-          <SidebarQuickSwitcher />
+          {showQuickSwitcher && <SidebarQuickSwitcher />}
           {app.chain && (
             <div
               class={getClasses<{

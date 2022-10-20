@@ -22,7 +22,7 @@
     .body-and-sticky-headers-container {
       display: flex;
       flex-direction: column;
-      width: calc(100vw - 56px);
+      width: 100%;
 
       .Body {
         display: flex;
