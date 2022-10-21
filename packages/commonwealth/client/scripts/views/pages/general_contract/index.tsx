@@ -155,13 +155,6 @@ class GeneralContractPage
 
     if (!app.contracts || !app.chain) {
       return <PageLoading title="General Contract" />;
-    } else if (this.state.loadingEtherscanAbi) {
-      return (
-        <PageLoading
-          title="Loading ABI from Etherscan"
-          message="Loading ABI from Etherscan"
-        />
-      );
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
         return (
