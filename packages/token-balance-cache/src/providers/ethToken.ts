@@ -9,7 +9,7 @@ type EthBPOpts = {
   contractType: string;
 };
 
-export default class EthTokenBalanceProvider implements BalanceProvider<EthBPOpts> {
+export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> {
   public name = 'eth-token';
   public opts = {
     contractType: 'string',

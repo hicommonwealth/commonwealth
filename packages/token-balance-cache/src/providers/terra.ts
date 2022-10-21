@@ -3,15 +3,9 @@ import axios from 'axios';
 
 import { BalanceProvider, IChainNode } from "../types";
 
-export type TerraBPOpts = { };
-
-export default class TerraBalanceProvider implements BalanceProvider<TerraBPOpts> {
+export default class TerraBalanceProvider extends BalanceProvider {
   public name = 'terra';
   public opts = {};
-
-  public getCacheKey(node: IChainNode, address: string): string {
-    return `${node.id}-${address}`;
-  }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {

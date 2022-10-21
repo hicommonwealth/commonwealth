@@ -6,15 +6,9 @@ import { ERC20__factory } from 'common-common/src/eth/types';
 
 import { BalanceProvider, IChainNode } from "../types";
 
-export type RoninBPOpts = { };
-
-export default class RoninBalanceProvider implements BalanceProvider<RoninBPOpts> {
+export default class RoninBalanceProvider extends BalanceProvider {
   public name = 'ronin';
   public opts = {};
-
-  public getCacheKey(node: IChainNode, address: string): string {
-    return `${node.id}-${address}`;
-  }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     // TODO: make configurable

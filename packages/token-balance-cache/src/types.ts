@@ -1,5 +1,4 @@
 import { BalanceType } from 'common-common/src/types';
-import BN from 'bn.js';
 
 // map of addresses to balances
 export interface ICache {
@@ -31,11 +30,15 @@ export type ChainNodeResp = {
   prefix?: string,
 };
 
-export type BalanceProvider<OptT extends Record<string, unknown> = Record<string, unknown>> = {
-  name: string;
-  opts: Record<keyof OptT, string>;
-  getCacheKey(node: IChainNode, address: string, opts: OptT): string;
-  getBalance(node: IChainNode, address: string, opts: OptT): Promise<string>;
+export abstract class BalanceProvider<OptT extends Record<string, unknown> = Record<string, unknown>> {
+  public readonly name: string;
+  public readonly opts: Record<keyof OptT, string>;
+
+  public getCacheKey(node: IChainNode, address: string, opts: OptT): string {
+    return `${node.id}-${address}`;
+  }
+
+  public abstract getBalance(node: IChainNode, address: string, opts: OptT): Promise<string>;
 }
 
 export type BalanceProviderResp = {
