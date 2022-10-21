@@ -94,13 +94,13 @@ export async function initAppState(
         updateActiveUser(data.user);
         app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
 
-        if (app.loginState == LoginState.LoggedIn) {
+        if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
         } else if (
-          app.loginState == LoginState.LoggedOut &&
+          app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
@@ -601,7 +601,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               null;
 
         /* Deprecating the contract_address => community pipeline.
-        This breaks our mental model of where our site is going. 
+        This breaks our mental model of where our site is going.
         */
 
         // if (scope) {
@@ -1048,6 +1048,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             '/:scope/analytics': importRoute('views/pages/stats', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/rules': importRoute('views/pages/rules', {
               scoped: true,
               deferChain: true,
             }),

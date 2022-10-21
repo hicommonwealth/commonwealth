@@ -144,7 +144,7 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
                   type="caption"
                   className="published-text"
                 >{`published on ${moment(ruleCreatedAt).format(
-                  'DD/MM/YY'
+                  'MM/DD/YY'
                 )}`}</CWText>
               )}
             </div>

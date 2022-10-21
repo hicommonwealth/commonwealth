@@ -1,0 +1,35 @@
+@import 'shared';
+
+.RulesPage {
+  display: flex;
+  flex-direction: column;
+  padding-right: 15%;
+  padding-left: 15%;
+  padding-top: 24px;
+
+  .rules-header-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    margin-top: 24px;
+
+    .create-rule-section {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+
+  .description {
+    margin-bottom: 24px;
+  }
+
+  .bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+}

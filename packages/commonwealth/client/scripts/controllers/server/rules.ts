@@ -11,6 +11,10 @@ class RulesController {
     return this._ruleTypes;
   }
 
+  public get getRules() {
+    return this._rulesStore.getAll();
+  }
+
   // Checks if a provided address passes a set of rules
   // Agnostic to chain; this will work even if the rule is not in the store
   public async checkAgainstRules({
