@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from 'server/models';
+import { ContractAbiAttributes } from 'server/models/contract_abi';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -20,13 +21,13 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateContractAbiReq = {
+export type CreateContractAbiReq = {
   contractId: number;
   abi: Array<Record<string, unknown>>;
 };
 
-type CreateContractAbiResp = {
-  contractAbi: any;
+export type CreateContractAbiResp = {
+  contractAbi: ContractAbiAttributes;
   contract: ContractAttributes;
 };
 
@@ -40,10 +41,6 @@ const createContractAbi = async (
 
   if (!req.user) {
     return next(new Error('Not logged in'));
-  }
-  // require Admin privilege for creating Contract
-  if (!req.user.isAdmin) {
-    return next(new Error(Errors.NotAdmin));
   }
 
   if (!contractId) {
@@ -62,8 +59,11 @@ const createContractAbi = async (
     const contract = await models.Contract.findOne({
       where: { id: contractId },
     });
-    if (contract) contract.abi_id = contract_abi.id;
-    await contract.save();
+
+    if (contract && contract_abi) {
+      contract.abi_id = contract_abi.id;
+      await contract.save();
+    }
 
     return success(res, {
       contractAbi: contract_abi.toJSON(),

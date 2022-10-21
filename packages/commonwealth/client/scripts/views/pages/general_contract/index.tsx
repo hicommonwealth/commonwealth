@@ -4,6 +4,7 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
+import { Spinner } from 'construct-ui';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
@@ -12,7 +13,6 @@ import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import Ethereum from 'controllers/chain/ethereum/adapter';
@@ -20,7 +20,13 @@ import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
   getEtherscanABI,
-} from '../../../helpers/abi_utils';
+  parseEventFromABI,
+} from 'helpers/abi_utils';
+import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
+import {
+  handleMappingMultipleAbiInputs,
+  validateAbiInput,
+} from 'helpers/abi_form_helpers';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -37,6 +43,7 @@ type CreateContractState = ChainFormState & {
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
 {
+  generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
     message: '',
     loaded: false,
@@ -49,8 +56,9 @@ class GeneralContractPage
     },
   };
 
-  // TODO: figure out when to use this method properly
-  loadAbiFromEtherscan = async (contractAddress: string): Promise<JSON> => {
+  loadAbiFromEtherscan = async (
+    contractAddress: string
+  ): Promise<Array<Record<string, unknown>>> => {
     try {
       return await getEtherscanABI('mainnet', contractAddress);
     } catch (error) {
@@ -58,51 +66,33 @@ class GeneralContractPage
     }
   };
 
-  async oninit(vnode) {
-    const { contractAddress } = vnode.attrs;
-    const contract: Contract =
-      app.contracts.store.getContractByAddress(contractAddress);
-    if (contract.abi === undefined || contract.abi === '') {
-      this.loadAbiFromEtherscan(contract.address).then((abi) => {
-        // Populate Abi Table
-        app.contracts.addContractAbi(contract, abi);
-      });
-    }
-    this.state.loaded = true;
-  }
-
   view(vnode) {
-    // Payable functions are not supported in this implementation
+    const Bytes32 = ethers.utils.formatBytes32String;
 
-    const getWeb3 = async (): Promise<Web3> => {
-      // Initialize Chain
-      const ethChain = app.chain.chain as EthereumChain;
-
-      const currChain = app.chain;
-      const currNode = currChain.meta.ChainNode;
-      const web3Api = await ethChain.initApi(currNode);
-      return web3Api;
-    };
-
-    const getWeb3Contract = async (): Promise<Web3Contract> => {
-      const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
-      // Initialize Chain and Create contract instance
-      const web3Api = await getWeb3();
-      const web3Contract: Web3Contract = new web3Api.eth.Contract(
-        parseAbiItemsFromABI(contract.abi),
-        contractAddress
-      );
-      return web3Contract;
+    const fetchContractAbi = async (contract: Contract) => {
+      if (contract.abi === undefined) {
+        if (contract.abi === undefined) {
+          const abiJson = await this.loadAbiFromEtherscan(contract.address);
+          await app.contracts.addContractAbi(contract, abiJson);
+          // TODO The UI Should In One Go show the abi form after successfully fetching the abi from etherscan
+          m.redraw();
+        }
+      }
     };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      this.state.loading = true;
       // handle array and int types
       const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
         const type = arg.type;
         if (type.substring(0, 4) === 'uint')
           return BigNumber.from(
+            this.state.form.functionNameToFunctionInputArgs
+              .get(fn.name)
+              .get(index)
+          );
+        if (type.substring(0, 4) === 'byte')
+          return Bytes32(
             this.state.form.functionNameToFunctionInputArgs
               .get(fn.name)
               .get(index)
@@ -118,86 +108,73 @@ class GeneralContractPage
           .get(index);
       });
 
-      const functionContract = await getWeb3Contract();
+      const contract = app.contracts.getByAddress(contractAddress);
+      let tx;
+      try {
+        // initialize daoFactory Controller
+        const ethChain = app.chain.chain as EthereumChain;
 
-      // 5. Build function tx
-      // Assumption is using this methodology for calling functions
-      // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html#id26
+        this.generalContractsController = new GeneralContractsController(
+          ethChain,
+          contract
+        );
 
-      // if (fn.stateMutability !== "view" && fn.constant !== true) {
-      //   // // set options for transaction
-      //   const opts: any = {};
-      //   if (ethToSend !== "") opts.value = ethers.utils.parseEther(ethToSend);
-      //   if (gasLimit !== "" && showGasLimit) opts.gasLimit = parseInt(gasLimit);
+        const sender = app.user.activeAccount;
+        //   // get querying wallet
+        const signingWallet = await app.wallets.locateWallet(
+          sender,
+          ChainBase.Ethereum
+        );
 
-      // } else {
-
-      // }
-
-      const methodSignature = `${fn.name}(${fn.inputs
-        .map((input) => input.type)
-        .join(',')})`;
-
-      const functionTx = functionContract.methods[methodSignature](
-        ...processedArgs
-      );
-      const sender = app.user.activeAccount;
-      //   // get querying wallet
-      const signingWallet = await app.wallets.locateWallet(
-        sender,
-        ChainBase.Ethereum
-      );
-
-      //   // get chain
-      const chain = (app.chain as Ethereum).chain;
-
-      const web3Api = await getWeb3();
-      let tx: string;
-      if (fn.stateMutability !== 'view' && fn.constant !== true) {
-        // Sign Tx with PK if not view function
-        tx = await chain.makeContractTx(
-          contractAddress,
-          functionTx.encodeABI(),
+        tx = await this.generalContractsController.callContractFunction(
+          fn,
+          processedArgs,
           signingWallet
         );
-      } else {
-        // send transaction
-        tx = await chain.makeContractCall(
-          contractAddress,
-          functionTx.encodeABI(),
-          signingWallet
+        console.log('tx is ', tx);
+      } catch (err) {
+        notifyError(
+          err.responseJSON?.error || `Calling Function ${fn.name} failed`
         );
+        this.state.status = 'failure';
+        this.state.message = err.message;
+        this.state.loading = false;
+        m.redraw();
+        return;
       }
-      // simple return type
-      if (fn.outputs.length === 1) {
-        const decodedTx = web3Api.eth.abi.decodeParameter(
-          fn.outputs[0].type,
-          tx
-        );
-        const result: any[] = [];
-        result.push(decodedTx);
-        this.state.functionNameToFunctionOutput.set(fn.name, result);
-      } else if (fn.outputs.length > 1) {
-        const decodedTxMap = web3Api.eth.abi.decodeParameters(
-          fn.outputs.map((output) => output.type),
-          tx
-        );
-        // complex return type
-        const processed = Array.from(Object.values(decodedTxMap));
-        this.state.functionNameToFunctionOutput.set(fn.name, processed);
-      }
+
+      this.state.saving = false;
+      const result = this.generalContractsController.decodeTransactionData(
+        fn,
+        tx
+      );
+      this.state.functionNameToFunctionOutput.set(fn.name, result);
+
+      this.state.loaded = true;
+      this.state.loading = false;
+      m.redraw();
     };
 
     const loadContractAbi = () => {
       const { contractAddress } = vnode.attrs;
-      const contract: Contract =
-        app.contracts.store.getContractByAddress(contractAddress);
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
       const abiFunctions = parseFunctionsFromABI(contract.abi);
       return abiFunctions;
     };
 
     const { contractAddress } = vnode.attrs;
-    if (!app.contracts || !app.chain || !this.state.loaded) {
+
+    if (app.contracts.getCommunityContracts().length > 0) {
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
+      if (contract) {
+        this.state.loaded = true;
+        this.state.status = 'success';
+        this.state.message = 'Contract loaded';
+      }
+      fetchContractAbi(contract);
+    }
+
+    if (!app.contracts || !app.chain) {
       return <PageLoading title="General Contract" />;
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
@@ -239,93 +216,18 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                if (
-                                  !this.state.form.functionNameToFunctionInputArgs.has(
-                                    fn.name
-                                  )
-                                ) {
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    new Map<number, string>()
-                                  );
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                } else {
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                }
+                                handleMappingMultipleAbiInputs(
+                                  inputIdx,
+                                  e.target.value,
+                                  fn,
+                                  this.state.form
+                                    .functionNameToFunctionInputArgs
+                                );
                                 this.state.loaded = true;
                               }}
-                              inputValidationFn={(
-                                val: string
-                              ): [ValidationStatus, string] => {
-                                // TODO Array Validation will be complex. Check what cases we want to cover here
-                                if (input.type.slice(-2) === '[]') {
-                                  if (
-                                    val[0] !== '[' ||
-                                    val[val.length - 1] !== ']'
-                                  ) {
-                                    return [
-                                      'failure',
-                                      'Input must be an array',
-                                    ];
-                                  } else {
-                                    return ['success', ''];
-                                  }
-                                }
-                                if (input.type === 'bool') {
-                                  if (val !== 'true' && val !== 'false') {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                }
-                                if (input.type.substring(0, 4) === 'uint') {
-                                  if (!Number.isNaN(Number(val))) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a number',
-                                    ];
-                                  }
-                                } else if (input.type === 'bool') {
-                                  if (val === 'true' || val === 'false') {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                } else if (input.type === 'address') {
-                                  if (val.length === 42) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be an address',
-                                    ];
-                                  }
-                                } else {
-                                  return ['success', ''];
-                                }
-                              }}
+                              inputValidationFn={(val) =>
+                                validateAbiInput(val, input)
+                              }
                             />
                           </div>
                         </div>
@@ -334,9 +236,8 @@ class GeneralContractPage
                   </div>
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
-                      const fnOutputArray = this.state.functionNameToFunctionOutput.get(
-                        fn.name
-                      )
+                      const fnOutputArray =
+                        this.state.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div class="function-outputs">
@@ -345,8 +246,11 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
+                            {this.state.loading && <Spinner active />}
                             <CWText>
-                              {fnOutputArray && fnOutputArray[i].toString() ? fnOutputArray[i].toString() : ''}
+                              {fnOutputArray && fnOutputArray[i].toString()
+                                ? fnOutputArray[i].toString()
+                                : ''}
                             </CWText>
                           </div>
                         </div>

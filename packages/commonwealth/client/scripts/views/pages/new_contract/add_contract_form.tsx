@@ -94,7 +94,6 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           options={[
             ContractType.ERC20,
             ContractType.ERC721,
-            ContractType.SPL,
             ContractType.AAVE,
             ContractType.COMPOUND,
           ]}
@@ -137,8 +136,16 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loading
           }
           onclick={async () => {
-            const { altWalletUrl, chainString, chain_node_id, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              address,
+              abi,
+              contractType,
+              chain_node_id,
+              nodeUrl,
+              symbol,
+              token_name,
+              decimals,
+            } = this.state.form;
             this.state.saving = true;
             try {
               const res = await app.contracts.add(
@@ -146,12 +153,12 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 ChainBase.Ethereum,
                 chain_node_id,
                 nodeUrl,
-                this.state.form.address,
-                this.state.form.abi,
-                this.state.form.contractType,
-                this.state.form.symbol,
-                this.state.form.token_name,
-                this.state.form.decimals
+                address,
+                abi,
+                contractType,
+                symbol,
+                token_name,
+                decimals
               );
               if (res) {
                 this.state.status = 'success';
@@ -165,6 +172,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               );
             } finally {
               this.state.saving = false;
+              m.redraw();
             }
           }}
         />

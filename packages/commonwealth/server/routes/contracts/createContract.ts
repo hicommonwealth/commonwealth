@@ -4,9 +4,9 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
+import { DB } from 'server/models';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
-import { DB } from '../../models';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -33,15 +33,16 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateContractReq = ContractAttributes &
+export type CreateContractReq = ContractAttributes &
   Omit<ChainNodeAttributes, 'id'> & {
+    community: string;
     node_url: string;
     address: string;
-    abi: Record<string, unknown>;
+    abi: Array<Record<string, unknown>>;
     contractType: ContractType;
   };
 
-type CreateContractResp = {
+export type CreateContractResp = {
   contract: ContractAttributes;
 };
 
@@ -52,6 +53,7 @@ const createContract = async (
   next: NextFunction
 ) => {
   const {
+    community,
     address,
     contractType,
     abi,
@@ -59,6 +61,7 @@ const createContract = async (
     token_name,
     decimals,
     chain_node_id,
+    chain_base,
   } = req.body;
 
   if (!req.user) {
@@ -68,7 +71,7 @@ const createContract = async (
   if (!req.user.isAdmin) {
     return next(new Error(Errors.NotAdmin));
   }
-  if (abi && (Object.keys(abi) as Array<string>).length === 0) {
+  if (abi && abi.length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
 
@@ -92,33 +95,66 @@ const createContract = async (
     return next(new Error(Errors.ContractAddressExists));
   }
 
-  // override provided URL for eth chains (typically ERC20) with stored, unless none found
-  const node = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      id: chain_node_id,
-    },
-  });
+  try {
+    // override provided URL for eth chains (typically ERC20) with stored, unless none found
+    const node = await models.ChainNode.scope('withPrivateData').findOne({
+      where: {
+        id: chain_node_id,
+        chain_base,
+      },
+    });
+    if (!node) {
+      return next(new Error('Node not found'));
+    }
 
-  const contract_abi = await models.ContractAbi.create({
-    abi,
-  });
+    let contract;
+    if (abi != null) {
+      const contract_abi = await models.ContractAbi.create({
+        abi,
+      });
+      if (contract_abi) {
+        [contract] = await models.Contract.findOrCreate({
+          where: {
+            address,
+            chain_node_id: node.id,
+            token_name,
+            abi_id: contract_abi.id,
+            symbol,
+            decimals,
+            type: contractType,
+          },
+        });
+      } else {
+        return next(new Error('Could not create contract abi'));
+      }
+    } else {
+      [contract] = await models.Contract.findOrCreate({
+        where: {
+          address,
+          token_name,
+          symbol,
+          decimals,
+          type: contractType,
+          chain_node_id: node.id,
+        },
+      });
+    }
 
-  const [contract, result] = await models.Contract.findOrCreate({
-    where: {
-      address,
-      chain_node_id: node.id,
-      token_name,
-      abi_id: contract_abi.id,
-      symbol,
-      decimals,
-      type: contractType,
-    },
-  });
+    await models.CommunityContract.create({
+      chain_id: community,
+      contract_id: contract.id,
+    });
 
-  const nodeJSON = node.toJSON();
-  delete nodeJSON.private_url;
+    const nodeJSON = node.toJSON();
+    delete nodeJSON.private_url;
 
-  return success(res, { contract: contract.toJSON() });
+    return success(res, {
+      contract: contract.toJSON(),
+    });
+  } catch (err) {
+    console.log('Error creating contract: ', err);
+    return next(err);
+  }
 };
 
 export default createContract;

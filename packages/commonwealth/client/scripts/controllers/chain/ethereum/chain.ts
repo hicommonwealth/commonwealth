@@ -45,7 +45,11 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._instance;
   }
 
-  public async makeContractCall(to: string, data: string, wallet: IWebWallet<any>) {
+  public async makeContractCall(
+    to: string,
+    data: string,
+    wallet: IWebWallet<any>
+  ) {
     // encoding + decoding require ABI + happen inside contracts controller
     try {
       const result = await wallet.contractCall({ to, data });
@@ -58,23 +62,14 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   /*
   Writing to contract data, aka creating transaction
   */
-  public async makeContractTx(
-    to: string,
-    data: string,
-    wallet: IWebWallet<any>
-  ) {
-    try {
-      // Not using contractApi because it's ethers-dependent
-      // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
-      const txHash = await wallet.sendTransaction({
-        from: wallet.accounts[0],
-        to,
-        data,
-      });
-      return txHash;
-    } catch (error) {
-      console.log(error);
-    }
+  public makeContractTx(to: string, data: string, wallet: IWebWallet<any>): Promise<TransactionReceipt> {
+    // Not using contractApi because it's ethers-dependent
+    // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
+    return wallet.sendTransaction({
+      from: wallet.accounts[0],
+      to,
+      data,
+    });
   }
 
   public get denom() {
@@ -104,18 +99,22 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._totalbalance;
   }
 
-  public async initApi(node?: NodeInfo): Promise<Web3> {
-    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+  public async _initApi(node: NodeInfo): Promise<Web3> {
     try {
       // TODO: support http?
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
+      return this._api;
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
       this.app.chain.networkStatus = ApiStatus.Disconnected;
       throw error;
     }
+  }
 
+  public async initApi(node?: NodeInfo): Promise<Web3> {
+    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();
