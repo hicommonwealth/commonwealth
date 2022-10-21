@@ -7,15 +7,13 @@ import m from 'mithril';
 import { Spinner } from 'construct-ui';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { ethers } from 'ethers';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
-import Web3 from 'web3';
-import Ethereum from 'controllers/chain/ethereum/adapter';
+import { TransactionReceipt } from 'web3-core';
 import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
@@ -24,7 +22,7 @@ import {
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import {
-  handleMappingMultipleAbiInputs,
+  handleMappingAbiInputs,
   processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
@@ -75,14 +73,17 @@ class GeneralContractPage
         if (contract.abi === undefined) {
           const abiJson = await this.loadAbiFromEtherscan(contract.address);
           await app.contracts.addContractAbi(contract, abiJson);
-          // TODO The UI Should In One Go show the abi form after successfully fetching the abi from etherscan
+          // TODO The UI Should In One Go show the abi form after successfully fetching the abi
+          // from etherscan, which it does not do rn
           m.redraw();
         }
       }
     };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
+      const contract = app.contracts.getByAddress(contractAddress);
       this.state.loading = true;
+      let tx: string | TransactionReceipt;
 
       // handle processing the forms inputs into their proper data types
       const processedArgs = processAbiInputsToDataTypes(
@@ -90,8 +91,6 @@ class GeneralContractPage
         this.state.form.functionNameToFunctionInputArgs
       );
 
-      const contract = app.contracts.getByAddress(contractAddress);
-      let tx;
       try {
         // initialize daoFactory Controller
         const ethChain = app.chain.chain as EthereumChain;
@@ -125,13 +124,13 @@ class GeneralContractPage
         return;
       }
 
-      this.state.saving = false;
       const result = this.generalContractsController.decodeTransactionData(
         fn,
         tx
       );
       this.state.functionNameToFunctionOutput.set(fn.name, result);
 
+      this.state.saving = false;
       this.state.loaded = true;
       this.state.loading = false;
       m.redraw();
@@ -205,7 +204,7 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                handleMappingMultipleAbiInputs(
+                                handleMappingAbiInputs(
                                   inputIdx,
                                   e.target.value,
                                   fn,

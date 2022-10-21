@@ -44,7 +44,7 @@ export function validateAbiInput(
   }
 }
 
-export function handleMappingMultipleAbiInputs(
+export function handleMappingAbiInputs(
   inputIndex: number,
   input: any,
   abiItem: AbiItem,
