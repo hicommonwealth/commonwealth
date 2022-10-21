@@ -7,7 +7,7 @@ import m from 'mithril';
 import { Spinner } from 'construct-ui';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -25,6 +25,7 @@ import {
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import {
   handleMappingMultipleAbiInputs,
+  processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
 import { PageNotFound } from '../404';
@@ -69,8 +70,6 @@ class GeneralContractPage
   };
 
   view(vnode) {
-    const Bytes32 = ethers.utils.formatBytes32String;
-
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
         if (contract.abi === undefined) {
@@ -84,31 +83,12 @@ class GeneralContractPage
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       this.state.loading = true;
-      // handle array and int types
-      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
-        const type = arg.type;
-        if (type.substring(0, 4) === 'uint')
-          return BigNumber.from(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        if (type.substring(0, 4) === 'byte')
-          return Bytes32(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        if (type.slice(-2) === '[]')
-          return JSON.parse(
-            this.state.form.functionNameToFunctionInputArgs
-              .get(fn.name)
-              .get(index)
-          );
-        return this.state.form.functionNameToFunctionInputArgs
-          .get(fn.name)
-          .get(index);
-      });
+
+      // handle processing the forms inputs into their proper data types
+      const processedArgs = processAbiInputsToDataTypes(
+        fn,
+        this.state.form.functionNameToFunctionInputArgs
+      );
 
       const contract = app.contracts.getByAddress(contractAddress);
       let tx;
