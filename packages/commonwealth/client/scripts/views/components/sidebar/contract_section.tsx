@@ -41,7 +41,7 @@ export class ContractSection
 
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
 
-    this.contracts = app.contracts.getByCommunity(app.activeChainId());
+    this.contracts = app.contracts.getCommunityContracts();
 
     // ---------- Build Section Props ---------- //
 
