@@ -19,7 +19,6 @@ import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { SnapshotProposalCards } from './snapshot_proposal_cards';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 
 type ViewProposalPageAttrs = {
@@ -159,68 +158,6 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             },
           ]}
         />
-        {/* <div class="SnapshotViewProposalPage">
-          <div class="proposal-body-with-tabs">
-            <CWTabBar>
-              <CWTab
-                label="Proposals"
-                isSelected={this.activeTab === 'proposals'}
-                onclick={() => {
-                  this.activeTab = 'proposals';
-                }}
-              />
-              <CWTab
-                label="Info & Results"
-                isSelected={this.activeTab === 'info-and-results'}
-                onclick={() => {
-                  this.activeTab = 'info-and-results';
-                }}
-              />
-            </CWTabBar>
-            {this.activeTab === 'proposals' && (
-              <SnapshotProposalContent
-                proposal={this.proposal}
-                votes={this.votes}
-                symbol={this.symbol}
-              />
-            )}
-            {this.activeTab === 'info-and-results' && (
-              <SnapshotProposalCards
-                identifier={identifier}
-                proposal={this.proposal}
-                scores={this.scores}
-                space={this.space}
-                symbol={this.symbol}
-                threads={this.threads}
-                totals={this.totals}
-                votes={this.votes}
-                validatedAgainstStrategies={this.validatedAgainstStrategies}
-                fetchedPower={this.fetchedPower}
-                totalScore={this.totalScore}
-              />
-            )}
-          </div>
-          <div class="proposal-body">
-            <SnapshotProposalContent
-              proposal={this.proposal}
-              votes={this.votes}
-              symbol={this.symbol}
-            />
-            <SnapshotProposalCards
-              identifier={identifier}
-              proposal={this.proposal}
-              scores={this.scores}
-              space={this.space}
-              symbol={this.symbol}
-              threads={this.threads}
-              totals={this.totals}
-              votes={this.votes}
-              validatedAgainstStrategies={this.validatedAgainstStrategies}
-              fetchedPower={this.fetchedPower}
-              totalScore={this.totalScore}
-            />
-          </div>
-        </div> */}
       </Sublayout>
     );
   }

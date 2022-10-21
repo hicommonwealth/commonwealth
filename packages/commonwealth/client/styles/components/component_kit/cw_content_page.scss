@@ -3,11 +3,23 @@
 .ContentPage {
   display: flex;
   flex: 1;
-  flex-direction: column;
   padding: 24px;
+
+  .body {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    &.showSidebar {
+      @include mediumSmallInclusive {
+        display: none;
+      }
+    }
+  }
 
   .body-with-tabs {
     display: none;
+    flex-direction: column;
 
     &.showSidebar {
       display: flex;
@@ -18,19 +30,6 @@
       }
 
       @include large {
-        display: none;
-      }
-    }
-  }
-
-  .body {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-
-    &.showSidebar {
-      @include mediumSmallInclusive {
         display: none;
       }
     }
