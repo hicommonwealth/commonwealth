@@ -13,7 +13,6 @@ import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
 import Ethereum from 'controllers/chain/ethereum/adapter';
@@ -24,6 +23,10 @@ import {
   parseEventFromABI,
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
+import {
+  handleMappingMultipleAbiInputs,
+  validateAbiInput,
+} from 'helpers/abi_form_helpers';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -53,7 +56,9 @@ class GeneralContractPage
     },
   };
 
-  loadAbiFromEtherscan = async (contractAddress: string): Promise<JSON> => {
+  loadAbiFromEtherscan = async (
+    contractAddress: string
+  ): Promise<Array<Record<string, unknown>>> => {
     try {
       return await getEtherscanABI('mainnet', contractAddress);
     } catch (error) {
@@ -61,20 +66,19 @@ class GeneralContractPage
     }
   };
 
-  async oninit(vnode) {
-    const { contractAddress } = vnode.attrs;
-    const contract: Contract = app.contracts.getByAddress(contractAddress);
-    if (contract.abi === undefined || contract.abi === '') {
-      this.loadAbiFromEtherscan(contract.address).then((abi) => {
-        // Populate Abi Table
-        app.contracts.addContractAbi(contract, abi);
-      });
-    }
-    this.state.loaded = true;
-  }
-
   view(vnode) {
     const Bytes32 = ethers.utils.formatBytes32String;
+
+    const fetchContractAbi = async (contract: Contract) => {
+      if (contract.abi === undefined) {
+        if (contract.abi === undefined) {
+          const abiJson = await this.loadAbiFromEtherscan(contract.address);
+          await app.contracts.addContractAbi(contract, abiJson);
+          // TODO The UI Should In One Go show the abi form after successfully fetching the abi from etherscan
+          m.redraw();
+        }
+      }
+    };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       this.state.loading = true;
@@ -159,7 +163,18 @@ class GeneralContractPage
     };
 
     const { contractAddress } = vnode.attrs;
-    if (!app.contracts || !app.chain || !this.state.loaded) {
+
+    if (app.contracts.getCommunityContracts().length > 0) {
+      const contract: Contract = app.contracts.getByAddress(contractAddress);
+      if (contract) {
+        this.state.loaded = true;
+        this.state.status = 'success';
+        this.state.message = 'Contract loaded';
+      }
+      fetchContractAbi(contract);
+    }
+
+    if (!app.contracts || !app.chain) {
       return <PageLoading title="General Contract" />;
     } else {
       if (app.chain.base !== ChainBase.Ethereum) {
@@ -201,93 +216,18 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                if (
-                                  !this.state.form.functionNameToFunctionInputArgs.has(
-                                    fn.name
-                                  )
-                                ) {
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    new Map<number, string>()
-                                  );
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                } else {
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                }
+                                handleMappingMultipleAbiInputs(
+                                  inputIdx,
+                                  e.target.value,
+                                  fn,
+                                  this.state.form
+                                    .functionNameToFunctionInputArgs
+                                );
                                 this.state.loaded = true;
                               }}
-                              inputValidationFn={(
-                                val: string
-                              ): [ValidationStatus, string] => {
-                                // TODO Array Validation will be complex. Check what cases we want to cover here
-                                if (input.type.slice(-2) === '[]') {
-                                  if (
-                                    val[0] !== '[' ||
-                                    val[val.length - 1] !== ']'
-                                  ) {
-                                    return [
-                                      'failure',
-                                      'Input must be an array',
-                                    ];
-                                  } else {
-                                    return ['success', ''];
-                                  }
-                                }
-                                if (input.type === 'bool') {
-                                  if (val !== 'true' && val !== 'false') {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                }
-                                if (input.type.substring(0, 4) === 'uint') {
-                                  if (!Number.isNaN(Number(val))) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a number',
-                                    ];
-                                  }
-                                } else if (input.type === 'bool') {
-                                  if (val === 'true' || val === 'false') {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be a boolean',
-                                    ];
-                                  }
-                                } else if (input.type === 'address') {
-                                  if (val.length === 42) {
-                                    return ['success', ''];
-                                  } else {
-                                    return [
-                                      'failure',
-                                      'Input must be an address',
-                                    ];
-                                  }
-                                } else {
-                                  return ['success', ''];
-                                }
-                              }}
+                              inputValidationFn={(val) =>
+                                validateAbiInput(val, input)
+                              }
                             />
                           </div>
                         </div>

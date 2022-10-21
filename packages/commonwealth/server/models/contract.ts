@@ -16,6 +16,8 @@ export type ContractAttributes = {
   type: string;
   is_factory?: boolean;
   nickname?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   // associations
   ChainNode?: ChainNodeAttributes;

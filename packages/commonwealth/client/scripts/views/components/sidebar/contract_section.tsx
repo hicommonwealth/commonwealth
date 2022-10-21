@@ -3,9 +3,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Spinner } from 'construct-ui';
-import {
-  ChainBase,
-} from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
 
 import 'components/sidebar/index.scss';
 
@@ -13,35 +11,26 @@ import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { Contract } from 'models';
 import { SidebarSectionGroup } from './sidebar_section';
-import {
-  ToggleTree,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-} from './types';
-export class ContractSection
-  implements m.ClassComponent<SidebarSectionAttrs>
-{
+import { ToggleTree, SectionGroupAttrs, SidebarSectionAttrs } from './types';
+export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
   contracts: Contract[];
   loaded: boolean;
   chain: string;
 
-  async oninit(vnode) {
-    this.loaded = false;
-    this.chain = app.activeChainId();
-
-    this.loaded = true;
-
-  }
-
   view(vnode) {
     const showContractsOptions = app.chain?.base === ChainBase.Ethereum;
+
+    this.contracts = app.contracts.getCommunityContracts();
+    if (this.contracts.length > 0) {
+      this.loaded = true;
+    } else {
+      this.loaded = false;
+    }
 
     if (!app.contracts) return;
     if (!this.loaded) return <Spinner />;
 
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
-
-    this.contracts = app.contracts.getCommunityContracts();
 
     // ---------- Build Section Props ---------- //
 
@@ -76,9 +65,6 @@ export class ContractSection
       };
     };
 
-    [];
-
-
     const contractsGroupData: SectionGroupAttrs[] = this.contracts.map(
       (contract: Contract) => {
         return contractData(contract.address);
@@ -86,7 +72,7 @@ export class ContractSection
     );
 
     const sidebarSectionData: SidebarSectionAttrs = {
-      title: 'CONTRACTS',
+      title: 'Contracts',
       hasDefaultToggle: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();

@@ -11,8 +11,7 @@ class Contract {
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
-  public readonly abi?: string;
-  public readonly community?: string;
+  public readonly abi?: Array<Record<string, unknown>>;
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
 
@@ -27,7 +26,6 @@ class Contract {
     tokenName?,
     symbol?,
     contractAbi?,
-    community?,
     isFactory?,
     nickname?,
   ) {
@@ -41,7 +39,6 @@ class Contract {
     this.tokenName = tokenName;
     this.symbol = symbol;
     this.abi = contractAbi;
-    this.community = community;
     this.isFactory = isFactory;
     this.nickname = nickname;
   }
@@ -56,8 +53,7 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    contract_abi,
-    community,
+    abi,
     is_factory,
     nickname,
   }) {
@@ -71,8 +67,7 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      contract_abi,
-      community,
+      abi,
       is_factory,
       nickname,
     );

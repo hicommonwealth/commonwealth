@@ -50,10 +50,7 @@ class NewContractPage implements m.ClassComponent<any> {
     const getActiveForm = () => {
       const { ethChains, ethChainNames } = this.state;
       return (
-          <AddContractForm
-            ethChains={ethChains}
-            ethChainNames={ethChainNames}
-          />
+        <AddContractForm ethChains={ethChains} ethChainNames={ethChainNames} />
       );
     };
 

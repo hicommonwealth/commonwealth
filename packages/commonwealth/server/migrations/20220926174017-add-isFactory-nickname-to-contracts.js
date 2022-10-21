@@ -29,5 +29,5 @@ module.exports = {
      */
     await queryInterface.removeColumn('Contracts', 'is_factory');
     await queryInterface.removeColumn('Contracts', 'nickname');
-  }
+  },
 };
