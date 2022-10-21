@@ -21,9 +21,12 @@ import {
   parseFunctionsFromABI,
   getEtherscanABI,
   parseEventFromABI,
-  validateAbiInput,
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
+import {
+  handleMappingMultipleAbiInputs,
+  validateAbiInput,
+} from 'helpers/abi_form_helpers';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -222,35 +225,13 @@ class GeneralContractPage
                               name="Contract Input Field"
                               placeholder="Insert Input Here"
                               oninput={(e) => {
-                                if (
-                                  !this.state.form.functionNameToFunctionInputArgs.has(
-                                    fn.name
-                                  )
-                                ) {
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    new Map<number, string>()
-                                  );
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                } else {
-                                  const inputArgMap =
-                                    this.state.form.functionNameToFunctionInputArgs.get(
-                                      fn.name
-                                    );
-                                  inputArgMap.set(inputIdx, e.target.value);
-                                  this.state.form.functionNameToFunctionInputArgs.set(
-                                    fn.name,
-                                    inputArgMap
-                                  );
-                                }
+                                handleMappingMultipleAbiInputs(
+                                  inputIdx,
+                                  e.target.value,
+                                  fn,
+                                  this.state.form
+                                    .functionNameToFunctionInputArgs
+                                );
                                 this.state.loaded = true;
                               }}
                               inputValidationFn={(val) =>
