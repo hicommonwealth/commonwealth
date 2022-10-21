@@ -18,10 +18,6 @@ import { default as BalanceProviders } from './providers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-function getKey(...args: string[]) {
-  return args.join('-');
-}
-
 async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainNode[]> {
   const query = `SELECT * FROM "ChainNodes" WHERE updated_at >= to_timestamp (${lastQueryUnixTime})::date;`
   
@@ -106,7 +102,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     const providerObj = this._providers[balanceProvider];
 
     const getBalance = async (address: string): Promise<string> => {
-      const cacheKey = getKey(nodeId.toString(), address, balanceProvider, JSON.stringify(opts));
+      const cacheKey = providerObj.getCacheKey(node, address, opts)
       const result = await this.access((async (c: ICache): Promise<string | undefined> => {
         if (c[cacheKey]) {
           return c[cacheKey].balance;

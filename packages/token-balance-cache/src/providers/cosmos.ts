@@ -7,9 +7,15 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 
 import { BalanceProvider, IChainNode } from "../types";
 
-export default class CosmosBalanceProvider implements BalanceProvider {
+export type CosmosBPOpts = { };
+
+export default class CosmosBalanceProvider implements BalanceProvider<CosmosBPOpts> {
   public name = 'cosmos';
   public opts = {};
+
+  public getCacheKey(node: IChainNode, address: string): string {
+    return `${node.id}-${address}`;
+  }
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */

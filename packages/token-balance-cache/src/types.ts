@@ -31,10 +31,11 @@ export type ChainNodeResp = {
   prefix?: string,
 };
 
-export type BalanceProvider = {
+export type BalanceProvider<OptT extends Record<string, unknown> = Record<string, unknown>> = {
   name: string;
-  opts: Record<string, string>;
-  getBalance(node: IChainNode, address: string, opts: Record<string, string>): Promise<string>;
+  opts: Record<keyof OptT, string>;
+  getCacheKey(node: IChainNode, address: string, opts: OptT): string;
+  getBalance(node: IChainNode, address: string, opts: OptT): Promise<string>;
 }
 
 export type BalanceProviderResp = {

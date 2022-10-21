@@ -3,11 +3,17 @@ import axios from 'axios';
 
 import { BalanceProvider, IChainNode } from "../types";
 
-export default class TerraBalanceProvider implements BalanceProvider {
-  public name = 'ronin';
+export type TerraBPOpts = { };
+
+export default class TerraBalanceProvider implements BalanceProvider<TerraBPOpts> {
+  public name = 'terra';
   public opts = {};
 
-  public async getBalance(node: IChainNode, address: string, opts: Record<string, string>): Promise<string> {
+  public getCacheKey(node: IChainNode, address: string): string {
+    return `${node.id}-${address}`;
+  }
+
+  public async getBalance(node: IChainNode, address: string): Promise<string> {
     if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {
       throw new Error('No API key found for terra endpoint');
     }

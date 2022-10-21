@@ -4,14 +4,23 @@ import { ERC20, ERC20__factory, ERC721, ERC721__factory } from 'common-common/sr
 
 import { BalanceProvider, IChainNode } from "../types";
 
-export default class EthTokenBalanceProvider implements BalanceProvider {
+type EthBPOpts = {
+  tokenAddress: string;
+  contractType: string;
+};
+
+export default class EthTokenBalanceProvider implements BalanceProvider<EthBPOpts> {
   public name = 'eth-token';
   public opts = {
     contractType: 'string',
     tokenAddress: 'string',
   };
 
-  public async getBalance(node: IChainNode, address: string, opts: { tokenAddress: string, contractType: string }): Promise<string> {
+  public getCacheKey(node: IChainNode, address: string, opts: EthBPOpts): string {
+    return `${node.id}-${address}-${opts.tokenAddress}`;
+  }
+
+  public async getBalance(node: IChainNode, address: string, opts: EthBPOpts): Promise<string> {
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
     const provider = new Web3.providers.WebsocketProvider(url);
