@@ -202,4 +202,10 @@ export const networkNameToId = {
     "kovan": 42,
 };
 
+export const factoryNicknameToCreateFunctionName = {
+  "curated-factory-goerli": "createProject",
+  "partybidfactory": "startParty",
+  "gnosissafe": "fallback",
+};
+
 // Use Web3-Core Types For Most Things

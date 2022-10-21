@@ -12,6 +12,7 @@ import {
   ChainBase,
   ChainNetwork,
   ChainType,
+  factoryNicknameToCreateFunctionName,
   WalletId,
 } from 'common-common/src/types';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
@@ -42,7 +43,6 @@ import {
   parseEventFromABI,
   parseFunctionFromABI,
 } from 'helpers/abi_utils';
-import { factoryNicknameToCreateFunctionName } from 'helpers/types';
 import EthereumChain from 'controllers/chain/ethereum/chain';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
