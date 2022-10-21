@@ -1,5 +1,8 @@
 import { AbiInput, AbiItem } from 'web3-utils';
+import { BigNumber, ethers } from 'ethers';
 import { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
+
+const Bytes32 = ethers.utils.formatBytes32String;
 
 export function validateAbiInput(
   val: string,
@@ -41,7 +44,7 @@ export function validateAbiInput(
   }
 }
 
-export function handleMappingMultipleAbiInputs(
+export function handleMappingAbiInputs(
   inputIndex: number,
   input: any,
   abiItem: AbiItem,
@@ -57,4 +60,21 @@ export function handleMappingMultipleAbiInputs(
     inputArgMap.set(inputIndex, input);
     inputMap.set(abiItem.name, inputArgMap);
   }
+}
+
+export function processAbiInputsToDataTypes(
+  fn: AbiItem,
+  inputsMap: Map<string, Map<number, string>>
+): any[] {
+  const processedArgs: any[] = fn.inputs.map((arg: AbiInput, index: number) => {
+    const type = arg.type;
+    if (type.substring(0, 4) === 'uint')
+      return BigNumber.from(inputsMap.get(fn.name).get(index));
+    if (type.substring(0, 4) === 'byte')
+      return Bytes32(inputsMap.get(fn.name).get(index));
+    if (type.slice(-2) === '[]')
+      return JSON.parse(inputsMap.get(fn.name).get(index));
+    return inputsMap.get(fn.name).get(index);
+  });
+  return processedArgs;
 }
