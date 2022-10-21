@@ -1,6 +1,5 @@
 import { chain } from 'web3-core/types';
 import { AbiItem, AbiInput, AbiOutput, StateMutabilityType, AbiType } from 'web3-utils/types';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 
 export function parseAbiItemsFromABI(abi: Array<Record<string, unknown>>): AbiItem[] {
   try {
