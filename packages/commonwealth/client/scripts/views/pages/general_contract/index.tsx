@@ -38,7 +38,6 @@ type CreateContractForm = {
 type CreateContractState = ChainFormState & {
   functionNameToFunctionOutput: Map<string, any[]>;
   form: CreateContractForm;
-  loadingEtherscanAbi: boolean;
 };
 class GeneralContractPage
   implements m.ClassComponent<{ contractAddress?: string }>
@@ -50,7 +49,6 @@ class GeneralContractPage
     loading: false,
     saving: false,
     status: undefined,
-    loadingEtherscanAbi: false,
     functionNameToFunctionOutput: new Map<string, any[]>(),
     form: {
       functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
