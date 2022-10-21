@@ -21,12 +21,12 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateContractAbiReq = {
+export type CreateContractAbiReq = {
   contractId: number;
   abi: Array<Record<string, unknown>>;
 };
 
-type CreateContractAbiResp = {
+export type CreateContractAbiResp = {
   contractAbi: ContractAbiAttributes;
   contract: ContractAttributes;
 };
@@ -59,8 +59,11 @@ const createContractAbi = async (
     const contract = await models.Contract.findOne({
       where: { id: contractId },
     });
-    if (contract) contract.abi_id = contract_abi.id;
-    await contract.save();
+
+    if (contract && contract_abi) {
+      contract.abi_id = contract_abi.id;
+      await contract.save();
+    }
 
     return success(res, {
       contractAbi: contract_abi.toJSON(),

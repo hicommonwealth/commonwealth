@@ -1,24 +1,15 @@
 import $ from 'jquery';
-import _ from 'lodash';
 
 import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
-import BN from 'bn.js';
 import { ChainBase, ContractType } from 'common-common/src/types';
 import { TypedResponse } from 'server/types';
-import { ChainNodeAttributes } from 'server/models/chain_node';
 import { ContractAttributes } from 'server/models/contract';
 import { ContractAbiAttributes } from 'server/models/contract_abi';
+import { CreateContractResp } from 'server/routes/contracts/createContract';
+import { CreateContractAbiResp } from 'server/routes/contractAbis/createContractAbi';
 
-type CreateContractResp = {
-  contract: ContractAttributes;
-  node: ChainNodeAttributes;
-};
-type CreateContractAbiResp = {
-  contractAbi: ContractAbiAttributes;
-  contract: ContractAttributes;
-};
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
@@ -60,8 +51,7 @@ class ContractsController {
       }
     );
     const resultContract: ContractAttributes = response['result']['contract'];
-    const resultAbi: ContractAbiAttributes =
-      response['result']['contractAbi'];
+    const resultAbi: ContractAbiAttributes = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
     return response;
   }
@@ -73,20 +63,33 @@ class ContractsController {
     if (this._store.getById(contractAttributes.id)) {
       this._store.remove(this._store.getById(contractAttributes.id));
     }
+    const {
+      id,
+      address,
+      chain_node_id,
+      type,
+      createdAt,
+      updatedAt,
+      decimals,
+      token_name,
+      symbol,
+      is_factory,
+      nickname,
+    } = contractAttributes;
     this._store.add(
       new Contract(
-        contractAttributes.id,
-        contractAttributes.address,
-        contractAttributes.chain_node_id,
-        contractAttributes.type,
-        contractAttributes.createdAt,
-        contractAttributes.updatedAt,
-        contractAttributes.decimals,
-        contractAttributes.token_name,
-        contractAttributes.symbol,
+        id,
+        address,
+        chain_node_id,
+        type,
+        createdAt,
+        updatedAt,
+        decimals,
+        token_name,
+        symbol,
         contractAbi,
-        contractAttributes.is_factory,
-        contractAttributes.nickname,
+        is_factory,
+        nickname
       )
     );
   }
@@ -120,15 +123,29 @@ class ContractsController {
           decimals,
         }
       );
-      const responseContract = response['result']['contract'];
+      const responseContract: ContractAttributes =
+        response['result']['contract'];
+      const {
+        id,
+        type,
+        is_factory,
+        nickname,
+        createdAt,
+        updatedAt,
+      } = responseContract;
       const result = new Contract(
-        responseContract.id,
-        responseContract.address,
-        responseContract.abi,
-        responseContract.contractType,
-        responseContract.symbol,
-        responseContract.token_name,
-        responseContract.decimals
+        id,
+        address,
+        chain_node_id,
+        type,
+        createdAt,
+        updatedAt,
+        decimals,
+        token_name,
+        symbol,
+        abi,
+        is_factory,
+        nickname,
       );
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
@@ -136,11 +153,11 @@ class ContractsController {
       this._store.add(result);
       return result;
     } catch (err) {
-      console.log('Failed to create contract', err);
+      console.log('Failed to create and add contract', err);
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
-          : 'Failed to create contract'
+          : 'Failed to create and add contract'
       );
     }
   }

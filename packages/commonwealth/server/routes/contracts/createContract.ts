@@ -33,7 +33,7 @@ export const Errors = {
   NotAdmin: 'Must be admin',
 };
 
-type CreateContractReq = ContractAttributes &
+export type CreateContractReq = ContractAttributes &
   Omit<ChainNodeAttributes, 'id'> & {
     community: string;
     node_url: string;
@@ -42,7 +42,7 @@ type CreateContractReq = ContractAttributes &
     contractType: ContractType;
   };
 
-type CreateContractResp = {
+export type CreateContractResp = {
   contract: ContractAttributes;
 };
 
@@ -61,6 +61,7 @@ const createContract = async (
     token_name,
     decimals,
     chain_node_id,
+    chain_base,
   } = req.body;
 
   if (!req.user) {
@@ -94,8 +95,6 @@ const createContract = async (
     return next(new Error(Errors.ContractAddressExists));
   }
 
-  const chain_base: string = req.body.chain_base;
-
   try {
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
     const node = await models.ChainNode.scope('withPrivateData').findOne({
@@ -113,17 +112,21 @@ const createContract = async (
       const contract_abi = await models.ContractAbi.create({
         abi,
       });
-      [contract] = await models.Contract.findOrCreate({
-        where: {
-          address,
-          chain_node_id: node.id,
-          token_name,
-          abi_id: contract_abi.id,
-          symbol,
-          decimals,
-          type: contractType,
-        },
-      });
+      if (contract_abi) {
+        [contract] = await models.Contract.findOrCreate({
+          where: {
+            address,
+            chain_node_id: node.id,
+            token_name,
+            abi_id: contract_abi.id,
+            symbol,
+            decimals,
+            type: contractType,
+          },
+        });
+      } else {
+        return next(new Error('Could not create contract abi'));
+      }
     } else {
       [contract] = await models.Contract.findOrCreate({
         where: {
