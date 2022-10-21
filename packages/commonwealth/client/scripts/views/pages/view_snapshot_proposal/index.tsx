@@ -20,6 +20,7 @@ import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { SnapshotProposalCards } from './snapshot_proposal_cards';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { CWContentPage } from '../../components/component_kit/cw_content_page';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -128,7 +129,37 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       <Sublayout
       // title="Snapshot Proposal"
       >
-        <div class="SnapshotViewProposalPage">
+        <CWContentPage
+          showSidebar
+          body={
+            <SnapshotProposalContent
+              proposal={this.proposal}
+              votes={this.votes}
+              symbol={this.symbol}
+            />
+          }
+          sidebarComponents={[
+            {
+              label: 'Cards',
+              item: (
+                <SnapshotProposalCards
+                  identifier={identifier}
+                  proposal={this.proposal}
+                  scores={this.scores}
+                  space={this.space}
+                  symbol={this.symbol}
+                  threads={this.threads}
+                  totals={this.totals}
+                  votes={this.votes}
+                  validatedAgainstStrategies={this.validatedAgainstStrategies}
+                  fetchedPower={this.fetchedPower}
+                  totalScore={this.totalScore}
+                />
+              ),
+            },
+          ]}
+        />
+        {/* <div class="SnapshotViewProposalPage">
           <div class="proposal-body-with-tabs">
             <CWTabBar>
               <CWTab
@@ -189,7 +220,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
               totalScore={this.totalScore}
             />
           </div>
-        </div>
+        </div> */}
       </Sublayout>
     );
   }

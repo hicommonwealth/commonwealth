@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 
 import 'components/component_kit/cw_content_page.scss';
@@ -8,13 +10,14 @@ import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
-import { getClasses } from './helpers';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 
 type SidebarItem = {
   label: string;
   item: m.Vnode;
 };
 
+// tuple
 type SidebarComponents = [
   item?: SidebarItem,
   item?: SidebarItem,
@@ -59,6 +62,18 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       updatedAt,
     } = vnode.attrs;
 
+    console.log(this.tabSelected);
+
+    window.onresize = () => {
+      if (
+        isWindowMediumSmallInclusive(window.innerWidth) &&
+        this.tabSelected !== 0
+      ) {
+        this.tabSelected = 0;
+        m.redraw();
+      }
+    };
+
     return (
       <div class={ComponentType.ContentPage}>
         <div
@@ -85,29 +100,46 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
               />
             ))}
           </CWTabBar>
-          {this.tabSelected === 0 && body}
-          {this.tabSelected === 1 && sidebarComponents[0]}
-          {this.tabSelected === 2 && sidebarComponents[1]}
-          {this.tabSelected === 3 && sidebarComponents[2]}
+          {this.tabSelected === 0 && (
+            <>
+              {subHeader}
+              {body}
+              {subBody}
+              {comments}
+            </>
+          )}
+          {this.tabSelected === 1 && <>{sidebarComponents[0].item}</>}
+          {/* {sidebarComponents.length === 2 &&
+            this.tabSelected === 2 &&
+            sidebarComponents[1].item}
+          {sidebarComponents.length === 3 &&
+            this.tabSelected === 3 &&
+            sidebarComponents[2].item} */}
         </div>
         <div
           class={getClasses<{ showSidebar?: boolean }>({ showSidebar }, 'body')}
         >
           <div>
-            <CWText>{title}</CWText>
-            <CWText>{author}</CWText>
-            <CWText>{createdAt}</CWText>
-            <CWText>{updatedAt}</CWText>
-            <CWPopoverMenu
-              trigger={<CWIconButton iconName="dotsVertical" />}
-              menuItems={actions}
-            />
+            <div>
+              <CWText>{title}</CWText>
+              <CWText>{author}</CWText>
+              {/* <CWText>{createdAt}</CWText>
+              <CWText>{updatedAt}</CWText> */}
+              {actions && (
+                <CWPopoverMenu
+                  trigger={<CWIconButton iconName="dotsVertical" />}
+                  menuItems={actions}
+                />
+              )}
+            </div>
+            {subHeader}
+            {body}
+            {subBody}
+            {comments}
           </div>
-          {subHeader}
-          {body}
-          {comments}
-          {subBody}
-          {showSidebar && sidebarComponents}
+          {sidebarComponents.map((c) => (
+            <div>{c.item}</div>
+          ))}
         </div>
       </div>
     );
