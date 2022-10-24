@@ -16,7 +16,7 @@ export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
     const { message } = vnode.attrs;
 
     return (
-      <Sublayout hideSearch={true}>
+      <Sublayout hideSearch>
         <div class="LoadingPage">
           <Spinner message={message} active={true} size="xl" />
         </div>
