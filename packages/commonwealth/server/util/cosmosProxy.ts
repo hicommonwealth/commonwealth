@@ -1,10 +1,12 @@
 import type { Express } from 'express';
 import axios from 'axios';
 import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from './errors';
+import StatsD from './statsd';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {
@@ -26,9 +28,11 @@ function setupCosmosProxy(app: Express, models: DB) {
           origin: 'https://commonwealth.im'
         }
       });
+      StatsD.get().increment('cosmos_proxy_success', [ req.params.chain ]);
       log.trace(`Got response from endpoint: ${JSON.stringify(response.data, null, 2)}`);
       return res.send(response.data);
     } catch (err) {
+      StatsD.get().increment('cosmos_proxy_error', [ req.params.chain ]);
       res.status(500).json({ message: err.message });
     }
   });

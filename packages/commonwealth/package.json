@@ -258,6 +258,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
     "ganache-cli": "^6.9.1",
+    "hot-shots": "^9.3.0",
     "mocha": "^6.2.2",
     "nyc": "^15.1.0",
     "source-map-support": "^0.5.13",
