@@ -7,7 +7,7 @@ import 'pages/view_proposal/create_comment.scss';
 
 import app from 'state';
 import { Thread, AnyProposal } from 'models';
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ContentType } from 'types';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
@@ -129,11 +129,13 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
+      : app.chain.base === ChainBase.CosmosSDK
+      ? 6
       : 18;
 
     return (
       <div class="CreateComment">
-        {!app.user.activeAccount?.profile.name ? (
+        {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
           <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
             <a

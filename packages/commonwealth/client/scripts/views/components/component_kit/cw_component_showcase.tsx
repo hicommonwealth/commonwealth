@@ -9,7 +9,6 @@ import { CWButton } from './cw_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
-import { CWTextInput } from './cw_text_input';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
@@ -33,6 +32,7 @@ import { CWSpinner } from './cw_spinner';
 import { CWRuleCard } from '../rules';
 import { CWDropdown } from './cw_dropdown';
 import RuleModal from '../rules/rule_modal';
+import { CWTextInput } from './cw_text_input';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
