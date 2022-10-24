@@ -19,6 +19,7 @@ import CoverImageUpload from './cover_image_upload';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
 import { CWButton } from '../../components/component_kit/cw_button';
+import CWCoverImageUploader from '../../components/component_kit/cw_cover_image_uploader';
 
 const weekInSeconds = 604800;
 const nowInSeconds = new Date().getTime() / 1000;
@@ -164,7 +165,9 @@ export class InformationSlide
           }
           value={vnode.attrs.form.shortDescription}
         />
-        <CoverImageUpload
+        <CWCoverImageUploader
+          headerText="Cover Image"
+          subheaderText="Use an image that helps people connect with your crowdfund right away"
           uploadCompleteCallback={(imageURL: string) => {
             vnode.attrs.form.coverImage = imageURL;
           }}
