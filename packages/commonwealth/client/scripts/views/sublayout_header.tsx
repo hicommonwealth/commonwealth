@@ -36,7 +36,11 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
             iconButtonTheme="black"
             iconSize="xl"
             onclick={() => {
-              m.route.set('/');
+              if (app.isCustomDomain()) {
+                m.route.set('/');
+              } else {
+                m.route.set('/dashboard/for-you');
+              }
             }}
           />
           {isWindowSmallInclusive(window.innerWidth) && (
