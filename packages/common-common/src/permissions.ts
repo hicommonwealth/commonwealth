@@ -25,7 +25,7 @@ type Permission = bigint;
 
 export function isPermitted(permission: Permission, action: Action): boolean {
   const actionAsBigInt: bigint = BigInt(1 << action);
-  const hasAction: boolean = (permission & actionAsBigInt) == actionAsBigInt
+  const hasAction: boolean = (permission & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }
 
@@ -33,6 +33,18 @@ export function computePermissions(
   base: Permission,
   assignments: Array<{ allow: Permission; deny: Permission }>
 ): Permission {
+  let permission: Permission = base;
+  let allow: Permission = BigInt(0);
+  let deny: Permission = BigInt(0);
+  for (const assignment of assignments) {
+    if (assignment.allow === assignment.deny) {
+      continue;
+    }
+    if (assignment.allow > 0) allow |= assignment.allow;
+    if (assignment.deny > 0) deny |= assignment.deny;
+  }
+  permission &= ~deny;
+  permission |= allow;
 
-    return BigInt(0);
+  return permission;
 }
