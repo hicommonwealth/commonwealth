@@ -276,6 +276,8 @@ module.exports = {
         },
       ];
 
+      // TODO: rectify chain_base, balance_type, ss58, and bech32 values for each node
+
       await Promise.all(chainNodes.map(async (cn) => {
         const query = `UPDATE "ChainNodes" SET name='${cn.name}' WHERE url LIKE '${cn.url}%';`;
         queryInterface.sequelize.query(query, { transaction });

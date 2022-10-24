@@ -39,7 +39,8 @@ async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainN
   return nodeArray;
 }
 
-// TODO: have JobRunner as include rather than extends, for unit testing
+// TODO: have JobRunner/cache as include rather than extends, for unit testing,
+//    then rename to TokenBalanceController / TokenBalanceService
 export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanceCache {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};

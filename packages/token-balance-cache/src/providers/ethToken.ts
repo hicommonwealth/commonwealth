@@ -25,6 +25,16 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
   public async getBalance(node: IChainNode, address: string, opts: EthBPOpts): Promise<string> {
     const url = node.private_url || node.url;
     const { tokenAddress, contractType } = opts;
+    if (contractType !== 'erc20' && contractType !== 'erc721') {
+      throw new Error('Invalid contract type');
+    }
+    if (!Web3.utils.isAddress(tokenAddress)) {
+      throw new Error('Invalid token address');
+    }
+    if (!Web3.utils.isAddress(address)) {
+      throw new Error('Invalid address');
+    }
+
     const provider = new Web3.providers.WebsocketProvider(url);
     let api: ERC20 | ERC721;
     if (contractType === 'erc20') {

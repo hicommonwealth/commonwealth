@@ -13,6 +13,10 @@ export default class RoninBalanceProvider extends BalanceProvider {
   public validBases = [BalanceType.AxieInfinity];
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
+    if (!Web3.utils.isAddress(address)) {
+      throw new Error('Invalid address');
+    }
+
     // TODO: make configurable
     const rpcUrl = 'https://api.roninchain.com/rpc';
     const provider = new Web3.providers.HttpProvider(rpcUrl);

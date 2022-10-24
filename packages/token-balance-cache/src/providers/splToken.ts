@@ -19,6 +19,15 @@ export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPO
   }
 
   public async getBalance(node: IChainNode, address: string, opts: SplTokenBPOpts): Promise<string> {
+    const mintKey = new solw3.PublicKey(opts.tokenAddress);
+    if (mintKey.toBase58() !== opts.tokenAddress) {
+      throw new Error('Invalid token address');
+    }
+    const addressKey = new solw3.PublicKey(address);
+    if (addressKey.toBase58() !== address) {
+      throw new Error('Invalid address');
+    }
+
     const url = solw3.clusterApiUrl(node.url as solw3.Cluster);
     const connection = new solw3.Connection(url);
     const mintPubKey = new solw3.PublicKey(opts.tokenAddress);
