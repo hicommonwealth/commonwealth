@@ -25,6 +25,7 @@ type RuleEditSectionAttrs = {
   }>;
   ruleTypeIdentifier: string;
   argumentIdx: number;
+  isNested: boolean;
 };
 
 // Handles the details of displaying a rule
@@ -42,13 +43,18 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
   }
 
   onupdate(vnode) {
-    const { internalBuiltRule, ruleTypeIdentifier, argumentIdx } = vnode.attrs;
+    const { internalBuiltRule, ruleTypeIdentifier } = vnode.attrs;
     this.subRules = internalBuiltRule[ruleTypeIdentifier];
   }
 
   view(vnode) {
-    const { internalBuiltRule, ruleArgument, ruleTypeIdentifier, argumentIdx } =
-      vnode.attrs;
+    const {
+      internalBuiltRule,
+      ruleArgument,
+      ruleTypeIdentifier,
+      argumentIdx,
+      isNested,
+    } = vnode.attrs;
 
     if (ruleArgument.type === 'address' || ruleArgument.type === 'balance') {
       return (
@@ -90,7 +96,7 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
       // 1. check if it already has subrules defined. If so, I should display them as COMPLETED
       // 2. If it doesnt have subrules defined, I should show a new sub modal to create one
       return (
-        <div class="display-section">
+        <div class={`display-section${isNested ? '' : ' parent'}`}>
           {internalBuiltRule[ruleTypeIdentifier].map((subRule, idx) => {
             if (this.subRuleEditState[idx]) {
               return (
@@ -277,6 +283,7 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
                   argumentIdx={idx}
                   internalBuiltRule={this.internalBuiltRule}
                   ruleTypeIdentifier={Object.keys(this.internalBuiltRule)[0]}
+                  isNested={isNested}
                 />
               );
             })}
