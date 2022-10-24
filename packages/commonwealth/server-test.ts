@@ -27,6 +27,7 @@ import IdentityFetchCache from './server/util/identityFetchCache';
 import BanCache from './server/util/banCheckCache';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
+import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 require('express-async-errors');
 
@@ -35,27 +36,6 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const identityFetchCache = new IdentityFetchCache(10 * 60);
-
-// always prune both token and non-token holders asap
-class MockTokenBalanceProvider implements BalanceProvider {
-  public name = 'eth-token'
-  public opts = {
-    tokenAddress: 'string',
-    contractType: 'string',
-  }
-  public validBases = [BalanceType.Ethereum];
-  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
-
-  public async getBalance(node: IChainNode, address: string, opts: Record<string, string>): Promise<string> {
-    if (this.balanceFn) {
-      const bal = await this.balanceFn(opts.tokenAddress, address);
-      return bal.toString();
-    } else {
-      throw new Error('unable to fetch token balance');
-    }
-  }
-}
-
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const tokenBalanceCache = new TokenBalanceCache(
   0,
