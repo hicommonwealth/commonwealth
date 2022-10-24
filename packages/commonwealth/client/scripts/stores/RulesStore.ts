@@ -18,6 +18,12 @@ class RuleStore extends IdStore<Rule> {
     return this;
   }
 
+  public update(rule: Rule) {
+    super.update(rule);
+    this._storeRules[rule.id] = rule;
+    return this;
+  }
+
   public clear() {
     super.clear();
     this._storeRules = {};

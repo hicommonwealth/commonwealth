@@ -21,15 +21,16 @@ export class CWRuleTable implements m.ClassComponent<RuleTableAttrs> {
           {title}
         </CWText>
         <div class="table-section">
-          {data.map((value, idx) => {
-            if (maxResults && idx + 1 > maxResults) return;
-            return (
-              <div class="table-row">
-                <CWText>{value}</CWText>
-              </div>
-            );
-          })}
-          {data.length === 0 && <div class="table-row"></div>}
+          {data &&
+            data.map((value, idx) => {
+              if (maxResults && idx + 1 > maxResults) return;
+              return (
+                <div class="table-row">
+                  <CWText>{value}</CWText>
+                </div>
+              );
+            })}
+          {!data || (data.length === 0 && <div class="table-row"></div>)}
         </div>
       </div>
     );

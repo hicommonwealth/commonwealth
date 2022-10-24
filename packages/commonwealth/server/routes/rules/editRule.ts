@@ -19,6 +19,7 @@ type editRuleReq = {
 
 type editRuleResp = {
   message: string;
+  rule: string;
 };
 
 const editRule = async (
@@ -51,7 +52,10 @@ const editRule = async (
 
     await existingRule.save();
 
-    return success(res, { message: 'Rule updated successfully' });
+    return success(res, {
+      message: 'Rule updated successfully',
+      rule: JSON.stringify(existingRule),
+    });
   } catch (e) {
     console.log('wtf', e);
     throw new AppError(EditRuleErrors.InvalidRule);

@@ -1,6 +1,7 @@
 import RuleStore from 'stores/RulesStore';
 import app from 'state';
 import $ from 'jquery';
+import _ from 'underscore';
 import { Rule } from 'models';
 
 class RulesController {
@@ -12,7 +13,7 @@ class RulesController {
   }
 
   public get getRules() {
-    return this._rulesStore.getAll();
+    return _.sortBy(this._rulesStore.getAll(), 'updatedAt').reverse(); // Sorted by updated
   }
 
   // Checks if a provided address passes a set of rules
@@ -66,9 +67,6 @@ class RulesController {
     chain_id: string;
     ruleSchema: any;
   }) {
-    console.log('created new rule with schema: ', ruleSchema);
-    console.log('and as a string: ', JSON.stringify(ruleSchema));
-
     try {
       const res = await $.post(`${app.serverUrl()}/createRule`, {
         chain_id,
@@ -106,7 +104,9 @@ class RulesController {
       if (res.result) {
         const ruleInStore = this._rulesStore.getById(rule_id);
         if (chain_id === app.activeChainId() && !ruleInStore) {
-          this._rulesStore.add(Rule.fromJSON(res.result));
+          this._rulesStore.add(Rule.fromJSON(JSON.parse(res.result.rule)));
+        } else if (ruleInStore) {
+          this._rulesStore.update(Rule.fromJSON(JSON.parse(res.result.rule)));
         }
       }
     } catch (e) {
