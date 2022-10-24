@@ -57,7 +57,7 @@ import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
-import getProfile from './routes/getProfile';
+import getProfileOld from './routes/getProfile';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -151,6 +151,13 @@ import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
 
 import getThreads from './routes/threads/getThreads';
+import getComments from './routes/comments/getComments';
+import getReactions from './routes/reactions/getReactions';
+import getCommunities from './routes/communities/getCommunities';
+import getProfile from './routes/profiles/getProfile';
+import getProfiles from './routes/profiles/getProfiles';
+
+
 
 function setupRouter(
   app: Express,
@@ -335,7 +342,7 @@ function setupRouter(
   router.get('/searchDiscussions', searchDiscussions.bind(this, models));
   router.get('/searchComments', searchComments.bind(this, models));
 
-  router.get('/profile', getProfile.bind(this, models));
+  router.get('/profile', getProfileOld.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -789,6 +796,12 @@ function setupRouter(
 
   // new API
   router.get('/threads', getThreads.bind(this, models));
+  router.get('/comments', getComments.bind(this, models));
+  router.get('/reactions', getReactions.bind(this, models));
+  router.get('/communities', getCommunities.bind(this, models));
+  router.get('/profile', getProfile.bind(this, models));
+  router.get('/profiles', getProfiles.bind(this, models));
+
 
   app.use('/api', router);
 }
