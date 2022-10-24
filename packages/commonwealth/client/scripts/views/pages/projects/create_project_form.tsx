@@ -15,10 +15,7 @@ import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import Web3 from 'web3';
-import CoverImageUpload from './cover_image_upload';
-import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
-import { CWButton } from '../../components/component_kit/cw_button';
 import CWCoverImageUploader from '../../components/component_kit/cw_cover_image_uploader';
 
 const weekInSeconds = 604800;
