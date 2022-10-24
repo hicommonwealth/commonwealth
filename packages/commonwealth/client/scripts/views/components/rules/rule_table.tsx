@@ -4,16 +4,18 @@ import m from 'mithril';
 
 import 'components/rules/rule_table.scss';
 import { CWText } from '../component_kit/cw_text';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 type RuleTableAttrs = {
   title: string;
   data: string[];
+  onDelete?: (index: number) => void;
   maxResults?: number;
 };
 
 export class CWRuleTable implements m.ClassComponent<RuleTableAttrs> {
   view(vnode) {
-    const { title, data, maxResults } = vnode.attrs;
+    const { title, data, maxResults, onDelete } = vnode.attrs;
 
     return (
       <div class="RuleTable">
@@ -27,6 +29,13 @@ export class CWRuleTable implements m.ClassComponent<RuleTableAttrs> {
               return (
                 <div class="table-row">
                   <CWText>{value}</CWText>
+                  {onDelete && (
+                    <CWIcon
+                      iconName="trash"
+                      onclick={() => onDelete(idx)}
+                      className="trash-icon"
+                    />
+                  )}
                 </div>
               );
             })}

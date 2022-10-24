@@ -73,11 +73,11 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                             });
                             this.rules = app.rules.getRules;
                             this.loadingRules = false;
+                            notifySuccess('Rule created!');
                             m.redraw();
                           } catch (e) {
                             console.log(e);
                           }
-                          notifySuccess('Rule created!');
                         },
                       },
                     });
@@ -86,9 +86,8 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
               </div>
             </div>
             <CWText className="description">
-              This section is for the community to discuss how to manage the
-              community treasury and spending on contributor grants, community
-              initiatives, liquidity mining and other programs.
+              This section displays the existing rules for a community and
+              allows admins to edit or add new rules.
             </CWText>
           </div>
           <div class="bottom-section">
@@ -137,6 +136,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                         });
                         this.rules = app.rules.getRules;
                         this.loadingRules = false;
+                        notifySuccess('Rule deleted!');
 
                         m.redraw();
                       } catch (e) {

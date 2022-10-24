@@ -102,7 +102,6 @@ type RulesCardAttrs = {
   adminView: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
-  onAddRule?: () => void;
 };
 
 export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
@@ -125,7 +124,6 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
       adminView,
       onEdit,
       onDelete,
-      onAddRule,
     } = vnode.attrs;
 
     return (
@@ -158,12 +156,6 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
                     label: 'Edit',
                     iconLeft: 'plusCircle',
                     onclick: onEdit,
-                    type: 'default',
-                  },
-                  {
-                    label: 'Add Rule',
-                    iconLeft: 'write',
-                    onclick: onAddRule,
                     type: 'default',
                   },
                   { type: 'divider' },
@@ -201,7 +193,7 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
         {!isNested && (
           <div class="footer-section">
             <CWText type="caption" className="edited-text">
-              {`Last edited ${moment(ruleUpdatedAt).format('DD/MM/YY')}`}
+              {`Last edited ${moment(ruleUpdatedAt).format('MM/DD/YY')}`}
             </CWText>
           </div>
         )}

@@ -21,6 +21,11 @@
       display: flex;
       padding: 16px;
       min-width: 496px;
+      justify-content: space-between;
+
+      .trash-icon {
+        cursor: pointer;
+      }
 
       .no-data {
         color: $neutral-500;

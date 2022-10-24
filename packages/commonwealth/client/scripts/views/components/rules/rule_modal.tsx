@@ -88,6 +88,10 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
           <CWRuleTable
             title={ruleArgument.description}
             data={internalBuiltRule[ruleTypeIdentifier][argumentIdx]}
+            onDelete={(idx) => {
+              internalBuiltRule[ruleTypeIdentifier][argumentIdx].splice(idx, 1);
+              m.redraw();
+            }}
           />
         </div>
       );
