@@ -1,49 +1,22 @@
 import { assert } from 'chai';
-import { isPermitted } from 'common-common/src/permissions';
+import { isPermitted, Permission, Action } from 'common-common/src/permissions';
 
 describe('isPermitted() unit tests', () => {
-  it('should not validate incorrect rule id', () => {
-    const invalidRule = { ABCD: [] };
-    assert.throw(() => isPermitted(invalidRule));
-  })
-
-  it('should validate correct address args', () => {
-    const allowListRule = { AllowListRule: [ ['hello', 'world'] ]};
-    const sanitizedRule = validateRule(allowListRule);
-    assert.deepEqual(allowListRule, sanitizedRule);
+  it('should validate a create thread permission', () => {
+    // eslint-disable-next-line no-bitwise
+    const permission: Permission = BigInt(1 << 12);
+    assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
   });
 
-  it('should not validate incorrect address arg type', () => {
-    const badAllowList = { AllowListRule: [ ['hello', 1] ]};
-    assert.throw(() => validateRule(badAllowList));
+  it('should validate a create thread permission with other permissions', () => {
+    // eslint-disable-next-line no-bitwise
+    const permission: Permission = BigInt(1 << 12) | BigInt(1 << 13);
+    assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
   });
 
-  it('should not validate incorrect address arg format', () => {
-    const badAllowList = { AllowListRule: ['hello'] };
-    assert.throw(() => validateRule(badAllowList));
-  });
-
-  it('should validate correct rule[] args', () => {
-    const goodAnyRule = {
-      AnyRule: [ [
-        { AllowListRule: [ ['a', 'b'] ] },
-        { AllowListRule: [ ['c', 'd'] ] }
-      ] ]
-    };
-    const sanitizedRule = validateRule(goodAnyRule);
-    assert.deepEqual(goodAnyRule, sanitizedRule);
-  });
-
-  it('should not validate correct rule[] args', () => {
-    const badAnyRule = {
-      AnyRule: [
-        { AnyRule: [
-          { AllowListRule: [ ['a'] ] },
-          { ABCD: [] }, // BAD
-        ] },
-        { AllowListRule: [ ['b'] ] }
-      ]
-    };
-    assert.throw(() => validateRule(badAnyRule));
+  it('should validate a create thread permission with other permissions', () => {
+    // eslint-disable-next-line no-bitwise
+    const permission: Permission = BigInt(1 << 13) | BigInt(1 << 15);
+    assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
   });
 });

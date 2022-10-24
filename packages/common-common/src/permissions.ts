@@ -21,7 +21,7 @@ export enum Action {
   MANAGE_POLLS = 19,
 }
 
-type Permission = bigint;
+export type Permission = bigint;
 
 export function isPermitted(permission: Permission, action: Action): boolean {
   const actionAsBigInt: bigint = BigInt(1 << action);
