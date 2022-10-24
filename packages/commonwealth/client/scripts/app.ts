@@ -646,9 +646,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Custom domain routes
             //
-            '/': importRoute('views/pages/discussions', {
+            '/': importRoute('views/pages/discussions_redirect', {
               scoped: true,
-              deferChain: true,
             }),
             '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
@@ -697,8 +696,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
+            '/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/discussions/:topic': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
@@ -807,7 +813,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
-            '/:scope/discussions': redirectRoute(() => '/'),
+            '/:scope/discussions': redirectRoute(() => '/discussions'),
             '/:scope': redirectRoute(() => '/'),
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`
@@ -963,8 +969,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions', {
+            '/:scope': importRoute('views/pages/discussions_redirect', {
+              scoped: true,
+            }),
+            '/:scope/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),

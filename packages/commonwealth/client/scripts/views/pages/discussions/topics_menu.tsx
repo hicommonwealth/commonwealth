@@ -31,21 +31,14 @@ type TopicsMenuAttrs = {
   disabled: boolean;
   featuredTopics: string[];
   otherTopics: Topic[];
-  parentState: any;
   selectedTopic: Topic;
   topic: string;
 };
 
 export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
   view(vnode) {
-    const {
-      disabled,
-      featuredTopics,
-      otherTopics,
-      parentState,
-      selectedTopic,
-      topic,
-    } = vnode.attrs;
+    const { disabled, featuredTopics, otherTopics, selectedTopic, topic } =
+      vnode.attrs;
     return (
       <PopoverMenu
         trigger={
@@ -72,9 +65,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
               }
               label="All Topics"
               onclick={() => {
-                localStorage.setItem('discussion-summary-toggle', 'false');
-                parentState.summaryView = false;
-                navigateToSubpage('/');
+                navigateToSubpage('/discussions');
               }}
             />
             <MenuDivider />
@@ -104,11 +95,6 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
                       onclick={(e) => {
                         e.preventDefault();
                         navigateToSubpage(`/discussions/${name}`);
-                        parentState.summaryView = false;
-                        localStorage.setItem(
-                          'discussion-summary-toggle',
-                          'false'
-                        );
                       }}
                       label={
                         <div class="topic-item">

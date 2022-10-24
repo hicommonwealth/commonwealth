@@ -12,10 +12,13 @@ import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import { providers } from 'ethers';
 
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ERC20, ERC20__factory, ERC721, ERC721__factory } from 'common-common/src/eth/types';
 import { BalanceType } from 'common-common/src/types';
 
 import { ContractType } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export default class TokenBalanceProvider {
   public async getTokenBalance(
@@ -107,32 +110,49 @@ export default class TokenBalanceProvider {
    *  Special balances for unique chain networks.
    */
   private async _getTerraTokenBalance(url: string, userAddress: string): Promise<BN> {
-    if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {
-      throw new Error('No API key found for terra endpoint');
-    }
-
     // make balance query
     const queryUrl = `${url}/cosmos/bank/v1beta1/balances/${
       userAddress
-    }?key=${
-      process.env.TERRA_SETTEN_PHOENIX_API_KEY
     }`;
 
+    let bankBalance = new BN(0);
     try {
       // NOTE: terra.js staking module is incompatible with stargate queries
       const balResp = await axios.get(queryUrl); // [ { denom: 'uluna', amount: '5000000' } ]
       const balances: Array<{ denom: string, amount: string }> = balResp?.data?.balances;
-      let balance = new BN(0);
       if (balances?.length > 0) {
         const balanceObj = balances.find(({ denom }) => denom === 'uluna');
         if (balanceObj) {
-          balance = new BN(balanceObj.amount);
+          bankBalance = new BN(balanceObj.amount);
         }
       }
-      return balance;
     } catch (e) {
-      throw new Error(`no balance found: ${e.message}`);
+      log.warn(`could not fetch terra bank balance: ${e.message}`);
     }
+
+    // make staking query
+    let stakedBalance = new BN(0);
+    const stakedQueryUrl = `${url}/cosmos/staking/v1beta1/delegations/${
+      userAddress
+    }`;
+
+    try {
+      // NOTE: terra.js staking module is incompatible with stargate queries
+      // TODO: support pagination (currently few users, if any, will have enough delegations to trigger it)
+      const balResp = await axios.get(stakedQueryUrl); // [ { denom: 'uluna', amount: '5000000' } ]
+      const delegations: Array<{ balance: { denom: string, amount: string }}> = balResp?.data?.delegation_responses;
+
+      // sum all delegation balanaces to produce total staked balance
+      for (const delegation of delegations) {
+        if (delegation?.balance && delegation.balance.denom === 'uluna') {
+          stakedBalance = stakedBalance.add(new BN(delegation.balance.amount));
+        }
+      }
+    } catch (e) {
+      log.warn(`could not fetch terra staked balances: ${e.message}`);
+    }
+
+    return bankBalance.add(stakedBalance);
   }
 
   private async _getRoninTokenBalance(address: string) {
