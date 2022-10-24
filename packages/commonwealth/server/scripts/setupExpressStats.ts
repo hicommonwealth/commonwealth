@@ -16,12 +16,12 @@ export default function expressStatsdInit (client: StatsD) {
 
       // Status Code
       const statusCode = res.statusCode || 'unknown_status';
-      const statusKey = `${stat}.status_code.${statusCode}`
+      const statusKey = `express.${stat}.status_code.${statusCode}`
       client.increment(statusKey);
 
       // Response Time
       const duration = new Date().getTime() - startTime;
-      const durationKey = `${stat}.response_time`;
+      const durationKey = `express.${stat}.response_time`;
       client.timing(durationKey, duration);
 
       // console.log(`SENDING STATS: ${statusKey} + ${durationKey}: ${duration}`);
