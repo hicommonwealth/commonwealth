@@ -84,7 +84,10 @@ describe('createRole tests', () => {
     try {
       await createRole(models, loggedInAddrId, 'nonexistent', 'member');
     } catch (error) {
-      assert.deepEqual(error.message, 'Community role not found');
+      assert.deepEqual(
+        error.message,
+        'insert or update on table "CommunityRoles" violates foreign key constraint "CommunityRoles_chain_id_fkey"'
+      );
     }
   });
 
@@ -94,10 +97,10 @@ describe('createRole tests', () => {
       id: newChain,
       name: newChain,
       chain_node_id: 1,
-      default_symbol: "",
+      default_symbol: '',
       network: ChainNetwork.ERC20,
       base: ChainBase.Ethereum,
-      icon_url: "https://commonwealth.im/static/media/eth.5b2b1b1f.svg",
+      icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
       active: false,
       type: ChainType.Token,
       chat_enabled: false,

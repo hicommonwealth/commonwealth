@@ -38,32 +38,11 @@ export async function findAllRoles(
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
   let roleFindOptions: any;
-  const whereChainIdCondition = {};
+  const whereCondition = {};
   if (chain_id) {
-    whereChainIdCondition['chain_id'] = chain_id;
+    whereCondition['chain_id'] = chain_id;
   }
-  if (chain_id === undefined) {
-    roleFindOptions = {
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
-    };
-  } else if (permissions === undefined) {
-    roleFindOptions = {
-      where: {
-        chain_id,
-      },
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
-    };
-  } else {
+  if (permissions) {
     roleFindOptions = {
       where: {
         [Op.and]: [
@@ -75,6 +54,16 @@ export async function findAllRoles(
           },
         ],
       },
+      include: [
+        {
+          model: models.RoleAssignment,
+          ...findOptions,
+        },
+      ],
+    };
+  } else {
+    roleFindOptions = {
+      where: whereCondition,
       include: [
         {
           model: models.RoleAssignment,
@@ -112,7 +101,7 @@ export async function findOneRole(
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
   let roleFindOptions: any;
-  if (permissions !== undefined) {
+  if (permissions) {
     roleFindOptions = {
       where: {
         [Op.and]: [
