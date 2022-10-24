@@ -1,110 +1,117 @@
 /* @jsx m */
 import 'pages/projects/cover_image_upload.scss';
 
-import m from 'mithril';
+import m, { VnodeDOM } from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import Dropzone from 'dropzone';
 
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { Spinner } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ICreateProjectForm } from './create_project_form';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 interface ICoverImageUploadAttrs {
-  form: ICreateProjectForm;
-  uploadStartedCallback?: CallableFunction;
-  uploadCompleteCallback?: CallableFunction;
+  uploadCompleteCallback: CallableFunction;
 }
 
 // TODO Graham 6/21/22: Consider syncing down the line w/ new Avatar upload
 export default class CoverImageUpload
   implements m.ClassComponent<ICoverImageUploadAttrs>
 {
-  private dropzone?: any;
   private uploading: boolean;
-  private uploaded: boolean;
 
-  oncreate(vnode: m.VnodeDOM<ICoverImageUploadAttrs>) {
-    $(vnode.dom).on('cleardropzone', () => {
-      this.dropzone.files.map((file) => this.dropzone.removeFile(file));
-    });
-    this.dropzone = new Dropzone(vnode.dom, {
-      // configuration for textarea dropzone
-      clickable: '.CoverImageUpload .attach-button',
-      previewsContainer: '.CoverImageUpload .dropzone-previews',
-      // configuration for direct upload to s3
-      url: '/', // overwritten when we get the target URL back from s3
-      header: '',
-      method: 'put',
-      parallelUploads: 1,
-      uploadMultiple: false,
-      autoProcessQueue: false,
-      maxFiles: 1,
-      maxFilesize: 10, // MB
-      // request a signed upload URL when a file is accepted from the user
-      accept: (file, done) => {
-        // TODO: Change to POST /uploadSignature
-        $.post(`${app.serverUrl()}/getUploadSignature`, {
+  async uploadImage(file: File) {
+    try {
+      const signatureResponse = await $.post(
+        `${app.serverUrl()}/getUploadSignature`,
+        {
           name: file.name,
           mimetype: file.type,
           auth: true,
           jwt: app.user.jwt,
-        })
-          .then((response) => {
-            if (response.status !== 'Success') {
-              return done(
-                'Failed to get an S3 signed upload URL',
-                response.error
-              );
-            }
-            file.uploadURL = response.result;
-            this.uploaded = true;
-            done();
-            setTimeout(() => this.dropzone.processFile(file));
-          })
-          .catch((err: any) => {
-            done(
-              'Failed to get an S3 signed upload URL',
-              err.responseJSON ? err.responseJSON.error : err.responseText
-            );
-          });
-      },
-      sending: (file, xhr) => {
-        const _send = xhr.send;
-        xhr.send = () => {
-          _send.call(xhr, file);
-        };
-      },
-    });
-    this.dropzone.on('processing', (file) => {
-      this.uploading = true;
-      this.dropzone.options.url = file.uploadURL;
-      if (vnode.attrs.uploadStartedCallback) {
-        vnode.attrs.uploadStartedCallback();
-      }
-    });
-    this.dropzone.on('complete', (file) => {
-      if (vnode.attrs.uploadCompleteCallback) {
-        vnode.attrs.uploadCompleteCallback(this.dropzone.files);
-      }
-    });
+        }
+      );
+      if (signatureResponse.status !== 'Success') throw new Error();
+
+      const uploadURL = signatureResponse.result;
+      const uploadResponse = await fetch(uploadURL, {
+        method: 'put',
+        body: file,
+      });
+
+      const imageURL = uploadResponse.url?.replace(/\?.*/, '').trim();
+      if (!imageURL) throw new Error();
+
+      notifySuccess('Image successfully uploaded');
+      return imageURL;
+    } catch (e) {
+      notifyError('Image failed to upload');
+    }
   }
 
-  view(vnode: m.Vnode<ICoverImageUploadAttrs>) {
-    const logoURL = this.dropzone?.options?.url;
+  oncreate(vnode: VnodeDOM<ICoverImageUploadAttrs, this>) {
+    console.log(vnode.attrs);
+    const attachZone = document.querySelector('.attach-zone') as HTMLElement;
+    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
+    const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
+
+    // Drag'n'Drop helper function
+    const handleDragEvent = (event, hoverAttachZone?: boolean) => {
+      event.preventDefault();
+      event.stopPropagation();
+      attachZone.classList[hoverAttachZone ? 'add' : 'remove']('hovered');
+    };
+    const handleUpload = async (file: File) => {
+      const imageURL = await this.uploadImage(file);
+      this.uploading = false;
+      attachZone.style.backgroundImage = `url(${imageURL})`;
+      attachButton.style.display = 'none';
+      vnode.attrs.uploadCompleteCallback(imageURL);
+    };
+
+    // Drag'n'Drop event handler declarations
+    const dragEnterHandler = (enterEvent: DragEvent) => {
+      handleDragEvent(enterEvent, true);
+    };
+    const dragOverHandler = (overEvent: DragEvent) => {
+      handleDragEvent(overEvent, true);
+    };
+    const dragLeaveHandler = (leaveEvent: DragEvent) => {
+      handleDragEvent(leaveEvent, false);
+    };
+    const dropHandler = (dropEvent: DragEvent) => {
+      handleDragEvent(dropEvent, false);
+      this.uploading = true;
+      m.redraw();
+      const { files } = dropEvent.dataTransfer;
+      handleUpload(files[0]);
+    };
+
+    attachZone.addEventListener('dragenter', dragEnterHandler);
+    attachZone.addEventListener('dragleave', dragLeaveHandler);
+    attachZone.addEventListener('dragover', dragOverHandler);
+    attachZone.addEventListener('drop', dropHandler);
+
+    // On-click support
+    const clickHandler = (clickEvent: MouseEvent) => {
+      clickEvent.preventDefault();
+      pseudoInput.click();
+    };
+    attachZone.addEventListener('click', clickHandler);
+  }
+
+  view() {
     return (
       <div class="CoverImageUpload">
-        <div
-          class={`dropzone-attach ${this.uploaded ? 'hidden' : ''}`}
-          style={`background-image: url(${logoURL}); background-size: 92px;`}
-        >
-          <div class="attach-button">
-            <CWIcon iconName="plus" iconSize="large" />
+        <div class="attach-zone">
+          <input type="file" id="pseudo-input" />
+          {this.uploading && <Spinner active="true" size="lg" />}
+          <div class="attach-btn">
+            {!this.uploading && <CWIcon iconName="plus" iconSize="large" />}
             <CWText type="h5">Upload Cover Image</CWText>
             <CWText type="caption">1040px by 568px</CWText>
           </div>
         </div>
-        <div class={`dropzone-previews`}></div>
       </div>
     );
   }

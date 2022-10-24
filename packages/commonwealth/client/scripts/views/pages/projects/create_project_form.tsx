@@ -109,7 +109,8 @@ export class InformationSlide
     if (!vnode.attrs.form.creator) return;
     return (
       <div class="InformationSlide">
-        <CWButton
+        {/* TEST CREATION */}
+        {/* <CWButton
           label="Create Project"
           onclick={async () => {
             const [txReceipt, newProjectId] = await app.projects.createProject({
@@ -129,7 +130,7 @@ export class InformationSlide
             });
             console.log({ txReceipt, newProjectId });
           }}
-        />
+        /> */}
         <CWText type="h1">General Information</CWText>
         <CWText type="caption">
           Name your crowdfund, add a brief card description and upload a header
@@ -164,16 +165,8 @@ export class InformationSlide
           value={vnode.attrs.form.shortDescription}
         />
         <CoverImageUpload
-          uploadStartedCallback={() => {
-            m.redraw();
-          }}
-          uploadCompleteCallback={(files) => {
-            files.forEach((f) => {
-              if (!f.uploadURL) return;
-              const url = f.uploadURL.replace(/\?.*/, '');
-              vnode.attrs.form.coverImage = url.trim();
-            });
-            m.redraw();
+          uploadCompleteCallback={(imageURL: string) => {
+            vnode.attrs.form.coverImage = imageURL;
           }}
         />
       </div>

@@ -3,6 +3,7 @@ import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import app from 'state';
+import Web3 from 'web3';
 import { SelectList, TabItem, Tabs } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
@@ -12,7 +13,6 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
-import Web3 from 'web3';
 
 enum ProjectListingSubpage {
   Explore = 'explore',
