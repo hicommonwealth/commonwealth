@@ -3,6 +3,7 @@ import { providers } from 'ethers';
 import { ERC20, ERC20__factory, ERC721, ERC721__factory } from 'common-common/src/eth/types';
 
 import { BalanceProvider, IChainNode } from "../types";
+import { BalanceType } from 'common-common/src/types';
 
 type EthBPOpts = {
   tokenAddress: string;
@@ -15,6 +16,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     contractType: 'string',
     tokenAddress: 'string',
   };
+  public validBases = [BalanceType.Ethereum];
 
   public getCacheKey(node: IChainNode, address: string, opts: EthBPOpts): string {
     return `${node.id}-${address}-${opts.tokenAddress}`;

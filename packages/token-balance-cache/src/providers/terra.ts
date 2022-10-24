@@ -2,10 +2,12 @@ import BN from 'bn.js';
 import axios from 'axios';
 
 import { BalanceProvider, IChainNode } from "../types";
+import { BalanceType } from 'common-common/src/types';
 
 export default class TerraBalanceProvider extends BalanceProvider {
   public name = 'terra';
   public opts = {};
+  public validBases = [BalanceType.Terra];
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     if (!process.env.TERRA_SETTEN_PHOENIX_API_KEY) {

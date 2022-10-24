@@ -43,6 +43,7 @@ class MockTokenBalanceProvider implements BalanceProvider {
     tokenAddress: 'string',
     contractType: 'string',
   }
+  public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
   public async getBalance(node: IChainNode, address: string, opts: Record<string, string>): Promise<string> {

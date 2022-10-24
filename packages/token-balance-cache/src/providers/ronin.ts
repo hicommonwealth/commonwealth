@@ -5,10 +5,12 @@ import { providers } from 'ethers';
 import { ERC20__factory } from 'common-common/src/eth/types';
 
 import { BalanceProvider, IChainNode } from "../types";
+import { BalanceType } from 'common-common/src/types';
 
 export default class RoninBalanceProvider extends BalanceProvider {
   public name = 'ronin';
   public opts = {};
+  public validBases = [BalanceType.AxieInfinity];
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     // TODO: make configurable

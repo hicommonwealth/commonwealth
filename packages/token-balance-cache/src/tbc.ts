@@ -15,6 +15,7 @@ import {
   TokenBalanceResp,
 } from './types';
 import { default as BalanceProviders } from './providers';
+import { BalanceType } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,6 +40,7 @@ async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainN
   return nodeArray;
 }
 
+// TODO: have JobRunner as include rather than extends, for unit testing
 export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanceCache {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
@@ -57,32 +59,28 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
 
   public async getChainNodes(): Promise<ChainNodeResp[]> {
     return Object.values(this._nodes)
-      .map(({ id, name, description, chain_base, ss58, bech32 }) => ({
-        id, name, description, base: chain_base, prefix: bech32 || ss58?.toString()
+      .map(({ id, name, description, balance_type, ss58, bech32 }) => ({
+        id, name, description, base: balance_type, prefix: bech32 || ss58?.toString()
       }));
   }
 
-  public async getBalanceProviders(nodeId: number): Promise<BalanceProviderResp[]> {
+  public async getBalanceProviders(nodeId?: number): Promise<BalanceProviderResp[]> {
+    const formatBps = (bps: BalanceProvider[]): BalanceProviderResp[] => {
+      return bps.map(({ name, opts }) => ({ bp: name, opts }));
+    };
+
+    // return all available providers if no nodeId passed
+    if (!nodeId) {
+      return formatBps(Object.values(this._providers));
+    }
+
+    // otherwise, return bps that support node's base
+    // TODO: ensure all nodes have proper bases / balance types in db...
     const node = this._nodes[nodeId];
     if (!node) throw new Error('Could not find node');
-    let provider: BalanceProvider;
-    if (node.chain_base === 'terra') {
-      provider = this._providers['terra'];
-    } else if (node.chain_base === 'ronin') {
-      provider = this._providers['ronin'];
-    } else if (node.chain_base === 'cosmos') {
-      provider = this._providers['cosmos'];
-    } else if (node.chain_base === 'ethereum') {
-      provider = this._providers['eth-token'];
-    } else if (node.chain_base === 'solana') {
-      provider = this._providers['spl-token'];
-    } else {
-      throw new Error('unknown chain base');
-    }
-    return [{
-      bp: provider.name,
-      opts: provider.opts,
-    }];
+    const base = node.balance_type;
+    const bps = Object.values(this._providers).filter(({ validBases }) => validBases.includes(base));
+    return formatBps(bps);
   }
 
   public async getBalancesForAddresses(
@@ -97,7 +95,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     }
     const [{ bp }] = await this.getBalanceProviders(nodeId);
     if (bp !== balanceProvider) {
-      throw new Error('balance provider does not match node');
+      throw new Error('balance provider not valid for node');
     }
     const providerObj = this._providers[balanceProvider];
 

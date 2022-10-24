@@ -1,4 +1,5 @@
 import * as solw3 from '@solana/web3.js';
+import { BalanceType } from 'common-common/src/types';
 
 import { BalanceProvider, IChainNode } from "../types";
 
@@ -11,6 +12,7 @@ export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPO
   public opts = {
     tokenAddress: 'string',
   };
+  public validBases = [BalanceType.Solana];
 
   public getCacheKey(node: IChainNode, address: string, opts: SplTokenBPOpts): string {
     return `${address}-${node.url as solw3.Cluster}-${opts.tokenAddress}`;

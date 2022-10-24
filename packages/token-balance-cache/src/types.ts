@@ -14,7 +14,7 @@ export type IChainNode = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
-  balance_type?: BalanceType;
+  balance_type: BalanceType;
   chain_base: string;
   name: string;
   description?: string;
@@ -26,13 +26,14 @@ export type ChainNodeResp = {
   id: number,
   name: string,
   description?: string,
-  base: string,
+  base: BalanceType,
   prefix?: string,
 };
 
 export abstract class BalanceProvider<OptT extends Record<string, unknown> = Record<string, unknown>> {
   public readonly name: string;
   public readonly opts: Record<keyof OptT, string>;
+  public abstract readonly validBases: BalanceType[];
 
   public getCacheKey(node: IChainNode, address: string, opts: OptT): string {
     return `${node.id}-${address}`;

@@ -4,12 +4,14 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { BalanceType } from 'common-common/src/types';
 
 import { BalanceProvider, IChainNode } from "../types";
 
 export default class CosmosBalanceProvider extends BalanceProvider {
   public name = 'cosmos';
   public opts = {};
+  public validBases = [BalanceType.Cosmos];
 
   public async getBalance(node: IChainNode, address: string): Promise<string> {
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
