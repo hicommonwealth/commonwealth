@@ -22,15 +22,17 @@ type RulesPageAttrs = {
 export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
   private isLoading: boolean;
 
-  oninit(vnode) {
+  oninit() {
     this.isLoading = true;
-    app.rules.refresh().then(() => {
-      this.isLoading = false;
-      m.redraw();
-    });
   }
 
   view() {
+    if (this.isLoading) {
+      app.rules.refresh().then(() => {
+        this.isLoading = false;
+        m.redraw();
+      });
+    }
     return this.isLoading ? (
       <PageLoading />
     ) : (
@@ -95,18 +97,24 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                       modal: RuleModal,
                       data: {
                         onFinish: async (editedRule) => {
+                          console.log('Edited Rule', editedRule);
+                          console.log(
+                            'Edited Rule as string',
+                            JSON.parse(editedRule)
+                          );
+
                           try {
                             await app.rules.editRule({
                               chain_id: app.activeChainId(),
                               rule_id: rule.id,
                               updated_rule: editedRule,
                             });
+                            notifySuccess('Rule updated!');
                           } catch (e) {
                             console.log(e);
                           }
-                          notifySuccess('Rule updated!');
                         },
-                        rule: rule.rule,
+                        rule: JSON.parse(JSON.stringify(rule.rule)),
                       },
                     });
                   }}

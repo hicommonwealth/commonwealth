@@ -66,6 +66,9 @@ class RulesController {
     chain_id: string;
     ruleSchema: any;
   }) {
+    console.log('created new rule with schema: ', ruleSchema);
+    console.log('and as a string: ', JSON.stringify(ruleSchema));
+
     try {
       const res = await $.post(`${app.serverUrl()}/createRule`, {
         chain_id,

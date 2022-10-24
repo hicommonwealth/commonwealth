@@ -53,6 +53,7 @@ const editRule = async (
 
     return success(res, { message: 'Rule updated successfully' });
   } catch (e) {
+    console.log('wtf', e);
     throw new AppError(EditRuleErrors.InvalidRule);
   }
 };
