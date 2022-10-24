@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import _ from 'underscore';
 import { slugify } from '../../shared/utils';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TokenResponse } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenAttributes } from '../models/token';

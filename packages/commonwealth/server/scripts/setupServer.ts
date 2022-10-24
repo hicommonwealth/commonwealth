@@ -1,13 +1,14 @@
+import { factory, formatFilename } from 'common-common/src/logging';
+import { Express } from 'express-serve-static-core';
 import http from 'http';
 import https from 'https';
 import path from 'path';
 import fs from 'fs';
-import { Express } from 'express-serve-static-core';
 import Rollbar from 'rollbar';
-import { factory, formatFilename } from 'common-common/src/logging';
+
 import { DEFAULT_PORT } from '../config';
+import { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
-import { DB } from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
 

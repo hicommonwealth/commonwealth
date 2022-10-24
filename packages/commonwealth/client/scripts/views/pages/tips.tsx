@@ -8,7 +8,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { formatCoin } from 'adapters/currency';
 import { ProposalType, ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

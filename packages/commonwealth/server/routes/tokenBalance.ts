@@ -2,7 +2,7 @@ import TokenBalanceCache from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
@@ -31,7 +31,7 @@ const tokenBalance = async (
   }
 
   let chain: ChainInstance;
-  let author: AddressInstance;
+  // let author: AddressInstance;
   let error: string;
   let contract: ContractInstance;
   try {
@@ -40,12 +40,14 @@ const tokenBalance = async (
   } catch (err) {
     throw new AppError(err);
   }
-  try {
-    [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new AppError(error);
-  } catch (err) {
-    throw new AppError(err)
-  }
+
+  // NOTE: Removing validation of ownership of address, seemingly unnecessary for logic
+  // try {
+  //   [author, error] = await lookupAddressIsOwnedByUser(models, req);
+  //   if (error) throw new AppError(error);
+  // } catch (err) {
+  //   throw new AppError(err)
+  // }
 
   let chain_node_id = chain.ChainNode.id;
   if (
@@ -69,7 +71,8 @@ const tokenBalance = async (
   try {
     const balance = await tokenBalanceCache.getBalance(
       chain_node_id,
-      author.address,
+      // author.address, // NOTE: see above
+      req.body.address,
       contract?.address,
       chain.network === ChainNetwork.ERC20
         ? 'erc20' : chain.network === ChainNetwork.ERC721

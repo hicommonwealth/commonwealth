@@ -7,7 +7,8 @@ import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 
 import '../types';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ChainBase, NotificationCategories, WalletId } from 'common-common/src/types';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
@@ -49,6 +50,8 @@ export function useMagicAuth(models: DB) {
           model: models.Address,
           where: { wallet_id: WalletId.Magic },
           required: false,
+        }, {
+          model: models.Profile
         }]
       });
 
@@ -339,11 +342,31 @@ export function useMagicAuth(models: DB) {
         console.log(`Found existing user: ${JSON.stringify(existingUser)}`);
         return cb(null, existingUser);
       } else {
-        // error if email exists but not registered with magic
-        console.log('User already registered with old method.');
-        return cb(null, null, {
-          message: `Email for user ${user.issuer} already registered`
+        // migrate to magic if email already exists
+        await sequelize.transaction(async (t) => {
+          const ethAddress = userMetadata.publicAddress;
+          const newAddress = await models.Address.create({
+            address: ethAddress,
+            chain: 'ethereum',
+            verification_token: 'MAGIC',
+            verification_token_expires: null,
+            verified: new Date(), // trust addresses from magic
+            last_active: new Date(),
+            user_id: existingUser.id,
+            profile_id: (existingUser.Profiles[0] as ProfileAttributes).id,
+            wallet_id: WalletId.Magic
+          }, { transaction: t });
+
+          await models.SsoToken.create({
+            issuer: userMetadata.issuer,
+            issued_at: user.claim.iat,
+            address_id: newAddress.id, // always ethereum address
+            created_at: new Date(),
+            updated_at: new Date(),
+          }, { transaction: t });
         });
+        console.log(`Migrated old email user to magic: ${existingUser.email}`);
+        return cb(null, existingUser);
       }
     }));
   }

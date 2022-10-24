@@ -11,7 +11,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 import { AddressInstance } from '../models/address';
@@ -329,6 +329,11 @@ const createChain = async (
     chain_id: chain.id,
     category: 'General',
   });
+
+  const topics = await models.Topic.create({
+    chain_id: chain.id,
+    name: 'General'
+  })
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored

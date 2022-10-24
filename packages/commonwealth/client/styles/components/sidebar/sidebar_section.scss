@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SidebarSectionGroup {
   border-bottom-color: $neutral-50;
@@ -14,12 +14,6 @@
     display: flex;
     justify-content: left;
     padding: 8px;
-    @include small {
-      padding: 12px 32px 12px 40px;
-    }
-    @include extraSmall {
-      padding: 10px 12px;
-    }
 
     &:hover {
       background-color: $primary-50;
@@ -27,9 +21,6 @@
 
     .Icon {
       margin-right: 4px;
-      @include smallInclusive {
-        margin-right: 14px;
-      }
     }
   }
 
@@ -45,14 +36,6 @@
     align-items: center;
     display: flex;
     min-width: 0;
-
-    @include small {
-      padding: 12px 32px 12px 78px;
-    }
-
-    @include extraSmall {
-      padding: 12px 8px 12px 44px;
-    }
 
     .title-text {
       color: $neutral-600;

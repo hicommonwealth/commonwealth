@@ -1,7 +1,8 @@
 import TokenBalanceCache from 'token-balance-cache/src/index';
 import { AddressInstance } from 'server/models/address';
 import { Op, QueryTypes } from 'sequelize';
-import { DB, sequelize } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { AppError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 

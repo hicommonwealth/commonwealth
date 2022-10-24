@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AppError, ServerError } from '../util/errors';
 

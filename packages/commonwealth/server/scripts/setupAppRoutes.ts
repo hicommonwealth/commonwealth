@@ -1,5 +1,5 @@
 import cheerio from 'cheerio';
-import { DB } from '../database';
+import { DB } from '../models';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';

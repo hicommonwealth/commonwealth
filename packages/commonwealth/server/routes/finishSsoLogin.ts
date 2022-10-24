@@ -5,7 +5,8 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 

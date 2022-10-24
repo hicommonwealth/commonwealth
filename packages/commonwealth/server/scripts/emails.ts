@@ -10,7 +10,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { SENDGRID_API_KEY, } from '../config';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import { IPostNotificationData, DynamicTemplate } from '../../shared/types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { UserAttributes } from '../models/user';
 
 const log = factory.getLogger(formatFilename(__filename));

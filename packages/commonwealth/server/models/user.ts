@@ -4,11 +4,8 @@ import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes, ChainInstance } from './chain';
 import { ProfileInstance, ProfileAttributes } from './profile';
-import {
-  SocialAccountInstance,
-  SocialAccountAttributes,
-} from './social_account';
-import { DB } from '../database';
+import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
+import { DB } from '../models';
 import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 
 export type EmailNotificationInterval = 'daily' | 'never';

@@ -12,7 +12,7 @@ import {
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-import { DB } from '../database';
+import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,

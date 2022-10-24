@@ -4,26 +4,13 @@ import moment from 'moment';
 
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
-
 import { CommentsStore } from 'stores';
-import {
-  Comment,
-  Attachment,
-  IUniqueId,
-  AddressInfo,
-  NodeInfo,
-  Thread,
-} from 'models';
+import { Comment, Attachment, IUniqueId } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
 
 // tslint:disable: object-literal-key-quotes
-
-export enum CommentParent {
-  Proposal = 'proposal',
-  Comment = 'comment',
-}
 
 export enum CommentRefreshOption {
   ResetAndLoadComments = 'ResetAndLoadComments',
@@ -32,9 +19,7 @@ export enum CommentRefreshOption {
 
 export const modelFromServer = (comment) => {
   const attachments = comment.Attachments
-    ? comment.Attachments.map(
-        (a) => new Attachment(a.url, a.description)
-      )
+    ? comment.Attachments.map((a) => new Attachment(a.url, a.description))
     : [];
 
   const { reactions } = comment;

@@ -6,7 +6,7 @@ import m from 'mithril';
 import 'modals/bounty_modals.scss';
 
 import app from 'state';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInputTypeahead } from 'views/components/address_input_typeahead';
 import { createTXModal } from 'views/modals/tx_signing_modal';

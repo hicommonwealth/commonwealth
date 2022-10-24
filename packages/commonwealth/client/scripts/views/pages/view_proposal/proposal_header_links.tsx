@@ -5,16 +5,17 @@ import m from 'mithril';
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import { externalLink, extractDomain, link } from 'helpers';
-import { Thread, AnyProposal } from 'models';
+import { AnyProposal } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-// if you add a link when you create the thread
+
+// Threads Kind.Link
 export class ProposalHeaderExternalLink
   implements
     m.ClassComponent<{
-      proposal: AnyProposal | Thread;
+      proposal: AnyProposal;
     }>
 {
   view(vnode) {
@@ -28,6 +29,7 @@ export class ProposalHeaderExternalLink
     );
   }
 }
+
 
 // "View in Subscan"
 export class ProposalHeaderBlockExplorerLink

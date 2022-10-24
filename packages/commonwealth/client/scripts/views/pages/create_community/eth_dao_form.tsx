@@ -22,21 +22,25 @@ import CompoundAPI, {
   GovernorType,
 } from 'controllers/chain/ethereum/compound/api';
 import AaveApi from 'controllers/chain/ethereum/aave/api';
+
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
+
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+
 import {
   initChainForm,
   defaultChainRows,
   ethChainRows,
-} from './chain_input_rows';
+} from 'views/pages/create_community/chain_input_rows';
+
 import {
   ChainFormFields,
   ChainFormState,
   EthChainAttrs,
   EthFormFields,
-} from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+} from 'views/pages/create_community/types';
 
-import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
