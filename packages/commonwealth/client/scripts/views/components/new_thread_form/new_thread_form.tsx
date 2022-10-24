@@ -33,6 +33,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getClasses } from '../component_kit/helpers';
 import { renderQuillTextBody } from '../quill/helpers';
+import CWCoverImageUploader from '../component_kit/cw_cover_image_uploader';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;
