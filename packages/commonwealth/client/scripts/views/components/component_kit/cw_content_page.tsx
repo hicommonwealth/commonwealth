@@ -1,16 +1,20 @@
 /* @jsx m */
 
 import m from 'mithril';
+import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
 
-import { Comment } from 'models';
+import app from 'state';
+import { AddressInfo, Comment } from 'models';
 import { ComponentType, MenuItem } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import { CWDivider } from './cw_divider';
+import User from '../widgets/user';
 
 type SidebarItem = {
   label: string;
@@ -25,16 +29,18 @@ type SidebarComponents = [
 ];
 
 type ContentPageAttrs = {
-  actions?: Array<MenuItem>;
   author: string;
   body: m.Vnode;
-  comments?: Array<Comment<any>>;
   createdAt: moment.Moment;
+  title: string;
+
+  // optional
+  actions?: Array<MenuItem>;
+  comments?: Array<Comment<any>>;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: m.Vnode;
   subHeader?: m.Vnode;
-  title: string;
   updatedAt?: moment.Moment;
 };
 
@@ -72,35 +78,60 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       }
     };
 
+    const mainBody = (
+      <div class="main-body-container">
+        <div class="header">
+          <CWText type="h3" fontWeight="semiBold">
+            {title}
+          </CWText>
+          <div class="header-info-row">
+            <CWText>
+              {m(User, {
+                user: new AddressInfo(null, author, app.activeChainId(), null),
+                showAddressWithDisplayName: true,
+                linkify: true,
+                popover: true,
+              })}
+            </CWText>
+            <CWText type="caption" className="header-text">
+              published on {moment(createdAt).format('l')}
+            </CWText>
+            {/* <CWText>{updatedAt}</CWText> */}
+            {actions && (
+              <CWPopoverMenu
+                trigger={<CWIconButton iconName="dotsVertical" />}
+                menuItems={actions}
+              />
+            )}
+          </div>
+        </div>
+        {subHeader}
+        {/* <CWDivider /> */}
+        {body}
+        {/* <CWDivider /> */}
+        {subBody}
+        {/* <CWDivider /> */}
+        {comments}
+      </div>
+    );
+
     return (
       <div class={ComponentType.ContentPage}>
         <div
-          class={getClasses<{ showSidebar?: boolean }>({ showSidebar }, 'body')}
+          class={getClasses<{ showSidebar?: boolean }>(
+            { showSidebar },
+            'sidebar-view'
+          )}
         >
-          <div>
-            <div>
-              <CWText>{title}</CWText>
-              <CWText>{author}</CWText>
-              {/* <CWText>{createdAt}</CWText>
-              <CWText>{updatedAt}</CWText> */}
-              {actions && (
-                <CWPopoverMenu
-                  trigger={<CWIconButton iconName="dotsVertical" />}
-                  menuItems={actions}
-                />
-              )}
-            </div>
-            {subHeader}
-            {body}
-            {subBody}
-            {comments}
+          {mainBody}
+          <div class="sidebar">
+            {showSidebar && sidebarComponents.map((c) => <>{c.item}</>)}
           </div>
-          {showSidebar && sidebarComponents.map((c) => <>{c.item}</>)}
         </div>
         <div
           class={getClasses<{ showSidebar?: boolean }>(
             { showSidebar },
-            'body-with-tabs'
+            'tabs-view'
           )}
         >
           <CWTabBar>
@@ -121,14 +152,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
               />
             ))}
           </CWTabBar>
-          {this.tabSelected === 0 && (
-            <>
-              {subHeader}
-              {body}
-              {subBody}
-              {comments}
-            </>
-          )}
+          {this.tabSelected === 0 && mainBody}
           {showSidebar && (
             <>
               {sidebarComponents.length >= 1 &&

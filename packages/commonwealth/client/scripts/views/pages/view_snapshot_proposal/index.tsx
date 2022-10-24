@@ -16,10 +16,16 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotProposalContent } from './snapshot_proposal_content';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
-import { SnapshotProposalCards } from './snapshot_proposal_cards';
+import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { SnapshotInformationCard } from './snapshot_information_card';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { SnapshotVotesTable } from './snapshot_votes_table';
+import {
+  ActiveProposalPill,
+  ClosedProposalPill,
+} from '../../components/proposal_pills';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -130,29 +136,50 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       >
         <CWContentPage
           showSidebar
-          body={
-            <SnapshotProposalContent
-              proposal={this.proposal}
-              votes={this.votes}
-              symbol={this.symbol}
-            />
+          title={this.proposal.title}
+          author={this.proposal.author}
+          createdAt={this.proposal.created}
+          subHeader={
+            this.proposal.state === 'active' ? (
+              <ActiveProposalPill proposalEnd={this.proposal.end} />
+            ) : (
+              <ClosedProposalPill proposalState={this.proposal.state} />
+            )
+          }
+          body={renderQuillTextBody(this.proposal.body)}
+          subBody={
+            this.votes.length > 0 && (
+              <SnapshotVotesTable
+                choices={this.proposal.choices}
+                symbol={this.symbol}
+                votes={this.votes}
+              />
+            )
           }
           sidebarComponents={[
             {
-              label: 'Cards',
+              label: 'Info',
               item: (
-                <SnapshotProposalCards
+                <SnapshotInformationCard
+                  proposal={this.proposal}
+                  threads={this.threads}
+                />
+              ),
+            },
+            {
+              label: 'Poll',
+              item: (
+                <SnapshotPollCardContainer
+                  fetchedPower={this.fetchedPower}
                   identifier={identifier}
                   proposal={this.proposal}
                   scores={this.scores}
                   space={this.space}
                   symbol={this.symbol}
-                  threads={this.threads}
                   totals={this.totals}
-                  votes={this.votes}
-                  validatedAgainstStrategies={this.validatedAgainstStrategies}
-                  fetchedPower={this.fetchedPower}
                   totalScore={this.totalScore}
+                  validatedAgainstStrategies={this.validatedAgainstStrategies}
+                  votes={this.votes}
                 />
               ),
             },

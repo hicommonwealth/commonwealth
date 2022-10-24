@@ -13,18 +13,28 @@ import { CWText } from '../../components/component_kit/cw_text';
 
 type SnapshotVotesTableAttrs = {
   choices: Array<string>;
-  toggleExpandedVoterList: () => void;
   symbol: string;
-  voteCount: number;
-  votersList: Array<SnapshotProposalVote>;
+  votes: Array<SnapshotProposalVote>;
 };
 
 export class SnapshotVotesTable
   implements m.ClassComponent<SnapshotVotesTableAttrs>
 {
+  votersListExpanded: boolean;
+
+  oninit() {
+    this.votersListExpanded = false;
+  }
+
   view(vnode) {
-    const { choices, toggleExpandedVoterList, symbol, voteCount, votersList } =
-      vnode.attrs;
+    const { choices, symbol, votes } = vnode.attrs;
+
+    const toggleExpandedVoterList = () => {
+      this.votersListExpanded = !this.votersListExpanded;
+      m.redraw();
+    };
+
+    const votersList = this.votersListExpanded ? votes : votes.slice(0, 10);
 
     return (
       <div class="SnapshotVotesTable">
@@ -34,7 +44,7 @@ export class SnapshotVotesTable
           </CWText>
           <div class="vote-count">
             <CWText className="vote-count-text" fontWeight="medium">
-              {voteCount}
+              {votes.length}
             </CWText>
           </div>
         </div>
@@ -70,10 +80,7 @@ export class SnapshotVotesTable
               </CWText>
             </div>
           ))}
-          <div
-            class="view-more-footer"
-            onclick={() => toggleExpandedVoterList()}
-          >
+          <div class="view-more-footer" onclick={toggleExpandedVoterList}>
             <CWText className="view-more-text" fontWeight="medium">
               View More
             </CWText>

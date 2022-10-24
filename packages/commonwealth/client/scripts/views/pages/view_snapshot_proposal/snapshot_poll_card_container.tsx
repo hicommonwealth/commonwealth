@@ -3,8 +3,6 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/snapshot/snapshot_proposal_cards.scss';
-
 import app from 'state';
 import {
   SnapshotProposal,
@@ -12,7 +10,6 @@ import {
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
-import { SnapshotInformationCard } from './snapshot_information_card';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
 
@@ -22,7 +19,6 @@ type SnapshotProposalCardsAttrs = {
   scores: number[];
   space: SnapshotSpace;
   symbol: string;
-  threads: Array<{ id: string; title: string }> | null;
   totals: any;
   votes: SnapshotProposalVote[];
   validatedAgainstStrategies: boolean;
@@ -47,7 +43,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   return timeRemainingString;
 }
 
-export class SnapshotProposalCards
+export class SnapshotPollCardContainer
   implements m.ClassComponent<SnapshotProposalCardsAttrs>
 {
   view(vnode) {
@@ -56,7 +52,6 @@ export class SnapshotProposalCards
       proposal,
       scores,
       space,
-      threads,
       totals,
       votes,
       validatedAgainstStrategies,
@@ -130,27 +125,24 @@ export class SnapshotProposalCards
     };
 
     return (
-      <div class="SnapshotProposalCards">
-        <SnapshotInformationCard proposal={proposal} threads={threads} />
-        <SnapshotPollCard
-          pollEnded={!isActive}
-          hasVoted={hasVoted}
-          votedFor={hasVoted ? userVote : ''}
-          disableVoteButton={!fetchedPower || voteErrorText !== null}
-          proposalTitle={proposal.title}
-          timeRemaining={calculateTimeRemaining(proposal)}
-          tokenSymbol={space.symbol}
-          totalVoteCount={totals.sumOfResultsBalance}
-          voteInformation={buildVoteInformation(proposal?.choices, votes)}
-          onVoteCast={(choice: string, callback: () => any) => {
-            castSnapshotVote(choice, callback);
-            m.redraw();
-          }}
-          incrementalVoteCast={totalScore}
-          tooltipErrorMessage={voteErrorText}
-          isPreview={false}
-        />
-      </div>
+      <SnapshotPollCard
+        pollEnded={!isActive}
+        hasVoted={hasVoted}
+        votedFor={hasVoted ? userVote : ''}
+        disableVoteButton={!fetchedPower || voteErrorText !== null}
+        proposalTitle={proposal.title}
+        timeRemaining={calculateTimeRemaining(proposal)}
+        tokenSymbol={space.symbol}
+        totalVoteCount={totals.sumOfResultsBalance}
+        voteInformation={buildVoteInformation(proposal?.choices, votes)}
+        onVoteCast={(choice: string, callback: () => any) => {
+          castSnapshotVote(choice, callback);
+          m.redraw();
+        }}
+        incrementalVoteCast={totalScore}
+        tooltipErrorMessage={voteErrorText}
+        isPreview={false}
+      />
     );
   }
 }

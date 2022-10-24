@@ -1,12 +1,51 @@
 @import 'shared';
 
+@mixin mainBodyStyles {
+  .main-body-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .header-info-row {
+        display: flex;
+        gap: 8px;
+
+        .User {
+          align-items: center;
+          display: flex;
+
+          .user-avatar {
+            position: unset;
+          }
+
+          .username {
+            @include caption;
+
+            font-weight: 500;
+          }
+        }
+
+        .header-text.Text {
+          color: $neutral-500;
+        }
+      }
+    }
+  }
+}
+
 .ContentPage {
   display: flex;
   flex: 1;
   padding: 24px;
 
-  .body {
+  .sidebar-view {
     display: flex;
+    gap: 56px;
     justify-content: space-between;
     width: 100%;
 
@@ -15,11 +54,21 @@
         display: none;
       }
     }
+
+    @include mainBodyStyles;
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
   }
 
-  .body-with-tabs {
+  .tabs-view {
     display: none;
     flex-direction: column;
+
+    @include mainBodyStyles;
 
     &.showSidebar {
       display: flex;
