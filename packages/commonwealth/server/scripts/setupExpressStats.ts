@@ -10,21 +10,18 @@ export default function expressStatsdInit (client: StatsD) {
 
     // Function called on response finish that sends stats to statsd
     function sendStats() {
-      const stat = (req.method + req.path).toLowerCase()
-        .replace(/[:.]/g, '')
-        .replace(/\//g, '.')
-
       // Status Code
-      const statusCode = res.statusCode || 'unknown_status';
-      const statusKey = `express.${stat}.status_code.${statusCode}`
-      client.increment(statusKey);
+      const statusCode = res.statusCode.toString() || 'unknown_status';
+      const tags = {
+        statusCode,
+        method: req.method,
+        path: req.path,
+      };
+      client.increment('express.request', tags);
 
       // Response Time
       const duration = new Date().getTime() - startTime;
-      const durationKey = `express.${stat}.response_time`;
-      client.timing(durationKey, duration);
-
-      // console.log(`SENDING STATS: ${statusKey} + ${durationKey}: ${duration}`);
+      client.timing('express.response_time', duration, tags);
 
       // eslint-disable-next-line no-use-before-define
       cleanup();
