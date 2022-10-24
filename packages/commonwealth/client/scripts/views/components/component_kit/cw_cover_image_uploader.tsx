@@ -65,26 +65,35 @@ export default class CWCoverImageUploader
       event.stopPropagation();
       attachZone.classList[hoverAttachZone ? 'add' : 'remove']('hovered');
     };
+
     const handleUpload = async (file: File) => {
       const [imageURL, uploadStatus] = await this.uploadImage(file);
+
       this.uploading = false;
       this.uploadStatus = uploadStatus;
-      this.imageURL = imageURL;
+
+      if (imageURL) {
+        this.imageURL = imageURL;
+        attachButton.style.display = 'none';
+        vnode.attrs.uploadCompleteCallback(imageURL);
+      }
+
       m.redraw();
-      attachButton.style.display = 'none';
-      vnode.attrs.uploadCompleteCallback(imageURL);
     };
 
     // Drag'n'Drop event handler declarations
     const dragEnterHandler = (enterEvent: DragEvent) => {
       handleDragEvent(enterEvent, true);
     };
+
     const dragOverHandler = (overEvent: DragEvent) => {
       handleDragEvent(overEvent, true);
     };
+
     const dragLeaveHandler = (leaveEvent: DragEvent) => {
       handleDragEvent(leaveEvent, false);
     };
+
     const dropHandler = (dropEvent: DragEvent) => {
       handleDragEvent(dropEvent, false);
       delete this.uploadStatus;
@@ -116,6 +125,7 @@ export default class CWCoverImageUploader
   view(vnode: VnodeDOM<ICWCoverImageUploaderAttrs, this>) {
     const { imageURL, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
+
     return (
       <div class="CoverImageUploader">
         {headerText && (
@@ -124,7 +134,7 @@ export default class CWCoverImageUploader
           </CWText>
         )}
         <MessageRow
-          label={subheaderText || 'Cover image uploader'}
+          label={subheaderText || 'Accepts JPG and PNG files.'}
           hasFeedback={true}
           statusMessage={
             this.uploadStatus === 'success'
