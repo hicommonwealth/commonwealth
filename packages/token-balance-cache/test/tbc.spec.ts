@@ -9,7 +9,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public readonly name = 'test-provider';
   public readonly opts = { testBalance: 'string' };
   public readonly validBases = [BalanceType.Ethereum];
-  public async getBalance(node: IChainNode, address: string, opts: { testBalance: string }): Promise<string> {
+  public async getBalance(_node: IChainNode, address: string, opts: { testBalance: string }): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
     } else {
@@ -18,7 +18,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   }
 }
 
-async function mockNodesProvider(lastQueryUnixTime: number): Promise<IChainNode[]> {
+async function mockNodesProvider(_lastQueryUnixTime: number): Promise<IChainNode[]> {
   return [{
     id: 1,
     url: 'none',
@@ -35,8 +35,13 @@ describe('TBC unit tests', () => {
     await tbc.start();
     const nodes = await tbc.getChainNodes();
     assert.sameDeepMembers(nodes, [{
-      id: 1, name: 'Mock Node', base: BalanceType.Ethereum, description: undefined, prefix: undefined,
+      id: 1,
+      name: 'Mock Node',
+      base: BalanceType.Ethereum,
+      description: undefined,
+      prefix: undefined,
     }]);
+    tbc.close();
   });
 
   it('should return balance providers', async () => {
@@ -47,6 +52,7 @@ describe('TBC unit tests', () => {
       bp: 'test-provider',
       opts: { testBalance: 'string' },
     }]);
+    tbc.close();
   });
 
   it('should return token balances', async () => {
@@ -63,5 +69,6 @@ describe('TBC unit tests', () => {
         [addresses[0]]: 'Invalid address!',
       }
     });
+    tbc.close();
   });
 });

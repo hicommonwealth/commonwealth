@@ -15,7 +15,6 @@ import {
   TokenBalanceResp,
 } from './types';
 import { default as BalanceProviders } from './providers';
-import { BalanceType } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -60,7 +59,11 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   public async getChainNodes(): Promise<ChainNodeResp[]> {
     return Object.values(this._nodes)
       .map(({ id, name, description, balance_type, ss58, bech32 }) => ({
-        id, name, description, base: balance_type, prefix: bech32 || ss58?.toString()
+        id,
+        name,
+        description,
+        base: balance_type,
+        prefix: bech32 || ss58?.toString()
       }));
   }
 
