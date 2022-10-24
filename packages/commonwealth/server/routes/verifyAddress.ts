@@ -6,7 +6,7 @@ import bs58 from 'bs58';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import { KeyringOptions } from '@polkadot/keyring/types';
-import { stringToU8a, hexToU8a } from '@polkadot/util';
+import { stringToU8a, hexToU8a, stringToHex } from '@polkadot/util';
 import { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
 import {
@@ -41,6 +41,7 @@ import { DynamicTemplate } from '../../shared/types';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import { constructCanvasMessage } from '../../shared/adapters/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -92,19 +93,20 @@ const verifySignature = async (
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const signedMessageNewline = stringToU8a(
-        `${addressModel.verification_token}\n`
-      );
-      const signedMessageNoNewline = stringToU8a(
-        addressModel.verification_token
-      );
+      const canvasMessage = constructCanvasMessage(
+        "substrate",
+        "edgeware",
+        addressModel.address,
+        sessionPublicAddress,
+        addressModel.block_info!
+      )
+      const message = stringToHex(JSON.stringify(canvasMessage));
+
       const signatureU8a =
         signatureString.slice(0, 2) === '0x'
           ? hexToU8a(signatureString)
           : hexToU8a(`0x${signatureString}`);
-      isValid =
-        signerKeyring.verify(signedMessageNewline, signatureU8a, address) ||
-        signerKeyring.verify(signedMessageNoNewline, signatureU8a, address);
+      isValid = signerKeyring.verify(message, signatureU8a, address);
     } else {
       log.error('Invalid keytype.');
       isValid = false;

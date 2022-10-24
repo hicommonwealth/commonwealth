@@ -1,3 +1,5 @@
+import app from 'state';
+
 import {
   web3Accounts,
   web3Enable,
@@ -11,6 +13,8 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
+import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>
@@ -53,16 +57,41 @@ class PolkadotWebWalletController
   }
 
   public async getRecentBlock() {
-    return null;
+        // TODO: are we using the polkadot API anywhere else on the frontend?
+    // we probably want to point to whatever substrate node we are already running instead of a public API
+    const api = await ApiPromise.create({
+      provider: new WsProvider("wss://rpc.polkadot.io")
+    });
+    const latestBlock = await api.rpc.chain.getBlock();
+    const timestamp = await api.query.timestamp.now.at(latestBlock.block.hash);
+
+    return {
+      number: latestBlock.block.header.number.toNumber(),
+      hash: latestBlock.block.hash.toString(),
+      timestamp: timestamp.toNumber()
+    };
   }
 
   // ACTIONS
   public async signWithAccount(account: Account): Promise<string> {
+    const walletController = app.sessions.getWalletController(ChainBase.Substrate);
+    const chainId = app.chain?.id || this.defaultNetwork;
+    const sessionPublicAddress = await walletController.getOrCreateAddress(chainId);
+
     const signer = await this.getSigner(account.address);
-    const token = account.validationToken;
+
+    const canvasMessage = constructCanvasMessage(
+      "substrate",
+      chainId,
+      account.address,
+      sessionPublicAddress,
+      account.validationBlockInfo
+    );
+    const message = stringToHex(JSON.stringify(canvasMessage));
+
     const payload: SignerPayloadRaw = {
       address: account.address,
-      data: stringToHex(token),
+      data: message,
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;

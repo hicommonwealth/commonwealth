@@ -65,11 +65,13 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
     const address = this.accounts[0].address
+    const walletController = app.sessions.getWalletController(ChainBase.CosmosSDK);
+    const sessionPublicAddress = await walletController.getOrCreateAddress(this._chainId);
 
     const msgParams = await constructKeplrMessage(
       address,
       this._chainId,
-      address,
+      sessionPublicAddress,
       validationBlockInfo,
     );
 
