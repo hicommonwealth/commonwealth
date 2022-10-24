@@ -49,9 +49,20 @@ class OverviewPage implements m.ClassComponent {
       <Sublayout>
         <div class="OverviewPage">
           <div class="header-row">
-            <CWText type="h3" fontWeight="semiBold">
-              Overview
-            </CWText>
+            <div class="header-row-left">
+              <CWText type="h3" fontWeight="semiBold">
+                Overview
+              </CWText>
+              <CWButton
+                  className='latest-button'
+                  buttonType="mini"
+                  label="Latest Threads"
+                  iconName="home"
+                  onclick={() => {
+                    navigateToSubpage('/discussions');
+                  }}
+                />
+            </div>
             {isWindowExtraSmall(window.innerWidth) ? (
               <CWIconButton
                 iconName="plusCircle"

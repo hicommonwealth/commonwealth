@@ -1,5 +1,6 @@
 /* @jsx m */
 
+import { navigateToSubpage } from 'app';
 import m from 'mithril';
 
 import app from 'state';
@@ -9,9 +10,9 @@ class DiscussionsRedirect implements m.ClassComponent {
   view() {
     if (app.chain) {
       if (app.chain.meta.defaultOverview) {
-        m.route.set(`${app.activeChainId()}/overview`);
+        navigateToSubpage('/overview');
       } else {
-        m.route.set(`${app.activeChainId()}/discussions`);
+        navigateToSubpage('/discussions');
       }
     } else {
       return <PageLoading />;

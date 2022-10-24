@@ -24,6 +24,14 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
+
+    .header-row-left {
+      display: flex;
+
+      .latest-button {
+        margin: auto auto auto 16px; 
+      }
+    }
   }
 
   .column-headers-row {

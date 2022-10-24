@@ -813,7 +813,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
-            '/:scope/discussions': redirectRoute(() => '/'),
+            '/:scope/discussions': redirectRoute(() => '/discussions'),
             '/:scope': redirectRoute(() => '/'),
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`
