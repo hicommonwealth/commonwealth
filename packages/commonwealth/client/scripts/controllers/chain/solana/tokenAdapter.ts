@@ -1,7 +1,7 @@
-import * as solw3 from '@solana/web3.js';
-import $ from 'jquery';
 import BN from 'bn.js';
-import { NodeInfo, ITokenAdapter, ChainInfo } from 'models';
+import { ContractType } from 'common-common/src/types';
+import $ from 'jquery';
+import { ChainInfo, ITokenAdapter } from 'models';
 import { IApp } from 'state';
 import Solana from './adapter';
 
@@ -32,7 +32,13 @@ export default class Token extends Solana implements ITokenAdapter {
   // Extensions of Solana
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
-    this.contractAddress = meta.address;
+    // iterate through selectedChain.Contracts for the Aave type and return the address
+    const solanaContracts = this.app.contracts.getByType(ContractType.SPL);
+    if (!solanaContracts || !solanaContracts.length) {
+      throw new Error('No Sol contracts found');
+    }
+    const solanaContract = solanaContracts[0];
+    this.contractAddress = solanaContract.address;
   }
 
   public async initData() {

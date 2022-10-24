@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import app from 'state';
 import m from 'mithril';
-import { MenuItemAttrs } from './types';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import { IconName } from '../components/component_kit/cw_icons/cw_icon_lookup';
 
-export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
+import app from 'state';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { MenuItem } from '../components/component_kit/types';
+
+export const getMainMenuItems = (): Array<MenuItem> => {
   return [
     // Graham TODO 22.10.05: Reinstate once proper search page built
     // which can take "empty queries" (i.e. doesn't require active search term)
@@ -18,47 +18,45 @@ export const getMainMenuItemAttrs = (): MenuItemAttrs[] => {
     //     m.route.set('/search');
     //   },
     // },
-    ...(app.activeChainId()
+    ...((app.activeChainId()
       ? [
           {
             label: 'Create',
-            iconName: 'plusCircle' as IconName,
-            mobileCaret: true,
+            iconLeft: 'plusCircle',
+            iconRight: 'chevronRight',
             onclick: () => {
               app.mobileMenu = 'CreateContentMenu';
             },
           },
         ]
-      : []),
+      : []) as Array<MenuItem>),
     {
       label: 'Help',
-      iconName: 'help',
-      mobileCaret: true,
+      iconLeft: 'help',
+      iconRight: 'chevronRight',
       onclick: () => {
         app.mobileMenu = 'HelpMenu';
       },
     },
-    ...(app.isLoggedIn()
+    ...((app.isLoggedIn()
       ? [
           {
             label: 'Notifications',
-            mobileCaret: true,
-            iconName: 'bell' as const,
-            type: 'notification' as const,
-            unreadNotifications: !!app.user?.notifications.numUnread,
+            iconLeft: 'bell',
+            iconRight: 'chevronRight',
+            type: 'notification',
+            hasUnreads: !!app.user?.notifications.numUnread,
             onclick: () => {
               app.mobileMenu = 'NotificationsMenu';
             },
           },
         ]
-      : []),
+      : []) as Array<MenuItem>),
   ];
 };
 
 export class MainMenu implements m.ClassComponent {
   view() {
-    return (
-      <CWMobileMenu className="MainMenu" menuItems={getMainMenuItemAttrs()} />
-    );
+    return <CWMobileMenu menuItems={getMainMenuItems()} />;
   }
 }

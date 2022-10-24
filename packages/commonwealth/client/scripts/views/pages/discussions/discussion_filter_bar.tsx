@@ -1,12 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'pages/discussions/discussion_filter_bar.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { parseCustomStages } from 'helpers';
 import { ThreadStage } from 'models';
 import { TopicsMenu } from './topics_menu';
@@ -53,11 +51,7 @@ export class DiscussionFilterBar
         ]
       : parseCustomStages(customStages);
 
-    const selectedStage = stages.find(
-      (s) => s === (stage as ThreadStage)
-    );
-
-    const summaryViewEnabled = vnode.attrs.parentState.summaryView;
+    const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
     return (
       <div class="DiscussionFilterBar">
@@ -79,44 +73,6 @@ export class DiscussionFilterBar
             stage={stage}
             stages={stages}
           />
-        )}
-        {topics.length > 0 && (
-          <>
-            <Button
-              rounded={true}
-              compact={true}
-              class={`${summaryViewEnabled ? 'active' : ''}`}
-              label="Summary"
-              size="sm"
-              disabled={disabled}
-              onclick={(e) => {
-                e.preventDefault();
-                navigateToSubpage('/');
-                localStorage.setItem('discussion-summary-toggle', 'true');
-                setTimeout(() => {
-                  parentState.summaryView = true;
-                  m.redraw();
-                }, 0);
-              }}
-            />
-            <Button
-              rounded={true}
-              compact={true}
-              class={`${!summaryViewEnabled ? 'active' : ''}`}
-              label="Latest"
-              size="sm"
-              disabled={disabled}
-              onclick={(e) => {
-                e.preventDefault();
-                localStorage.setItem('discussion-summary-toggle', 'false');
-                navigateToSubpage('/');
-                setTimeout(() => {
-                  parentState.summaryView = false;
-                  m.redraw();
-                }, 0);
-              }}
-            />
-          </>
         )}
       </div>
     );
