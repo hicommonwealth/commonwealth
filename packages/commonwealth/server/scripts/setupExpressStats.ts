@@ -17,7 +17,6 @@ export default function expressStatsdInit (client: StatsD) {
         method: req.method,
         path: req.path,
       };
-      client.increment('express.request', tags);
 
       // Response Time
       const duration = new Date().getTime() - startTime;
