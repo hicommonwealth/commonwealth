@@ -1,5 +1,6 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
 import { DB } from 'server/models';
+import { Action } from '../../../common-common/src/permissions';
 import { sequelize } from '../database';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -8,25 +9,30 @@ export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
   chain_id: string;
   permission: Permission;
+  permissions: bigint;
 
   constructor(
     _roleAssignmentInstance: RoleAssignmentAttributes,
     chain_id: string,
-    permission: Permission
+    permission: Permission,
+    permissions: bigint
   ) {
     this._roleAssignmentAttributes = _roleAssignmentInstance;
     this.chain_id = chain_id;
     this.permission = permission;
+    this.permissions = permissions;
   }
 
   public toJSON(): RoleAssignmentAttributes & {
     chain_id: string;
     permission: Permission;
+    permissions: bigint;
   } {
     return {
       ...this._roleAssignmentAttributes,
       chain_id: this.chain_id,
       permission: this.permission,
+      permissions: this.permissions,
     };
   }
 }
@@ -82,10 +88,11 @@ export async function findAllRoles(
           const role = new RoleInstanceWithPermission(
             roleAssignment.toJSON(),
             chain_id,
-            communityRole.name
+            communityRole.name,
+            communityRole.permissions
           );
           roles.push(role);
-        }
+        } 
       }
     }
   } else {
@@ -152,7 +159,8 @@ export async function findOneRole(
       const role: RoleInstanceWithPermission = new RoleInstanceWithPermission(
         roleAssignment.toJSON(),
         chain_id,
-        communityRole.name
+        communityRole.name,
+        communityRole.permissions
       );
       return role;
     } else {
@@ -237,6 +245,21 @@ export async function createRole(
   return new RoleInstanceWithPermission(
     role_assignment.toJSON(),
     chain_id,
-    role_name
+    role_name,
+    community_role.permissions
   );
+}
+
+export enum PermissionError {
+  NOT_PERMITTED = 'Action not permitted',
+}
+
+export async function isAddressPermitted(
+  models: DB,
+  address_id: number,
+  chain_id: string,
+  action: Action
+): Promise<PermissionError | undefined> {
+  const roles = await findAllRoles(models, { where: { address_id } }, chain_id)
+  return null;
 }
