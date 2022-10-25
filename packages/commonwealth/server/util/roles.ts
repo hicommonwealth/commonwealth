@@ -111,7 +111,7 @@ export async function findOneRole(
   findOptions: FindOptions,
   chain_id: string,
   permissions?: Permission[]
-): Promise<RoleInstanceWithPermission ||> {
+): Promise<RoleInstanceWithPermission> {
   let roleFindOptions: any;
   if (permissions) {
     roleFindOptions = {
