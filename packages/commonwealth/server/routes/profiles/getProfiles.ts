@@ -9,6 +9,7 @@ const { Op } = Sequelize;
 
 type GetProfilesReq = {
   addresses?: string[];
+  profile_ids?: number[]; // TODO: Not Implemented
 
   // goes in pagination helper
   limit?: number;
@@ -17,7 +18,8 @@ type GetProfilesReq = {
 };
 
 export const Errors = {
-  NoAddresses: "Must provide community_id",
+  NoArgs: "Must provide addresses or profile_ids",
+  BothArgs: "Must not provide both args"
 };
 
 type GetProfilesResp = ProfileAttributes[];
@@ -28,20 +30,32 @@ const getProfiles = async (
   res: TypedResponse<GetProfilesResp>,
 ) => {
   // This route is for fetching all profiles + addresses by community
-  const { addresses } = req.query;
+  const { addresses, profile_ids } = req.query;
 
-  if (!addresses) throw new AppError(Errors.NoAddresses);
+  if (!addresses && !profile_ids) throw new AppError(Errors.NoArgs);
+  if (addresses && profile_ids) throw new AppError(Errors.BothArgs);
 
   const pagination = formatPagination(req.query);
   const order = req.query.sort ? orderBy('createdAt', req.query.sort) : {};
 
+  let profiles;
+
   // by addresses
-  const profiles = await models.Profile.findAll({
-    include: [{ model: models.Address, where: { address: { [Op.in]: addresses, }} }],
-    attributes: { exclude: ['user_id'] },
-    ...pagination,
-    ...order,
-  });
+  if (addresses) {
+    profiles = await models.Profile.findAll({
+      include: [{ model: models.Address, where: { address: { [Op.in]: addresses, }} }],
+      attributes: { exclude: ['user_id'] },
+      ...pagination,
+      ...order,
+    });
+  } else if (profile_ids) {
+    profiles = await models.Profile.findAll({
+      where: { id: { [Op.in]: profile_ids, }},
+      attributes: { exclude: ['user_id'] },
+      ...pagination,
+      ...order,
+    });
+  }
 
   return success(res, profiles);
 };
