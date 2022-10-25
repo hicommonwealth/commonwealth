@@ -91,7 +91,7 @@ export async function findAllRoles(
         for (const roleAssignment of roleAssignments) {
           const role = new RoleInstanceWithPermission(
             roleAssignment.toJSON(),
-            chain_id,
+            communityRole.chain_id,
             communityRole.name,
             communityRole.allow,
             communityRole.deny
