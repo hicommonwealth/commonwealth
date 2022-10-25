@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import { Models } from '../models';
 
 
 /*
@@ -18,22 +19,32 @@ export const orderBy = (property: string, order: orderByOptions) => {
   return { order: [property, order]};
 }
 
+// Will order by max(property)
 export const orderByMax = (property: string, order: orderByOptions) => {
   return { order: [Sequelize.fn('max', Sequelize.col(property)), order]};
 }
 
+// Will order through an associated model's 'property' using the model names as the associations' names.
+export const orderByAssociations = (associations: Models[], property: string, order: orderByOptions) => {
+  return { order: [...associations, property, order]};
+}
+
+// Yields `GROUP BY property`
 export const groupBy = (property: string) => {
   return { group: property };
 }
 
-export const limitBy = (limit: number) => {
-  return { limit };
+// Yields `LIMIT count`
+export const limitBy = (count: number) => {
+  return { limit: count };
 }
 
-export const offsetBy = (offset: number) => {
-  return { offset };
+// Yields `OFFSET page`
+export const offsetBy = (page: number) => {
+  return { offset: page };
 }
 
-export const paginate = (limit: number, offset: number) => {
-  return { limit, offset };
+// Yields `LIMIT count OFFSET page`
+export const paginate = (count: number, page: number) => {
+  return { limit: count, offset: page };
 }
