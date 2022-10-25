@@ -1,6 +1,10 @@
 /* eslint-disable max-len */
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { DescriptionSlide } from './create_project_form/description_slide';
+import { FundraisingSlide } from './create_project_form/fundraising_slide';
+import { InformationSlide } from './create_project_form/information_slide';
 
+// View Project Page + Project Cards
 export enum ProjectRole {
   Curator = 'curator',
   Backer = 'backer',
@@ -13,11 +17,7 @@ export enum ProjectStatus {
   Active = 'active',
 }
 
-export type TokenOption = {
-  name: string;
-  address: string;
-};
-
+// Create Project Form
 export interface ICreateProjectForm {
   // Descriptive
   title: string;
@@ -34,6 +34,19 @@ export interface ICreateProjectForm {
   fundraiseLength: number;
   curatorFee: number;
 }
+
+export const CreateProjectStages = {
+  1: InformationSlide,
+  2: FundraisingSlide,
+  3: DescriptionSlide,
+};
+
+export type CreateProjectStageNumber = keyof typeof CreateProjectStages;
+
+export type TokenOption = {
+  name: string;
+  address: string;
+};
 
 export const weekInSeconds = 604800;
 export const nowInSeconds = new Date().getTime() / 1000;

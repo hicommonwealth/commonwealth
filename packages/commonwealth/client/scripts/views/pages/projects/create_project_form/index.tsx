@@ -11,30 +11,27 @@ import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
 import { validateProjectForm } from '../helpers';
-import { ICreateProjectForm, weekInSeconds, nowInSeconds } from '../types';
+import {
+  ICreateProjectForm,
+  weekInSeconds,
+  nowInSeconds,
+  CreateProjectStages,
+  CreateProjectStageNumber,
+} from '../types';
+import { DescriptionSlide } from './description_slide';
+import { FundraisingSlide } from './fundraising_slide';
+import { InformationSlide } from './information_slide';
 
 export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
-  private stage: 'information' | 'fundraising' | 'description';
+  private stageNumber: CreateProjectStageNumber;
   private $form: HTMLFormElement;
 
-  onupdate() {
-    this.$form = document.getElementsByTagName('form')[0];
-  }
-
-  view() {
-    // Because we are switching to new chain, activeAccount may not be set
-    if (!app.user?.activeAccount && app.isLoggedIn()) {
-      return;
-    }
-    // Create project form must be scoped to an Ethereum page
-    if (app.user.activeAccount.chain.base !== ChainBase.Ethereum) {
-      m.route.set(`/projects/explore`);
+  setStateData() {
+    if (!this.stageNumber) {
+      this.stageNumber = 1;
     }
 
-    if (!this.stage) {
-      this.stage = 'information';
-    }
     if (!this.form) {
       this.form = {
         title: null,
@@ -54,6 +51,58 @@ export default class CreateProjectForm implements m.ClassComponent {
     if (!this.form.creator && app.user.activeAccount?.address) {
       this.form.creator = app.user.activeAccount.address;
     }
+  }
+
+  async submitForm() {
+    for (const property in this.form) {
+      if ({}.hasOwnProperty.call(this.form, property)) {
+        const [state, errorMessage] = validateProjectForm(
+          property,
+          this.form[property]
+        );
+        if (state !== 'success') {
+          notifyError(errorMessage);
+          return;
+        }
+      }
+    }
+    const [txReceipt, newProjectId] = await app.projects.createProject({
+      title: this.form.title,
+      description: this.form.description.textContentsAsString,
+      shortDescription: this.form.shortDescription,
+      coverImage: this.form.coverImage,
+      chainId: app.activeChainId(),
+      token: this.form.token,
+      creator: this.form.creator,
+      beneficiary: this.form.beneficiary,
+      threshold: this.form.threshold,
+      deadline: nowInSeconds + this.form.fundraiseLength,
+      curatorFee: Math.round(this.form.curatorFee * 100), // curator fee is between 0 & 10000
+    });
+    if (txReceipt.status !== 1) {
+      notifyError('Project creation failed');
+    } else {
+      m.route.set(`/project/${newProjectId}`);
+    }
+  }
+
+  onupdate() {
+    this.$form = document.getElementsByTagName('form')[0];
+  }
+
+  view() {
+    // Because we are switching to new chain, activeAccount may not be set
+    if (!app.user?.activeAccount && app.isLoggedIn()) {
+      return;
+    }
+    // Create project form must be scoped to an Ethereum page
+    if (app.user.activeAccount.chain.base !== ChainBase.Ethereum) {
+      m.route.set(`/projects/explore`);
+    }
+
+    this.setStateData();
+
+    const StagePanel = CreateProjectStages[this.stageNumber];
 
     return (
       <Sublayout
@@ -68,19 +117,11 @@ export default class CreateProjectForm implements m.ClassComponent {
             <CWText type="h5" weight="medium">
               Project Creation
             </CWText>
-            {this.stage === 'information' && (
-              <InformationSlide form={this.form} />
-            )}
-            {this.stage === 'fundraising' && (
-              <FundraisingSlide form={this.form} />
-            )}
-            {this.stage === 'description' && (
-              <DescriptionSlide form={this.form} />
-            )}
+            <StagePanel form={this.form} />
           </div>
           <ButtonGroup class="NavigationButtons" outlined={true}>
             <Button
-              disabled={this.stage === 'information'}
+              disabled={this.stageNumber === 1}
               label={
                 <>
                   <CWIcon iconName="arrowLeft" />
@@ -88,15 +129,10 @@ export default class CreateProjectForm implements m.ClassComponent {
                 </>
               }
               onclick={(e) => {
-                e.preventDefault();
-                if (this.stage === 'fundraising') {
-                  this.stage = 'information';
-                } else if (this.stage === 'description') {
-                  this.stage = 'fundraising';
-                }
+                this.stageNumber -= 1;
               }}
             />
-            {this.stage !== 'description' && (
+            {this.stageNumber !== 3 ? (
               <Button
                 label={
                   <>
@@ -105,54 +141,16 @@ export default class CreateProjectForm implements m.ClassComponent {
                   </>
                 }
                 onclick={(e) => {
-                  e.preventDefault();
                   this.$form.reportValidity();
-                  return;
-                  if (this.stage === 'information') {
-                    this.stage = 'fundraising';
-                  } else if (this.stage === 'fundraising') {
-                    this.stage = 'description';
-                  }
+                  this.stageNumber += 1;
                 }}
               />
-            )}
-            {this.stage === 'description' && (
+            ) : (
               <Button
                 label="Submit"
                 onclick={async (e) => {
-                  e.preventDefault();
                   console.log(this.form);
-                  for (const property in this.form) {
-                    if ({}.hasOwnProperty.call(this.form, property)) {
-                      const [state, errorMessage] = validateProjectForm(
-                        property,
-                        this.form[property]
-                      );
-                      if (state !== 'success') {
-                        notifyError(errorMessage);
-                        return;
-                      }
-                    }
-                  }
-                  const [txReceipt, newProjectId] =
-                    await app.projects.createProject({
-                      title: this.form.title,
-                      description: this.form.description.textContentsAsString,
-                      shortDescription: this.form.shortDescription,
-                      coverImage: this.form.coverImage,
-                      chainId: app.activeChainId(),
-                      token: this.form.token,
-                      creator: this.form.creator,
-                      beneficiary: this.form.beneficiary,
-                      threshold: this.form.threshold,
-                      deadline: nowInSeconds + this.form.fundraiseLength,
-                      curatorFee: Math.round(this.form.curatorFee * 100), // curator fee is between 0 & 10000
-                    });
-                  if (txReceipt.status !== 1) {
-                    notifyError('Project creation failed');
-                  } else {
-                    m.route.set(`/project/${newProjectId}`);
-                  }
+                  this.submitForm();
                 }}
               />
             )}

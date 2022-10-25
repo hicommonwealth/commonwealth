@@ -1,12 +1,12 @@
 /* @jsx m */
 import m from 'mithril';
 
-import CWCoverImageUploader from '../../components/component_kit/cw_cover_image_uploader';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { validateProjectForm } from './helpers';
-import { ICreateProjectForm } from './types';
+import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { CWTextArea } from '../../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../../components/component_kit/cw_text_input';
+import { validateProjectForm } from '../helpers';
+import { ICreateProjectForm } from '../types';
 
 export class InformationSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
