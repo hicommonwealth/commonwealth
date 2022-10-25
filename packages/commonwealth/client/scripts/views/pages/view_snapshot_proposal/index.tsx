@@ -35,25 +35,27 @@ type ViewProposalPageAttrs = {
 
 class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private activeTab: 'proposals' | 'info-and-results';
+  private fetchedPower: boolean;
   private proposal: SnapshotProposal;
-  private scores: number[];
+  private scores: Array<number>;
   private space: SnapshotSpace;
   private symbol: string;
   private threads: Array<{ id: string; title: string }> | null;
   private totals: any;
-  private votes: SnapshotProposalVote[];
-  private fetchedPower: boolean;
-  private validatedAgainstStrategies: boolean;
   private totalScore: number;
+  private validatedAgainstStrategies: boolean;
+  private isVotersListExpanded: boolean;
+  private votes: Array<SnapshotProposalVote>;
 
   oninit(vnode) {
     this.activeTab = 'proposals';
-    this.votes = [];
-    this.scores = [];
-    this.proposal = null;
-    this.threads = null;
     this.fetchedPower = false;
+    this.isVotersListExpanded = false;
+    this.proposal = null;
+    this.scores = [];
+    this.threads = null;
     this.validatedAgainstStrategies = true;
+    this.votes = [];
 
     const loadVotes = async () => {
       this.proposal = app.snapshot.proposals.find(
@@ -128,6 +130,18 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   view(vnode) {
     const { identifier } = vnode.attrs;
 
+    const toggleExpandedVoterList = () => {
+      this.isVotersListExpanded = !this.isVotersListExpanded;
+      console.log('in');
+      m.redraw();
+    };
+
+    const displayedVoters = this.isVotersListExpanded
+      ? this.votes
+      : this.votes.slice(0, 10);
+
+    console.log(displayedVoters.length, this.isVotersListExpanded);
+
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
     ) : (
@@ -151,8 +165,10 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             this.votes.length > 0 && (
               <SnapshotVotesTable
                 choices={this.proposal.choices}
+                displayedVoters={displayedVoters}
                 symbol={this.symbol}
-                votes={this.votes}
+                toggleExpandedVoterList={toggleExpandedVoterList}
+                voteCount={this.votes.length}
               />
             )
           }

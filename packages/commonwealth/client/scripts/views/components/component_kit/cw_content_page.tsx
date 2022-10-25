@@ -13,7 +13,6 @@ import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import { CWDivider } from './cw_divider';
 import User from '../widgets/user';
 
 type SidebarItem = {
@@ -41,7 +40,6 @@ type ContentPageAttrs = {
   sidebarComponents?: SidebarComponents;
   subBody?: m.Vnode;
   subHeader?: m.Vnode;
-  updatedAt?: moment.Moment;
 };
 
 export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
@@ -65,7 +63,6 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       subBody,
       subHeader,
       title,
-      updatedAt,
     } = vnode.attrs;
 
     window.onresize = () => {
@@ -96,7 +93,6 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
             <CWText type="caption" className="header-text">
               published on {moment(createdAt).format('l')}
             </CWText>
-            {/* <CWText>{updatedAt}</CWText> */}
             {actions && (
               <CWPopoverMenu
                 trigger={<CWIconButton iconName="dotsVertical" />}
@@ -106,11 +102,8 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           </div>
         </div>
         {subHeader}
-        {/* <CWDivider /> */}
         {body}
-        {/* <CWDivider /> */}
         {subBody}
-        {/* <CWDivider /> */}
         {comments}
       </div>
     );

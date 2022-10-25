@@ -13,28 +13,25 @@ import { CWText } from '../../components/component_kit/cw_text';
 
 type SnapshotVotesTableAttrs = {
   choices: Array<string>;
+  displayedVoters: Array<SnapshotProposalVote>;
   symbol: string;
-  votes: Array<SnapshotProposalVote>;
+  toggleExpandedVoterList: () => void;
+  voteCount: number;
 };
 
 export class SnapshotVotesTable
   implements m.ClassComponent<SnapshotVotesTableAttrs>
 {
-  votersListExpanded: boolean;
+  view(vnode: m.VnodeDOM<SnapshotVotesTableAttrs, this>) {
+    const {
+      choices,
+      displayedVoters,
+      symbol,
+      toggleExpandedVoterList,
+      voteCount,
+    } = vnode.attrs;
 
-  oninit() {
-    this.votersListExpanded = false;
-  }
-
-  view(vnode) {
-    const { choices, symbol, votes } = vnode.attrs;
-
-    const toggleExpandedVoterList = () => {
-      this.votersListExpanded = !this.votersListExpanded;
-      m.redraw();
-    };
-
-    const votersList = this.votersListExpanded ? votes : votes.slice(0, 10);
+    console.log('displayedVoters in table', displayedVoters);
 
     return (
       <div class="SnapshotVotesTable">
@@ -44,7 +41,7 @@ export class SnapshotVotesTable
           </CWText>
           <div class="vote-count">
             <CWText className="vote-count-text" fontWeight="medium">
-              {votes.length}
+              {voteCount}
             </CWText>
           </div>
         </div>
@@ -60,7 +57,7 @@ export class SnapshotVotesTable
               Power
             </CWText>
           </div>
-          {votersList.map((vote) => (
+          {displayedVoters.map((vote) => (
             <div class="vote-row">
               {m(User, {
                 user: new AddressInfo(
