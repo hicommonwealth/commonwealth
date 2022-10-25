@@ -118,7 +118,4 @@ class SessionsController {
 }
 
 
-// this doesn't seem right, should we be using the global state
-// app.chain ?
-
 export default SessionsController;
