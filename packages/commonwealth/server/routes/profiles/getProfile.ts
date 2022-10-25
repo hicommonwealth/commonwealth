@@ -9,6 +9,11 @@ type GetProfileReq = {
   profile_id?: number;
 };
 
+export const Errors = {
+  NoArgs: "Must provide address or profile_id",
+  BothArgs: "Must not provide both args"
+};
+
 type GetProfileResp = ProfileAttributes[];
 
 const getProfile = async (
@@ -18,7 +23,27 @@ const getProfile = async (
 ) => {
   // This route is for getting a single profile + owned addresses
   // queriable by profile_id or owned address
-  return success(res, []);
+  const { address, profile_id} = req.query;
+  if (!address && !profile_id) throw new AppError(Errors.NoArgs);
+  if (address && profile_id) throw new AppError(Errors.BothArgs);
+
+  let profile;
+  if (profile_id) {
+    profile = await models.Profile.findOne({
+      where: { id: profile_id },
+      include: [{ model: models.Address, required: true }],
+    });
+  } else {
+    const addressProvided = await models.Address.findOne({
+      where: { address },
+    })
+    profile = await models.Profile.findOne({
+      where: { id: addressProvided.profile_id},
+      include: [{ model: models.Address, required: true }],
+    });
+  }
+
+  return success(res, [profile]);
 };
 
 export default getProfile;
