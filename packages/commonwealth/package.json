@@ -146,6 +146,7 @@
     "dotenv": "^8.2.0",
     "dragula": "^3.7.2",
     "dropzone": "^5.5.1",
+    "esbuild-darwin-64": "^0.15.12",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
