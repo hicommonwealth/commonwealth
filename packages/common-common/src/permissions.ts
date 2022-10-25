@@ -21,21 +21,21 @@ export enum Action {
   MANAGE_POLLS = 19,
 }
 
-export type Permission = bigint;
+export type Permissions = bigint;
 
-export function isPermitted(permission: Permission, action: Action): boolean {
+export function isPermitted(permission: Permissions, action: Action): boolean {
   const actionAsBigInt: bigint = BigInt(1 << action);
   const hasAction: boolean = (permission & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }
 
 export function computePermissions(
-  base: Permission,
-  assignments: Array<{ allow: Permission; deny: Permission }>
-): Permission {
-  let permission: Permission = base;
-  let allow: Permission = BigInt(0);
-  let deny: Permission = BigInt(0);
+  base: Permissions,
+  assignments: Array<{ allow: Permissions; deny: Permissions }>
+): Permissions {
+  let permission: Permissions = base;
+  let allow: Permissions = BigInt(0);
+  let deny: Permissions = BigInt(0);
   for (const assignment of assignments) {
     if (assignment.allow === assignment.deny) {
       continue;

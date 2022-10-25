@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import {
   computePermissions,
-  Permission,
+  Permissions,
   Action,
 } from 'common-common/src/permissions';
 

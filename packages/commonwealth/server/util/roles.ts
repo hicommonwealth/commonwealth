@@ -1,6 +1,6 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
 import { DB } from 'server/models';
-import { Action } from '../../../common-common/src/permissions';
+import { Action, computePermissions, isPermitted, Permissions } from '../../../common-common/src/permissions';
 import { sequelize } from '../database';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -92,7 +92,7 @@ export async function findAllRoles(
             communityRole.permissions
           );
           roles.push(role);
-        } 
+        }
       }
     }
   } else {
@@ -101,6 +101,7 @@ export async function findAllRoles(
   return roles;
 }
 
+// Returns highest permission role found
 export async function findOneRole(
   models: DB,
   findOptions: FindOptions,
@@ -250,9 +251,15 @@ export async function createRole(
   );
 }
 
+// Permissions Helpers for Roles
+/// ////////////////////////////////////////////////////////////////////////////////////////////
+
 export enum PermissionError {
   NOT_PERMITTED = 'Action not permitted',
 }
+
+// eslint-disable-next-line no-bitwise
+export const BASE_PERMISSIONS: Permissions = BigInt(1 << Action.CREATE_THREAD)
 
 export async function isAddressPermitted(
   models: DB,
@@ -261,5 +268,15 @@ export async function isAddressPermitted(
   action: Action
 ): Promise<PermissionError | undefined> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id)
+
+  // sort roles by roles with highest permissions first
+  roles.sort((a) => {
+    if (a.permission === 'member') return -1;
+    if (a.permission === 'moderator') return 0;
+    else return 1;
+  });
+
+  // compute permissions
+  computePermissions(BASE_PERMISSIONS, roles);
   return null;
 }
