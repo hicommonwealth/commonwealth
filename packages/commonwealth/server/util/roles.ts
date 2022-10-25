@@ -1,9 +1,14 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
-import { DB } from 'server/models';
-import { Action, computePermissions, isPermitted, Permissions } from '../../../common-common/src/permissions';
-import { sequelize } from '../database';
-import { Permission } from '../models/role';
-import { RoleAssignmentAttributes } from '../models/role_assignment';
+import {
+  Action,
+  computePermissions,
+  isPermitted,
+  Permissions,
+} from 'common-common/src/permissions';
+import { DB } from 'commonwealth/server/models';
+import { Permission } from 'commonwealth/server/models/role';
+import { RoleAssignmentAttributes } from 'commonwealth/server/models/role_assignment';
+import { sequelize } from 'commonwealth/server/database';
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -271,7 +276,7 @@ export enum PermissionError {
 }
 
 // eslint-disable-next-line no-bitwise
-export const BASE_PERMISSIONS: Permissions = BigInt(1 << Action.CREATE_THREAD)
+export const BASE_PERMISSIONS: Permissions = BigInt(1 << Action.CREATE_THREAD);
 
 export async function isAddressPermitted(
   models: DB,
@@ -279,7 +284,7 @@ export async function isAddressPermitted(
   chain_id: string,
   action: Action
 ): Promise<PermissionError | undefined> {
-  const roles = await findAllRoles(models, { where: { address_id } }, chain_id)
+  const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
   // sort roles by roles with highest permissions first
   roles.sort((a) => {
