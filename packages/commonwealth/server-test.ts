@@ -89,23 +89,26 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       const nodes = [
-        ['mainnet1.edgewa.re'],
+        ['mainnet1.edgewa.re', 'Edgeware Mainnet'],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'Ethereum Mainnet',
           '1',
         ],
         [
           'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          'Ropsten Testnet',
           '3',
         ],
       ];
 
       const [edgewareNode, mainnetNode, testnetNode] = await Promise.all(
-        nodes.map(([url, eth_chain_id]) =>
+        nodes.map(([url, name, eth_chain_id]) =>
           models.ChainNode.create({
             url,
+            name,
             eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-            balance_type: BalanceType.Ethereum,
+            balance_type: eth_chain_id ? BalanceType.Ethereum : BalanceType.Substrate,
           })
         )
       );

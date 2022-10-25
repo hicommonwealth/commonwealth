@@ -132,4 +132,5 @@ export enum BalanceType {
   Solana = 'solana',
   Cosmos = 'cosmos',
   NEAR = 'near',
+  Substrate = 'substrate',
 }
