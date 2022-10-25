@@ -65,7 +65,7 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
               }
               label="All Topics"
               onclick={() => {
-                navigateToSubpage('/');
+                navigateToSubpage('/discussions');
               }}
             />
             <MenuDivider />

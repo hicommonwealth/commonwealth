@@ -6,8 +6,6 @@ import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AddressInstance } from '../models/address';
 import { BalanceType, ChainNetwork } from '../../../common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -31,7 +29,7 @@ const tokenBalance = async (
   }
 
   let chain: ChainInstance;
-  let author: AddressInstance;
+  // let author: AddressInstance;
   let error: string;
   let contract: ContractInstance;
   try {
@@ -40,12 +38,14 @@ const tokenBalance = async (
   } catch (err) {
     throw new AppError(err);
   }
-  try {
-    [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new AppError(error);
-  } catch (err) {
-    throw new AppError(err)
-  }
+
+  // NOTE: Removing validation of ownership of address, seemingly unnecessary for logic
+  // try {
+  //   [author, error] = await lookupAddressIsOwnedByUser(models, req);
+  //   if (error) throw new AppError(error);
+  // } catch (err) {
+  //   throw new AppError(err)
+  // }
 
   let chain_node_id = chain?.ChainNode?.id;
   if (!chain_node_id) {
@@ -83,7 +83,7 @@ const tokenBalance = async (
   try {
     balancesResp = await tokenBalanceCache.getBalancesForAddresses(
       chain_node_id,
-      [ author.address ],
+      [ req.body.address ],
       bp,
       {
         contractAddress: contract?.address,
@@ -97,10 +97,10 @@ const tokenBalance = async (
     throw new ServerError(Errors.QueryFailed);
   }
 
-  if (balancesResp.balances[author.address]) {
-    return success(res, balancesResp.balances[author.address]);
-  } else if (balancesResp.errors[author.address]) {
-    throw new AppError(`Error querying balance: ${balancesResp.errors[author.address]}`);
+  if (balancesResp.balances[req.body.address]) {
+    return success(res, balancesResp.balances[req.body.address]);
+  } else if (balancesResp.errors[req.body.address]) {
+    throw new AppError(`Error querying balance: ${balancesResp.errors[req.body.address]}`);
   } else {
     throw new ServerError(Errors.QueryFailed);
   }
