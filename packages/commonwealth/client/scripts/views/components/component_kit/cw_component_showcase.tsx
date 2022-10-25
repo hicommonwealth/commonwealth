@@ -29,6 +29,7 @@ import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
+import { CWDropdown } from './cw_dropdown';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -66,6 +67,19 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Dropdown</h1>
+        <div class="form-gallery">
+          <CWDropdown
+            inputOptions={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            onSelect={(optionLabel) =>
+              console.log('Selected option: ', optionLabel)
+            }
+          />
+        </div>
         <h1>Spinner</h1>
         <div class="basic-gallery">
           <CWSpinner />
@@ -95,18 +109,18 @@ export class ComponentShowcase implements m.ClassComponent {
             trigger={<CWIconButton iconName="dotsVertical" />}
             menuItems={[
               { type: 'header', label: 'Community' },
-              { label: 'Create Thread', iconName: 'write' },
-              { label: 'Create Proposal', iconName: 'write' },
-              { label: 'Create Poll', iconName: 'write' },
-              { label: 'Create Snapshot', iconName: 'write', disabled: true },
+              { label: 'Create Thread', iconLeft: 'write' },
+              { label: 'Create Proposal', iconLeft: 'write' },
+              { label: 'Create Poll', iconLeft: 'write' },
+              { label: 'Create Snapshot', iconLeft: 'write', disabled: true },
               { type: 'divider' },
               { type: 'header', label: 'Universal' },
-              { label: 'Create Community', iconName: 'people' },
-              { label: 'Create Crowdfund', iconName: 'wallet' },
+              { label: 'Create Community', iconLeft: 'people' },
+              { label: 'Create Crowdfund', iconLeft: 'wallet' },
               { type: 'divider' },
               {
                 label: 'Report',
-                iconName: 'cautionCircle',
+                iconLeft: 'cautionCircle',
                 isSecondary: true,
                 onclick: () => console.log('clicked'),
               },

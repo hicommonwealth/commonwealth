@@ -2,7 +2,10 @@
 @import 'quill_formatted_text.scss';
 
 .MarkdownFormattedText {
+  @include b2;
+
   position: relative;
+  word-break: break-word;
 
   @include formatted-text();
   @include collapsible();
@@ -16,8 +19,16 @@
     margin-inline-end: 0px;
   }
 
+  overflow: visible;
+
   table {
     width: 100%;
+    overflow-x: scroll;
+    display: block;
+
+    box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -webkit-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
+    -moz-box-shadow: -3px -1px 9px 0px rgba(255, 255, 255, 0.5) inset;
 
     thead {
       border-bottom: 1px solid $black;

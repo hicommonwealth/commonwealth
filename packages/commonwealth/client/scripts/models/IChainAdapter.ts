@@ -65,11 +65,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         }),
       ]);
     } else {
-      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
-      });
+      [response, ] = await Promise.all([
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        }),
+      ]);
     }
 
     // If user is no longer on the initializing chain, abort initialization
@@ -90,13 +92,16 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       chatChannels,
       rules, // TODO: store in rules controller
       communityBanner,
+      contracts,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    console.log('initializing banner', this.meta.communityBanner);
+    this.app.contracts.initialize(contracts, true);
+
+    await this.app.recentActivity.getRecentTopicActivity(this.id);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));

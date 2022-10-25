@@ -18,6 +18,7 @@ type WalletOptionRowStyleAttrs = {
 type WalletOptionRowAttrs = {
   onclick?: () => void;
   walletName: string;
+  walletLabel: string;
 } & WalletOptionRowStyleAttrs;
 
 const getWalletKeyFromValue = (value: string) => {
@@ -28,7 +29,7 @@ export class CWWalletOptionRow
   implements m.ClassComponent<WalletOptionRowAttrs>
 {
   view(vnode) {
-    const { disabled = false, darkMode, onclick, walletName } = vnode.attrs;
+    const { disabled = false, darkMode, onclick, walletName, walletLabel } = vnode.attrs;
     return (
       <div
         class={getClasses<WalletOptionRowStyleAttrs>(
@@ -47,7 +48,7 @@ export class CWWalletOptionRow
           className="wallet-option-text"
           noWrap
         >
-          {getWalletKeyFromValue(walletName)}
+          {walletLabel}
         </CWText>
       </div>
     );

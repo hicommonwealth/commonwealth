@@ -16,6 +16,7 @@ describe('findAllRoles and findOneRole tests', () => {
   let loggedInAddrId, loggedInAddrId2: number;
   const chain = 'ethereum';
   let newChain: ChainInstance;
+  let newChain2: ChainInstance;
 
   beforeEach(
     'reset server and create new address, user, and community roles ',
@@ -58,6 +59,8 @@ describe('findAllRoles and findOneRole tests', () => {
       loggedInAddrId2 = addressObj2.id;
 
       const chainName = `newtestChain${Math.random()}`;
+      const chainName2 = `newtestChain${Math.random()}`;
+
       newChain = await models.Chain.create({
         id: chainName,
         name: chainName,
@@ -71,13 +74,29 @@ describe('findAllRoles and findOneRole tests', () => {
         chat_enabled: false,
       });
 
+      newChain2 = await models.Chain.create({
+        id: chainName2,
+        name: chainName2,
+        chain_node_id: 1,
+        default_symbol: '',
+        network: ChainNetwork.ERC20,
+        base: ChainBase.Ethereum,
+        icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
+        active: false,
+        type: ChainType.Token,
+        chat_enabled: false,
+      });
+
       await createDefaultCommunityRoles(models, newChain.id);
+      await createDefaultCommunityRoles(models, newChain2.id);
 
       await createRole(models, loggedInAddrId, newChain.id, 'member');
 
       await createRole(models, loggedInAddrId, newChain.id, 'admin');
 
       await createRole(models, loggedInAddrId2, newChain.id, 'member');
+
+      await createRole(models, loggedInAddrId, newChain2.id, 'member');
     }
   );
   describe('findAllRoles', () => {
@@ -132,7 +151,7 @@ describe('findAllRoles and findOneRole tests', () => {
       assert.equal(roles[0].toJSON().Address.id, loggedInAddrId);
     });
 
-    it('it should return an array of roles if only a filter option is passed in', async () => {
+    it('it should return an array of roles if only a filter option is passed in and chain_id is empty', async () => {
       const myAddressIds = [loggedInAddrId2];
       const roles = await findAllRoles(models, {
         where: { address_id: { [Op.in]: myAddressIds } },
@@ -148,7 +167,7 @@ describe('findAllRoles and findOneRole tests', () => {
       assert.isNull(role, 'role should be null');
     });
 
-    it('should return highest role', async () => {
+    it('should return highest role first', async () => {
       const existingRole = await findOneRole(
         models,
         { where: { address_id: loggedInAddrId } },
