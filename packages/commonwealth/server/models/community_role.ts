@@ -12,7 +12,8 @@ export type CommunityRoleAttributes = {
   name: Permission;
   id?: number;
   chain_id: string;
-  permissions?: bigint;
+  allow?: bigint;
+  deny?: bigint;
   created_at?: Date;
   updated_at?: Date;
 
@@ -43,7 +44,12 @@ export default (
         defaultValue: 'member',
         allowNull: false,
       },
-      permissions: {
+      allow: {
+        type: dataTypes.BIGINT,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      deny: {
         type: dataTypes.BIGINT,
         defaultValue: 0,
         allowNull: false,

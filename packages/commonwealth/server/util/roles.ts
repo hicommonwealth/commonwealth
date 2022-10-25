@@ -8,6 +8,8 @@ export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
   chain_id: string;
   permission: Permission;
+  allow: bigint;
+  deny: bigint;
 
   constructor(
     _roleAssignmentInstance: RoleAssignmentAttributes,

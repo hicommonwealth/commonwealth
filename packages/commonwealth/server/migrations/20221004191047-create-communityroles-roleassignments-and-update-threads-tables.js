@@ -28,7 +28,12 @@ module.exports = {
             defaultValue: 'member',
             allowNull: false,
           },
-          permissions: {
+          allow: {
+            type: Sequelize.BIGINT,
+            defaultValue: 0,
+            allowNull: false,
+          },
+          deny: {
             type: Sequelize.BIGINT,
             defaultValue: 0,
             allowNull: false,
