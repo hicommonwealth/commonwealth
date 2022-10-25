@@ -6,11 +6,9 @@ import { Models } from '../models';
 These methods are for generating the sequelize formatting for
 different types of query options. Enumerated methods here
 for ORDERING, GROUPING, LIMIT, OFFSET
-
-
 */
 
-enum orderByOptions {
+export enum orderByOptions {
   DESC = 'DESC',
   ASC = 'ASC'
 }
@@ -47,4 +45,13 @@ export const offsetBy = (page: number) => {
 // Yields `LIMIT count OFFSET page`
 export const paginate = (count: number, page: number) => {
   return { limit: count, offset: page };
+}
+
+// helper methods
+export const formatPagination = (query) => {
+  const { limit, page } = query;
+  let pagination;
+  if (limit && page) pagination = paginate(limit, page)
+  else if (limit) pagination = limitBy(limit);
+  return pagination;
 }

@@ -31,7 +31,8 @@ const getProfile = async (
   if (profile_id) {
     profile = await models.Profile.findOne({
       where: { id: profile_id },
-      include: [{ model: models.Address, required: true }],
+      include: [{ model: models.Address, required: true, attributes: { exclude: ['user_id'] } }],
+      attributes: { exclude: ['user_id'] },
     });
   } else {
     const addressProvided = await models.Address.findOne({
@@ -39,7 +40,8 @@ const getProfile = async (
     })
     profile = await models.Profile.findOne({
       where: { id: addressProvided.profile_id},
-      include: [{ model: models.Address, required: true }],
+      include: [{ model: models.Address, required: true, attributes: { exclude: ['user_id'] } }],
+      attributes: { exclude: ['user_id'] },
     });
   }
 

@@ -1,17 +1,23 @@
+import Sequelize from 'sequelize';
 import { AppError, ServerError } from '../../util/errors';
-import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ProfileAttributes } from '../../models/profile';
+import { formatPagination, orderBy, orderByOptions } from '../../util/queries';
+
+const { Op } = Sequelize;
 
 type GetProfilesReq = {
-  community_id: string;
+  addresses?: string[];
 
-  // TODO: goes in pagination helper
+  // goes in pagination helper
   limit?: number;
-  page?: string;
-  sort?: string;
-  profiles_only?: boolean; // no addresses fetched
+  page?: number;
+  sort?: orderByOptions;
+};
+
+export const Errors = {
+  NoAddresses: "Must provide community_id",
 };
 
 type GetProfilesResp = ProfileAttributes[];
@@ -22,7 +28,22 @@ const getProfiles = async (
   res: TypedResponse<GetProfilesResp>,
 ) => {
   // This route is for fetching all profiles + addresses by community
-  return success(res, []);
+  const { addresses } = req.query;
+
+  if (!addresses) throw new AppError(Errors.NoAddresses);
+
+  const pagination = formatPagination(req.query);
+  const order = req.query.sort ? orderBy('createdAt', req.query.sort) : {};
+
+  // by addresses
+  const profiles = await models.Profile.findAll({
+    include: [{ model: models.Address, where: { address: { [Op.in]: addresses, }} }],
+    attributes: { exclude: ['user_id'] },
+    ...pagination,
+    ...order,
+  });
+
+  return success(res, profiles);
 };
 
 export default getProfiles;
