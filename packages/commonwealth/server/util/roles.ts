@@ -289,6 +289,10 @@ export async function isAddressPermitted(
   });
 
   // compute permissions
-  computePermissions(BASE_PERMISSIONS, roles);
-  return null;
+  const permission: bigint = computePermissions(BASE_PERMISSIONS, roles);
+
+  // check if action is permitted
+  if (!isPermitted(permission, action)) {
+    return PermissionError.NOT_PERMITTED;
+  }
 }
