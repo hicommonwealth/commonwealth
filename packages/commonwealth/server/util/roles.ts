@@ -14,21 +14,29 @@ export class RoleInstanceWithPermission {
   constructor(
     _roleAssignmentInstance: RoleAssignmentAttributes,
     chain_id: string,
-    permission: Permission
+    permission: Permission,
+    allow: bigint,
+    deny: bigint
   ) {
     this._roleAssignmentAttributes = _roleAssignmentInstance;
     this.chain_id = chain_id;
     this.permission = permission;
+    this.allow = allow;
+    this.deny = deny;
   }
 
   public toJSON(): RoleAssignmentAttributes & {
     chain_id: string;
     permission: Permission;
+    allow: bigint;
+    deny: bigint;
   } {
     return {
       ...this._roleAssignmentAttributes,
       chain_id: this.chain_id,
       permission: this.permission,
+      allow: this.allow,
+      deny: this.deny,
     };
   }
 }
@@ -84,7 +92,9 @@ export async function findAllRoles(
           const role = new RoleInstanceWithPermission(
             roleAssignment.toJSON(),
             chain_id,
-            communityRole.name
+            communityRole.name,
+            communityRole.allow,
+            communityRole.deny
           );
           roles.push(role);
         }
@@ -101,7 +111,7 @@ export async function findOneRole(
   findOptions: FindOptions,
   chain_id: string,
   permissions?: Permission[]
-): Promise<RoleInstanceWithPermission> {
+): Promise<RoleInstanceWithPermission ||> {
   let roleFindOptions: any;
   if (permissions) {
     roleFindOptions = {
@@ -147,14 +157,17 @@ export async function findOneRole(
   }
 
   const communityRole = await models.CommunityRole.findOne(roleFindOptions);
+  let role: RoleInstanceWithPermission;
   if (communityRole) {
     // Retrieve the highest role as it will be the highest permission role for the address_id
     if (communityRole.RoleAssignments.length > 0) {
       const roleAssignment = communityRole.RoleAssignments[0];
-      const role: RoleInstanceWithPermission = new RoleInstanceWithPermission(
+      role = new RoleInstanceWithPermission(
         roleAssignment.toJSON(),
         chain_id,
-        communityRole.name
+        communityRole.name,
+        communityRole.allow,
+        communityRole.deny
       );
       return role;
     } else {
@@ -174,17 +187,20 @@ export async function createDefaultCommunityRoles(
     await models.CommunityRole.create({
       chain_id,
       name: 'member',
-      permissions: BigInt(0),
+      allow: BigInt(0),
+      deny: BigInt(0),
     });
     await models.CommunityRole.create({
       chain_id,
       name: 'moderator',
-      permissions: BigInt(0),
+      allow: BigInt(0),
+      deny: BigInt(0),
     });
     await models.CommunityRole.create({
       chain_id,
       name: 'admin',
-      permissions: BigInt(0),
+      allow: BigInt(0),
+      deny: BigInt(0),
     });
   } catch (error) {
     throw new Error(`Couldn't create default community roles ${error}`);
@@ -239,6 +255,8 @@ export async function createRole(
   return new RoleInstanceWithPermission(
     role_assignment.toJSON(),
     chain_id,
-    role_name
+    role_name,
+    community_role.allow,
+    community_role.deny
   );
 }
