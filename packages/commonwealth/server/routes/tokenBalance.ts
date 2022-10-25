@@ -8,7 +8,7 @@ import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AddressInstance } from '../models/address';
-import { ChainNetwork } from '../../../common-common/src/types';
+import { BalanceType, ChainNetwork } from '../../../common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -61,7 +61,8 @@ const tokenBalance = async (
   }
 
   if (
-    ['ethereum', 'near', 'solana'].includes(chain.ChainNode.chain_base) &&
+    chain.ChainNode?.balance_type &&
+    [BalanceType.Ethereum, BalanceType.Solana, BalanceType.NEAR].includes(chain.ChainNode.balance_type) &&
     chain.network !== ChainNetwork.AxieInfinity
   ) {
     try {

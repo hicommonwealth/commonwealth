@@ -27,6 +27,7 @@ module.exports = {
         defaultValue: new Date(),
       }, { transaction });
 
+      await queryInterface.removeColumn('ChainNodes', 'chain_base', { transaction });
 
       // Add entry names
       const chainNodes = [
@@ -40,11 +41,13 @@ module.exports = {
         },
         {
           name: 'Straightedge',
-          url: 'wss://straightedge.commonwealth.im'
+          url: 'wss://straightedge.commonwealth.im',
+          bech32: 'str',
         },
         {
           name: 'Stafi',
-          url: 'wss://scan-rpc.stafi.io/'
+          url: 'wss://scan-rpc.stafi.io/',
+          ss58: 20
         },
         {
           name: 'xDAI',
@@ -52,23 +55,28 @@ module.exports = {
         },
         {
           name: 'Polkadot',
-          url: 'wss://rpc.polkadot.io/'
+          url: 'wss://rpc.polkadot.io',
+          ss58: 0
         },
         {
           name: 'Plasmnet',
-          url: 'wss://rpc.plasmnet.io/'
+          url: 'wss://rpc.plasmnet.io/',
+          ss58: 5
         },
         {
           name: 'Kulupu',
-          url: 'wss://rpc.kulupu.corepaper.org/ws'
+          url: 'wss://rpc.kulupu.corepaper.org/ws',
+          ss58: 16
         },
         {
           name: 'Darwinia',
-          url: 'wss://rpc.darwinia.network/'
+          url: 'wss://rpc.darwinia.network/',
+          ss58: 18
         },
         {
           name: 'HydraDX',
-          url: 'wss://rpc-01.snakenet.hydradx.io/'
+          url: 'wss://rpc-01.snakenet.hydradx.io/',
+          ss58: 63
         },
         {
           name: 'Ronin',
@@ -80,19 +88,22 @@ module.exports = {
         },
         {
           name: 'Fantom',
-          url: 'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e'
+          url: 'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e/'
         },
         {
           name: 'ChainX',
-          url: 'wss://mainnet.chainx.org/ws'
+          url: 'wss://mainnet.chainx.org/ws',
+          ss58: 44,
         },
         {
           name: 'Nodle Protocol',
-          url: 'wss://main3.nodleprotocol.io'
+          url: 'wss://main3.nodleprotocol.io',
+          ss58: 37,
         },
         {
           name: 'Khala Chain',
-          url: 'wss://khala-api.phala.network/ws'
+          url: 'wss://khala-api.phala.network/ws',
+          ss58: 30
         },
         {
           name: 'BSC',
@@ -100,7 +111,8 @@ module.exports = {
         },
         {
           name: 'Centrifuge',
-          url: 'wss://fullnode.centrifuge.io/'
+          url: 'wss://fullnode.centrifuge.io/',
+          ss58: 36
         },
         {
           name: 'Celo',
@@ -112,11 +124,14 @@ module.exports = {
         },
         {
           name: 'Ethereum (Mainnet)',
-          url: 'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_'
+          url: 'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_',
+          balance_type: 'ethereum',
         },
         {
           name: 'Edgeware (Mainnet)',
-          url: 'wss://edgeware-rpc.dwellir.com'
+          url: 'wss://edgeware-rpc.dwellir.com',
+          balance_type: 'substrate',
+          ss58: 7
         },
         {
           name: 'Arbitrum (Mainnet)',
@@ -124,19 +139,23 @@ module.exports = {
         },
         {
           name: 'Crust Network',
-          url: 'wss://api.crust.network/'
+          url: 'wss://api.crust.network/',
+          ss58: 66,
         },
         {
           name: 'Kusama',
-          url: 'ws://kusama-rpc.polkadot.io:9944'
+          url: 'ws://kusama-rpc.polkadot.io:9944',
+          ss58: 2
         },
         {
           name: 'Edgeware (Testnet)',
-          url: 'ws://beresheet1.edgewa.re:9944'
+          url: 'ws://beresheet1.edgewa.re:9944',
+          ss58: 7
         },
         {
           name: 'CLV Chain (Clover)',
-          url: 'ws://api.clover.finance/'
+          url: 'ws://api.clover.finance/',
+          ss58: 42
         },
         {
           name: 'Solana (Testnet)',
@@ -148,23 +167,28 @@ module.exports = {
         },
         {
           name: 'Cosmos (localhost)',
-          url: 'localhost:26657'
+          url: 'localhost:26657',
+          bech32: 'cosmos',
         },
         {
           name: 'Carbon Network',
-          url: 'https://tm-api.carbon.network'
+          url: 'https://tm-api.carbon.network',
+          bech32: 'swth',
         },
         {
           name: 'Evmos',
-          url: 'https://tendermint.bd.evmos.org:26657/'
+          url: 'https://tendermint.bd.evmos.org:26657/',
+          bech32: 'evmos',
         },
         {
           name: 'Polkachu',
-          url: 'https://stride-rpc.polkachu.com/'
+          url: 'https://stride-rpc.polkachu.com/',
+          bech32: 'stride',
         },
         {
           name: 'Haqq Network',
-          url: 'https://rpc.tm.haqq.network'
+          url: 'https://rpc.tm.haqq.network',
+          bech32: 'haqq',
         },
         {
           name: 'NEAR (Testnet)',
@@ -172,19 +196,23 @@ module.exports = {
         },
         {
           name: 'Stargaze',
-          url: 'https://rpc.stargaze-apis.com/'
+          url: 'https://rpc.stargaze-apis.com/',
+          bech32: 'stars',
         },
         {
           name: 'Sifchain',
-          url: 'https://rpc.sifchain.finance/'
+          url: 'https://rpc.sifchain.finance/',
+          bech32: 'sif',
         },
         {
           name: 'Osmosis',
-          url: 'https://rpc-osmosis.blockapsis.com'
+          url: 'https://rpc-osmosis.blockapsis.com',
+          bech32: 'osmo',
         },
         {
           name: 'Oraichain',
-          url: 'https://rpc.orai.io'
+          url: 'https://rpc.orai.io',
+          bech32: 'orai',
         },
         {
           name: 'NEAR (Mainnet)',
@@ -192,83 +220,108 @@ module.exports = {
         },
         {
           name: 'Juno',
-          url: 'https://rpc-juno.itastakers.com'
+          url: 'https://rpc-juno.itastakers.com',
+          bech32: 'juno',
+        },
+        {
+          name: 'Wynd',
+          url: 'https://rpc-juno-wynd.mib.tech',
+          bech32: 'juno',
         },
         {
           name: 'Panacea',
-          url: 'https://rpc.gopanacea.org'
+          url: 'https://rpc.gopanacea.org/',
+          bech32: 'panacea',
         },
         {
           name: 'Bitsong',
-          url: 'https://rpc.explorebitsong.com'
+          url: 'https://rpc.explorebitsong.com',
+          bech32: 'bitsong',
         },
         {
           name: 'Persistence',
-          url: 'https://rpc.core.persistence.one'
+          url: 'https://rpc.core.persistence.one',
+          bech32: 'persistence',
         },
         {
           name: 'Archway',
-          url: 'https://rpc.constantine-1.archway.tech'
+          url: 'https://rpc.constantine-1.archway.tech',
+          bech32: 'archway',
         },
         {
           name: 'Chihuahua',
-          url: 'https://rpc.chihuahua.wtf:443'
+          url: 'https://rpc.chihuahua.wtf:443',
+          bech32: 'chihuahua',
         },
         {
           name: 'Cheqd',
-          url: 'https://rpc.cheqd.net'
+          url: 'https://rpc.cheqd.net',
+          bech32: 'cheqd',
         },
         {
           name: 'Cerberus',
-          url: 'https://rpc.cerberus.zone:26657'
+          url: 'https://rpc.cerberus.zone:26657/',
+          bech32: 'cerberus',
         },
         {
           name: 'Umee',
-          url: 'https://rpc.blue.main.network.umee.cc'
+          url: 'https://rpc.blue.main.network.umee.cc/',
+          bech32: 'umee',
         },
         {
           name: 'Agoric',
-          url: 'https://main.rpc.agoric.net:443/'
+          url: 'https://main.rpc.agoric.net:443/',
+          bech32: 'agoric',
         },
         {
           name: 'Vidulum (Mainnet)',
-          url: 'https://mainnet-rpc.vidulum.app'
+          url: 'https://mainnet-rpc.vidulum.app/',
+          bech32: 'vdl',
         },
         {
           name: 'Crescent Network',
-          url: 'https://mainnet.crescent.network:26657'
+          url: 'https://mainnet.crescent.network:26657/',
+          bech32: 'cre',
         },
         {
           name: 'Terra',
-          url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9'
+          url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
+          bech32: 'terra',
         },
         {
           name: 'Injective (Testnet)',
-          url: 'https://injective-rpc-testnet.cw-figment.workers.dev'
+          url: 'https://injective-rpc-testnet.cw-figment.workers.dev',
+          bech32: 'inj',
         },
         {
           name: 'Injective (Mainnet)',
-          url: 'https://injective-rpc.cw-figment.workers.dev'
+          url: 'https://injective-rpc.cw-figment.workers.dev',
+          bech32: 'inj',
         },
         {
           name: 'Gravity Chain',
-          url: 'https://gravitychain.io:26657'
+          url: 'https://gravitychain.io:26657/',
+          bech32: 'gravity',
         },
         {
           name: 'Andromeda (Testnet)',
-          url: 'https://andromeda-testnet-rpc.orbitalcommand.io'
+          url: 'https://andromeda-testnet-rpc.orbitalcommand.io',
+          bech32: 'andr',
         },
         {
           name: 'Regen Network',
-          url: 'http://public-rpc.regen.vitwit.com:26657'
+          url: 'http://public-rpc.regen.vitwit.com:26657/',
+          bech32: 'regen',
         },
         {
           name: 'Althea',
-          url: 'http://chainripper-2.althea.net:26657'
+          url: 'http://chainripper-2.althea.net:26657/',
+          bech32: 'gravity',
         },
         {
           name: 'ODIN Protocol',
-          url: 'http://34.79.179.216:26657'
+          url: 'http://34.79.179.216:26657',
+          bech32: 'odin',
         },
         {
           name: 'Solana (Devnet)',
@@ -276,24 +329,71 @@ module.exports = {
         },
       ];
 
-      // TODO: rectify chain_base, balance_type, ss58, and bech32 values for each node
+      // TODO: rectify balance_type, ss58, and bech32 values for each node
 
       await Promise.all(chainNodes.map(async (cn) => {
-        const query = `UPDATE "ChainNodes" SET name='${cn.name}' WHERE url LIKE '${cn.url}%';`;
-        queryInterface.sequelize.query(query, { transaction });
-      }))
+        const update = { name: cn.name };
+        if (cn.balance_type) update['balance_type'] = cn.balance_type;
+        if (cn.ss58 !== undefined) update['ss58'] = cn.ss58;
+        if (cn.bech32) update['bech32'] = cn.bech32;
+        await queryInterface.bulkUpdate(
+          'ChainNodes',
+          update,
+          { url: cn.url },
+          { transaction }
+        );
+      }));
 
+      // fix two chains and remove duplicates
+      await queryInterface.bulkUpdate(
+        'Chains',
+        { chain_node_id: 17 },
+        { id: 'neta-money' },
+        { transaction },
+      );
+      await queryInterface.bulkUpdate(
+        'Chains',
+        { chain_node_id: 20 },
+        { id: 'clandestina' },
+        { transaction },
+      );
+      await queryInterface.bulkDelete(
+        'ChainNodes',
+        { id: 18 },
+        { transaction }
+      );
+      await queryInterface.bulkDelete(
+        'ChainNodes',
+        { id: 21 },
+        { transaction }
+      );
+      await queryInterface.changeColumn(
+        'ChainNodes',
+        'name',
+        { type: Sequelize.STRING, allowNull: false },
+        { transaction }
+      );
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.sequelize.query(`UPDATE "ChainNodes" SET name=NULL;`, { transaction });
-      await queryInterface.sequelize.query(`UPDATE "ChainNodes" SET description=NULL;`, { transaction });
+      await queryInterface.changeColumn(
+        'ChainNodes',
+        'name',
+        { type: Sequelize.STRING, allowNull: true },
+        { transaction }
+      );
+      await queryInterface.bulkUpdate('ChainNodes', { name: null, description: null }, {}, { transaction });
       await queryInterface.removeColumn('ChainNodes', 'ss58', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'bech32', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'created_at', { transaction });
       await queryInterface.removeColumn('ChainNodes', 'updated_at', { transaction });
+      await queryInterface.addColumn('ChainNodes', 'chain_base', {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '',
+      }, { transaction });
     });
   }
 };

@@ -9,10 +9,9 @@ export type ChainNodeAttributes = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
-  balance_type?: BalanceType;
+  balance_type: BalanceType;
   name?: string;
   description?: string;
-  chain_base: string;
 }
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
@@ -33,12 +32,11 @@ export default (
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
-      balance_type: { type: dataTypes.STRING, allowNull: true },
+      balance_type: { type: dataTypes.STRING, allowNull: false },
       name: { type: dataTypes.STRING, allowNull: true },
       description: { type: dataTypes.TEXT, allowNull: true },
       ss58: { type: dataTypes.INTEGER, allowNull: true },
       bech32: { type: dataTypes.STRING, allowNull: true },
-      chain_base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },

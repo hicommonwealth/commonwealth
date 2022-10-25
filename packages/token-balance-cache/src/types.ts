@@ -15,7 +15,6 @@ export type IChainNode = {
   alt_wallet_url?: string;
   private_url?: string;
   balance_type: BalanceType;
-  chain_base: string;
   name: string;
   description?: string;
   ss58?: number;

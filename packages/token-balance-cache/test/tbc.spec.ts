@@ -24,7 +24,6 @@ async function mockNodesProvider(_lastQueryUnixTime: number): Promise<IChainNode
     url: 'none',
     eth_chain_id: 5555,
     balance_type: BalanceType.Ethereum,
-    chain_base: 'unknown',
     name: 'Mock Node',
   }];
 }

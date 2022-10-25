@@ -131,4 +131,5 @@ export enum BalanceType {
   Ethereum = 'ethereum',
   Solana = 'solana',
   Cosmos = 'cosmos',
+  NEAR = 'near',
 }
