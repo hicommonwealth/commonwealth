@@ -915,41 +915,29 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
             ),
-            // CMN
 
-            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
-            // are replaced by redirects to scopeless URI for time being
-            '/:scope/projects': redirectRoute(() => `/projects/explore`),
-            // '/:scope/projects': redirectRoute(
-            //   (attrs) => `/${attrs.scope}/projects/explore`
-            // ),
+            // Crowdfund
+            '/:scope/projects': redirectRoute(
+              (attrs) => `/${attrs.scope}/projects/explore`
+            ),
             '/projects': redirectRoute(() => `/projects/explore`),
             '/projects/:subpage': importRoute(
               'views/pages/projects/index.tsx',
               { scoped: false, hideSidebar: true, deferChain: true }
             ),
-            '/:scope/projects/:subpage': redirectRoute(
-              (attrs) => `/projects/${attrs.subpage}`
-            ),
-            // '/:scope/projects/:subpage': importRoute(
-            //   'views/pages/projects/index.tsx',
-            //   { scoped: true, hideSidebar: true }
-            // ),
-            '/:scope/project/:identifier': redirectRoute(
-              (attrs) => `/project/${attrs.identifier}`
-            ),
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
               { scoped: false, hideSidebar: true, deferChain: true }
             ),
-            // '/:scope/project/:identifier': importRoute(
-            //   'views/pages/projects/view_project.tsx',
-            //   { scoped: true, hideSidebar: true }
-            // ),
+            '/:scope/project/:identifier': importRoute(
+              'views/pages/projects/view_project.tsx',
+              { scoped: true, hideSidebar: true }
+            ),
             '/:scope/new/project': importRoute(
               'views/pages/projects/create_project_form.tsx',
               { scoped: true, hideSidebar: true, deferChain: true }
             ),
+
             // NEAR
             '/:scope/finishNearLogin': importRoute(
               'views/pages/finish_near_login',
