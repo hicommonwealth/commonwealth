@@ -285,7 +285,7 @@ module.exports = {
         },
         {
           name: 'Terra',
-          url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
+          url: 'https://phoenix-lcd.terra.dev',
           bech32: 'terra',
         },
         {
