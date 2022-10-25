@@ -101,7 +101,7 @@ class Account {
       throw new Error('signature required for validation');
     }
 
-    const walletController = app.sessions.getWalletController(this.chain.base);
+    const sessionController = app.sessions.getSessionController(this.chain.base);
     // TODO: I'm unsure about this
     const chainId = this.chain.id == "ethereum" ? this.chain.node.ethChainId : this.chain.id;
 
@@ -112,7 +112,7 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      session_public_address: walletController ? walletController.getAddress(chainId) : null,
+      session_public_address: sessionController ? sessionController.getAddress(chainId) : null,
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);

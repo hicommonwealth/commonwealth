@@ -5,13 +5,13 @@ import { ChainBase } from '../../../../../common-common/src/types';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 
 
-abstract class WalletController<ChainIdType extends string | number | symbol> {
+abstract class ISessionController<ChainIdType extends string | number | symbol> {
   abstract getAddress(chainId: ChainIdType): string | null;
   abstract getOrCreateAddress(chainId: ChainIdType): Promise<string>;
 }
 
 
-class EthereumWalletController extends WalletController<number> {
+class EthereumSessionController extends ISessionController<number> {
   addresses: Record<number,string>;
 
   constructor() {
@@ -34,7 +34,7 @@ class EthereumWalletController extends WalletController<number> {
 }
 
 
-class SubstrateWalletController extends WalletController<string> {
+class SubstrateSessionController extends ISessionController<string> {
   keyring: Keyring;
   addresses: Record<string,string>;
 
@@ -65,7 +65,7 @@ class SubstrateWalletController extends WalletController<string> {
   }
 }
 
-class CosmosSDKWalletController extends WalletController<string> {
+class CosmosSDKSessionController extends ISessionController<string> {
   addresses: Record<string,string>;
 
   constructor() {
@@ -96,17 +96,17 @@ class CosmosSDKWalletController extends WalletController<string> {
 }
 
 class SessionsController {
-  ethereum: EthereumWalletController;
-  substrate: SubstrateWalletController;
-  cosmos: CosmosSDKWalletController;
+  ethereum: EthereumSessionController;
+  substrate: SubstrateSessionController;
+  cosmos: CosmosSDKSessionController;
 
   constructor() {
-    this.ethereum = new EthereumWalletController();
-    this.substrate = new SubstrateWalletController();
-    this.cosmos = new CosmosSDKWalletController();
+    this.ethereum = new EthereumSessionController();
+    this.substrate = new SubstrateSessionController();
+    this.cosmos = new CosmosSDKSessionController();
   }
 
-  getWalletController(chainBase: ChainBase): WalletController<any> {
+  getSessionController(chainBase: ChainBase): ISessionController<any> {
     if (chainBase == "ethereum") {
       return this.ethereum;
     } else if (chainBase == "substrate") {

@@ -74,9 +74,9 @@ class PolkadotWebWalletController
 
   // ACTIONS
   public async signWithAccount(account: Account): Promise<string> {
-    const walletController = app.sessions.getWalletController(ChainBase.Substrate);
+    const sessionController = app.sessions.getSessionController(ChainBase.Substrate);
     const chainId = app.chain?.id || this.defaultNetwork;
-    const sessionPublicAddress = await walletController.getOrCreateAddress(chainId);
+    const sessionPublicAddress = await sessionController.getOrCreateAddress(chainId);
 
     const signer = await this.getSigner(account.address);
 
