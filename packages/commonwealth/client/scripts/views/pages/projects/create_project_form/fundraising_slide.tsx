@@ -1,9 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWTextInput } from 'client/scripts/views/components/component_kit/cw_text_input';
-import { CWTokenInput } from 'client/scripts/views/components/component_kit/cw_token_input';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWTokenInput } from 'views/components/component_kit/cw_token_input';
 import { SelectList, Button, Icons } from 'construct-ui';
 import { validateProjectForm } from '../helpers';
 import {
@@ -79,8 +79,9 @@ export class FundraisingSlide
           oninput={(e) => {
             vnode.attrs.form.threshold = e.target.value;
           }}
-          value={vnode.attrs.form.threshold}
+          required
           tokenIconUrl={WethUrl}
+          value={vnode.attrs.form.threshold}
         />
         <SelectList
           items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
@@ -121,6 +122,7 @@ export class FundraisingSlide
           oninput={(e) => {
             vnode.attrs.form.beneficiary = e.target.value;
           }}
+          required
           value={vnode.attrs.form.beneficiary}
         />
         <CWTextInput

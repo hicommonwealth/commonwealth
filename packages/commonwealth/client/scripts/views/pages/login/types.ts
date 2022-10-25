@@ -1,4 +1,4 @@
-import { IWebWallet } from 'client/scripts/models';
+import { IWebWallet } from 'models';
 import { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =

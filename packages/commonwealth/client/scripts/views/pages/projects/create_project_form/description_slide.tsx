@@ -1,8 +1,8 @@
 /* @jsx m */
 
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { QuillEditor } from 'client/scripts/views/components/quill/quill_editor';
-import { QuillEditorComponent } from 'client/scripts/views/components/quill/quill_editor_component';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { QuillEditor } from 'views/components/quill/quill_editor';
+import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import m from 'mithril';
 import { ICreateProjectForm } from '../types';
 

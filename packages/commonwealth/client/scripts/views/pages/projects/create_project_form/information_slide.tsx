@@ -47,6 +47,7 @@ export class InformationSlide
           inputValidationFn={(val: string) =>
             validateProjectForm('shortDescription', val)
           }
+          required
           value={vnode.attrs.form.shortDescription}
         />
         <CWCoverImageUploader

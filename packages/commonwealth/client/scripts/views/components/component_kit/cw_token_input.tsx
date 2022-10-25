@@ -10,6 +10,11 @@ import { CWLabel } from './cw_label';
 import { ValidationStatus } from './cw_validation_text';
 import { CWText } from './cw_text';
 import { CWAvatar } from './cw_avatar';
+import {
+  MessageRowAttrs,
+  InputStyleAttrs,
+  InputInternalStyleAttrs,
+} from './cw_text_input';
 
 export type TokenInputAttrs = {
   autofocus?: boolean;
@@ -19,28 +24,10 @@ export type TokenInputAttrs = {
   label?: string;
   oninput?: (e) => void;
   placeholder?: string;
+  required?: boolean;
   tabindex?: number;
   tokenId?: string;
   tokenIconUrl?: string;
-};
-
-type InputStyleAttrs = {
-  inputClassName?: string;
-  darkMode?: boolean;
-  disabled?: boolean;
-  validationStatus?: ValidationStatus;
-};
-
-type InputInternalStyleAttrs = {
-  hasRightIcon?: boolean;
-  isTyping: boolean;
-};
-
-type MessageRowAttrs = {
-  hasFeedback?: boolean;
-  label: string;
-  statusMessage?: string;
-  validationStatus?: ValidationStatus;
 };
 
 export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
@@ -90,6 +77,8 @@ export class CWTokenInput implements m.ClassComponent<TokenInputAttrs> {
       name,
       oninput,
       placeholder = '0.00',
+      required,
+      size,
       tabindex,
       tokenId,
     } = vnode.attrs;
@@ -127,11 +116,13 @@ export class CWTokenInput implements m.ClassComponent<TokenInputAttrs> {
               isTyping: this.isTyping,
               darkMode,
               inputClassName,
+              size,
             })}
             disabled={disabled}
             tabindex={tabindex}
             name={name}
             placeholder={placeholder}
+            required={required}
             oninput={(e) => {
               oninput(e);
 

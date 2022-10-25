@@ -33,7 +33,7 @@ export type TextInputAttrs = {
   tabindex?: number;
 };
 
-type InputStyleAttrs = {
+export type InputStyleAttrs = {
   inputClassName?: string;
   darkMode?: boolean;
   disabled?: boolean;
@@ -42,12 +42,12 @@ type InputStyleAttrs = {
   displayOnly?: boolean;
 };
 
-type InputInternalStyleAttrs = {
+export type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
   isTyping: boolean;
 };
 
-type MessageRowAttrs = {
+export type MessageRowAttrs = {
   hasFeedback?: boolean;
   label: string;
   statusMessage?: string;

@@ -663,10 +663,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            // CMN
 
-            // TODO Graham 5-16-22: Scoped project listings postponed til v2;
-            // are replaced by redirects to scopeless URI for time being
+            // CMN
             '/:scope/projects': redirectRoute(() => `/projects/explore`),
             '/projects': redirectRoute(() => `/projects/explore`),
             '/:scope/projects/:subpage': redirectRoute(
@@ -683,8 +681,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/projects/view_project.tsx',
               { scoped: false, hideSidebar: true, deferChain: true }
             ),
+            '/new/project': redirectRoute(() => `/projects/explore`),
             '/:scope/new/project': importRoute(
-              'views/pages/projects/create_project_form.tsx',
+              'views/pages/projects/create_project_form/index',
               { scoped: true, hideSidebar: true, deferChain: true }
             ),
             // NEAR
@@ -917,13 +916,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Crowdfund
+            '/projects': redirectRoute(() => `/projects/explore`),
             '/:scope/projects': redirectRoute(
               (attrs) => `/${attrs.scope}/projects/explore`
-            ),
-            '/projects': redirectRoute(() => `/projects/explore`),
-            '/projects/:subpage': importRoute(
-              'views/pages/projects/index.tsx',
-              { scoped: false, hideSidebar: true, deferChain: true }
             ),
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
@@ -934,7 +929,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, hideSidebar: true }
             ),
             '/:scope/new/project': importRoute(
-              'views/pages/projects/create_project_form.tsx',
+              'views/pages/projects/create_project_form/index.tsx',
               { scoped: true, hideSidebar: true, deferChain: true }
             ),
 

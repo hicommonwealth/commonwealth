@@ -18,9 +18,6 @@ import {
   CreateProjectStages,
   CreateProjectStageNumber,
 } from '../types';
-import { DescriptionSlide } from './description_slide';
-import { FundraisingSlide } from './fundraising_slide';
-import { InformationSlide } from './information_slide';
 
 export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
@@ -129,7 +126,10 @@ export default class CreateProjectForm implements m.ClassComponent {
                 </>
               }
               onclick={(e) => {
-                this.stageNumber -= 1;
+                const requiredInputsFilled = this.$form.reportValidity();
+                if (requiredInputsFilled) {
+                  this.stageNumber -= 1;
+                }
               }}
             />
             {this.stageNumber !== 3 ? (
@@ -141,8 +141,10 @@ export default class CreateProjectForm implements m.ClassComponent {
                   </>
                 }
                 onclick={(e) => {
-                  this.$form.reportValidity();
-                  this.stageNumber += 1;
+                  const requiredInputsFilled = this.$form.reportValidity();
+                  if (requiredInputsFilled) {
+                    this.stageNumber += 1;
+                  }
                 }}
               />
             ) : (
