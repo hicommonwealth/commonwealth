@@ -33,7 +33,6 @@ module.exports = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
-    new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
   optimization: {
     splitChunks: {

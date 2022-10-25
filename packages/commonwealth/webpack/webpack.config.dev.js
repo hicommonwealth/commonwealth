@@ -28,6 +28,7 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('development'),
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
+    new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
   module: {
     rules: [
