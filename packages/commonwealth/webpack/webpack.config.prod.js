@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const common = require('./webpack.common.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
@@ -23,10 +22,6 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('production'),
       CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com')
     }),
-    new webpack.optimize.ModuleConcatenationPlugin(),
-    new MiniCssExtractPlugin({
-      filename: 'bundle.[chunkhash:8].css'
-    }),
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
@@ -37,7 +32,7 @@ module.exports = merge(common, {
     rules: [
       {
         test: /\.s?css/i,
-        use : [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+        use : ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
   }
