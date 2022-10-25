@@ -25,7 +25,8 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted, PermissionError } from '../util/roles';
+import { Action } from 'common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -215,6 +216,11 @@ const createThread = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(models, author.id, chain.id, Action.CREATE_THREAD);
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
