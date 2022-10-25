@@ -8,9 +8,16 @@ different types of query options. Enumerated methods here
 for ORDERING, GROUPING, LIMIT, OFFSET
 */
 
+
 export enum orderByOptions {
   DESC = 'DESC',
   ASC = 'ASC'
+}
+
+export type IPagination = {
+  limit?: number;
+  page?: number;
+  sort?: orderByOptions;
 }
 
 export const orderBy = (property: string, order: orderByOptions) => {

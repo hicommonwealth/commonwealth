@@ -3,19 +3,14 @@ import { AppError, ServerError } from '../../util/errors';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ProfileAttributes } from '../../models/profile';
-import { formatPagination, orderBy, orderByOptions } from '../../util/queries';
+import { formatPagination, orderBy, IPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
 type GetProfilesReq = {
   addresses?: string[];
-  profile_ids?: number[]; // TODO: Not Implemented
-
-  // goes in pagination helper
-  limit?: number;
-  page?: number;
-  sort?: orderByOptions;
-};
+  profile_ids?: number[];
+} & IPagination;
 
 export const Errors = {
   NoArgs: "Must provide addresses or profile_ids",

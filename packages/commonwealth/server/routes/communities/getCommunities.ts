@@ -3,16 +3,12 @@ import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ChainAttributes } from '../../models/chain';
+import { IPagination } from '../../util/queries';
 
 type GetCommunitiesReq = {
   community_id?: string;
-
-  // TODO: goes in pagination helper
-  limit?: number;
-  page?: string;
-  sort?: string;
   count_only?: boolean; // Desired?
-};
+} & IPagination;
 
 type GetCommunitiesResp = ChainAttributes[];
 

@@ -3,18 +3,14 @@ import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { CommentAttributes } from '../../models/comment';
+import { IPagination } from '../../util/queries';
 
 type GetCommentsReq = {
   community_id: string;
   thread_id?: number;
   addresses?: string[];
-
-  // TODO: goes in pagination helper
-  limit?: number;
-  page?: string;
-  sort?: string;
   count_only?: boolean;
-};
+} & IPagination;
 
 type GetThreadsResp = CommentAttributes[];
 
