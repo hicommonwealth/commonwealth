@@ -29,6 +29,7 @@ export type TextInputAttrs = {
   onenterkey?: (e) => void;
   onclick?: (e) => void;
   placeholder?: string;
+  required?: boolean;
   tabindex?: number;
 };
 
@@ -107,6 +108,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       onenterkey,
       onclick,
       placeholder,
+      required,
       size = 'large',
       tabindex,
       displayOnly,
@@ -153,6 +155,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             maxlength={maxlength}
             name={name}
             placeholder={placeholder}
+            required={required}
             oninput={(e) => {
               oninput(e);
 
