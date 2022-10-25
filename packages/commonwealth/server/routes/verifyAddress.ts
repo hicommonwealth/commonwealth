@@ -219,7 +219,7 @@ const verifySignature = async (
           const keplrMessage = await constructKeplrMessage(
             addressModel.address,
             // TODO: get chain id dynamically
-            "osmosis-1",
+            "something",
             addressModel.address,
             addressModel.block_info
           )
@@ -302,8 +302,17 @@ const verifySignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
+        const canvasMessage = constructCanvasMessage(
+          "solana",
+          // TODO: what should this be?
+          "something",
+          addressModel.address,
+          sessionPublicAddress,
+          addressModel.block_info
+        );
+
         isValid = nacl.sign.detached.verify(
-          Buffer.from(`${addressModel.verification_token}`),
+          Buffer.from(`${JSON.stringify(canvasMessage)}`),
           Buffer.from(signatureString, 'base64'),
           decodedAddress
         );

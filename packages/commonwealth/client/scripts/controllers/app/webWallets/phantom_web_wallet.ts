@@ -1,7 +1,10 @@
 declare let window: any;
 
+import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
+import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import * as solw3 from '@solana/web3.js';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -31,11 +34,32 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock() {
-    return null;
+    // TODO: Use our own Solana RPC - is this configurable?
+    const connection = new solw3.Connection("https://api.devnet.solana.com");
+    const slot = await connection.getSlot()
+    const block = await connection.getBlock(slot);
+
+    return {
+      number: slot,
+      hash: block.blockhash,
+      timestamp: block.blockTime
+    };
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const encodedMessage = new TextEncoder().encode(account.validationToken);
+    const sessionController = app.sessions.getSessionController(ChainBase.Solana);
+    const chainId = app.chain?.id || this.defaultNetwork;
+    const sessionPublicAddress = await sessionController.getOrCreateAddress(chainId);
+
+    const canvasMessage = constructCanvasMessage(
+      "solana",
+      chainId,
+      account.address,
+      sessionPublicAddress,
+      account.validationBlockInfo
+    );
+
+    const encodedMessage = new TextEncoder().encode(JSON.stringify(canvasMessage));
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'

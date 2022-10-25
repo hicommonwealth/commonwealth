@@ -3,6 +3,7 @@ import { Keyring } from '@polkadot/api';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import { ChainBase } from '../../../../../common-common/src/types';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import * as solw3 from '@solana/web3.js';
 
 
 abstract class ISessionController<ChainIdType extends string | number | symbol> {
@@ -95,15 +96,40 @@ class CosmosSDKSessionController extends ISessionController<string> {
   }
 }
 
+
+class SolanaSessionController extends ISessionController<string> {
+  addresses: Record<string,string>;
+
+  constructor() {
+    super();
+    this.addresses = {};
+  }
+
+  getAddress(chainId: string): string {
+    return this.addresses[chainId];
+  }
+
+  getOrCreateAddress(chainId: string): Promise<string> {
+    if(!this.addresses[chainId]) {
+      // create address
+      this.addresses[chainId] = solw3.Keypair.generate().publicKey.toString();
+    }
+    return Promise.resolve(this.addresses[chainId]);
+  }
+}
+
+
 class SessionsController {
   ethereum: EthereumSessionController;
   substrate: SubstrateSessionController;
   cosmos: CosmosSDKSessionController;
+  solana: SolanaSessionController;
 
   constructor() {
     this.ethereum = new EthereumSessionController();
     this.substrate = new SubstrateSessionController();
     this.cosmos = new CosmosSDKSessionController();
+    this.solana = new SolanaSessionController();
   }
 
   getSessionController(chainBase: ChainBase): ISessionController<any> {
@@ -113,6 +139,8 @@ class SessionsController {
       return this.substrate;
     } else if (chainBase == "cosmos") {
       return this.cosmos;
+    } else if (chainBase == "solana") {
+      return this.solana;
     }
   }
 }
