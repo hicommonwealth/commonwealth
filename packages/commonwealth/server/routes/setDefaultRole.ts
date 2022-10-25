@@ -43,7 +43,7 @@ const setDefaultRole = async (
   const existingRoleInstanceToUpdate = await models.RoleAssignment.findOne({
     where: {
       address_id: validAddress.id,
-      community_role_id: existingRole.toJSON().chain_id,
+      community_role_id: existingRole.toJSON().community_role_id,
     },
   })
 
