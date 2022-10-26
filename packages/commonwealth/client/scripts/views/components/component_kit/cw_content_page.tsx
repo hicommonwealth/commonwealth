@@ -12,7 +12,7 @@ import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import { isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 
 type SidebarItem = {
@@ -46,8 +46,11 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
   private viewType: 'sidebarView' | 'tabsView';
   private tabSelected: number;
 
-  onResize() {
-    if (isWindowMediumSmallInclusive(window.innerWidth)) {
+  onResize(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
+    if (
+      isWindowMediumSmallInclusive(window.innerWidth) &&
+      vnode.attrs.showSidebar
+    ) {
       this.viewType = 'tabsView';
     } else {
       this.viewType = 'sidebarView';
@@ -56,22 +59,23 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
   }
 
   oninit(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
-    this.viewType = isWindowMediumSmallInclusive(window.innerWidth)
-      ? 'tabsView'
-      : 'sidebarView';
+    this.viewType =
+      isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
+        ? 'tabsView'
+        : 'sidebarView';
 
     if (vnode.attrs.sidebarComponents.length > 0) {
       this.tabSelected = 0;
     }
 
     window.addEventListener('resize', () => {
-      this.onResize();
+      this.onResize(vnode);
     });
   }
 
-  onremove() {
+  onremove(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
     window.removeEventListener('resize', () => {
-      this.onResize();
+      this.onResize(vnode);
     });
   }
 
@@ -125,12 +129,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
     return (
       <div class={ComponentType.ContentPage}>
         {this.viewType === 'sidebarView' && (
-          <div
-            class={getClasses<{ showSidebar?: boolean }>(
-              { showSidebar },
-              'sidebar-view'
-            )}
-          >
+          <div class="sidebar-view">
             {mainBody}
             <div class="sidebar">
               {showSidebar && sidebarComponents.map((c) => c.item)}
@@ -138,12 +137,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           </div>
         )}
         {this.viewType === 'tabsView' && (
-          <div
-            class={getClasses<{ showSidebar?: boolean }>(
-              { showSidebar },
-              'tabs-view'
-            )}
-          >
+          <div class="tabs-view">
             <CWTabBar>
               <CWTab
                 label="Thread"

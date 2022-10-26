@@ -13,8 +13,8 @@ import { CWText } from '../../components/component_kit/cw_text';
 
 type SnapshotVotesTableAttrs = {
   choices: Array<string>;
-  voters: Array<SnapshotProposalVote>;
   symbol: string;
+  voters: Array<SnapshotProposalVote>;
 };
 
 export class SnapshotVotesTable
