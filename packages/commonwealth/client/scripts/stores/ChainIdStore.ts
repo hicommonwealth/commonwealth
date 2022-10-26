@@ -3,11 +3,16 @@ import Store from './Store';
 
 class ChainIdStore<T extends IHasChainId> extends Store<T> {
   private readonly _storeChainId: { [chainId: string]: Array<T> } = {};
-  private readonly _sortingFunction?: (a: T, b: T) => number;
+  private readonly _sortFn?: (a: T, b: T) => number;
+  private readonly _searchFn?: (a: T) => boolean;
 
-  constructor(sortingFunction?: (a: T, b: T) => number) {
+  constructor(params: {
+    sortFn?: (a: T, b: T) => number;
+    searchFn?: (a: T) => boolean;
+  }) {
     super();
-    this._sortingFunction = sortingFunction;
+    this._sortFn = params.sortFn;
+    this._searchFn = params.searchFn;
   }
 
   public add(n: T): ChainIdStore<T> {
@@ -22,8 +27,8 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
     this._storeChainId[n.chainId].push(n);
 
     // Sort store
-    if (this._sortingFunction) {
-      this._storeChainId[n.chainId].sort(this._sortingFunction);
+    if (this._sortFn) {
+      this._storeChainId[n.chainId].sort(this._sortFn);
     }
 
     return this;
@@ -31,7 +36,9 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
 
   public remove(n: T): ChainIdStore<T> {
     // Locate object
-    const idx = this._storeChainId[n.chainId].indexOf(n);
+    const idx = this._searchFn
+      ? this._storeChainId[n.chainId].findIndex(this._searchFn)
+      : this._storeChainId[n.chainId].indexOf(n);
     if (idx === -1) throw new Error('Object not in store.');
 
     // Replace object
@@ -40,10 +47,11 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
     return this;
   }
 
-  public update(n: T, eqFn: (a: T) => boolean): ChainIdStore<T> {
-    t;
+  public update(n: T): ChainIdStore<T> {
     // Locate object
-    const idx = this._storeChainId[n.chainId].findIndex(eqFn);
+    const idx = this._searchFn
+      ? this._storeChainId[n.chainId].findIndex(this._searchFn)
+      : this._storeChainId[n.chainId].indexOf(n);
     if (idx === -1) throw new Error('Object not in store.');
 
     // Update object
