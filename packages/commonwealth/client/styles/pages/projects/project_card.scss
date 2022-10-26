@@ -18,7 +18,7 @@
     }
   }
 
-  .ProjectHeaderPanel {
+  .HeaderPanel {
     background-color: $neutral-200;
     background-size: 100%;
     border-radius: 5px 5px 0 0;
@@ -78,7 +78,7 @@
     }
   }
 
-  .ProjectCompletionBar {
+  .CompletionBar {
     flex: 1;
     height: 8px;
     background-color: $neutral-300;
@@ -91,7 +91,7 @@
     }
   }
 
-  .ProjectInfoPanel {
+  .InfoPanel {
     background-color: $white;
     padding: 8px 16px;
     min-height: 208px;

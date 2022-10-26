@@ -4,7 +4,7 @@ import { DescriptionSlide } from './create_project_form/description_slide';
 import { FundraisingSlide } from './create_project_form/fundraising_slide';
 import { InformationSlide } from './create_project_form/information_slide';
 
-// View Project Page + Project Cards
+// Project display and rendering
 export enum ProjectRole {
   Curator = 'curator',
   Backer = 'backer',
@@ -15,6 +15,12 @@ export enum ProjectStatus {
   Failed = 'failed',
   Succeeded = 'succeeded',
   Active = 'active',
+}
+
+export enum ProjectCardSize {
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
 }
 
 // Create Project Form

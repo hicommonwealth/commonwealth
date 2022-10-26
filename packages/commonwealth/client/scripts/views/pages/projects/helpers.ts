@@ -1,5 +1,9 @@
+import { AddressInfo, Project } from 'models';
+import BN from 'bn.js';
 import Web3 from 'web3';
+import { ProjectRole } from './types';
 
+// Creation
 export const validateProjectForm = (property: string, value: string) => {
   if (!value)
     return [
@@ -74,3 +78,43 @@ export const validateProjectForm = (property: string, value: string) => {
     console.log({ txReceipt, newProjectId });
   }}
 /> */
+
+// Display
+
+export const getUserRoles = (
+  project: Project,
+  addresses: AddressInfo[]
+): [ProjectRole, BN] => {
+  let backingAmount = new BN(0);
+  let curatorAmount = new BN(0);
+  let isAuthor = false;
+  let isCurator = false;
+  let isBacker = false;
+  for (const address of addresses) {
+    const addressInfo: [string, string] = [address.address, address.chain.id];
+    if (project.isAuthor(...addressInfo)) {
+      isAuthor = true;
+    }
+    if (project.isCurator(...addressInfo)) {
+      isCurator = true;
+      curatorAmount = curatorAmount.add(
+        project.getCuratedAmount(...addressInfo)
+      );
+    }
+    if (project.isBacker(...addressInfo)) {
+      isBacker = true;
+      backingAmount = backingAmount.add(
+        project.getBackedAmount(...addressInfo)
+      );
+    }
+  }
+  if (isAuthor) {
+    return [ProjectRole.Author, null];
+  } else if (isCurator) {
+    return [ProjectRole.Curator, curatorAmount];
+  } else if (isBacker) {
+    return [ProjectRole.Backer, backingAmount];
+  } else {
+    return [null, null];
+  }
+};
