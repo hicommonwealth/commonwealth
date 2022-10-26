@@ -12,7 +12,7 @@ import { getClasses } from './helpers';
 import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 
-interface ICWCoverImageUploaderAttrs {
+type ICWCoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
   uploadCompleteCallback: CallableFunction;
