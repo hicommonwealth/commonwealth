@@ -35,6 +35,8 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
   }
 
   public remove(n: T): ChainIdStore<T> {
+    super.remove(n, this._searchFn);
+
     // Locate object
     const idx = this._searchFn
       ? this._storeChainId[n.chainId].findIndex(this._searchFn)
@@ -48,6 +50,8 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
   }
 
   public update(n: T): ChainIdStore<T> {
+    super.update(n, this._searchFn);
+
     // Locate object
     const idx = this._searchFn
       ? this._storeChainId[n.chainId].findIndex(this._searchFn)
