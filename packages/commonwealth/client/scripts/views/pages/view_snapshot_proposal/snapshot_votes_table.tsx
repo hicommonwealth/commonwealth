@@ -5,16 +5,24 @@ import m from 'mithril';
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
-import { SnapshotProposalVote } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
 import { formatNumberLong } from 'helpers';
 import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 
+type SnapshotVoteType = {
+  balance: number;
+  choice: number;
+  created: number;
+  id: string;
+  scores: Array<number>;
+  voter: string;
+};
+
 type SnapshotVotesTableAttrs = {
   choices: Array<string>;
   symbol: string;
-  voters: Array<SnapshotProposalVote>;
+  voters: Array<SnapshotVoteType>;
 };
 
 export class SnapshotVotesTable
