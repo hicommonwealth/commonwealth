@@ -25,8 +25,8 @@ const validateRoles = async (
     .filter((addr) => !!addr.verified)
     .map((addr) => addr.id);
 
-  const allowedRoles: any[] =
-    (minimum_role === 'member') ? ['admin, moderator, member']
+  const allowedRoles: Permission[] =
+    (minimum_role === 'member') ? ['admin', 'moderator', 'member']
     : (minimum_role === 'moderator') ? ['admin', 'moderator']
     : ['admin'];
 

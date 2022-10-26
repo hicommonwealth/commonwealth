@@ -1,5 +1,6 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
 import { DB } from 'server/models';
+import { CommunityRoleInstance } from 'server/models/community_role';
 import { sequelize } from '../database';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -168,7 +169,7 @@ export async function findOneRole(
     };
   }
 
-  const communityRole = await models.CommunityRole.findOne(roleFindOptions);
+  const communityRole: CommunityRoleInstance = await models.CommunityRole.findOne(roleFindOptions);
   let role: RoleInstanceWithPermission;
   if (communityRole) {
     // Retrieve the highest role as it will be the highest permission role for the address_id
