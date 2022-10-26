@@ -12,6 +12,7 @@ class Account {
 
   // validation token sent by server
   private _validationToken?: string;
+  private _sessionPublicAddress: string;
   // block that the client is signing, in order to validate login to the server
   private _validationBlockInfo?: string;
 
@@ -30,6 +31,7 @@ class Account {
     addressId,
     walletId,
     validationToken,
+    sessionPublicAddress,
     validationBlockInfo,
     profile,
     ignoreProfile,
@@ -42,6 +44,7 @@ class Account {
     addressId?: number;
     walletId?: WalletId;
     validationToken?: string;
+    sessionPublicAddress?: string;
     validationBlockInfo?: string;
     profile?: Profile;
 
@@ -56,6 +59,7 @@ class Account {
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
+    this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
     if (profile) {
@@ -93,6 +97,13 @@ class Account {
     this._validationBlockInfo = token;
   }
 
+  get sessionPublicAddress() {
+    return this._sessionPublicAddress;
+  }
+  public setSessionPublicAddress(sessionPublicAddress: string) {
+    this._sessionPublicAddress = sessionPublicAddress;
+  }
+
   public async validate(signature: string) {
     if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
@@ -101,11 +112,6 @@ class Account {
       throw new Error('signature required for validation');
     }
 
-    const sessionController = app.sessions.getSessionController(this.chain.base);
-    // TODO: I'm unsure about this
-    // the problem with `chain` being ambiguous... confusing
-    const chainId = this.chain.id == "ethereum" ? this.chain.node.ethChainId : this.chain.id;
-
     const params = {
       address: this.address,
       chain: this.chain.id,
@@ -113,7 +119,7 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      session_public_address: sessionController ? sessionController.getAddress(chainId) : null,
+      session_public_address: this.sessionPublicAddress,
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);

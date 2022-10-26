@@ -56,6 +56,11 @@ class PolkadotWebWalletController
     return injector.signer;
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    const sessionController = app.sessions.getSessionController(this.chain);
+    return sessionController.getOrCreateAddress(app.chain?.id || this.defaultNetwork);
+  }
+
   public async getRecentBlock() {
         // TODO: are we using the polkadot API anywhere else on the frontend?
     // we probably want to point to whatever substrate node we are already running instead of a public API

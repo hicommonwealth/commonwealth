@@ -248,6 +248,7 @@ export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
   chain: string,
+  sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo,
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
@@ -265,6 +266,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };

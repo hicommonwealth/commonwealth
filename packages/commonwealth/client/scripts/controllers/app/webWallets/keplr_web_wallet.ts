@@ -5,8 +5,8 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { constructKeplrMessage } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -63,10 +63,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    const sessionController = app.sessions.getSessionController(this.chain);
+    return sessionController.getOrCreateAddress(this._chainId);
+  }
+
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
     const address = this.accounts[0].address
-    const sessionController = app.sessions.getSessionController(ChainBase.CosmosSDK);
-    const sessionPublicAddress = await sessionController.getOrCreateAddress(this._chainId);
+    const sessionPublicAddress = await this.getSessionPublicAddress();
 
     const msgParams = await constructKeplrMessage(
       address,

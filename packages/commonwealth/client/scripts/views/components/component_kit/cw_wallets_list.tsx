@@ -166,7 +166,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       linking,
     } = vnode.attrs;
 
-    async function handleNormalWalletLogin(wallet, address) {
+    async function handleNormalWalletLogin(wallet: IWebWallet<any>, address) {
       if (app.isLoggedIn()) {
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
           address:
@@ -195,11 +195,13 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
       try {
         const validationBlockInfo = await wallet.getRecentBlock();
+        const sessionPublicAddress = await wallet.getSessionPublicAddress();
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
             wallet.name,
             app.chain?.id || wallet.defaultNetwork,
+            sessionPublicAddress,
             validationBlockInfo
           );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);

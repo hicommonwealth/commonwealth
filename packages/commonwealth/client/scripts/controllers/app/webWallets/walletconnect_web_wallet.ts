@@ -37,6 +37,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    const sessionController = app.sessions.getSessionController(this.chain);
+    return sessionController.getOrCreateAddress(this._chainInfo.node.ethChainId || 1);
+  }
+
   public async getRecentBlock(): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
 

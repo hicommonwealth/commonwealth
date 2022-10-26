@@ -50,6 +50,11 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return this._offlineSigner;
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    const sessionController = app.sessions.getSessionController(this.chain);
+    return sessionController.getOrCreateAddress(app.chain?.id || this.defaultNetwork);
+  }
+
   public async getRecentBlock() {
     const url = `${window.location.origin}/cosmosAPI/${
       app.chain?.id || this.defaultNetwork

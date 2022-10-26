@@ -18,6 +18,10 @@ class RoninWebWalletController implements IWebWallet<any> {
     return [];
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    return null;
+  }
+
   public async getRecentBlock() {
     return null;
   }

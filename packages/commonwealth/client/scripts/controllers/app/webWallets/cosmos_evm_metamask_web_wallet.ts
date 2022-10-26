@@ -56,6 +56,10 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return null;
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    return null;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
       message,

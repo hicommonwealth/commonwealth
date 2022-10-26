@@ -33,6 +33,11 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    const sessionController = app.sessions.getSessionController(this.chain);
+    return sessionController.getOrCreateAddress(app.chain?.id || this.defaultNetwork);
+  }
+
   public async getRecentBlock() {
     // TODO: Use our own Solana RPC - is this configurable?
     const connection = new solw3.Connection("https://api.devnet.solana.com");

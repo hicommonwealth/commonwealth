@@ -57,6 +57,10 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     return null;
   }
 
+  public async getSessionPublicAddress(): Promise<string> {
+    return null;
+  }
+
   public async signWithAccount(account: Account): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
