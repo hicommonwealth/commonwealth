@@ -5,9 +5,7 @@ import m from 'mithril';
 import { Project } from 'models';
 import app from 'state';
 import { Spinner } from 'construct-ui';
-import Web3 from 'web3';
 import ProjectCard, { ProjectCardSize } from './project_card';
-import { ChainNetwork } from '../../../../../../common-common/src/types';
 
 export default class YourPage
   implements m.ClassComponent<{ currentBlockNum: number }>
@@ -25,6 +23,9 @@ export default class YourPage
     app.user.addresses.forEach(({ address, chain }) => {
       app.projects.store
         .getAll()
+        .filter((project) =>
+          app.activeChainId() ? project.chainId === app.activeChainId() : true
+        )
         .filter(
           (project) =>
             project.isAuthor(address, chain.id) ||

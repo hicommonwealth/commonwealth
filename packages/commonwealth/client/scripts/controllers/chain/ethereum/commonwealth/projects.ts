@@ -8,8 +8,8 @@ import { ChainInfo, Project } from 'models';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
 import { BigNumberish, ContractReceipt } from 'ethers';
-import { attachSigner } from './contractApi';
 import { formatBytes32String } from 'ethers/lib/utils';
+import { attachSigner } from './contractApi';
 
 export type IProjectCreationData = {
   title: string; // TODO length limits for contract side
@@ -25,6 +25,11 @@ export type IProjectCreationData = {
   curatorFee: BigNumberish;
 };
 
+type fetchProjectsParams = {
+  project_id?: number;
+  chain_id?: string;
+};
+
 export default class ProjectsController {
   private _initialized = false;
   public initialized() {
@@ -36,6 +41,10 @@ export default class ProjectsController {
     return this._initializing;
   }
 
+  // TODO: Graham 22-10-26: Build a generic CommunityIdStore which extends IdStore
+  // and includes a _storeCommunityId substore. This would allow us to consolidate custom stores
+  // such as ActivityStore, TopicStore, and DraftStore, and to remove filtering logic on
+  // chain-scoped project listing pages.
   protected _store: IdStore<Project> = new IdStore();
   public get store() {
     return this._store;
@@ -44,11 +53,12 @@ export default class ProjectsController {
   private _factoryInfo: ChainInfo;
   private _app: IApp;
 
-  private async _loadProjectsFromServer(project_id?: number) {
-    const res = await $.getJSON(
-      `${this._app.serverUrl()}/getProjects`,
-      project_id ? { project_id } : {}
-    );
+  private async _fetchProjectsFromServer(params: fetchProjectsParams) {
+    const { project_id, chain_id } = params;
+    const res = await $.get(`${this._app.serverUrl()}/getProjects`, {
+      project_id,
+      chain_id,
+    });
     console.log({ res });
     for (const project of res.result) {
       try {
@@ -84,7 +94,7 @@ export default class ProjectsController {
 
     // load all projects from server
     try {
-      await this._loadProjectsFromServer();
+      await this._fetchProjectsFromServer();
     } catch (e) {
       console.error(`Failed to load projects: ${e.message}`);
       this._initializing = false;
@@ -205,7 +215,7 @@ export default class ProjectsController {
     }
 
     // refresh metadata + return final result
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return [txReceipt, projectId];
   }
 
@@ -232,7 +242,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return txReceipt;
   }
 
@@ -259,7 +269,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return txReceipt;
   }
 
@@ -289,7 +299,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return txReceipt;
   }
 
@@ -319,7 +329,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return txReceipt;
   }
 
@@ -351,7 +361,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._loadProjectsFromServer(projectId);
+    await this._fetchProjectsFromServer({ projectId });
     return txReceipt;
   }
 }

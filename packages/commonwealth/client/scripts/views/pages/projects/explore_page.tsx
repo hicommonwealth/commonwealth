@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Project } from 'models';
 import app from 'state';
 import { Spinner } from 'construct-ui';
 import ProjectCard from './project_card';
@@ -20,6 +19,9 @@ export default class ExplorePage
     }
     const exploreProjects = app.projects.store
       .getAll()
+      .filter((project) =>
+        app.activeChainId() ? project.chainId === app.activeChainId() : true
+      )
       .map((project) => (
         <ProjectCard project={project} currentBlockNum={currentBlockNum} />
       ));
