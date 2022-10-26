@@ -43,7 +43,7 @@ export class RoleInstanceWithPermission {
 
 export async function findAllRoles(
   models: DB,
-  findOptions: FindOptions,
+  findOptions: FindOptions<RoleAssignmentAttributes>,
   chain_id?: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
@@ -108,7 +108,7 @@ export async function findAllRoles(
 
 export async function findOneRole(
   models: DB,
-  findOptions: FindOptions,
+  findOptions: FindOptions<RoleAssignmentAttributes>,
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
