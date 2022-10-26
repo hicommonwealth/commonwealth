@@ -86,56 +86,36 @@ const upgradeMember = async (
     // “Demotion” should remove all RoleAssignments above the new role.
     // “Promotion” should create new RoleAssignment above the existing role.
     const currentRole = member.permission;
-    if (currentRole === 'member') {
-      if (new_role === 'member') {
-        return next(new AppError(Errors.InvalidRole));
-      } else {
-        newMember = await createRole(
-          models,
-          memberAddress.id,
-          chain.id,
-          new_role
-        );
-      }
-    } else if (currentRole === 'moderator') {
-      if (new_role === 'member') {
-        // Demotion
-        const communityRole = await models.CommunityRole.findOne({
-          where: {
-            chain_id: chain.id,
-            name: currentRole,
-          },
-        });
-        await models.RoleAssignment.destroy({
-          where: {
-            address_id: memberAddress.id,
-            community_role_id: communityRole.id,
-          },
-        });
-        newMember = await createRole(
-          models,
-          memberAddress.id,
-          chain.id,
-          'member'
-        );
-      } else if (new_role === 'moderator') {
-        return next(new AppError(Errors.InvalidRole));
-      } else {
-        newMember = await createRole(
-          models,
-          memberAddress.id,
-          chain.id,
-          new_role
-        );
-      }
+    // give each permissions a integer ranking
+    const roleRanking = {
+      "admin": 2,
+      "moderator": 1,
+      "member": 0,
+    };
+    const rankingToRole = {
+      2: "admin",
+      1: "moderator",
+      0: "member",
+    };
+    const newRoleRanking = roleRanking[new_role];
+    let currentRoleRanking = roleRanking[currentRole];
+    if (newRoleRanking === currentRoleRanking) {
+      return next(new AppError(Errors.InvalidRole));
+    } else if (newRoleRanking > currentRoleRanking) {
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        new_role
+      );
     } else {
-      // Handle demotions to moderator
-      if (new_role === 'moderator') {
-        // destroy admin role
+      // handle demotions
+      while (newRoleRanking < currentRoleRanking) {
+        const roleToRemove = rankingToRole[currentRoleRanking];
         const communityRole = await models.CommunityRole.findOne({
           where: {
             chain_id: chain.id,
-            name: 'admin',
+            name: roleToRemove,
           },
         });
         await models.RoleAssignment.destroy({
@@ -144,53 +124,18 @@ const upgradeMember = async (
             community_role_id: communityRole.id,
           },
         });
-        newMember = await createRole(
-          models,
-          memberAddress.id,
-          chain.id,
-          'moderator'
-        );
-      } else if (new_role === 'member') {
-        // destroy admin roles
-        const communityRole = await models.CommunityRole.findOne({
-          where: {
-            chain_id: chain.id,
-            name: 'admin',
-          },
-        });
-        await models.RoleAssignment.destroy({
-          where: {
-            address_id: memberAddress.id,
-            community_role_id: communityRole.id,
-          },
-        });
-        // destroy moderator role if it exists
-        const communityRole2 = await models.CommunityRole.findOne({
-          where: {
-            chain_id: chain.id,
-            name: 'moderator',
-          },
-        });
-        if (communityRole2) {
-          await models.RoleAssignment.destroy({
-            where: {
-              address_id: memberAddress.id,
-              community_role_id: communityRole2.id,
-            },
-          });
-        }
-        newMember = await createRole(
-          models,
-          memberAddress.id,
-          chain.id,
-          'member'
-        );
+        currentRoleRanking -= 1;
       }
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        rankingToRole[newRoleRanking]
+      );
     }
   } else {
     return next(new AppError(Errors.InvalidRole));
   }
-
   return res.json({ status: 'Success', result: newMember.toJSON() });
 };
 
