@@ -24,6 +24,7 @@ const getProfiles = async (
   req: TypedRequestQuery<GetProfilesReq>,
   res: TypedResponse<GetProfilesResp>,
 ) => {
+  if (!req.query) throw new AppError(Errors.NoArgs);
   // This route is for fetching all profiles + addresses by community
   const { addresses, profile_ids } = req.query;
 
