@@ -34,7 +34,7 @@ import { addressSwapper } from '../../shared/utils';
 import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
-import { constructKeplrMessage, validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
@@ -228,14 +228,15 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const keplrMessage = await constructKeplrMessage(
-            addressModel.address,
-            // TODO: get chain id dynamically
+          const canvasMessage = constructCanvasMessage(
+            "cosmos",
             "something",
             addressModel.address,
+            sessionPublicAddress,
             addressModel.block_info
-          )
-          const generatedSignDoc = validationTokenToSignDoc(Buffer.from(keplrMessage), generatedAddress)
+          );
+
+          const generatedSignDoc = validationTokenToSignDoc(Buffer.from(JSON.stringify(canvasMessage)), generatedAddress)
 
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);

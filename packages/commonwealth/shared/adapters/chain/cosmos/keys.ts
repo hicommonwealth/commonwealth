@@ -3,7 +3,6 @@
 // generated signature. But first we need the message to insert.
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { toBase64 } from '@cosmjs/encoding';
-import { constructCanvasMessage } from '../../shared';
 
 export const validationTokenToSignDoc = (
   token: Uint8Array,
@@ -35,8 +34,3 @@ export const validationTokenToSignDoc = (
   );
   return signDoc;
 };
-
-export const constructKeplrMessage = async (fromAddress: string, fromChainId: string, sessionPublicAddress: string, validationBlockInfoString: string) => {
-  const message = constructCanvasMessage("cosmos", fromChainId, fromAddress, sessionPublicAddress, validationBlockInfoString);
-  return JSON.stringify(message);
-}
