@@ -25,12 +25,10 @@ class EthereumSessionController extends ISessionController<number> {
   }
 
   getOrCreateAddress(chainId: number): Promise<string> {
-    return new Promise((resolve) => {
-      if (!this.addresses[chainId]) {
-        this.addresses[chainId] = ethers.Wallet.createRandom().address;
-      }
-      resolve(this.addresses[chainId]);
-    });
+    if (!this.addresses[chainId]) {
+      this.addresses[chainId] = ethers.Wallet.createRandom().address;
+    }
+    return Promise.resolve(this.addresses[chainId]);
   }
 }
 
@@ -75,7 +73,7 @@ class CosmosSDKSessionController extends ISessionController<string> {
   }
 
   async generateWallet() {
-    return await DirectSecp256k1HdWallet.generate();
+    return DirectSecp256k1HdWallet.generate();
   }
 
   getAddress(chainId: string): string {
@@ -83,16 +81,14 @@ class CosmosSDKSessionController extends ISessionController<string> {
   }
 
   async getOrCreateAddress(chainId: string): Promise<string> {
-    return new Promise(async () => {
-      if(!this.addresses[chainId]) {
-        // create address
-        const wallet = await this.generateWallet();
-        const accounts = await wallet.getAccounts();
+    if(!this.addresses[chainId]) {
+      // create address
+      const wallet = await this.generateWallet();
+      const accounts = await wallet.getAccounts();
 
-        this.addresses[chainId] = accounts[0].address
-      }
-      return this.addresses[chainId];
-    });
+      this.addresses[chainId] = accounts[0].address
+    }
+    return Promise.resolve(this.addresses[chainId]);
   }
 }
 
