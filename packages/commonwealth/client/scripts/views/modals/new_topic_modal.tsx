@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import 'modals/new_topic_modal.scss';
 
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
@@ -58,6 +58,8 @@ export class NewTopicModal implements m.ClassComponent {
       ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
+      : app.chain.base === ChainBase.CosmosSDK
+      ? 6
       : 18;
 
     return (

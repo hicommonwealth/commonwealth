@@ -7,18 +7,11 @@ import 'sublayout.scss';
 import app from 'state';
 import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
-import { SearchBar } from './components/search_bar';
-import { SublayoutHeaderLeft } from './sublayout_header_left';
-import { SublayoutHeaderRight } from './sublayout_header_right';
-import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import {
-  isWindowExtraSmall,
-  isWindowSmallInclusive,
-} from './components/component_kit/helpers';
-import { CommunityHeader } from './components/sidebar/community_header';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { AppMobileMenus } from './app_mobile_menus';
+import { SublayoutHeader } from './sublayout_header';
 
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
@@ -29,31 +22,14 @@ type SublayoutAttrs = {
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
-  private showBodyContainer: boolean;
-  private showCommunityHeader: boolean;
-  private showQuickSwitcher: boolean;
-  private showSidebarContainer: boolean;
-
-  checkSidebarToggles() {
-    const isOnMobile = isWindowSmallInclusive(window.innerWidth);
-    const storedSidebarToggleState =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-    if (!app.chain) {
-      this.isSidebarToggled = false;
-      this.showQuickSwitcher = true;
-    } else {
-      this.isSidebarToggled = !isOnMobile || storedSidebarToggleState;
-      this.showQuickSwitcher = this.isSidebarToggled;
-    }
-    this.showSidebarContainer = this.isSidebarToggled || this.showQuickSwitcher;
-    this.showCommunityHeader = this.isSidebarToggled && this.showQuickSwitcher;
-    this.showBodyContainer = !(isOnMobile && storedSidebarToggleState);
-  }
 
   oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
+
+    this.isSidebarToggled =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
   }
 
   view(vnode) {
@@ -69,47 +45,26 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    this.checkSidebarToggles();
-    const {
-      showBodyContainer,
-      showSidebarContainer,
-      showCommunityHeader,
-      isSidebarToggled,
-      showQuickSwitcher,
-    } = this;
+    const isSidebarToggleable =
+      app.chain && isWindowSmallInclusive(window.innerWidth);
 
-    if (!isWindowExtraSmall(window.innerWidth)) {
-      delete app.mobileMenu;
-    }
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
-          <div class="header-container">
-            <SublayoutHeaderLeft
-              isSidebarToggled={isSidebarToggled}
-              toggleSidebar={() => {
-                this.isSidebarToggled = !isSidebarToggled;
-              }}
-            />
-            {!hideSearch && <SearchBar />}
-            <SublayoutHeaderRight chain={chain} />
-          </div>
+          <SublayoutHeader
+            hideSearch={hideSearch}
+            isSidebarToggleable={isSidebarToggleable}
+            isSidebarToggled={this.isSidebarToggled}
+            toggleSidebar={() => {
+              this.isSidebarToggled = !this.isSidebarToggled;
+            }}
+          />
           <div class="sidebar-and-body-container">
-            {showSidebarContainer && (
-              <div class="sidebar-container">
-                {showCommunityHeader && (
-                  <CommunityHeader meta={app.chain.meta} />
-                )}
-                <div class="sidebar-inner-container">
-                  {showQuickSwitcher && <SidebarQuickSwitcher />}
-                  {isSidebarToggled && <Sidebar />}
-                </div>
-              </div>
-            )}
-            <div
-              class="body-and-sticky-headers-container"
-              style={showBodyContainer ? 'display:flex' : 'display:none'}
-            >
+            <Sidebar
+              isSidebarToggleable={isSidebarToggleable}
+              isSidebarToggled={this.isSidebarToggled}
+            />
+            <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
                 chain={chain}
@@ -118,7 +73,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
 
-              {app.mobileMenu ? (
+              {isWindowSmallInclusive(window.innerWidth) && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
                 <div class="Body" onscroll={onscroll}>
