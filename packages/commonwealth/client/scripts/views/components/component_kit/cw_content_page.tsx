@@ -131,9 +131,9 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
         {this.viewType === 'sidebarView' && (
           <div class="sidebar-view">
             {mainBody}
-            <div class="sidebar">
-              {showSidebar && sidebarComponents.map((c) => c.item)}
-            </div>
+            {showSidebar && (
+              <div class="sidebar">{sidebarComponents.map((c) => c.item)}</div>
+            )}
           </div>
         )}
         {this.viewType === 'tabsView' && (
