@@ -72,14 +72,15 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     const address = this.accounts[0].address
     const sessionPublicAddress = await this.getSessionPublicAddress();
 
-    const msgParams = await constructKeplrMessage(
-      address,
+    const msgParams = constructCanvasMessage(
+      "cosmos",
       this._chainId,
+      address,
       sessionPublicAddress,
       validationBlockInfo,
     );
 
-    const stdSignature = await window.keplr.signArbitrary(this._chainId, address, msgParams)
+    const stdSignature = await window.keplr.signArbitrary(this._chainId, address, JSON.stringify(msgParams))
     return JSON.stringify({signature: stdSignature});
   }
 
