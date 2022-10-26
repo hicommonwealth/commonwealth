@@ -30,22 +30,33 @@ class ChainIdStore<T extends IHasChainId> extends Store<T> {
   }
 
   public remove(n: T): ChainIdStore<T> {
+    // Locate object
     const idx = this._storeChainId[n.chainId].indexOf(n);
     if (idx === -1) throw new Error('Object not in store.');
+
+    // Replace object
     this._storeChainId[n.chainId].splice(idx, 1);
+
     return this;
   }
 
   public update(n: T, eqFn: (a: T) => boolean): ChainIdStore<T> {
+    t;
+    // Locate object
     const idx = this._storeChainId[n.chainId].findIndex(eqFn);
     if (idx === -1) throw new Error('Object not in store.');
+
+    // Update object
     this._storeChainId[n.chainId][idx] = n;
+
     return this;
   }
 
   public clear(): ChainIdStore<T> {
     super.clear();
-    this._storeChainId = {};
+    Object.keys(this._storeChainId).forEach(
+      (chainId: string) => delete this._storeChainId[chainId]
+    );
     return this;
   }
 
