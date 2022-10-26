@@ -140,8 +140,6 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       ? this.votes
       : this.votes.slice(0, 10);
 
-    console.log(displayedVoters.length, this.isVotersListExpanded);
-
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
     ) : (

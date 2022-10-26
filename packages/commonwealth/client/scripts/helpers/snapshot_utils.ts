@@ -159,13 +159,13 @@ export interface SnapshotProposal {
   }>;
 }
 
-export interface SnapshotProposalVote {
+export type SnapshotProposalVote = {
   id: string;
   voter: string;
   created: number;
   choice: number;
   balance: number;
-}
+};
 
 export async function getVersion(): Promise<string> {
   return '0.1.3';
