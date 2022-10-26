@@ -16,3 +16,7 @@ export interface IHasId {
 export interface IHasAddress {
   address: string;
 }
+
+export interface IHasChainId {
+  chainId: string;
+}
