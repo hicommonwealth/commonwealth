@@ -103,6 +103,7 @@ class Account {
 
     const sessionController = app.sessions.getSessionController(this.chain.base);
     // TODO: I'm unsure about this
+    // the problem with `chain` being ambiguous... confusing
     const chainId = this.chain.id == "ethereum" ? this.chain.node.ethChainId : this.chain.id;
 
     const params = {

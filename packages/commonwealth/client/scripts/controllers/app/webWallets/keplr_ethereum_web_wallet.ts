@@ -10,6 +10,7 @@ import {
   ChainInfo,
   EthSignType,
 } from '@keplr-wallet/types';
+import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -50,27 +51,46 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock() {
-    return null;
+    const url = `${window.location.origin}/cosmosAPI/${
+      app.chain?.id || this.defaultNetwork
+    }`;
+    const client = await StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height - 1);
+
+    return {
+      number: block.header.height,
+      hash: block.id,
+      // seconds since epoch
+      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+    };
   }
 
-  public async signLoginToken(
-    message: string,
-    address: string
-  ): Promise<string> {
+  public async signLoginToken(validationBlockInfo: string): Promise<string> {
+    const address = this.accounts[0].address
+
+    const sessionController = app.sessions.getSessionController(this.chain);
+    const sessionPublicAddress = await sessionController.getOrCreateAddress(this._chainId);
+
+    const message = constructCanvasMessage(
+      "eth",
+      this._chainId,
+      address,
+      sessionPublicAddress,
+      validationBlockInfo
+    );
+
     const signature = await window.keplr.signEthereum(
       this._chainId,
       address,
-      message,
+      JSON.stringify(message),
       EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken.trim(),
-      account.address
-    );
+    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
     return webWalletSignature;
   }
 

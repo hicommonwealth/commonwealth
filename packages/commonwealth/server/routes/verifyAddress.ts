@@ -119,7 +119,19 @@ const verifySignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const msgBuffer = Buffer.from(addressModel.verification_token.trim());
+
+    const message = constructCanvasMessage(
+      "eth",
+      // TODO: what is this? do we want to send the chain id with the request?
+      "something",
+      addressModel.address,
+      sessionPublicAddress,
+      addressModel.block_info
+    );
+
+    const msgBuffer = Buffer.from(JSON.stringify(message));
+
+    // const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
     const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
