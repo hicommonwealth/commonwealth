@@ -51,7 +51,7 @@ export class ChainMetadataRows
   chatEnabled: boolean;
   customDomain: string;
   terms: string;
-  defaultSummaryView: boolean;
+  defaultOverview: boolean;
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
@@ -79,7 +79,7 @@ export class ChainMetadataRows
     this.network = vnode.attrs.chain.network;
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
-    this.defaultSummaryView = vnode.attrs.chain.defaultSummaryView;
+    this.defaultOverview = vnode.attrs.chain.defaultOverview;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
@@ -176,9 +176,9 @@ export class ChainMetadataRows
         />
         <ToggleRow
           title="Summary view"
-          defaultValue={vnode.attrs.chain.defaultSummaryView}
+          defaultValue={vnode.attrs.chain.defaultOverview}
           onToggle={(checked) => {
-            this.defaultSummaryView = checked;
+            this.defaultOverview = checked;
           }}
           caption={(checked) =>
             checked
@@ -309,7 +309,7 @@ export class ChainMetadataRows
               snapshot,
               terms,
               iconUrl,
-              defaultSummaryView,
+              defaultOverview,
             } = this;
 
             for (const space of snapshot) {
@@ -369,7 +369,7 @@ export class ChainMetadataRows
                 snapshot,
                 terms,
                 iconUrl,
-                defaultSummaryView,
+                defaultOverview,
                 chatEnabled,
               });
               vnode.attrs.onSave();

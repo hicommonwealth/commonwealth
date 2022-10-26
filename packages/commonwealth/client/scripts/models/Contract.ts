@@ -37,9 +37,10 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    contract_abi
+    ContractAbi
   }) {
-    return new Contract(id,
+    return new Contract(
+      id,
       address,
       chain_node_id,
       type,
@@ -48,7 +49,7 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      contract_abi);
+      ContractAbi);
   }
 }
 
