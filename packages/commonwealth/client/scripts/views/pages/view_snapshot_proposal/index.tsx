@@ -16,7 +16,6 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { SnapshotInformationCard } from './snapshot_information_card';
@@ -34,7 +33,6 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
-  private activeTab: 'proposals' | 'info-and-results';
   private fetchedPower: boolean;
   private proposal: SnapshotProposal;
   private scores: Array<number>;
@@ -44,13 +42,10 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private totals: any;
   private totalScore: number;
   private validatedAgainstStrategies: boolean;
-  private isVotersListExpanded: boolean;
   private votes: Array<SnapshotProposalVote>;
 
   oninit(vnode) {
-    this.activeTab = 'proposals';
     this.fetchedPower = false;
-    this.isVotersListExpanded = false;
     this.proposal = null;
     this.scores = [];
     this.threads = null;
@@ -115,30 +110,10 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       mixpanelTrack();
       loadVotes();
     }
-
-    window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.activeTab !== 'proposals'
-      ) {
-        this.activeTab = 'proposals';
-        m.redraw();
-      }
-    };
   }
 
   view(vnode) {
     const { identifier } = vnode.attrs;
-
-    const toggleExpandedVoterList = () => {
-      this.isVotersListExpanded = !this.isVotersListExpanded;
-      console.log('in');
-      m.redraw();
-    };
-
-    const displayedVoters = this.isVotersListExpanded
-      ? this.votes
-      : this.votes.slice(0, 10);
 
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
@@ -163,10 +138,8 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             this.votes.length > 0 && (
               <SnapshotVotesTable
                 choices={this.proposal.choices}
-                displayedVoters={displayedVoters}
                 symbol={this.symbol}
-                toggleExpandedVoterList={toggleExpandedVoterList}
-                voteCount={this.votes.length}
+                voters={this.votes}
               />
             )
           }
