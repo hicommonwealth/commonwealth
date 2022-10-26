@@ -41,6 +41,18 @@ export class RoleInstanceWithPermission {
   }
 }
 
+export async function getHighestRole(roles: RoleInstanceWithPermission[]) {
+  if (roles.findIndex((r) => r.permission === 'admin') !== -1) {
+    return roles[roles.findIndex((r) => r.permission === 'admin')];
+  }
+  else if (roles.findIndex((r) => r.permission === 'moderator') !== -1) {
+    return roles[roles.findIndex((r) => r.permission === 'moderator')];
+  }
+  else {
+    return roles[roles.findIndex((r) => r.permission === 'member')];
+  }
+}
+
 export async function findAllRoles(
   models: DB,
   findOptions: FindOptions<RoleAssignmentAttributes>,
@@ -220,12 +232,10 @@ export async function createRole(
   }
 
   // check if role is already assigned to address
-  const role = await findOneRole(models, { where: { address_id } }, chain_id, [
-    role_name,
-  ]);
-  if (role) {
+  const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
+  if (roles.findIndex((r) => r.permission === role_name) !== -1) {
     // if role is already assigned to address, return highest role this address has on that chain
-    return findOneRole(models, { where: { address_id } }, chain_id);
+    return getHighestRole(roles);
   }
 
   // Get the community role that has given chain_id and name if exists
