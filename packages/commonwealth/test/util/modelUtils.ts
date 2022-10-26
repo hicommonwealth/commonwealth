@@ -10,6 +10,7 @@ import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from 'common-common/src/logging';
 import TokenBalanceProvider from 'token-balance-cache/src/provider';
 import { createRole, findOneRole } from 'server/util/roles';
+import { Action } from 'common-common/src/permissions';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
@@ -23,6 +24,29 @@ export const generateEthAddress = () => {
   const address = Web3.utils.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
+
+export async function addAllowDenyPermissions(
+  role_name: Permission,
+  chain_id: string,
+  allow_permission: Action,
+  deny_permission: Action
+) {
+  // get community role object from the database
+  const communityRole = await models.CommunityRole.findOne({
+    where: {
+      chain_id,
+      name: role_name,
+    },
+  });
+  // update allow permission on community role object
+  // eslint-disable-next-line no-bitwise
+  communityRole.allow = BigInt(communityRole.allow) | BigInt(1 << allow_permission);
+  // update deny permission on community role object
+  // eslint-disable-next-line no-bitwise
+  communityRole.deny = BigInt(communityRole.deny) | BigInt(1 << deny_permission);
+  // save community role object to the database
+  await communityRole.save();
+}
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {

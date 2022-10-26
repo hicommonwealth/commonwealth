@@ -34,14 +34,20 @@ export function computePermissions(
   assignments: Array<{ allow: Permissions; deny: Permissions }>
 ): Permissions {
   let permission: Permissions = base;
-  let allow: Permissions = BigInt(0);
-  let deny: Permissions = BigInt(0);
+  let allow: bigint = BigInt(0);
+  let deny: bigint = BigInt(0);
   for (const assignment of assignments) {
     if (assignment.allow === assignment.deny) {
       continue;
     }
-    if (assignment.allow > 0) allow |= assignment.allow;
-    if (assignment.deny > 0) deny |= assignment.deny;
+    if (assignment.allow > 0) {
+      const assignmentAllow: bigint = BigInt(assignment.allow);
+      allow |= assignmentAllow;
+    }
+    if (assignment.deny > 0) {
+      const assignmentDeny: bigint = BigInt(assignment.deny);
+      deny |= assignmentDeny;
+    }
   }
   permission &= ~deny;
   permission |= allow;
