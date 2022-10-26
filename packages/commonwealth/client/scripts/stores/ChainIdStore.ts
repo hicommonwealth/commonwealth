@@ -2,10 +2,10 @@ import { IHasChainId } from './interfaces';
 import Store from './Store';
 
 class ChainIdStore<T extends IHasChainId> extends Store<T> {
-  private _storeChainId: { [chainId: string]: Array<T> } = {};
-  private _sortingFunction: (a: T, b: T) => number;
+  private readonly _storeChainId: { [chainId: string]: Array<T> } = {};
+  private readonly _sortingFunction?: (a: T, b: T) => number;
 
-  constructor(sortingFunction: (a: T, b: T) => number) {
+  constructor(sortingFunction?: (a: T, b: T) => number) {
     super();
     this._sortingFunction = sortingFunction;
   }
