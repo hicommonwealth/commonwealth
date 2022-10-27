@@ -1,11 +1,14 @@
 /* @jsx m */
+import app from 'client/scripts/state';
+import { CWButton } from 'client/scripts/views/components/component_kit/cw_button';
+import { SelectList } from 'construct-ui';
 import m from 'mithril';
 
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
-import { validateProjectForm } from '../helpers';
+import { getUserEthChains, validateProjectForm } from '../helpers';
 import { ICreateProjectForm } from '../types';
 
 export class InformationSlide
@@ -13,6 +16,8 @@ export class InformationSlide
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     if (!vnode.attrs.form.creator) return;
+    const userEthChains = getUserEthChains(app);
+    const defaultChainIdx = userEthChains.indexOf(app.activeChainId());
     return (
       <form class="InformationSlide">
         <CWText type="h1">General Information</CWText>
@@ -31,11 +36,14 @@ export class InformationSlide
           required
           value={vnode.attrs.form.title}
         />
-        <CWTextInput
-          value={vnode.attrs.form.creator}
-          disabled={true}
-          label="Creator Address (Switch active address to change)"
-          name="Creator Address"
+        <SelectList
+          items={userEthChains}
+          itemRender={(n: string) => <CWText>{n}</CWText>}
+          defaultActiveIndex={defaultChainIdx}
+          onSelect={(n: string) => {
+            vnode.attrs.form.chainId = n;
+          }}
+          trigger={<CWButton label={vnode.attrs.form.chainId} />}
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project,"

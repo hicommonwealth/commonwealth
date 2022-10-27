@@ -6,7 +6,7 @@ import { ProjectRole } from './types';
 import { ChainBase } from '../../../../../../common-common/src/types';
 
 // Creation
-export const getUserEthereumCommunities = (app: IApp): string[] => {
+export const getUserEthChains = (app: IApp): string[] => {
   return app.roles.roles
     .map((role: RoleInfo) => role.chain_id)
     .filter((id) => app.config.chains.getById(id).base === ChainBase.Ethereum)

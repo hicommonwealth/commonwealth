@@ -10,7 +10,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
-import { validateProjectForm } from '../helpers';
+import { getUserEthChains, validateProjectForm } from '../helpers';
 import {
   ICreateProjectForm,
   weekInSeconds,
@@ -88,7 +88,7 @@ export default class CreateProjectForm implements m.ClassComponent {
   }
 
   view() {
-    // Because we are switching to new chain, activeAccount may not be set
+    // Because we are switching to new chain, activeAccount may not be set yet
     if (!app.user?.activeAccount && app.isLoggedIn()) {
       return;
     }

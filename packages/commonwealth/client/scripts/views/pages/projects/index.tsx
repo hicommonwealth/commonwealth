@@ -13,7 +13,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
-import { getUserEthereumCommunities } from './helpers';
+import { getUserEthChains } from './helpers';
 
 enum ProjectListingSubpage {
   Explore = 'explore',
@@ -60,12 +60,11 @@ export default class ProjectListing implements m.ClassComponent {
 
     // Prefer Ethereum as default chainId for new projects, unless user
     // is a member of ETH chains that do not include Ethereum
-    const userEthereumCommunities = getUserEthereumCommunities(app);
+    const userEthChains = getUserEthChains(app);
     const defaultProjectChain =
-      !userEthereumCommunities.length ||
-      userEthereumCommunities.includes('ethereum')
+      !userEthChains.length || userEthChains.includes('ethereum')
         ? 'ethereum'
-        : userEthereumCommunities[0];
+        : userEthChains[0];
 
     return (
       <Sublayout
