@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Client } from 'pg';
 
 import BN from 'bn.js';
@@ -47,7 +46,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   private _lastQueryTime: number = 0;
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
-    private readonly _hasBalancePruneTimeS: number = 24 * 60 * 60,
+    private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
     providers: BalanceProvider[] = BalanceProviders,
     private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB,
   ) {
@@ -115,7 +114,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       if (result !== undefined) return result;
 
       // fetch balance if not found in cache
-      const fetchedAt = moment();
+      const fetchedAt = Date.now();
 
       // will throw on invalid chain / other error
       const balance = await providerObj.getBalance(node, address, opts);
@@ -179,10 +178,10 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
         // 5 minute lifetime (i.e. one job run) if no token balance
         delete cache[key];
       } else {
-        // 24 hour lifetime if token balance exists
-        const cutoff = moment().subtract(this._hasBalancePruneTimeS, 'seconds');
+        // 1 hour lifetime if token balance exists
+        const cutoff = Date.now() - (this._hasBalancePruneTimeS * 1000);
         const fetchedAt = cache[key].fetchedAt;
-        if (fetchedAt.isSameOrBefore(cutoff)) {
+        if (fetchedAt <= cutoff) {
           delete cache[key];
         }
       }

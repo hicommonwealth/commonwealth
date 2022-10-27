@@ -4,7 +4,7 @@ import { BalanceType } from 'common-common/src/types';
 export interface ICache {
   [cacheKey: string]: {
     balance: string,
-    fetchedAt: moment.Moment;
+    fetchedAt: number;
   }
 }
 
