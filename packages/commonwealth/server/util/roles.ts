@@ -1,6 +1,9 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
 import { DB } from 'commonwealth/server/models';
-import { CommunityRoleAttributes, CommunityRoleInstance } from 'commonwealth/server/models/community_role';
+import {
+  CommunityRoleAttributes,
+  CommunityRoleInstance,
+} from 'commonwealth/server/models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 
@@ -58,7 +61,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
   findOptions: FindOptions<RoleAssignmentAttributes>,
   chain_id?: string,
   permissions?: Permission[]
-) : Promise<CommunityRoleAttributes[]> {
+): Promise<CommunityRoleAttributes[]> {
   let roleFindOptions: any;
   const whereCondition = {};
   if (chain_id) {
@@ -221,7 +224,9 @@ export async function createRole(
   );
   if (communityRoles.findIndex((r) => r.name === role_name) !== -1) {
     // if role is already assigned to address, return current highest role this address has on that chain
-    const highestCommunityRole: CommunityRoleAttributes = await getHighestRole(communityRoles);
+    const highestCommunityRole: CommunityRoleAttributes = await getHighestRole(
+      communityRoles
+    );
     if (
       highestCommunityRole.RoleAssignments &&
       highestCommunityRole.RoleAssignments.length > 0

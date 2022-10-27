@@ -47,12 +47,14 @@ const upgradeMember = async (
     chain.id,
     ['admin']
   );
+  console.log("chain", chain.id);
 
   if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
     return next(new AppError(Errors.MustBeAdmin));
   const memberAddress = await models.Address.findOne({
     where: {
       address,
+      chain: chain.id,
     },
   });
   if (!memberAddress) return next(new AppError(Errors.NoMember));
