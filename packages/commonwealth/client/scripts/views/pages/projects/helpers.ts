@@ -1,16 +1,22 @@
 import { IApp } from 'state';
-import { AddressInfo, Project, RoleInfo } from 'models';
+import { AddressInfo, ChainInfo, Project, RoleInfo } from 'models';
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { ProjectRole } from './types';
 import { ChainBase } from '../../../../../../common-common/src/types';
 
 // Creation
-export const getUserEthChains = (app: IApp): string[] => {
-  return app.roles.roles
-    .map((role: RoleInfo) => role.chain_id)
-    .filter((id) => app.config.chains.getById(id).base === ChainBase.Ethereum)
+export const getAllEthChains = (app: IApp): ChainInfo[] => {
+  return app.config.chains
+    .getAll()
+    .filter((c) => c.base === ChainBase.Ethereum);
+};
+
+export const getUserEthChains = (app: IApp): ChainInfo[] => {
+  const userRoleChainIds = app.roles.roles
+    .map((r) => r.chain_id)
     .sort((a, b) => a.localeCompare(b));
+  return getAllEthChains(app).filter((c) => userRoleChainIds.includes(c.id));
 };
 
 export const validateProjectForm = (property: string, value: string) => {

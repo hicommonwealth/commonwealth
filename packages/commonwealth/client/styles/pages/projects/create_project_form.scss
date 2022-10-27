@@ -24,11 +24,17 @@ $formWidth: 480px;
     margin-top: 16px;
   }
   .InformationSlide > .cui-button {
-    @include inputStyles;
+    background-color: $neutral-25;
+    border-radius: $border-radius-corners;
+    border: 2px solid $neutral-200;
     padding: 6px 8px;
 
     &.darkMode {
       @include darkModeInputStyles;
+    }
+
+    .Text {
+      color: $neutral-500;
     }
   }
   .NavigationButtons.cui-button-group {
@@ -53,6 +59,9 @@ $formWidth: 480px;
   width: $formWidth;
   .Text {
     padding: 8px;
+    &.disabled {
+      cursor: default;
+    }
     &:hover {
       background-color: $neutral-50;
     }

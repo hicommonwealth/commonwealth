@@ -1,14 +1,19 @@
 /* @jsx m */
 import app from 'state';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { Button, Icons, SelectList } from 'construct-ui';
+import _ from 'lodash';
 import m from 'mithril';
 
+import { Button, Icons, SelectList } from 'construct-ui';
+import { ChainInfo } from 'models';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
-import { getUserEthChains, validateProjectForm } from '../helpers';
+import {
+  getAllEthChains,
+  getUserEthChains,
+  validateProjectForm,
+} from '../helpers';
 import { ICreateProjectForm } from '../types';
 
 export class InformationSlide
@@ -16,8 +21,18 @@ export class InformationSlide
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     if (!vnode.attrs.form.creator) return;
+    if (!vnode.attrs.form.chainId) {
+      vnode.attrs.form.chainId = app.activeChainId();
+    }
+    const allEthChains = getAllEthChains(app);
     const userEthChains = getUserEthChains(app);
-    const defaultChainIdx = userEthChains.indexOf(app.activeChainId());
+    const defaultChainIdx = userEthChains
+      .concat(allEthChains)
+      .findIndex((c) => c.id === app.activeChainId());
+    const selectedChainName = userEthChains.find(
+      (c) => c.id === vnode.attrs.form.chainId
+    );
+
     return (
       <form class="InformationSlide">
         <CWText type="h1">General Information</CWText>
@@ -38,19 +53,27 @@ export class InformationSlide
         />
         <SelectList
           class="chain-id-list"
-          items={userEthChains}
-          itemRender={(n: string) => <CWText>{n}</CWText>}
+          items={userEthChains.concat(allEthChains)}
+          itemPredicate={(query: string, item: ChainInfo) => {
+            return (
+              item.id.toLowerCase().includes(query.toLowerCase()) ||
+              item.name.toLowerCase().includes(query.toLowerCase())
+            );
+          }}
+          itemRender={(c: ChainInfo) => (
+            <CWText disabled={!userEthChains.includes(c)}>{c.name}</CWText>
+          )}
           defaultActiveIndex={defaultChainIdx}
-          onSelect={(n: string) => {
-            vnode.attrs.form.chainId = n;
+          onSelect={(n: ChainInfo) => {
+            vnode.attrs.form.chainId = n.id;
           }}
           trigger={
             <Button
               align="left"
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
-              sublabel="Chain:"
-              label={<CWText>{vnode.attrs.form.chainId}</CWText>}
+              sublabel={<CWText>Chain:</CWText>}
+              label={<CWText>{selectedChainName}</CWText>}
             />
           }
         />
