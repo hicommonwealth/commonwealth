@@ -4,13 +4,13 @@ import { StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { Account } from 'models';
 import {
   Window as KeplrWindow,
   ChainInfo,
   EthSignType,
 } from '@keplr-wallet/types';
-import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import { CanvasData } from 'commonwealth/shared/adapters/shared';
 import ClientSideWebWalletController from './client_side_web_wallet';
 
 declare global {
@@ -71,39 +71,14 @@ class EVMKeplrWebWalletController extends ClientSideWebWalletController<AccountD
     };
   }
 
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const address = this.accounts[0].address
-
-    const sessionController = app.sessions.getSessionController(this.chain);
-    const sessionPublicAddress = await sessionController.getOrCreateAddress(this._chainId);
-
-    const message = constructCanvasMessage(
-      "eth",
-      this._chainId,
-      address,
-      sessionPublicAddress,
-      validationBlockInfo
-    );
-
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     const signature = await window.keplr.signEthereum(
       this._chainId,
-      address,
-      JSON.stringify(message),
+      account.address,
+      JSON.stringify(canvasMessage),
       EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   // ACTIONS
