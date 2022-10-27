@@ -51,10 +51,10 @@ module.exports = {
       // Migrate Current Chains to Contracts + CommunityContracts
         // eth + solana
       const query = `
-        SELECT c.id as cid, cn.id as cnid, c.address, c.decimals, c.token_name, c.symbol, c.network 
-        FROM "Chains" c 
-        LEFT JOIN "ChainNodes" cn 
-        ON c.chain_node_id = cn.id 
+        SELECT c.id as cid, cn.id as cnid, c.address, c.decimals, c.token_name, c.symbol, c.network
+        FROM "Chains" c
+        LEFT JOIN "ChainNodes" cn
+        ON c.chain_node_id = cn.id
         WHERE (base='ethereum' AND address LIKE '0x%')
           OR (base='solana' AND address IS NOT NULL);`;
       const chains = await queryInterface.sequelize.query(query, { transaction: t });
@@ -74,6 +74,7 @@ module.exports = {
         const contract = await queryInterface.sequelize.query(
           `SELECT * FROM "Contracts" WHERE address='${c.address}';`,
           { transaction: t});
+        if (!contract[0][0]) return;
         await queryInterface.bulkInsert('CommunityContracts', [{
           chain_id: c.cid,
           contract_id: contract[0][0].id,
@@ -85,8 +86,8 @@ module.exports = {
       // Migrate sputnik Contracts
       const sputQuery = `
       SELECT c.id as cid, cn.id as cnid, c.address, c.decimals, c.token_name, c.symbol, c.network
-        FROM "Chains" c 
-        LEFT JOIN "ChainNodes" cn 
+        FROM "Chains" c
+        LEFT JOIN "ChainNodes" cn
         ON c.chain_node_id = cn.id WHERE network='sputnik';`;
       const sputChains = await queryInterface.sequelize.query(sputQuery, { transaction: t });
       await Promise.all(sputChains[0].map(async (c) => {
@@ -105,6 +106,7 @@ module.exports = {
         const contract = await queryInterface.sequelize.query(
           `SELECT * FROM "Contracts" WHERE chain_node_id='19';`, // filter by NEAR's chain_node_id
           { transaction: t});
+        if (!contract[0][0]) return;
         await queryInterface.bulkInsert('CommunityContracts', [{
           chain_id: c.cid,
           contract_id: contract[0][0].id,
@@ -112,7 +114,6 @@ module.exports = {
           updated_at: new Date(),
         }], {transaction: t });
       }));
-
 
       // Update Columns on Chains Table
       await queryInterface.renameColumn('Chains', 'symbol', 'default_symbol', { transaction: t });
@@ -149,7 +150,7 @@ module.exports = {
         { type: Sequelize.STRING, allowNull: true }, { transaction: t });
 
       const contracts = await queryInterface.sequelize.query(
-        `SELECT c.decimals, c.address, cc.chain_id FROM "Contracts" c 
+        `SELECT c.decimals, c.address, cc.chain_id FROM "Contracts" c
         LEFT JOIN "CommunityContracts" cc ON c.id = cc.contract_id;`,
         { transaction: t });
 
