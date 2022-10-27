@@ -69,18 +69,20 @@ class RuleDisplaySection implements m.ClassComponent<RuleDisplaySectionAttrs> {
         </div>
       );
     } else if (ruleArgument.type === 'rule[]') {
-      return rule[ruleTypeIdentifier].map((subRule) => {
+      console.log('yo', rule[ruleTypeIdentifier]);
+      return rule[ruleTypeIdentifier][0].map((subRule) => {
+        console.log('subRule', subRule);
         return (
           <div class="display-section">
             <CWRuleCard
               isNested={true}
-              rule={subRule[0]}
+              rule={subRule}
               ruleId={ruleId}
               chainId={chainId}
               ruleCreatedAt={ruleCreatedAt}
               ruleUpdatedAt={ruleUpdatedAt}
               adminView={false}
-              ruleTypeIdentifier={Object.keys(subRule[0])[0]}
+              ruleTypeIdentifier={Object.keys(subRule)[0]}
             />
           </div>
         );

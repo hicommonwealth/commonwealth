@@ -51,6 +51,7 @@ const authCallback = async (
     iat = +tokenObj.iat;
   } catch (err) {
     log.info(`Failed to decrypt JWE: ${err.message}`);
+    console.log('owtf', err);
     throw new AppError(Errors.RegistrationError);
   }
 

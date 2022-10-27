@@ -85,34 +85,16 @@ export class ComponentShowcase implements m.ClassComponent {
                     notifySuccess('Rule created!');
                   },
                   rule: {
-                    AllRule: [
+                    AnyRule: [
                       [
+                        { AllowListRule: [['a', 'b']] },
+                        { AllowListRule: [['c', 'd']] },
                         {
                           AnyRule: [
                             [
-                              {
-                                AllowListRule: [
-                                  [
-                                    '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                                    '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                                    '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                                  ],
-                                ],
-                              },
+                              { TokenBalanceRule: ['e', 'f'] },
+                              { AllowListRule: [['g', 'h']] },
                             ],
-                            [
-                              {
-                                AdminOnlyRule: [],
-                              },
-                            ],
-                          ],
-                        },
-                      ],
-                      [
-                        {
-                          TokenBalanceRule: [
-                            '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                            '500 AVAX',
                           ],
                         },
                       ],
@@ -143,6 +125,31 @@ export class ComponentShowcase implements m.ClassComponent {
         <h1>Rule Card</h1>
         <div class="form-gallery">
           <CWRuleCard
+            isNested={false}
+            rule={{
+              AnyRule: [
+                [
+                  { AllowListRule: [['a', 'b']] },
+                  { AllowListRule: [['c', 'd']] },
+                  {
+                    AnyRule: [
+                      [
+                        { TokenBalanceRule: ['e', 'f'] },
+                        { AllowListRule: [['g', 'h']] },
+                      ],
+                    ],
+                  },
+                ],
+              ],
+            }}
+            ruleId={1}
+            chainId="test-chain"
+            ruleCreatedAt={new Date()}
+            ruleUpdatedAt={new Date()}
+            ruleTypeIdentifier="AnyRule"
+            adminView={true}
+          />
+          {/* <CWRuleCard
             isNested={false}
             rule={{
               AllRule: [
@@ -184,7 +191,7 @@ export class ComponentShowcase implements m.ClassComponent {
             ruleUpdatedAt={new Date()}
             ruleTypeIdentifier="AllRule"
             adminView={true}
-          />
+          /> */}
         </div>
 
         <h1>Dropdown</h1>
