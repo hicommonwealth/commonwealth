@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/poll_editor_card.scss';
+import 'pages/view_thread/poll_editor_card.scss';
 
 import app from 'state';
 import { Thread } from 'models';

@@ -10,10 +10,10 @@ import { ChainEntity, Poll, Thread, ThreadStage } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
-import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
 import { LinkedProposalsCard } from './linked_proposals_card';
-import { LinkedThreadsCard } from './linked_threads_card';
 import { PollEditorCard } from './poll_editor_card';
+import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
+import { LinkedThreadsCard } from './linked_threads_card';
 
 type ProposalSidebarAttrs = {
   isAdmin: boolean;
@@ -25,7 +25,7 @@ type ProposalSidebarAttrs = {
   showLinkedThreadOptions: boolean;
 };
 
-export class ProposalSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
+export class ThreadSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
   view(vnode) {
     const {
       isAdmin,

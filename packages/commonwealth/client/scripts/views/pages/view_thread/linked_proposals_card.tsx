@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/linked_proposals_card.scss';
+import 'pages/view_thread/linked_proposals_card.scss';
 
 import app from 'state';
 import { link } from 'helpers';

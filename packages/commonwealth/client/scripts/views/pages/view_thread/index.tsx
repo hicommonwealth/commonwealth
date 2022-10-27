@@ -23,7 +23,7 @@ import {
 } from '../../components/component_kit/helpers';
 import { activeQuillEditorHasText } from '../view_proposal/helpers';
 import { ProposalBody } from '../view_proposal/proposal_body';
-import { ProposalSidebar } from '../view_proposal/proposal_sidebar';
+import { ThreadSidebar } from './thread_sidebar';
 import { Prefetch } from '../view_proposal/types';
 
 class ViewThreadPage
@@ -286,28 +286,15 @@ class ViewThreadPage
 
     this.prefetch[threadIdAndType]['profilesFinished'] = true;
 
-    const windowListener = (e) => {
-      if (this.isGloballyEditing || activeQuillEditorHasText()) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', windowListener);
-
-    const comments = this.comments;
-    const viewCount: number = this.viewCount;
-    const commentCount: number = app.comments.nComments(thread);
+    const commentCount = app.comments.nComments(thread);
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
     const { activeAccount } = app.user;
-    const authorChain = thread.authorChain;
-    const authorAddress = thread.author;
 
     const isAuthor =
-      activeAccount?.address === authorAddress &&
-      activeAccount?.chain.id === authorChain;
+      activeAccount?.address === thread.author &&
+      activeAccount?.chain.id === thread.authorChain;
 
     const isEditor =
       thread.collaborators?.filter((c) => {
@@ -359,6 +346,15 @@ class ViewThreadPage
       }
     };
 
+    const windowListener = (e) => {
+      if (this.isGloballyEditing || activeQuillEditorHasText()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', windowListener);
+
     const hasSidebar =
       showLinkedSnapshotOptions ||
       showLinkedThreadOptions ||
@@ -395,7 +391,7 @@ class ViewThreadPage
             {this.tabSelected === 'viewProposal' && (
               <ProposalBody
                 commentCount={commentCount}
-                comments={comments}
+                comments={this.comments}
                 updatedCommentsCallback={updatedCommentsCallback}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isAdminOrMod={isAdminOrMod}
@@ -403,11 +399,11 @@ class ViewThreadPage
                 isEditor={isEditor}
                 isGloballyEditing={this.isGloballyEditing}
                 proposal={thread}
-                viewCount={viewCount}
+                viewCount={this.viewCount}
               />
             )}
             {hasSidebar && this.tabSelected === 'viewSidebar' && (
-              <ProposalSidebar
+              <ThreadSidebar
                 isAdmin={isAdmin}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
@@ -426,7 +422,7 @@ class ViewThreadPage
           >
             <ProposalBody
               commentCount={commentCount}
-              comments={comments}
+              comments={this.comments}
               updatedCommentsCallback={updatedCommentsCallback}
               setIsGloballyEditing={setIsGloballyEditing}
               isAdminOrMod={isAdminOrMod}
@@ -434,10 +430,10 @@ class ViewThreadPage
               isEditor={isEditor}
               isGloballyEditing={this.isGloballyEditing}
               proposal={thread}
-              viewCount={viewCount}
+              viewCount={this.viewCount}
             />
             {hasSidebar && (
-              <ProposalSidebar
+              <ThreadSidebar
                 isAdmin={isAdmin}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}

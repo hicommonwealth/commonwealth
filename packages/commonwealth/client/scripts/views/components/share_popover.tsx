@@ -3,8 +3,8 @@
 import m from 'mithril';
 import { int } from 'aws-sdk/clients/datapipeline';
 
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
 export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
   view(vnode) {
