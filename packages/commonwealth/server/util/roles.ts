@@ -1,7 +1,6 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
-import { DB } from 'server/models';
-import { CommunityRoleInstance } from 'server/models/community_role';
-import { sequelize } from '../database';
+import { DB } from 'commonwealth/server/models';
+import { CommunityRoleInstance } from 'commonwealth/server/models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 
@@ -42,24 +41,22 @@ export class RoleInstanceWithPermission {
   }
 }
 
-export async function getHighestRole(roles: RoleInstanceWithPermission[]) {
-  if (roles.findIndex((r) => r.permission === 'admin') !== -1) {
-    return roles[roles.findIndex((r) => r.permission === 'admin')];
-  }
-  else if (roles.findIndex((r) => r.permission === 'moderator') !== -1) {
-    return roles[roles.findIndex((r) => r.permission === 'moderator')];
-  }
-  else {
-    return roles[roles.findIndex((r) => r.permission === 'member')];
+export async function getHighestRole(roles: CommunityRoleInstance[]): Promise<CommunityRoleInstance> {
+  if (roles.findIndex((r) => r.name === 'admin') !== -1) {
+    return roles[roles.findIndex((r) => r.name === 'admin')];
+  } else if (roles.findIndex((r) => r.name === 'moderator') !== -1) {
+    return roles[roles.findIndex((r) => r.name === 'moderator')];
+  } else {
+    return roles[roles.findIndex((r) => r.name === 'member')];
   }
 }
 
-export async function findAllRoles(
+async function findAllCommunityRolesWithRoleAssignments(
   models: DB,
   findOptions: FindOptions<RoleAssignmentAttributes>,
   chain_id?: string,
   permissions?: Permission[]
-): Promise<RoleInstanceWithPermission[]> {
+) {
   let roleFindOptions: any;
   const whereCondition = {};
   if (chain_id) {
@@ -96,11 +93,27 @@ export async function findAllRoles(
     };
   }
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
+  return communityRoles;
+}
+
+export async function findAllRoles(
+  models: DB,
+  findOptions: FindOptions<RoleAssignmentAttributes>,
+  chain_id?: string,
+  permissions?: Permission[]
+): Promise<RoleInstanceWithPermission[]> {
+  // find all CommunityRoles with chain id, permissions and find options given
+  const communityRoles: CommunityRoleInstance[] = await findAllCommunityRolesWithRoleAssignments(
+    models,
+    findOptions,
+    chain_id,
+    permissions
+  );
   const roles: RoleInstanceWithPermission[] = [];
   if (communityRoles) {
     for (const communityRole of communityRoles) {
       const roleAssignments = communityRole.RoleAssignments;
-      if (roleAssignments.length > 0) {
+      if (roleAssignments && roleAssignments.length > 0) {
         for (const roleAssignment of roleAssignments) {
           const role = new RoleInstanceWithPermission(
             roleAssignment.toJSON(),
@@ -125,55 +138,23 @@ export async function findOneRole(
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
-  let roleFindOptions: any;
-  if (permissions) {
-    roleFindOptions = {
-      where: {
-        [Op.and]: [
-          { chain_id },
-          {
-            name: {
-              [Op.or]: permissions,
-            },
-          },
-        ],
-      },
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
-      order: [
-        sequelize.literal(
-          `CASE WHEN name='admin' THEN 0 WHEN name='moderator' THEN 1 ELSE 2 END`
-        ),
-      ],
-    };
+  const communityRoles: CommunityRoleInstance[] = await findAllCommunityRolesWithRoleAssignments(
+    models,
+    findOptions,
+    chain_id,
+    permissions
+  );
+  let communityRole: CommunityRoleInstance;
+  if (communityRoles) {
+    communityRole = await getHighestRole(communityRoles);
   } else {
-    roleFindOptions = {
-      where: {
-        chain_id,
-      },
-      include: [
-        {
-          model: models.RoleAssignment,
-          ...findOptions,
-        },
-      ],
-      order: [
-        sequelize.literal(
-          `CASE WHEN name='admin' THEN 0 WHEN name='moderator' THEN 1 ELSE 2 END`
-        ),
-      ],
-    };
+    throw new Error("Couldn't find any community roles");
   }
 
-  const communityRole: CommunityRoleInstance = await models.CommunityRole.findOne(roleFindOptions);
   let role: RoleInstanceWithPermission;
   if (communityRole) {
     // Retrieve the highest role as it will be the highest permission role for the address_id
-    if (communityRole.RoleAssignments.length > 0) {
+    if (communityRole.RoleAssignments && communityRole.RoleAssignments.length > 0) {
       const roleAssignment = communityRole.RoleAssignments[0];
       role = new RoleInstanceWithPermission(
         roleAssignment.toJSON(),
@@ -233,10 +214,23 @@ export async function createRole(
   }
 
   // check if role is already assigned to address
-  const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
-  if (roles.findIndex((r) => r.permission === role_name) !== -1) {
-    // if role is already assigned to address, return highest role this address has on that chain
-    return getHighestRole(roles);
+  const communityRoles = await findAllCommunityRolesWithRoleAssignments(models, { where: { address_id } }, chain_id);
+  if (communityRoles.findIndex((r) => r.name === role_name) !== -1) {
+    // if role is already assigned to address, return current highest role this address has on that chain
+    const highestCommunityRole = await getHighestRole(communityRoles);
+    if (highestCommunityRole.RoleAssignments && highestCommunityRole.RoleAssignments.length > 0) {
+      const roleAssignment = highestCommunityRole.RoleAssignments[0];
+      const role = new RoleInstanceWithPermission(
+        roleAssignment.toJSON(),
+        chain_id,
+        highestCommunityRole.name,
+        highestCommunityRole.allow,
+        highestCommunityRole.deny
+      );
+      return role;
+    } else {
+      throw new Error('No role found');
+    }
   }
 
   // Get the community role that has given chain_id and name if exists
@@ -244,13 +238,17 @@ export async function createRole(
   community_role = await models.CommunityRole.findOne({
     where: { chain_id, name: role_name },
   });
+
   // If the community role doesn't exist, create it
   if (!community_role) {
     community_role = await models.CommunityRole.create({
       name: role_name,
       chain_id,
+      allow: BigInt(0),
+      deny: BigInt(0),
     });
   }
+
   // Create role assignment
   const role_assignment = await models.RoleAssignment.create(
     {

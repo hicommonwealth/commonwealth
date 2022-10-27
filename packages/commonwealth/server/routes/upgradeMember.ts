@@ -63,7 +63,7 @@ const upgradeMember = async (
   );
   if (!roles) return next(new AppError(Errors.NoMember));
 
-  // There should only need one role
+  // There should only be one role per address per chain/community
   const member = await findOneRole(
     models,
     { where: { address_id: memberAddress.id } },
@@ -88,14 +88,14 @@ const upgradeMember = async (
     const currentRole = member.permission;
     // give each permissions a integer ranking
     const roleRanking = {
-      "admin": 2,
-      "moderator": 1,
-      "member": 0,
+      admin: 2,
+      moderator: 1,
+      member: 0,
     };
     const rankingToRole = {
-      2: "admin",
-      1: "moderator",
-      0: "member",
+      2: 'admin',
+      1: 'moderator',
+      0: 'member',
     };
     const newRoleRanking = roleRanking[new_role];
     let currentRoleRanking = roleRanking[currentRole];
