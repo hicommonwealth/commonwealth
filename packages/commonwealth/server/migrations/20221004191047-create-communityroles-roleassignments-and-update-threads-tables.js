@@ -8,7 +8,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.sequelize.transaction(async (t) => {
+    return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.createTable(
         'CommunityRoles',
         {
@@ -40,6 +40,14 @@ module.exports = {
           },
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
+        },
+        {
+          underscored: true,
+          indexes: [
+            { fields: ['chain_id'] },
+            { fields: ['community_role_id'] },
+            { fields: ['address_id'] },
+          ],
         },
         { transaction: t }
       );
@@ -154,24 +162,6 @@ module.exports = {
             { transaction: t }
           );
         })
-      );
-    });
-    // Add indexes
-    return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.addIndex(
-        'CommunityRoles',
-        { fields: ['chain_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['community_role_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['address_id'] },
-        { transaction: t }
       );
     });
   },
