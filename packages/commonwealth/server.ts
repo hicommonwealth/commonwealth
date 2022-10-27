@@ -42,6 +42,8 @@ import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
+import expressStatsdInit from './server/scripts/setupExpressStats';
+import StatsDController from './server/util/statsd';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -247,6 +249,7 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
+    app.use(expressStatsdInit(StatsDController.get()));
     app.use(bodyParser.json({ limit: '1mb' }));
     app.use(bodyParser.urlencoded({ limit: '1mb', extended: false }));
     app.use(cookieParser());

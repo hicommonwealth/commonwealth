@@ -3,6 +3,8 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+require('dotenv').config();
+
 module.exports = {
   context: __dirname,
   devServer: {
@@ -11,6 +13,11 @@ module.exports = {
     },
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
+        process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
+      ),
+    }),
     new CopyWebpackPlugin([
       { from: path.resolve(__dirname, '../static'), to: 'static' },
     ]),

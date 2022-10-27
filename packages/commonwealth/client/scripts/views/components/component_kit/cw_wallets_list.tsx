@@ -232,6 +232,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
             {wallets.map((wallet: IWebWallet<any>) => (
               <CWWalletOptionRow
                 walletName={wallet.name}
+                walletLabel={wallet.label}
                 darkMode={darkMode}
                 onclick={async () => {
                   await wallet.enable();
