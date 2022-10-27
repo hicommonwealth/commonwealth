@@ -157,19 +157,15 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
               ))}
             </CWTabBar>
             {this.tabSelected === 0 && mainBody}
-            {showSidebar && (
-              <>
-                {sidebarComponents.length >= 1 &&
-                  this.tabSelected === 1 &&
-                  sidebarComponents[0].item}
-                {sidebarComponents.length >= 2 &&
-                  this.tabSelected === 2 &&
-                  sidebarComponents[1].item}
-                {sidebarComponents.length === 3 &&
-                  this.tabSelected === 3 &&
-                  sidebarComponents[2].item}
-              </>
-            )}
+            {sidebarComponents.length >= 1 &&
+              this.tabSelected === 1 &&
+              sidebarComponents[0].item}
+            {sidebarComponents.length >= 2 &&
+              this.tabSelected === 2 &&
+              sidebarComponents[1].item}
+            {sidebarComponents.length === 3 &&
+              this.tabSelected === 3 &&
+              sidebarComponents[2].item}
           </div>
         )}
       </div>
