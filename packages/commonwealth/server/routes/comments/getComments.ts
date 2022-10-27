@@ -6,8 +6,10 @@ import { CommentAttributes } from '../../models/comment';
 import { IPagination } from '../../util/queries';
 
 type GetCommentsReq = {
-  community_id: string;
+  community_id?: string;
   thread_id?: number;
+  address?: string;
+  profile_id?: string;
   addresses?: string[];
   count_only?: boolean;
 } & IPagination;
@@ -19,7 +21,14 @@ const getComments = async (
   req: TypedRequestQuery<GetCommentsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
-  return success(res, []);
+
+
+  const comments = await models.Comment.findAll({
+    where,
+    include: [ models.Address, models.Attachment ],
+    order: [['created_at', 'DESC']],
+  });
+  return success(res, [...comments.map((c) => c.toJSON() )]);
 };
 
 export default getComments;
