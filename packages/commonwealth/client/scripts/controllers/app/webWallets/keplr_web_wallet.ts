@@ -4,16 +4,17 @@ import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import { CanvasData } from 'commonwealth/shared/adapters/shared';
+import ClientSideWebWalletController from './client_side_web_wallet';
+import { Account } from 'models';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
 
-class KeplrWebWalletController implements IWebWallet<AccountData> {
+class KeplrWebWalletController extends ClientSideWebWalletController<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
@@ -28,7 +29,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
 
-  public get available() {
+  public get available(): boolean {
     return !!window.keplr;
   }
   public get enabling() {
@@ -47,6 +48,10 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return this._offlineSigner;
   }
 
+  getChainId() {
+    return this._chainId;
+  }
+
   public async getRecentBlock() {
     const url = `${window.location.origin}/cosmosAPI/${
       app.chain?.id || this.defaultNetwork
@@ -63,37 +68,10 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     };
   }
 
-  public async getSessionPublicAddress(): Promise<string> {
-    const sessionController = app.sessions.getSessionController(this.chain);
-    return sessionController.getOrCreateAddress(this._chainId);
-  }
-
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const address = this.accounts[0].address
-    const sessionPublicAddress = await this.getSessionPublicAddress();
-
-    const msgParams = constructCanvasMessage(
-      "cosmos",
-      this._chainId,
-      address,
-      sessionPublicAddress,
-      validationBlockInfo,
-    );
-
-    const stdSignature = await window.keplr.signArbitrary(this._chainId, address, JSON.stringify(msgParams))
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+    const chainId = this.getChainId();
+    const stdSignature = await window.keplr.signArbitrary(chainId, account.address, JSON.stringify(canvasMessage))
     return JSON.stringify({signature: stdSignature});
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   // ACTIONS

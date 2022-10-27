@@ -2,11 +2,12 @@ declare let window: any;
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import { Account } from 'models';
+import { CanvasData } from 'commonwealth/shared/adapters/shared';
 import * as solw3 from '@solana/web3.js';
+import ClientSideWebWalletController from './client_side_web_wallet';
 
-class PhantomWebWalletController implements IWebWallet<string> {
+class PhantomWebWalletController extends ClientSideWebWalletController<string> {
   // GETTERS/SETTERS
   private _enabled = false;
   private _enabling = false;
@@ -33,9 +34,8 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async getSessionPublicAddress(): Promise<string> {
-    const sessionController = app.sessions.getSessionController(this.chain);
-    return sessionController.getOrCreateAddress(app.chain?.id || this.defaultNetwork);
+  async getChainId() {
+    return app.chain?.id || this.defaultNetwork;
   }
 
   public async getRecentBlock() {
@@ -51,19 +51,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const sessionController = app.sessions.getSessionController(ChainBase.Solana);
-    const chainId = app.chain?.id || this.defaultNetwork;
-    const sessionPublicAddress = await sessionController.getOrCreateAddress(chainId);
-
-    const canvasMessage = constructCanvasMessage(
-      "solana",
-      chainId,
-      account.address,
-      sessionPublicAddress,
-      account.validationBlockInfo
-    );
-
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     const encodedMessage = new TextEncoder().encode(JSON.stringify(canvasMessage));
     const { signature } = await window.solana.signMessage(
       encodedMessage,
@@ -73,13 +61,6 @@ class PhantomWebWalletController implements IWebWallet<string> {
       'base64'
     );
     return signedMessage;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   // ACTIONS

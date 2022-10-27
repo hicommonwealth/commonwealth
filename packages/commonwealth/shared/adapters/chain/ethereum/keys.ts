@@ -1,10 +1,8 @@
 import { TypedDataDomain, TypedDataField } from "@ethersproject/abstract-signer"
-import { constructCanvasMessage } from "../../shared";
 
 export const TEST_BLOCK_INFO_STRING = '{"number":1,"hash":"0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf","timestamp":1665083987891}';
 
-export const constructTypedMessage = (fromAddress: string, fromChainId: number, sessionPublicAddress: string, validationBlockInfoString: string) => {
-  const message = constructCanvasMessage("eth", fromChainId, fromAddress, sessionPublicAddress, validationBlockInfoString)
+export const constructTypedCanvasMessage = (message) => {
   // construct the signature data from scratch, since canvas' implementation doesn't
   // include an EIP712Domain
   const domain: TypedDataDomain = {

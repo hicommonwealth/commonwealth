@@ -35,7 +35,7 @@ import { ChainInstance } from '../models/chain';
 import { ProfileAttributes } from '../models/profile';
 import { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
-import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
+import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
 import { AppError, ServerError } from '../util/errors';
@@ -268,17 +268,21 @@ const verifySignature = async (
     //
     try {
       const node = await chain.getChainNode();
-      const typedMessage = constructTypedMessage(
-        addressModel.address,
+      const canvasMessage = constructCanvasMessage(
+        "eth",
         node.eth_chain_id || 1,
+        addressModel.address,
         sessionPublicAddress,
         addressModel.block_info
       );
+
+      const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
+
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
       }
       const address = recoverTypedSignature({
-        data: typedMessage,
+        data: typedCanvasMessage,
         signature: signatureString.trim(),
         version: SignTypedDataVersion.V4,
       });

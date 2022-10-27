@@ -11,13 +11,14 @@ import {
   EthSignType,
 } from '@keplr-wallet/types';
 import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
+import ClientSideWebWalletController from './client_side_web_wallet';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
 
-class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
+class EVMKeplrWebWalletController extends ClientSideWebWalletController<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
@@ -50,9 +51,8 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     return this._offlineSigner;
   }
 
-  public async getSessionPublicAddress(): Promise<string> {
-    const sessionController = app.sessions.getSessionController(this.chain);
-    return sessionController.getOrCreateAddress(app.chain?.id || this.defaultNetwork);
+  getChainId() {
+    return this._chainId;
   }
 
   public async getRecentBlock() {
