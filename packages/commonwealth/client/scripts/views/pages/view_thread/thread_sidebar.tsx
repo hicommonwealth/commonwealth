@@ -3,7 +3,7 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/view_proposal/proposal_sidebar.scss';
+import 'pages/view_thread/thread_sidebar.scss';
 
 import app from 'state';
 import { ChainEntity, Poll, Thread, ThreadStage } from 'models';
