@@ -13,6 +13,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
+import { getUserEthereumCommunities } from './helpers';
 
 enum ProjectListingSubpage {
   Explore = 'explore',
@@ -57,6 +58,15 @@ export default class ProjectListing implements m.ClassComponent {
       this.getBlockNumber();
     }
 
+    // Prefer Ethereum as default chainId for new projects, unless user
+    // is a member of ETH chains that do not include Ethereum
+    const userEthereumCommunities = getUserEthereumCommunities(app);
+    const defaultProjectChain =
+      !userEthereumCommunities.length ||
+      userEthereumCommunities.includes('ethereum')
+        ? 'ethereum'
+        : userEthereumCommunities[0];
+
     return (
       <Sublayout
         title="Projects"
@@ -99,29 +109,9 @@ export default class ProjectListing implements m.ClassComponent {
                 }}
               />
             </Tabs>
-            <SelectList
-              items={app.roles.roles
-                .map((role: RoleInfo) => role.chain_id)
-                .filter(
-                  (id) =>
-                    app.config.chains.getById(id).base === ChainBase.Ethereum
-                )}
-              itemRender={(chainId: string) => {
-                return (
-                  <div value={chainId} style="cursor: pointer">
-                    <CWText type="body1">{chainId}</CWText>
-                  </div>
-                );
-              }}
-              emptyContent={m(
-                '',
-                'Join (or create) an Ethereum community to create a project'
-              )}
-              filterable={false}
-              onSelect={(chainId: string) => {
-                m.route.set(`/${chainId}/new/project`);
-              }}
-              trigger={<CWButton label="Create Project" />}
+            <CWButton
+              label="Create Project"
+              onclick={() => m.route.set(`/${defaultProjectChain}/new/project`)}
             />
           </div>
           <div class="listing-body">
