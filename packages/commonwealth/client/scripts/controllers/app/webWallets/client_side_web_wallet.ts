@@ -1,21 +1,7 @@
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, BlockInfo, IWebWallet } from 'models';
-import { CanvasData, constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
-import { Chain } from '@canvas-js/interfaces';
-
-function chainBasetoCanvasChain(chainBase: ChainBase): Chain {
-  /*
-  Translate the commonwealth ChainBase names to canvas Chain names.
-  */
-  const mapping = {
-    [ChainBase.CosmosSDK]: "cosmos",
-    [ChainBase.Ethereum]: "eth",
-    [ChainBase.Solana]: "solana",
-    [ChainBase.Substrate]: "substrate"
-  };
-  return mapping[chainBase];
-}
+import { CanvasData, constructCanvasMessage, chainBasetoCanvasChain } from 'commonwealth/shared/adapters/shared';
 
 abstract class ClientSideWebWalletController<AccountT extends { address: string } | string> implements IWebWallet<AccountT> {
   /**

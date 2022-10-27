@@ -1,4 +1,6 @@
 import type { Block, Chain, SessionPayload } from '@canvas-js/interfaces';
+import { ChainBase } from 'common-common/src/types';
+
 
 /// An object with an identifier.
 export interface IIdentifiable {
@@ -52,4 +54,17 @@ export const constructCanvasMessage = (
     registerSessionDuration: payload.duration.toString(),
     timestamp: payload.timestamp.toString(),
   };
+}
+
+export function chainBasetoCanvasChain(chainBase: ChainBase): Chain {
+  /*
+  Translate the commonwealth ChainBase names to canvas Chain names.
+  */
+  const mapping = {
+    [ChainBase.CosmosSDK]: "cosmos",
+    [ChainBase.Ethereum]: "eth",
+    [ChainBase.Solana]: "solana",
+    [ChainBase.Substrate]: "substrate"
+  };
+  return mapping[chainBase];
 }

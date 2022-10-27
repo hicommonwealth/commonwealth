@@ -41,7 +41,7 @@ import { DynamicTemplate } from '../../shared/types';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { constructCanvasMessage } from '../../shared/adapters/shared';
+import { chainBasetoCanvasChain, constructCanvasMessage } from '../../shared/adapters/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -76,6 +76,17 @@ const verifySignature = async (
     return false;
   }
 
+  // Reconstruct the expected canvas message
+  const canvasMessage = constructCanvasMessage(
+    chainBasetoCanvasChain(chain.base),
+    // TODO: Figure out how to retrieve the right chain ID
+    // this is not currently being checked
+    "unknown",
+    addressModel.address,
+    sessionPublicAddress,
+    addressModel.block_info!
+  )
+
   let isValid: boolean;
   if (chain.base === ChainBase.Substrate) {
     //
@@ -93,13 +104,6 @@ const verifySignature = async (
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const canvasMessage = constructCanvasMessage(
-        "substrate",
-        "edgeware",
-        addressModel.address,
-        sessionPublicAddress,
-        addressModel.block_info!
-      )
       const message = stringToHex(JSON.stringify(canvasMessage));
 
       const signatureU8a =
@@ -120,16 +124,7 @@ const verifySignature = async (
     // ethereum address handling on cosmos chains via metamask
     //
 
-    const message = constructCanvasMessage(
-      "eth",
-      // TODO: what is this? do we want to send the chain id with the request?
-      "something",
-      addressModel.address,
-      sessionPublicAddress,
-      addressModel.block_info
-    );
-
-    const msgBuffer = Buffer.from(JSON.stringify(message));
+    const msgBuffer = Buffer.from(JSON.stringify(canvasMessage));
 
     // const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
@@ -228,14 +223,6 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const canvasMessage = constructCanvasMessage(
-            "cosmos",
-            "something",
-            addressModel.address,
-            sessionPublicAddress,
-            addressModel.block_info
-          );
-
           const generatedSignDoc = validationTokenToSignDoc(Buffer.from(JSON.stringify(canvasMessage)), generatedAddress)
 
           const { pubkey, signature } = decodeSignature(stdSignature);
@@ -267,15 +254,6 @@ const verifySignature = async (
     // ethereum address handling
     //
     try {
-      const node = await chain.getChainNode();
-      const canvasMessage = constructCanvasMessage(
-        "eth",
-        node.eth_chain_id || 1,
-        addressModel.address,
-        sessionPublicAddress,
-        addressModel.block_info
-      );
-
       const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
 
       if (addressModel.block_info !== sessionBlockInfo) {
@@ -319,15 +297,6 @@ const verifySignature = async (
     try {
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
-        const canvasMessage = constructCanvasMessage(
-          "solana",
-          // TODO: what should this be?
-          "something",
-          addressModel.address,
-          sessionPublicAddress,
-          addressModel.block_info
-        );
-
         isValid = nacl.sign.detached.verify(
           Buffer.from(`${JSON.stringify(canvasMessage)}`),
           Buffer.from(signatureString, 'base64'),
