@@ -41,7 +41,9 @@ export class RoleInstanceWithPermission {
   }
 }
 
-export async function getHighestRole(roles: CommunityRoleInstance[]): Promise<CommunityRoleInstance> {
+export async function getHighestRole(
+  roles: CommunityRoleInstance[]
+): Promise<CommunityRoleInstance> {
   if (roles.findIndex((r) => r.name === 'admin') !== -1) {
     return roles[roles.findIndex((r) => r.name === 'admin')];
   } else if (roles.findIndex((r) => r.name === 'moderator') !== -1) {
@@ -103,12 +105,13 @@ export async function findAllRoles(
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
   // find all CommunityRoles with chain id, permissions and find options given
-  const communityRoles: CommunityRoleInstance[] = await findAllCommunityRolesWithRoleAssignments(
-    models,
-    findOptions,
-    chain_id,
-    permissions
-  );
+  const communityRoles: CommunityRoleInstance[] =
+    await findAllCommunityRolesWithRoleAssignments(
+      models,
+      findOptions,
+      chain_id,
+      permissions
+    );
   const roles: RoleInstanceWithPermission[] = [];
   if (communityRoles) {
     for (const communityRole of communityRoles) {
@@ -126,8 +129,6 @@ export async function findAllRoles(
         }
       }
     }
-  } else {
-    return null;
   }
   return roles;
 }
@@ -138,38 +139,37 @@ export async function findOneRole(
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
-  const communityRoles: CommunityRoleInstance[] = await findAllCommunityRolesWithRoleAssignments(
-    models,
-    findOptions,
-    chain_id,
-    permissions
-  );
+  const communityRoles: CommunityRoleInstance[] =
+    await findAllCommunityRolesWithRoleAssignments(
+      models,
+      findOptions,
+      chain_id,
+      permissions
+    );
   let communityRole: CommunityRoleInstance;
   if (communityRoles) {
+    // find the highest role
     communityRole = await getHighestRole(communityRoles);
   } else {
     throw new Error("Couldn't find any community roles");
   }
 
-  let role: RoleInstanceWithPermission;
-  if (communityRole) {
-    // Retrieve the highest role as it will be the highest permission role for the address_id
-    if (communityRole.RoleAssignments && communityRole.RoleAssignments.length > 0) {
-      const roleAssignment = communityRole.RoleAssignments[0];
-      role = new RoleInstanceWithPermission(
-        roleAssignment.toJSON(),
-        chain_id,
-        communityRole.name,
-        communityRole.allow,
-        communityRole.deny
-      );
-      return role;
-    } else {
-      return null;
-    }
-  } else {
-    return null;
+  let role: RoleInstanceWithPermission = null;
+  if (
+    communityRole &&
+    communityRole.RoleAssignments &&
+    communityRole.RoleAssignments.length > 0
+  ) {
+    const roleAssignment = communityRole.RoleAssignments[0];
+    role = new RoleInstanceWithPermission(
+      roleAssignment.toJSON(),
+      chain_id,
+      communityRole.name,
+      communityRole.allow,
+      communityRole.deny
+    );
   }
+  return role;
 }
 
 export async function createDefaultCommunityRoles(
@@ -214,11 +214,18 @@ export async function createRole(
   }
 
   // check if role is already assigned to address
-  const communityRoles = await findAllCommunityRolesWithRoleAssignments(models, { where: { address_id } }, chain_id);
+  const communityRoles = await findAllCommunityRolesWithRoleAssignments(
+    models,
+    { where: { address_id } },
+    chain_id
+  );
   if (communityRoles.findIndex((r) => r.name === role_name) !== -1) {
     // if role is already assigned to address, return current highest role this address has on that chain
     const highestCommunityRole = await getHighestRole(communityRoles);
-    if (highestCommunityRole.RoleAssignments && highestCommunityRole.RoleAssignments.length > 0) {
+    if (
+      highestCommunityRole.RoleAssignments &&
+      highestCommunityRole.RoleAssignments.length > 0
+    ) {
       const roleAssignment = highestCommunityRole.RoleAssignments[0];
       const role = new RoleInstanceWithPermission(
         roleAssignment.toJSON(),
