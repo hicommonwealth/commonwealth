@@ -58,7 +58,7 @@ const validateTopicThreshold = async (
           contractType: topic.chain.network === ChainNetwork.ERC20
           ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
             ? 'erc721' : undefined,
-          contractAddress: communityContracts?.Contract?.address,
+          tokenAddress: communityContracts?.Contract?.address,
         }
       );
       if (tokenBalances.errors[userAddress] || !tokenBalances.balances[userAddress]) {

@@ -130,7 +130,7 @@ const bulkBalances = async (
         try {
           const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {
             contractType: contract.tokenType,
-            contractAddress: contract.address,
+            tokenAddress: contract.address,
           });
           for (const balance of Object.values(balanceResults.balances)) {
             balanceTotal = balanceTotal.add(new BN(balance));

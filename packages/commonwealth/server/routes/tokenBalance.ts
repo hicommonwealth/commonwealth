@@ -87,7 +87,7 @@ const tokenBalance = async (
       [ req.body.address ],
       bp,
       {
-        contractAddress: contract?.address,
+        tokenAddress: contract?.address,
         contractType: chain.network === ChainNetwork.ERC20
           ? 'erc20' : chain.network === ChainNetwork.ERC721
             ? 'erc721' : undefined,
