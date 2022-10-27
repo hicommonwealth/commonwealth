@@ -30,7 +30,7 @@ export const constructTypedMessage = async (fromAddress: string, fromChainId: nu
   // construct the signature data from scratch, since canvas' implementation doesn't
   // include an EIP712Domain
   const domain: TypedDataDomain = {
-    name: "Canvas",
+    name: "Commonwealth",
   };
 
   const types: Record<string, TypedDataField[]> = {
