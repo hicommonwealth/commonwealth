@@ -24,12 +24,6 @@ export type IProjectCreationData = {
   deadline: BigNumberish;
   curatorFee: BigNumberish;
 };
-
-type fetchProjectsParams = {
-  project_id?: number;
-  chain_id?: string;
-};
-
 export default class ProjectsController {
   private _initialized = false;
   public initialized() {
@@ -53,11 +47,14 @@ export default class ProjectsController {
   private _factoryInfo: ChainInfo;
   private _app: IApp;
 
-  private async _fetchProjectsFromServer(params: fetchProjectsParams) {
-    const { project_id, chain_id } = params;
+  private async _fetchProjectsFromServer(params: {
+    projectId?: number;
+    chainId?: string;
+  }) {
+    const { projectId, chainId } = params;
     const res = await $.get(`${this._app.serverUrl()}/getProjects`, {
-      project_id,
-      chain_id,
+      project_id: projectId,
+      chain_id: chainId,
     });
     console.log({ res });
     for (const project of res.result) {
@@ -94,7 +91,7 @@ export default class ProjectsController {
 
     // load all projects from server
     try {
-      await this._fetchProjectsFromServer();
+      await this._fetchProjectsFromServer({});
     } catch (e) {
       console.error(`Failed to load projects: ${e.message}`);
       this._initializing = false;

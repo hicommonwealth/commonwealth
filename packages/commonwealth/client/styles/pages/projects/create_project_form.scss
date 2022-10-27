@@ -1,5 +1,7 @@
 @import 'shared';
 
+$formWidth: 480px;
+
 .CreateProjectForm {
   display: flex;
   flex-direction: column;
@@ -9,7 +11,7 @@
     color: $primary-500;
   }
   .form-panel {
-    width: 480px;
+    width: $formWidth;
   }
   .InformationSlide,
   .DescriptionSlide,
@@ -20,6 +22,14 @@
   }
   .CoverImageUpload {
     margin-top: 16px;
+  }
+  .InformationSlide > .cui-button {
+    @include inputStyles;
+    padding: 6px 8px;
+
+    &.darkMode {
+      @include darkModeInputStyles;
+    }
   }
   .NavigationButtons.cui-button-group {
     width: 480px;
@@ -34,6 +44,17 @@
           padding: 0 5px;
         }
       }
+    }
+  }
+}
+
+// Chain id select list
+.chain-id-list > .cui-popover-content {
+  width: $formWidth;
+  .Text {
+    padding: 8px;
+    &:hover {
+      background-color: $neutral-50;
     }
   }
 }

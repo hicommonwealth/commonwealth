@@ -1,7 +1,7 @@
 /* @jsx m */
-import app from 'client/scripts/state';
-import { CWButton } from 'client/scripts/views/components/component_kit/cw_button';
-import { SelectList } from 'construct-ui';
+import app from 'state';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { Button, Icons, SelectList } from 'construct-ui';
 import m from 'mithril';
 
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
@@ -37,13 +37,22 @@ export class InformationSlide
           value={vnode.attrs.form.title}
         />
         <SelectList
+          class="chain-id-list"
           items={userEthChains}
           itemRender={(n: string) => <CWText>{n}</CWText>}
           defaultActiveIndex={defaultChainIdx}
           onSelect={(n: string) => {
             vnode.attrs.form.chainId = n;
           }}
-          trigger={<CWButton label={vnode.attrs.form.chainId} />}
+          trigger={
+            <Button
+              align="left"
+              compact={true}
+              iconRight={Icons.CHEVRON_DOWN}
+              sublabel="Chain:"
+              label={<CWText>{vnode.attrs.form.chainId}</CWText>}
+            />
+          }
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project,"

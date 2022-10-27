@@ -665,27 +665,30 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
 
             // CMN
-            '/:scope/projects': redirectRoute(() => `/projects/explore`),
-            '/projects': redirectRoute(() => `/projects/explore`),
-            '/:scope/projects/:subpage': redirectRoute(
-              (attrs) => `/projects/${attrs.subpage}`
+            '/projects/explore': importRoute('views/pages/projects/index.tsx', {
+              scoped: true,
+              hideSidebar: true,
+            }),
+            '/:scope/projects/explore': redirectRoute(
+              () => `/projects/explore`
             ),
-            '/projects/:subpage': importRoute(
-              'views/pages/projects/index.tsx',
-              { scoped: false, hideSidebar: false, deferChain: true }
+            '/projects': redirectRoute(() => `/projects/explore`),
+            '/:scope/projects': redirectRoute(() => `/projects/explore`),
+
+            '/project/:identifier': importRoute(
+              'views/pages/projects/view_project.tsx',
+              { scoped: true, hideSidebar: true }
             ),
             '/:scope/project/:identifier': redirectRoute(
               (attrs) => `/project/${attrs.identifier}`
             ),
-            '/project/:identifier': importRoute(
-              'views/pages/projects/view_project.tsx',
-              { scoped: false, hideSidebar: true, deferChain: true }
-            ),
-            '/new/project': redirectRoute(() => `/projects/explore`),
-            '/:scope/new/project': importRoute(
+
+            '/new/project': importRoute(
               'views/pages/projects/create_project_form/index',
-              { scoped: true, hideSidebar: true, deferChain: true }
+              { scoped: true, hideSidebar: true }
             ),
+            '/:scope/new/project': redirectRoute(() => `/new/project`),
+
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -916,21 +919,34 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Crowdfund
+            '/projects/explore': importRoute('views/pages/projects/index.tsx', {
+              scoped: false,
+              hideSidebar: true,
+            }),
+            '/:scope/projects/explore': importRoute(
+              'views/pages/projects/index.tsx',
+              {
+                scoped: true,
+                hideSidebar: true,
+              }
+            ),
             '/projects': redirectRoute(() => `/projects/explore`),
             '/:scope/projects': redirectRoute(
               (attrs) => `/${attrs.scope}/projects/explore`
             ),
+
             '/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
-              { scoped: false, hideSidebar: true, deferChain: true }
+              { scoped: false, hideSidebar: true }
             ),
             '/:scope/project/:identifier': importRoute(
               'views/pages/projects/view_project.tsx',
               { scoped: true, hideSidebar: true }
             ),
+
             '/:scope/new/project': importRoute(
               'views/pages/projects/create_project_form/index.tsx',
-              { scoped: true, hideSidebar: true, deferChain: true }
+              { scoped: true, hideSidebar: true }
             ),
 
             // NEAR

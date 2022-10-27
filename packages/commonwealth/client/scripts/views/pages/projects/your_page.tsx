@@ -5,7 +5,8 @@ import m from 'mithril';
 import { Project } from 'models';
 import app from 'state';
 import { Spinner } from 'construct-ui';
-import ProjectCard, { ProjectCardSize } from './project_card';
+import ProjectCard from './project_card/index';
+import { ProjectCardSize } from './types';
 
 export default class YourPage
   implements m.ClassComponent<{ currentBlockNum: number }>

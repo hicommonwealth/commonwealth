@@ -3,7 +3,7 @@
 import m from 'mithril';
 import app from 'state';
 import { Spinner } from 'construct-ui';
-import ProjectCard from './project_card';
+import ProjectCard from './project_card/index';
 
 export default class ExplorePage
   implements m.ClassComponent<{ currentBlockNum: number }>
