@@ -15,24 +15,24 @@ import { PollEditorCard } from './poll_editor_card';
 import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
 import { LinkedThreadsCard } from './linked_threads_card';
 
-type ProposalSidebarAttrs = {
+type ThreadSidebarAttrs = {
   isAdmin: boolean;
   isAdminOrMod: boolean;
   isAuthor: boolean;
   polls: Array<Poll>;
-  proposal: Thread;
+  thread: Thread;
   showLinkedSnapshotOptions: boolean;
   showLinkedThreadOptions: boolean;
 };
 
-export class ThreadSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
+export class ThreadSidebar implements m.ClassComponent<ThreadSidebarAttrs> {
   view(vnode) {
     const {
       isAdmin,
       isAdminOrMod,
       isAuthor,
       polls,
-      proposal,
+      thread,
       showLinkedSnapshotOptions,
       showLinkedThreadOptions,
     } = vnode.attrs;
@@ -46,21 +46,21 @@ export class ThreadSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
               chainEntities: ChainEntity[],
               snapshotProposal: SnapshotProposal[]
             ) => {
-              proposal.stage = stage;
-              proposal.chainEntities = chainEntities;
+              thread.stage = stage;
+              thread.chainEntities = chainEntities;
               if (app.chain?.meta.snapshot.length) {
-                proposal.snapshotProposal = snapshotProposal[0]?.id;
+                thread.snapshotProposal = snapshotProposal[0]?.id;
               }
-              app.threads.fetchThreadsFromId([proposal.identifier]);
+              app.threads.fetchThreadsFromId([thread.identifier]);
               m.redraw();
             }}
-            thread={proposal}
+            thread={thread}
             showAddProposalButton={isAuthor || isAdminOrMod}
           />
         )}
         {showLinkedThreadOptions && (
           <LinkedThreadsCard
-            proposalId={proposal.id}
+            threadlId={thread.id}
             allowLinking={isAuthor || isAdminOrMod}
           />
         )}
@@ -123,8 +123,8 @@ export class ThreadSidebar implements m.ClassComponent<ProposalSidebarAttrs> {
         )}
         {isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
           <PollEditorCard
-            proposal={proposal}
-            proposalAlreadyHasPolling={!polls?.length}
+            thread={thread}
+            threadAlreadyHasPolling={!polls?.length}
           />
         )}
       </div>

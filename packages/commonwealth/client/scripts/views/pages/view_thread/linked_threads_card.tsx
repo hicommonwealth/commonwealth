@@ -17,7 +17,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 export class LinkedThreadsCard
   implements
     m.ClassComponent<{
-      proposalId: number;
+      threadlId: number;
       allowLinking: boolean;
     }>
 {
@@ -30,26 +30,27 @@ export class LinkedThreadsCard
   }
 
   view(vnode) {
-    const { allowLinking, proposalId } = vnode.attrs;
+    const { allowLinking, threadlId } = vnode.attrs;
 
-    const proposal = app.threads.getById(proposalId);
+    const thread = app.threads.getById(threadlId);
 
-    if (!proposal) return;
+    if (!thread) return;
 
     if (!this.linkedThreads) {
       this.linkedThreads = [];
     }
 
-    if (!proposal.linkedThreads?.length) {
+    if (!thread.linkedThreads?.length) {
       this.fetchLinkedThreads = false;
     }
 
     if (this.fetchLinkedThreads) {
       this.fetchLinkedThreads = false;
       this.loading = true;
+
       app.threads
         .fetchThreadsFromId(
-          proposal.linkedThreads.map(
+          thread.linkedThreads.map(
             (relation: LinkedThreadRelation) => relation.linkedThread
           )
         )
@@ -61,25 +62,27 @@ export class LinkedThreadsCard
           console.error(err);
           this.loading = false;
         });
+
       return null;
     }
 
-    if (allowLinking || proposal.linkedThreads.length) {
+    if (allowLinking || thread.linkedThreads.length) {
       return (
         <div class="LinkedThreadsCard">
           <CWText type="h5">
-            {proposal.linkedThreads.length === 0
+            {thread.linkedThreads.length === 0
               ? 'Link to an existing thread?'
               : 'Linked Threads'}
           </CWText>
-          {proposal.linkedThreads.length > 0 && (
+          {thread.linkedThreads.length > 0 && (
             <div class="links-container">
-              {this.linkedThreads.map((thread) => {
+              {this.linkedThreads.map((t) => {
                 const discussionLink = getProposalUrlPath(
-                  thread.slug,
-                  `${thread.identifier}-${slugify(thread.title)}`
+                  t.slug,
+                  `${t.identifier}-${slugify(t.title)}`
                 );
-                return link('a', discussionLink, thread.title);
+
+                return link('a', discussionLink, t.title);
               })}
             </div>
           )}
@@ -87,7 +90,7 @@ export class LinkedThreadsCard
             <CWButton
               disabled={this.loading}
               label={
-                proposal.linkedThreads?.length
+                thread.linkedThreads?.length
                   ? 'Link another thread'
                   : 'Link threads'
               }
@@ -96,7 +99,7 @@ export class LinkedThreadsCard
                 app.modals.create({
                   modal: LinkedThreadModal,
                   data: {
-                    linkingThread: proposal,
+                    linkingThread: thread,
                     linkedThreads: this.linkedThreads,
                   },
                 });

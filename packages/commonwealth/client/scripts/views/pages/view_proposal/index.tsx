@@ -516,7 +516,7 @@ class ViewProposalPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={proposal}
+                thread={proposal}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
@@ -546,7 +546,7 @@ class ViewProposalPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={proposal}
+                thread={proposal}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />

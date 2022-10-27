@@ -408,7 +408,7 @@ class ViewThreadPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={thread}
+                thread={thread}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
@@ -438,7 +438,7 @@ class ViewThreadPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={thread}
+                thread={thread}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
