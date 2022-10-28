@@ -31,6 +31,7 @@ class ContractsStore extends IdStore<Contract> {
   public getContractByNickname(nickname: string): Contract {
     // filter through the _storeId map for a contract with a specified nickname
     const contracts = this.getAll().filter((c) => c.nickname === nickname);
+    // if there is more than one contract with the same nickname, return the first one
     if (contracts.length > 0) {
       return contracts[0];
     } else {
