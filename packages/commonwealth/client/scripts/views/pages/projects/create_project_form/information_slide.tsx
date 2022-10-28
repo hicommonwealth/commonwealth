@@ -105,7 +105,7 @@ export class InformationSlide
           }
         />
         <CWTextArea
-          placeholder="Write a short 2 or 3 sentence description of your project,"
+          placeholder="Write a short 2 or 3 sentence description of your project"
           label="Short Description"
           name="Short Description"
           oninput={(e) => {

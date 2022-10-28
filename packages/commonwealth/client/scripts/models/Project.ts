@@ -6,6 +6,13 @@ import { CWParticipant } from '../controllers/chain/ethereum/commonwealth/partic
 import AddressInfo from './AddressInfo';
 import { weiToTokens } from '../helpers';
 
+const projectDefaults = {
+  title: 'Untitled Crowdfund',
+  description: 'This project has not been provided with a description.',
+  shortDescription: 'This project has not been provided with a description.',
+  coverImage: '/static/img/crowdfund/default_cover_image',
+};
+
 class Project {
   // Helper getters
   public get address(): string {
@@ -172,10 +179,10 @@ class Project {
     public readonly creatorAddressId: number,
     public readonly beneficiary: string,
     public readonly token: string,
-    public readonly title: string,
-    public readonly description: string,
-    public readonly shortDescription: string,
-    public readonly coverImage: string,
+    public readonly title: string = projectDefaults.title,
+    public readonly description: string = projectDefaults.description,
+    public readonly shortDescription: string = projectDefaults.shortDescription,
+    public readonly coverImage: string = projectDefaults.coverImage,
     public readonly curatorFee: BN,
     public readonly threshold: BN,
     public readonly deadline: number,
@@ -226,11 +233,10 @@ class Project {
       creator_address_id,
       beneficiary,
       token,
-      title || 'Untitled',
-      description || 'This project has not been provided with a description.',
-      short_description ||
-        'This project has not been provided with a description.',
-      cover_image,
+      title || projectDefaults.title,
+      description || projectDefaults.description,
+      short_description || projectDefaults.shortDescription,
+      cover_image || projectDefaults.coverImage,
       new BN(curator_fee), // TODO: This should perhaps be a % or decimal, not BN
       new BN(threshold),
       deadline,
