@@ -636,9 +636,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Custom domain routes
             //
-            '/': importRoute('views/pages/discussions', {
+            '/': importRoute('views/pages/discussions_redirect', {
               scoped: true,
-              deferChain: true,
             }),
             '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
@@ -683,8 +682,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
+            '/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/discussions/:topic': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
@@ -790,13 +796,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
+            '/:scope/overview': redirectRoute(() => '/overview'),
             '/:scope/projects': redirectRoute(() => '/projects'),
             '/:scope/backers': redirectRoute(() => '/backers'),
             '/:scope/collectives': redirectRoute(() => '/collectives'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
-            '/:scope/discussions': redirectRoute(() => '/'),
+            '/:scope/discussions': redirectRoute(() => '/discussions'),
             '/:scope': redirectRoute(() => '/'),
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`

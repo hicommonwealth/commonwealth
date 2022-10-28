@@ -68,13 +68,11 @@ class GeneralContractPage
   view(vnode) {
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
-        if (contract.abi === undefined) {
-          const abiJson = await this.loadAbiFromEtherscan(contract.address);
-          await app.contracts.addContractAbi(contract, abiJson);
-          // TODO The UI Should In One Go show the abi form after successfully fetching the abi
-          // from etherscan, which it does not do rn
-          m.redraw();
-        }
+        const abiJson = await this.loadAbiFromEtherscan(contract.address);
+        await app.contracts.addContractAbi(contract, abiJson);
+        // TODO The UI Should In One Go show the abi form after successfully fetching the abi
+        // from etherscan, which it does not do rn
+        m.redraw();
       }
     };
 

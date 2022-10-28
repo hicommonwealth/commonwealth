@@ -20,7 +20,7 @@ export const Errors = {
   InvalidNode: 'Node url returned invalid response',
   InvalidABI: 'Invalid ABI',
   MustBeWs: 'Node must support websockets on ethereum',
-  InvalidBase: 'Must provide valid chain base',
+  InvalidBalanceType: 'Must provide balance type',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
   InvalidChainIdOrUrl:
     'Could not determine a valid endpoint for provided chain',
@@ -61,7 +61,7 @@ const createContract = async (
     token_name,
     decimals,
     chain_node_id,
-    chain_base,
+    balance_type,
   } = req.body;
 
   if (!req.user) {
@@ -86,6 +86,12 @@ const createContract = async (
   if (decimals < 0 || decimals > 18) {
     return next(new Error(Errors.InvalidDecimal));
   }
+  if (!chain_node_id) {
+    return next(new Error(Errors.NoNodeUrl));
+  }
+  if (!balance_type) {
+    return next(new Error(Errors.InvalidBalanceType));
+  }
 
   const oldContract = await models.Contract.findOne({
     where: { address },
@@ -100,7 +106,7 @@ const createContract = async (
     const node = await models.ChainNode.scope('withPrivateData').findOne({
       where: {
         id: chain_node_id,
-        chain_base,
+        balance_type,
       },
     });
     if (!node) {

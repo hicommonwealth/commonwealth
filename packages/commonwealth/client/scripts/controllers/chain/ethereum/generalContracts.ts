@@ -12,6 +12,7 @@ import {
   ChainFormFields,
   EthFormFields,
 } from 'views/pages/create_community/types';
+import { TransactionReceipt } from 'web3-core';
 import EthereumChain from './chain';
 
 type EthDaoFormFields = {
@@ -55,7 +56,7 @@ export default class GeneralContractsController {
     fn: AbiItem,
     processedArgs: any[],
     wallet: IWebWallet<any>
-  ) {
+  ): Promise<TransactionReceipt | string> {
     const methodSignature = `${fn.name}(${fn.inputs
       .map((input) => input.type)
       .join(',')})`;
@@ -69,7 +70,7 @@ export default class GeneralContractsController {
     );
     if (fn.stateMutability !== 'view' && fn.constant !== true) {
       // Sign Tx with PK if not view function
-      const txReceipt = await chain.makeContractTx(
+      const txReceipt: TransactionReceipt = await chain.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
         wallet
@@ -77,7 +78,7 @@ export default class GeneralContractsController {
       return txReceipt;
     } else {
       // send transaction
-      const tx = await chain.makeContractCall(
+      const tx: string = await chain.makeContractCall(
         contract.address,
         functionTx.encodeABI(),
         wallet
@@ -86,7 +87,7 @@ export default class GeneralContractsController {
     }
   }
 
-  public decodeTransactionData(fn: AbiItem, tx: any): any {
+  public decodeTransactionData(fn: AbiItem, tx: any): any[] {
     // simple return type
     let result;
     if (fn.outputs.length === 1) {
@@ -130,7 +131,7 @@ export default class GeneralContractsController {
     processedArgs: any[],
     wallet: IWebWallet<any>,
     daoForm: CreateFactoryEthDaoForm
-  ): Promise<any> {
+  ) {
     const functionContract = this.web3Contract;
 
     const methodSignature = `${fn.name}(${fn.inputs

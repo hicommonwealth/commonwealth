@@ -46,7 +46,7 @@ export function validateAbiInput(
 
 export function handleMappingAbiInputs(
   inputIndex: number,
-  input: any,
+  input: string,
   abiItem: AbiItem,
   inputMap: Map<string, Map<number, string>>
 ) {

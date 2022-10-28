@@ -1,4 +1,4 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const dev = require('./webpack.config.dev.js');
 const exec = require('child_process').exec;
 const spawn = require('child_process').spawn;
