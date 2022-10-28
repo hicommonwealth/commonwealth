@@ -53,34 +53,35 @@ export function validateAbiInput(
 export function handleMappingAbiInputs(
   inputIndex: number,
   input: string,
-  abiItem: AbiItem,
+  functionName: string,
   inputMap: Map<string, Map<number, string>>
 ) {
-  if (!inputMap.has(abiItem.name)) {
-    inputMap.set(abiItem.name, new Map<number, string>());
-    const inputArgMap = inputMap.get(abiItem.name);
+  if (!inputMap.has(functionName)) {
+    inputMap.set(functionName, new Map<number, string>());
+    const inputArgMap = inputMap.get(functionName);
     inputArgMap.set(inputIndex, input);
-    inputMap.set(abiItem.name, inputArgMap);
+    inputMap.set(functionName, inputArgMap);
   } else {
-    const inputArgMap = inputMap.get(abiItem.name);
+    const inputArgMap = inputMap.get(functionName);
     inputArgMap.set(inputIndex, input);
-    inputMap.set(abiItem.name, inputArgMap);
+    inputMap.set(functionName, inputArgMap);
   }
 }
 
 export function processAbiInputsToDataTypes(
-  fn: AbiItem,
+  functionName: string,
+  functionInputs: AbiInput[],
   inputsMap: Map<string, Map<number, string>>
 ): any[] {
-  const processedArgs: any[] = fn.inputs.map((arg: AbiInput, index: number) => {
+  const processedArgs: any[] = functionInputs.map((arg: AbiInput, index: number) => {
     const type = arg.type;
     if (type.substring(0, 4) === 'uint')
-      return BigNumber.from(inputsMap.get(fn.name).get(index));
+      return BigNumber.from(inputsMap.get(functionName).get(index));
     if (type.substring(0, 4) === 'byte')
-      return Bytes32(inputsMap.get(fn.name).get(index));
+      return Bytes32(inputsMap.get(functionName).get(index));
     if (type.slice(-2) === '[]')
-      return JSON.parse(inputsMap.get(fn.name).get(index));
-    return inputsMap.get(fn.name).get(index);
+      return JSON.parse(inputsMap.get(functionName).get(index));
+    return inputsMap.get(functionName).get(index);
   });
   return processedArgs;
 }

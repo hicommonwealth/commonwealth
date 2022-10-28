@@ -83,7 +83,8 @@ class GeneralContractPage
 
       // handle processing the forms inputs into their proper data types
       const processedArgs = processAbiInputsToDataTypes(
-        fn,
+        fn.name,
+        fn.inputs,
         this.state.form.functionNameToFunctionInputArgs
       );
 
@@ -196,7 +197,7 @@ class GeneralContractPage
                                 handleMappingAbiInputs(
                                   inputIdx,
                                   e.target.value,
-                                  fn,
+                                  fn.name,
                                   this.state.form
                                     .functionNameToFunctionInputArgs
                                 );

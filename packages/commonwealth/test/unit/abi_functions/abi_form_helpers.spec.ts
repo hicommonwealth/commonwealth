@@ -1,10 +1,10 @@
-import { assert } from 'chai';
+import { assert, expect } from 'chai';
 import {
   handleMappingAbiInputs,
   processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'client/scripts/helpers/abi_form_helpers';
-import { validateRule } from '../../../server/util/rules/ruleParser';
+import { BigNumber, ethers } from 'ethers';
 
 describe('validateAbiInput() unit tests', () => {
   it('should validate correct address args', () => {
@@ -51,38 +51,62 @@ describe('validateAbiInput() unit tests', () => {
   });
 });
 
-// describe('handleMappingAbiInputs() unit tests', () => {
-//   it('should validate correct address args', () => {
-//     const allowListRule = { AllowListRule: [['hello', 'world']] };
-//     const sanitizedRule = handleMappingAbiInputs(allowListRule);
-//     assert.deepEqual(allowListRule, sanitizedRule);
-//   });
+describe('handleMappingAbiInputs() unit tests', () => {
+  it('should store correct address args', () => {
+    const inputIndex = 5;
+    const input = '0x0000000000000000000000000000000000000000';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    assert.equal(inputMap.get(functionName).get(inputIndex), input);
+  });
+  it('should store correct args with multiple calls', () => {
+    const inputIndex = 5;
+    const input = '123';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    const inputIndex2 = 6;
+    const input2 = '456';
+    handleMappingAbiInputs(inputIndex2, input2, functionName, inputMap);
+    assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
+  });
+  it('should store correct args with multiple calls and multiple functions', () => {
+    const inputIndex = 5;
+    const input = '123';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    const inputIndex2 = 6;
+    const input2 = '456';
+    handleMappingAbiInputs(inputIndex2, input2, functionName, inputMap);
+    const inputIndex3 = 7;
+    const input3 = '789';
+    const functionName2 = 'testFunction2';
+    handleMappingAbiInputs(inputIndex3, input3, functionName2, inputMap);
+    assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
+    assert.equal(inputMap.get(functionName2).get(inputIndex3), input3);
+  });
+});
 
-//   it('should not validate incorrect address arg type', () => {
-//     const badAllowList = { AllowListRule: [['hello', 1]] };
-//     assert.throw(() => validateRule(badAllowList));
-//   });
+describe('processAbiInputsToDataTypes() unit tests', () => {
+  it('should properly parse bytes type', () => {
+    const inputIndex = 0;
+    const input = '123';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
 
-//   it('should not validate incorrect address arg format', () => {
-//     const badAllowList = { AllowListRule: ['hello'] };
-//     assert.throw(() => validateRule(badAllowList));
-//   });
-// });
+    const functionInputs = [
+        {
+            name: 'test',
+            type: 'uint256',
+        },
+    ];
+    const processedArgs = processAbiInputsToDataTypes(functionName, functionInputs, inputMap);
+    expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
+  });
 
-// describe('processAbiInputsToDataTypes() unit tests', () => {
-//   it('should validate correct address args', () => {
-//     const allowListRule = { AllowListRule: [['hello', 'world']] };
-//     const sanitizedRule = processAbiInputsToDataTypes(allowListRule);
-//     assert.deepEqual(allowListRule, sanitizedRule);
-//   });
-
-//   it('should not validate incorrect address arg type', () => {
-//     const badAllowList = { AllowListRule: [['hello', 1]] };
-//     assert.throw(() => validateRule(badAllowList));
-//   });
-
-//   it('should not validate incorrect address arg format', () => {
-//     const badAllowList = { AllowListRule: ['hello'] };
-//     assert.throw(() => validateRule(badAllowList));
-//   });
-// });
+});
