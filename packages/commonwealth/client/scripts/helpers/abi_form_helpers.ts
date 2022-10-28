@@ -6,7 +6,7 @@ const Bytes32 = ethers.utils.formatBytes32String;
 
 export function validateAbiInput(
   val: string,
-  input: AbiInput
+  inputType: string
 ): [ValidationStatus, string] {
   // TODO Array Validation will be complex. Check what cases we want to cover here
   // Cases not covered yet:
@@ -15,31 +15,31 @@ export function validateAbiInput(
   // - Array of Enums
   // - Array of Bytes
   // - Array of Addresses and etc
-  if (input.type.slice(-2) === '[]') {
+  if (inputType.slice(-2) === '[]') {
     if (val[0] !== '[' || val[val.length - 1] !== ']') {
       return ['failure', 'Input must be an array'];
     } else {
       return ['success', ''];
     }
   }
-  if (input.type === 'bool') {
+  if (inputType === 'bool') {
     if (val !== 'true' && val !== 'false') {
       return ['failure', 'Input must be a boolean'];
     }
   }
-  if (input.type.substring(0, 4) === 'uint') {
+  if (inputType.substring(0, 4) === 'uint') {
     if (!Number.isNaN(Number(val))) {
       return ['success', ''];
     } else {
       return ['failure', 'Input must be a number'];
     }
-  } else if (input.type === 'bool') {
+  } else if (inputType === 'bool') {
     if (val === 'true' || val === 'false') {
       return ['success', ''];
     } else {
       return ['failure', 'Input must be a boolean'];
     }
-  } else if (input.type === 'address') {
+  } else if (inputType === 'address') {
     if (val.length === 42) {
       return ['success', ''];
     } else {
