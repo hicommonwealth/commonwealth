@@ -89,26 +89,15 @@ const tokenBalance = async (
   try {
     balancesResp = await tokenBalanceCache.getBalancesForAddresses(
       chain_node_id,
-<<<<<<< HEAD
-      author.address,
-      contract?.address,
-      chain.network === ChainNetwork.ERC20
-        ? 'erc20'
-        : chain.network === ChainNetwork.ERC721
-        ? 'erc721'
-        : chain.network === ChainNetwork.SPL
-        ? 'spl-token'
-        : undefined
-=======
       [ req.body.address ],
       bp,
       {
         tokenAddress: contract?.address,
         contractType: chain.network === ChainNetwork.ERC20
           ? 'erc20' : chain.network === ChainNetwork.ERC721
-            ? 'erc721' : undefined,
-      },
->>>>>>> master
+            ? 'erc721' : chain.network === ChainNetwork.SPL
+            ? 'spl-token' : undefined
+      }
     );
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
