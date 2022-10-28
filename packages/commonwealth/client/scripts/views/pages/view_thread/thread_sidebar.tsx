@@ -38,7 +38,7 @@ export class ThreadSidebar implements m.ClassComponent<ThreadSidebarAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="ProposalSidebar">
+      <div class="ThreadSidebar">
         {showLinkedSnapshotOptions && (
           <LinkedProposalsCard
             onChangeHandler={(
