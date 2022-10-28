@@ -8,7 +8,6 @@ import { IPagination } from '../../util/queries';
 type GetCommentsReq = {
   community_id?: string;
   thread_id?: number;
-  address?: string;
   profile_id?: string;
   addresses?: string[];
   count_only?: boolean;
