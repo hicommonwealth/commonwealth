@@ -126,6 +126,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={this.proposal.author}
           createdAt={this.proposal.created}
+          contentBodyLabel="Snapshot"
           subHeader={
             this.proposal.state === 'active' ? (
               <ActiveProposalPill proposalEnd={this.proposal.end} />

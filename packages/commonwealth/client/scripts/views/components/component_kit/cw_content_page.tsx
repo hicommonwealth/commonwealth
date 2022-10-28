@@ -36,6 +36,7 @@ type ContentPageAttrs = {
   // optional
   actions?: Array<MenuItem>;
   comments?: Array<Comment<any>>;
+  contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: m.Vnode;
@@ -85,6 +86,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       author,
       body,
       comments,
+      contentBodyLabel,
       createdAt,
       showSidebar,
       sidebarComponents,
@@ -140,7 +142,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           <div class="tabs-view">
             <CWTabBar>
               <CWTab
-                label="Thread"
+                label={contentBodyLabel}
                 onclick={() => {
                   this.tabSelected = 0;
                 }}
