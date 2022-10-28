@@ -1,10 +1,16 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
+import { Account } from 'models';
+import { Extension, LCDClient } from '@terra-money/terra.js';
+import ClientSideWebWalletController from './client_side_web_wallet';
+import { CanvasData } from 'shared/adapters/shared';
 
-class TerraStationWebWalletController implements IWebWallet<string> {
+type TerraAddress = {
+  address: string
+}
+
+class TerraStationWebWalletController extends ClientSideWebWalletController<TerraAddress> {
   private _enabled: boolean;
-  private _accounts: string[] = [];
+  private _accounts: TerraAddress[] = [];
   private _enabling = false;
   private _extension = new Extension();
 
@@ -38,30 +44,46 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
-    try {
-      this._extension.once('onConnect', (accountAddr) => {
-        if (accountAddr && !this._accounts.includes(accountAddr)) {
-          this._accounts.push(accountAddr);
-        }
-        this._enabled = this._accounts.length !== 0;
-      });
+    const accountAddr = await new Promise<TerraAddress>((resolve) => {
+      this._extension.once('onConnect', resolve);
       this._extension.connect();
-      this._enabling = false;
-    } catch (error) {
+    }).catch((error) => {
       console.error(`Failed to enabled Terra Station ${error.message}`);
-      this._enabling = false;
+    });
+
+    if (accountAddr && !this._accounts.includes(accountAddr)) {
+      this._accounts.push(accountAddr);
     }
+
+    this._enabled = this._accounts.length !== 0;
+    this._enabling = false;
+  }
+
+  public async getChainId() {
+    // Terra mainnet
+    return "phoenix-1";
   }
 
   public async getRecentBlock() {
-    return null;
+    const chainId = await this.getChainId();
+    const client = new LCDClient({
+      // why doesn't setten.io work?
+      URL: "https://phoenix-lcd.terra.dev/",
+      chainID: chainId
+    });
+
+    const txInfos = await client.tx.txInfosByHeight(undefined);
+    const txInfo = txInfos[0];
+
+    return {
+      number: txInfo.height,
+      hash: txInfo.txhash,
+      // seconds since epoch
+      timestamp: Math.floor(new Date(txInfo.timestamp).getTime() / 1000)
+    };
   }
 
-  public async getSessionPublicAddress(): Promise<string> {
-    return null;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
@@ -70,7 +92,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(account.validationToken),
+          bytes: Buffer.from(JSON.stringify(canvasMessage)),
         });
       } catch (error) {
         console.error(error);
