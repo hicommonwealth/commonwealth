@@ -482,7 +482,7 @@ class ViewProposalPage
           >
             <CWTabBar>
               <CWTab
-                label="Proposal"
+                label={proposal instanceof Thread ? 'Thread' : 'Proposal'}
                 onclick={() => {
                   this.tabSelected = 'viewProposal';
                 }}
