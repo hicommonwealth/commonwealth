@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { findOneRole } from 'commonwealth/server/util/roles';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { findOneRole } from '../util/roles';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';

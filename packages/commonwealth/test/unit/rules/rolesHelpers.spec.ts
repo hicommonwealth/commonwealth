@@ -1,9 +1,6 @@
 import { assert } from 'chai';
-import {
-  findAllCommunityRolesWithRoleAssignments,
-  getHighestRole,
-} from 'commonwealth/server/util/roles';
-import { CommunityRoleAttributes } from 'commonwealth/server/models/community_role';
+import { getHighestRole } from '../../../server/util/roles';
+import { CommunityRoleAttributes } from '../../../server/models/community_role';
 
 describe('getHighestRole() unit tests', () => {
   it('should return highest role', async () => {

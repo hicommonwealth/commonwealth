@@ -47,7 +47,6 @@ const upgradeMember = async (
     chain.id,
     ['admin']
   );
-  console.log("chain", chain.id);
 
   if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
     return next(new AppError(Errors.MustBeAdmin));

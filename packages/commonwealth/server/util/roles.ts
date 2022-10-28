@@ -1,9 +1,9 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
-import { DB } from 'commonwealth/server/models';
+import { DB } from '../models';
 import {
   CommunityRoleAttributes,
   CommunityRoleInstance,
-} from 'commonwealth/server/models/community_role';
+} from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 
