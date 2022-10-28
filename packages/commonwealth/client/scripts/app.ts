@@ -671,6 +671,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
+            // General Contracts
+            '/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/contract/:contractAddress': importRoute(
+              'views/pages/general_contract',
+              { scoped: true }
+            ),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions': importRoute('views/pages/discussions', {
@@ -930,7 +939,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions_redirect', { 
+            '/:scope': importRoute('views/pages/discussions_redirect', {
               scoped: true,
             }),
             '/:scope/discussions': importRoute('views/pages/discussions', {
@@ -947,7 +956,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             '/:scope/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
-              { scoped: true, deferChain: true }
+              { scoped: true }
             ),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
