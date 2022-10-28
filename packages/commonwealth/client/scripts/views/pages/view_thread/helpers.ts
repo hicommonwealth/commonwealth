@@ -6,7 +6,7 @@ import { Poll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
-export const handleProposalPollVote = async (
+export const handlePollVote = async (
   poll: Poll,
   option: string,
   isSelected: boolean,
@@ -43,7 +43,7 @@ export const handleProposalPollVote = async (
     });
 };
 
-export const getProposalPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
+export const getPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
   if (!poll.endsAt.isValid()) {
     return 'No end date';
   }

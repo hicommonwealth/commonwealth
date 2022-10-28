@@ -12,7 +12,7 @@ import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { PollEditorCard } from './poll_editor_card';
-import { getProposalPollTimestamp, handleProposalPollVote } from './helpers';
+import { getPollTimestamp, handlePollVote } from './helpers';
 import { LinkedThreadsCard } from './linked_threads_card';
 
 type ThreadSidebarAttrs = {
@@ -85,7 +85,7 @@ export class ThreadSidebar implements m.ClassComponent<ThreadSidebarAttrs> {
                   )?.option
                 }
                 proposalTitle={poll.prompt}
-                timeRemaining={getProposalPollTimestamp(
+                timeRemaining={getPollTimestamp(
                   poll,
                   poll.endsAt && poll.endsAt?.isBefore(moment().utc())
                 )}
@@ -106,7 +106,7 @@ export class ThreadSidebar implements m.ClassComponent<ThreadSidebarAttrs> {
                     : 'You must join this community to vote.'
                 }
                 onVoteCast={(option, isSelected, callback) =>
-                  handleProposalPollVote(poll, option, isSelected, callback)
+                  handlePollVote(poll, option, isSelected, callback)
                 }
                 onResultsClick={(e) => {
                   e.preventDefault();
