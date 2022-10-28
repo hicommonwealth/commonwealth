@@ -3,30 +3,31 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/discussions/threads_overview_topic_summary_row.scss';
+import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { getLastUpdated, isHot } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
+import { getLastUpdated, isHot } from '../discussions/helpers';
+import { SharePopover } from '../view_proposal/share_popover';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
 
-type SummaryRowAttrs = {
+type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
   topic: Topic;
 };
 
-export class ThreadsOverviewTopicSummaryRow
-  implements m.ClassComponent<SummaryRowAttrs>
-{
-  view(vnode) {
+export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
+  view(vnode: m.VnodeDOM<TopicSummaryRowAttrs, this>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads
@@ -37,8 +38,21 @@ export class ThreadsOverviewTopicSummaryRow
       })
       .slice(0, 5);
 
+    const isAdmin =
+      app.roles.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      }) || app.user.isSiteAdmin;
+
+    const isAdminOrMod =
+      isAdmin ||
+      app.roles.isRoleOfCommunity({
+        role: 'moderator',
+        chain: app.activeChainId(),
+      });
+
     return (
-      <div class="ThreadsOverviewTopicSummaryRow">
+      <div class="TopicSummaryRow">
         <div class="topic-column">
           <div class="name-and-count">
             <CWText
@@ -64,7 +78,6 @@ export class ThreadsOverviewTopicSummaryRow
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        {isWindowMediumSmallInclusive(window.innerWidth) && <CWDivider />}
         <div class="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
@@ -74,17 +87,10 @@ export class ThreadsOverviewTopicSummaryRow
 
             const user = app.chain.accounts.get(thread.author);
             const commentsCount = app.comments.nComments(thread);
-            // const gallery = [user, user, user, user];
 
             return (
               <>
-                <div
-                  class="recent-thread-row"
-                  onclick={(e) => {
-                    e.preventDefault();
-                    m.route.set(discussionLink);
-                  }}
-                >
+                <div class="recent-thread-row">
                   <div class="row-top">
                     <div class="user-and-date-row">
                       {m(User, {
@@ -100,15 +106,24 @@ export class ThreadsOverviewTopicSummaryRow
                       >
                         {moment(getLastUpdated(thread)).format('l')}
                       </CWText>
+                      {thread.readOnly && (
+                        <CWIcon iconName="lock" iconSize="small" />
+                      )}
                     </div>
                     <div class="row-top-icons">
-                      {isHot(thread) && (
-                        <CWIcon iconName="flame" className="hot" />
-                      )}
+                      {isHot(thread) && <div class="flame" />}
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
-                  <CWText type="b2" fontWeight="bold">
+                  <CWText
+                    type="b2"
+                    fontWeight="bold"
+                    className="thread-title-text"
+                    onclick={(e) => {
+                      e.stopPropagation();
+                      m.route.set(discussionLink);
+                    }}
+                  >
                     {thread.title}
                   </CWText>
                   <CWText
@@ -135,28 +150,56 @@ export class ThreadsOverviewTopicSummaryRow
                         <CWText type="caption">+4 others</CWText>
                       </div> */}
                     </div>
-                    {/* <div class="row-bottom-menu">
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="share"
-                        onclick={(e) => e.stopPropagation()}
-                      />
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="flag"
-                        onclick={(e) => e.stopPropagation()}
-                      />
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="bell"
-                        onclick={(e) => e.stopPropagation()}
-                      />
-                      <CWIconButton
-                        iconSize="small"
-                        iconName="dotsVertical"
-                        onclick={(e) => e.stopPropagation()}
-                      />
-                    </div> */}
+                    <div class="row-bottom-menu">
+                      <SharePopover />
+                      {isAdminOrMod && (
+                        <CWPopoverMenu
+                          menuItems={[
+                            {
+                              label: 'Delete',
+                              iconLeft: 'trash',
+                              onclick: async (e) => {
+                                e.preventDefault();
+
+                                const confirmed =
+                                  await confirmationModalWithText(
+                                    'Delete this entire thread?'
+                                  )();
+
+                                if (!confirmed) return;
+
+                                app.threads.delete(thread).then(() => {
+                                  navigateToSubpage('/overview');
+                                });
+                              },
+                            },
+                            {
+                              label: thread.readOnly
+                                ? 'Unlock thread'
+                                : 'Lock thread',
+                              iconLeft: 'lock',
+                              onclick: (e) => {
+                                e.preventDefault();
+                                app.threads
+                                  .setPrivacy({
+                                    threadId: thread.id,
+                                    readOnly: !thread.readOnly,
+                                  })
+                                  .then(() => {
+                                    m.redraw();
+                                  });
+                              },
+                            },
+                          ]}
+                          trigger={
+                            <CWIconButton
+                              iconSize="small"
+                              iconName="dotsVertical"
+                            />
+                          }
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
                 {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}

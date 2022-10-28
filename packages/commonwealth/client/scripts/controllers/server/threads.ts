@@ -360,6 +360,7 @@ class ThreadsController {
           // Deleted posts are removed from all stores containing them
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
+          this._overviewStore.remove(proposal);
           m.redraw();
           resolve(result);
         })
@@ -416,6 +417,7 @@ class ThreadsController {
         // Post edits propagate to all thread stores
         this._store.update(result);
         this._listingStore.update(result);
+        this._overviewStore.update(result);
         return result;
       },
       error: (err) => {
