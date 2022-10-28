@@ -9,6 +9,12 @@ export function validateAbiInput(
   input: AbiInput
 ): [ValidationStatus, string] {
   // TODO Array Validation will be complex. Check what cases we want to cover here
+  // Cases not covered yet:
+  // - Array of Arrays
+  // - Array of Structs
+  // - Array of Enums
+  // - Array of Bytes
+  // - Array of Addresses and etc
   if (input.type.slice(-2) === '[]') {
     if (val[0] !== '[' || val[val.length - 1] !== ']') {
       return ['failure', 'Input must be an array'];
