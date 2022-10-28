@@ -38,9 +38,7 @@ export default class GeneralContractsController {
       if (this.chain.app.chain) {
         nodeObj = this.chain.app.chain.meta.node;
       } else {
-        nodeObj = this.chain.app.config.nodes.getNodesByChainId(
-          this.contract.chainNodeId
-        );
+        throw new Error('No chain found');
       }
       this.chain._initApi(nodeObj);
       this.web3Contract = new this.chain.api.eth.Contract(
