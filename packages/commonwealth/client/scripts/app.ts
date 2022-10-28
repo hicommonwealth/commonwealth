@@ -678,7 +678,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             '/contract/:contractAddress': importRoute(
               'views/pages/general_contract',
-              { scoped: true, deferChain: true }
+              { scoped: true }
             ),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
