@@ -4,7 +4,7 @@ import _ from 'lodash';
 import m from 'mithril';
 
 import { Button, Icons, SelectList } from 'construct-ui';
-import { ChainInfo } from 'models';
+import { Account, ChainInfo } from 'models';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
@@ -20,8 +20,8 @@ export class InformationSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
-    if (!vnode.attrs.form.creator) return;
-    if (!vnode.attrs.form.chainId) {
+    if (!app) return;
+    if (vnode.attrs.form.chainId !== app.activeChainId()) {
       vnode.attrs.form.chainId = app.activeChainId();
     }
     const allEthChains = getAllEthChains(app);
@@ -29,9 +29,11 @@ export class InformationSlide
     const defaultChainIdx = userEthChains
       .concat(allEthChains)
       .findIndex((c) => c.id === app.activeChainId());
-    const selectedChainName = userEthChains.find(
+    const selectedChain = userEthChains.find(
       (c) => c.id === vnode.attrs.form.chainId
     );
+
+    const chainAccounts = app.user.activeAccounts;
 
     return (
       <form class="InformationSlide">
@@ -52,7 +54,7 @@ export class InformationSlide
           value={vnode.attrs.form.title}
         />
         <SelectList
-          class="chain-id-list"
+          class="chain-info-list"
           items={userEthChains.concat(allEthChains)}
           itemPredicate={(query: string, item: ChainInfo) => {
             return (
@@ -65,7 +67,7 @@ export class InformationSlide
           )}
           defaultActiveIndex={defaultChainIdx}
           onSelect={(n: ChainInfo) => {
-            vnode.attrs.form.chainId = n.id;
+            m.route.set(`/${n.id}/new/project`);
           }}
           trigger={
             <Button
@@ -73,7 +75,32 @@ export class InformationSlide
               compact={true}
               iconRight={Icons.CHEVRON_DOWN}
               sublabel={<CWText>Chain:</CWText>}
-              label={<CWText>{selectedChainName}</CWText>}
+              label={selectedChain.name}
+            />
+          }
+        />
+        <SelectList
+          class="account-address-list"
+          items={chainAccounts}
+          itemPredicate={(query: string, item: Account) => {
+            return (
+              item.address.toLowerCase().includes(query.toLowerCase()) ||
+              item.profile.displayName
+                .toLowerCase()
+                .includes(query.toLowerCase())
+            );
+          }}
+          itemRender={(a: Account) => <CWText>{a.address}</CWText>}
+          defaultActiveIndex={0}
+          onSelect={(a: Account) => {
+            vnode.attrs.form.creator = a.address;
+          }}
+          trigger={
+            <Button
+              align="left"
+              compact={true}
+              iconRight={Icons.CHEVRON_DOWN}
+              label={vnode.attrs.form.creator}
             />
           }
         />

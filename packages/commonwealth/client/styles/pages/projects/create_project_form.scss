@@ -23,19 +23,12 @@ $formWidth: 480px;
   .CoverImageUpload {
     margin-top: 16px;
   }
-  .InformationSlide > .cui-button {
+  .InformationSlide > .cui-button,
+  .FundraisingSlide > .cui-button {
     background-color: $neutral-25;
     border-radius: $border-radius-corners;
     border: 2px solid $neutral-200;
     padding: 6px 8px;
-
-    &.darkMode {
-      @include darkModeInputStyles;
-    }
-
-    .Text {
-      color: $neutral-500;
-    }
   }
   .NavigationButtons.cui-button-group {
     width: 480px;
@@ -43,19 +36,19 @@ $formWidth: 480px;
     .cui-button {
       width: 50%;
       .cui-button-label {
+        width: 100%;
         display: flex;
-        span {
-          position: relative;
-          top: 2px;
-          padding: 0 5px;
-        }
+        justify-content: space-between;
       }
     }
   }
 }
 
-// Chain id select list
-.chain-id-list > .cui-popover-content {
+// Popover styles
+
+// ChainInfo and Account select list
+.chain-info-list > .cui-popover-content,
+.account-address-list > .cui-popover-content {
   width: $formWidth;
   .Text {
     padding: 8px;
@@ -65,5 +58,12 @@ $formWidth: 480px;
     &:hover {
       background-color: $neutral-50;
     }
+  }
+}
+
+.fundraise-length-list .Text {
+  padding: 4px;
+  &:hover {
+    background-color: $neutral-50;
   }
 }

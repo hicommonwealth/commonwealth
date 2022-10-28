@@ -10,23 +10,24 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { ChainBase } from 'common-common/src/types';
-import { getUserEthChains, validateProjectForm } from '../helpers';
+import { validateProjectForm } from '../helpers';
 import {
   ICreateProjectForm,
   weekInSeconds,
   nowInSeconds,
-  CreateProjectStages,
-  CreateProjectStageNumber,
+  CreateProjectSlides,
+  CreateProjectSlideNumber,
 } from '../types';
+import { PageLoading } from '../../loading';
 
 export default class CreateProjectForm implements m.ClassComponent {
   private form: ICreateProjectForm;
-  private stageNumber: CreateProjectStageNumber;
+  private slideNumber: CreateProjectSlideNumber;
   private $form: HTMLFormElement;
 
   setStateData() {
-    if (!this.stageNumber) {
-      this.stageNumber = 1;
+    if (!this.slideNumber) {
+      this.slideNumber = 1;
     }
 
     if (!this.form) {
@@ -88,18 +89,20 @@ export default class CreateProjectForm implements m.ClassComponent {
   }
 
   view() {
-    // Because we are switching to new chain, activeAccount may not be set yet
-    if (!app.user?.activeAccount && app.isLoggedIn()) {
-      return;
+    if (!app?.activeChainId()) {
+      return <PageLoading />;
     }
-    // Create project form must be scoped to an Ethereum page
-    if (app.user.activeAccount.chain.base !== ChainBase.Ethereum) {
+
+    // Project creation may only take place within Ethereum communities
+    const isEthScoped =
+      app.config.chains.getById(app.activeChainId()).base ===
+      ChainBase.Ethereum;
+    if (!app.isLoggedIn() || !isEthScoped) {
       m.route.set(`/projects/explore`);
     }
 
     this.setStateData();
-
-    const StagePanel = CreateProjectStages[this.stageNumber];
+    const FormSlide = CreateProjectSlides[this.slideNumber];
 
     return (
       <Sublayout
@@ -114,36 +117,33 @@ export default class CreateProjectForm implements m.ClassComponent {
             <CWText type="h5" weight="medium">
               Project Creation
             </CWText>
-            <StagePanel form={this.form} />
+            <FormSlide form={this.form} />
           </div>
           <ButtonGroup class="NavigationButtons" outlined={true}>
             <Button
-              disabled={this.stageNumber === 1}
+              disabled={this.slideNumber === 1}
               label={
                 <>
                   <CWIcon iconName="arrowLeft" />
-                  <span>'Previous Page'</span>
+                  <span>Previous Page</span>
                 </>
               }
               onclick={(e) => {
-                const requiredInputsFilled = this.$form.reportValidity();
-                if (requiredInputsFilled) {
-                  this.stageNumber -= 1;
-                }
+                this.slideNumber -= 1;
               }}
             />
-            {this.stageNumber !== 3 ? (
+            {this.slideNumber !== 3 ? (
               <Button
                 label={
                   <>
-                    <span>'Next Page'</span>
+                    <span>Next Page</span>
                     <CWIcon iconName="arrowRight" />
                   </>
                 }
                 onclick={(e) => {
-                  const requiredInputsFilled = this.$form.reportValidity();
+                  const requiredInputsFilled = this.$form?.reportValidity();
                   if (requiredInputsFilled) {
-                    this.stageNumber += 1;
+                    this.slideNumber += 1;
                   }
                 }}
               />

@@ -41,13 +41,13 @@ export interface ICreateProjectForm {
   curatorFee: number;
 }
 
-export const CreateProjectStages = {
+export const CreateProjectSlides = {
   1: InformationSlide,
   2: FundraisingSlide,
   3: DescriptionSlide,
 };
 
-export type CreateProjectStageNumber = keyof typeof CreateProjectStages;
+export type CreateProjectSlideNumber = keyof typeof CreateProjectSlides;
 
 export type TokenOption = {
   name: string;

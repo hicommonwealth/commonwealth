@@ -112,10 +112,6 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
       this.handleToggle();
     }
 
-    if (loggedIn) {
-      console.log(app.user);
-    }
-
     // Scroll
     this.onscroll = _.debounce(async () => {
       if (this.activePage === DashboardViews.ForYou) {

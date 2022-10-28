@@ -4,12 +4,11 @@ import 'pages/projects/index.scss';
 import m from 'mithril';
 import app from 'state';
 import Web3 from 'web3';
-import { SelectList, TabItem, Tabs } from 'construct-ui';
+import { TabItem, Tabs } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
-import { RoleInfo } from 'models';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YourPage from './your_page';
@@ -62,9 +61,9 @@ export default class ProjectListing implements m.ClassComponent {
     // is a member of ETH chains that do not include Ethereum
     const userEthChains = getUserEthChains(app);
     const defaultProjectChain =
-      !userEthChains.length || userEthChains.includes('ethereum')
+      !userEthChains.length || userEthChains.find((c) => c.id === 'ethereum')
         ? 'ethereum'
-        : userEthChains[0];
+        : userEthChains[0].id;
 
     return (
       <Sublayout

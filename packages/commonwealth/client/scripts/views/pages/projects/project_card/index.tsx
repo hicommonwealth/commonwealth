@@ -3,7 +3,6 @@
 import 'pages/projects/project_card.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
 import { slugify } from 'utils';
 
 import { Project } from 'models';

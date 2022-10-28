@@ -84,6 +84,7 @@ export class FundraisingSlide
           value={vnode.attrs.form.threshold}
         />
         <SelectList
+          class="fundraise-length-list"
           items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
           itemRender={(i: string) => {
             return (
