@@ -107,6 +107,23 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWButton
             iconName="plus"
             buttonType="mini"
+            label="Edit Rule"
+            onclick={() => {
+              app.modals.create({
+                modal: RuleModal,
+                data: {
+                  onFinish: (rule) => {
+                    console.log('Rule that will be saved: ', rule);
+                    notifySuccess('Rule created!');
+                  },
+                  rule: { AllowListRule: [['a', 'b']] },
+                },
+              });
+            }}
+          />
+          <CWButton
+            iconName="plus"
+            buttonType="mini"
             label="Create Rule"
             onclick={() => {
               app.modals.create({

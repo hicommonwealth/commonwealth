@@ -69,9 +69,7 @@ class RuleDisplaySection implements m.ClassComponent<RuleDisplaySectionAttrs> {
         </div>
       );
     } else if (ruleArgument.type === 'rule[]') {
-      console.log('yo', rule[ruleTypeIdentifier]);
       return rule[ruleTypeIdentifier][0].map((subRule) => {
-        console.log('subRule', subRule);
         return (
           <div class="display-section">
             <CWRuleCard

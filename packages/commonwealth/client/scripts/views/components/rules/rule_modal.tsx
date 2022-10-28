@@ -35,16 +35,20 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
   private subRuleEditState: Array<boolean>;
 
   oninit(vnode) {
-    const { internalBuiltRule, ruleTypeIdentifier } = vnode.attrs;
-
+    const { internalBuiltRule, ruleTypeIdentifier, ruleArgument } = vnode.attrs;
     this.subRuleResolved = true;
-    this.subRules = internalBuiltRule[ruleTypeIdentifier]; // Only applicable for compound rules
-    this.subRuleEditState = this.subRules.map(() => false);
+    if (ruleArgument.type === 'rule[]') {
+      this.subRules = internalBuiltRule[ruleTypeIdentifier][0]; // Only applicable for compound rules
+      this.subRuleEditState = this.subRules.map(() => false);
+    }
   }
 
   onupdate(vnode) {
-    const { internalBuiltRule, ruleTypeIdentifier } = vnode.attrs;
-    this.subRules = internalBuiltRule[ruleTypeIdentifier];
+    const { internalBuiltRule, ruleTypeIdentifier, ruleArgument } = vnode.attrs;
+
+    if (ruleArgument.type === 'rule[]') {
+      this.subRules = internalBuiltRule[ruleTypeIdentifier][0];
+    }
   }
 
   view(vnode) {
@@ -96,21 +100,18 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
         </div>
       );
     } else if (ruleArgument.type === 'rule[]') {
-      // If i have a rule argument, I need to
-      // 1. check if it already has subrules defined. If so, I should display them as COMPLETED
-      // 2. If it doesnt have subrules defined, I should show a new sub modal to create one
       return (
         <div class={`display-section${isNested ? '' : ' parent'}`}>
-          {internalBuiltRule[ruleTypeIdentifier].map((subRule, idx) => {
+          {internalBuiltRule[ruleTypeIdentifier][0].map((subRule, idx) => {
             if (this.subRuleEditState[idx]) {
               return (
                 <RuleModal
                   isNested
                   onFinish={(rule) => {
-                    internalBuiltRule[ruleTypeIdentifier][idx] = [rule];
+                    internalBuiltRule[ruleTypeIdentifier][0][idx] = rule;
                     this.subRuleEditState[idx] = false;
                   }}
-                  rule={subRule[0]}
+                  rule={subRule}
                   onCancel={(
                     internalRule: Record<string, unknown>,
                     ruleValid: boolean
@@ -126,7 +127,7 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
                           return i !== idx;
                         }
                       );
-                      internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+                      internalBuiltRule[ruleTypeIdentifier][0] = this.subRules;
                       m.redraw();
                     }
                   }}
@@ -135,7 +136,7 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
             } else {
               return (
                 <div class="completed-rule-display">
-                  <CWText type="h5">{Object.keys(subRule[0])[0]}</CWText>
+                  <CWText type="h5">{Object.keys(subRule)[0]}</CWText>
                   <div class="icons-display">
                     <CWIcon
                       iconName="write"
@@ -155,7 +156,8 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
                             return i !== idx;
                           }
                         );
-                        internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+                        internalBuiltRule[ruleTypeIdentifier][0] =
+                          this.subRules;
                         m.redraw();
                       }}
                     />
@@ -167,9 +169,9 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
           <div className="add-button-wrapper">
             <CWButton
               onclick={() => {
-                this.subRules.push([{}]);
+                this.subRules.push({});
                 this.subRuleEditState.push(true);
-                internalBuiltRule[ruleTypeIdentifier] = this.subRules;
+                internalBuiltRule[ruleTypeIdentifier][0] = this.subRules;
                 m.redraw();
               }}
               label="add subrule"
@@ -268,7 +270,9 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
                     argument.type === 'address' ||
                     argument.type === 'balance'
                   ) {
-                    ruleValue.push('');
+                    ruleValue.push([]);
+                  } else if (argument.type === 'rule[]') {
+                    ruleValue.push([]);
                   }
                 }
                 this.internalBuiltRule[optionLabel] = ruleValue;
