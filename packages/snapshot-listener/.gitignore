@@ -1,6 +1,6 @@
-/node_modules
-/dist
-/build
-/.github
+node_modules/
+dist/
+build/
+.github/
 .env
 .gitignore
