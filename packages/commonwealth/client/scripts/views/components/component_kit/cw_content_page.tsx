@@ -48,14 +48,11 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
   private tabSelected: number;
 
   onResize(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
-    if (
-      isWindowMediumSmallInclusive(window.innerWidth) &&
-      vnode.attrs.showSidebar
-    ) {
-      this.viewType = 'tabsView';
-    } else {
-      this.viewType = 'sidebarView';
-    }
+    this.viewType =
+      isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
+        ? 'tabsView'
+        : 'sidebarView';
+
     m.redraw();
   }
 
