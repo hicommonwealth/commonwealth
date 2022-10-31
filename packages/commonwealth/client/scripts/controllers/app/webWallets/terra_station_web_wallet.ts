@@ -1,8 +1,10 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account } from 'models';
-import { Extension, LCDClient } from '@terra-money/terra.js';
+import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 
 type TerraAddress = {
   address: string
@@ -67,19 +69,18 @@ class TerraStationWebWalletController extends ClientSideWebWalletController<Terr
   public async getRecentBlock() {
     const chainId = await this.getChainId();
     const client = new LCDClient({
-      // why doesn't setten.io work?
-      URL: "https://phoenix-lcd.terra.dev/",
+      URL: app.chain.meta.ChainNode.url,
       chainID: chainId
     });
-
-    const txInfos = await client.tx.txInfosByHeight(undefined);
-    const txInfo = txInfos[0];
+    const tmClient = new TendermintAPI(client);
+    const blockInfo = await tmClient.blockInfo();
 
     return {
-      number: txInfo.height,
-      hash: txInfo.txhash,
+      number: parseInt(blockInfo.block.header.height),
+      // TODO: is this the hash we should use? the terra.js API has no documentation
+      hash: blockInfo.block.header.data_hash,
       // seconds since epoch
-      timestamp: Math.floor(new Date(txInfo.timestamp).getTime() / 1000)
+      timestamp: Math.floor(new Date(blockInfo.block.header.time).getTime() / 1000)
     };
   }
 
