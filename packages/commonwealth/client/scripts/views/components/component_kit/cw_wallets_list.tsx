@@ -312,14 +312,14 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         wallet.chain === 'solana'
                       ) {
                         address = wallet.accounts[0];
+                      } else if (wallet.defaultNetwork === 'terra') {
+                        address = wallet.accounts[0].address;
                       } else if (wallet.chain === 'cosmos') {
                         if (wallet.defaultNetwork === 'injective') {
                           address = wallet.accounts[0];
                         } else {
                           address = wallet.accounts[0].address;
                         }
-                      } else if (wallet.defaultNetwork === 'terra') {
-                        address = wallet.accounts[0].address;
                       }
 
                       await handleNormalWalletLogin(wallet, address);

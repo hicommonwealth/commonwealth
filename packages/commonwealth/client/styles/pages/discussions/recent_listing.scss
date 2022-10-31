@@ -1,25 +1,16 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .RecentListing {
   padding: 0 24px;
 
-  .infinite-scroll-reached-end {
-    color: $neutral-500;
-    font-size: 0.94rem;
-    margin: 20px 0;
-    text-align: center;
-  }
-
-  .topic-loading-spinner-wrap,
-  .infinite-scroll-spinner-wrap {
+  .listing-scroll {
     align-items: center;
     display: flex;
-    height: 70px;
     justify-content: center;
-    width: 100%;
-  }
+    margin: 16px 0;
 
-  .topic-loading-spinner-wrap {
-    height: 120px;
+    .thread-count-text.Text {
+      color: $neutral-500;
+    }
   }
 }

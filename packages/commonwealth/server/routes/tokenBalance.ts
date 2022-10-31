@@ -1,4 +1,4 @@
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache, TokenBalanceResp as TBCResp } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractInstance } from '../models/contract';
 import validateChain from '../util/validateChain';
@@ -6,9 +6,7 @@ import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AddressInstance } from '../models/address';
-import { ChainNetwork } from '../../../common-common/src/types';
+import { BalanceType, ChainNetwork } from '../../../common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -31,7 +29,7 @@ const tokenBalance = async (
   }
 
   let chain: ChainInstance;
-  let author: AddressInstance;
+  // let author: AddressInstance;
   let error: string;
   let contract: ContractInstance;
   try {
@@ -40,16 +38,32 @@ const tokenBalance = async (
   } catch (err) {
     throw new AppError(err);
   }
-  try {
-    [author, error] = await lookupAddressIsOwnedByUser(models, req);
-    if (error) throw new AppError(error);
-  } catch (err) {
-    throw new AppError(err)
+
+  // NOTE: Removing validation of ownership of address, seemingly unnecessary for logic
+  // try {
+  //   [author, error] = await lookupAddressIsOwnedByUser(models, req);
+  //   if (error) throw new AppError(error);
+  // } catch (err) {
+  //   throw new AppError(err)
+  // }
+
+  let chain_node_id = chain?.ChainNode?.id;
+  if (!chain_node_id) {
+    throw new ServerError(`No chain node found for chain ${chain.id}`)
   }
 
-  let chain_node_id = chain.ChainNode.id;
+  let bp: string;
+  try {
+    const providersResult = await tokenBalanceCache.getBalanceProviders(chain_node_id);
+    bp = providersResult[0].bp;
+  } catch (e) {
+    log.info(e.message);
+    throw new AppError(`No token balance provider found for ${chain.id}`);
+  }
+
   if (
-    ['ethereum', 'near', 'solana'].includes(chain.ChainNode.chain_base) &&
+    chain.ChainNode?.balance_type &&
+    [BalanceType.Ethereum, BalanceType.Solana, BalanceType.NEAR].includes(chain.ChainNode.balance_type) &&
     chain.network !== ChainNetwork.AxieInfinity
   ) {
     try {
@@ -66,19 +80,29 @@ const tokenBalance = async (
     }
   }
 
+  let balancesResp: TBCResp;
   try {
-    const balance = await tokenBalanceCache.getBalance(
+    balancesResp = await tokenBalanceCache.getBalancesForAddresses(
       chain_node_id,
-      author.address,
-      contract?.address,
-      chain.network === ChainNetwork.ERC20
-        ? 'erc20' : chain.network === ChainNetwork.ERC721
-          ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined,
+      [ req.body.address ],
+      bp,
+      {
+        tokenAddress: contract?.address,
+        contractType: chain.network === ChainNetwork.ERC20
+          ? 'erc20' : chain.network === ChainNetwork.ERC721
+            ? 'erc721' : undefined,
+      },
     );
-    return success(res, balance.toString());
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);
+    throw new ServerError(Errors.QueryFailed);
+  }
+
+  if (balancesResp.balances[req.body.address]) {
+    return success(res, balancesResp.balances[req.body.address]);
+  } else if (balancesResp.errors[req.body.address]) {
+    throw new AppError(`Error querying balance: ${balancesResp.errors[req.body.address]}`);
+  } else {
     throw new ServerError(Errors.QueryFailed);
   }
 };
