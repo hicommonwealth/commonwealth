@@ -13,6 +13,17 @@ export default class Token extends Ethereum implements ITokenAdapter {
   public tokenBalance: BN = new BN(0);
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
     if (!activeAddress) return false;
+
+    if (!this.contractAddress) {
+      // iterate through selectedChain.Contracts for the erc20 type and return the address
+      const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
+      if (!tokenContracts || !tokenContracts.length) {
+        throw new Error('No ERC20 contracts found');
+      }
+      const tokenContract = tokenContracts[0];
+      this.contractAddress = tokenContract.address;
+    }
+
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
@@ -39,14 +50,6 @@ export default class Token extends Ethereum implements ITokenAdapter {
   }
 
   public async initApi() {
-    // iterate through selectedChain.Contracts for the erc20 type and return the address
-    const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
-    if (!tokenContracts || !tokenContracts.length) {
-      throw new Error('No ERC20 contracts found');
-    }
-    const tokenContract = tokenContracts[0];
-    this.contractAddress = tokenContract.address;
-
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
     this._apiInitialized = true;
