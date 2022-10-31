@@ -276,7 +276,7 @@ export enum PermissionError {
 }
 
 // eslint-disable-next-line no-bitwise
-export const BASE_PERMISSIONS: Permissions = BigInt(1 << Action.CREATE_THREAD);
+export const BASE_PERMISSIONS: Permissions = BigInt(1) << BigInt(Action.CREATE_THREAD);
 
 export async function isAddressPermitted(
   models: DB,

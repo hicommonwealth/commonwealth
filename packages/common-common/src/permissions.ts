@@ -24,7 +24,7 @@ export enum Action {
 export type Permissions = bigint;
 
 export function isPermitted(permission: Permissions, action: Action): boolean {
-  const actionAsBigInt: bigint = BigInt(1 << action);
+  const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
   const hasAction: boolean = (permission & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }

@@ -40,10 +40,10 @@ export async function addAllowDenyPermissions(
   });
   // update allow permission on community role object
   // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1 << allow_permission);
+  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
   // update deny permission on community role object
   // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1 << deny_permission);
+  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
   // save community role object to the database
   await communityRole.save();
 }
