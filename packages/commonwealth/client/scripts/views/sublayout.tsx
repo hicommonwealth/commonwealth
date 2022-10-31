@@ -37,6 +37,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     this.isSidebarToggled =
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
 
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+
     window.addEventListener('resize', () => {
       this.onResize();
     });
