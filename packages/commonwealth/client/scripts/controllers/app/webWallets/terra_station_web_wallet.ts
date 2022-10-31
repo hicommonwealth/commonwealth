@@ -4,7 +4,6 @@ import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 
 type TerraAddress = {
   address: string
