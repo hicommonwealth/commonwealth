@@ -22,6 +22,12 @@ type SublayoutAttrs = {
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
   private isSidebarToggled: boolean;
+  private isWindowSmallInclusive: boolean;
+
+  onResize() {
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+    m.redraw();
+  }
 
   oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -30,6 +36,16 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
 
     this.isSidebarToggled =
       localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+
+    window.addEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('resize', () => {
+      this.onResize();
+    });
   }
 
   view(vnode) {
@@ -45,8 +61,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
-    const isSidebarToggleable =
-      app.chain && isWindowSmallInclusive(window.innerWidth);
+    const isSidebarToggleable = app.chain && this.isWindowSmallInclusive;
 
     return (
       <div class="Sublayout">
@@ -73,7 +88,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
 
-              {isWindowSmallInclusive(window.innerWidth) && app.mobileMenu ? (
+              {this.isWindowSmallInclusive && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
                 <div class="Body" onscroll={onscroll}>

@@ -31,8 +31,12 @@ import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWRuleCard } from '../rules';
 import { CWDropdown } from './cw_dropdown';
+<<<<<<< HEAD
 import RuleModal from '../rules/rule_modal';
 import { CWTextInput } from './cw_text_input';
+=======
+import CWCoverImageUploader from './cw_cover_image_uploader';
+>>>>>>> master
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -438,6 +442,11 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Textarea"
             label="Text area"
             placeholder="Type here"
+          />
+          <CWCoverImageUploader
+            uploadCompleteCallback={(url: string) => {
+              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+            }}
           />
         </div>
         <h1>Buttons</h1>
