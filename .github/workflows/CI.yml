@@ -49,11 +49,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-<<<<<<< HEAD
-        run: yarn --ignore-engines
-=======
         run: yarn
->>>>>>> master
 
       - name: Typecheck
         run: yarn check-types
