@@ -6,34 +6,40 @@ const Bytes32 = ethers.utils.formatBytes32String;
 
 export function validateAbiInput(
   val: string,
-  input: AbiInput
+  inputType: string
 ): [ValidationStatus, string] {
   // TODO Array Validation will be complex. Check what cases we want to cover here
-  if (input.type.slice(-2) === '[]') {
+  // Cases not covered yet:
+  // - Array of Arrays
+  // - Array of Structs
+  // - Array of Enums
+  // - Array of Bytes
+  // - Array of Addresses and etc
+  if (inputType.slice(-2) === '[]') {
     if (val[0] !== '[' || val[val.length - 1] !== ']') {
       return ['failure', 'Input must be an array'];
     } else {
       return ['success', ''];
     }
   }
-  if (input.type === 'bool') {
+  if (inputType === 'bool') {
     if (val !== 'true' && val !== 'false') {
       return ['failure', 'Input must be a boolean'];
     }
   }
-  if (input.type.substring(0, 4) === 'uint') {
+  if (inputType.substring(0, 4) === 'uint') {
     if (!Number.isNaN(Number(val))) {
       return ['success', ''];
     } else {
       return ['failure', 'Input must be a number'];
     }
-  } else if (input.type === 'bool') {
+  } else if (inputType === 'bool') {
     if (val === 'true' || val === 'false') {
       return ['success', ''];
     } else {
       return ['failure', 'Input must be a boolean'];
     }
-  } else if (input.type === 'address') {
+  } else if (inputType === 'address') {
     if (val.length === 42) {
       return ['success', ''];
     } else {
@@ -47,34 +53,35 @@ export function validateAbiInput(
 export function handleMappingAbiInputs(
   inputIndex: number,
   input: string,
-  abiItem: AbiItem,
+  functionName: string,
   inputMap: Map<string, Map<number, string>>
 ) {
-  if (!inputMap.has(abiItem.name)) {
-    inputMap.set(abiItem.name, new Map<number, string>());
-    const inputArgMap = inputMap.get(abiItem.name);
+  if (!inputMap.has(functionName)) {
+    inputMap.set(functionName, new Map<number, string>());
+    const inputArgMap = inputMap.get(functionName);
     inputArgMap.set(inputIndex, input);
-    inputMap.set(abiItem.name, inputArgMap);
+    inputMap.set(functionName, inputArgMap);
   } else {
-    const inputArgMap = inputMap.get(abiItem.name);
+    const inputArgMap = inputMap.get(functionName);
     inputArgMap.set(inputIndex, input);
-    inputMap.set(abiItem.name, inputArgMap);
+    inputMap.set(functionName, inputArgMap);
   }
 }
 
 export function processAbiInputsToDataTypes(
-  fn: AbiItem,
+  functionName: string,
+  functionInputs: AbiInput[],
   inputsMap: Map<string, Map<number, string>>
 ): any[] {
-  const processedArgs: any[] = fn.inputs.map((arg: AbiInput, index: number) => {
+  const processedArgs: any[] = functionInputs.map((arg: AbiInput, index: number) => {
     const type = arg.type;
     if (type.substring(0, 4) === 'uint')
-      return BigNumber.from(inputsMap.get(fn.name).get(index));
+      return BigNumber.from(inputsMap.get(functionName).get(index));
     if (type.substring(0, 4) === 'byte')
-      return Bytes32(inputsMap.get(fn.name).get(index));
+      return Bytes32(inputsMap.get(functionName).get(index));
     if (type.slice(-2) === '[]')
-      return JSON.parse(inputsMap.get(fn.name).get(index));
-    return inputsMap.get(fn.name).get(index);
+      return JSON.parse(inputsMap.get(functionName).get(index));
+    return inputsMap.get(functionName).get(index);
   });
   return processedArgs;
 }
