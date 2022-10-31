@@ -42,7 +42,7 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
 	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
 	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-	getRoleAssignment: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+	getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
 	getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 }
 

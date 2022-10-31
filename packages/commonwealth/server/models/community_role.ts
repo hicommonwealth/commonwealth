@@ -12,8 +12,8 @@ export type CommunityRoleAttributes = {
   name: Permission;
   id?: number;
   chain_id: string;
-  allow?: bigint;
-  deny?: bigint;
+  allow: bigint;
+  deny: bigint;
   created_at?: Date;
   updated_at?: Date;
 
@@ -23,7 +23,6 @@ export type CommunityRoleAttributes = {
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  RoleAssignments?: RoleAssignmentInstance[];
   getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
 };
 

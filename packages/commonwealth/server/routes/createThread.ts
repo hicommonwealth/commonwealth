@@ -6,7 +6,7 @@ import {
   ChainType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { Action } from 'common-common/src/permissions';
 import {

@@ -75,9 +75,6 @@ const addEditors = async (
         if (!collaborator.RoleAssignments || !collaborator.User) {
           return null;
         }
-        // const isMember = collaborator.RoleAssignments.find(
-        //   (role_assignment) => role_assignment.chain_id === chain.id
-        // );
         const isMember = await findOneRole(
           models,
           { where: { address_id: collaborator.id } },

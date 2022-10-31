@@ -8,7 +8,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.sequelize.transaction(async (t) => {
+    return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.createTable(
         'CommunityRoles',
         {
@@ -40,6 +40,14 @@ module.exports = {
           },
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
+        },
+        {
+          underscored: true,
+          indexes: [
+            { fields: ['chain_id'] },
+            { fields: ['community_role_id'] },
+            { fields: ['address_id'] },
+          ],
         },
         { transaction: t }
       );
@@ -73,9 +81,7 @@ module.exports = {
         },
         { transaction: t }
       );
-    });
 
-    await queryInterface.sequelize.transaction(async (t) => {
       // Migrate CommunityRoles for Current Chains
       const query = `
       SELECT c.id as cid
@@ -124,10 +130,8 @@ module.exports = {
           );
         })
       );
-    });
 
-    // I think we need to do it half and half
-    await queryInterface.sequelize.transaction(async (t) => {
+      // I think we need to do it half and half
       // Migrate RoleAssignments for Current Roles
       const role_query = `
       SELECT r.id as rid, cr.name as crname, r.address_id, r.permission, r.chain_id, r.is_user_default, cr.id as crid
@@ -159,29 +163,6 @@ module.exports = {
           );
         })
       );
-    });
-
-    // Add indexes
-    await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.addIndex(
-        'CommunityRoles',
-        { fields: ['chain_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['community_role_id'] },
-        { transaction: t }
-      );
-      await queryInterface.addIndex(
-        'RoleAssignments',
-        { fields: ['address_id'] },
-        { transaction: t }
-      );
-    });
-
-    return new Promise((resolve, reject) => {
-      resolve();
     });
   },
 

@@ -271,8 +271,20 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
-      // TODO: add other balance types if needed
-      balance_type: base === ChainBase.CosmosSDK ? BalanceType.Cosmos : undefined,
+      balance_type: base === ChainBase.CosmosSDK
+        ? BalanceType.Cosmos
+        : base === ChainBase.Substrate
+        ? BalanceType.Substrate
+        : base === ChainBase.Ethereum
+        ? BalanceType.Ethereum
+        // beyond here should never really happen, but just to make sure...
+        : base === ChainBase.NEAR
+        ? BalanceType.NEAR
+        : base === ChainBase.Solana
+        ? BalanceType.Solana
+        : undefined,
+      // use first chain name as node name
+      name: req.body.name,
     }
   });
 
