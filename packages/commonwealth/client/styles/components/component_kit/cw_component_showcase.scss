@@ -45,6 +45,14 @@ $width: 360px;
     }
   }
 
+  .rule-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: $margin-bottom;
+    width: 700px;
+  }
+
   .text-gallery {
     display: flex;
     flex-direction: column;

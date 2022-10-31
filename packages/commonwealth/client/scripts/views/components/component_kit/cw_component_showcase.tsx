@@ -70,57 +70,8 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Create Rule</h1>
-        <div class="form-gallery">
-          <CWButton
-            iconName="plus"
-            buttonType="mini"
-            label="Edit Rule"
-            onclick={() => {
-              app.modals.create({
-                modal: RuleModal,
-                data: {
-                  onFinish: (rule) => {
-                    console.log('Rule that will be saved: ', rule);
-                    notifySuccess('Rule created!');
-                  },
-                  rule: {
-                    AnyRule: [
-                      [
-                        { AllowListRule: [['a', 'b']] },
-                        { AllowListRule: [['c', 'd']] },
-                        {
-                          AnyRule: [
-                            [
-                              { TokenBalanceRule: ['e', 'f'] },
-                              { AllowListRule: [['g', 'h']] },
-                            ],
-                          ],
-                        },
-                      ],
-                    ],
-                  },
-                },
-              });
-            }}
-          />
-          <CWButton
-            iconName="plus"
-            buttonType="mini"
-            label="Edit Rule"
-            onclick={() => {
-              app.modals.create({
-                modal: RuleModal,
-                data: {
-                  onFinish: (rule) => {
-                    console.log('Rule that will be saved: ', rule);
-                    notifySuccess('Rule created!');
-                  },
-                  rule: { AllowListRule: [['a', 'b']] },
-                },
-              });
-            }}
-          />
+        <h1>Rules</h1>
+        <div class="rule-gallery">
           <CWButton
             iconName="plus"
             buttonType="mini"
@@ -130,29 +81,23 @@ export class ComponentShowcase implements m.ClassComponent {
                 modal: RuleModal,
                 data: {
                   onFinish: (rule) => {
-                    console.log('what am i here', rule);
                     notifySuccess('Rule created!');
                   },
                 },
               });
             }}
           />
-        </div>
-
-        <h1>Rule Card</h1>
-        <div class="form-gallery">
           <CWRuleCard
             isNested={false}
             rule={{
               AnyRule: [
                 [
-                  { AllowListRule: [['a', 'b']] },
-                  { AllowListRule: [['c', 'd']] },
+                  { AllowListRule: [['address1', 'address2']] },
                   {
-                    AnyRule: [
+                    AllRule: [
                       [
-                        { TokenBalanceRule: ['e', 'f'] },
-                        { AllowListRule: [['g', 'h']] },
+                        { TokenBalanceRule: ['token_contract', '1000'] },
+                        { AdminOnlyRule: [] },
                       ],
                     ],
                   },
@@ -166,49 +111,6 @@ export class ComponentShowcase implements m.ClassComponent {
             ruleTypeIdentifier="AnyRule"
             adminView={true}
           />
-          {/* <CWRuleCard
-            isNested={false}
-            rule={{
-              AllRule: [
-                [
-                  {
-                    AnyRule: [
-                      [
-                        {
-                          AllowListRule: [
-                            [
-                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                              '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                            ],
-                          ],
-                        },
-                      ],
-                      [
-                        {
-                          AdminOnlyRule: [],
-                        },
-                      ],
-                    ],
-                  },
-                ],
-                [
-                  {
-                    TokenBalanceRule: [
-                      '0xE58E375Cc657e434e6981218A356fAC756b98097',
-                      '500 AVAX',
-                    ],
-                  },
-                ],
-              ],
-            }}
-            ruleId={1}
-            chainId="test-chain"
-            ruleCreatedAt={new Date()}
-            ruleUpdatedAt={new Date()}
-            ruleTypeIdentifier="AllRule"
-            adminView={true}
-          /> */}
         </div>
 
         <h1>Dropdown</h1>
