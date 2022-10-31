@@ -25,7 +25,7 @@ export class AttributeDisplay
           containerClassName="display-input"
           disabled
           value={value}
-        ></CWTextInput>
+        />
       </div>
     );
   }
