@@ -23,10 +23,20 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
 
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
   app.use((error, req, res: Response, next) => {
+    const tags = {
+      statusCode: error.status || 500,
+      method: req.method,
+      path: req.path,
+    };
     if (error instanceof ServerError) {
       console.trace(error);
       rollbar.error(error); // expected server error
-      StatsDController.get().event('server_error', error.message, {alert_type: 'error'});
+      StatsDController.get().event(
+        'server_error',
+        error.message,
+        { alert_type: 'error' },
+        tags
+      );
       res.status(error.status).send({
         status: error.status,
         // Use external facing error message
@@ -34,7 +44,14 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
       });
     } else if (error instanceof AppError) {
       rollbar.log(error); // expected application/user error
-      StatsDController.get().event('app_error', error.message, {alert_type: 'error'});
+      StatsDController.get().event(
+        'app_error',
+        error.message,
+        {
+          alert_type: 'error',
+        },
+        tags
+      );
       res.status(error.status).send({
         status: error.status,
         error: error.message,
@@ -42,7 +59,14 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
     } else {
       console.trace(error);
       rollbar.critical(error); // unexpected error
-      StatsDController.get().event('critical error', error.message, {alert_type: 'error'});
+      StatsDController.get().event(
+        'critical error',
+        error.message,
+        {
+          alert_type: 'error',
+        },
+        tags
+      );
       res.status(500);
       res.json({
         status: error.status,

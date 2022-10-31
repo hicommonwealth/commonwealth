@@ -86,7 +86,7 @@ export class RedisCache {
           StatsDController.get().event(
             'reconnect_strategy_error',
             'RedisCache max connection retries exceeded! RedisCache client shutting down!',
-            { alert_type: 'error' }
+            { alert_type: 'error' },
           );
         }
       } else if (err instanceof SocketClosedUnexpectedlyError) {
