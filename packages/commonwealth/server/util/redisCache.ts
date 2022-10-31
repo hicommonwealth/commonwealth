@@ -1,8 +1,14 @@
-import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import {
+  ConnectionTimeoutError,
+  createClient,
+  ReconnectStrategyError,
+  SocketClosedUnexpectedlyError,
+} from 'redis';
 import { factory, formatFilename } from 'common-common/src/logging';
+import Rollbar from 'rollbar';
 import { REDIS_URL, VULTR_IP } from '../config';
 import { RedisNamespaces } from '../../shared/types';
-import Rollbar from 'rollbar';
+import StatsDController from './statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -73,16 +79,28 @@ export class RedisCache {
         );
       } else if (err instanceof ReconnectStrategyError) {
         log.error(`RedisCache max connection retries exceeded!`);
-        if (!localRedis && !vultrRedis)
+        if (!localRedis && !vultrRedis) {
           this.rollbar.critical(
             'RedisCache max connection retries exceeded! RedisCache client shutting down!'
           );
+          StatsDController.get().event(
+            'reconnect_strategy_error',
+            'RedisCache max connection retries exceeded! RedisCache client shutting down!',
+            { alert_type: 'error' }
+          );
+        }
       } else if (err instanceof SocketClosedUnexpectedlyError) {
         log.error(`RedisCache socket closed unexpectedly`);
       } else {
         log.error(`RedisCache connection error:`, err);
-        if (!localRedis && !vultrRedis)
+        if (!localRedis && !vultrRedis) {
           this.rollbar.critical('RedisCache unknown connection error!', err);
+          StatsDController.get().event(
+            'unknown_connection_error',
+            'RedisCache unknown connection error!',
+            { alert_type: 'error' }
+          );
+        }
       }
     });
 
