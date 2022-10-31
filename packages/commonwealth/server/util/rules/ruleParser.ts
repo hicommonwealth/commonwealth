@@ -32,8 +32,6 @@ function validateArg(type: RuleArgumentType, arg: unknown, depth = 0): void {
           ({ type: argType }) => argType
         );
         const subRuleArgs = ruleArg[ruleKey];
-        console.log('subRuleArgTypes', subRuleArgTypes);
-        console.log('subRuleArgs', subRuleArgs);
         if (!Array.isArray(subRuleArgs)) {
           throw new Error('sub rule args must be array');
         }
