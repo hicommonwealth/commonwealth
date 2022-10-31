@@ -12,18 +12,18 @@ import { getClasses } from './helpers';
 import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 
-interface ICWCoverImageUploaderAttrs {
+type ICWCoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
   uploadCompleteCallback: CallableFunction;
-}
+};
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
 export default class CWCoverImageUploader
   implements m.ClassComponent<ICWCoverImageUploaderAttrs>
 {
   private imageURL: string;
-  private uploading: boolean;
+  private isUploading: boolean;
   private uploadStatus: ValidationStatus;
 
   async uploadImage(file: File): Promise<[string, ValidationStatus]> {
@@ -63,13 +63,17 @@ export default class CWCoverImageUploader
     const handleDragEvent = (event, hoverAttachZone?: boolean) => {
       event.preventDefault();
       event.stopPropagation();
+      if (this.isUploading) return;
       attachZone.classList[hoverAttachZone ? 'add' : 'remove']('hovered');
     };
 
     const handleUpload = async (file: File) => {
-      const [imageURL, uploadStatus] = await this.uploadImage(file);
+      if (!file) return;
+      this.isUploading = true;
+      m.redraw();
 
-      this.uploading = false;
+      const [imageURL, uploadStatus] = await this.uploadImage(file);
+      this.isUploading = false;
       this.uploadStatus = uploadStatus;
 
       if (imageURL) {
@@ -96,9 +100,8 @@ export default class CWCoverImageUploader
 
     const dropHandler = (dropEvent: DragEvent) => {
       handleDragEvent(dropEvent, false);
+      if (this.isUploading) return;
       delete this.uploadStatus;
-      this.uploading = true;
-      m.redraw();
       const { files } = dropEvent.dataTransfer;
       handleUpload(files[0]);
     };
@@ -110,11 +113,10 @@ export default class CWCoverImageUploader
 
     // On-click support
     const pseudoInputHandler = (inputEvent: InputEvent) => {
-      this.uploading = true;
-      m.redraw();
       handleUpload((inputEvent.target as HTMLInputElement).files[0]);
     };
     const clickHandler = () => {
+      if (this.isUploading) return;
       pseudoInput.click();
     };
 
@@ -123,7 +125,7 @@ export default class CWCoverImageUploader
   }
 
   view(vnode: VnodeDOM<ICWCoverImageUploaderAttrs, this>) {
-    const { imageURL, uploadStatus } = this;
+    const { imageURL, isUploading, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
 
     return (
@@ -146,8 +148,12 @@ export default class CWCoverImageUploader
           validationStatus={this.uploadStatus}
         />
         <div
-          class={getClasses<{ uploadStatus: ValidationStatus }>(
+          class={getClasses<{
+            isUploading: boolean;
+            uploadStatus: ValidationStatus;
+          }>(
             {
+              isUploading,
               uploadStatus,
             },
             'attach-zone'
@@ -159,9 +165,9 @@ export default class CWCoverImageUploader
             accept="image/jpeg, image/jpg, image/png"
             id="pseudo-input"
           />
-          {this.uploading && <CWSpinner active="true" size="large" />}
+          {this.isUploading && <CWSpinner active="true" size="large" />}
           <div class="attach-btn">
-            {!this.uploading && (
+            {!this.isUploading && (
               <CWIcon iconName="imageUpload" iconSize="medium" />
             )}
             <CWText type="caption" fontWeight="medium">
