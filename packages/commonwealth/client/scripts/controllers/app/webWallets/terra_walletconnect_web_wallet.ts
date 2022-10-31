@@ -37,6 +37,7 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
   public async signWithAccount(account: Account): Promise<string> {
     try {
       const result = await this._wallet.signBytes(Buffer.from(account.validationToken));
+      console.log(result);
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
