@@ -1,4 +1,5 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
+import { computePermissions, Action, isPermitted, Permissions } from '../../../common-common/src/permissions';
 import { DB } from '../models';
 import {
   CommunityRoleAttributes,
