@@ -183,7 +183,7 @@ const verifySignature = async (
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
-            Buffer.from(addressModel.verification_token.trim())
+            Buffer.from(JSON.stringify(canvasMessage))
           ).digest();
 
           isValid = await Secp256k1.verifySignature(
