@@ -70,6 +70,11 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
               internalBuiltRule[ruleTypeIdentifier][argumentIdx] =
                 e.target.value;
             }}
+            value={
+              internalBuiltRule[ruleTypeIdentifier][argumentIdx] !== ''
+                ? internalBuiltRule[ruleTypeIdentifier][argumentIdx]
+                : undefined
+            }
           />
         </div>
       );

@@ -6,7 +6,7 @@ import 'pages/rules/index.scss';
 
 import app from 'state';
 import { Rule } from 'models';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 
 import { CWBreadcrumbs } from '../../components/component_kit/cw_breadcrumbs';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -32,6 +32,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
 
   view() {
     if (this.isLoading && app.activeChainId()) {
+      this.rules = [];
       app.rules.refresh().then(() => {
         this.isLoading = false;
         this.rules = app.rules.getRules;
@@ -40,7 +41,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
       });
     }
 
-    return this.isLoading ? (
+    return this.isLoading || this.loadingRules ? (
       <PageLoading />
     ) : (
       <Sublayout>
@@ -55,7 +56,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
             <div class="rules-header-section">
               <CWText type="h3">Community Rules</CWText>
               <div class="create-rule-section">
-                <CWText type="caption">{`${app.rules.getRules.length} Rules in Use`}</CWText>
+                <CWText type="caption">{`${this.rules.length} Rules in Use`}</CWText>
                 <CWButton
                   iconName="plus"
                   buttonType="mini"
@@ -77,6 +78,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                             m.redraw();
                           } catch (e) {
                             console.log(e);
+                            notifyError('Error creating rule!');
                           }
                         },
                       },
@@ -121,6 +123,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                               notifySuccess('Rule updated!');
                             } catch (e) {
                               console.log(e);
+                              notifyError('Failed to update rule!');
                             }
                           },
                           rule: JSON.parse(JSON.stringify(rule.rule)),
@@ -137,10 +140,10 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                         this.rules = app.rules.getRules;
                         this.loadingRules = false;
                         notifySuccess('Rule deleted!');
-
                         m.redraw();
                       } catch (e) {
-                        console.log('delete error', e);
+                        console.log(e);
+                        notifyError('Failed to delete rule!');
                       }
                     }}
                   />

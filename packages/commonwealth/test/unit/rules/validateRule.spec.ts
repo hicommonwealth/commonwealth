@@ -13,6 +13,12 @@ describe('validateRule() unit tests', () => {
     assert.deepEqual(allowListRule, sanitizedRule);
   });
 
+  it('should validate correct token balance rule', () => {
+    const tokenBalanceRule = { TokenBalanceRule: ['address', '111'] };
+    const sanitizedRule = validateRule(tokenBalanceRule);
+    assert.deepEqual(tokenBalanceRule, sanitizedRule);
+  });
+
   it('should not validate incorrect address arg type', () => {
     const badAllowList = { AllowListRule: [['hello', 1]] };
     assert.throw(() => validateRule(badAllowList));
