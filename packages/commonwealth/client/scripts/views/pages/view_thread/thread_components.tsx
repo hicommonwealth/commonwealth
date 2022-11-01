@@ -2,12 +2,28 @@
 
 import m from 'mithril';
 
+import 'pages/view_thread/thread_components.scss';
+import 'pages/view_proposal/proposal_header_links.scss';
+
 import app from 'state';
-import { pluralize } from 'helpers';
-import { Account, Thread, AddressInfo } from 'models';
+import { navigateToSubpage } from 'app';
+import {
+  externalLink,
+  extractDomain,
+  pluralize,
+  threadStageToLabel,
+} from 'helpers';
+import {
+  Account,
+  Thread,
+  ThreadStage as ThreadStageType,
+  AddressInfo,
+} from 'models';
 import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import { getClasses } from '../../components/component_kit/helpers';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 export class ThreadAuthor
   implements
@@ -49,6 +65,57 @@ export class ThreadAuthor
           </>
         )}
       </>
+    );
+  }
+}
+
+export class ThreadStage implements m.ClassComponent<{ proposal: Thread }> {
+  view(vnode) {
+    const { proposal } = vnode.attrs;
+
+    return (
+      <CWText
+        type="caption"
+        className={getClasses<{ stage: 'negative' | 'positive' }>(
+          {
+            stage:
+              proposal.stage === ThreadStageType.ProposalInReview
+                ? 'positive'
+                : proposal.stage === ThreadStageType.Voting
+                ? 'positive'
+                : proposal.stage === ThreadStageType.Passed
+                ? 'positive'
+                : proposal.stage === ThreadStageType.Failed
+                ? 'negative'
+                : 'positive',
+          },
+          'proposal-stage-text'
+        )}
+        onclick={(e) => {
+          e.preventDefault();
+          navigateToSubpage(`?stage=${proposal.stage}`);
+        }}
+      >
+        {threadStageToLabel(proposal.stage)}
+      </CWText>
+    );
+  }
+}
+
+export class ExternalLink
+  implements
+    m.ClassComponent<{
+      thread: Thread;
+    }>
+{
+  view(vnode) {
+    const { thread } = vnode.attrs;
+
+    return (
+      <div class="HeaderLink">
+        {externalLink('a', thread.url, [extractDomain(thread.url)])}
+        <CWIcon iconName="externalLink" iconSize="small" />
+      </div>
     );
   }
 }

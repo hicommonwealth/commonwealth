@@ -5,13 +5,10 @@ import m from 'mithril';
 import 'pages/view_proposal/proposal_components.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { threadStageToLabel } from 'helpers';
-import { Comment, Thread, ThreadStage, AnyProposal } from 'models';
+import { Comment, Thread, AnyProposal } from 'models';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import { notifyError } from 'controllers/app/notifications';
 import { CWText } from '../../components/component_kit/cw_text';
-import { getClasses } from '../../components/component_kit/helpers';
 import {
   QueueButton,
   ExecuteButton,
@@ -22,45 +19,10 @@ import {
   getStatusText,
 } from '../../components/proposal_card/helpers';
 import {
-  ProposalHeaderThreadLink,
-  ProposalHeaderBlockExplorerLink,
-  ProposalHeaderVotingInterfaceLink,
+  ThreadLink,
+  BlockExplorerLink,
+  VotingInterfaceLink,
 } from './proposal_header_links';
-
-export class ProposalHeaderStage
-  implements m.ClassComponent<{ proposal: Thread }>
-{
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-
-    return (
-      <CWText
-        type="caption"
-        className={getClasses<{ stage: 'negative' | 'positive' }>(
-          {
-            stage:
-              proposal.stage === ThreadStage.ProposalInReview
-                ? 'positive'
-                : proposal.stage === ThreadStage.Voting
-                ? 'positive'
-                : proposal.stage === ThreadStage.Passed
-                ? 'positive'
-                : proposal.stage === ThreadStage.Failed
-                ? 'negative'
-                : 'positive',
-          },
-          'proposal-stage-text'
-        )}
-        onclick={(e) => {
-          e.preventDefault();
-          navigateToSubpage(`?stage=${proposal.stage}`);
-        }}
-      >
-        {threadStageToLabel(proposal.stage)}
-      </CWText>
-    );
-  }
-}
 
 export class ProposalSubheader
   implements m.ClassComponent<{ proposal: AnyProposal }>
@@ -77,14 +39,12 @@ export class ProposalSubheader
           proposal['votingInterfaceLink'] ||
           proposal.threadId) && (
           <div class="proposal-links">
-            {proposal.threadId && (
-              <ProposalHeaderThreadLink proposal={proposal} />
-            )}
+            {proposal.threadId && <ThreadLink proposal={proposal} />}
             {proposal['blockExplorerLink'] && (
-              <ProposalHeaderBlockExplorerLink proposal={proposal} />
+              <BlockExplorerLink proposal={proposal} />
             )}
             {proposal['votingInterfaceLink'] && (
-              <ProposalHeaderVotingInterfaceLink proposal={proposal} />
+              <VotingInterfaceLink proposal={proposal} />
             )}
           </div>
         )}

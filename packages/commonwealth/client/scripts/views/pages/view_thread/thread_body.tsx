@@ -7,7 +7,7 @@ import 'pages/view_thread/thread_body.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { Comment, Thread, ThreadStage, Topic } from 'models';
+import { Comment, Thread, ThreadStage as ThreadStageType, Topic } from 'models';
 import { pluralize } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { ContentType } from 'types';
@@ -23,9 +23,7 @@ import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ProposalHeaderStage } from '../view_proposal/proposal_components';
-import { ProposalHeaderExternalLink } from '../view_proposal/proposal_header_links';
-import { ThreadAuthor } from './thread_components';
+import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
 import { CollapsibleBodyText } from '../../components/collapsible_body_text';
@@ -39,7 +37,7 @@ type ThreadBodyAttrs = {
   isAuthor: boolean;
   isEditor: boolean;
   isGloballyEditing: boolean;
-  proposal: Thread;
+  thread: Thread;
   setIsGloballyEditing: (status: boolean) => void;
   updatedCommentsCallback: () => void;
   viewCount: number;
@@ -52,7 +50,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
   private title: string;
 
   oninit(vnode) {
-    this.title = vnode.attrs.proposal.title;
+    this.title = vnode.attrs.thread.title;
   }
 
   view(vnode) {
@@ -65,7 +63,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
       isAuthor,
       isEditor,
       isGloballyEditing,
-      proposal,
+      thread,
       viewCount,
     } = vnode.attrs;
 
@@ -78,14 +76,11 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
 
     const canComment =
       app.user.activeAccount ||
-      (!isAdminOrMod &&
-        TopicGateCheck.isGatedTopic(
-          proposal instanceof Thread ? proposal?.topic?.name : null
-        ));
+      (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
     const reactionsAndReplyButtons = (
       <div class="thread-footer-row">
-        <ThreadReactionButton thread={proposal} />
+        <ThreadReactionButton thread={thread} />
         <div class="comments-count">
           <CWIcon iconName="feedback" iconSize="small" />
           <CWText type="caption">{commentCount} Comments</CWText>
@@ -105,26 +100,26 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
             />
           ) : (
             <CWText type="h3" fontWeight="semiBold">
-              {proposal.title}
+              {thread.title}
             </CWText>
           )}
           <div class="info-and-menu-row">
-            <ThreadAuthor thread={proposal} />
+            <ThreadAuthor thread={thread} />
             <CWText type="caption" className="header-text">
-              published on {moment(proposal.createdAt).format('l')}
+              published on {moment(thread.createdAt).format('l')}
             </CWText>
             <CWText type="caption" className="header-text">
               {pluralize(viewCount, 'view')}
             </CWText>
-            {proposal.readOnly && <CWIcon iconName="lock" iconSize="small" />}
-            {proposal.stage !== ThreadStage.Discussion && (
-              <ProposalHeaderStage proposal={proposal} />
+            {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+            {thread.stage !== ThreadStageType.Discussion && (
+              <ThreadStage proposal={thread} />
             )}
             <SharePopover />
             {app.isLoggedIn() && hasEditPerms && !isGloballyEditing && (
               <CWPopoverMenu
                 menuItems={[
-                  ...(hasEditPerms && !proposal.readOnly
+                  ...(hasEditPerms && !thread.readOnly
                     ? [
                         {
                           label: 'Edit',
@@ -133,13 +128,13 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                             e.preventDefault();
                             this.savedEdits = localStorage.getItem(
                               `${app.activeChainId()}-edit-thread-${
-                                proposal.id
+                                thread.id
                               }-storedText`
                             );
 
                             if (this.savedEdits) {
                               clearEditingLocalStorage(
-                                proposal.id,
+                                thread.id,
                                 ContentType.Thread
                               );
                               this.shouldRestoreEdits =
@@ -165,7 +160,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                             app.modals.create({
                               modal: EditCollaboratorsModal,
                               data: {
-                                thread: proposal,
+                                thread,
                               },
                             });
                           },
@@ -183,10 +178,10 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                               modal: ChangeTopicModal,
                               data: {
                                 onChangeHandler: (topic: Topic) => {
-                                  proposal.topic = topic;
+                                  thread.topic = topic;
                                   m.redraw();
                                 },
-                                thread: proposal,
+                                thread,
                               },
                             });
                           },
@@ -207,7 +202,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
 
                             if (!confirmed) return;
 
-                            app.threads.delete(proposal).then(() => {
+                            app.threads.delete(thread).then(() => {
                               navigateToSubpage('/discussions');
                             });
                           },
@@ -217,7 +212,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                   ...(isAuthor || isAdminOrMod
                     ? [
                         {
-                          label: proposal.readOnly
+                          label: thread.readOnly
                             ? 'Unlock thread'
                             : 'Lock thread',
                           iconLeft: 'lock',
@@ -225,8 +220,8 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                             e.preventDefault();
                             app.threads
                               .setPrivacy({
-                                threadId: proposal.id,
-                                readOnly: !proposal.readOnly,
+                                threadId: thread.id,
+                                readOnly: !thread.readOnly,
                               })
                               .then(() => {
                                 setIsEditingBody(false);
@@ -248,7 +243,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                             if (snapshotSpaces.length > 1) {
                               navigateToSubpage('/multiple-snapshots', {
                                 action: 'create-from-thread',
-                                proposal,
+                                thread,
                               });
                             } else {
                               navigateToSubpage(`/snapshot/${snapshotSpaces}`);
@@ -260,7 +255,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
                   ...(isAuthor || isAdminOrMod
                     ? [
                         { type: 'divider' },
-                        getThreadSubScriptionMenuItem(proposal),
+                        getThreadSubScriptionMenuItem(thread),
                       ]
                     : []),
                 ]}
@@ -272,13 +267,13 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
           </div>
         </div>
         <CWDivider />
-        {!!proposal.url && <ProposalHeaderExternalLink proposal={proposal} />}
+        {!!thread.url && <ExternalLink proposal={thread} />}
         <div class="thread-content">
           {this.isEditingBody ? (
             <>
               {reactionsAndReplyButtons}
               <EditBody
-                thread={proposal}
+                thread={thread}
                 savedEdits={this.savedEdits}
                 shouldRestoreEdits={this.shouldRestoreEdits}
                 setIsEditing={setIsEditingBody}
@@ -287,20 +282,20 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
             </>
           ) : (
             <>
-              <CollapsibleBodyText item={proposal} />
-              {proposal.readOnly ? (
+              <CollapsibleBodyText item={thread} />
+              {thread.readOnly ? (
                 <CWText type="h5" className="callout-text">
                   Commenting is disabled because this post has been locked.
                 </CWText>
               ) : !isGloballyEditing && canComment ? (
                 <>
-                  {proposal instanceof Thread && reactionsAndReplyButtons}
+                  {reactionsAndReplyButtons}
                   <CreateComment
                     updatedCommentsCallback={updatedCommentsCallback}
                     setIsGloballyEditing={setIsGloballyEditing}
                     isGloballyEditing={isGloballyEditing}
                     parentComment={null}
-                    rootProposal={proposal}
+                    rootProposal={thread}
                   />
                 </>
               ) : null}
@@ -309,7 +304,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
         </div>
         <CommentsTree
           comments={comments}
-          proposal={proposal}
+          proposal={thread}
           setIsGloballyEditing={setIsGloballyEditing}
           updatedCommentsCallback={updatedCommentsCallback}
         />
