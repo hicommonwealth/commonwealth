@@ -311,6 +311,12 @@ export async function isAddressPermitted(
 ): Promise<PermissionError | undefined> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
+  // fetch the default allow and deny permissions for the chain
+  const chain = await models.Chain.findOne({ where: { id: chain_id } });
+  if (!chain) {
+    throw new Error('Chain not found');
+  }
+
   // sort roles by roles with highest permissions first
   roles.sort((a) => {
     if (a.permission === 'member') return -1;
@@ -318,8 +324,13 @@ export async function isAddressPermitted(
     else return 1;
   });
 
+  const permissionsAllowDeny: Array<{ allow: Permissions; deny: Permissions }> = roles
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift({allow: chain.default_allow_permissions, deny: chain.default_deny_permissions});
+
   // compute permissions
-  const permission: bigint = computePermissions(BASE_PERMISSIONS, roles);
+  const permission: bigint = computePermissions(BASE_PERMISSIONS, permissionsAllowDeny);
 
   // check if action is permitted
   if (!isPermitted(permission, action)) {
