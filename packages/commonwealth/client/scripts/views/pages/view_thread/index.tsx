@@ -374,7 +374,7 @@ class ViewThreadPage
           >
             <CWTabBar>
               <CWTab
-                label="Proposal"
+                label="Thread"
                 onclick={() => {
                   this.tabSelected = 'viewProposal';
                 }}
