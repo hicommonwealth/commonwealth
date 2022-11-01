@@ -1,3 +1,5 @@
+
+
 export enum Action {
   INVITE_MEMBERS = 0,
   BAN_MEMBERS = 1,
@@ -22,6 +24,32 @@ export enum Action {
 }
 
 export type Permissions = bigint;
+
+export enum PermissionError {
+  NOT_PERMITTED = 'Action not permitted',
+}
+
+export function addPermission(
+  permission: Permissions,
+  actionNumber: number
+): Permissions {
+  // eslint-disable-next-line no-bitwise
+  permission |= BigInt(1) << BigInt(actionNumber);
+  return permission;
+}
+
+export function removePermission(
+  permission: Permissions,
+  actionNumber: number
+): Permissions {
+  // eslint-disable-next-line no-bitwise
+  permission &= ~(BigInt(1) << BigInt(actionNumber));
+  return permission;
+}
+
+export const BASE_PERMISSIONS: Permissions =
+  addPermission(BigInt(0), Action.CREATE_THREAD) |
+  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS)
 
 export function isPermitted(permission: Permissions, action: Action): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);

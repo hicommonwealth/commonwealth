@@ -8,6 +8,14 @@ import {
   RolePermission,
   ChainInfo,
 } from 'models';
+import {
+  Action,
+  BASE_PERMISSIONS,
+  computePermissions,
+  isPermitted,
+  PermissionError,
+  Permissions,
+} from 'common-common/src/permissions';
 import { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -297,5 +305,63 @@ export class RolesController {
 
     if (!role) return;
     return this.User.addresses.find((a) => a.id === role.address_id);
+  }
+}
+
+// Client-side helpers
+export function isActiveAddressPermitted(
+  active_address_roles: RoleInfo[],
+  chain_info: ChainInfo,
+  action: Action
+): PermissionError | undefined {
+  const chainRoles = active_address_roles.filter(
+    (r) => r.chain_id === chain_info.id
+  );
+
+  if (chainRoles.length > 0) {
+    // sort roles by roles with lowest roles first
+    chainRoles.sort((a) => {
+      if (a.permission === 'member') return -1;
+      if (a.permission === 'moderator') return 0;
+      else return 1;
+    });
+    // populate permission assignment array with role allow and deny permissions
+    const permissionAssignments: Array<{
+      allow: Permissions;
+      deny: Permissions;
+    }> = chainRoles.map((r) => {
+      const communityRole = chain_info.communityRoles.find(
+        (cr) => cr.name === r.permission
+      );
+      return {
+        allow: communityRole.allow,
+        deny: communityRole.deny,
+      };
+    });
+    // Add chain default permissions to beginning of permissions array
+    permissionAssignments.unshift({
+      allow: chain_info.defaultAllowPermissions,
+      deny: chain_info.defaultDenyPermissions,
+    });
+    const permission = computePermissions(
+      BASE_PERMISSIONS,
+      permissionAssignments
+    );
+    if (!isPermitted(permission, action)) {
+      return PermissionError.NOT_PERMITTED;
+    }
+  }
+  // If no roles are given for the chain, compute permissions with chain default permissions
+  else {
+    // compute permissions with chain default permissions
+    const permission = computePermissions(BASE_PERMISSIONS, [
+      {
+        allow: chain_info.defaultAllowPermissions,
+        deny: chain_info.defaultDenyPermissions,
+      },
+    ]);
+    if (!isPermitted(permission, action)) {
+      return PermissionError.NOT_PERMITTED;
+    }
   }
 }

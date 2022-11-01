@@ -21,7 +21,6 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
-  chat_enabled: boolean;
   id?: string;
   description?: string;
   discord?: string;
@@ -44,6 +43,8 @@ export type ChainAttributes = {
   bech32_prefix?: string;
   token_name?: string;
   ce_verbose?: boolean;
+  default_allow_permissions: bigint;
+  default_deny_permissions: bigint;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -115,11 +116,6 @@ export default (
         defaultValue: true,
       },
       type: { type: dataTypes.STRING, allowNull: false },
-      chat_enabled: {
-        type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
@@ -134,6 +130,16 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
+      default_allow_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      default_deny_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       tableName: 'Chains',
