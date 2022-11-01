@@ -1,5 +1,10 @@
 import { Model, Transaction, Op, FindOptions } from 'sequelize';
-import { computePermissions, Action, isPermitted, Permissions } from '../../../common-common/src/permissions';
+import {
+  computePermissions,
+  Action,
+  isPermitted,
+  Permissions,
+} from 'common-common/src/permissions';
 import { DB } from '../models';
 import {
   CommunityRoleAttributes,
@@ -292,7 +297,11 @@ export enum PermissionError {
 }
 
 // eslint-disable-next-line no-bitwise
-export const BASE_PERMISSIONS: Permissions = BigInt(1) << BigInt(Action.CREATE_THREAD);
+export const BASE_PERMISSIONS: Permissions =
+  // eslint-disable-next-line no-bitwise
+  (BigInt(1) << BigInt(Action.CREATE_THREAD)) |
+  // eslint-disable-next-line no-bitwise
+  (BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS));
 
 export async function isAddressPermitted(
   models: DB,
