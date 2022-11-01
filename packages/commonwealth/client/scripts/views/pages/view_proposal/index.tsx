@@ -25,12 +25,13 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import User from '../../components/widgets/user';
-import { ProposalBodyText, ProposalSubheader } from './proposal_components';
+import { ProposalSubheader } from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import { CommentsTree } from '../../components/comments/comments_tree';
+import { CollapsibleBodyText } from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -267,7 +268,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
           subHeader={<ProposalSubheader proposal={this.proposal} />}
           body={
             !!this.proposal.description && (
-              <ProposalBodyText item={this.proposal} />
+              <CollapsibleBodyText item={this.proposal} />
             )
           }
           subBody={

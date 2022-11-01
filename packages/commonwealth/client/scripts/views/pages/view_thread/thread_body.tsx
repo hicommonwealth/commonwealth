@@ -23,16 +23,14 @@ import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { EditBody } from '../view_proposal/edit_body';
-import { clearEditingLocalStorage } from '../view_proposal/helpers';
-import {
-  ProposalHeaderStage,
-  ProposalBodyText,
-} from '../view_proposal/proposal_components';
+import { ProposalHeaderStage } from '../view_proposal/proposal_components';
 import { ProposalHeaderExternalLink } from '../view_proposal/proposal_header_links';
 import { ThreadAuthor } from './thread_components';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
+import { CollapsibleBodyText } from '../../components/collapsible_body_text';
+import { EditBody } from './edit_body';
+import { clearEditingLocalStorage } from '../../components/comments/helpers';
 
 type ThreadBodyAttrs = {
   commentCount: number;
@@ -289,7 +287,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
             </>
           ) : (
             <>
-              <ProposalBodyText item={proposal} />
+              <CollapsibleBodyText item={proposal} />
               {proposal.readOnly ? (
                 <CWText type="h5" className="callout-text">
                   Commenting is disabled because this post has been locked.

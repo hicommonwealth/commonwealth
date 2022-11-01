@@ -8,7 +8,7 @@ import app from 'state';
 import { Comment } from 'models';
 import { ContentType } from 'types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { clearEditingLocalStorage } from '../../pages/view_proposal/helpers';
+import { clearEditingLocalStorage } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { QuillEditor } from '../quill/quill_editor';
 import { QuillEditorComponent } from '../quill/quill_editor_component';

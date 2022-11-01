@@ -10,7 +10,6 @@ import { Account, Comment as CommentType } from 'models';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { clearEditingLocalStorage } from '../../pages/view_proposal/helpers';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
@@ -20,6 +19,7 @@ import { CommentReactionButton } from '../reaction_button/comment_reaction_butto
 import { SharePopover } from '../share_popover';
 import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
+import { clearEditingLocalStorage } from './helpers';
 
 class CommentAuthor
   implements

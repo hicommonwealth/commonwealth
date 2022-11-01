@@ -7,10 +7,11 @@ import 'components/comments/comments_tree.scss';
 import app from 'state';
 import { Thread, Comment as CommentType, AnyProposal } from 'models';
 import { Comment } from './comment';
-import { MAX_THREAD_LEVEL } from '../../pages/view_proposal/constants';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { CreateComment } from './create_comment';
 import { jumpHighlightComment } from './helpers';
+
+const MAX_THREAD_LEVEL = 2;
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;

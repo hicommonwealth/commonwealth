@@ -21,7 +21,7 @@ import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { activeQuillEditorHasText } from '../view_proposal/helpers';
+import { activeQuillEditorHasText } from './helpers';
 import { ThreadSidebar } from './thread_sidebar';
 import { ThreadBody } from './thread_body';
 
