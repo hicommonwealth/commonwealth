@@ -21,7 +21,6 @@ import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
-import ClientSideWebWalletController from 'client/scripts/controllers/app/webWallets/client_side_web_wallet';
 import KeplrWebWalletController from 'client/scripts/controllers/app/webWallets/keplr_web_wallet';
 
 // Copied over from the old wallet selector with modifications
@@ -168,7 +167,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       linking,
     } = vnode.attrs;
 
-    async function handleNormalWalletLogin(wallet: ClientSideWebWalletController<any>, address) {
+    async function handleNormalWalletLogin(wallet: IWebWallet<any>, address) {
       if (app.isLoggedIn()) {
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
           address:
@@ -329,7 +328,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         }
                       }
 
-                      await handleNormalWalletLogin(wallet as ClientSideWebWalletController<any>, address);
+                      await handleNormalWalletLogin(wallet, address);
                     }
                   }
                 }}
