@@ -69,9 +69,9 @@ export class ThreadAuthor
   }
 }
 
-export class ThreadStage implements m.ClassComponent<{ proposal: Thread }> {
+export class ThreadStage implements m.ClassComponent<{ thread: Thread }> {
   view(vnode) {
-    const { proposal } = vnode.attrs;
+    const { thread } = vnode.attrs;
 
     return (
       <CWText
@@ -79,13 +79,13 @@ export class ThreadStage implements m.ClassComponent<{ proposal: Thread }> {
         className={getClasses<{ stage: 'negative' | 'positive' }>(
           {
             stage:
-              proposal.stage === ThreadStageType.ProposalInReview
+              thread.stage === ThreadStageType.ProposalInReview
                 ? 'positive'
-                : proposal.stage === ThreadStageType.Voting
+                : thread.stage === ThreadStageType.Voting
                 ? 'positive'
-                : proposal.stage === ThreadStageType.Passed
+                : thread.stage === ThreadStageType.Passed
                 ? 'positive'
-                : proposal.stage === ThreadStageType.Failed
+                : thread.stage === ThreadStageType.Failed
                 ? 'negative'
                 : 'positive',
           },
@@ -93,10 +93,10 @@ export class ThreadStage implements m.ClassComponent<{ proposal: Thread }> {
         )}
         onclick={(e) => {
           e.preventDefault();
-          navigateToSubpage(`?stage=${proposal.stage}`);
+          navigateToSubpage(`?stage=${thread.stage}`);
         }}
       >
-        {threadStageToLabel(proposal.stage)}
+        {threadStageToLabel(thread.stage)}
       </CWText>
     );
   }
