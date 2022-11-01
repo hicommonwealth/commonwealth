@@ -49,7 +49,7 @@ class MetamaskWebWalletController extends ClientSideWebWalletController<string> 
     return app.chain?.meta.node.ethChainId || 1;
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
 
     return {

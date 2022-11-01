@@ -65,11 +65,10 @@ class TerraStationWebWalletController extends ClientSideWebWalletController<Terr
     return "phoenix-1";
   }
 
-  public async getRecentBlock() {
-    const chainId = await this.getChainId();
+  public async getRecentBlock(chainIdentifier: string) {
     const client = new LCDClient({
       URL: app.chain.meta.ChainNode.url,
-      chainID: chainId
+      chainID: chainIdentifier
     });
     const tmClient = new TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();

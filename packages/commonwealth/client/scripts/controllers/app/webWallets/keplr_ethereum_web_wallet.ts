@@ -55,9 +55,9 @@ class EVMKeplrWebWalletController extends ClientSideWebWalletController<AccountD
     return this._chainId;
   }
 
-  public async getRecentBlock() {
+  public async getRecentBlock(chainIdentifier: string) {
     const url = `${window.location.origin}/cosmosAPI/${
-      app.chain?.id || this.defaultNetwork
+      chainIdentifier
     }`;
     const client = await StargateClient.connect(url);
     const height = await client.getHeight();

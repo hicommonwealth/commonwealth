@@ -196,7 +196,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, wallet.getChainId())
+        const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, await wallet.getChainId());
         const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
         const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
         const { account: signerAccount, newlyCreated } =

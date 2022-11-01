@@ -24,7 +24,7 @@ abstract class ClientSideWebWalletController<AccountT extends { address: string 
   abstract enable(): Promise<void>;
 
   abstract getChainId(): any;
-  abstract getRecentBlock(): Promise<BlockInfo>;
+  abstract getRecentBlock(chainIdentifier: string): Promise<BlockInfo>;
 
   abstract signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string>;
 

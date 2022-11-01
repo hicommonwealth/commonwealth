@@ -43,7 +43,7 @@ class WalletConnectWebWalletController extends ClientSideWebWalletController<str
     return Promise.resolve(this._chainInfo.node.ethChainId || 1);
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
 
     return {

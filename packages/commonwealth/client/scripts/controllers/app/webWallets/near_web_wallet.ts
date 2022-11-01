@@ -17,7 +17,7 @@ class NearWebWalletController implements IWebWallet<any> {
     return [];
   }
 
-  public async getRecentBlock() {
+  public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 

@@ -38,7 +38,7 @@ class PhantomWebWalletController extends ClientSideWebWalletController<string> {
     return app.chain?.id || this.defaultNetwork;
   }
 
-  public async getRecentBlock() {
+  public async getRecentBlock(chainIdentifier: string) {
     // TODO: Use our own Solana RPC - is this configurable?
     const connection = new solw3.Connection("https://api.devnet.solana.com");
     const slot = await connection.getSlot()

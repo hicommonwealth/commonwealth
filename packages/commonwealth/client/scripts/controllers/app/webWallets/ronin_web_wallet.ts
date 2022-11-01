@@ -22,7 +22,7 @@ class RoninWebWalletController implements IWebWallet<any> {
     return null;
   }
 
-  public async getRecentBlock() {
+  public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 

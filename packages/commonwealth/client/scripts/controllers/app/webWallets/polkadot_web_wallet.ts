@@ -61,7 +61,7 @@ class PolkadotWebWalletController
     return Promise.resolve(app.chain?.id || this.defaultNetwork);
   }
 
-  public async getRecentBlock() {
+  public async getRecentBlock(chainIdentifier: string) {
         // TODO: are we using the polkadot API anywhere else on the frontend?
     // we probably want to point to whatever substrate node we are already running instead of a public API
     const api = await ApiPromise.create({
