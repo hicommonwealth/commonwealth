@@ -139,6 +139,14 @@ class SessionsController {
       return this.solana;
     }
   }
+
+  getAddress(chainBase: ChainBase, chainId: string | number | symbol): string {
+    return this.getSessionController(chainBase).getAddress(chainId);
+  }
+
+  getOrCreateAddress(chainBase: ChainBase, chainId: string | number | symbol): Promise<string> {
+    return this.getSessionController(chainBase).getOrCreateAddress(chainId);
+  }
 }
 
 

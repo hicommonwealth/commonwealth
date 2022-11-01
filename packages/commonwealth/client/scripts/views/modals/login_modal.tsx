@@ -204,7 +204,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       // Handle Logged in and joining community of different chain base
       if (this.currentlyInCommunityPage && app.isLoggedIn()) {
         const signature = await this.selectedWallet.signWithAccount(account);
-        await this.selectedWallet.validateWithAccount(account, signature);
+        await account.validate(signature);
         await logInWithAccount(account, true);
         return;
       }
@@ -231,7 +231,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       if (!newlyCreated && !linking) {
         try {
           const signature = await this.selectedWallet.signWithAccount(account);
-          await this.selectedWallet.validateWithAccount(account, signature);
+          await account.validate(signature);
           await logInWithAccount(account, true);
         } catch (e) {
           console.log(e);
@@ -258,10 +258,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const createNewAccountCallback = async () => {
       try {
         if (this.selectedWallet.chain !== 'near') {
-          await this.selectedWallet.validateWithAccount(
-            this.primaryAccount,
-            this.cashedWalletSignature
-          );
+          await this.primaryAccount.validate(this.cashedWalletSignature);
         }
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
@@ -290,14 +287,8 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
         const signature = await this.selectedLinkingWallet.signWithAccount(
           this.secondaryLinkAccount,
         );
-        await this.selectedLinkingWallet.validateWithAccount(
-          this.secondaryLinkAccount,
-          signature,
-        );
-        await this.selectedWallet.validateWithAccount(
-          this.primaryAccount,
-          this.cashedWalletSignature
-        );
+        await this.secondaryLinkAccount.validate(signature);
+        await this.primaryAccount.validate(this.cashedWalletSignature);
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);

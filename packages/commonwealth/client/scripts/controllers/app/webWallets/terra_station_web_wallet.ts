@@ -110,13 +110,6 @@ class TerraStationWebWalletController extends ClientSideWebWalletController<Terr
     };
     return JSON.stringify(signature);
   }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
-  }
 }
 
 export default TerraStationWebWalletController;

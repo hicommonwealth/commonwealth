@@ -26,17 +26,12 @@ abstract class ClientSideWebWalletController<AccountT extends { address: string 
   abstract getChainId(): any;
   abstract getRecentBlock(): Promise<BlockInfo>;
 
-  async getSessionPublicAddress() {
-    const sessionController = app.sessions.getSessionController(this.chain);
-    return sessionController.getOrCreateAddress(this.getChainId());
-  }
-
   abstract signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string>;
 
   public async signWithAccount(account: Account): Promise<string> {
     const canvasChain = chainBasetoCanvasChain(this.chain);
-    const sessionPublicAddress = await this.getSessionPublicAddress();
     const chainId = await this.getChainId();
+    const sessionPublicAddress = await app.sessions.getOrCreateAddress(this.chain, chainId)
 
     const canvasMessage = constructCanvasMessage(
       canvasChain,
@@ -47,10 +42,6 @@ abstract class ClientSideWebWalletController<AccountT extends { address: string 
     );
 
     return this.signCanvasMessage(account, canvasMessage);
-  }
-
-  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
-    return account.validate(walletSignature);
   }
 }
 

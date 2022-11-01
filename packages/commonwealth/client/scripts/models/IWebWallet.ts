@@ -12,10 +12,9 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
-  getRecentBlock: () => Promise<BlockInfo>;
+  getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 
   signWithAccount: (account: Account) => Promise<string>;
-  validateWithAccount: (account: Account, walletSignature: string) => Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
