@@ -69,22 +69,21 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
 
     // Input value must be passed as spread to CWTextInput, or it will
     // always overwrite the defaultValue prop
+
+    if (!this.activeMenuItems.length) this.showDropdown = false;
     const { activeMenuItems, showDropdown, ...thisParams } = this;
 
     return (
       <div class="dropdown-wrapper">
-        {/* Check with design re: Some sort of visual indicator that this is a typeable field */}
         <CWTextInput
           iconRight="chevronDown"
           defaultValue={defaultMenuItems[defaultActiveIndex ?? 0].label}
           displayOnly={!searchable}
-          // Be sure you haven't damaged non-searchable functionality
           iconRightonclick={(e: MouseEvent) => {
             this.showDropdown = !showDropdown;
             e.stopPropagation();
           }}
           inputValidationFn={(val: string) => {
-            console.log({ val });
             if (defaultMenuItems.find((i) => i.label === val)) {
               return ['success', 'Input validated'];
             } else {
@@ -98,7 +97,6 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
             this.showDropdown = !showDropdown;
           }}
           oninput={(e) => {
-            // TODO: Debounce
             this.showDropdown = true;
             if (e.target.value?.length > 0) {
               const inputText = e.target.value;
@@ -109,6 +107,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
               );
             } else {
               this.activeMenuItems = defaultMenuItems;
+              m.redraw();
             }
           }}
           label={label}

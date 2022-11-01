@@ -11,6 +11,7 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
+import _ from 'lodash';
 
 type TextInputSize = 'small' | 'large';
 
@@ -160,7 +161,9 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             placeholder={placeholder}
             required={required}
             oninput={(e) => {
-              oninput(e);
+              _.debounce(() => {
+                if (oninput) oninput(e);
+              }, 250)();
 
               if (e.target.value?.length === 0) {
                 this.isTyping = false;
