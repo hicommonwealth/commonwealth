@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/linked_proposals_card.scss';
+import 'pages/view_thread/linked_proposals_card.scss';
 
 import app from 'state';
 import { link } from 'helpers';
@@ -22,7 +22,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
-class ProposalSidebarLinkedChainEntity
+class LinkedChainEntity
   implements
     m.ClassComponent<{
       thread: Thread;
@@ -48,7 +48,7 @@ class ProposalSidebarLinkedChainEntity
   }
 }
 
-class ProposalSidebarLinkedSnapshot
+class LinkedSnapshot
   implements
     m.ClassComponent<{
       thread: Thread;
@@ -134,7 +134,7 @@ export class LinkedProposalsCard
             <div class="proposal-chain-entities">
               {thread.chainEntities.map((chainEntity) => {
                 return (
-                  <ProposalSidebarLinkedChainEntity
+                  <LinkedChainEntity
                     thread={thread}
                     chainEntity={chainEntity}
                   />
@@ -143,7 +143,7 @@ export class LinkedProposalsCard
             </div>
           )}
           {thread.snapshotProposal?.length > 0 && (
-            <ProposalSidebarLinkedSnapshot thread={thread} />
+            <LinkedSnapshot thread={thread} />
           )}
         </div>
         {showAddProposalButton && (
