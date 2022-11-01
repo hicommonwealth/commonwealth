@@ -1,5 +1,10 @@
 @import 'shared';
 
+.thread-subheader {
+  display: flex;
+  gap: 8px;
+}
+
 .thread-content {
   display: flex;
   flex-direction: column;

@@ -52,16 +52,6 @@ export type ThreadPrefetch = {
   };
 };
 
-class TitleEditor
-  implements m.ClassComponent<{ onUpdateTitle: () => void; value: string }>
-{
-  view(vnode) {
-    const { onUpdateTitle, value } = vnode.attrs;
-
-    return <CWTextInput oninput={onUpdateTitle} value={value} />;
-  }
-}
-
 class ViewThreadPage
   implements
     m.ClassComponent<{
@@ -81,6 +71,25 @@ class ViewThreadPage
   private threadFetchFailed: boolean;
   private title: string;
   private viewCount: number;
+
+  editorListener(e) {
+    if (this.isGloballyEditing || activeQuillEditorHasText()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  }
+
+  oninit() {
+    window.addEventListener('beforeunload', (e) => {
+      this.editorListener(e);
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('beforeunload', (e) => {
+      this.editorListener(e);
+    });
+  }
 
   view(vnode) {
     const { identifier } = vnode.attrs;
@@ -373,15 +382,6 @@ class ViewThreadPage
     const showLinkedThreadOptions =
       thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
-    const windowListener = (e) => {
-      if (this.isGloballyEditing || activeQuillEditorHasText()) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', windowListener);
-
     const canComment =
       app.user.activeAccount ||
       (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
@@ -413,10 +413,6 @@ class ViewThreadPage
 
     const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
 
-    const onUpdateTitle = (e) => {
-      this.title = e.target.value;
-    };
-
     return (
       <Sublayout
       //  title={headerTitle}
@@ -431,7 +427,12 @@ class ViewThreadPage
           }
           title={
             this.isEditingBody ? (
-              <TitleEditor onUpdateTitle={onUpdateTitle} value={this.title} />
+              <CWTextInput
+                oninput={(e) => {
+                  this.title = e.target.value;
+                }}
+                value={this.title}
+              />
             ) : (
               thread.title
             )
@@ -441,12 +442,12 @@ class ViewThreadPage
           viewCount={this.viewCount}
           readOnly={thread.readOnly}
           subHeader={
-            <>
+            <div class="thread-subheader">
               {thread.stage !== ThreadStageType.Discussion && (
                 <ThreadStage thread={thread} />
               )}
               {!!thread.url && <ExternalLink thread={thread} />}
-            </>
+            </div>
           }
           actions={
             app.isLoggedIn() &&
