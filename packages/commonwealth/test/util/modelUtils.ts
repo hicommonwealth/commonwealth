@@ -29,8 +29,8 @@ export const generateEthAddress = () => {
 export async function addAllowDenyPermissions(
   role_name: Permission,
   chain_id: string,
-  allow_permission: Action,
-  deny_permission: Action
+  allow_permission: number,
+  deny_permission: number
 ) {
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
