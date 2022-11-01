@@ -83,7 +83,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, null, Action.CREATE_THREAD );
+    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD );
   });
 
   describe('/createThread', () => {
