@@ -28,15 +28,11 @@ class RoninWebWalletController implements IWebWallet<any> {
   }
 
   public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
-    return null;
+    throw new Error('not implemented');
   }
 
   public async getRecentBlock(chainIdentifier: string) {
     return null;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    throw new Error('not implemented');
   }
 
   public async enable() {

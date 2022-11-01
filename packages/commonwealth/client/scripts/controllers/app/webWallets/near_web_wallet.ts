@@ -31,10 +31,6 @@ class NearWebWalletController implements IWebWallet<any> {
   }
 
   public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
-    return null;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
     throw new Error('not implemented');
   }
 
