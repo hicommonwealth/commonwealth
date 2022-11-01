@@ -8,10 +8,15 @@ import {
 import { Account, IWebWallet } from 'models';
 
 // TODO: ensure this only opens on mobile
-class TerraWalletConnectWebWalletController implements IWebWallet<string> {
+
+type TerraAddress = {
+  address: string
+}
+
+class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _enabling = false;
-  private _accounts: string[];
+  private _accounts: TerraAddress[];
   private _controller: WalletController;
   private _wallet: ConnectedWallet;
 
@@ -37,7 +42,6 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
   public async signWithAccount(account: Account): Promise<string> {
     try {
       const result = await this._wallet.signBytes(Buffer.from(account.validationToken));
-      console.log(result);
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
@@ -84,16 +88,16 @@ class TerraWalletConnectWebWalletController implements IWebWallet<string> {
       //  Enable session (triggers QR Code modal)
       await this._controller.connect(ConnectType.WALLETCONNECT);
 
-      const connectedWallet = await this._controller.connectedWallet().toPromise();
-      if (connectedWallet) {
-        this._accounts = [ connectedWallet.terraAddress ];
-      } else {
-        this._accounts = [];
-      }
-      if (this._accounts.length === 0) {
-        throw new Error('WalletConnect fetched no accounts.');
-      }
+      // TODO: clean up this observable handling -> deal with undefined, add timeout
+      this._wallet = await new Promise((resolve, reject) => {
+        this._controller.connectedWallet().subscribe((connectedWallet) => {
+          if (connectedWallet) {
+            resolve(connectedWallet)
+          }
+        })
+      });
 
+      this._accounts = [ { address: this._wallet.terraAddress } ];
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
