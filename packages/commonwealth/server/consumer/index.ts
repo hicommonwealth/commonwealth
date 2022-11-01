@@ -1,25 +1,28 @@
-import * as Amqp from "amqp-ts";
+import amqp, { Message } from 'amqplib/callback_api'
 
-export default async function consumeMessages(){
-  // @TODO Set URL in environment variable
-  const connection = new Amqp.Connection("amqp://localhost");
-  connection.createChannel((err, channel) => {
-    channel.assertQueue("hello", {durable: false});
+const createMQConsumer = (amqpUrl: string, queueName: string) => {
+  console.log('Connecting to RabbitMQ...')
+  return () => {
+    amqp.connect(amqpUrl, (errConn, conn) => {
+      if (errConn) {
+        console.log('Error connecting to RabbitMQ: ', errConn)
+        throw errConn
+      }
 
-    channel.consume("hello", (msg) => {
-      console.log(" [x] Received %s", msg.content.toString());
-    }, {noAck: true});
-  });
+      conn.createChannel((errCh, ch) => {
+        if (errCh) {
+          console.log('Error creating channel: ', errCh)
+          throw errCh
+        }
 
-
-  const q = await channel.assertQueue('snapsh_queue');
-
-  await channel.bindQueue(q.queue, 'logExchange', 'Info');
-
-  channel.consume(q.queue, (msg) => {
-    const data = JSON.parse(msg.content);
-    console.log(data);
-    channel.ack(msg);
-  })
+        ch.assertQueue(queueName, { durable: true })
+        ch.consume(queueName, (msg: Message | null ) => {
+          console.log('Consume message from RabbitMQ...')
+          //do ssomething with the msg 
+        })
+      })
+    })
+  }
 }
 
+export default createMQConsumer
