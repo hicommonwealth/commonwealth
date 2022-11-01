@@ -17,7 +17,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import { SharePopover } from '../view_proposal/share_popover';
+import { SharePopover } from '../../components/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
