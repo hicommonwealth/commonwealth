@@ -75,6 +75,14 @@ class ViewThreadPage
   view(vnode) {
     const { identifier } = vnode.attrs;
 
+    if (!app.chain?.meta) {
+      return (
+        <PageLoading
+        // title="Loading..."
+        />
+      );
+    }
+
     if (typeof identifier !== 'string')
       return (
         <PageNotFound
