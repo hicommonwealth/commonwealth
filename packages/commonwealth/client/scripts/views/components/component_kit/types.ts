@@ -60,7 +60,7 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label: string;
-  onclick: () => void;
+  onclick?: () => void;
   type?: 'default';
 };
 

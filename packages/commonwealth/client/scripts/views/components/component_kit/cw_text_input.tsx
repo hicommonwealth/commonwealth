@@ -18,7 +18,7 @@ export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
-  value?: string;
+  defaultValue;
   iconRight?: string;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
@@ -31,6 +31,7 @@ export type TextInputAttrs = {
   placeholder?: string;
   required?: boolean;
   tabindex?: number;
+  value?: string;
 };
 
 export type InputStyleAttrs = {
@@ -96,6 +97,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       containerClassName,
       darkMode,
       value,
+      defaultValue,
       disabled,
       iconRight,
       iconRightonclick,
@@ -150,6 +152,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               darkMode,
               inputClassName,
             })}
+            defaultValue={defaultValue}
             disabled={disabled || displayOnly}
             tabindex={tabindex}
             maxlength={maxlength}

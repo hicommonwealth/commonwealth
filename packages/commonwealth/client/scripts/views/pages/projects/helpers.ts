@@ -1,9 +1,10 @@
-import { IApp } from 'state';
-import { AddressInfo, ChainInfo, Project, RoleInfo } from 'models';
+import app, { IApp } from 'state';
+import { AddressInfo, ChainInfo, Project } from 'models';
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { ProjectRole } from './types';
+import { CreateProjectKey, ProjectRole } from './types';
 import { ChainBase } from '../../../../../../common-common/src/types';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 // Creation
 export const getAllEthChains = (app: IApp): ChainInfo[] => {
@@ -19,7 +20,10 @@ export const getUserEthChains = (app: IApp): ChainInfo[] => {
   return getAllEthChains(app).filter((c) => userRoleChainIds.includes(c.id));
 };
 
-export const validateProjectForm = (property: string, value: string) => {
+export const validateProjectForm = (
+  property: CreateProjectKey,
+  value: string
+): [ValidationStatus, string] => {
   if (!value)
     return [
       'failure',
@@ -29,7 +33,7 @@ export const validateProjectForm = (property: string, value: string) => {
   switch (property) {
     case 'title':
       if (value.length < 8 || value.length > 64) {
-        errorMessage = `Title must be valid string between 3 and 64 characters. Current count: ${value.length}`;
+        errorMessage = `Title must be valid string between 8 and 64 characters. Current count: ${value.length}`;
       }
       break;
     case 'shortDescription':
@@ -37,9 +41,7 @@ export const validateProjectForm = (property: string, value: string) => {
         errorMessage = `Input limit is 224 characters. Current count: ${value.length}`;
       }
       break;
-    case 'token':
-    case 'beneficiary':
-    case 'creator':
+    case 'beneficiary' || 'creator':
       if (!Web3.utils.isAddress(value)) {
         errorMessage = `Invalid ${property} address. Must be a valid Ethereum address.`;
       }

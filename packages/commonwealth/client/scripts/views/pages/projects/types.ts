@@ -41,6 +41,8 @@ export interface ICreateProjectForm {
   curatorFee: number;
 }
 
+export type CreateProjectKey = keyof ICreateProjectForm;
+
 export const CreateProjectSlides = {
   1: InformationSlide,
   2: FundraisingSlide,

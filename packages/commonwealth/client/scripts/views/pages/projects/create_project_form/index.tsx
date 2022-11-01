@@ -17,6 +17,7 @@ import {
   nowInSeconds,
   CreateProjectSlides,
   CreateProjectSlideNumber,
+  CreateProjectKey,
 } from '../types';
 import { PageLoading } from '../../loading';
 
@@ -52,11 +53,12 @@ export default class CreateProjectForm implements m.ClassComponent {
   }
 
   async submitForm() {
-    for (const property in this.form) {
-      if ({}.hasOwnProperty.call(this.form, property)) {
+    const keys = Object.keys(this.form) as CreateProjectKey[];
+    for (const key in keys) {
+      if ({}.hasOwnProperty.call(this.form, key)) {
         const [state, errorMessage] = validateProjectForm(
-          property,
-          this.form[property]
+          key as CreateProjectKey,
+          this.form[key]
         );
         if (state !== 'success') {
           notifyError(errorMessage);

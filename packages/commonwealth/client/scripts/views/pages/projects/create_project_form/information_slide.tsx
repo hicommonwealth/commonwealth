@@ -3,9 +3,9 @@ import app from 'state';
 import _ from 'lodash';
 import m from 'mithril';
 
-import { Button, Icons, SelectList } from 'construct-ui';
 import { Account, ChainInfo } from 'models';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
+import { CWDropdown } from '../../../components/component_kit/cw_dropdown';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
@@ -15,6 +15,7 @@ import {
   validateProjectForm,
 } from '../helpers';
 import { ICreateProjectForm } from '../types';
+import { DefaultMenuItem } from '../../../components/component_kit/types';
 
 export class InformationSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
@@ -24,16 +25,17 @@ export class InformationSlide
     if (vnode.attrs.form.chainId !== app.activeChainId()) {
       vnode.attrs.form.chainId = app.activeChainId();
     }
+
+    const chainAccounts = app.user.activeAccounts;
+    if (!vnode.attrs.form.creator) {
+      vnode.attrs.form.creator = chainAccounts[0].address;
+    }
+
     const allEthChains = getAllEthChains(app);
     const userEthChains = getUserEthChains(app);
     const defaultChainIdx = userEthChains
       .concat(allEthChains)
       .findIndex((c) => c.id === app.activeChainId());
-    const selectedChain = userEthChains.find(
-      (c) => c.id === vnode.attrs.form.chainId
-    );
-
-    const chainAccounts = app.user.activeAccounts;
 
     return (
       <form class="InformationSlide">
@@ -53,56 +55,76 @@ export class InformationSlide
           required
           value={vnode.attrs.form.title}
         />
-        <SelectList
-          class="chain-info-list"
-          items={userEthChains.concat(allEthChains)}
-          itemPredicate={(query: string, item: ChainInfo) => {
-            return (
-              item.id.toLowerCase().includes(query.toLowerCase()) ||
-              item.name.toLowerCase().includes(query.toLowerCase())
-            );
+        <CWDropdown
+          defaultMenuItems={
+            userEthChains
+              .map((chain: ChainInfo) => {
+                return { label: chain.name };
+              })
+              .concat(
+                allEthChains.map((chain: ChainInfo) => {
+                  return { label: chain.name, disabled: true };
+                })
+              ) as DefaultMenuItem[]
+          }
+          customFilter={(item: DefaultMenuItem, query: string) => {
+            const matchingChains: string[] = allEthChains
+              .filter(
+                (c: ChainInfo) =>
+                  c.id.toLowerCase().includes(query.toLowerCase()) ||
+                  c.name.toLowerCase().includes(query.toLowerCase())
+              )
+              .map((c: ChainInfo) => c.name);
+            return matchingChains.includes(item.label);
           }}
-          itemRender={(c: ChainInfo) => (
-            <CWText disabled={!userEthChains.includes(c)}>{c.name}</CWText>
-          )}
           defaultActiveIndex={defaultChainIdx}
-          onSelect={(n: ChainInfo) => {
-            m.route.set(`/${n.id}/new/project`);
-          }}
-          trigger={
-            <Button
-              align="left"
-              compact={true}
-              iconRight={Icons.CHEVRON_DOWN}
-              sublabel={<CWText>Chain:</CWText>}
-              label={selectedChain.name}
-            />
-          }
-        />
-        <SelectList
-          class="account-address-list"
-          items={chainAccounts}
-          itemPredicate={(query: string, item: Account) => {
-            return (
-              item.address.toLowerCase().includes(query.toLowerCase()) ||
-              item.profile.displayName
-                .toLowerCase()
-                .includes(query.toLowerCase())
+          inputValidationFn={(val: string) => {
+            const userChain = userEthChains.find(
+              (c: ChainInfo) => c.name === val
             );
+            if (!userChain) {
+              return ['failure', 'User is not part of this community'];
+            } else {
+              return ['success', null];
+            }
           }}
-          itemRender={(a: Account) => <CWText>{a.address}</CWText>}
-          defaultActiveIndex={0}
-          onSelect={(a: Account) => {
-            vnode.attrs.form.creator = a.address;
+          label="Chain"
+          onSelect={(label: string) => {
+            const chain: ChainInfo = app.config.chains
+              .getAll()
+              .find((c: ChainInfo) => c.name === label);
+            m.route.set(`/${chain.id}/new/project`);
           }}
-          trigger={
-            <Button
-              align="left"
-              compact={true}
-              iconRight={Icons.CHEVRON_DOWN}
-              label={vnode.attrs.form.creator}
-            />
+          searchable={true}
+        />
+        <CWDropdown
+          defaultMenuItems={
+            chainAccounts.map((acc: Account) => {
+              return { label: acc.address };
+            }) as DefaultMenuItem[]
           }
+          customFilter={(item: DefaultMenuItem, query: string) => {
+            const matchingAccounts: string[] = chainAccounts
+              .filter(
+                (a: Account) =>
+                  a.address.includes(query) ||
+                  a.profile?.displayName.includes(query)
+              )
+              .map((a: Account) => a.address);
+            return matchingAccounts.includes(item.label);
+          }}
+          inputValidationFn={(val: string) =>
+            validateProjectForm('creator', val)
+          }
+          label="Creator address"
+          onSelect={(label: string) => {
+            const selectedAccount = chainAccounts.find(
+              (a) => a.address === label
+            );
+            app.user.setActiveAccounts([selectedAccount]);
+            vnode.attrs.form.creator === selectedAccount.address;
+          }}
+          searchable={true}
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project"
