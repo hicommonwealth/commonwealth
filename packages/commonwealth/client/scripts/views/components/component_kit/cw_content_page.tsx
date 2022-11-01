@@ -14,6 +14,7 @@ import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';
+import { SharePopover } from '../share_popover';
 
 type SidebarItem = {
   label: string;
@@ -123,6 +124,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
                 menuItems={actions}
               />
             )}
+            <SharePopover />
           </div>
         </div>
         {subHeader}

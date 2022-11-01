@@ -3,7 +3,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 
-import 'pages/view_proposal/index.scss';
+import 'pages/view_thread/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -30,7 +30,6 @@ import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { CommentsTree } from '../../components/comments/comments_tree';
-import { SharePopover } from '../../components/share_popover';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
@@ -431,7 +430,6 @@ class ViewThreadPage
               {thread.stage !== ThreadStageType.Discussion && (
                 <ThreadStage thread={thread} />
               )}
-              <SharePopover />
               {!!thread.url && <ExternalLink thread={thread} />}
             </>
           }

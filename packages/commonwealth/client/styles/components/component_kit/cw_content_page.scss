@@ -6,6 +6,7 @@
     flex-direction: column;
     gap: 16px;
     max-width: 768px;
+    width: 100%;
 
     .header {
       display: flex;
@@ -42,19 +43,8 @@
 .ContentPage {
   display: flex;
   flex: 1;
-  padding: 56px;
 
-  @include medium {
-    padding: 40px;
-  }
-
-  @include mediumSmall {
-    padding: 32px;
-  }
-
-  @include smallInclusive {
-    padding: 24px;
-  }
+  @include contentPadding;
 
   .sidebar-view {
     display: flex;

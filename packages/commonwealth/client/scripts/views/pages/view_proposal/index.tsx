@@ -2,8 +2,6 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/index.scss';
-
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
