@@ -52,6 +52,16 @@ export type ThreadPrefetch = {
   };
 };
 
+class TitleEditor
+  implements m.ClassComponent<{ onUpdateTitle: () => void; value: string }>
+{
+  view(vnode) {
+    const { onUpdateTitle, value } = vnode.attrs;
+
+    return <CWTextInput oninput={onUpdateTitle} value={value} />;
+  }
+}
+
 class ViewThreadPage
   implements
     m.ClassComponent<{
@@ -166,9 +176,7 @@ class ViewThreadPage
 
     const { thread } = this;
 
-    if (thread) {
-      this.title = thread.title;
-    }
+    this.title = thread.title;
 
     if (threadRecentlyEdited) {
       this.recentlyEdited = false;
@@ -405,6 +413,10 @@ class ViewThreadPage
 
     const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
 
+    const onUpdateTitle = (e) => {
+      this.title = e.target.value;
+    };
+
     return (
       <Sublayout
       //  title={headerTitle}
@@ -419,12 +431,7 @@ class ViewThreadPage
           }
           title={
             this.isEditingBody ? (
-              <CWTextInput
-                oninput={(e) => {
-                  this.title = e.target.value;
-                }}
-                value={this.title}
-              />
+              <TitleEditor onUpdateTitle={onUpdateTitle} value={this.title} />
             ) : (
               thread.title
             )
