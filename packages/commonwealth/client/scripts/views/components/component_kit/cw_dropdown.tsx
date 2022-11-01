@@ -66,7 +66,10 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
       placeholder,
       searchable,
     } = vnode.attrs;
-    const { activeMenuItems, showDropdown, ...value } = this;
+
+    // Input value must be passed as spread to CWTextInput, or it will
+    // always overwrite the defaultValue prop
+    const { activeMenuItems, showDropdown, ...thisParams } = this;
 
     return (
       <div class="dropdown-wrapper">
@@ -80,10 +83,19 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
             this.showDropdown = !showDropdown;
             e.stopPropagation();
           }}
-          inputValidationFn={inputValidationFn}
+          inputValidationFn={(val: string) => {
+            console.log({ val });
+            if (defaultMenuItems.find((i) => i.label === val)) {
+              return ['success', 'Input validated'];
+            } else {
+              return inputValidationFn(val);
+            }
+          }}
           onclick={() => {
-            this.value = null;
-            this.showDropdown = true;
+            if (searchable) {
+              delete this.value;
+            }
+            this.showDropdown = !showDropdown;
           }}
           oninput={(e) => {
             // TODO: Debounce
@@ -101,7 +113,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
           }}
           label={label}
           placeholder={placeholder}
-          {...value}
+          {...thisParams}
         />
         {showDropdown && (
           <div class="dropdown-options-display">

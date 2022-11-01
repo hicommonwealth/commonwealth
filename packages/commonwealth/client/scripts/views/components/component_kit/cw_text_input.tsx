@@ -18,7 +18,7 @@ export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
-  value?: string;
+  defaultValue;
   iconRight?: string;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
@@ -29,10 +29,12 @@ export type TextInputAttrs = {
   onenterkey?: (e) => void;
   onclick?: (e) => void;
   placeholder?: string;
+  required?: boolean;
   tabindex?: number;
+  value?: string;
 };
 
-type InputStyleAttrs = {
+export type InputStyleAttrs = {
   inputClassName?: string;
   darkMode?: boolean;
   disabled?: boolean;
@@ -41,12 +43,12 @@ type InputStyleAttrs = {
   displayOnly?: boolean;
 };
 
-type InputInternalStyleAttrs = {
+export type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
   isTyping: boolean;
 };
 
-type MessageRowAttrs = {
+export type MessageRowAttrs = {
   hasFeedback?: boolean;
   label: string;
   statusMessage?: string;
@@ -95,6 +97,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       containerClassName,
       darkMode,
       value,
+      defaultValue,
       disabled,
       iconRight,
       iconRightonclick,
@@ -107,6 +110,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       onenterkey,
       onclick,
       placeholder,
+      required,
       size = 'large',
       tabindex,
       displayOnly,
@@ -148,13 +152,15 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               darkMode,
               inputClassName,
             })}
+            defaultValue={defaultValue}
             disabled={disabled || displayOnly}
             tabindex={tabindex}
             maxlength={maxlength}
             name={name}
             placeholder={placeholder}
+            required={required}
             oninput={(e) => {
-              if (oninput) oninput(e);
+              oninput(e);
 
               if (e.target.value?.length === 0) {
                 this.isTyping = false;
@@ -168,7 +174,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 const timeout = e.target.value?.length > 3 ? 250 : 1000;
                 this.inputTimeout = setTimeout(() => {
                   this.isTyping = false;
-                  if (inputValidationFn && e.target.value?.length > 3) {
+                  if (inputValidationFn && e.target.value?.length > 0) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
                     m.redraw();
