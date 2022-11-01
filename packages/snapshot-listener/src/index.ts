@@ -1,13 +1,22 @@
 import express, { Express, Request, Response } from "express";
-import { Producer, SnapshotEvent } from "./producer";
+import { rabbitMQ } from './config'
+import createMQProducer from './producer';
 import dotenv from "dotenv";
 dotenv.config();
 
-const producer = new Producer();
 const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
+
+const produceMessage = createMQProducer(rabbitMQ.url, "snapshot_event");
+
+export interface SnapshotEvent {
+  id: string;
+  event: string;
+  space: string;
+  expire: number;
+}
 
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
@@ -16,7 +25,7 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
     const event: SnapshotEvent = req.body.event;
-    await producer.publishMessage("snapshot", event);
+    produceMessage(JSON.stringify(event));
 
     res.status(201).send("Snapshot event sent:" + JSON.stringify(event));
   } catch (err) {

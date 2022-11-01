@@ -1,4 +1,5 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { RegisteredTypes } from '@polkadot/types/types';
 import { DataTypes } from 'sequelize';
@@ -139,6 +140,9 @@ export default (
       tableName: 'Chains',
       timestamps: false,
       underscored: false,
+      indexes: [
+        { fields: ['snapshot'] },
+      ],
     }
   );
 

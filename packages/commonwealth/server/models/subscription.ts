@@ -9,9 +9,10 @@ import { DB } from '../models';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {
-  IPostNotificationData,
   ICommunityNotificationData,
   IChainEventNotificationData,
+  ISnapshotNotificationData,
+  IPostNotificationData,
   IChatNotification,
 } from '../../shared/types';
 import {
@@ -67,7 +68,8 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   models: DB,
   category_id: string,
   object_id: string,
-  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
+  notification_data: IPostNotificationData | ICommunityNotificationData
+  | IChainEventNotificationData | IChatNotification | ISnapshotNotificationData,
   webhook_data?: Partial<WebhookContent>,
   wss?: WebSocket.Server,
   excludeAddresses?: string[],
@@ -109,7 +111,9 @@ export default (
     models: DB,
     category_id: string,
     object_id: string,
-    notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
+    notification_data: IPostNotificationData
+    | ICommunityNotificationData | IChainEventNotificationData
+    | IChatNotification | ISnapshotNotificationData,
     webhook_data?: WebhookContent,
     wss?: WebSocket.Server,
     excludeAddresses?: string[],
@@ -199,6 +203,7 @@ export default (
           chain_id: (<IPostNotificationData>notification_data).chain_id
             || (<ICommunityNotificationData>notification_data).chain
             || (<IChatNotification>notification_data).chain_id
+            || (<ISnapshotNotificationData>notification_data).chain_id,
         });
       }
     }
