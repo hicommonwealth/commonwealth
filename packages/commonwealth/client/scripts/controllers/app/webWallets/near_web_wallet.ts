@@ -1,5 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
+import { CanvasData } from 'shared/adapters/shared';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
 // is handled through redirects involving the `/finishNearLogin` page.
@@ -17,11 +18,19 @@ class NearWebWalletController implements IWebWallet<any> {
     return [];
   }
 
+  public async getChainId() {
+    return null;
+  }
+
   public async getRecentBlock(chainIdentifier: string) {
     return null;
   }
 
   public async getSessionPublicAddress(): Promise<string> {
+    return null;
+  }
+
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     return null;
   }
 

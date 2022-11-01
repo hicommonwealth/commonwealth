@@ -11,14 +11,12 @@ import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CanvasData } from 'commonwealth/shared/adapters/shared';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import ClientSideWebWalletController from './client_side_web_wallet';
 
-class PolkadotWebWalletController
-  extends ClientSideWebWalletController<InjectedAccountWithMeta>
+class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
   private _enabled: boolean;

@@ -4,21 +4,20 @@ import { StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 import {
   Window as KeplrWindow,
   ChainInfo,
   EthSignType,
 } from '@keplr-wallet/types';
 import { CanvasData } from 'commonwealth/shared/adapters/shared';
-import ClientSideWebWalletController from './client_side_web_wallet';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
 
-class EVMKeplrWebWalletController extends ClientSideWebWalletController<AccountData> {
+class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;

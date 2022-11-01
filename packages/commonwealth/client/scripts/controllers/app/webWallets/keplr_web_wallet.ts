@@ -6,15 +6,14 @@ import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
 import { CanvasData } from 'commonwealth/shared/adapters/shared';
-import ClientSideWebWalletController from './client_side_web_wallet';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface Window extends KeplrWindow {}
 }
 
-class KeplrWebWalletController extends ClientSideWebWalletController<AccountData> {
+class KeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;

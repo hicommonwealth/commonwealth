@@ -6,11 +6,10 @@ import Web3 from 'web3';
 import { provider } from 'web3-core';
 import { StargateClient } from '@cosmjs/stargate';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
-import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
@@ -20,7 +19,7 @@ function encodeEthAddress(bech32Prefix: string, address: string): string {
   );
 }
 
-class CosmosEvmWebWalletController extends ClientSideWebWalletController<string> {
+class CosmosEvmWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;

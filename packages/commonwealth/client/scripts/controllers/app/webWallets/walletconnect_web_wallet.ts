@@ -1,15 +1,14 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, BlockInfo } from 'models';
+import { Account, ChainInfo, BlockInfo, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
 
-class WalletConnectWebWalletController extends ClientSideWebWalletController<string> {
+class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
@@ -54,8 +53,6 @@ class WalletConnectWebWalletController extends ClientSideWebWalletController<str
   }
 
   public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
-    console.log(account);
-    console.log(canvasMessage);
     const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
     const signature = await this._provider.wc.signTypedData([
       account.address,

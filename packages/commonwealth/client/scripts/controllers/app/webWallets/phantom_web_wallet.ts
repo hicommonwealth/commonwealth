@@ -2,12 +2,11 @@ declare let window: any;
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 import { CanvasData } from 'commonwealth/shared/adapters/shared';
 import * as solw3 from '@solana/web3.js';
-import ClientSideWebWalletController from './client_side_web_wallet';
 
-class PhantomWebWalletController extends ClientSideWebWalletController<string> {
+class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled = false;
   private _enabling = false;

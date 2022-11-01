@@ -1,7 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account } from 'models';
+import { Account, IWebWallet } from 'models';
 import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
-import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
@@ -9,7 +8,7 @@ type TerraAddress = {
   address: string
 }
 
-class TerraStationWebWalletController extends ClientSideWebWalletController<TerraAddress> {
+class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;

@@ -6,13 +6,12 @@ import $ from 'jquery';
 import { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, BlockInfo } from 'models';
+import { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import ClientSideWebWalletController from './client_side_web_wallet';
 import { CanvasData } from 'shared/adapters/shared';
 
-class MetamaskWebWalletController extends ClientSideWebWalletController<string> {
+class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
