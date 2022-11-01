@@ -117,7 +117,9 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
             {readOnly && <CWIcon iconName="lock" iconSize="small" />}
             {actions && (
               <CWPopoverMenu
-                trigger={<CWIconButton iconName="dotsVertical" />}
+                trigger={
+                  <CWIconButton iconName="dotsVertical" iconSize="small" />
+                }
                 menuItems={actions}
               />
             )}

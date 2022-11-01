@@ -157,19 +157,21 @@ class ViewThreadPage
       }
     }
 
-    if (this.thread) {
-      this.title = this.thread.title;
+    const { thread } = this;
+
+    if (thread) {
+      this.title = thread.title;
     }
 
     if (threadRecentlyEdited) {
       this.recentlyEdited = false;
     }
 
-    if (identifier !== `${threadId}-${slugify(this.thread.title)}`) {
+    if (identifier !== `${threadId}-${slugify(thread.title)}`) {
       navigateToSubpage(
         getProposalUrlPath(
-          this.thread.slug,
-          `${threadId}-${slugify(this.thread.title)}`,
+          thread.slug,
+          `${threadId}-${slugify(thread.title)}`,
           true
         ),
         {},
@@ -179,17 +181,17 @@ class ViewThreadPage
 
     // load proposal
     if (!this.prefetch[threadIdAndType]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([this.thread]).then(() => m.redraw);
+      app.threads.fetchReactionsCount([thread]).then(() => m.redraw);
       this.prefetch[threadIdAndType]['threadReactionsStarted'] = true;
     }
 
     // load comments
     if (!this.prefetch[threadIdAndType]['commentsStarted']) {
       app.comments
-        .refresh(this.thread, app.activeChainId())
+        .refresh(thread, app.activeChainId())
         .then(async () => {
           this.comments = app.comments
-            .getByProposal(this.thread)
+            .getByProposal(thread)
             .filter((c) => c.parentComment === null);
 
           // fetch reactions
@@ -202,7 +204,7 @@ class ViewThreadPage
             data: JSON.stringify({
               proposal_ids: [threadId],
               comment_ids: app.comments
-                .getByProposal(this.thread)
+                .getByProposal(thread)
                 .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
@@ -243,14 +245,14 @@ class ViewThreadPage
 
     const updatedCommentsCallback = () => {
       this.comments = app.comments
-        .getByProposal(this.thread)
+        .getByProposal(thread)
         .filter((c) => c.parentComment === null);
       m.redraw();
     };
 
     // load polls
     if (!this.prefetch[threadIdAndType]['pollsStarted']) {
-      app.polls.fetchPolls(app.activeChainId(), this.thread.id).catch(() => {
+      app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
         m.redraw();
@@ -258,14 +260,14 @@ class ViewThreadPage
 
       this.prefetch[threadIdAndType]['pollsStarted'] = true;
     } else {
-      this.polls = app.polls.getByThreadId(this.thread.id);
+      this.polls = app.polls.getByThreadId(thread.id);
     }
 
     // load view count
     if (!this.prefetch[threadIdAndType]['viewCountStarted']) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: this.thread.id,
+        object_id: thread.id,
       })
         .then((response) => {
           if (response.status !== 'Success') {
@@ -294,7 +296,7 @@ class ViewThreadPage
 
     // load profiles
     if (this.prefetch[threadIdAndType]['profilesStarted'] === undefined) {
-      app.profiles.getProfile(this.thread.authorChain, this.thread.author);
+      app.profiles.getProfile(thread.authorChain, thread.author);
 
       this.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
@@ -316,18 +318,18 @@ class ViewThreadPage
 
     this.prefetch[threadIdAndType]['profilesFinished'] = true;
 
-    const commentCount = app.comments.nComments(this.thread);
+    const commentCount = app.comments.nComments(thread);
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
     const { activeAccount } = app.user;
 
     const isAuthor =
-      activeAccount?.address === this.thread.author &&
-      activeAccount?.chain.id === this.thread.authorChain;
+      activeAccount?.address === thread.author &&
+      activeAccount?.chain.id === thread.authorChain;
 
     const isEditor =
-      this.thread.collaborators?.filter((c) => {
+      thread.collaborators?.filter((c) => {
         return (
           c.address === activeAccount?.address &&
           c.chain === activeAccount?.chain.id
@@ -348,13 +350,13 @@ class ViewThreadPage
       });
 
     const showLinkedSnapshotOptions =
-      this.thread.snapshotProposal?.length > 0 ||
-      this.thread.chainEntities?.length > 0 ||
+      thread.snapshotProposal?.length > 0 ||
+      thread.chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
 
     const showLinkedThreadOptions =
-      this.thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+      thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
     const windowListener = (e) => {
       if (this.isGloballyEditing || activeQuillEditorHasText()) {
@@ -367,7 +369,7 @@ class ViewThreadPage
 
     const canComment =
       app.user.activeAccount ||
-      (!isAdminOrMod && TopicGateCheck.isGatedTopic(this.thread?.topic?.name));
+      (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
 
     const setIsGloballyEditing = (status: boolean) => {
       this.isGloballyEditing = status;
@@ -386,7 +388,7 @@ class ViewThreadPage
 
     const reactionsAndReplyButtons = (
       <div class="thread-footer-row">
-        <ThreadReactionButton thread={this.thread} />
+        <ThreadReactionButton thread={thread} />
         <div class="comments-count">
           <CWIcon iconName="feedback" iconSize="small" />
           <CWText type="caption">{commentCount} Comments</CWText>
@@ -417,27 +419,27 @@ class ViewThreadPage
                 value={this.title}
               />
             ) : (
-              this.thread.title
+              thread.title
             )
           }
-          author={<ThreadAuthor thread={this.thread} />}
-          createdAt={this.thread.createdAt}
+          author={<ThreadAuthor thread={thread} />}
+          createdAt={thread.createdAt}
           viewCount={this.viewCount}
-          readOnly={this.thread.readOnly}
+          readOnly={thread.readOnly}
           subHeader={
             <>
-              {this.thread.stage !== ThreadStageType.Discussion && (
-                <ThreadStage thread={this.thread} />
+              {thread.stage !== ThreadStageType.Discussion && (
+                <ThreadStage thread={thread} />
               )}
               <SharePopover />
-              {!!this.thread.url && <ExternalLink thread={this.thread} />}
+              {!!thread.url && <ExternalLink thread={thread} />}
             </>
           }
           actions={
             app.isLoggedIn() &&
             hasEditPerms &&
             !this.isGloballyEditing && [
-              ...(hasEditPerms && !this.thread.readOnly
+              ...(hasEditPerms && !thread.readOnly
                 ? [
                     {
                       label: 'Edit',
@@ -446,13 +448,13 @@ class ViewThreadPage
                         e.preventDefault();
                         this.savedEdits = localStorage.getItem(
                           `${app.activeChainId()}-edit-thread-${
-                            this.thread.id
+                            thread.id
                           }-storedText`
                         );
 
                         if (this.savedEdits) {
                           clearEditingLocalStorage(
-                            this.thread.id,
+                            thread.id,
                             ContentType.Thread
                           );
                           this.shouldRestoreEdits =
@@ -478,7 +480,7 @@ class ViewThreadPage
                         app.modals.create({
                           modal: EditCollaboratorsModal,
                           data: {
-                            thread: this.thread,
+                            thread,
                           },
                         });
                       },
@@ -496,10 +498,10 @@ class ViewThreadPage
                           modal: ChangeTopicModal,
                           data: {
                             onChangeHandler: (topic: Topic) => {
-                              this.thread.topic = topic;
+                              thread.topic = topic;
                               m.redraw();
                             },
-                            thread: this.thread,
+                            thread,
                           },
                         });
                       },
@@ -520,7 +522,7 @@ class ViewThreadPage
 
                         if (!confirmed) return;
 
-                        app.threads.delete(this.thread).then(() => {
+                        app.threads.delete(thread).then(() => {
                           navigateToSubpage('/discussions');
                         });
                       },
@@ -530,16 +532,14 @@ class ViewThreadPage
               ...(isAuthor || isAdminOrMod
                 ? [
                     {
-                      label: this.thread.readOnly
-                        ? 'Unlock thread'
-                        : 'Lock thread',
+                      label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                       iconLeft: 'lock',
                       onclick: (e) => {
                         e.preventDefault();
                         app.threads
                           .setPrivacy({
-                            threadId: this.thread.id,
-                            readOnly: !this.thread.readOnly,
+                            threadId: thread.id,
+                            readOnly: !thread.readOnly,
                           })
                           .then(() => {
                             setIsEditingBody(false);
@@ -561,7 +561,7 @@ class ViewThreadPage
                         if (snapshotSpaces.length > 1) {
                           navigateToSubpage('/multiple-snapshots', {
                             action: 'create-from-thread',
-                            thread: this.thread,
+                            thread,
                           });
                         } else {
                           navigateToSubpage(`/snapshot/${snapshotSpaces}`);
@@ -571,10 +571,7 @@ class ViewThreadPage
                   ]
                 : []),
               ...(isAuthor || isAdminOrMod
-                ? [
-                    { type: 'divider' },
-                    getThreadSubScriptionMenuItem(this.thread),
-                  ]
+                ? [{ type: 'divider' }, getThreadSubScriptionMenuItem(thread)]
                 : []),
             ]
           }
@@ -584,7 +581,7 @@ class ViewThreadPage
                 <>
                   {reactionsAndReplyButtons}
                   <EditBody
-                    thread={this.thread}
+                    thread={thread}
                     savedEdits={this.savedEdits}
                     shouldRestoreEdits={this.shouldRestoreEdits}
                     setIsEditing={setIsEditingBody}
@@ -593,8 +590,8 @@ class ViewThreadPage
                 </>
               ) : (
                 <>
-                  <CollapsibleBodyText item={this.thread} />
-                  {this.thread.readOnly ? (
+                  <CollapsibleBodyText item={thread} />
+                  {thread.readOnly ? (
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
@@ -606,7 +603,7 @@ class ViewThreadPage
                         setIsGloballyEditing={setIsGloballyEditing}
                         isGloballyEditing={this.isGloballyEditing}
                         parentComment={null}
-                        rootProposal={this.thread}
+                        rootProposal={thread}
                       />
                     </>
                   ) : null}
@@ -617,7 +614,7 @@ class ViewThreadPage
           comments={
             <CommentsTree
               comments={this.comments}
-              proposal={this.thread}
+              proposal={thread}
               setIsGloballyEditing={setIsGloballyEditing}
               updatedCommentsCallback={updatedCommentsCallback}
             />
@@ -631,7 +628,7 @@ class ViewThreadPage
                   isAdminOrMod={isAdminOrMod}
                   isAuthor={isAuthor}
                   polls={this.polls}
-                  thread={this.thread}
+                  thread={thread}
                   showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                   showLinkedThreadOptions={showLinkedThreadOptions}
                 />
