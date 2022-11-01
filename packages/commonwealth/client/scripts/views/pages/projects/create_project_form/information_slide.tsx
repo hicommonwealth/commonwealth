@@ -31,8 +31,12 @@ export class InformationSlide
       vnode.attrs.form.creator = chainAccounts[0].address;
     }
 
-    const allEthChains = getAllEthChains(app);
     const userEthChains = getUserEthChains(app);
+    const allEthChains = getAllEthChains(app).sort((a, b) => {
+      if (userEthChains.includes(a) && !userEthChains.includes(b)) return -1;
+      if (userEthChains.includes(b) && !userEthChains.includes(a)) return 1;
+      else return 0;
+    });
     const defaultChainIdx = userEthChains
       .concat(allEthChains)
       .findIndex((c) => c.id === app.activeChainId());
@@ -45,27 +49,22 @@ export class InformationSlide
           image.
         </CWText>
         <CWTextInput
-          placeholder="Your Project Name Here"
+          defaultValue={vnode.attrs.form.title}
+          inputValidationFn={(val: string) => validateProjectForm('title', val)}
           label="Name Your Crowdfund"
-          name="Name"
           oninput={(e) => {
             vnode.attrs.form.title = e.target.value;
           }}
-          inputValidationFn={(val: string) => validateProjectForm('title', val)}
+          name="Name"
+          placeholder="Your Project Name Here"
           required
-          value={vnode.attrs.form.title}
         />
         <CWDropdown
           defaultMenuItems={
-            userEthChains
-              .map((chain: ChainInfo) => {
-                return { label: chain.name };
-              })
-              .concat(
-                allEthChains.map((chain: ChainInfo) => {
-                  return { label: chain.name, disabled: true };
-                })
-              ) as DefaultMenuItem[]
+            allEthChains.map((chain: ChainInfo) => {
+              const disabled = !userEthChains.includes(chain);
+              return { label: chain.name, disabled };
+            }) as DefaultMenuItem[]
           }
           customFilter={(item: DefaultMenuItem, query: string) => {
             const matchingChains: string[] = allEthChains
@@ -80,11 +79,12 @@ export class InformationSlide
           defaultActiveIndex={defaultChainIdx}
           inputValidationFn={(val: string) => {
             const userChain = userEthChains.find(
-              (c: ChainInfo) => c.name === val
+              (c: ChainInfo) => c.name.toLowerCase() === val.toLowerCase()
             );
             if (!userChain) {
               return ['failure', 'User is not part of this community'];
             } else {
+              m.route.set(`/${userChain.id}/new/project`);
               return ['success', null];
             }
           }}
@@ -93,9 +93,12 @@ export class InformationSlide
             const chain: ChainInfo = app.config.chains
               .getAll()
               .find((c: ChainInfo) => c.name === label);
-            m.route.set(`/${chain.id}/new/project`);
+            if (chain) {
+              m.route.set(`/${chain.id}/new/project`);
+            }
           }}
           searchable={true}
+          validateWhileTyping={false}
         />
         <CWDropdown
           defaultMenuItems={

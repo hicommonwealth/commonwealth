@@ -1,4 +1,4 @@
-import app, { IApp } from 'state';
+import { IApp } from 'state';
 import { AddressInfo, ChainInfo, Project } from 'models';
 import BN from 'bn.js';
 import Web3 from 'web3';

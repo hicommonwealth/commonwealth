@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import m from 'mithril';
+import m, { VnodeDOM } from 'mithril';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -14,6 +14,15 @@ import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 
 type TextInputSize = 'small' | 'large';
+
+export type InputStyleAttrs = {
+  inputClassName?: string;
+  darkMode?: boolean;
+  disabled?: boolean;
+  size: TextInputSize;
+  validationStatus?: ValidationStatus;
+  displayOnly?: boolean;
+};
 
 export type TextInputAttrs = {
   autocomplete?: string;
@@ -32,17 +41,9 @@ export type TextInputAttrs = {
   placeholder?: string;
   required?: boolean;
   tabindex?: number;
+  validateWhileTyping?: boolean;
   value?: string;
-};
-
-export type InputStyleAttrs = {
-  inputClassName?: string;
-  darkMode?: boolean;
-  disabled?: boolean;
-  size: TextInputSize;
-  validationStatus?: ValidationStatus;
-  displayOnly?: boolean;
-};
+} & InputStyleAttrs;
 
 export type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
@@ -91,13 +92,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: VnodeDOM<TextInputAttrs, this>) {
     const {
       autocomplete = 'off',
       autofocus,
       containerClassName,
       darkMode,
-      value,
+      displayOnly,
       defaultValue,
       disabled,
       iconRight,
@@ -114,8 +115,10 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       required,
       size = 'large',
       tabindex,
-      displayOnly,
+      value,
     } = vnode.attrs;
+
+    const validateWhileTyping = vnode.attrs.validateWhileTyping ?? true;
 
     return (
       <div
@@ -165,7 +168,8 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 if (oninput) oninput(e);
               }, 250)();
 
-              if (e.target.value?.length === 0) {
+              const inputLength = e.target.value?.length;
+              if (inputLength === 0) {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
@@ -174,10 +178,14 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 e.stopPropagation();
                 this.isTyping = true;
                 clearTimeout(this.inputTimeout);
-                const timeout = e.target.value?.length > 3 ? 250 : 1000;
+                const timeout = inputLength > 3 ? 250 : 1000;
                 this.inputTimeout = setTimeout(() => {
                   this.isTyping = false;
-                  if (inputValidationFn && e.target.value?.length > 0) {
+                  if (
+                    inputValidationFn &&
+                    validateWhileTyping &&
+                    inputLength > 0
+                  ) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
                     m.redraw();

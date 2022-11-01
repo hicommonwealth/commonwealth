@@ -19,6 +19,7 @@ export type DropdownInputAttrs = {
   onSelect?: (optionLabel: string, index?: number) => void;
   searchable?: boolean;
   textInputAttrs?: TextInputAttrs;
+  validateWhileTyping?: boolean;
 };
 
 export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
@@ -65,6 +66,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
       onSelect,
       placeholder,
       searchable,
+      validateWhileTyping,
     } = vnode.attrs;
 
     // Input value must be passed as spread to CWTextInput, or it will
@@ -91,7 +93,6 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
               return inputValidationFn(val);
             }
           }}
-          inputValidationFn={inputValidationFn}
           onclick={() => {
             if (searchable) {
               delete this.value;
@@ -114,6 +115,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
           }}
           label={label}
           placeholder={placeholder}
+          validateWhileTyping={validateWhileTyping}
           {...thisParams}
         />
         {showDropdown && (
