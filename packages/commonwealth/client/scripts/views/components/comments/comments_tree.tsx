@@ -2,26 +2,24 @@
 
 import m from 'mithril';
 
-import 'components/content_comments_tree.scss';
+import 'components/comments/comments_tree.scss';
 
 import app from 'state';
-import { Thread, Comment, AnyProposal } from 'models';
-import { MAX_THREAD_LEVEL } from '../pages/view_proposal/constants';
-import { CreateComment } from '../pages/view_proposal/create_comment';
-import { jumpHighlightComment } from '../pages/view_proposal/helpers';
-import { ProposalComment } from '../pages/view_proposal/proposal_comment';
-import { CWValidationText } from './component_kit/cw_validation_text';
+import { Thread, Comment as CommentType, AnyProposal } from 'models';
+import { Comment } from './comment';
+import { MAX_THREAD_LEVEL } from '../../pages/view_proposal/constants';
+import { CWValidationText } from '../component_kit/cw_validation_text';
+import { CreateComment } from './create_comment';
+import { jumpHighlightComment } from './helpers';
 
-type ContentCommentsTreeAttrs = {
-  comments: Array<Comment<any>>;
+type CommentsTreeAttrs = {
+  comments: Array<CommentType<any>>;
   proposal: Thread | AnyProposal;
   setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
 };
 
-export class ContentCommentsTree
-  implements m.ClassComponent<ContentCommentsTreeAttrs>
-{
+export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
   private commentError: any;
   private dom;
   private highlightedComment: boolean;
@@ -101,13 +99,13 @@ export class ContentCommentsTree
     };
 
     const recursivelyGatherComments = (
-      comments_: Comment<any>[],
-      parentComment: Comment<any>,
+      comments_: CommentType<any>[],
+      parentComment: CommentType<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
-      return comments_.map((comment: Comment<any>) => {
+      return comments_.map((comment: CommentType<any>) => {
         const children = app.comments
           .getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
@@ -115,7 +113,7 @@ export class ContentCommentsTree
         if (isLivingCommentTree(comment, children)) {
           return (
             <>
-              <ProposalComment
+              <Comment
                 comment={comment}
                 handleIsReplying={handleIsReplying}
                 isLast={threadLevel === 2}

@@ -10,24 +10,6 @@ import {
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
 } from './constants';
 
-// highlight the header/body of a parent thread, or the body of a comment
-export const jumpHighlightComment = (commentId: number) => {
-  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[1];
-
-  if (commentEle) {
-    // clear any previous animation
-    commentEle.classList.remove('highlighted');
-    commentEle.classList.remove('highlightAnimationComplete');
-    // scroll to comment
-    commentEle.scrollIntoView();
-    // add new highlight classes
-    commentEle.classList.add('highlighted');
-    setTimeout(() => {
-      commentEle.classList.add('highlightAnimationComplete');
-    }, 2000 + 500);
-  }
-};
-
 export const clearEditingLocalStorage = (
   id: number | string,
   contentType: ContentType

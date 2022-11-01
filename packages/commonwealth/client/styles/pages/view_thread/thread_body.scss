@@ -1,0 +1,40 @@
+@import 'shared';
+
+.ThreadBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 40px;
+  max-width: 768px;
+  width: 100%;
+
+  .thread-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    .thread-footer-row {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+
+      .comments-count {
+        align-items: center;
+        display: flex;
+        gap: 4px;
+
+        .Text,
+        .Icon {
+          color: $neutral-500;
+        }
+      }
+    }
+
+    .callout-text.Text {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+      padding: 16px;
+    }
+  }
+}

@@ -3,7 +3,7 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/view_proposal/proposal_body.scss';
+import 'pages/view_thread/thread_body.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -23,7 +23,6 @@ import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { CreateComment } from '../view_proposal/create_comment';
 import { EditBody } from '../view_proposal/edit_body';
 import { clearEditingLocalStorage } from '../view_proposal/helpers';
 import {
@@ -31,8 +30,9 @@ import {
   ProposalBodyText,
 } from '../view_proposal/proposal_components';
 import { ProposalHeaderExternalLink } from '../view_proposal/proposal_header_links';
-import { ContentCommentsTree } from '../../components/content_comments_tree';
 import { ThreadAuthor } from './thread_components';
+import { CommentsTree } from '../../components/comments/comments_tree';
+import { CreateComment } from '../../components/comments/create_comment';
 
 type ThreadBodyAttrs = {
   commentCount: number;
@@ -96,7 +96,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
     );
 
     return (
-      <div class="ProposalBody">
+      <div class="ThreadBody">
         <div class="header">
           {this.isEditingBody ? (
             <CWTextInput
@@ -275,7 +275,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
         </div>
         <CWDivider />
         {!!proposal.url && <ProposalHeaderExternalLink proposal={proposal} />}
-        <div class="proposal-content">
+        <div class="thread-content">
           {this.isEditingBody ? (
             <>
               {reactionsAndReplyButtons}
@@ -309,7 +309,7 @@ export class ThreadBody implements m.ClassComponent<ThreadBodyAttrs> {
             </>
           )}
         </div>
-        <ContentCommentsTree
+        <CommentsTree
           comments={comments}
           proposal={proposal}
           setIsGloballyEditing={setIsGloballyEditing}

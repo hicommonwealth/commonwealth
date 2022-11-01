@@ -15,6 +15,9 @@
 }
 
 .ProposalSubheader {
+  display: flex;
+  flex-direction: column;
+
   .onchain-status-text.Text {
     &.pass {
       color: $green-600;

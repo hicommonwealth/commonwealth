@@ -24,13 +24,13 @@ import { PageNotFound } from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { ContentCommentsTree } from '../../components/content_comments_tree';
 import User from '../../components/widgets/user';
 import { ProposalBodyText, ProposalSubheader } from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
+import { CommentsTree } from '../../components/comments/comments_tree';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -281,7 +281,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             </>
           }
           comments={
-            <ContentCommentsTree
+            <CommentsTree
               comments={this.comments}
               proposal={this.proposal}
               updatedCommentsCallback={updatedCommentsCallback}
