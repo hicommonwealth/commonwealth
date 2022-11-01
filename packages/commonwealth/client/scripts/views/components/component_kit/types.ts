@@ -39,6 +39,7 @@ export enum ComponentType {
   TextArea = 'TextArea',
   TextInput = 'TextInput',
   ThreadVoteButton = 'ThreadVoteButton',
+  TokenInput = 'TokenInput',
   Toggle = 'Toggle',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
@@ -49,23 +50,31 @@ export type StyleAttrs = {
   className?: string;
 };
 
+export type DividerMenuItem = { type: 'divider' };
+
+export type HeaderMenuItem = { type: 'header'; label: string };
+
+export type DefaultMenuItem = {
+  disabled?: boolean;
+  iconLeft?: IconName;
+  iconRight?: IconName;
+  isSecondary?: boolean;
+  label: string;
+  onclick?: () => void;
+  type?: 'default';
+};
+
+export type NotificationMenuItem = {
+  hasUnreads: boolean;
+  iconLeft?: IconName;
+  iconRight?: IconName;
+  label: string;
+  onclick: () => void;
+  type: 'notification';
+};
+
 export type MenuItem =
-  | { type: 'divider' }
-  | { type: 'header'; label: string }
-  | {
-      disabled?: boolean;
-      iconLeft?: IconName;
-      iconRight?: IconName;
-      isSecondary?: boolean;
-      label: string;
-      onclick: () => void;
-      type?: 'default';
-    }
-  | {
-      hasUnreads: boolean;
-      iconLeft?: IconName;
-      iconRight?: IconName;
-      label: string;
-      onclick: () => void;
-      type: 'notification';
-    };
+  | DividerMenuItem
+  | HeaderMenuItem
+  | DefaultMenuItem
+  | NotificationMenuItem;
