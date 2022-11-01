@@ -2,25 +2,25 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/proposal_comments.scss';
+import 'components/content_comments_tree.scss';
 
 import app from 'state';
 import { Thread, Comment, AnyProposal } from 'models';
-import { CreateComment } from './create_comment';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { jumpHighlightComment } from './helpers';
-import { MAX_THREAD_LEVEL } from './constants';
-import { ProposalComment } from './proposal_comment';
+import { MAX_THREAD_LEVEL } from '../pages/view_proposal/constants';
+import { CreateComment } from '../pages/view_proposal/create_comment';
+import { jumpHighlightComment } from '../pages/view_proposal/helpers';
+import { ProposalComment } from '../pages/view_proposal/proposal_comment';
+import { CWValidationText } from './component_kit/cw_validation_text';
 
-type ProposalCommentsAttrs = {
+type ContentCommentsTreeAttrs = {
   comments: Array<Comment<any>>;
   proposal: Thread | AnyProposal;
-  setIsGloballyEditing: (status: boolean) => void;
+  setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
 };
 
-export class ProposalComments
-  implements m.ClassComponent<ProposalCommentsAttrs>
+export class ContentCommentsTree
+  implements m.ClassComponent<ContentCommentsTreeAttrs>
 {
   private commentError: any;
   private dom;

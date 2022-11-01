@@ -5,15 +5,13 @@ import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
 
-import app from 'state';
-import { AddressInfo, Comment } from 'models';
+import { Comment } from 'models';
 import { ComponentType, MenuItem } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
-import User from '../widgets/user';
 
 type SidebarItem = {
   label: string;
@@ -28,13 +26,13 @@ type SidebarComponents = [
 ];
 
 type ContentPageAttrs = {
-  author: string;
-  body: m.Vnode;
   createdAt: moment.Moment;
   title: string;
 
   // optional
+  author?: m.Vnode;
   actions?: Array<MenuItem>;
+  body?: m.Vnode;
   comments?: Array<Comment<any>>;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   showSidebar?: boolean;
@@ -62,7 +60,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
         ? 'tabsView'
         : 'sidebarView';
 
-    if (vnode.attrs.sidebarComponents.length > 0) {
+    if (vnode.attrs.sidebarComponents?.length > 0) {
       this.tabSelected = 0;
     }
 
@@ -99,14 +97,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
             {title}
           </CWText>
           <div class="header-info-row">
-            <CWText>
-              {m(User, {
-                user: new AddressInfo(null, author, app.activeChainId(), null),
-                showAddressWithDisplayName: true,
-                linkify: true,
-                popover: true,
-              })}
-            </CWText>
+            {author}
             <CWText type="caption" className="header-text">
               published on {moment(createdAt).format('l')}
             </CWText>

@@ -6,15 +6,8 @@ import 'pages/view_proposal/proposal_components.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { pluralize, threadStageToLabel } from 'helpers';
-import {
-  Account,
-  Comment,
-  Thread,
-  ThreadStage,
-  AnyProposal,
-  AddressInfo,
-} from 'models';
+import { threadStageToLabel } from 'helpers';
+import { Account, Comment, Thread, ThreadStage, AnyProposal } from 'models';
 import VersionHistoryModal from 'views/modals/version_history_modal';
 import { notifyError } from 'controllers/app/notifications';
 import { ChainType } from 'common-common/src/types';
@@ -28,7 +21,20 @@ import {
   MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH,
 } from './constants';
 import { formatBody } from './helpers';
-import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import {
+  QueueButton,
+  ExecuteButton,
+  CancelButton,
+} from '../../components/proposals/voting_actions_components';
+import {
+  getStatusClass,
+  getStatusText,
+} from '../../components/proposal_card/helpers';
+import {
+  ProposalHeaderThreadLink,
+  ProposalHeaderBlockExplorerLink,
+  ProposalHeaderVotingInterfaceLink,
+} from './proposal_header_links';
 
 export class ProposalHeaderStage
   implements m.ClassComponent<{ proposal: Thread }>
@@ -65,51 +71,36 @@ export class ProposalHeaderStage
   }
 }
 
-export class ProposalBodyAuthor
-  implements
-    m.Component<{
-      item: AnyProposal | Thread;
-    }>
+export class ProposalSubheader
+  implements m.ClassComponent<{ proposal: AnyProposal }>
 {
   view(vnode) {
-    const { item } = vnode.attrs;
+    const { proposal } = vnode.attrs;
 
-    if (!item.author) return;
-
-    const author: Account =
-      item instanceof Thread
-        ? app.chain.accounts.get(item.author)
-        : item.author;
-
-    return item.deleted ? (
-      <span>[deleted]</span>
-    ) : (
-      <>
-        {m(User, {
-          avatarSize: 24,
-          user: author,
-          popover: true,
-          linkify: true,
-        })}
-        {item instanceof Thread && item.collaborators?.length > 0 && (
-          <>
-            <CWText> and </CWText>
-            <CWPopover
-              interactionType="hover"
-              hoverOpenDelay={500}
-              content={item.collaborators.map(({ address, chain }) => {
-                return m(User, {
-                  user: new AddressInfo(null, address, chain, null),
-                  linkify: true,
-                });
-              })}
-              trigger={
-                <a href="#">{pluralize(item.collaborators?.length, 'other')}</a>
-              }
-            />
-          </>
+    return (
+      <div class="ProposalSubheader">
+        <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
+          {getStatusText(proposal)}
+        </CWText>
+        {(proposal['blockExplorerLink'] ||
+          proposal['votingInterfaceLink'] ||
+          proposal.threadId) && (
+          <div class="proposal-links">
+            {proposal.threadId && (
+              <ProposalHeaderThreadLink proposal={proposal} />
+            )}
+            {proposal['blockExplorerLink'] && (
+              <ProposalHeaderBlockExplorerLink proposal={proposal} />
+            )}
+            {proposal['votingInterfaceLink'] && (
+              <ProposalHeaderVotingInterfaceLink proposal={proposal} />
+            )}
+          </div>
         )}
-      </>
+        <QueueButton proposal={proposal} />
+        <ExecuteButton proposal={proposal} />
+        <CancelButton proposal={proposal} />
+      </div>
     );
   }
 }

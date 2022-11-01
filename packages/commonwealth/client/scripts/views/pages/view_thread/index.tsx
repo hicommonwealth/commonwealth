@@ -22,9 +22,18 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { activeQuillEditorHasText } from '../view_proposal/helpers';
-import { ProposalBody } from '../view_proposal/proposal_body';
 import { ThreadSidebar } from './thread_sidebar';
-import { Prefetch } from '../view_proposal/types';
+import { ThreadBody } from './thread_body';
+
+export type ThreadPrefetch = {
+  [identifier: string]: {
+    commentsStarted: boolean;
+    pollsStarted?: boolean;
+    profilesFinished: boolean;
+    profilesStarted: boolean;
+    viewCountStarted?: boolean;
+  };
+};
 
 class ViewThreadPage
   implements
@@ -35,7 +44,7 @@ class ViewThreadPage
   private comments: Array<Comment<Thread>>;
   private isGloballyEditing: boolean;
   private polls: Poll[];
-  private prefetch: Prefetch;
+  private prefetch: ThreadPrefetch;
   private thread: Thread;
   private recentlyEdited: boolean;
   private tabSelected: 'viewProposal' | 'viewSidebar';
@@ -389,7 +398,7 @@ class ViewThreadPage
               />
             </CWTabBar>
             {this.tabSelected === 'viewProposal' && (
-              <ProposalBody
+              <ThreadBody
                 commentCount={commentCount}
                 comments={this.comments}
                 updatedCommentsCallback={updatedCommentsCallback}
@@ -420,7 +429,7 @@ class ViewThreadPage
               'proposal-body'
             )}
           >
-            <ProposalBody
+            <ThreadBody
               commentCount={commentCount}
               comments={this.comments}
               updatedCommentsCallback={updatedCommentsCallback}

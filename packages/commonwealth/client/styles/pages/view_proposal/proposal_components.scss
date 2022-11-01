@@ -13,3 +13,22 @@
     color: $rorange-500;
   }
 }
+
+.ProposalSubheader {
+  .onchain-status-text.Text {
+    &.pass {
+      color: $green-600;
+    }
+
+    &.fail {
+      color: $rorange-600;
+    }
+  }
+
+  .proposal-links {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
