@@ -42,9 +42,8 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
   }
 
   oninit(vnode: VnodeDOM<DropdownInputAttrs, this>) {
-    const { defaultActiveIndex, defaultMenuItems } = vnode.attrs;
     this.showDropdown = false;
-    this.activeMenuItems = defaultMenuItems;
+    this.activeMenuItems = vnode.attrs.defaultMenuItems;
 
     document.body.addEventListener('click', (event) => {
       const $dropdown = document.querySelector('.dropdown-wrapper');
@@ -67,7 +66,12 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
       placeholder,
       searchable,
     } = vnode.attrs;
-    const { activeMenuItems, showDropdown, ...value } = this;
+
+    // Input value must be passed as spread to CWTextInput, or it will
+    // always overwrite the defaultValue prop
+
+    if (!this.activeMenuItems.length) this.showDropdown = false;
+    const { activeMenuItems, showDropdown, ...thisParams } = this;
 
     return (
       <div class="dropdown-wrapper">
@@ -76,18 +80,25 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
           iconRight="chevronDown"
           defaultValue={defaultMenuItems[defaultActiveIndex ?? 0].label}
           displayOnly={!searchable}
-          // Be sure you haven't damaged non-searchable functionality
           iconRightonclick={(e: MouseEvent) => {
             this.showDropdown = !showDropdown;
             e.stopPropagation();
           }}
+          inputValidationFn={(val: string) => {
+            if (defaultMenuItems.find((i) => i.label === val)) {
+              return ['success', 'Input validated'];
+            } else {
+              return inputValidationFn(val);
+            }
+          }}
           inputValidationFn={inputValidationFn}
           onclick={() => {
-            this.value = null;
-            this.showDropdown = true;
+            if (searchable) {
+              delete this.value;
+            }
+            this.showDropdown = !showDropdown;
           }}
           oninput={(e) => {
-            // TODO: Debounce
             this.showDropdown = true;
             if (e.target.value?.length > 0) {
               const inputText = e.target.value;
@@ -98,11 +109,12 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
               );
             } else {
               this.activeMenuItems = defaultMenuItems;
+              m.redraw();
             }
           }}
           label={label}
           placeholder={placeholder}
-          {...value}
+          {...thisParams}
         />
         {showDropdown && (
           <div class="dropdown-options-display">

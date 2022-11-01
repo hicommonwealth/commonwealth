@@ -36,9 +36,6 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 
-    this.isSidebarToggled =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-
     this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
 
     window.addEventListener('resize', () => {
@@ -66,6 +63,8 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     }
 
     const isSidebarToggleable = app.chain && this.isWindowSmallInclusive;
+    this.isSidebarToggled =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
 
     return (
       <div class="Sublayout">

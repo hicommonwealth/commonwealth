@@ -4,6 +4,7 @@ import m from 'mithril';
 
 import 'components/component_kit/cw_text_input.scss';
 
+import _ from 'lodash';
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
@@ -160,7 +161,9 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             placeholder={placeholder}
             required={required}
             oninput={(e) => {
-              oninput(e);
+              _.debounce(() => {
+                if (oninput) oninput(e);
+              }, 250)();
 
               if (e.target.value?.length === 0) {
                 this.isTyping = false;

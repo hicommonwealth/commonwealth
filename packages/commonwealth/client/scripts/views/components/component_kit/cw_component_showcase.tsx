@@ -69,19 +69,6 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
-        <h1>Dropdown</h1>
-        <div class="form-gallery">
-          <CWDropdown
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
-            ]}
-            onSelect={(optionLabel) =>
-              console.log('Selected option: ', optionLabel)
-            }
-          />
-        </div>
         <h1>Spinner</h1>
         <div class="basic-gallery">
           <CWSpinner />
@@ -124,7 +111,7 @@ export class ComponentShowcase implements m.ClassComponent {
                 label: 'Report',
                 iconLeft: 'cautionCircle',
                 isSecondary: true,
-                onclick: () => console.log('clicked'),
+                onclick: () => notifySuccess('clicked'),
               },
             ]}
           />
@@ -399,6 +386,35 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Textarea"
             label="Text area"
             placeholder="Type here"
+          />
+          <CWDropdown
+            defaultMenuItems={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            onSelect={(optionLabel: string) =>
+              notifySuccess(`Selected option: ${optionLabel}`)
+            }
+          />
+          <CWDropdown
+            defaultMenuItems={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return ['failure', 'Must enter characters A-Z'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
+            label="This input accepts chars A-Z"
+            onSelect={(optionLabel) =>
+              notifySuccess(`Selected option: ${optionLabel}`)
+            }
+            searchable={true}
           />
           <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {

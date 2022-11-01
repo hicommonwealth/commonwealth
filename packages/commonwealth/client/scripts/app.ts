@@ -35,6 +35,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 import(/* webpackPrefetch: true */ 'views/pages/landing');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+import(/* webpackPrefetch: true */ 'views/pages/view_thread');
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
@@ -752,7 +753,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/discussion/:identifier': importRoute(
-              'views/pages/view_proposal/index',
+              'views/pages/view_thread/index',
               { scoped: true }
             ),
             '/new/proposal/:type': importRoute(
@@ -1035,7 +1036,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/:scope/discussion/:identifier': importRoute(
-              'views/pages/view_proposal/index',
+              'views/pages/view_thread/index',
               { scoped: true }
             ),
             '/:scope/new/proposal/:type': importRoute(
