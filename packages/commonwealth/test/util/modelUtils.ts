@@ -39,7 +39,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom()
-    const message = constructCanvasMessage(chain, chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
     const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
