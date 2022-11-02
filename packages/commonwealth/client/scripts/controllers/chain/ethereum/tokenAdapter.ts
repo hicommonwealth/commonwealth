@@ -1,7 +1,7 @@
 import Ethereum from 'controllers/chain/ethereum/adapter';
 
 import BN from 'bn.js';
-import { ContractType } from 'common-common/src/types';
+import { ChainNetwork, ContractType } from 'common-common/src/types';
 import $ from 'jquery';
 import { ChainInfo, ITokenAdapter } from 'models';
 import { IApp } from 'state';
@@ -14,7 +14,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
     if (!activeAddress) return false;
 
-    if (!this.contractAddress) {
+    if (!this.contractAddress && this.network !== ChainNetwork.AxieInfinity) {
       // iterate through selectedChain.Contracts for the erc20 type and return the address
       const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
       if (!tokenContracts || !tokenContracts.length) {

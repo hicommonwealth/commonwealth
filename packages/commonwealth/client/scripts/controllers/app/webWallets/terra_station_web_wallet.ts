@@ -44,6 +44,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
+    // use a promise so that this function returns *after* the wallet has connected
     const accountAddr = await new Promise<TerraAddress>((resolve) => {
       this._extension.once('onConnect', resolve);
       this._extension.connect();
