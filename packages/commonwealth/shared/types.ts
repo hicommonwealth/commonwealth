@@ -75,6 +75,12 @@ export interface IChainEventNotificationData {
   chain_id: string;
 }
 
+export interface ISnapshotNotificationData {
+  created_at: Date;
+  chain_id: string;
+  snapshotEventType: string;
+}
+
 export interface IChatNotification {
   message_id: string | number;
   channel_id: string | number;

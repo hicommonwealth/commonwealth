@@ -157,6 +157,12 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 
+import createMQConsumer from './consumer';
+import { RABBITMQ_URL } from './config';
+
+const consumer = createMQConsumer(RABBITMQ_URL, 'snapshot_event');
+// The consumer should be run in a sepearate process / service.
+consumer();
 
 
 function setupRouter(
