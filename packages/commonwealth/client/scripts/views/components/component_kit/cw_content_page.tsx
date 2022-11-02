@@ -111,9 +111,11 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           )}
           <div class="header-info-row">
             {author}
-            <CWText type="caption" className="header-text">
-              published on {moment(createdAt).format('l')}
-            </CWText>
+            {createdAt.isValid() && (
+              <CWText type="caption" className="header-text">
+                published on {moment(createdAt).format('l')}
+              </CWText>
+            )}
             {!!viewCount && (
               <CWText type="caption" className="header-text">
                 {pluralize(viewCount, 'view')}
