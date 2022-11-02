@@ -4,10 +4,7 @@ import m from 'mithril';
 
 import 'pages/view_proposal/proposal_components.scss';
 
-import app from 'state';
-import { Comment, Thread, AnyProposal } from 'models';
-import VersionHistoryModal from 'views/modals/version_history_modal';
-import { notifyError } from 'controllers/app/notifications';
+import { AnyProposal } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   QueueButton,

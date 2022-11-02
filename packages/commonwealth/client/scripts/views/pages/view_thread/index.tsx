@@ -415,7 +415,7 @@ class ViewThreadPage
       </div>
     );
 
-    const hasEditPerms = isAuthor || isAdminOrMod || isEditor;
+    const hasEditPerms = isAuthor || isEditor;
 
     return (
       <Sublayout
@@ -452,8 +452,7 @@ class ViewThreadPage
           }
           subHeader={!!thread.url && <ExternalLink thread={thread} />}
           actions={
-            app.isLoggedIn() &&
-            hasEditPerms &&
+            app.user.activeAccount &&
             !this.isGloballyEditing && [
               ...(hasEditPerms && !thread.readOnly
                 ? [
@@ -486,7 +485,7 @@ class ViewThreadPage
                     },
                   ]
                 : []),
-              ...(isAuthor
+              ...(hasEditPerms
                 ? [
                     {
                       label: 'Edit collaborators',
@@ -503,7 +502,7 @@ class ViewThreadPage
                     },
                   ]
                 : []),
-              ...(isAdminOrMod
+              ...(isAdminOrMod || isAuthor
                 ? [
                     {
                       label: 'Change topic',
@@ -524,7 +523,7 @@ class ViewThreadPage
                     },
                   ]
                 : []),
-              ...(isAuthor || isAdminOrMod || app.user.isSiteAdmin
+              ...(isAuthor || isAdminOrMod
                 ? [
                     {
                       label: 'Delete',
@@ -586,9 +585,8 @@ class ViewThreadPage
                     },
                   ]
                 : []),
-              ...(isAuthor || isAdminOrMod
-                ? [{ type: 'divider' }, getThreadSubScriptionMenuItem(thread)]
-                : []),
+              { type: 'divider' },
+              getThreadSubScriptionMenuItem(thread),
             ]
           }
           body={

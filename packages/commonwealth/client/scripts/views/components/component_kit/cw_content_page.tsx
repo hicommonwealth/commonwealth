@@ -29,7 +29,7 @@ type SidebarComponents = [
 ];
 
 type ContentPageAttrs = {
-  createdAt: moment.Moment;
+  createdAt: moment.Moment | number;
   title: string | m.Vnode;
 
   // optional
@@ -111,7 +111,12 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           )}
           <div class="header-info-row">
             {author}
-            {createdAt.isValid() && (
+            {typeof createdAt === 'number' && (
+              <CWText type="caption" className="header-text">
+                published on {moment(createdAt).format('l')}
+              </CWText>
+            )}
+            {moment.isMoment(createdAt) && createdAt.isValid() && (
               <CWText type="caption" className="header-text">
                 published on {moment(createdAt).format('l')}
               </CWText>
