@@ -1,9 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
+import m, { VnodeDOM } from 'mithril';
 
 import 'components/component_kit/cw_text_input.scss';
 
+import _ from 'lodash';
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
@@ -11,9 +12,17 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import _ from 'lodash';
 
 type TextInputSize = 'small' | 'large';
+
+export type InputStyleAttrs = {
+  inputClassName?: string;
+  darkMode?: boolean;
+  disabled?: boolean;
+  size: TextInputSize;
+  validationStatus?: ValidationStatus;
+  displayOnly?: boolean;
+};
 
 export type TextInputAttrs = {
   autocomplete?: string;
@@ -33,16 +42,7 @@ export type TextInputAttrs = {
   required?: boolean;
   tabindex?: number;
   value?: string;
-};
-
-export type InputStyleAttrs = {
-  inputClassName?: string;
-  darkMode?: boolean;
-  disabled?: boolean;
-  size: TextInputSize;
-  validationStatus?: ValidationStatus;
-  displayOnly?: boolean;
-};
+} & InputStyleAttrs;
 
 export type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
@@ -57,8 +57,8 @@ export type MessageRowAttrs = {
 };
 
 export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
-  view(vnode) {
-    const { hasFeedback, label, statusMessage, validationStatus, displayOnly } =
+  view(vnode: VnodeDOM<MessageRowAttrs, this>) {
+    const { hasFeedback, label, statusMessage, validationStatus } =
       vnode.attrs;
 
     return (
@@ -91,13 +91,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: VnodeDOM<TextInputAttrs, this>) {
     const {
       autocomplete = 'off',
       autofocus,
       containerClassName,
       darkMode,
-      value,
+      displayOnly,
       defaultValue,
       disabled,
       iconRight,
@@ -114,7 +114,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       required,
       size = 'large',
       tabindex,
-      displayOnly,
+      value,
     } = vnode.attrs;
 
     return (
