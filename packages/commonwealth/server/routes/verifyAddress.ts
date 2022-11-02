@@ -85,7 +85,7 @@ const verifySignature = async (
     addressModel.address,
     sessionPublicAddress,
     addressModel.block_info!
-  )
+  );
 
   let isValid: boolean;
   if (chain.base === ChainBase.Substrate) {
@@ -283,7 +283,7 @@ const verifySignature = async (
     // both in base64 encoding
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
     isValid = nacl.sign.detached.verify(
-      Buffer.from(`${addressModel.verification_token}\n`),
+      Buffer.from(JSON.stringify(canvasMessage)),
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );

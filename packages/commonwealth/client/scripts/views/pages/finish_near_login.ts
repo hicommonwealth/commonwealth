@@ -14,7 +14,7 @@ import {
   completeClientLogin,
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
-import { Account, AddressInfo } from 'models';
+import { Account } from 'models';
 import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -23,6 +23,8 @@ import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { NewLoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import NearChain from 'client/scripts/controllers/chain/near/chain';
+import { constructCanvasMessage } from 'commonwealth/shared/adapters/shared';
 
 interface IState {
   validating: boolean;
@@ -76,17 +78,43 @@ const validate = async (
     const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
     const chain =
       app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+
+    // create canvas thing
+    const nearApi = (app.chain.chain as NearChain).api;
+    const block = await nearApi.connection.provider.block({finality: "final"});
+
+    const chainId = "something";
+    const sessionPublicAddress = await app.sessions.getOrCreateAddress(ChainBase.NEAR, chainId);
+    const blockInfo = {
+      hash: block.header.hash,
+      number: block.header.height,
+      timestamp: block.header.timestamp
+    };
     const newAcct = await createUserWithAddress(
       acct.address,
       WalletId.NearWallet,
-      chain.id
+      chain.id,
+      sessionPublicAddress,
+      blockInfo
     );
+    const canvasMessage = constructCanvasMessage(
+      //  @ts-ignore
+      "near",
+      chainId,
+      acct.address,
+      sessionPublicAddress,
+      JSON.stringify(blockInfo)
+    );
+
     vnode.state.isNewAccount = newAcct.newlyCreated;
     // vnode.state.account = newAcct.account;
     acct.setValidationToken(newAcct.account.validationToken);
     acct.setWalletId(WalletId.NearWallet);
     acct.setAddressId(newAcct.account.addressId);
-    const signature = await acct.signMessage(`${acct.validationToken}\n`);
+    acct.setSessionPublicAddress(sessionPublicAddress);
+    acct.setValidationBlockInfo(JSON.stringify(blockInfo));
+
+    const signature = await acct.signMessage(JSON.stringify(canvasMessage));
     await acct.validate(signature);
     if (!app.isLoggedIn()) {
       await initAppState();

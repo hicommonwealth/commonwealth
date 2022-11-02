@@ -4,6 +4,9 @@ import { mnemonicGenerate } from '@polkadot/util-crypto';
 import { ChainBase } from '../../../../../common-common/src/types';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import * as solw3 from '@solana/web3.js';
+import { KeyPair } from 'near-api-js';
+import { PublicKey } from 'near-api-js/lib/utils';
+
 
 
 abstract class ISessionController<ChainIdType extends string | number | symbol> {
@@ -115,17 +118,43 @@ class SolanaSessionController extends ISessionController<string> {
 }
 
 
+class NEARSessionController extends ISessionController<string> {
+  addresses: Record<string, string>;
+
+  constructor() {
+    super();
+    this.addresses = {};
+  }
+
+  getAddress(chainId: string): string {
+    return this.addresses[chainId];
+  }
+
+  getOrCreateAddress(chainId: string): Promise<string> {
+    if(!this.addresses[chainId]) {
+      // create address
+      const ed25519Key = KeyPair.fromRandom("ed25519").getPublicKey().toString();
+      const hexAddress = Buffer.from(PublicKey.fromString(ed25519Key).data).toString("hex");
+      this.addresses[chainId] = hexAddress;
+    }
+    return Promise.resolve(this.addresses[chainId]);
+  }
+}
+
+
 class SessionsController {
   ethereum: EthereumSessionController;
   substrate: SubstrateSessionController;
   cosmos: CosmosSDKSessionController;
   solana: SolanaSessionController;
+  near: NEARSessionController;
 
   constructor() {
     this.ethereum = new EthereumSessionController();
     this.substrate = new SubstrateSessionController();
     this.cosmos = new CosmosSDKSessionController();
     this.solana = new SolanaSessionController();
+    this.near = new NEARSessionController();
   }
 
   getSessionController(chainBase: ChainBase): ISessionController<any> {
@@ -137,6 +166,8 @@ class SessionsController {
       return this.cosmos;
     } else if (chainBase == "solana") {
       return this.solana;
+    } else if (chainBase == "near") {
+      return this.near;
     }
   }
 
