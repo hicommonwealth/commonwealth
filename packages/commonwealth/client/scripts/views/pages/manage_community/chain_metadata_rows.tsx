@@ -23,6 +23,7 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { stringList } from 'aws-sdk/clients/datapipeline';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -61,6 +62,7 @@ export class ChainMetadataRows
   communityBanner: string;
   quillBanner: any;
   bannerStateUpdated: boolean;
+  discord_config_id: string;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -83,6 +85,7 @@ export class ChainMetadataRows
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
+    this.discord_config_id = vnode.attrs.chain.discord_config_id;
   }
 
   view(vnode) {
@@ -272,6 +275,23 @@ export class ChainMetadataRows
                 />
               );
             })}
+          </div>
+        </div>
+        <div class="tag-row">
+          <CWLabel label="Connect Commonbot" />
+          <div class="tag-group">
+            <CWButton
+              label={'Connect'}
+              buttonType={'primary-black'}
+              onclick={() => {
+                console.log('connecting');
+                // What needs to happen
+                // 1. OAuth with commonbot, added to a discord server
+                // 2. Create entry in DiscordBotConfig table
+                // 3. Create discord_config_id entry in Chain table
+                // 4. Update state here to show its connected and enable visibility for snapshot notif settings
+              }}
+            />
           </div>
         </div>
         <ManageRoles

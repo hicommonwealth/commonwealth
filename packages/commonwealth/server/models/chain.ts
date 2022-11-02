@@ -44,6 +44,7 @@ export type ChainAttributes = {
   bech32_prefix?: string;
   token_name?: string;
   ce_verbose?: boolean;
+  discord_config_id?: number;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -87,6 +88,7 @@ export default (
       id: { type: dataTypes.STRING, primaryKey: true },
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
+      discord_config_id: { type: dataTypes.INTEGER, allowNull: true }, // null if no bot enabled
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
