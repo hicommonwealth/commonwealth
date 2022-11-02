@@ -112,9 +112,11 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
             <CWText type="caption" className="header-text">
               published on {moment(createdAt).format('l')}
             </CWText>
-            <CWText type="caption" className="header-text">
-              {pluralize(viewCount, 'view')}
-            </CWText>
+            {!!viewCount && (
+              <CWText type="caption" className="header-text">
+                {pluralize(viewCount, 'view')}
+              </CWText>
+            )}
             {readOnly && <CWIcon iconName="lock" iconSize="small" />}
             {actions && (
               <CWPopoverMenu

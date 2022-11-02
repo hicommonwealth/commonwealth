@@ -1,6 +1,7 @@
 @import 'shared';
 
 .thread-subheader {
+  align-items: center;
   display: flex;
   gap: 8px;
 }
@@ -33,4 +34,10 @@
     border-radius: $border-radius-corners;
     padding: 16px;
   }
+}
+
+.cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }

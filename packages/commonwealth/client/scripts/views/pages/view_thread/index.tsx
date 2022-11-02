@@ -13,6 +13,7 @@ import { getProposalUrlPath, idToProposal } from 'identifiers';
 import { slugify } from 'utils';
 import { notifyError } from 'controllers/app/notifications';
 import {
+  ChainEntity,
   Comment,
   Poll,
   Thread,
@@ -20,12 +21,12 @@ import {
   Topic,
 } from 'models';
 import { ContentType } from 'types';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { activeQuillEditorHasText } from './helpers';
-import { ThreadSidebar } from './thread_sidebar';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
@@ -41,6 +42,9 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 import { EditBody } from './edit_body';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
+import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -635,17 +639,56 @@ class ViewThreadPage
           }
           sidebarComponents={[
             {
-              label: 'Info',
+              label: 'Links',
               item: (
-                <ThreadSidebar
-                  isAdmin={isAdmin}
-                  isAdminOrMod={isAdminOrMod}
-                  isAuthor={isAuthor}
-                  polls={this.polls}
-                  thread={thread}
-                  showLinkedSnapshotOptions={showLinkedSnapshotOptions}
-                  showLinkedThreadOptions={showLinkedThreadOptions}
-                />
+                <div class="cards-column">
+                  {showLinkedSnapshotOptions && (
+                    <LinkedProposalsCard
+                      onChangeHandler={(
+                        stage: ThreadStageType,
+                        chainEntities: ChainEntity[],
+                        snapshotProposal: SnapshotProposal[]
+                      ) => {
+                        thread.stage = stage;
+                        thread.chainEntities = chainEntities;
+                        if (app.chain?.meta.snapshot.length) {
+                          thread.snapshotProposal = snapshotProposal[0]?.id;
+                        }
+                        app.threads.fetchThreadsFromId([thread.identifier]);
+                        m.redraw();
+                      }}
+                      thread={thread}
+                      showAddProposalButton={isAuthor || isAdminOrMod}
+                    />
+                  )}
+                  {showLinkedThreadOptions && (
+                    <LinkedThreadsCard
+                      threadlId={thread.id}
+                      allowLinking={isAuthor || isAdminOrMod}
+                    />
+                  )}
+                </div>
+              ),
+            },
+            {
+              label: 'Polls',
+              item: (
+                <div class="cards-column">
+                  {[
+                    ...new Map(
+                      this.polls?.map((poll) => [poll.id, poll])
+                    ).values(),
+                  ].map((poll: Poll) => {
+                    return <ThreadPollCard poll={poll} />;
+                  })}
+                  {isAuthor &&
+                    (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                      <ThreadPollEditorCard
+                        thread={thread}
+                        threadAlreadyHasPolling={!this.polls?.length}
+                      />
+                    )}
+                </div>
               ),
             },
           ]}
