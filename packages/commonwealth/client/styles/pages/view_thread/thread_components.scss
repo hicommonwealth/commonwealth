@@ -13,3 +13,20 @@
     color: $rorange-500;
   }
 }
+
+.ThreadAuthor {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+
+  .trigger-text.Text {
+    cursor: pointer;
+  }
+}
+
+.collaborators {
+  background-color: $white;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-1;
+  padding: 8px;
+}

@@ -37,7 +37,7 @@ export class ThreadAuthor
     const author: Account = app.chain.accounts.get(thread.author);
 
     return (
-      <>
+      <div class="ThreadAuthor">
         {m(User, {
           avatarSize: 24,
           user: author,
@@ -46,25 +46,28 @@ export class ThreadAuthor
         })}
         {thread.collaborators?.length > 0 && (
           <>
-            <CWText> and </CWText>
+            <CWText type="caption">and</CWText>
             <CWPopover
               interactionType="hover"
-              hoverOpenDelay={500}
-              content={thread.collaborators.map(({ address, chain }) => {
-                return m(User, {
-                  user: new AddressInfo(null, address, chain, null),
-                  linkify: true,
-                });
-              })}
+              hoverCloseDelay={500}
+              content={
+                <div class="collaborators">
+                  {thread.collaborators.map(({ address, chain }) => {
+                    return m(User, {
+                      user: new AddressInfo(null, address, chain, null),
+                    });
+                  })}
+                </div>
+              }
               trigger={
-                <a href="#">
+                <CWText type="caption" className="trigger-text">
                   {pluralize(thread.collaborators?.length, 'other')}
-                </a>
+                </CWText>
               }
             />
           </>
         )}
-      </>
+      </div>
     );
   }
 }

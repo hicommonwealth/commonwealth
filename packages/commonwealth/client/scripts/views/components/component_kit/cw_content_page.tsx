@@ -38,6 +38,7 @@ type ContentPageAttrs = {
   body?: m.Vnode;
   comments?: Array<Comment<any>>;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
+  headerComponents?: m.Vnode;
   readOnly?: boolean;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
@@ -88,6 +89,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       comments,
       contentBodyLabel,
       createdAt,
+      headerComponents,
       readOnly,
       showSidebar,
       sidebarComponents,
@@ -117,6 +119,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
                 {pluralize(viewCount, 'view')}
               </CWText>
             )}
+            {headerComponents}
             {readOnly && <CWIcon iconName="lock" iconSize="small" />}
             {actions && (
               <CWPopoverMenu

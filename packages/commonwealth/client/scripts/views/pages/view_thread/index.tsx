@@ -445,14 +445,12 @@ class ViewThreadPage
           createdAt={thread.createdAt}
           viewCount={this.viewCount}
           readOnly={thread.readOnly}
-          subHeader={
-            <div class="thread-subheader">
-              {thread.stage !== ThreadStageType.Discussion && (
-                <ThreadStage thread={thread} />
-              )}
-              {!!thread.url && <ExternalLink thread={thread} />}
-            </div>
+          headerComponents={
+            thread.stage !== ThreadStageType.Discussion && (
+              <ThreadStage thread={thread} />
+            )
           }
+          subHeader={!!thread.url && <ExternalLink thread={thread} />}
           actions={
             app.isLoggedIn() &&
             hasEditPerms &&
@@ -670,27 +668,31 @@ class ViewThreadPage
                 </div>
               ),
             },
-            {
-              label: 'Polls',
-              item: (
-                <div class="cards-column">
-                  {[
-                    ...new Map(
-                      this.polls?.map((poll) => [poll.id, poll])
-                    ).values(),
-                  ].map((poll: Poll) => {
-                    return <ThreadPollCard poll={poll} />;
-                  })}
-                  {isAuthor &&
-                    (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                      <ThreadPollEditorCard
-                        thread={thread}
-                        threadAlreadyHasPolling={!this.polls?.length}
-                      />
-                    )}
-                </div>
-              ),
-            },
+            ...(this.polls?.length > 0
+              ? [
+                  {
+                    label: 'Polls',
+                    item: (
+                      <div class="cards-column">
+                        {[
+                          ...new Map(
+                            this.polls?.map((poll) => [poll.id, poll])
+                          ).values(),
+                        ].map((poll: Poll) => {
+                          return <ThreadPollCard poll={poll} />;
+                        })}
+                        {isAuthor &&
+                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            <ThreadPollEditorCard
+                              thread={thread}
+                              threadAlreadyHasPolling={!this.polls?.length}
+                            />
+                          )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
       </Sublayout>

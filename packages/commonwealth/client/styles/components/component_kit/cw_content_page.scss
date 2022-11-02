@@ -14,7 +14,9 @@
       gap: 8px;
 
       .header-info-row {
+        align-items: center;
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
 
         .User {
