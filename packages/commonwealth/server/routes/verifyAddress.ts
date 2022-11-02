@@ -126,7 +126,6 @@ const verifySignature = async (
 
     const msgBuffer = Buffer.from(JSON.stringify(canvasMessage));
 
-    // const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
     const ethSignatureParams = ethUtil.fromRpcSig(signatureString.trim());
