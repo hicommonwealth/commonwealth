@@ -68,8 +68,8 @@ const verifySignature = async (
   addressModel: AddressInstance,
   user_id: number,
   signatureString: string,
-  sessionPublicAddress: string | null, // used when signing a block to login, currently eth only
-  sessionBlockInfo: string | null,     // used when signing a block to login, currently eth only
+  sessionPublicAddress: string | null, // used when signing a block to login
+  sessionBlockInfo: string | null,     // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
