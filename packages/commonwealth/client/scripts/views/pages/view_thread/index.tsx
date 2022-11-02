@@ -417,6 +417,137 @@ class ViewThreadPage
 
     const hasEditPerms = isAuthor || isEditor;
 
+    const getActionMenuItems = () => {
+      return [
+        ...(hasEditPerms && !thread.readOnly
+          ? [
+              {
+                label: 'Edit',
+                iconLeft: 'write',
+                onclick: async (e) => {
+                  e.preventDefault();
+                  this.savedEdits = localStorage.getItem(
+                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+                  );
+
+                  if (this.savedEdits) {
+                    clearEditingLocalStorage(thread.id, ContentType.Thread);
+                    this.shouldRestoreEdits = await confirmationModalWithText(
+                      'Previous changes found. Restore edits?',
+                      'Yes',
+                      'No'
+                    )();
+                  }
+
+                  setIsEditingBody(true);
+                },
+              },
+            ]
+          : []),
+        ...(hasEditPerms
+          ? [
+              {
+                label: 'Edit collaborators',
+                iconLeft: 'write',
+                onclick: async (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditCollaboratorsModal,
+                    data: {
+                      thread,
+                    },
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAdminOrMod || isAuthor
+          ? [
+              {
+                label: 'Change topic',
+                iconLeft: 'write',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: ChangeTopicModal,
+                    data: {
+                      onChangeHandler: (topic: Topic) => {
+                        thread.topic = topic;
+                        m.redraw();
+                      },
+                      thread,
+                    },
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAuthor || isAdminOrMod
+          ? [
+              {
+                label: 'Delete',
+                iconLeft: 'trash',
+                onclick: async (e) => {
+                  e.preventDefault();
+
+                  const confirmed = await confirmationModalWithText(
+                    'Delete this entire thread?'
+                  )();
+
+                  if (!confirmed) return;
+
+                  app.threads.delete(thread).then(() => {
+                    navigateToSubpage('/discussions');
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAuthor || isAdminOrMod
+          ? [
+              {
+                label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                iconLeft: 'lock',
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.threads
+                    .setPrivacy({
+                      threadId: thread.id,
+                      readOnly: !thread.readOnly,
+                    })
+                    .then(() => {
+                      setIsEditingBody(false);
+                      m.redraw();
+                    });
+                },
+              },
+            ]
+          : []),
+        ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
+          ? [
+              {
+                label: 'Snapshot proposal from thread',
+                iconLeft: 'democraticProposal',
+                onclick: () => {
+                  const snapshotSpaces = app.chain.meta.snapshot;
+
+                  if (snapshotSpaces.length > 1) {
+                    navigateToSubpage('/multiple-snapshots', {
+                      action: 'create-from-thread',
+                      thread,
+                    });
+                  } else {
+                    navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                  }
+                },
+              },
+            ]
+          : []),
+        { type: 'divider' },
+        getThreadSubScriptionMenuItem(thread),
+      ];
+    };
+
     return (
       <Sublayout
       //  title={headerTitle}
@@ -453,141 +584,8 @@ class ViewThreadPage
           subHeader={!!thread.url && <ExternalLink thread={thread} />}
           actions={
             app.user.activeAccount &&
-            !this.isGloballyEditing && [
-              ...(hasEditPerms && !thread.readOnly
-                ? [
-                    {
-                      label: 'Edit',
-                      iconLeft: 'write',
-                      onclick: async (e) => {
-                        e.preventDefault();
-                        this.savedEdits = localStorage.getItem(
-                          `${app.activeChainId()}-edit-thread-${
-                            thread.id
-                          }-storedText`
-                        );
-
-                        if (this.savedEdits) {
-                          clearEditingLocalStorage(
-                            thread.id,
-                            ContentType.Thread
-                          );
-                          this.shouldRestoreEdits =
-                            await confirmationModalWithText(
-                              'Previous changes found. Restore edits?',
-                              'Yes',
-                              'No'
-                            )();
-                        }
-
-                        setIsEditingBody(true);
-                      },
-                    },
-                  ]
-                : []),
-              ...(hasEditPerms
-                ? [
-                    {
-                      label: 'Edit collaborators',
-                      iconLeft: 'write',
-                      onclick: async (e) => {
-                        e.preventDefault();
-                        app.modals.create({
-                          modal: EditCollaboratorsModal,
-                          data: {
-                            thread,
-                          },
-                        });
-                      },
-                    },
-                  ]
-                : []),
-              ...(isAdminOrMod || isAuthor
-                ? [
-                    {
-                      label: 'Change topic',
-                      iconLeft: 'write',
-                      onclick: (e) => {
-                        e.preventDefault();
-                        app.modals.create({
-                          modal: ChangeTopicModal,
-                          data: {
-                            onChangeHandler: (topic: Topic) => {
-                              thread.topic = topic;
-                              m.redraw();
-                            },
-                            thread,
-                          },
-                        });
-                      },
-                    },
-                  ]
-                : []),
-              ...(isAuthor || isAdminOrMod
-                ? [
-                    {
-                      label: 'Delete',
-                      iconLeft: 'trash',
-                      onclick: async (e) => {
-                        e.preventDefault();
-
-                        const confirmed = await confirmationModalWithText(
-                          'Delete this entire thread?'
-                        )();
-
-                        if (!confirmed) return;
-
-                        app.threads.delete(thread).then(() => {
-                          navigateToSubpage('/discussions');
-                        });
-                      },
-                    },
-                  ]
-                : []),
-              ...(isAuthor || isAdminOrMod
-                ? [
-                    {
-                      label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
-                      iconLeft: 'lock',
-                      onclick: (e) => {
-                        e.preventDefault();
-                        app.threads
-                          .setPrivacy({
-                            threadId: thread.id,
-                            readOnly: !thread.readOnly,
-                          })
-                          .then(() => {
-                            setIsEditingBody(false);
-                            m.redraw();
-                          });
-                      },
-                    },
-                  ]
-                : []),
-              ...((isAuthor || isAdminOrMod) &&
-              !!app.chain?.meta.snapshot.length
-                ? [
-                    {
-                      label: 'Snapshot proposal from thread',
-                      iconLeft: 'democraticProposal',
-                      onclick: () => {
-                        const snapshotSpaces = app.chain.meta.snapshot;
-
-                        if (snapshotSpaces.length > 1) {
-                          navigateToSubpage('/multiple-snapshots', {
-                            action: 'create-from-thread',
-                            thread,
-                          });
-                        } else {
-                          navigateToSubpage(`/snapshot/${snapshotSpaces}`);
-                        }
-                      },
-                    },
-                  ]
-                : []),
-              { type: 'divider' },
-              getThreadSubScriptionMenuItem(thread),
-            ]
+            !this.isGloballyEditing &&
+            getActionMenuItems()
           }
           body={
             <div class="thread-content">
