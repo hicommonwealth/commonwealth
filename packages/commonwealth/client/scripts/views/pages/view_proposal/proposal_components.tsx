@@ -55,51 +55,51 @@ export class ProposalSubheader
     );
   }
 }
-// needs refactoring
-export class ProposalBodyLastEdited
-  implements
-    m.ClassComponent<{
-      item: Thread | Comment<any>;
-    }>
-{
-  view(vnode) {
-    const { item } = vnode.attrs;
+// // needs refactoring
+// export class ProposalBodyLastEdited
+//   implements
+//     m.ClassComponent<{
+//       item: Thread | Comment<any>;
+//     }>
+// {
+//   view(vnode) {
+//     const { item } = vnode.attrs;
 
-    const isThread = item instanceof Thread;
+//     const isThread = item instanceof Thread;
 
-    if (!item.lastEdited) {
-      return;
-    }
+//     if (!item.lastEdited) {
+//       return;
+//     }
 
-    return (
-      <a
-        href="#"
-        onclick={async (e) => {
-          e.preventDefault();
+//     return (
+//       <a
+//         href="#"
+//         onclick={async (e) => {
+//           e.preventDefault();
 
-          let postWithHistory;
+//           let postWithHistory;
 
-          const grabHistory = isThread && !item.versionHistory?.length;
+//           const grabHistory = isThread && !item.versionHistory?.length;
 
-          if (grabHistory) {
-            try {
-              postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
-            } catch (err) {
-              notifyError('Version history not found.');
-              return;
-            }
-          }
+//           if (grabHistory) {
+//             try {
+//               postWithHistory = await app.threads.fetchThreadsFromId([item.id]);
+//             } catch (err) {
+//               notifyError('Version history not found.');
+//               return;
+//             }
+//           }
 
-          app.modals.create({
-            modal: VersionHistoryModal,
-            data: {
-              item: grabHistory && postWithHistory ? postWithHistory : item,
-            },
-          });
-        }}
-      >
-        Edited {item.lastEdited.fromNow()}
-      </a>
-    );
-  }
-}
+//           app.modals.create({
+//             modal: VersionHistoryModal,
+//             data: {
+//               item: grabHistory && postWithHistory ? postWithHistory : item,
+//             },
+//           });
+//         }}
+//       >
+//         Edited {item.lastEdited.fromNow()}
+//       </a>
+//     );
+//   }
+// }
