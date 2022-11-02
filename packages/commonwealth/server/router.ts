@@ -33,6 +33,7 @@ import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
+import setDiscordBotConfig from './routes/setDiscordBotConfig';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -156,8 +157,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-
-
 
 function setupRouter(
   app: Express,
@@ -714,6 +713,8 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
+  router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
+
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
   router.post('/migrateEvent', migrateEvent.bind(this, models));
 
@@ -801,7 +802,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

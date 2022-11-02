@@ -23,7 +23,6 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { stringList } from 'aws-sdk/clients/datapipeline';
 
 type ChainMetadataRowsAttrs = {
   admins: any;

@@ -34,10 +34,14 @@ export default (
         references: { model: 'Chains', key: 'id' },
       },
       guild_id: { type: Sequelize.STRING, allowNull: false },
-      snapshot_channel_id: { type: Sequelize.STRING, allowNull: false },
+      snapshot_channel_id: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'DiscordBotConfig',
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
     }
   );
 

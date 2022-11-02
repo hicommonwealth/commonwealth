@@ -50,6 +50,7 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
+import DiscordBotConfigFactory from './models/discord_bot_config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -98,6 +99,7 @@ const models: Models = {
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
+  DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
