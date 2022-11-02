@@ -3,6 +3,7 @@
 .ProposalSubheader {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 
   .onchain-status-text.Text {
     &.pass {
