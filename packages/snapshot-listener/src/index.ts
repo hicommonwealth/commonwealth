@@ -25,9 +25,18 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
     const event: SnapshotEvent = req.body.event;
-    produceMessage(JSON.stringify(event));
+    if (!event) {
+      res.status(500).send("Error sending snapshot event");
+    }
 
-    res.status(201).send("Snapshot event sent:" + JSON.stringify(event));
+    const success = produceMessage(JSON.stringify(event));
+    
+    if (success) {
+      res.status(201).send("Snapshot event sent: " + JSON.stringify(event));
+    } else {
+      res.status(500).send("Error sending snapshot event");
+    }
+
   } catch (err) {
     console.log(err);
 

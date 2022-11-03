@@ -26,19 +26,16 @@ const createMQProducer = (amqpUrl: string, queueName: string) => {
       switch (msg) {
         case '':
           log.error('Message cannot be empty');
-          throw new Error('Message cannot be empty');
         case undefined:
           log.error('Message cannot be undefined');
-          throw new Error('Message cannot be undefined');
         case null:
           log.error('Message cannot be null');
-          throw new Error('Message cannot be null');
         default:
-          log.info(`Sending message to queue ${queueName}`);
+          log.info(`Sending message: ${msg} to queue: '${queueName}'`);
           ch.sendToQueue(queueName, Buffer.from(msg))
+          return true
       }
     } catch (error) {
-      console.log('Error producing message: ', error)
       throw error
     }
   }
