@@ -8,57 +8,39 @@ import 'pages/view_proposal/index.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
-import { ProposalType, ChainBase } from 'common-common/src/types';
-import {
-  chainToProposalSlug,
-  getProposalUrlPath,
-  idToProposal,
-  pathIsDiscussion,
-  proposalSlugToClass,
-} from 'identifiers';
+import { ProposalType } from 'common-common/src/types';
+import { getProposalUrlPath, idToProposal } from 'identifiers';
 import { slugify } from 'utils';
-import Substrate from 'controllers/chain/substrate/adapter';
 import { notifyError } from 'controllers/app/notifications';
-import {
-  Comment,
-  Poll,
-  Thread,
-  Account,
-  ProposalModule,
-  AnyProposal,
-} from 'models';
+import { Comment, Poll, Thread } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { activeQuillEditorHasText } from './helpers';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 import {
   getClasses,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import { Prefetch } from './types';
-import { TipDetail } from '../tip_detail';
-import { ProposalBody } from './proposal_body';
-import { ThreadSidebar } from '../view_thread/thread_sidebar';
+import { activeQuillEditorHasText } from '../view_proposal/helpers';
+import { ProposalBody } from '../view_proposal/proposal_body';
+import { ThreadSidebar } from './thread_sidebar';
+import { Prefetch } from '../view_proposal/types';
 
-class ViewProposalPage
+class ViewThreadPage
   implements
     m.ClassComponent<{
       identifier: string;
-      type?: string;
     }>
 {
-  private comments: Comment<Thread>[];
+  private comments: Array<Comment<Thread>>;
   private isGloballyEditing: boolean;
   private polls: Poll[];
   private prefetch: Prefetch;
-  private proposal: AnyProposal | Thread;
+  private thread: Thread;
   private recentlyEdited: boolean;
   private tabSelected: 'viewProposal' | 'viewSidebar';
   private threadFetched: boolean;
   private threadFetchFailed: boolean;
-  private tipAmount: number;
   private viewCount: number;
 
   oninit() {
@@ -68,23 +50,13 @@ class ViewProposalPage
   view(vnode) {
     const { identifier } = vnode.attrs;
 
-    const isDiscussion = pathIsDiscussion(app.activeChainId(), m.route.get());
-
-    if (!app.chain?.meta && !isDiscussion) {
+    if (!app.chain?.meta) {
       return (
         <PageLoading
         // title="Loading..."
         />
       );
     }
-
-    const type =
-      vnode.attrs.type ||
-      (isDiscussion
-        ? ProposalType.Thread
-        : chainToProposalSlug(app.chain.meta));
-
-    const headerTitle = isDiscussion ? 'Discussions' : 'Proposals';
 
     if (typeof identifier !== 'string')
       return (
@@ -93,14 +65,13 @@ class ViewProposalPage
         />
       );
 
-    const proposalId = identifier.split('-')[0];
-    const proposalType = type;
-    const proposalIdAndType = `${proposalId}-${proposalType}`;
+    const threadId = identifier.split('-')[0];
+    const threadIdAndType = `${threadId}-${ProposalType.Thread}`;
 
     // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-    if (!this.prefetch || !this.prefetch[proposalIdAndType]) {
+    if (!this.prefetch || !this.prefetch[threadIdAndType]) {
       this.prefetch = {};
-      this.prefetch[proposalIdAndType] = {
+      this.prefetch[threadIdAndType] = {
         commentsStarted: false,
         pollsStarted: false,
         viewCountStarted: false,
@@ -126,98 +97,57 @@ class ViewProposalPage
       );
     }
 
-    const proposalRecentlyEdited = this.recentlyEdited;
+    const threadRecentlyEdited = this.recentlyEdited;
 
-    const proposalDoesNotMatch =
-      this.proposal &&
-      (+this.proposal.identifier !== +proposalId ||
-        this.proposal.slug !== proposalType);
+    const threadDoesNotMatch =
+      this.thread &&
+      (+this.thread.identifier !== +threadId ||
+        this.thread.slug !== ProposalType.Thread);
 
-    if (proposalDoesNotMatch) {
-      this.proposal = undefined;
+    if (threadDoesNotMatch) {
+      this.thread = undefined;
       this.recentlyEdited = false;
       this.threadFetched = false;
     }
 
-    // load proposal, and return m(PageLoading)
-    if (!this.proposal || proposalRecentlyEdited) {
+    // load thread, and return PageLoading
+    if (!this.thread || threadRecentlyEdited) {
       try {
-        this.proposal = idToProposal(proposalType, proposalId);
+        this.thread = idToProposal(ProposalType.Thread, threadId);
       } catch (e) {
         // proposal might be loading, if it's not an thread
-        if (proposalType === ProposalType.Thread) {
-          if (!this.threadFetched) {
-            app.threads
-              .fetchThreadsFromId([+proposalId])
-              .then((res) => {
-                this.proposal = res[0];
-                m.redraw();
-              })
-              .catch(() => {
-                notifyError('Thread not found');
-                this.threadFetchFailed = true;
-              });
-            this.threadFetched = true;
-          }
-          return (
-            <PageLoading
-            //  title={headerTitle}
-            />
-          );
-        } else {
-          if (!app.chain.loaded) {
-            return (
-              <PageLoading
-              //  title={headerTitle}
-              />
-            );
-          }
-          // check if module is still initializing
-          const c = proposalSlugToClass().get(proposalType) as ProposalModule<
-            any,
-            any,
-            any
-          >;
-          if (!c) {
-            return <PageNotFound message="Invalid proposal type" />;
-          }
-          if (!c.ready) {
-            // TODO: perhaps we should be able to load here without fetching ALL proposal data
-            // load sibling modules too
-            if (app.chain.base === ChainBase.Substrate) {
-              const chain = app.chain as Substrate;
-              app.chain.loadModules([
-                chain.council,
-                chain.technicalCommittee,
-                chain.treasury,
-                chain.democracyProposals,
-                chain.democracy,
-                chain.tips,
-              ]);
-            } else {
-              app.chain.loadModules([c]);
-            }
-            return (
-              <PageLoading
-              // title={headerTitle}
-              />
-            );
-          }
+        if (!this.threadFetched) {
+          app.threads
+            .fetchThreadsFromId([+threadId])
+            .then((res) => {
+              this.thread = res[0];
+              m.redraw();
+            })
+            .catch(() => {
+              notifyError('Thread not found');
+              this.threadFetchFailed = true;
+            });
+
+          this.threadFetched = true;
         }
-        // proposal does not exist, 404
-        return <PageNotFound message="Proposal not found" />;
+
+        return (
+          <PageLoading
+          //  title={headerTitle}
+          />
+        );
       }
     }
 
-    const { proposal } = this;
+    const { thread } = this;
 
-    if (proposalRecentlyEdited) this.recentlyEdited = false;
+    if (threadRecentlyEdited) this.recentlyEdited = false;
 
-    if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
+    if (identifier !== `${threadId}-${slugify(thread.title)}`) {
       navigateToSubpage(
         getProposalUrlPath(
-          proposal.slug,
-          `${proposalId}-${slugify(proposal.title)}`,
+          thread.slug,
+          `${threadId}-${slugify(thread.title)}`,
           true
         ),
         {},
@@ -226,18 +156,18 @@ class ViewProposalPage
     }
 
     // load proposal
-    if (!this.prefetch[proposalIdAndType]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([proposal]).then(() => m.redraw);
-      this.prefetch[proposalIdAndType]['threadReactionsStarted'] = true;
+    if (!this.prefetch[threadIdAndType]['threadReactionsStarted']) {
+      app.threads.fetchReactionsCount([thread]).then(() => m.redraw);
+      this.prefetch[threadIdAndType]['threadReactionsStarted'] = true;
     }
 
     // load comments
-    if (!this.prefetch[proposalIdAndType]['commentsStarted']) {
+    if (!this.prefetch[threadIdAndType]['commentsStarted']) {
       app.comments
-        .refresh(proposal, app.activeChainId())
+        .refresh(thread, app.activeChainId())
         .then(async () => {
           this.comments = app.comments
-            .getByProposal(proposal)
+            .getByProposal(thread)
             .filter((c) => c.parentComment === null);
 
           // fetch reactions
@@ -248,9 +178,9 @@ class ViewProposalPage
               'content-type': 'application/json',
             },
             data: JSON.stringify({
-              proposal_ids: [proposalId],
+              proposal_ids: [threadId],
               comment_ids: app.comments
-                .getByProposal(proposal)
+                .getByProposal(thread)
                 .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
             }),
@@ -263,6 +193,7 @@ class ViewProposalPage
               proposalId: rc.proposal_id,
               commentId: rc.comment_id,
             });
+
             app.reactionCounts.store.add(
               modelReactionCountFromServer({ ...rc, id })
             );
@@ -274,48 +205,45 @@ class ViewProposalPage
           this.comments = [];
           m.redraw();
         });
-      this.prefetch[proposalIdAndType]['commentsStarted'] = true;
+
+      this.prefetch[threadIdAndType]['commentsStarted'] = true;
     }
 
     if (this.comments?.length) {
       const mismatchedComments = this.comments.filter((c) => {
-        return c.rootProposal !== `${type}_${proposalId}`;
+        return c.rootProposal !== `${ProposalType.Thread}_${threadId}`;
       });
+
       if (mismatchedComments.length) {
-        this.prefetch[proposalIdAndType]['commentsStarted'] = false;
+        this.prefetch[threadIdAndType]['commentsStarted'] = false;
       }
     }
 
     const updatedCommentsCallback = () => {
       this.comments = app.comments
-        .getByProposal(proposal)
+        .getByProposal(thread)
         .filter((c) => c.parentComment === null);
       m.redraw();
     };
 
     // load polls
-    if (
-      proposal instanceof Thread &&
-      !this.prefetch[proposalIdAndType]['pollsStarted']
-    ) {
-      app.polls.fetchPolls(app.activeChainId(), proposal.id).catch(() => {
+    if (!this.prefetch[threadIdAndType]['pollsStarted']) {
+      app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
         m.redraw();
       });
-      this.prefetch[proposalIdAndType]['pollsStarted'] = true;
-    } else if (proposal instanceof Thread) {
-      this.polls = app.polls.getByThreadId(proposal.id);
+
+      this.prefetch[threadIdAndType]['pollsStarted'] = true;
+    } else {
+      this.polls = app.polls.getByThreadId(thread.id);
     }
 
     // load view count
-    if (
-      !this.prefetch[proposalIdAndType]['viewCountStarted'] &&
-      proposal instanceof Thread
-    ) {
+    if (!this.prefetch[threadIdAndType]['viewCountStarted']) {
       $.post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: proposal.id,
+        object_id: thread.id,
       })
         .then((response) => {
           if (response.status !== 'Success') {
@@ -330,11 +258,8 @@ class ViewProposalPage
           this.viewCount = 0;
           throw new Error('could not load view count');
         });
-      this.prefetch[proposalIdAndType]['viewCountStarted'] = true;
-    } else if (!this.prefetch[proposalIdAndType]['viewCountStarted']) {
-      // view counts currently not supported for proposals
-      this.prefetch[proposalIdAndType]['viewCountStarted'] = true;
-      this.viewCount = 0;
+
+      this.prefetch[threadIdAndType]['viewCountStarted'] = true;
     }
 
     if (this.comments === undefined || this.viewCount === undefined) {
@@ -346,24 +271,19 @@ class ViewProposalPage
     }
 
     // load profiles
-    if (this.prefetch[proposalIdAndType]['profilesStarted'] === undefined) {
-      if (proposal instanceof Thread) {
-        app.profiles.getProfile(proposal.authorChain, proposal.author);
-      } else if (proposal.author instanceof Account) {
-        // AnyProposal
-        app.profiles.getProfile(
-          proposal.author.chain.id,
-          proposal.author.address
-        );
-      }
+    if (this.prefetch[threadIdAndType]['profilesStarted'] === undefined) {
+      app.profiles.getProfile(thread.authorChain, thread.author);
+
       this.comments.forEach((comment) => {
         app.profiles.getProfile(comment.authorChain, comment.author);
       });
-      this.prefetch[proposalIdAndType]['profilesStarted'] = true;
+
+      this.prefetch[threadIdAndType]['profilesStarted'] = true;
     }
+
     if (
       !app.profiles.allLoaded() &&
-      !this.prefetch[proposalIdAndType]['profilesFinished']
+      !this.prefetch[threadIdAndType]['profilesFinished']
     ) {
       return (
         <PageLoading
@@ -371,37 +291,21 @@ class ViewProposalPage
         />
       );
     }
-    this.prefetch[proposalIdAndType]['profilesFinished'] = true;
 
-    const windowListener = (e) => {
-      if (this.isGloballyEditing || activeQuillEditorHasText()) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
+    this.prefetch[threadIdAndType]['profilesFinished'] = true;
 
-    window.addEventListener('beforeunload', windowListener);
-
-    const comments = this.comments;
-    const viewCount: number = this.viewCount;
-    const commentCount: number = app.comments.nComments(proposal);
+    const commentCount = app.comments.nComments(thread);
 
     // Original posters have full editorial control, while added collaborators
     // merely have access to the body and title
     const { activeAccount } = app.user;
 
-    const authorChain =
-      proposal instanceof Thread ? proposal.authorChain : app.activeChainId();
-
-    const authorAddress =
-      proposal instanceof Thread ? proposal.author : proposal.author?.address;
-
     const isAuthor =
-      activeAccount?.address === authorAddress &&
-      activeAccount?.chain.id === authorChain;
+      activeAccount?.address === thread.author &&
+      activeAccount?.chain.id === thread.authorChain;
 
     const isEditor =
-      (proposal as Thread).collaborators?.filter((c) => {
+      thread.collaborators?.filter((c) => {
         return (
           c.address === activeAccount?.address &&
           c.chain === activeAccount?.chain.id
@@ -431,26 +335,14 @@ class ViewProposalPage
       m.redraw();
     };
 
-    if (proposal instanceof SubstrateTreasuryTip) {
-      <TipDetail
-        proposal={proposal}
-        headerTitle={headerTitle}
-        setTipAmount={(tip) => {
-          this.tipAmount = tip;
-        }}
-      />;
-    }
-
     const showLinkedSnapshotOptions =
-      (proposal as Thread).snapshotProposal?.length > 0 ||
-      (proposal as Thread).chainEntities?.length > 0 ||
+      thread.snapshotProposal?.length > 0 ||
+      thread.chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
 
     const showLinkedThreadOptions =
-      (proposal as Thread).linkedThreads?.length > 0 ||
-      isAuthor ||
-      isAdminOrMod;
+      thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
     window.onresize = () => {
       if (
@@ -462,12 +354,20 @@ class ViewProposalPage
       }
     };
 
+    const windowListener = (e) => {
+      if (this.isGloballyEditing || activeQuillEditorHasText()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', windowListener);
+
     const hasSidebar =
-      proposal instanceof Thread &&
-      (showLinkedSnapshotOptions ||
-        showLinkedThreadOptions ||
-        this.polls?.length > 0 ||
-        isAuthor);
+      showLinkedSnapshotOptions ||
+      showLinkedThreadOptions ||
+      this.polls?.length > 0 ||
+      isAuthor;
 
     return (
       <Sublayout
@@ -482,7 +382,7 @@ class ViewProposalPage
           >
             <CWTabBar>
               <CWTab
-                label={proposal instanceof Thread ? 'Thread' : 'Proposal'}
+                label="Thread"
                 onclick={() => {
                   this.tabSelected = 'viewProposal';
                 }}
@@ -499,15 +399,15 @@ class ViewProposalPage
             {this.tabSelected === 'viewProposal' && (
               <ProposalBody
                 commentCount={commentCount}
-                comments={comments}
+                comments={this.comments}
                 updatedCommentsCallback={updatedCommentsCallback}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 isEditor={isEditor}
                 isGloballyEditing={this.isGloballyEditing}
-                proposal={proposal}
-                viewCount={viewCount}
+                proposal={thread}
+                viewCount={this.viewCount}
               />
             )}
             {hasSidebar && this.tabSelected === 'viewSidebar' && (
@@ -516,7 +416,7 @@ class ViewProposalPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                thread={proposal}
+                thread={thread}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
@@ -530,15 +430,15 @@ class ViewProposalPage
           >
             <ProposalBody
               commentCount={commentCount}
-              comments={comments}
+              comments={this.comments}
               updatedCommentsCallback={updatedCommentsCallback}
               setIsGloballyEditing={setIsGloballyEditing}
               isAdminOrMod={isAdminOrMod}
               isAuthor={isAuthor}
               isEditor={isEditor}
               isGloballyEditing={this.isGloballyEditing}
-              proposal={proposal}
-              viewCount={viewCount}
+              proposal={thread}
+              viewCount={this.viewCount}
             />
             {hasSidebar && (
               <ThreadSidebar
@@ -546,7 +446,7 @@ class ViewProposalPage
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                thread={proposal}
+                thread={thread}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
@@ -558,4 +458,4 @@ class ViewProposalPage
   }
 }
 
-export default ViewProposalPage;
+export default ViewThreadPage;
