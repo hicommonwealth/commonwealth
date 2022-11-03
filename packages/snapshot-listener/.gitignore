@@ -4,3 +4,4 @@ build/
 .github/
 .env
 .gitignore
+yarn-error.log
