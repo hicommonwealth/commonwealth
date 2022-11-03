@@ -3227,11 +3227,6 @@
     long "^4.0.0"
     secretjs "^0.17.0"
 
-"@magic-ext/polkadot@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@magic-ext/polkadot/-/polkadot-5.0.0.tgz#fe87a83ead236afb7246d2a924753029325617c1"
-  integrity sha512-L8cWMwCbW1arNZoCwFKKtZU9HuVb9YQGIZq7b36FWOGHxC45mPGcX1cRd4e+UXmBzzNyKxbd021CFgystFUmVg==
-
 "@magic-sdk/admin@^0.1.0-beta.8":
   version "0.1.0-beta.10"
   resolved "https://registry.npmjs.org/@magic-sdk/admin/-/admin-0.1.0-beta.10.tgz"

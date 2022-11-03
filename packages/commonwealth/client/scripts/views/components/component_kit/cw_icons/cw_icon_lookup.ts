@@ -88,7 +88,7 @@ export const customIconLookup = {
   phantom: CustomIcons.CWPhantom,
   polkadot: CustomIcons.CWPolkadot,
   ronin: CustomIcons.CWRonin,
-  terrastation: CustomIcons.CWTerraStation,
+  terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
