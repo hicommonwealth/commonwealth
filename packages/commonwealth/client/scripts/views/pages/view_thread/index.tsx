@@ -189,8 +189,6 @@ class ViewThreadPage
 
     const { thread } = this;
 
-    this.title = thread.title;
-
     if (threadRecentlyEdited) {
       this.recentlyEdited = false;
     }
@@ -566,7 +564,7 @@ class ViewThreadPage
                 oninput={(e) => {
                   this.title = e.target.value;
                 }}
-                value={this.title}
+                defaultValue={thread.title}
               />
             ) : (
               thread.title
