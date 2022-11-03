@@ -3,40 +3,45 @@ import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { MixpanelSnapshotEvents } from '../../shared/analytics/types';
+import { ISnapshotNotificationData } from '../../shared/types';
 import DB from '../database';
 import SnapshotSpaceCache from '../util/snapshotSpaceCache';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { NotificationInstance } from '../models/notification'
 
-type SnapshotListenerReq = {
+type SnapshotEvent = {
   id: string;
   event: string;
   space: string;
   expire: number;
 };
 
-type SnapshotListenerResp = string;
-
 const snapshotListener = async (
   models: typeof DB,
-  cache: SnapshotSpaceCache,
-  req: TypedRequestBody<SnapshotListenerReq>,
-  res: TypedResponse<SnapshotListenerResp>,
+  cache: any,
+  event: SnapshotEvent,
 ) => {
 
   // Check cache to see if any chains are subscribed to this space
   // returns an array of the chains that subscribe to that space or an empty array
-  const chainsToNotify = await cache.checkChainsToNotify(req.body.space);
+  const chainsToNotify = await cache.checkChainsToNotify(event.space);
 
   // If the array is empty, log that the listener was pinged for a invalid space
   if (!chainsToNotify.length) {
     mixpanelTrack({
       event: MixpanelSnapshotEvents.SNAPSHOT_INVALID_SPACE,
       isCustomDomain: false,
-      space: req.body.space
+      space: event.space
     });
-    return success(res, "Snapshot POST Recieved, Space not present");
+    //return success('No chains subscribed to this space');
   }
+
+  const notificationData: ISnapshotNotificationData = {
+    created_at: new Date(),
+    chain_id: event.space,
+    snapshotEventType: event.event,
+  }
+
 
   // DEPRECATED: Build array of notifications to emit from array of chains to notify
   // const notificationObjects = chainsToNotify.map((chain:string): NotificationInstance => {
@@ -67,12 +72,7 @@ const snapshotListener = async (
       NotificationCategories.NewSnapshot,
       // using the id snapshot sends with the event
       // this may need to be altered so the link works
-      `snapshot-${req.body.id}`,
-      {
-        created_at: new Date(),
-        chain_id: e,
-        snapshotEventType: req.body.event,
-      }
+      `snapshot-${event.id}`, notificationData
     );
   });
 
@@ -80,14 +80,14 @@ const snapshotListener = async (
   mixpanelTrack({
     event: MixpanelSnapshotEvents.SNAPSHOT_VALID_SPACE,
     isCustomDomain: false,
-    space: req.body.space
+    space: event.space
   });
 
-  try {
-    return success(res, "Snapshot POST recieved, Space present");
-  } catch(e) {
-    return e;
-  }
+  // try {
+  //   return success(res, "Snapshot POST recieved, Space present");
+  // } catch(e) {
+  //   return e;
+  // }
 
 };
 
@@ -106,10 +106,17 @@ const createMQConsumer = (amqpURl: string, queueName: string) => {
 
         console.log('Consumer connected to queue: ', queueName);
         chan.assertQueue(queueName, { durable: true });
+
         chan.consume(
           queueName,
           (msg: Message | null) => {
-           snapshotListener(DB, SnapshotSpaceCache, msg, res);
+              const snapshotEvent: SnapshotEvent = JSON.parse(msg.content.toString());
+              console.log({ snapshotEvent })
+              snapshotListener(
+                DB,
+                SnapshotSpaceCache,
+                snapshotEvent
+              );
           },
           { noAck: true }
         );
