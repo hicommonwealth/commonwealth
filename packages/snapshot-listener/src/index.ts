@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import { rabbitMQ } from './config'
-import createMQProducer from './producer';
+import createMQProducer from './producer/producer';
 import dotenv from "dotenv";
 dotenv.config();
 
