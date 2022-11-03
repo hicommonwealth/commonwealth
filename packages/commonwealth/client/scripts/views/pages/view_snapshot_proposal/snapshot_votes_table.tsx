@@ -5,26 +5,42 @@ import m from 'mithril';
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
-import { SnapshotProposalVote } from 'helpers/snapshot_utils';
 import { AddressInfo } from 'models';
 import { formatNumberLong } from 'helpers';
 import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 
+type SnapshotVoteType = {
+  balance: number;
+  choice: number;
+  created: number;
+  id: string;
+  scores: Array<number>;
+  voter: string;
+};
+
 type SnapshotVotesTableAttrs = {
   choices: Array<string>;
-  toggleExpandedVoterList: () => void;
   symbol: string;
-  voteCount: number;
-  votersList: Array<SnapshotProposalVote>;
+  voters: Array<SnapshotVoteType>;
 };
 
 export class SnapshotVotesTable
   implements m.ClassComponent<SnapshotVotesTableAttrs>
 {
-  view(vnode) {
-    const { choices, toggleExpandedVoterList, symbol, voteCount, votersList } =
-      vnode.attrs;
+  isVotersListExpanded: boolean;
+
+  view(vnode: m.VnodeDOM<SnapshotVotesTableAttrs, this>) {
+    const { choices, symbol, voters } = vnode.attrs;
+
+    const toggleExpandedVoterList = () => {
+      this.isVotersListExpanded = !this.isVotersListExpanded;
+      m.redraw();
+    };
+
+    const displayedVoters = this.isVotersListExpanded
+      ? voters
+      : voters.slice(0, 10);
 
     return (
       <div class="SnapshotVotesTable">
@@ -34,7 +50,7 @@ export class SnapshotVotesTable
           </CWText>
           <div class="vote-count">
             <CWText className="vote-count-text" fontWeight="medium">
-              {voteCount}
+              {voters.length}
             </CWText>
           </div>
         </div>
@@ -50,7 +66,7 @@ export class SnapshotVotesTable
               Power
             </CWText>
           </div>
-          {votersList.map((vote) => (
+          {displayedVoters.map((vote) => (
             <div class="vote-row">
               {m(User, {
                 user: new AddressInfo(
@@ -70,10 +86,7 @@ export class SnapshotVotesTable
               </CWText>
             </div>
           ))}
-          <div
-            class="view-more-footer"
-            onclick={() => toggleExpandedVoterList()}
-          >
+          <div class="view-more-footer" onclick={toggleExpandedVoterList}>
             <CWText className="view-more-text" fontWeight="medium">
               View More
             </CWText>

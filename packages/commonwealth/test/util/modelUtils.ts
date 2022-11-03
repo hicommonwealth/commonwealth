@@ -9,7 +9,8 @@ import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceProvider from 'token-balance-cache/src/provider';
+import { BalanceType } from 'common-common/src/types';
+import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
@@ -343,15 +344,24 @@ export const createInvite = async (args: InviteArgs) => {
   return invite;
 };
 
-export class MockTokenBalanceProvider extends TokenBalanceProvider {
+// always prune both token and non-token holders asap
+export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+  public name = 'eth-token'
+  public opts = {
+    tokenAddress: 'string',
+    contractType: 'string',
+  }
+  public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
-  public async getEthTokenBalance(
-    tokenAddress: string,
-    userAddress: string
-  ): Promise<BN> {
+  public async getBalance(
+    node: IChainNode,
+    address: string,
+    opts: { tokenAddress: string, contractType: string }
+  ): Promise<string> {
     if (this.balanceFn) {
-      return this.balanceFn(tokenAddress, userAddress);
+      const bal = await this.balanceFn(opts.tokenAddress, address);
+      return bal.toString();
     } else {
       throw new Error('unable to fetch token balance');
     }
