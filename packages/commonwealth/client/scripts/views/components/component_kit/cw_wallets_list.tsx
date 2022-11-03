@@ -194,7 +194,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const validationBlockInfo = await wallet.getRecentBlock();
+        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock();
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,

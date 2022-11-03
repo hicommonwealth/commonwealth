@@ -48,10 +48,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     return this._offlineSigner;
   }
 
-  public async getRecentBlock() {
-    return null;
-  }
-
   public async signLoginToken(
     message: string,
     address: string
