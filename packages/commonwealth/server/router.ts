@@ -34,6 +34,7 @@ import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
 import setDiscordBotConfig from './routes/setDiscordBotConfig';
+import createDiscordBotConfig from './routes/createDiscordBotConfig';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -713,6 +714,12 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
+  // Discord Bot
+  router.post(
+    '/createDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
+    createDiscordBotConfig.bind(this, models)
+  );
   router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));

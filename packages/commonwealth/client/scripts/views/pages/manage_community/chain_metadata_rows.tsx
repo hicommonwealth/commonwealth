@@ -6,6 +6,8 @@ import m from 'mithril';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
+import { uuidv4 } from 'lib/util';
+
 import {
   ChainBase,
   ChainCategoryType,
@@ -23,6 +25,10 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
+
+// TODO: Webpack config to get this from process.env
+const DISCORD_CLIENT_ID = '1034502265664454776';
+const DISCORD_CALLBACK_URL = 'http://localhost:3000/callback';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -61,7 +67,8 @@ export class ChainMetadataRows
   communityBanner: string;
   quillBanner: any;
   bannerStateUpdated: boolean;
-  discord_config_id: string;
+  discord_bot_connected: boolean;
+  discord_bot_connecting: boolean;
 
   oninit(vnode) {
     this.name = vnode.attrs.chain.name;
@@ -84,7 +91,8 @@ export class ChainMetadataRows
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
     this.communityBanner = vnode.attrs.chain.communityBanner;
-    this.discord_config_id = vnode.attrs.chain.discord_config_id;
+    this.discord_bot_connected = vnode.attrs.chain.discord_config_id !== null;
+    this.discord_bot_connecting = this.discord_bot_connected;
   }
 
   view(vnode) {
@@ -276,23 +284,7 @@ export class ChainMetadataRows
             })}
           </div>
         </div>
-        <div class="tag-row">
-          <CWLabel label="Connect Commonbot" />
-          <div class="tag-group">
-            <CWButton
-              label={'Connect'}
-              buttonType={'primary-black'}
-              onclick={() => {
-                console.log('connecting');
-                // What needs to happen
-                // 1. OAuth with commonbot, added to a discord server
-                // 2. Create entry in DiscordBotConfig table
-                // 3. Create discord_config_id entry in Chain table
-                // 4. Update state here to show its connected and enable visibility for snapshot notif settings
-              }}
-            />
-          </div>
-        </div>
+
         <ManageRoles
           label="Admins"
           roledata={vnode.attrs.admins}
@@ -400,6 +392,53 @@ export class ChainMetadataRows
             m.redraw();
           }}
         />
+
+        <div class="tag-row">
+          {this.discord_bot_connected ? (
+            <CWLabel label="Commonbot Connected" />
+          ) : this.discord_bot_connecting ? (
+            <CWLabel label="Commonbot Connecting" />
+          ) : (
+            <>
+              <CWLabel label="Connect Commonbot" />
+              <div class="tag-group">
+                <CWButton
+                  label={'Connect'}
+                  buttonType={'primary-black'}
+                  onclick={async () => {
+                    try {
+                      const verification_token = uuidv4();
+
+                      await $.post(
+                        `${app.serverUrl()}/createDiscordBotConfig`,
+                        {
+                          chain_id: app.activeChainId(),
+                          verification_token,
+                          jwt: app.user.jwt,
+                        }
+                      );
+
+                      window.open(
+                        `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURI(
+                          DISCORD_CALLBACK_URL
+                        )}&response_type=code&scope=bot&state=${encodeURI(
+                          JSON.stringify({
+                            cw_chain_id: app.activeChainId(),
+                            verification_token,
+                          })
+                        )}`
+                      );
+                      this.discord_bot_connecting = true;
+                      m.redraw();
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     );
   }

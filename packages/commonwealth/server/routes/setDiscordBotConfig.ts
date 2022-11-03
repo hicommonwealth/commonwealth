@@ -13,13 +13,16 @@ import { BanAttributes } from '../models/ban';
 enum SetDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
   NotAdmin = 'Not an admin',
+  CommonbotConnected = 'Discord is already connected to another Commonwealth community',
   Error = 'Could not set discord bot config',
+  TokenExpired = 'Token expired',
 }
 
 type SetDiscordBotConfigReq = {
   chain_id: string;
   bot_id: string;
   guild_id: string;
+  verification_token: string;
 };
 
 type SetDiscordBotConfigResp = {
@@ -31,62 +34,73 @@ const setDiscordBotConfig = async (
   req: TypedRequestBody<SetDiscordBotConfigReq>,
   res: TypedResponse<SetDiscordBotConfigResp>
 ) => {
-  const { chain_id, bot_id, guild_id } = req.body;
-  console.log('req.query', req.body);
-  console.log('chain id', chain_id);
+  const { chain_id, bot_id, guild_id, verification_token } = req.body;
 
   const [chain, error] = await validateChain(models, { chain_id });
-  console.log('error', error);
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
-  // TODO: admin check
+  const configEntry = await models.DiscordBotConfig.findOne({
+    where: {
+      chain_id,
+      verification_token,
+    },
+  });
+
+  if (!configEntry || chain_id !== configEntry.chain_id) {
+    throw new AppError(SetDiscordBotConfigErrors.NotAdmin);
+  }
+
+  if (configEntry.token_expiration < new Date()) {
+    throw new AppError(SetDiscordBotConfigErrors.TokenExpired);
+  }
+
+  const existingCommunityWithGuildConnected =
+    await models.DiscordBotConfig.findAll({ where: { guild_id } });
+
+  if (
+    existingCommunityWithGuildConnected &&
+    existingCommunityWithGuildConnected.length > 0
+  ) {
+    // Handle discord already linked to another CW community
+    try {
+      const chainInstance = await models.Chain.findOne({
+        where: { id: chain_id },
+      });
+
+      chainInstance.discord_config_id = null;
+      await chainInstance.save();
+
+      await models.DiscordBotConfig.destroy({
+        where: {
+          chain_id,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+
+    throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
+  }
 
   try {
-    // check if already exists
-    const existing = await models.DiscordBotConfig.findOne({
-      where: {
-        guild_id,
-      },
-    });
-
-    if (existing) {
-      const existingConfig = await existing.update(
-        {
-          chain_id,
-          bot_id,
-          guild_id,
-        },
-        {
-          where: {
-            guild_id,
-          },
-        }
-      );
-
-      await models.Chain.update(
-        { discord_config_id: existingConfig.id },
-        { where: { id: chain_id } }
-      );
-
-      return success(res, {
-        message: 'updated an existing discord bot config',
-      });
-    } else {
-      const newConfig = await models.DiscordBotConfig.create({
+    const updatedConfig = await configEntry.update(
+      {
         chain_id,
         bot_id,
         guild_id,
-      });
+        verification_token: null,
+        token_expiration: null,
+      },
+      {
+        where: {
+          guild_id,
+        },
+      }
+    );
 
-      await models.Chain.update(
-        { discord_config_id: newConfig.id },
-        { where: { id: chain_id } }
-      );
-
-      return success(res, {
-        message: 'created a new discord bot config',
-      });
-    }
+    return success(res, {
+      message: 'created a new discord bot config',
+    });
   } catch (e) {
     console.log(e);
     throw new AppError(SetDiscordBotConfigErrors.Error);
