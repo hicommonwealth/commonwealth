@@ -88,14 +88,17 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
       //  Enable session (triggers QR Code modal)
       await this._controller.connect(ConnectType.WALLETCONNECT);
 
-      // TODO: clean up this observable handling -> deal with undefined, add timeout
+      let subscription;
       this._wallet = await new Promise((resolve, reject) => {
-        this._controller.connectedWallet().subscribe((connectedWallet) => {
+        subscription = this._controller.connectedWallet().subscribe((connectedWallet) => {
           if (connectedWallet) {
             resolve(connectedWallet)
           }
         })
       });
+      if (subscription?.unsubscribe) {
+        subscription.unsubscribe();
+      }
 
       this._accounts = [ { address: this._wallet.terraAddress } ];
       this._enabled = true;
