@@ -111,16 +111,12 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           )}
           <div class="header-info-row">
             {author}
-            {typeof createdAt === 'number' && (
-              <CWText type="caption" className="header-text">
-                published on {moment(createdAt).format('l')}
-              </CWText>
-            )}
-            {moment.isMoment(createdAt) && createdAt.isValid() && (
-              <CWText type="caption" className="header-text">
-                published on {moment(createdAt).format('l')}
-              </CWText>
-            )}
+            {typeof createdAt === 'number' ||
+              (moment.isMoment(createdAt) && createdAt.isValid() && (
+                <CWText type="caption" className="header-text">
+                  published on {moment(createdAt).format('l')}
+                </CWText>
+              ))}
             {!!viewCount && (
               <CWText type="caption" className="header-text">
                 {pluralize(viewCount, 'view')}
