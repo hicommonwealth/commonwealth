@@ -12,9 +12,9 @@ type CacheT = { [snapshotCache: string] : Map<string, Array<string>>};
 
 export default class SnapshotSpaceCache extends JobRunner<CacheT> {
   private _models: typeof DB;
+
   constructor(
     models: typeof DB,
-    // Update the cache every hour
     jobTimeS = 60 * 60,
     cache: CacheT = { snapshotCache : new Map<string, Array<string>>() }
   ) {

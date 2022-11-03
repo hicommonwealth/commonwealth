@@ -1,13 +1,9 @@
 import amqp, { Message } from 'amqplib/callback_api';
-import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
-import { TypedRequestBody, TypedResponse, success } from '../types';
 import { MixpanelSnapshotEvents } from '../../shared/analytics/types';
-import { ISnapshotNotificationData } from '../../shared/types';
 import DB from '../database';
 import SnapshotSpaceCache from '../util/snapshotSpaceCache';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import { NotificationInstance } from '../models/notification'
 
 type SnapshotEvent = {
   id: string;
@@ -18,7 +14,7 @@ type SnapshotEvent = {
 
 const snapshotListener = async (
   models: typeof DB,
-  cache: any,
+  cache: SnapshotSpaceCache,
   event: SnapshotEvent,
 ) => {
 
@@ -33,29 +29,7 @@ const snapshotListener = async (
       isCustomDomain: false,
       space: event.space
     });
-    //return success('No chains subscribed to this space');
   }
-
-  const notificationData: ISnapshotNotificationData = {
-    created_at: new Date(),
-    chain_id: event.space,
-    snapshotEventType: event.event,
-  }
-
-
-  // DEPRECATED: Build array of notifications to emit from array of chains to notify
-  // const notificationObjects = chainsToNotify.map((chain:string): NotificationInstance => {
-  //   const notification = models.Notification.build({
-  //     notification_data: JSON.stringify({
-  //       created_at: new Date(),
-  //       chain_id: chain,
-  //       snapshotEventType: req.body.event,
-  //     }),
-  //     category_id: NotificationCategories.NewSnapshot,
-  //     chain_id: chain
-  //   });
-  //   return notification;
-  // });
 
   // Temporarily emit all notifications in one step by iteratiting over each chain to notify
   // calling the DB in a loop is bad practice, but in this case chainsToNotify
@@ -65,15 +39,21 @@ const snapshotListener = async (
   //      to not require chain_id for snapshot notifications so notifications can be grouped by
   //      snapshot space and not by chain
 
-  chainsToNotify.forEach(async (e) => {
+  chainsToNotify.forEach(async (chain: string) => {
     // Send out notifications
-    await models.Subscription.emitNotifications(
+    const notification = await models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewSnapshot,
       // using the id snapshot sends with the event
       // this may need to be altered so the link works
-      `snapshot-${event.id}`, notificationData
+      `snapshot-${event.id}`, {
+        created_at: new Date(),
+        chain_id: chain,
+        snapshotEventType: event.event,
+      }
     );
+
+    console.log({ notification })
   });
 
   // Log that the listener was pinged for a valid space
@@ -83,16 +63,13 @@ const snapshotListener = async (
     space: event.space
   });
 
-  // try {
-  //   return success(res, "Snapshot POST recieved, Space present");
-  // } catch(e) {
-  //   return e;
-  // }
-
+  console.log('Snapshot event stored: ', event);
 };
 
 
 const createMQConsumer = (amqpURl: string, queueName: string) => {
+  const snapshotSpaceCache = new SnapshotSpaceCache(DB);
+
   return () => {
     amqp.connect(amqpURl, (errConn, conn) => {
       if (errConn) {
@@ -112,9 +89,11 @@ const createMQConsumer = (amqpURl: string, queueName: string) => {
           (msg: Message | null) => {
               const snapshotEvent: SnapshotEvent = JSON.parse(msg.content.toString());
               console.log({ snapshotEvent })
+              console.log({ queueName })
+
               snapshotListener(
                 DB,
-                SnapshotSpaceCache,
+                snapshotSpaceCache,
                 snapshotEvent
               );
           },
