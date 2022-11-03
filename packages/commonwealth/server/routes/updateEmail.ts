@@ -5,7 +5,7 @@ import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DynamicTemplate } from '../../shared/types';
 import { WalletId } from 'common-common/src/types';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

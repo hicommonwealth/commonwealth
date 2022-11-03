@@ -166,7 +166,9 @@ class DelegatePage implements m.ClassComponent {
     }
 
     return (
-      <Sublayout title="Delegate">
+      <Sublayout
+      // title="Delegate"
+      >
         <DelegateForm />
       </Sublayout>
     );

@@ -16,10 +16,15 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotProposalContent } from './snapshot_proposal_content';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
-import { SnapshotProposalCards } from './snapshot_proposal_cards';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
+import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { SnapshotInformationCard } from './snapshot_information_card';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { SnapshotVotesTable } from './snapshot_votes_table';
+import {
+  ActiveProposalPill,
+  ClosedProposalPill,
+} from '../../components/proposal_pills';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -28,26 +33,24 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
-  private activeTab: 'proposals' | 'info-and-results';
+  private fetchedPower: boolean;
   private proposal: SnapshotProposal;
-  private scores: number[];
+  private scores: Array<number>;
   private space: SnapshotSpace;
   private symbol: string;
   private threads: Array<{ id: string; title: string }> | null;
   private totals: any;
-  private votes: SnapshotProposalVote[];
-  private fetchedPower: boolean;
-  private validatedAgainstStrategies: boolean;
   private totalScore: number;
+  private validatedAgainstStrategies: boolean;
+  private votes: Array<SnapshotProposalVote>;
 
   oninit(vnode) {
-    this.activeTab = 'proposals';
-    this.votes = [];
-    this.scores = [];
-    this.proposal = null;
-    this.threads = null;
     this.fetchedPower = false;
+    this.proposal = null;
+    this.scores = [];
+    this.threads = null;
     this.validatedAgainstStrategies = true;
+    this.votes = [];
 
     const loadVotes = async () => {
       this.proposal = app.snapshot.proposals.find(
@@ -107,16 +110,6 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       mixpanelTrack();
       loadVotes();
     }
-
-    window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.activeTab !== 'proposals'
-      ) {
-        this.activeTab = 'proposals';
-        m.redraw();
-      }
-    };
   }
 
   view(vnode) {
@@ -125,71 +118,61 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     return !this.votes || !this.totals || !this.proposal ? (
       <PageLoading />
     ) : (
-      <Sublayout title="Snapshot Proposal">
-        <div class="SnapshotViewProposalPage">
-          <div class="proposal-body-with-tabs">
-            <CWTabBar>
-              <CWTab
-                label="Proposals"
-                isSelected={this.activeTab === 'proposals'}
-                onclick={() => {
-                  this.activeTab = 'proposals';
-                }}
-              />
-              <CWTab
-                label="Info & Results"
-                isSelected={this.activeTab === 'info-and-results'}
-                onclick={() => {
-                  this.activeTab = 'info-and-results';
-                }}
-              />
-            </CWTabBar>
-            {this.activeTab === 'proposals' && (
-              <SnapshotProposalContent
-                proposal={this.proposal}
-                votes={this.votes}
+      <Sublayout
+      // title="Snapshot Proposal"
+      >
+        <CWContentPage
+          showSidebar
+          title={this.proposal.title}
+          author={this.proposal.author}
+          createdAt={this.proposal.created}
+          contentBodyLabel="Snapshot"
+          subHeader={
+            this.proposal.state === 'active' ? (
+              <ActiveProposalPill proposalEnd={this.proposal.end} />
+            ) : (
+              <ClosedProposalPill proposalState={this.proposal.state} />
+            )
+          }
+          body={renderQuillTextBody(this.proposal.body)}
+          subBody={
+            this.votes.length > 0 && (
+              <SnapshotVotesTable
+                choices={this.proposal.choices}
                 symbol={this.symbol}
+                voters={this.votes}
               />
-            )}
-            {this.activeTab === 'info-and-results' && (
-              <div class="proposal-cards-container">
-                <SnapshotProposalCards
+            )
+          }
+          sidebarComponents={[
+            {
+              label: 'Info',
+              item: (
+                <SnapshotInformationCard
+                  proposal={this.proposal}
+                  threads={this.threads}
+                />
+              ),
+            },
+            {
+              label: 'Poll',
+              item: (
+                <SnapshotPollCardContainer
+                  fetchedPower={this.fetchedPower}
                   identifier={identifier}
                   proposal={this.proposal}
                   scores={this.scores}
                   space={this.space}
                   symbol={this.symbol}
-                  threads={this.threads}
                   totals={this.totals}
-                  votes={this.votes}
-                  validatedAgainstStrategies={this.validatedAgainstStrategies}
-                  fetchedPower={this.fetchedPower}
                   totalScore={this.totalScore}
+                  validatedAgainstStrategies={this.validatedAgainstStrategies}
+                  votes={this.votes}
                 />
-              </div>
-            )}
-          </div>
-          <div class="proposal-body">
-            <SnapshotProposalContent
-              proposal={this.proposal}
-              votes={this.votes}
-              symbol={this.symbol}
-            />
-            <SnapshotProposalCards
-              identifier={identifier}
-              proposal={this.proposal}
-              scores={this.scores}
-              space={this.space}
-              symbol={this.symbol}
-              threads={this.threads}
-              totals={this.totals}
-              votes={this.votes}
-              validatedAgainstStrategies={this.validatedAgainstStrategies}
-              fetchedPower={this.fetchedPower}
-              totalScore={this.totalScore}
-            />
-          </div>
-        </div>
+              ),
+            },
+          ]}
+        />
       </Sublayout>
     );
   }

@@ -11,7 +11,7 @@ import {
 } from 'chain-events/src';
 import { WhereOptions } from 'sequelize';
 
-import { DB } from '../database';
+import { DB } from '../models';
 import {
   ChainEventAttributes,
   ChainEventInstance,

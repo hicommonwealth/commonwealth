@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import bs58 from 'bs58';
 import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {

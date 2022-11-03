@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { AppError, ServerError } from '../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import validateRoles from '../util/validateRoles';
 

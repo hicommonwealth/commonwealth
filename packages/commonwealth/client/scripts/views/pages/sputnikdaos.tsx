@@ -10,7 +10,7 @@ import app from 'state';
 import { formatDuration } from 'helpers';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import Near from 'controllers/chain/near/main';
+import Near from 'controllers/chain/near/adapter';
 import { IDaoInfo } from 'controllers/chain/near/chain';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
@@ -84,8 +84,7 @@ class SputnikDAOsPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Loading Sputnik DAOs"
-          title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
         />
       );
 
@@ -131,8 +130,7 @@ class SputnikDAOsPage implements m.ClassComponent {
         return (
           <PageLoading
             message="Loading Sputnik DAOs"
-            title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-            showNewProposalButton
+            // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
           />
         );
       } else return <PageLoading message="Redirecting..." />;
@@ -140,8 +138,7 @@ class SputnikDAOsPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
       >
         <div class="SputnikDAOsPage">
           <CWText type="h3">Sputnik DAOs</CWText>

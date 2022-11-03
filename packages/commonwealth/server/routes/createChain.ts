@@ -11,7 +11,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { ChainAttributes } from '../models/chain';
 import { ChainNodeAttributes } from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 import { AddressInstance } from '../models/address';
@@ -270,8 +270,20 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
-      // TODO: add other balance types if needed
-      balance_type: base === ChainBase.CosmosSDK ? BalanceType.Cosmos : undefined,
+      balance_type: base === ChainBase.CosmosSDK
+        ? BalanceType.Cosmos
+        : base === ChainBase.Substrate
+        ? BalanceType.Substrate
+        : base === ChainBase.Ethereum
+        ? BalanceType.Ethereum
+        // beyond here should never really happen, but just to make sure...
+        : base === ChainBase.NEAR
+        ? BalanceType.NEAR
+        : base === ChainBase.Solana
+        ? BalanceType.Solana
+        : undefined,
+      // use first chain name as node name
+      name: req.body.name,
     }
   });
 
@@ -329,6 +341,11 @@ const createChain = async (
     chain_id: chain.id,
     category: 'General',
   });
+
+  const topics = await models.Topic.create({
+    chain_id: chain.id,
+    name: 'General'
+  })
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored

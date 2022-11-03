@@ -1,0 +1,14 @@
+@import 'shared';
+
+.EditComment {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .buttons-row {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
+  }
+}

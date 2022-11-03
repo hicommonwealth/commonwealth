@@ -32,7 +32,7 @@ import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import Cosmos from 'controllers/chain/cosmos/main';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import {
   NearSputnikVote,

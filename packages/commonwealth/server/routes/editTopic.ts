@@ -3,7 +3,7 @@ import { NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TopicAttributes } from '../models/topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';

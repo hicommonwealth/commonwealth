@@ -10,9 +10,9 @@ import { AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import Cosmos from 'controllers/chain/cosmos/main';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
 import { BalanceInfo } from 'views/components/proposals/balance_info';

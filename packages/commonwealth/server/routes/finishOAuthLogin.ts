@@ -5,7 +5,7 @@ import {
   redirectWithLoginSuccess,
   redirectWithLoginError,
 } from './finishEmailLogin';
-import { DB } from '../database';
+import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,

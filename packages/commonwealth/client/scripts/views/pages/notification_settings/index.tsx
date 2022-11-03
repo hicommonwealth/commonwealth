@@ -40,7 +40,9 @@ class NotificationSettingsPage implements m.ClassComponent {
     const bundledSubs = bundleSubs(app.user.notifications.subscriptions);
 
     return (
-      <Sublayout title={<BreadcrumbsTitleTag title="Notification Settings" />}>
+      <Sublayout
+      // title={<BreadcrumbsTitleTag title="Notification Settings" />}
+      >
         <div class="NotificationSettingsPage">
           <CWText type="h3" fontWeight="semiBold" className="page-header-text">
             Notification Management

@@ -20,7 +20,9 @@ class SettingsPage implements m.ClassComponent {
     if (!app.loginStatusLoaded()) return <PageLoading />;
 
     return (
-      <Sublayout title="Account Settings">
+      <Sublayout
+      // title="Account Settings"
+      >
         <div class="SettingsPage">
           <EmailSection />
           <LinkedAddressesSection />

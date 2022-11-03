@@ -29,6 +29,8 @@ import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
+import { CWDropdown } from './cw_dropdown';
+import CWCoverImageUploader from './cw_cover_image_uploader';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -66,6 +68,19 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <h1>Dropdown</h1>
+        <div class="form-gallery">
+          <CWDropdown
+            inputOptions={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            onSelect={(optionLabel) =>
+              console.log('Selected option: ', optionLabel)
+            }
+          />
+        </div>
         <h1>Spinner</h1>
         <div class="basic-gallery">
           <CWSpinner />
@@ -93,20 +108,20 @@ export class ComponentShowcase implements m.ClassComponent {
         <div class="basic-gallery">
           <CWPopoverMenu
             trigger={<CWIconButton iconName="dotsVertical" />}
-            popoverMenuItems={[
+            menuItems={[
               { type: 'header', label: 'Community' },
-              { label: 'Create Thread', iconName: 'edit' },
-              { label: 'Create Proposal', iconName: 'edit' },
-              { label: 'Create Poll', iconName: 'edit' },
-              { label: 'Create Snapshot', iconName: 'edit', disabled: true },
+              { label: 'Create Thread', iconLeft: 'write' },
+              { label: 'Create Proposal', iconLeft: 'write' },
+              { label: 'Create Poll', iconLeft: 'write' },
+              { label: 'Create Snapshot', iconLeft: 'write', disabled: true },
               { type: 'divider' },
               { type: 'header', label: 'Universal' },
-              { label: 'Create Community', iconName: 'people' },
-              { label: 'Create Crowdfund', iconName: 'wallet' },
+              { label: 'Create Community', iconLeft: 'people' },
+              { label: 'Create Crowdfund', iconLeft: 'wallet' },
               { type: 'divider' },
               {
                 label: 'Report',
-                iconName: 'cautionCircle',
+                iconLeft: 'cautionCircle',
                 isSecondary: true,
                 onclick: () => console.log('clicked'),
               },
@@ -360,7 +375,7 @@ export class ComponentShowcase implements m.ClassComponent {
             label="Text field with icon"
             name="Text field with icon"
             placeholder="Type here"
-            iconRight="edit"
+            iconRight="write"
           />
           <CWTextInput
             name="Text field"
@@ -378,6 +393,11 @@ export class ComponentShowcase implements m.ClassComponent {
             name="Textarea"
             label="Text area"
             placeholder="Type here"
+          />
+          <CWCoverImageUploader
+            uploadCompleteCallback={(url: string) => {
+              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+            }}
           />
         </div>
         <h1>Buttons</h1>
@@ -689,6 +709,20 @@ export class ComponentShowcase implements m.ClassComponent {
               }}
             />
             {this.selectedIconButton === 2 && (
+              <div class="icon-button-selected">is selected</div>
+            )}
+          </div>
+          <div class="icon-button-row">
+            <CWIconButton
+              iconName="views"
+              iconSize="large"
+              iconButtonTheme="black"
+              selected={this.selectedIconButton === 3}
+              onclick={() => {
+                this.selectedIconButton = 3;
+              }}
+            />
+            {this.selectedIconButton === 3 && (
               <div class="icon-button-selected">is selected</div>
             )}
           </div>

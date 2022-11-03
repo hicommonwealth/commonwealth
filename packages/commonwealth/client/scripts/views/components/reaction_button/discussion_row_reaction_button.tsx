@@ -91,9 +91,7 @@ export class DiscussionRowReactionButton
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
-        onclick={async (e) =>
-          onReactionClick(e, hasReacted, dislike, like, thread)
-        }
+        onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         class={`DiscussionRowReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
         }`}

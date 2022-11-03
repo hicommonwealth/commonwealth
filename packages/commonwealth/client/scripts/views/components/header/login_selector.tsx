@@ -107,7 +107,7 @@ export class LoginSelectorMenuLeft
             }}
             label={
               <div class="label-wrap">
-                {mobile && <CWIcon iconName="edit" />}
+                {mobile && <CWIcon iconName="write" />}
                 <span>Edit profile</span>
               </div>
             }

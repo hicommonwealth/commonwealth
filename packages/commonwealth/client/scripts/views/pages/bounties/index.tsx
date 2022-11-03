@@ -7,7 +7,7 @@ import 'pages/bounties.scss';
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
@@ -103,8 +103,7 @@ class BountiesPage implements m.ClassComponent {
       return (
         <PageLoading
           message="Connecting to chain"
-          title={<BreadcrumbsTitleTag title="Council" />}
-          showNewProposalButton
+          // title={<BreadcrumbsTitleTag title="Council" />}
         />
       );
     }
@@ -163,8 +162,7 @@ class BountiesPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Council" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Council" />}
       >
         <div class="BountiesPage">
           <GovExplainer

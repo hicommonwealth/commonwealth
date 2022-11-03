@@ -5,7 +5,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
-import { DB } from '../database';
+import { DB } from '../models';
 import { NotificationCategoryAttributes } from './notification_category';
 import { ModelStatic } from './types';
 import {

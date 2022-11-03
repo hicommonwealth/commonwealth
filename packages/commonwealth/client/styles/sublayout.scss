@@ -11,17 +11,6 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-
-    .header-container {
-      align-items: center;
-      border-bottom: 1px solid $neutral-200;
-      display: flex;
-      flex-direction: row;
-      height: $global-header-height;
-      justify-content: space-between;
-      min-height: $global-header-height;
-      padding: 0 8px;
-    }
   }
 
   .sidebar-and-body-container {
@@ -29,19 +18,6 @@
     height: 100%;
     overflow: hidden;
     width: 100%;
-
-    .sidebar-container {
-      display: flex;
-      flex-direction: column;
-      width: min-content;
-
-      .sidebar-inner-container {
-        display: flex;
-        height: 100%;
-        overflow: hidden;
-        width: min-content;
-      }
-    }
 
     .body-and-sticky-headers-container {
       display: flex;

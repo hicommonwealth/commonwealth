@@ -164,10 +164,10 @@ export class SubscriptionRowMenu
     return (
       <CWPopoverMenu
         trigger={<CWIconButton iconName="dotsVertical" />}
-        popoverMenuItems={[
+        menuItems={[
           {
             label: 'Unsubscribe',
-            iconName: 'close',
+            iconLeft: 'close',
             isSecondary: true,
             onclick: () =>
               app.user.notifications

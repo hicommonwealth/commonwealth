@@ -49,8 +49,7 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
         app.chain.network === ChainNetwork.Commonwealth ||
-        app.chain.meta.snapshot);
-    if (!hasProposals) return;
+        app.chain.meta.snapshot?.length);
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
@@ -74,7 +73,7 @@ export class GovernanceSection
       app.chain?.network === ChainNetwork.Aave;
     const showSnapshotOptions =
       app.chain?.base === ChainBase.Ethereum &&
-      app.chain?.meta.snapshot?.length > 0;
+      !!app.chain?.meta.snapshot?.length;
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
@@ -455,7 +454,7 @@ export class GovernanceSection
       displayData: null,
     };
 
-    const governanceGroupData: SectionGroupAttrs[] = [
+    let governanceGroupData: SectionGroupAttrs[] = [
       membersData,
       snapshotData,
       delegateData,
@@ -467,6 +466,8 @@ export class GovernanceSection
       councillorsData,
       validatorsData,
     ];
+
+    if (!hasProposals) governanceGroupData = [membersData];
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',

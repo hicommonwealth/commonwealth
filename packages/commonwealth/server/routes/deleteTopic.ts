@@ -2,7 +2,7 @@
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
