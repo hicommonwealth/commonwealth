@@ -83,8 +83,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       this.loadingScope = scope;
       initNewTokenChain(scope);
       return <LoadingLayout />;
-      // } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
-    } else if (true) {
+    } else if (scope && !scopeMatchesChain && !scopeIsEthereumAddress) {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (

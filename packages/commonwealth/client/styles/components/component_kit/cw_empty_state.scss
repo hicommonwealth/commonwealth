@@ -3,8 +3,16 @@
 .EmptyState {
   align-items: center;
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  flex: 1;
   justify-content: center;
-  width: 100%;
+
+  .inner-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 24px;
+    max-width: 400px;
+    text-align: center;
+  }
 }
