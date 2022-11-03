@@ -32,6 +32,16 @@ module.exports = {
         },
         { transaction: t }
       );
+
+      await queryInterface.addColumn(
+        'Chains',
+        'discord_config_id',
+        {
+          type: Sequelize.INTEGER,
+          references: { model: 'DiscordBotConfig', key: 'id' },
+        },
+        { transaction: t }
+      );
     });
   },
 
@@ -44,6 +54,9 @@ module.exports = {
      */
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('DiscordBotConfig', { transaction: t });
+      await queryInterface.removeColumn('Chains', 'discord_config_id', {
+        transaction: t,
+      });
     });
   },
 };
