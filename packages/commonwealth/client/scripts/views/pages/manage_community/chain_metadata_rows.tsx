@@ -25,10 +25,9 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
-
-// TODO: Webpack config to get this from process.env
-const DISCORD_CLIENT_ID = '1034502265664454776';
-const DISCORD_CALLBACK_URL = 'http://localhost:3000/callback';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -392,51 +391,94 @@ export class ChainMetadataRows
             m.redraw();
           }}
         />
-
-        <div class="tag-row">
+        <div class="commonbot-section">
+          <CWText type="h3">Commonbot Settings</CWText>
           {this.discord_bot_connected ? (
-            <CWLabel label="Commonbot Connected" />
-          ) : this.discord_bot_connecting ? (
-            <CWLabel label="Commonbot Connecting" />
-          ) : (
             <>
-              <CWLabel label="Connect Commonbot" />
-              <div class="tag-group">
-                <CWButton
-                  label={'Connect'}
-                  buttonType={'primary-black'}
-                  onclick={async () => {
-                    try {
-                      const verification_token = uuidv4();
+              <div class="connected-line">
+                <CWIcon iconName="check" />
+                <CWText>Connected</CWText>
+              </div>
+              <CWButton
+                label="reconnect"
+                buttonType="mini"
+                className="connect-button"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
 
-                      await $.post(
-                        `${app.serverUrl()}/createDiscordBotConfig`,
-                        {
-                          chain_id: app.activeChainId(),
+                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+                      chain_id: app.activeChainId(),
+                      verification_token,
+                      jwt: app.user.jwt,
+                    });
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
                           verification_token,
-                          jwt: app.user.jwt,
-                        }
-                      );
-
-                      window.open(
-                        `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURI(
-                          DISCORD_CALLBACK_URL
-                        )}&response_type=code&scope=bot&state=${encodeURI(
-                          JSON.stringify({
-                            cw_chain_id: app.activeChainId(),
-                            verification_token,
-                          })
-                        )}`
-                      );
-                      this.discord_bot_connecting = true;
-                      m.redraw();
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }}
-                />
+                        })
+                      )}`
+                    );
+                    this.discord_bot_connected = false;
+                    this.discord_bot_connecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </>
+          ) : this.discord_bot_connecting ? (
+            <>
+              <div class="settings-row">
+                <div class="spinner-group">
+                  <CWSpinner />
+                  <CWText>Connecting...</CWText>
+                </div>
+                <CWText>Refresh to check if connection succeeded</CWText>
               </div>
             </>
+          ) : (
+            <div class="settings-row">
+              <CWButton
+                label="Connect"
+                buttonType="primary-black"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
+
+                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+                      chain_id: app.activeChainId(),
+                      verification_token,
+                      jwt: app.user.jwt,
+                    });
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
+                          verification_token,
+                        })
+                      )}`
+                    );
+                    this.discord_bot_connecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </div>
           )}
         </div>
       </div>
