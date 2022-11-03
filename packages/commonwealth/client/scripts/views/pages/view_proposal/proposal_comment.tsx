@@ -15,7 +15,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
-import { SharePopover } from './share_popover';
+import { SharePopover } from '../../components/share_popover';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
