@@ -315,7 +315,6 @@ export class ChainMetadataRows
               stagesEnabled,
               customStages,
               customDomain,
-              default_allow_permissions,
               default_deny_permissions,
               snapshot,
               terms,
@@ -367,13 +366,13 @@ export class ChainMetadataRows
 
             try {
               if (this.chatEnabled) {
-                this.default_allow_permissions = addPermission(
-                  default_allow_permissions,
+                this.default_deny_permissions = removePermission(
+                  default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               } else {
-                this.default_allow_permissions = removePermission(
-                  this.default_allow_permissions,
+                this.default_deny_permissions = addPermission(
+                  default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               }
