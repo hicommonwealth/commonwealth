@@ -12,9 +12,10 @@ import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { NotificationRow } from './notification_row';
 
+const MAX_NOTIFS = 40;
+
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
-const MAX_NOTIFS = 40;
 let init = false;
 let pageKey = 0;
 
@@ -23,14 +24,16 @@ const increment = (type: 'chain-event' | 'discussion') => {
     if (
       app.user.notifications.chainEventNotifications.length >=
       minChainEventsNotification + MAX_NOTIFS
-    )
+    ) {
       minChainEventsNotification += MAX_NOTIFS;
+    }
   } else if (type === 'discussion') {
     if (
       app.user.notifications.discussionNotifications.length >=
       minDiscussionNotification + MAX_NOTIFS
-    )
+    ) {
       minDiscussionNotification += MAX_NOTIFS;
+    }
   }
 };
 
@@ -83,7 +86,7 @@ const previousPage = () => {
 
 class NotificationsPage implements m.ClassComponent {
   view() {
-    if (!app.isLoggedIn())
+    if (!app.isLoggedIn()) {
       return m(PageError, {
         title: [
           'Notifications ',
@@ -95,9 +98,11 @@ class NotificationsPage implements m.ClassComponent {
         ],
         message: 'This page requires you to be logged in.',
       });
+    }
 
     const activeEntity = app.chain;
-    if (!activeEntity)
+
+    if (!activeEntity) {
       return m(PageLoading, {
         title: [
           'Notifications ',
@@ -108,14 +113,12 @@ class NotificationsPage implements m.ClassComponent {
           }),
         ],
       });
+    }
 
     const discussionNotifications =
       app.user.notifications.discussionNotifications;
     const chainEventNotifications =
       app.user.notifications.chainEventNotifications;
-
-    // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
-    // console.log("Sorted Notifications:", sortedNotifications);
 
     return m(
       Sublayout,
@@ -143,23 +146,23 @@ class NotificationsPage implements m.ClassComponent {
                 onclick: (e) => {
                   e.preventDefault();
                   pageKey -= 1;
-                  console.log(
-                    'Before=\t',
-                    `ChainEvents: ${minChainEventsNotification}-${
-                      minChainEventsNotification + MAX_NOTIFS
-                    }, Discussion: ${minDiscussionNotification}-${
-                      minDiscussionNotification + MAX_NOTIFS
-                    }`
-                  );
+                  // console.log(
+                  //   'Before=\t',
+                  //   `ChainEvents: ${minChainEventsNotification}-${
+                  //     minChainEventsNotification + MAX_NOTIFS
+                  //   }, Discussion: ${minDiscussionNotification}-${
+                  //     minDiscussionNotification + MAX_NOTIFS
+                  //   }`
+                  // );
                   previousPage();
-                  console.log(
-                    'After=\t',
-                    `ChainEvents: ${minChainEventsNotification}-${
-                      minChainEventsNotification + MAX_NOTIFS
-                    }, Discussion: ${minDiscussionNotification}-${
-                      minDiscussionNotification + MAX_NOTIFS
-                    }`
-                  );
+                  // console.log(
+                  //   'After=\t',
+                  //   `ChainEvents: ${minChainEventsNotification}-${
+                  //     minChainEventsNotification + MAX_NOTIFS
+                  //   }, Discussion: ${minDiscussionNotification}-${
+                  //     minDiscussionNotification + MAX_NOTIFS
+                  //   }`
+                  // );
                 },
               }),
               m(Button, {
@@ -175,23 +178,23 @@ class NotificationsPage implements m.ClassComponent {
                     minChainEventsNotification =
                       app.user.notifications.chainEventNotifications.length;
                   }
-                  console.log(
-                    'Before=\t',
-                    `ChainEvents: ${minChainEventsNotification}-${
-                      minChainEventsNotification + MAX_NOTIFS
-                    }, Discussion: ${minDiscussionNotification}-${
-                      minDiscussionNotification + MAX_NOTIFS
-                    }`
-                  );
+                  // console.log(
+                  //   'Before=\t',
+                  //   `ChainEvents: ${minChainEventsNotification}-${
+                  //     minChainEventsNotification + MAX_NOTIFS
+                  //   }, Discussion: ${minDiscussionNotification}-${
+                  //     minDiscussionNotification + MAX_NOTIFS
+                  //   }`
+                  // );
                   nextPage();
-                  console.log(
-                    'After=\t',
-                    `ChainEvents: ${minChainEventsNotification}-${
-                      minChainEventsNotification + MAX_NOTIFS
-                    }, Discussion: ${minDiscussionNotification}-${
-                      minDiscussionNotification + MAX_NOTIFS
-                    }`
-                  );
+                  // console.log(
+                  //   'After=\t',
+                  //   `ChainEvents: ${minChainEventsNotification}-${
+                  //     minChainEventsNotification + MAX_NOTIFS
+                  //   }, Discussion: ${minDiscussionNotification}-${
+                  //     minDiscussionNotification + MAX_NOTIFS
+                  //   }`
+                  // );
                 },
               }),
               m(Button, {
@@ -267,12 +270,9 @@ class NotificationsPage implements m.ClassComponent {
                   pageKey: () => {
                     return pageKey;
                   },
-                  item: (data, opts, index) => {
-                    return m(NotificationRow, {
-                      notifications: [data],
-                      onListPage: true,
-                    });
-                  },
+                  item: (data) => (
+                    <NotificationRow notifications={[data]} onListPage />
+                  ),
                 });
               } else return m('.no-notifications', 'No Notifications');
             })(),

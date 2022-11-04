@@ -38,12 +38,16 @@ export class NotificationRow
 
   view(vnode) {
     const { notifications } = vnode.attrs;
+
     const notification = notifications[0];
+
     const { category } = notifications[0].subscription;
+
     if (category === NotificationCategories.ChainEvent) {
       if (!notification.chainEvent) {
         throw new Error('chain event notification does not have expected data');
       }
+
       const chainId = notification.chainEvent.type.chain;
 
       // construct compatible CW event from DB by inserting network from type
@@ -52,6 +56,7 @@ export class NotificationRow
         network: notification.chainEvent.type.eventNetwork,
         data: notification.chainEvent.data,
       };
+
       const chainName = app.config.chains.getById(chainId)?.name;
 
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
@@ -62,6 +67,7 @@ export class NotificationRow
           const el = document.getElementById(m.route.param('id'));
           if (el) el.scrollIntoView();
         }, 1);
+
         this.scrollOrStop = false;
       }
 
@@ -76,6 +82,7 @@ export class NotificationRow
           [m('.comment-body', [m('.comment-body-top', 'Loading...')])]
         );
       }
+
       return link(
         'a.NotificationRow',
         `/notifications?id=${notification.id}`,
@@ -127,11 +134,13 @@ export class NotificationRow
     } else if (category === NotificationCategories.NewChatMention) {
       const { chain_id, author_address, created_at, message_id, channel_id } =
         JSON.parse(notification.data);
+
       const route = app.socket.chatNs.getRouteToMessage(
         channel_id,
         message_id,
         chain_id
       );
+
       const author = new AddressInfo(null, author_address, chain_id, null);
 
       const authorName = m(User, {
@@ -292,7 +301,7 @@ export class NotificationRow
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
-          onclick: (e) => {
+          onclick: () => {
             // Graham TODO 22.10.05: Temporary fix while we wait for full
             // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
             // array
