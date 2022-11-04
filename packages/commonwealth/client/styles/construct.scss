@@ -57,10 +57,6 @@ $cui-base-height: floor($cui-base-size * 2.8);
   font-weight: $cui-font-weight-bold; // fix weight
 }
 
-.cui-empty-state .cui-empty-state-header {
-  font-weight: $cui-font-weight-bold; // fix weight
-}
-
 .cui-callout.cui-primary {
   background: $purple-50;
 }
@@ -366,48 +362,6 @@ button,
 // icon styles
 .cui-icon.filled-icon svg {
   fill: currentColor;
-}
-
-// empty state override
-.cui-empty-state.cui-empty-state-fill {
-  z-index: initial;
-}
-
-.cui-spinner.cui-spinner-fill {
-  z-index: initial;
-}
-
-// make spinner visually minimal
-.cui-spinner .cui-spinner-icon {
-  border-color: transparent;
-  border-top-color: $neutral-900 !important;
-  border-right-color: $neutral-900 !important;
-}
-
-.cui-spinner-message {
-  margin-top: 0.8em;
-  color: $neutral-900;
-}
-
-// make spinner slower
-$spinner-animation-duration: 1700ms;
-
-.cui-spinner-icon {
-  animation: loading $spinner-animation-duration infinite linear;
-}
-
-// make large spinners bigger
-.cui-spinner.cui-lg .cui-spinner-icon,
-.cui-lg .cui-spinner .cui-spinner-icon {
-  height: 24px;
-  width: 24px;
-}
-
-.cui-spinner.cui-xl .cui-spinner-icon,
-.cui-xl .cui-spinner .cui-spinner-icon {
-  height: 40px;
-  width: 40px;
-  border-width: 4px;
 }
 
 // the declarative construct-ui toaster doesn't allow position to be set by default, so we override it here

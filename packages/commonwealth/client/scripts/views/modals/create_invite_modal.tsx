@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { ListItem, List, Spinner, SelectList } from 'construct-ui';
+import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
@@ -20,6 +20,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 type SearchParams = {
   chainScope?: string;
@@ -550,10 +551,10 @@ export class CreateInviteModal
                     }}
                   />
                 ) : (
-                  <ListItem label={<Spinner active />} />
+                  <ListItem label={<CWSpinner size="small" />} />
                 )
               ) : this.isTyping ? (
-                <ListItem label={<Spinner active />} />
+                <ListItem label={<CWSpinner size="small" />} />
               ) : (
                 results
               )}
