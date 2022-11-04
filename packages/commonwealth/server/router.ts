@@ -158,9 +158,9 @@ import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 
 import createMQConsumer from './eventHandlers/snapshotConsumer';
-import { RABBITMQ_URL } from './config';
+import { RABBITMQ_URI } from './config';
 
-const consumer = createMQConsumer(RABBITMQ_URL, 'snapshot_event');
+const consumer = createMQConsumer(RABBITMQ_URI, 'snapshot_event');
 // The consumer should be run in a sepearate process / service.
 consumer();
 

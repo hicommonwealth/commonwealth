@@ -106,4 +106,3 @@ export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 
-export const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
