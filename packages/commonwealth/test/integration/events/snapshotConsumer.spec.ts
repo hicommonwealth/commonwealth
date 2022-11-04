@@ -10,6 +10,7 @@ import 'chai/register-should';
 import models from '../../../server/database';
 import { setupSubscriptions, setupDbEvent } from './util';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
+import createMQConsumer from '../../../server/eventHandlers/snapshotConsumer';
 
 chai.use(chaiHttp);
 const { assert } = chai;
@@ -30,7 +31,7 @@ describe('Snapshot Consumer Tests', () => {
     );
   });
 
-  it('should create chain event and emit notification', async () => {
+  it('should create a snapshot event and emit notification', async () => {
     // setup
     const event: CWEvent = {
       blockNumber: 10,
@@ -70,10 +71,8 @@ describe('Snapshot Consumer Tests', () => {
       ],
     });
 
-    const userIds = notifications.map(
-      (n) => n.NotificationsRead.Subscription.subscriber_id
-    );
-    assert.sameMembers(userIds, [aliceId, bobId]);
+    const consumer = createMQConsumer(RABBITMQ_URL, 'snapshot_event');
+
   });
 
 });
