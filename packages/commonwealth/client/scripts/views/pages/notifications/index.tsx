@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import 'pages/notifications_page.scss';
+/* @jsx m */
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
+import 'pages/notifications/index.scss';
+
 import app from 'state';
-import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+import { NotificationRow } from './notification_row';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
@@ -17,7 +18,7 @@ const MAX_NOTIFS = 40;
 let init = false;
 let pageKey = 0;
 
-function increment(type: 'chain-event' | 'discussion') {
+const increment = (type: 'chain-event' | 'discussion') => {
   if (type === 'chain-event') {
     if (
       app.user.notifications.chainEventNotifications.length >=
@@ -31,9 +32,9 @@ function increment(type: 'chain-event' | 'discussion') {
     )
       minDiscussionNotification += MAX_NOTIFS;
   }
-}
+};
 
-function nextPage() {
+const nextPage = () => {
   const numChainEventNotif =
     app.user.notifications.chainEventNotifications.length;
   const numDiscussionNotif =
@@ -58,9 +59,9 @@ function nextPage() {
     increment('discussion');
     m.redraw();
   }
-}
+};
 
-function previousPage() {
+const previousPage = () => {
   let flag = false;
   if (minChainEventsNotification >= MAX_NOTIFS) {
     minChainEventsNotification -= MAX_NOTIFS;
@@ -78,10 +79,10 @@ function previousPage() {
     flag = true;
   }
   if (flag) m.redraw();
-}
+};
 
-const NotificationsPage: m.Component<{}> = {
-  view: (vnode) => {
+class NotificationsPage implements m.ClassComponent {
+  view() {
     if (!app.isLoggedIn())
       return m(PageError, {
         title: [
@@ -217,7 +218,11 @@ const NotificationsPage: m.Component<{}> = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      if (app.user.notifications.chainEventNotifications.length === 0) return;
+                      if (
+                        app.user.notifications.chainEventNotifications
+                          .length === 0
+                      )
+                        return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
@@ -259,7 +264,9 @@ const NotificationsPage: m.Component<{}> = {
                   pageData: () => {
                     return allNotifications;
                   },
-                  pageKey: () => {return pageKey},
+                  pageKey: () => {
+                    return pageKey;
+                  },
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
                       notifications: [data],
@@ -273,7 +280,7 @@ const NotificationsPage: m.Component<{}> = {
         ]),
       ]
     );
-  },
-};
+  }
+}
 
 export default NotificationsPage;

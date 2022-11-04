@@ -8,9 +8,9 @@ import 'components/header/notifications_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import NotificationRow from '../components/notification_row';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { NotificationRow } from '../pages/notifications/notification_row';
 
 const MAX_NOTIFS = 40;
 
@@ -138,7 +138,7 @@ export class NotificationsMenu implements m.ClassComponent {
                       // notifications and notifications read table are split
                     }
                     item={(data) => {
-                      return m(NotificationRow, { notifications: [data] });
+                      return <NotificationRow notifications={[data]} />;
                     }}
                   />
                 );
