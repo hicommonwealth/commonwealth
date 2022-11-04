@@ -164,7 +164,6 @@ const consumer = createMQConsumer(RABBITMQ_URI, 'snapshot_event');
 // The consumer should be run in a sepearate process / service.
 consumer();
 
-
 function setupRouter(
   app: Express,
   models: DB,

@@ -29,21 +29,18 @@ const snapshotListener = async (
   }
 
   chainsToNotify.forEach(async (chain: string) => {
-    // Send out notifications
-    const notification = await models.Subscription.emitNotifications(
+    // using the id snapshot sends with the event
+    // this may need to be altered so the link works
+    await models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewSnapshot,
-      // using the id snapshot sends with the event
-      // this may need to be altered so the link works
-      `snapshot-${event.id}`, {
+        `snapshot-${event.id}`, {
         created_at: new Date(),
         chain_id: chain,
         snapshot_id: event.id,
         snapshotEventType: event.event,
       }
     );
-
-    console.log({ notification })
   });
 
   // Log that the listener was pinged for a valid space
@@ -52,8 +49,6 @@ const snapshotListener = async (
     isCustomDomain: false,
     space: event.space
   });
-
-  console.log('Snapshot event stored: ', event);
 };
 
 
