@@ -161,7 +161,6 @@ import createMQConsumer from './eventHandlers/snapshotConsumer';
 import { RABBITMQ_URI } from './config';
 
 const consumer = createMQConsumer(RABBITMQ_URI, 'snapshot_event');
-// The consumer should be run in a sepearate process / service.
 consumer();
 
 function setupRouter(

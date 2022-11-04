@@ -1,4 +1,4 @@
 export const rabbitMQ = {
-	 url : 'amqp://localhost',
+	 url : process.env.AMQP_URI || 'amqp://localhost',
 	 exchangeName: 'logExchange',
 }
