@@ -12,66 +12,25 @@ import {
 
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
-import { NotificationCategories } from 'common-common/src/types';
-import StorageHandler from '../../../server/eventHandlers/storage';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
+
+import { setupSubscriptions, setupDbEvent } from './util';
 
 chai.use(chaiHttp);
 const { assert } = chai;
-
-const setupUserAndEventSubscriptions = async (email, address, chain) => {
-  const user = await models['User'].create({
-    email,
-    emailVerified: true,
-    isAdmin: false,
-    lastVisited: '{}',
-  });
-
-  await models['Address'].create({
-    user_id: user.id,
-    address,
-    chain,
-    // selected: true,
-    verification_token: 'PLACEHOLDER',
-    verification_token_expires: null,
-    verified: new Date(),
-    created_at: new Date(),
-    updated_at: new Date(),
-  });
-
-  await models['Subscription'].create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.ChainEvent,
-    object_id: 'edgeware-democracy-started',
-    is_active: true,
-  });
-
-  await models['Subscription'].create({
-    subscriber_id: user.id,
-    category_id: NotificationCategories.ChainEvent,
-    object_id: 'edgeware-slash',
-    is_active: true,
-  });
-  return user.id;
-};
-
-const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, 'edgeware');
-  return storageHandler.handle(event);
-};
 
 describe('Event Handler Tests', () => {
   let aliceId, bobId;
   before('reset database', async () => {
     await resetDatabase();
 
-    aliceId = await setupUserAndEventSubscriptions(
+    aliceId = await setupSubscriptions(
       'alice@gmail.com',
       '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
       'edgeware',
     );
 
-    bobId = await setupUserAndEventSubscriptions(
+    bobId = await setupSubscriptions(
       'bob@gmail.com',
       '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
       'edgeware',
@@ -257,3 +216,5 @@ describe('Event Handler Tests', () => {
     assert.isEmpty(notifications);
   });
 });
+
+export default setupUserAndEventSubscriptions;

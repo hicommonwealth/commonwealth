@@ -157,7 +157,7 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 
-import createMQConsumer from './consumer';
+import createMQConsumer from './eventHandlers/snapshotConsumer';
 import { RABBITMQ_URL } from './config';
 
 const consumer = createMQConsumer(RABBITMQ_URL, 'snapshot_event');

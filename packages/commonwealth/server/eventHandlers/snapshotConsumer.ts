@@ -18,7 +18,6 @@ const snapshotListener = async (
   event: SnapshotEvent,
 ) => {
 
-
   const chainsToNotify = await cache.checkChainsToNotify(event.space);
 
   if (!chainsToNotify.length) {
