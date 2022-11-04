@@ -3,7 +3,6 @@
 import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
-import { Spinner } from 'construct-ui';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
@@ -22,6 +21,7 @@ import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
+import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -96,7 +96,7 @@ const LinkAccountItem: m.Component<
           vnode.state.linking &&
             m('.account-waiting', [
               // TODO: show a (?) icon with a tooltip explaining to check your wallet
-              m(Spinner, { size: 'xs', active: true }),
+              m(CWSpinner, { size: 'small' }),
             ]),
         ]),
       ]
