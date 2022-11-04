@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -13,6 +12,7 @@ import { NextFn, TxDataState } from './types';
 import { CWButton } from '../component_kit/cw_button';
 import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { CWText } from '../component_kit/cw_text';
+import { CWSpinner } from '../component_kit/cw_spinner';
 
 export class TxSigningModalIntroStage
   implements m.ClassComponent<ITXModalData & NextFn & IWebWallet<any>>
@@ -109,7 +109,7 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
         <CWText>
           Waiting for your transaction to be confirmed by the network...
         </CWText>
-        <Spinner active />
+        <CWSpinner />
         <CWText>`Waiting ${this.timer || 0}s...</CWText>
       </>
     );

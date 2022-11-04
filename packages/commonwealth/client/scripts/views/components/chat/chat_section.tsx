@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui';
+import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
 
@@ -27,6 +27,7 @@ import {
   SidebarSectionAttrs,
 } from '../sidebar/types';
 import { verifyCachedToggleTree } from '../sidebar/helpers';
+import { CWSpinner } from '../component_kit/cw_spinner';
 
 enum Errors {
   None = '',
@@ -165,7 +166,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
 
   view(vnode) {
     if (!app.socket) return;
-    if (!this.loaded) return <Spinner />;
+    if (!this.loaded) return <CWSpinner />;
     this.activeChannel = m.route.param()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 

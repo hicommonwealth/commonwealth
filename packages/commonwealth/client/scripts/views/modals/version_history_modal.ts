@@ -8,8 +8,8 @@ import { QuillFormattedText } from 'views/components/quill/quill_formatted_text'
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import User from 'views/components/widgets/user';
 import { VersionHistory } from 'controllers/server/threads';
-import { Spinner } from 'construct-ui';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 const Delta = Quill.import('delta');
 
 interface IVersionHistoryAttrs {
@@ -105,7 +105,7 @@ const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
                 return getVersion(edit, prevEdit);
               }),
             ])
-          : m('.versions.versions-loading', [m(Spinner, { active: true })]),
+          : m('.versions.versions-loading', [m(CWSpinner)]),
       ]),
     ]);
   },
