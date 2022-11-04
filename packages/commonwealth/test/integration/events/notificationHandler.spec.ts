@@ -217,4 +217,3 @@ describe('Event Handler Tests', () => {
   });
 });
 
-export default setupUserAndEventSubscriptions;
