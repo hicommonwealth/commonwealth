@@ -6,6 +6,7 @@ import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
 import { RoleAttributes } from '../models/role';
 import { SubscriptionAttributes } from '../models/subscription';
+import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -41,12 +42,9 @@ const createRole = async (
       verified: { [Sequelize.Op.ne]: null }
     }
   });
-  if (!validAddress) throw new AppError(Errors.InvalidAddress);
+  if (!validAddress?.id) throw new AppError(Errors.InvalidAddress);
 
-  const [ role ] = await models.Role.findOrCreate({ where: {
-    address_id: validAddress.id,
-    chain_id: chain.id,
-  }});
+  const role = await _createRole(models, validAddress.id, chain.id);
 
   const [ subscription ] = await models.Subscription.findOrCreate({
     where: {
