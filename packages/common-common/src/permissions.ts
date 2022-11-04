@@ -33,27 +33,29 @@ export function addPermission(
   permission: Permissions,
   actionNumber: number
 ): Permissions {
+  let result = BigInt(permission)
   // eslint-disable-next-line no-bitwise
-  permission |= BigInt(1) << BigInt(actionNumber);
-  return permission;
+  result |= BigInt(1) << BigInt(actionNumber);
+  return result;
 }
 
 export function removePermission(
   permission: Permissions,
   actionNumber: number
 ): Permissions {
+  let result = BigInt(permission)
   // eslint-disable-next-line no-bitwise
-  permission &= ~(BigInt(1) << BigInt(actionNumber));
-  return permission;
+  result &= ~(BigInt(1) << BigInt(actionNumber));
+  return result;
 }
 
 export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.CREATE_THREAD) |
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS)
 
-export function isPermitted(permission: Permissions, action: Action): boolean {
+export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-  const hasAction: boolean = (permission & actionAsBigInt) == actionAsBigInt;
+  const hasAction: boolean = (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }
 

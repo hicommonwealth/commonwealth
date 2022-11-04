@@ -26,6 +26,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import {
   Action,
   addPermission,
+  isPermitted,
   removePermission,
 } from '../../../../../../common-common/src/permissions';
 
@@ -80,7 +81,7 @@ export class ChainMetadataRows
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = false;
+    this.chatEnabled = !isPermitted(chain.defaultDenyPermissions, Action.VIEW_CHAT_CHANNELS);
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -397,7 +398,7 @@ export class ChainMetadataRows
               vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
-              notifyError(err.responseJSON?.error || 'Chain update failed');
+              notifyError(err || 'Chain update failed');
             }
 
             m.redraw();
