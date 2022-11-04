@@ -84,17 +84,6 @@
     display: inline;
     color: $neutral-500;
     margin-left: 8px;
-
-    .cui-spinner {
-      position: relative;
-      top: -1px;
-
-      .cui-spinner-icon {
-        border-color: transparent;
-        border-top-color: $primary-600 !important;
-        border-right-color: $primary-600 !important;
-      }
-    }
   }
 
   .comment-body-mark-as-read:hover {

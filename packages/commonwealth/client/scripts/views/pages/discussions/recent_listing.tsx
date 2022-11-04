@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
 
 import 'pages/discussions/recent_listing.scss';
 
@@ -11,6 +10,7 @@ import { LoadingRow } from '../../components/loading_row';
 import { DiscussionRow } from './discussion_row';
 import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholder';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 interface RecentListingAttrs {
   stageName: string;
@@ -81,7 +81,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
               )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
             </CWText>
           ) : (
-            <Spinner active size="lg" />
+            <CWSpinner size="large" />
           )}
         </div>
       </div>
