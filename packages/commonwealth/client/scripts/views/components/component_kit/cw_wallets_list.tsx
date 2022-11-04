@@ -13,6 +13,7 @@ import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/adapter';
 import Substrate from 'controllers/chain/substrate/adapter';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
@@ -208,7 +209,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
     const resetWalletConnectOnclick = async (webWallets) => {
       const wallet = webWallets.find(
-        (w) => w instanceof WalletConnectWebWalletController
+        (w) => w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController
       );
       await wallet.reset();
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
