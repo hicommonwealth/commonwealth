@@ -630,39 +630,47 @@ class ViewThreadPage
             />
           }
           sidebarComponents={[
-            {
-              label: 'Links',
-              item: (
-                <div class="cards-column">
-                  {showLinkedSnapshotOptions && (
-                    <LinkedProposalsCard
-                      onChangeHandler={(
-                        stage: ThreadStageType,
-                        chainEntities: ChainEntity[],
-                        snapshotProposal: SnapshotProposal[]
-                      ) => {
-                        thread.stage = stage;
-                        thread.chainEntities = chainEntities;
-                        if (app.chain?.meta.snapshot.length) {
-                          thread.snapshotProposal = snapshotProposal[0]?.id;
-                        }
-                        app.threads.fetchThreadsFromId([thread.identifier]);
-                        m.redraw();
-                      }}
-                      thread={thread}
-                      showAddProposalButton={isAuthor || isAdminOrMod}
-                    />
-                  )}
-                  {showLinkedThreadOptions && (
-                    <LinkedThreadsCard
-                      threadlId={thread.id}
-                      allowLinking={isAuthor || isAdminOrMod}
-                    />
-                  )}
-                </div>
-              ),
-            },
-            ...(this.polls?.length > 0
+            ...(showLinkedSnapshotOptions || showLinkedThreadOptions
+              ? [
+                  {
+                    label: 'Links',
+                    item: (
+                      <div class="cards-column">
+                        {showLinkedSnapshotOptions && (
+                          <LinkedProposalsCard
+                            onChangeHandler={(
+                              stage: ThreadStageType,
+                              chainEntities: ChainEntity[],
+                              snapshotProposal: SnapshotProposal[]
+                            ) => {
+                              thread.stage = stage;
+                              thread.chainEntities = chainEntities;
+                              if (app.chain?.meta.snapshot.length) {
+                                thread.snapshotProposal =
+                                  snapshotProposal[0]?.id;
+                              }
+                              app.threads.fetchThreadsFromId([
+                                thread.identifier,
+                              ]);
+                              m.redraw();
+                            }}
+                            thread={thread}
+                            showAddProposalButton={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                        {showLinkedThreadOptions && (
+                          <LinkedThreadsCard
+                            threadlId={thread.id}
+                            allowLinking={isAuthor || isAdminOrMod}
+                          />
+                        )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(this.polls?.length > 0 ||
+            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
                   {
                     label: 'Polls',
