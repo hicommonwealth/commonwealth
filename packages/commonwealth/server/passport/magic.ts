@@ -12,6 +12,7 @@ import validateChain from '../util/validateChain';
 import { ProfileAttributes } from '../models/profile';
 
 import { AppError, ServerError } from '../util/errors';
+import { createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {
@@ -80,11 +81,16 @@ export function useMagicAuth(models: DB) {
               wallet_id: WalletId.Magic,
             }, { transaction: t });
 
-          if (req.body.chain) await models.Role.create({
-            address_id: newAddress.id,
-            chain_id: req.body.chain,
-            permission: 'member',
-          }, { transaction: t });
+          if (req.body.chain) {
+            await createRole(
+              models,
+              newAddress.id,
+              'ethereum',
+              'member',
+              false,
+              t
+            );
+          }
 
           // Automatically create subscription to their own mentions
           await models.Subscription.create({
