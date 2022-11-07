@@ -16,7 +16,8 @@ export const Errors = {
   CannotDeleteChain: 'Cannot delete this protected chain',
   NotAcceptableAdmin: 'Not an Acceptable Admin',
   BadSecret: 'Must provide correct secret',
-  AdminPresent: 'There exists an admin in this community, cannot delete if there is an admin!',
+  AdminPresent:
+    'There exists an admin in this community, cannot delete if there is an admin!',
 };
 
 // const protectedIdList = [];
@@ -73,7 +74,7 @@ const deleteChain = async (
 
     const admin = await findOneRole(models, {}, chain.id, ['admin']);
     if (!admin) {
-      return next(new AppError(Errors.AdminPresent))
+      return next(new AppError(Errors.AdminPresent));
     }
 
     await models.sequelize.query(
@@ -252,7 +253,32 @@ const deleteChain = async (
 
     // TODO: Remove this once we figure out a better way to relate addresses across many chains (token communities)
     await models.sequelize.query(
+      `DELETE FROM "RoleAssignments" WHERE address_id IN(SELECT id FROM "Addresses" WHERE chain='${chain.id}');`,
+      {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    await models.sequelize.query(
       `DELETE FROM "Addresses" WHERE chain='${chain.id}';`,
+      {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    await models.sequelize.query(
+      // eslint-disable-next-line max-len
+      `DELETE FROM "RoleAssignments" WHERE community_role_id IN(SELECT id FROM "CommunityRoles" WHERE chain_id IN(SELECT id FROM "Chains" WHERE id='${chain.id}'));`,
+      {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      }
+    );
+
+    await models.sequelize.query(
+      `DELETE FROM "CommunityRoles" WHERE chain_id IN(SELECT id FROM "Chains" WHERE id='${chain.id}');`,
       {
         type: QueryTypes.DELETE,
         transaction: t,
