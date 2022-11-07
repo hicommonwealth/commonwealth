@@ -61,93 +61,73 @@ const deleteChain = async (
   //   return next(new AppError(Errors.CannotDeleteChain));
   // }
 
+  const chain = await models.Chain.findOne({
+    where: {
+      id,
+      has_chain_events_listener: false, // make sure no chain events
+    },
+  });
+  if (!chain) {
+    return next(new AppError(Errors.NoChain));
+  }
+
+  const admin = await findOneRole(models, {}, chain.id, ['admin']);
+  if (admin) {
+    return next(new AppError(Errors.AdminPresent));
+  }
+
   await models.sequelize.transaction(async (t) => {
-    const chain = await models.Chain.findOne({
-      where: {
-        id,
-        has_chain_events_listener: false, // make sure no chain events
-      },
+    await models.ChainEntity.destroy({
+      where: { chain: chain.id },
+      transaction: t,
     });
-    if (!chain) {
-      return next(new AppError(Errors.NoChain));
-    }
 
-    const admin = await findOneRole(models, {}, chain.id, ['admin']);
-    if (!admin) {
-      return next(new AppError(Errors.AdminPresent));
-    }
-
-    await models.sequelize.query(
-      `DELETE FROM "ChainEntities" WHERE chain='${chain.id}';`,
+    await models.User.update(
       {
-        type: QueryTypes.DELETE,
+        selected_chain_id: null,
+      },
+      {
+        where: {
+          selected_chain_id: chain.id,
+        },
         transaction: t,
       }
     );
 
-    await models.sequelize.query(
-      `UPDATE "Users" SET "selected_chain_id" = NULL WHERE "selected_chain_id" = '${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Reaction.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Reactions" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Comment.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Comments" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Topic.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Topics" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Role.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Roles" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.InviteCode.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "InviteCodes" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Subscription.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Subscriptions" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
-
-    await models.sequelize.query(
-      `DELETE FROM "Webhooks" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Webhook.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
     await models.sequelize.query(
       `DELETE FROM "Collaborations"
@@ -174,37 +154,25 @@ const deleteChain = async (
       }
     );
 
-    await models.sequelize.query(
-      `DELETE FROM "Votes" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Vote.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Polls" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Poll.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "Threads" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Thread.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "StarredCommunities" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.StarredCommunity.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
     await models.sequelize.query(
       `DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
@@ -218,38 +186,26 @@ const deleteChain = async (
       }
     );
 
-    await models.sequelize.query(
-      `DELETE FROM "ChainCategories" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.ChainCategory.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "CommunityBanners" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.CommunityBanner.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "ChainEventTypes" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.ChainEventType.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
     // notifications + notifications_read (cascade)
-    await models.sequelize.query(
-      `DELETE FROM "Notifications" WHERE chain_id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Notification.destroy({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
     // TODO: Remove this once we figure out a better way to relate addresses across many chains (token communities)
     await models.sequelize.query(
@@ -260,13 +216,10 @@ const deleteChain = async (
       }
     );
 
-    await models.sequelize.query(
-      `DELETE FROM "Addresses" WHERE chain='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Address.destroy({
+      where: { chain: chain.id },
+      transaction: t,
+    });
 
     await models.sequelize.query(
       // eslint-disable-next-line max-len
@@ -285,13 +238,10 @@ const deleteChain = async (
       }
     );
 
-    await models.sequelize.query(
-      `DELETE FROM "Chains" WHERE id='${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Chain.destroy({
+      where: { id: chain.id },
+      transaction: t,
+    });
   });
 
   return success(res, { result: 'Deleted Chain' });
