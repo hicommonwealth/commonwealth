@@ -4,7 +4,7 @@ import m from 'mithril';
 import $ from 'jquery';
 import { Button, Tag } from 'construct-ui';
 
-import 'pages/discussions/discussion_row.scss';
+import 'pages/discussions/thread_preview.scss';
 
 import { slugify } from 'utils';
 import app from 'state';
@@ -23,18 +23,18 @@ import {
 import { Thread, ThreadStage, AddressInfo, ThreadKind } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { DiscussionRowMenu } from './discussion_row_menu';
+import { ThreadPreviewMenu } from './thread_preview_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { DiscussionRowReactionButton } from '../../components/reaction_button/discussion_row_reaction_button';
+import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
 
-type DiscussionRowAttrs = {
+type ThreadPreviewAttrs = {
   onSelect?: any;
   thread: Thread;
 };
 
-export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
-  view(vnode: m.VnodeDOM<DiscussionRowAttrs, this>) {
+export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
+  view(vnode: m.VnodeDOM<ThreadPreviewAttrs, this>) {
     const { thread } = vnode.attrs;
 
     const discussionLink = getProposalUrlPath(
@@ -44,7 +44,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
 
     return (
       <div
-        class="DiscussionRow"
+        class="ThreadPreview"
         onclick={(e) => {
           if (vnode.attrs.onSelect) {
             return vnode.attrs.onSelect();
@@ -73,7 +73,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             <CWIcon iconName="pin" iconSize="small" />
           </div>
         ) : (
-          <DiscussionRowReactionButton thread={thread} />
+          <ThreadPreviewReactionButton thread={thread} />
         )}
         <div class="title-container">
           <div class="row-header">{thread.title}</div>
@@ -195,7 +195,7 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
             users:
               app.threadUniqueAddressesCount.getUniqueAddressesByRootId(thread),
           })}
-          {app.isLoggedIn() && <DiscussionRowMenu thread={thread} />}
+          {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
         </div>
       </div>
     );

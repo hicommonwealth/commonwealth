@@ -2,8 +2,6 @@
 
 import m from 'mithril';
 
-import 'pages/discussions/discussion_row_menu.scss';
-
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
@@ -66,7 +64,7 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
   };
 };
 
-export class DiscussionRowMenu implements m.ClassComponent<{ thread: Thread }> {
+export class ThreadPreviewMenu implements m.ClassComponent<{ thread: Thread }> {
   view(vnode) {
     if (!app.isLoggedIn()) return;
 
@@ -89,7 +87,7 @@ export class DiscussionRowMenu implements m.ClassComponent<{ thread: Thread }> {
 
     return (
       <div
-        class="DiscussionRowMenu"
+        class="ThreadPreviewMenu"
         onclick={(e) => {
           // prevent clicks from propagating to discussion row
           e.preventDefault();

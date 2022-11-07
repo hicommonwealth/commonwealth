@@ -31,7 +31,7 @@ import {
   ProposalHeaderStage,
 } from './proposal_components';
 import { SharePopover } from '../../components/share_popover';
-import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
+import { getThreadSubScriptionMenuItem } from '../discussions/thread_preview_menu';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';

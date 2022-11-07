@@ -7,7 +7,7 @@ import 'pages/discussions/index.scss';
 
 import app from 'state';
 import { PageLoading } from '../loading';
-import { RecentListing } from './recent_listing';
+import { RecentThreads } from './recent_threads';
 import Sublayout from '../../sublayout';
 import { DiscussionFilterBar } from './discussion_filter_bar';
 
@@ -89,7 +89,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
               parentState={this}
             />
           )}
-          <RecentListing
+          <RecentThreads
             topicName={this.topicName}
             stageName={this.stageName}
           />

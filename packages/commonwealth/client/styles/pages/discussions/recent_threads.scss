@@ -2,7 +2,7 @@
 
 $size: 48px;
 
-.EmptyListingPlaceholder {
+.NoThreadsPlaceholder {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -33,7 +33,7 @@ $size: 48px;
   }
 }
 
-.RecentListing {
+.RecentThreads {
   padding: 0 24px;
 
   .listing-scroll {

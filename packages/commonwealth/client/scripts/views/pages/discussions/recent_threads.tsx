@@ -2,25 +2,25 @@
 
 import m from 'mithril';
 
-import 'pages/discussions/recent_listing.scss';
+import 'pages/discussions/recent_threads.scss';
 
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import { pluralize } from 'helpers';
-import { DiscussionRow } from './discussion_row';
+import { ThreadPreview } from './thread_preview';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CreateContentPopover } from '../../menus/create_content_menu';
 
-interface RecentListingAttrs {
+interface RecentThreadsAttrs {
   stageName: string;
   topicName: string;
 }
-export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
+export class RecentThreads implements m.ClassComponent<RecentThreadsAttrs> {
   private initializing: boolean;
 
-  view(vnode: m.VnodeDOM<RecentListingAttrs, this>) {
+  view(vnode: m.VnodeDOM<RecentThreadsAttrs, this>) {
     const { topicName, stageName } = vnode.attrs;
 
     const { listingStore } = app.threads;
@@ -55,7 +55,7 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
     if (!totalThreadCount) {
       return (
-        <div class="EmptyListingPlaceholder">
+        <div class="NoThreadsPlaceholder">
           {isNotUndefined(topicName) ? (
             <CWText className="no-threads-text">
               There are no threads matching your filter.
@@ -81,16 +81,16 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
     const subpage = topicName || stageName;
 
     return (
-      <div class="RecentListing">
+      <div class="RecentThreads">
         {this.initializing ? (
           <CWSpinner />
         ) : (
           <>
             {pinnedThreads.map((t) => (
-              <DiscussionRow thread={t} />
+              <ThreadPreview thread={t} />
             ))}
             {unpinnedThreads.map((t) => (
-              <DiscussionRow thread={t} />
+              <ThreadPreview thread={t} />
             ))}
             <div class="listing-scroll">
               {listingStore.isDepleted({ topicName, stageName }) ? (

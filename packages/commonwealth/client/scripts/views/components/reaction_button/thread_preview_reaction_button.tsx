@@ -3,7 +3,7 @@
 import m from 'mithril';
 import { Popover } from 'construct-ui';
 
-import 'components/reaction_button/discussion_row_reaction_button.scss';
+import 'components/reaction_button/thread_preview_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -15,12 +15,12 @@ import {
   onReactionClick,
 } from './helpers';
 
-type DiscussionRowReactionButtonAttrs = {
+type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class DiscussionRowReactionButton
-  implements m.ClassComponent<DiscussionRowReactionButtonAttrs>
+export class ThreadPreviewReactionButton
+  implements m.ClassComponent<ThreadPreviewReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;
@@ -29,7 +29,7 @@ export class DiscussionRowReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<DiscussionRowReactionButtonAttrs, this>) {
+  view(vnode: m.VnodeDOM<ThreadPreviewReactionButtonAttrs, this>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -41,7 +41,7 @@ export class DiscussionRowReactionButton
 
     let topicName = '';
 
-    if (thread instanceof Thread && thread.topic && app.topics) {
+    if (thread.topic && app.topics) {
       topicName = thread.topic.name;
     }
 
@@ -92,7 +92,7 @@ export class DiscussionRowReactionButton
           this.reactors = await fetchReactionsByPost(thread);
         }}
         onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
-        class={`DiscussionRowReactionButton${this.loading ? ' disabled' : ''}${
+        class={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
         }`}
       >
