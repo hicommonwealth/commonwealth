@@ -1,5 +1,6 @@
 import {CWEvent} from "chain-events/src";
 import {ChainEventNotification} from "commonwealth/shared/types";
+import moment from 'moment';
 
 export class RmqMsgFormatError extends Error {
   constructor(msg: string) {
@@ -10,6 +11,29 @@ export class RmqMsgFormatError extends Error {
 export type TRmqMessages =
   | CWEvent
   | ChainEventNotification
+
+export function isRmqMsgCWEvent(data: any): data is CWEvent {
+  return (
+    typeof data.blockNumber === 'number'
+    && data.data
+    && data.network && typeof data.network === 'string'
+  );
+}
+
+export function isRmqMsgCENotification(data: any): data is ChainEventNotification {
+  return (
+    data.id && typeof data.id === 'string'
+    && data.notification_data && typeof data.notification_data === 'string'
+    && data.chain_event_id && typeof data.chain_event_id === 'string'
+    && data.category_id === 'chain-event'
+    && data.chain_id && typeof data.chain_id === 'string'
+    && moment.isMoment(data.updated_at)
+    && moment.isMoment(data.created_at)
+    && data.ChainEvent
+    && typeof data.ChainEvent.chain_event_type_id === 'string'
+    && typeof data.ChainEvent.block_number === 'string'
+  );
+}
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',

@@ -40,8 +40,8 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
   }
 
   const queueOptions = {
-    'x-dead-letter-exchange': [RascalExchanges.DeadLetter],
-    'dead-letter-routing-key': [RascalRoutingKeys.DeadLetter]
+    'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+    'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
   }
 
   const subscriptionConfig = {
@@ -110,58 +110,58 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
         },
         'bindings': {
           [RascalBindings.ChainEvents]: {
-            'source': [RascalExchanges.ChainEvents],
-            'destination': [RascalQueues.ChainEvents],
+            'source': RascalExchanges.ChainEvents,
+            'destination': RascalQueues.ChainEvents,
             'destinationType': 'queue',
-            'bindingKey': [RascalRoutingKeys.ChainEvents]
+            'bindingKey': RascalRoutingKeys.ChainEvents
           },
           [RascalBindings.SubstrateIdentityEvents]: {
-            'source': [RascalExchanges.ChainEvents],
-            'destination': [RascalQueues.SubstrateIdentityEvents],
+            'source': RascalExchanges.ChainEvents,
+            'destination': RascalQueues.SubstrateIdentityEvents,
             'destinationType': 'queue',
-            'bindingKey': [RascalRoutingKeys.SubstrateIdentityEvents]
+            'bindingKey': RascalRoutingKeys.SubstrateIdentityEvents
           },
           [RascalBindings.ChainEventNotifications]: {
-            'source': [RascalExchanges.Notifications],
-            'destination': [RascalQueues.ChainEventNotifications],
+            'source': RascalExchanges.Notifications,
+            'destination': RascalQueues.ChainEventNotifications,
             'destinationType': 'queue',
-            'bindingKey': [RascalRoutingKeys.ChainEventNotifications]
+            'bindingKey': RascalRoutingKeys.ChainEventNotifications
           },
           [RascalBindings.DeadLetter]: {
-            'source': [RascalExchanges.DeadLetter],
-            'destination': [RascalQueues.DeadLetter],
+            'source': RascalExchanges.DeadLetter,
+            'destination': RascalQueues.DeadLetter,
             'destinationType': 'queue',
-            'bindingKey': [RascalRoutingKeys.DeadLetter]
+            'bindingKey': RascalRoutingKeys.DeadLetter
           }
         },
         'publications': {
           [RascalPublications.ChainEvents]: {
-            'exchange': [RascalExchanges.ChainEvents],
-            'routingKey': [RascalRoutingKeys.ChainEvents],
+            'exchange': RascalExchanges.ChainEvents,
+            'routingKey': RascalRoutingKeys.ChainEvents,
             ...publicationConfig
           },
           [RascalPublications.SubstrateIdentityEvents]: {
-            'exchange': [RascalExchanges.ChainEvents],
-            'routingKey': [RascalRoutingKeys.SubstrateIdentityEvents],
+            'exchange': RascalExchanges.ChainEvents,
+            'routingKey': RascalRoutingKeys.SubstrateIdentityEvents,
             ...publicationConfig
           },
           [RascalPublications.ChainEventNotifications]: {
-            'exchange': [RascalExchanges.Notifications],
-            'routingKey': [RascalRoutingKeys.ChainEventNotifications],
+            'exchange': RascalExchanges.Notifications,
+            'routingKey': RascalRoutingKeys.ChainEventNotifications,
             ...publicationConfig
           }
         },
         'subscriptions': {
           [RascalSubscriptions.ChainEvents]: {
-            'queue': [RascalQueues.ChainEvents],
+            'queue': RascalQueues.ChainEvents,
             ...subscriptionConfig
           },
           [RascalSubscriptions.SubstrateIdentityEvents]: {
-            'queue': [RascalQueues.SubstrateIdentityEvents],
+            'queue': RascalQueues.SubstrateIdentityEvents,
             ...subscriptionConfig
           },
           [RascalSubscriptions.ChainEventNotifications]: {
-            'queue': [RascalQueues.ChainEventNotifications],
+            'queue': RascalQueues.ChainEventNotifications,
             ...subscriptionConfig
           }
         }
@@ -170,5 +170,5 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
   };
 
 // the above configuration is correct but Rascal has some type issues
-  return <Rascal.BrokerConfig><unknown>config;
+  return <Rascal.BrokerConfig>config;
 }
