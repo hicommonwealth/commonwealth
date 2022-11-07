@@ -1,6 +1,5 @@
 import 'components/notification_row.scss';
 
-import { Spinner } from 'construct-ui';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
@@ -17,6 +16,7 @@ import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 const jumpHighlightNotification = (
   commentId,
@@ -467,7 +467,7 @@ const NotificationRow: m.Component<
                   },
                   [
                     vnode.state.markingRead
-                      ? m(Spinner, { size: 'xs', active: true })
+                      ? m(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
                 ),
@@ -563,7 +563,7 @@ const NotificationRow: m.Component<
                   },
                   [
                     vnode.state.markingRead
-                      ? m(Spinner, { size: 'xs', active: true })
+                      ? m(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
                 ),

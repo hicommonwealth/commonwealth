@@ -8,7 +8,6 @@ import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
-import { PolkadotExtension } from '@magic-ext/polkadot';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   ChainInfo,
@@ -296,15 +295,7 @@ export async function unlinkLogin(account: AddressInfo) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
-      new PolkadotExtension({
-        // we don't need a real node URL because we're only generating an address,
-        // not doing anything requiring chain connection
-        rpcUrl: 'ws://localhost:9944',
-      }),
-    ],
-  });
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,

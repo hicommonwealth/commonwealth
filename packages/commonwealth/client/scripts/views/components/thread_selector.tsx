@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ListItem, QueryList, Spinner } from 'construct-ui';
+import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
 
@@ -12,6 +12,7 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWText } from './component_kit/cw_text';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 const renderThreadPreview = (state, thread: Thread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
@@ -86,7 +87,7 @@ export class ThreadSelector
     return (
       <div class="ThreadSelector">
         {this.loading ? (
-          <Spinner active fill message="Loading threads..." />
+          <CWSpinner />
         ) : (
           <>
             <CWTextInput
