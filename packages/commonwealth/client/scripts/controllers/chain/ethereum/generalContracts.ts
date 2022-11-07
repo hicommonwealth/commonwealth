@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import m from 'mithril';
-
+import app from 'state';
 import { Contract, NodeInfo, IWebWallet } from 'models';
 import { initAppState } from 'app';
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -13,7 +13,7 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 import { TransactionReceipt } from 'web3-core';
-import EthereumChain from './chain';
+import Web3 from 'web3';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -24,30 +24,54 @@ type CreateFactoryEthDaoForm = ChainFormFields &
   EthDaoFormFields;
 
 export default class GeneralContractsController {
-  public chain: EthereumChain;
+  public web3: Web3;
   public contract: Contract;
   public web3Contract: Web3Contract;
   public isFactory: boolean;
 
-  constructor(chain: EthereumChain, contract: Contract) {
+  constructor(web3: Web3, contract: Contract) {
     this.isFactory = contract.isFactory;
-    this.chain = chain;
+    this.web3 = web3;
     this.contract = contract;
     try {
-      let nodeObj: NodeInfo;
-      if (this.chain.app.chain) {
-        nodeObj = this.chain.app.chain.meta.node;
-      } else {
-        throw new Error('No chain found');
-      }
-      this.chain._initApi(nodeObj);
-      this.web3Contract = new this.chain.api.eth.Contract(
+      this.web3Contract = new this.web3.eth.Contract(
         parseAbiItemsFromABI(this.contract.abi),
         this.contract.address
       );
     } catch (error) {
       console.error('Failed to create DaoFactory controller', error);
     }
+  }
+
+  public async makeContractCall(
+    to: string,
+    data: string,
+    wallet: IWebWallet<any>
+  ) {
+    // encoding + decoding require ABI + happen inside contracts controller
+    try {
+      const result = await wallet.contractCall({ to, data });
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /*
+  Writing to contract data, aka creating transaction
+  */
+  public makeContractTx(
+    to: string,
+    data: string,
+    wallet: IWebWallet<any>
+  ): Promise<TransactionReceipt> {
+    // Not using contractApi because it's ethers-dependent
+    // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
+    return wallet.sendTransaction({
+      from: wallet.accounts[0],
+      to,
+      data,
+    });
   }
 
   public async callContractFunction(
@@ -60,7 +84,6 @@ export default class GeneralContractsController {
       .join(',')})`;
 
     const functionContract = this.web3Contract;
-    const chain = this.chain;
     const contract = this.contract;
 
     const functionTx = functionContract.methods[methodSignature](
@@ -68,7 +91,7 @@ export default class GeneralContractsController {
     );
     if (fn.stateMutability !== 'view' && fn.constant !== true) {
       // Sign Tx with PK if not view function
-      const txReceipt: TransactionReceipt = await chain.makeContractTx(
+      const txReceipt: TransactionReceipt = await this.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
         wallet
@@ -76,7 +99,7 @@ export default class GeneralContractsController {
       return txReceipt;
     } else {
       // send transaction
-      const tx: string = await chain.makeContractCall(
+      const tx: string = await this.makeContractCall(
         contract.address,
         functionTx.encodeABI(),
         wallet
@@ -98,7 +121,7 @@ export default class GeneralContractsController {
           this.contract.abi,
           'ProjectCreated'
         );
-        const decodedLog = this.chain.api.eth.abi.decodeLog(
+        const decodedLog = this.web3.eth.abi.decodeLog(
           eventAbiItem.inputs,
           tx.logs[0].data,
           tx.logs[0].topics
@@ -106,7 +129,7 @@ export default class GeneralContractsController {
         console.log('decodedLog', decodedLog);
         decodedTx = decodedLog.projectAddress;
       } else {
-        decodedTx = this.chain.api.eth.abi.decodeParameter(
+        decodedTx = this.web3.eth.abi.decodeParameter(
           fn.outputs[0].type,
           tx
         );
@@ -114,7 +137,7 @@ export default class GeneralContractsController {
       result = [];
       result.push(decodedTx);
     } else if (fn.outputs.length > 1) {
-      const decodedTxMap = this.chain.api.eth.abi.decodeParameters(
+      const decodedTxMap = this.web3.eth.abi.decodeParameters(
         fn.outputs.map((output) => output.type),
         tx
       );
@@ -140,20 +163,18 @@ export default class GeneralContractsController {
       ...processedArgs
     );
 
-    const chain = this.chain;
     const contract = this.contract;
-    const app = this.chain.app;
 
     if (contract.nickname === 'curated-factory-goerli') {
       const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
       // Sign Tx with PK if not view function
-      const txReceipt = await chain.makeContractTx(
+      const txReceipt = await this.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
         wallet
       );
       console.log('txReceipt', txReceipt);
-      const decodedLog = chain.api.eth.abi.decodeLog(
+      const decodedLog = this.web3.eth.abi.decodeLog(
         eventAbiItem.inputs,
         txReceipt.logs[0].data,
         txReceipt.logs[0].topics
