@@ -1,24 +1,23 @@
 /* eslint-disable no-continue */
 import fetch from 'node-fetch';
-import { Pool } from 'pg';
+import {Pool} from 'pg';
 import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  SubstrateTypes,
-  SubstrateEvents,
-  IEventHandler,
   CWEvent,
+  IEventHandler,
   LoggingHandler,
+  SubstrateEvents,
+  SubstrateTypes,
   SupportedNetwork,
 } from 'chain-events/src';
 
-import { BrokerConfig } from 'rascal';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
-import { DATABASE_URI } from '../config';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import {ChainBase, ChainNetwork, ChainType} from 'common-common/src/types';
+import {addPrefix, factory, formatFilename} from 'common-common/src/logging';
+import {RabbitMqHandler} from '../eventHandlers/rabbitMQ';
+import {DATABASE_URI, RABBITMQ_URI} from '../config';
+import {RascalPublications, getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -473,7 +472,7 @@ async function mainProcess(
 
     for (const event of identityEvents) {
       event.chain = chain.id; // augment event with chain
-      await producer.publish(event, 'SubstrateIdentityEventsPublication');
+      await producer.publish(event, RascalPublications.SubstrateIdentityEvents);
     }
 
     // clear the identity cache for this chain
@@ -600,7 +599,7 @@ async function initializer(): Promise<void> {
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(getRabbitMQConfig(RABBITMQ_URI), RascalPublications.ChainEvents);
   erc20Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   erc721Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   try {
