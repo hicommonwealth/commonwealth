@@ -82,11 +82,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
         onscroll={debounce(this.onscroll.bind(this), 400)}
       >
         <div class="DiscussionsPage">
-          <DiscussionFilterBar
-            topic={this.topicName}
-            stage={this.stageName}
-            parentState={this}
-          />
+          {app.chain?.meta && (
+            <DiscussionFilterBar
+              topic={this.topicName}
+              stage={this.stageName}
+              parentState={this}
+            />
+          )}
           <RecentListing
             topicName={this.topicName}
             stageName={this.stageName}

@@ -5,12 +5,13 @@ import m from 'mithril';
 import 'pages/discussions/recent_listing.scss';
 
 import app from 'state';
+import { isNotUndefined } from 'helpers/typeGuards';
 import { pluralize } from 'helpers';
-import { LoadingRow } from '../../components/loading_row';
 import { DiscussionRow } from './discussion_row';
-import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholder';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CreateContentPopover } from '../../menus/create_content_menu';
 
 interface RecentListingAttrs {
   stageName: string;
@@ -24,24 +25,18 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
 
     const { listingStore } = app.threads;
 
-    const listingInitialized = listingStore.isInitialized({
-      topicName,
-      stageName,
-    });
-
-    const listingDepleted = listingStore.isDepleted({ topicName, stageName });
-
     // Fetch first 20 unpinned threads
-    if (!listingInitialized) {
+    if (
+      !listingStore.isInitialized({
+        topicName,
+        stageName,
+      })
+    ) {
       this.initializing = true;
       app.threads.loadNextPage({ topicName, stageName }).then(() => {
         this.initializing = false;
         m.redraw();
       });
-    }
-
-    if (this.initializing) {
-      return LoadingRow;
     }
 
     const pinnedThreads = listingStore.getThreads({
@@ -59,31 +54,58 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
     const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
 
     if (!totalThreadCount) {
-      return <EmptyListingPlaceholder stageName={topicName} />;
+      return (
+        <div class="EmptyListingPlaceholder">
+          {isNotUndefined(topicName) ? (
+            <CWText className="no-threads-text">
+              There are no threads matching your filter.
+            </CWText>
+          ) : (
+            <>
+              <div class="icon-circle">
+                <CWIcon iconName="hash" iconSize="large" />
+              </div>
+              <div class="welcome-text-container">
+                <CWText type="h3">Welcome to the community!</CWText>
+                <CWText className="no-threads-text">
+                  There are no threads here yet.
+                </CWText>
+              </div>
+              <CreateContentPopover />
+            </>
+          )}
+        </div>
+      );
     }
 
     const subpage = topicName || stageName;
 
     return (
       <div class="RecentListing">
-        {pinnedThreads.map((t) => (
-          <DiscussionRow proposal={t} />
-        ))}
-        {unpinnedThreads.map((t) => (
-          <DiscussionRow proposal={t} />
-        ))}
-        <div class="listing-scroll">
-          {listingDepleted ? (
-            <CWText className="thread-count-text">
-              {`Showing ${totalThreadCount} of ${pluralize(
-                totalThreadCount,
-                'thread'
-              )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
-            </CWText>
-          ) : (
-            <CWSpinner size="large" />
-          )}
-        </div>
+        {this.initializing ? (
+          <CWSpinner />
+        ) : (
+          <>
+            {pinnedThreads.map((t) => (
+              <DiscussionRow proposal={t} />
+            ))}
+            {unpinnedThreads.map((t) => (
+              <DiscussionRow proposal={t} />
+            ))}
+            <div class="listing-scroll">
+              {listingStore.isDepleted({ topicName, stageName }) ? (
+                <CWText className="thread-count-text">
+                  {`Showing ${totalThreadCount} of ${pluralize(
+                    totalThreadCount,
+                    'thread'
+                  )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
+                </CWText>
+              ) : (
+                <CWSpinner size="large" />
+              )}
+            </div>
+          </>
+        )}
       </div>
     );
   }

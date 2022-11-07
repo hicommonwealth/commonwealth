@@ -185,17 +185,18 @@ export class CreateContentMenu implements m.ClassComponent {
 
 export class CreateContentPopover implements m.ClassComponent {
   view() {
-    if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
+    if (
+      !app.isLoggedIn() ||
+      !app.chain ||
+      !app.activeChainId() ||
+      !app.user.activeAccount
+    ) {
+      return;
+    }
 
     return (
       <CWPopoverMenu
-        trigger={
-          <CWIconButton
-            iconButtonTheme="black"
-            disabled={!app.user.activeAccount}
-            iconName="plusCircle"
-          />
-        }
+        trigger={<CWIconButton iconButtonTheme="black" iconName="plusCircle" />}
         menuItems={getCreateContentMenuItems()}
       />
     );

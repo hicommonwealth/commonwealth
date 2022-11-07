@@ -23,11 +23,7 @@ export class DiscussionFilterBar
   view(vnode) {
     const { topic, stage, disabled, parentState } = vnode.attrs;
 
-    const communityInfo = app.chain?.meta;
-
-    if (!communityInfo) return;
-
-    const { stagesEnabled, customStages } = communityInfo;
+    const { stagesEnabled, customStages } = app.chain?.meta;
 
     const topics = app.topics.getByCommunity(app.activeChainId());
 
@@ -35,6 +31,7 @@ export class DiscussionFilterBar
       .filter((t) => t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => a.order - b.order);
+
     const otherTopics = topics
       .filter((t) => !t.featuredInSidebar)
       .sort((a, b) => a.name.localeCompare(b.name));
