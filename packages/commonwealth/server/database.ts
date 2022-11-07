@@ -20,6 +20,7 @@ import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
+import CommunityRoleFactory from './models/community_role';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
@@ -35,6 +36,7 @@ import OffchainProfileFactory from './models/offchain_profile';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
+import RoleAssignmentFactory from './models/role_assignment';
 import RoleFactory from './models/role';
 import RuleFactory from './models/rule';
 import SocialAccountFactory from './models/social_account';
@@ -98,6 +100,7 @@ const models: Models = {
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
+  CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
@@ -119,6 +122,7 @@ const models: Models = {
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
+  RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
   Rule: RuleFactory(sequelize, DataTypes),
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),

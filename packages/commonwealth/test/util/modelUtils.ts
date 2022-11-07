@@ -8,6 +8,7 @@ import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceType } from 'common-common/src/types';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import app from '../../server-test';
@@ -35,10 +36,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, wallet_id });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
+    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
     const data = constructTypedMessage(chain_id, token);
     const privateKey = keypair.getPrivateKey();
-    const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
+    const signature = signTypedData({
+      privateKey,
+      data,
+      version: SignTypedDataVersion.V4,
+    });
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -151,8 +156,7 @@ export interface CommentArgs {
   root_id?: any;
 }
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, root_id } =
-    args;
+  const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
     .agent(app)
     .post('/api/createComment')
@@ -255,25 +259,59 @@ export interface AssignRoleArgs {
 }
 
 export const assignRole = async (args: AssignRoleArgs) => {
-  const role = await models['Role'].create({
-    ...args.chainOrCommObj,
+  const communityRole = await models.CommunityRole.findOne({
+    where: { chain_id: args.chainOrCommObj.chain_id, name: args.role },
+  });
+  const role = await models['RoleAssignment'].create({
     address_id: args.address_id,
-    permission: args.role,
+    community_role_id: communityRole.id,
   });
 
   return role;
 };
 
 export const updateRole = async (args: AssignRoleArgs) => {
-  const role = await models['Role'].findOne({
-    where: {
-      ...args.chainOrCommObj,
-      address_id: args.address_id,
-    },
-  });
+  const currentRole = await findOneRole(
+    models,
+    { where: { address_id: args.address_id } },
+    args.chainOrCommObj.chain_id
+  );
+  let role;
+  // Can only be a promotion
+  if (currentRole.toJSON().permission === 'member') {
+    role = await createRole(
+      models,
+      args.address_id,
+      args.chainOrCommObj.chain_id,
+      args.role
+    );
+  }
+  // Can be demoted or promoted
+  else if (currentRole.toJSON().permission === 'moderator') {
+    // Demotion
+    if (args.role === 'member') {
+      role = await models['RoleAssignment'].destroy({
+        where: {
+          community_role_id: currentRole.toJSON().community_role_id,
+          address_id: args.address_id,
+        },
+      });
+    }
+    // Promotion
+    else if (args.role === 'admin') {
+      role = await createRole(
+        models,
+        args.address_id,
+        args.chainOrCommObj.chain_id,
+        args.role
+      );
+    }
+  }
+  // If current role is admin, you cannot change it is the assumption
+  else {
+    return null;
+  }
   if (!role) return null;
-  role.permission = args.role;
-  await role.save();
   return role;
 };
 
