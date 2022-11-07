@@ -64,6 +64,9 @@ type CreateFactoryEthDaoForm = ChainFormFields &
   EthDaoFormFields;
 
 type CreateAbiFactoryState = ChainFormState & {
+  ethChainNames: any;
+  ethChains: any;
+  loadingEthChains: boolean;
   functionNameToFunctionOutput: Map<string, any[]>;
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
   daoFactoryType: string;
@@ -78,6 +81,9 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     loading: false,
     saving: false,
     status: undefined,
+    ethChainNames: {},
+    ethChains: {},
+    loadingEthChains: true,
     functionNameToFunctionOutput: new Map<string, any[]>(),
     functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
     daoFactoryType: 'partybidfactory',
@@ -99,6 +105,28 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
   }
 
   view(vnode) {
+    const queryEthChains = async () => {
+      // query eth chains
+      $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(
+        async (res) => {
+          if (res.status === 'Success') {
+            this.state.ethChains = res.result;
+          }
+
+          // query names from chainlist if possible
+          const chains = await $.getJSON('https://chainid.network/chains.json');
+          for (const id of Object.keys(this.state.ethChains)) {
+            const chain = chains.find((c) => c.chainId === +id);
+            if (chain) {
+              this.state.ethChainNames[id] = chain.name;
+            }
+          }
+          this.state.loadingEthChains = false;
+          m.redraw();
+        }
+      );
+    };
+
     const Bytes32 = ethers.utils.formatBytes32String;
 
     const disableField = !this.state.loaded;
@@ -310,8 +338,12 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       );
     };
 
+    if (this.state.loadingEthChains) queryEthChains();
+
     return (
       <div class="CreateCommunityForm">
+        {!this.state.loadingEthChains &&
+          ethChainRows(vnode.attrs, this.state.form)}
         <SelectRow
           title="DAO Network Type (Only Ethereum is supported at this time)"
           options={[ChainNetwork.Ethereum]}

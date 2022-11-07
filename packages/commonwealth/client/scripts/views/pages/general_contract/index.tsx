@@ -29,18 +29,23 @@ import {
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import { ChainFormState } from '../create_community/types';
+import {
+  ChainFormState,
+  EthChainAttrs,
+  EthFormFields,
+} from '../create_community/types';
+import { ethChainRows } from '../create_community/chain_input_rows';
 
 type CreateContractForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
-};
+} & EthFormFields;
 
 type CreateContractState = ChainFormState & {
   functionNameToFunctionOutput: Map<string, any[]>;
   form: CreateContractForm;
 };
 class GeneralContractPage
-  implements m.ClassComponent<{ contractAddress?: string }>
+  implements m.ClassComponent<{ contractAddress?: string } & EthChainAttrs>
 {
   generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
