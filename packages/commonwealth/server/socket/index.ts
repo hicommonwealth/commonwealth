@@ -14,7 +14,7 @@ import {JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP} from '../config';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {createChatNamespace} from './chatNs';
 import {DB} from '../models';
-import {RedisCache, redisRetryStrategy} from '../util/redisCache';
+import {RedisCache, redisRetryStrategy} from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
