@@ -87,10 +87,10 @@ export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
         ) : (
           <>
             {pinnedThreads.map((t) => (
-              <DiscussionRow proposal={t} />
+              <DiscussionRow thread={t} />
             ))}
             {unpinnedThreads.map((t) => (
-              <DiscussionRow proposal={t} />
+              <DiscussionRow thread={t} />
             ))}
             <div class="listing-scroll">
               {listingStore.isDepleted({ topicName, stageName }) ? (

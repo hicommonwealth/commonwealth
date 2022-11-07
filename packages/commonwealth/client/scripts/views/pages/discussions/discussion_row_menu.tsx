@@ -15,16 +15,16 @@ import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
-export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
+export const getThreadSubScriptionMenuItem = (thread: Thread) => {
   const commentSubscription = app.user.notifications.subscriptions.find(
     (v) =>
-      v.objectId === proposal.uniqueIdentifier &&
+      v.objectId === thread.uniqueIdentifier &&
       v.category === NotificationCategories.NewComment
   );
 
   const reactionSubscription = app.user.notifications.subscriptions.find(
     (v) =>
-      v.objectId === proposal.uniqueIdentifier &&
+      v.objectId === thread.uniqueIdentifier &&
       v.category === NotificationCategories.NewReaction
   );
 
@@ -38,11 +38,11 @@ export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
         await Promise.all([
           app.user.notifications.subscribe(
             NotificationCategories.NewReaction,
-            proposal.uniqueIdentifier
+            thread.uniqueIdentifier
           ),
           app.user.notifications.subscribe(
             NotificationCategories.NewComment,
-            proposal.uniqueIdentifier
+            thread.uniqueIdentifier
           ),
         ]);
         notifySuccess('Subscribed!');
@@ -66,13 +66,11 @@ export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
   };
 };
 
-export class DiscussionRowMenu
-  implements m.ClassComponent<{ proposal: Thread }>
-{
+export class DiscussionRowMenu implements m.ClassComponent<{ thread: Thread }> {
   view(vnode) {
     if (!app.isLoggedIn()) return;
 
-    const { proposal } = vnode.attrs;
+    const { thread } = vnode.attrs;
 
     const hasAdminPermissions =
       app.user.activeAccount &&
@@ -87,7 +85,7 @@ export class DiscussionRowMenu
 
     const isAuthor =
       app.user.activeAccount &&
-      proposal.author === app.user.activeAccount.address;
+      thread.author === app.user.activeAccount.address;
 
     return (
       <div
@@ -100,7 +98,7 @@ export class DiscussionRowMenu
       >
         <CWPopoverMenu
           menuItems={[
-            getThreadSubScriptionMenuItem(proposal),
+            getThreadSubScriptionMenuItem(thread),
             ...(hasAdminPermissions ? [{ type: 'divider' }] : []),
             ...(hasAdminPermissions
               ? [
@@ -108,9 +106,11 @@ export class DiscussionRowMenu
                     onclick: (e) => {
                       e.preventDefault();
 
-                      app.threads.pin({ proposal }).then(() => m.redraw());
+                      app.threads
+                        .pin({ proposal: thread })
+                        .then(() => m.redraw());
                     },
-                    label: proposal.pinned ? 'Unpin thread' : 'Pin thread',
+                    label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                   },
                 ]
               : []),
@@ -122,12 +122,12 @@ export class DiscussionRowMenu
 
                       app.threads
                         .setPrivacy({
-                          threadId: proposal.id,
-                          readOnly: !proposal.readOnly,
+                          threadId: thread.id,
+                          readOnly: !thread.readOnly,
                         })
                         .then(() => m.redraw());
                     },
-                    label: proposal.readOnly ? 'Unlock thread' : 'Lock thread',
+                    label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                   },
                 ]
               : []),
@@ -140,10 +140,10 @@ export class DiscussionRowMenu
                         modal: ChangeTopicModal,
                         data: {
                           onChangeHandler: (topic: Topic) => {
-                            proposal.topic = topic;
+                            thread.topic = topic;
                             m.redraw();
                           },
-                          thread: proposal,
+                          thread,
                         },
                       });
                     },
@@ -160,10 +160,10 @@ export class DiscussionRowMenu
                         modal: UpdateProposalStatusModal,
                         data: {
                           onChangeHandler: (stage: ThreadStage) => {
-                            proposal.stage = stage;
+                            thread.stage = stage;
                             m.redraw();
                           },
-                          thread: proposal,
+                          thread,
                         },
                       });
                     },
@@ -189,7 +189,7 @@ export class DiscussionRowMenu
 
                       if (!confirmed) return;
 
-                      app.threads.delete(proposal).then(() => {
+                      app.threads.delete(thread).then(() => {
                         navigateToSubpage('/discussions');
                       });
                     },
