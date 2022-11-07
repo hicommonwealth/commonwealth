@@ -36,6 +36,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api(): any {
+    return this._web3;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(message, this.accounts[0]);
     return signature;

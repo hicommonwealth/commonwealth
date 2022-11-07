@@ -4,6 +4,7 @@ import app from 'state';
 import { Contract, NodeInfo, IWebWallet } from 'models';
 import { initAppState } from 'app';
 import { Contract as Web3Contract } from 'web3-eth-contract';
+import { RLPEncodedTransaction, TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -12,7 +13,6 @@ import {
   ChainFormFields,
   EthFormFields,
 } from 'views/pages/create_community/types';
-import { TransactionReceipt } from 'web3-core';
 import Web3 from 'web3';
 
 type EthDaoFormFields = {
@@ -43,6 +43,21 @@ export default class GeneralContractsController {
     }
   }
 
+  private async contractCall(web3: Web3, tx: TransactionConfig): Promise<string> {
+    const txResult = await web3.givenProvider.request({
+      method: 'eth_call',
+      params: [tx, 'latest'],
+    });
+    return txResult;
+  }
+
+  private async sendTransaction(
+    web3: Web3,
+    tx: TransactionConfig
+  ): Promise<TransactionReceipt> {
+    return web3.eth.sendTransaction(tx);
+  }
+
   public async makeContractCall(
     to: string,
     data: string,
@@ -50,7 +65,7 @@ export default class GeneralContractsController {
   ) {
     // encoding + decoding require ABI + happen inside contracts controller
     try {
-      const result = await wallet.contractCall({ to, data });
+      const result = await this.contractCall(wallet.api, { to, data });
       return result;
     } catch (error) {
       console.log(error);
@@ -67,7 +82,7 @@ export default class GeneralContractsController {
   ): Promise<TransactionReceipt> {
     // Not using contractApi because it's ethers-dependent
     // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
-    return wallet.sendTransaction({
+    return this.sendTransaction(wallet.api, {
       from: wallet.accounts[0],
       to,
       data,

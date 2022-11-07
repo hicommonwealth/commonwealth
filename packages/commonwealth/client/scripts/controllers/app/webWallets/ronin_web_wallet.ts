@@ -36,6 +36,8 @@ class RoninWebWalletController implements IWebWallet<any> {
   public get enabled() {
     return this._enabled;
   }
+  api: () => any
+
 }
 
 export default RoninWebWalletController;
