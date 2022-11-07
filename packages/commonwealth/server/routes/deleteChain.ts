@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { DB } from '../models';
@@ -129,30 +129,21 @@ const deleteChain = async (
       transaction: t,
     });
 
-    await models.sequelize.query(
-      `DELETE FROM "Collaborations"
-        USING "Collaborations" AS c
-        LEFT JOIN "Threads" t ON thread_id = t.id
-        WHERE t.chain = '${chain.id}'
-        AND c.thread_id  = "Collaborations".thread_id 
-        AND c.address_id = "Collaborations".address_id;`,
-      {
-        raw: true,
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    const threads = await models.Thread.findAll({
+      where: { chain: chain.id },
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "LinkedThreads"
-        USING "LinkedThreads" AS l
-        LEFT JOIN "Threads" t ON linked_thread = t.id
-        WHERE t.chain = '${chain.id}';`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.Collaboration.destroy({
+      where: { thread_id: { [Op.in]: threads.map((thread) => thread.id) } },
+      transaction: t,
+    });
+
+    await models.LinkedThread.destroy({
+      where: {
+        linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
+      },
+      transaction: t,
+    });
 
     await models.Vote.destroy({
       where: { chain_id: chain.id },
@@ -174,17 +165,14 @@ const deleteChain = async (
       transaction: t,
     });
 
-    await models.sequelize.query(
-      `DELETE FROM "OffchainProfiles" AS profilesGettingDeleted
-        USING "OffchainProfiles" AS profilesBeingUsedAsReferences
-        LEFT JOIN "Addresses" a ON profilesBeingUsedAsReferences.address_id = a.id
-        WHERE a.chain = '${chain.id}'
-        AND profilesGettingDeleted.address_id  = profilesBeingUsedAsReferences.address_id;`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    const addresses = await models.Address.findAll({
+      where: { chain: chain.id },
+    });
+
+    await models.OffchainProfile.destroy({
+      where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
+      transaction: t,
+    });
 
     await models.ChainCategory.destroy({
       where: { chain_id: chain.id },
@@ -207,36 +195,35 @@ const deleteChain = async (
       transaction: t,
     });
 
-    // TODO: Remove this once we figure out a better way to relate addresses across many chains (token communities)
-    await models.sequelize.query(
-      `DELETE FROM "RoleAssignments" WHERE address_id IN(SELECT id FROM "Addresses" WHERE chain='${chain.id}');`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.RoleAssignment.destroy({
+      where: {
+        address_id: { [Op.in]: addresses.map((a) => a.id) },
+      },
+    });
+
+    await models.RoleAssignment.destroy({
+      where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
+      transaction: t,
+    });
 
     await models.Address.destroy({
       where: { chain: chain.id },
       transaction: t,
     });
 
-    await models.sequelize.query(
-      // eslint-disable-next-line max-len
-      `DELETE FROM "RoleAssignments" WHERE community_role_id IN(SELECT id FROM "CommunityRoles" WHERE chain_id IN(SELECT id FROM "Chains" WHERE id='${chain.id}'));`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    const communityRoles = await models.CommunityRole.findAll({
+      where: { chain_id: chain.id },
+      transaction: t,
+    });
 
-    await models.sequelize.query(
-      `DELETE FROM "CommunityRoles" WHERE chain_id IN(SELECT id FROM "Chains" WHERE id='${chain.id}');`,
-      {
-        type: QueryTypes.DELETE,
-        transaction: t,
-      }
-    );
+    await models.RoleAssignment.destroy({
+      where: {
+        community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
+      },
+      transaction: t,
+    });
+
+    await Promise.all(communityRoles.map((r) => r.destroy({ transaction: t })));
 
     await models.Chain.destroy({
       where: { id: chain.id },
