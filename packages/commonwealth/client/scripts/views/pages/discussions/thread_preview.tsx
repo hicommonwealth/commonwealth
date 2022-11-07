@@ -22,14 +22,12 @@ import {
 } from 'helpers';
 import { Thread, ThreadStage, AddressInfo, ThreadKind } from 'models';
 import User from 'views/components/widgets/user';
-import UserGallery from 'views/components/widgets/user_gallery';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 import { getLastUpdated, isHot } from './helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
 
 type ThreadPreviewAttrs = {
-  onSelect?: any;
   thread: Thread;
 };
 
@@ -46,10 +44,6 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
       <div
         class="ThreadPreview"
         onclick={(e) => {
-          if (vnode.attrs.onSelect) {
-            return vnode.attrs.onSelect();
-          }
-
           if ($(e.target).hasClass('cui-tag')) return;
 
           if (isCommandClick(e)) {
@@ -134,7 +128,7 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                     : 'positive'
                 }
                 size="xs"
-                compact={true}
+                compact
                 label={threadStageToLabel(thread.stage)}
               />
             )}
@@ -184,17 +178,6 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
           </div>
         </div>
         <div class="content-right-container">
-          {m(UserGallery, {
-            avatarSize: 36,
-            popover: true,
-            maxUsers: 2,
-            addressesCount:
-              app.threadUniqueAddressesCount.getAddressesCountRootId(
-                `${thread.slug}_${thread.id}`
-              ),
-            users:
-              app.threadUniqueAddressesCount.getUniqueAddressesByRootId(thread),
-          })}
           {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
         </div>
       </div>

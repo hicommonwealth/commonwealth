@@ -12,6 +12,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CreateContentPopover } from '../../menus/create_content_menu';
+import { _ThreadPreview } from './_thread_preview';
 
 interface RecentThreadsAttrs {
   stageName: string;
@@ -87,10 +88,10 @@ export class RecentThreads implements m.ClassComponent<RecentThreadsAttrs> {
         ) : (
           <>
             {pinnedThreads.map((t) => (
-              <ThreadPreview thread={t} />
+              <_ThreadPreview thread={t} />
             ))}
             {unpinnedThreads.map((t) => (
-              <ThreadPreview thread={t} />
+              <_ThreadPreview thread={t} />
             ))}
             <div class="listing-scroll">
               {listingStore.isDepleted({ topicName, stageName }) ? (
