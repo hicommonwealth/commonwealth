@@ -30,7 +30,7 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
 
     return (
       <div class="SublayoutHeader">
-        <div class="sidebar-left">
+        <div class="header-left">
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"
@@ -65,7 +65,7 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
           )}
         </div>
         {!hideSearch && <SearchBar />}
-        <div class="sidebar-right">
+        <div class="header-right">
           <div class="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
