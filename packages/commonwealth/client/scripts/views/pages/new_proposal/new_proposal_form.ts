@@ -12,7 +12,6 @@ import {
   Button,
   Grid,
   Col,
-  Spinner,
   PopoverMenu,
   Icons,
   MenuItem,
@@ -54,6 +53,7 @@ import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -668,12 +668,7 @@ const NewProposalForm = {
           title: 'Proposals',
         });
       }
-      return m(Spinner, {
-        fill: true,
-        message: 'Connecting to chain...',
-        size: 'xl',
-        style: 'visibility: visible; opacity: 1;',
-      });
+      return m(CWSpinner);
     }
 
     const activeEntityInfo = app.chain.meta;

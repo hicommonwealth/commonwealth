@@ -36,6 +36,12 @@ module.exports = merge(common, {
         test: /\.s?css$/i,
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
     ],
   },
 });
