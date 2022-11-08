@@ -3,6 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { createRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,14 +16,19 @@ export const Errors = {
   CodeUpdateFailure: 'Failed to update invite code',
 };
 
-const acceptInvite = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const acceptInvite = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { inviteCode, address, reject } = req.body;
 
   const code = await models.InviteCode.findOne({
     where: {
       id: inviteCode,
       used: false,
-    }
+    },
   });
   if (!code) return next(new AppError(Errors.NoInviteCodeFound(inviteCode)));
 
@@ -36,7 +42,7 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
   const addressObj = await models.Address.findOne({
     where: {
       address,
-    }
+    },
   });
   if (!addressObj) return next(new AppError(Errors.NoAddressFound(address)));
 
@@ -50,17 +56,19 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: code.chain_id }
+    where: { id: code.chain_id },
   });
   if (!chain) {
     return next(new AppError(Errors.NoCommunityFound(code.chain_id)));
   }
 
-  const role = await models.Role.create({
-    address_id: addressObj.id,
-    chain_id: chain?.id,
-    permission: 'member',
-  });
+  const role = await createRole(
+    models,
+    addressObj.id,
+    chain?.id,
+    'member'
+  );
+
   if (!role) return next(new ServerError(Errors.RoleCreationFailure));
 
   const updatedCode = await code.update({
@@ -78,7 +86,11 @@ const acceptInvite = async (models: DB, req: Request, res: Response, next: NextF
 
   return res.json({
     status: 'Success',
-    result: { updatedCode: updatedCode.toJSON(), role: role.toJSON(), subscription: subscription.toJSON() }
+    result: {
+      updatedCode: updatedCode.toJSON(),
+      role: role.toJSON(),
+      subscription: subscription.toJSON(),
+    },
   });
 };
 

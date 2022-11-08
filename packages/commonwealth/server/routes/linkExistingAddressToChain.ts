@@ -7,6 +7,7 @@ import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { createRole, findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
@@ -49,9 +50,15 @@ const linkExistingAddressToChain = async (
   }
 
   // check if the original address is verified and is owned by the user
-  const originalAddress = await models.Address.scope('withPrivateData').findOne({
-    where: { address: req.body.address, user_id: userId, verified: { [Op.ne]: null } }
-  });
+  const originalAddress = await models.Address.scope('withPrivateData').findOne(
+    {
+      where: {
+        address: req.body.address,
+        user_id: userId,
+        verified: { [Op.ne]: null },
+      },
+    }
+  );
 
   if (!originalAddress) {
     return next(new AppError(Errors.NotVerifiedAddressOrUser));
@@ -167,19 +174,14 @@ const linkExistingAddressToChain = async (
       where: { user_id: originalAddress.user_id },
     });
 
-    const role = await models.Role.findOne({
-      where: {
-        address_id: addressId,
-        chain_id: req.body.chain,
-      },
-    });
+    const role = await findOneRole(
+      models,
+      { where: { address_id: addressId } },
+      req.body.chain
+    );
 
     if (!role) {
-      await models.Role.create({
-        address_id: addressId,
-        chain_id: req.body.chain,
-        permission: 'member',
-      });
+      await createRole(models, addressId, req.body.chain, 'member');
     }
 
     return res.json({

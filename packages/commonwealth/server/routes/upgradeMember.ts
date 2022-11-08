@@ -1,9 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { isAddress } from 'web3-utils';
+import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import {
+  createRole,
+  findAllRoles,
+  findOneRole,
+  RoleInstanceWithPermission,
+} from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,7 +25,12 @@ export const Errors = {
 
 const ValidRoles = ['admin', 'moderator', 'member'];
 
-const upgradeMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const upgradeMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   const { address, new_role } = req.body;
@@ -26,59 +38,106 @@ const upgradeMember = async (models: DB, req: Request, res: Response, next: Next
   if (!new_role) return next(new AppError(Errors.InvalidRole));
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   const requesterAddresses = await req.user.getAddresses();
-  const requesterAddressIds = requesterAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const requesterAdminRoles = await models.Role.findAll({
-    where: {
-      chain_id: chain.id,
-      address_id: { [Op.in]: requesterAddressIds },
-      permission: 'admin',
-    },
-  });
+  const requesterAddressIds = requesterAddresses
+    .filter((addr) => !!addr.verified)
+    .map((addr) => addr.id);
+  const requesterAdminRoles = await findAllRoles(
+    models,
+    { where: { address_id: { [Op.in]: requesterAddressIds } } },
+    chain.id,
+    ['admin']
+  );
 
-  if (requesterAdminRoles.length < 1 && !req.user.isAdmin) return next(new AppError(Errors.MustBeAdmin));
-
+  if (requesterAdminRoles.length < 1 && !req.user.isAdmin)
+    return next(new AppError(Errors.MustBeAdmin));
   const memberAddress = await models.Address.findOne({
     where: {
       address,
+      chain: chain.id,
     },
-    include: [{
-      model: models.Role,
-      required: true,
-      where: {
-        chain_id: chain.id,
-      }
-    }]
   });
-  const roles = memberAddress?.Roles;
-  if (!memberAddress || !roles) return next(new AppError(Errors.NoMember));
+  if (!memberAddress) return next(new AppError(Errors.NoMember));
+  const roles = await findAllRoles(
+    models,
+    { where: { address_id: memberAddress.id } },
+    chain.id
+  );
+  if (!roles) return next(new AppError(Errors.NoMember));
 
   // There should only be one role per address per chain/community
-  const member = await models.Role.findOne({ where: { id: roles[0].id } });
+  const member = await findOneRole(
+    models,
+    { where: { address_id: memberAddress.id } },
+    chain.id
+  );
   if (!member) return next(new AppError(Errors.NoMember));
 
-  const allCommunityAdmin = await models.Role.findAll({
-    where: {
-      chain_id: chain.id,
-      permission: 'admin',
-    },
-  });
-  const requesterAdminAddressIds = requesterAdminRoles.map((r) => r.address_id);
+  const allCommunityAdmin = await findAllRoles(models, {}, chain.id, ['admin']);
+  const requesterAdminAddressIds = requesterAdminRoles.map(
+    (r) => r.toJSON().address_id
+  );
   const isLastAdmin = allCommunityAdmin.length < 2;
-  const adminSelfDemoting = requesterAdminAddressIds.includes(memberAddress.id)
-    && new_role !== 'admin';
+  const adminSelfDemoting =
+    requesterAdminAddressIds.includes(memberAddress.id) && new_role !== 'admin';
   if (isLastAdmin && adminSelfDemoting) {
     return next(new AppError(Errors.MustHaveAdmin));
   }
-
+  let newMember: RoleInstanceWithPermission;
   if (ValidRoles.includes(new_role)) {
-    member.permission = new_role;
+    // “Demotion” should remove all RoleAssignments above the new role.
+    // “Promotion” should create new RoleAssignment above the existing role.
+    const currentRole = member.permission;
+    // give each permissions a integer ranking
+    const roleRanking = {
+      admin: 2,
+      moderator: 1,
+      member: 0,
+    };
+    const rankingToRole = {
+      2: 'admin',
+      1: 'moderator',
+      0: 'member',
+    };
+    const newRoleRanking = roleRanking[new_role];
+    let currentRoleRanking = roleRanking[currentRole];
+    if (newRoleRanking === currentRoleRanking) {
+      return next(new AppError(Errors.InvalidRole));
+    } else if (newRoleRanking > currentRoleRanking) {
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        new_role
+      );
+    } else {
+      // handle demotions
+      while (newRoleRanking < currentRoleRanking) {
+        const roleToRemove = rankingToRole[currentRoleRanking];
+        const communityRole = await models.CommunityRole.findOne({
+          where: {
+            chain_id: chain.id,
+            name: roleToRemove,
+          },
+        });
+        await models.RoleAssignment.destroy({
+          where: {
+            address_id: memberAddress.id,
+            community_role_id: communityRole.id,
+          },
+        });
+        currentRoleRanking -= 1;
+      }
+      newMember = await createRole(
+        models,
+        memberAddress.id,
+        chain.id,
+        rankingToRole[newRoleRanking]
+      );
+    }
   } else {
     return next(new AppError(Errors.InvalidRole));
   }
-
-  await member.save();
-
-  return res.json({ status: 'Success', result: member.toJSON() });
+  return res.json({ status: 'Success', result: newMember.toJSON() });
 };
 
 export default upgradeMember;

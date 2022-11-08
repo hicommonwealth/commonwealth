@@ -16,7 +16,7 @@ import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import {factory, formatFilename} from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
@@ -38,6 +38,8 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
+import expressStatsdInit from './server/scripts/setupExpressStats';
+import StatsDController from './server/util/statsd';
 import {BrokerConfig} from "rascal";
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -55,6 +57,8 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
+  const NO_TOKEN_BALANCE_CACHE =
+    process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
@@ -111,11 +115,11 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
+  const compiler = DEV ? webpack(devWebpackConfig as any) : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler, {
+      ? webpackDevMiddleware(compiler as any, {
         publicPath: '/build',
       })
       : null;
@@ -204,6 +208,7 @@ async function main() {
 
     // add other middlewares
     app.use(logger('dev'));
+    app.use(expressStatsdInit(StatsDController.get()));
     app.use(bodyParser.json({limit: '1mb'}));
     app.use(bodyParser.urlencoded({limit: '1mb', extended: false}));
     app.use(cookieParser());
@@ -258,8 +263,7 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-
-  await tokenBalanceCache.start();
+  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   await ruleCache.start();
   const banCache = new BanCache(models);
   setupAPI(

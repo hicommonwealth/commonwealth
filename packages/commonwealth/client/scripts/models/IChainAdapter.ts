@@ -56,11 +56,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         }),
       ]);
     } else {
-      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
-      });
+      [response, ] = await Promise.all([
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        }),
+      ]);
     }
 
     // If user is no longer on the initializing chain, abort initialization
@@ -89,6 +91,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contracts, true);
+
+    await this.app.recentActivity.getRecentTopicActivity(this.id);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));

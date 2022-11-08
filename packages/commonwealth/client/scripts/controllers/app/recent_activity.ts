@@ -70,9 +70,9 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(): Promise<Thread[]> {
+  public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
     const params = {
-      chain: app.activeChainId(),
+      chain: id || app.activeChainId(),
       threads_per_topic: 3,
     };
 

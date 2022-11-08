@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { findOneRole } from '../util/roles';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -50,7 +51,7 @@ const addEditors = async (
     Object.values(editors).map((editor: any) => {
       return models.Address.findOne({
         where: { id: editor.id },
-        include: [models.Role, models.User],
+        include: [models.RoleAssignment, models.User],
       });
     })
   );
@@ -71,12 +72,15 @@ const addEditors = async (
     });
     await Promise.all(
       uniqueCollaborators.map(async (collaborator) => {
-        if (!collaborator.Roles || !collaborator.User) {
+        if (!collaborator.RoleAssignments || !collaborator.User) {
           return null;
         }
-        const isMember = collaborator.Roles.find(
-          (role) => role.chain_id === chain.id
+        const isMember = await findOneRole(
+          models,
+          { where: { address_id: collaborator.id } },
+          chain.id
         );
+
         if (!isMember) throw new AppError(Errors.InvalidEditor);
 
         await models.Collaboration.findOrCreate({
@@ -149,7 +153,6 @@ const addEditors = async (
       );
     });
   }
-
 
   const finalCollaborations = await models.Collaboration.findAll({
     where: { thread_id: thread.id },

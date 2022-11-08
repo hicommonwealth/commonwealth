@@ -1,9 +1,9 @@
 import type { Express } from 'express';
 import axios from 'axios';
 import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,10 +1,14 @@
-import TokenBalanceCache from 'token-balance-cache/src/index';
-import { AddressInstance } from 'server/models/address';
+import BN from 'bn.js';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { Op, QueryTypes } from 'sequelize';
+import { AddressInstance } from '../models/address';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 enum BulkBalancesErrors {
   InvalidToken = 'Invalid token',
@@ -27,13 +31,15 @@ type bulkBalanceReq = {
   };
 };
 
+// TODO: ensure commonbot parses the strings properly rather than relying
+//   on js `numbers`, which can overflow in e.g. wei.
 type bulkBalanceResp = {
   balances: {
     [nodeId: string]:
       | {
-          [tokenAddress: string]: number;
+          [tokenAddress: string]: string;
         }
-      | number;
+      | string;
   };
   bases: string[];
 };
@@ -87,19 +93,14 @@ const bulkBalances = async (
 
   const bases = basesRaw.map((b) => b['base']);
 
-  const balances: {
-    [nodeId: string]:
-      | {
-          [tokenAddress: string]: number;
-        }
-      | number;
-  } = {};
+  const balances: Pick<bulkBalanceResp, 'balances'>['balances'] = {};
 
   // Iterate through chain nodes
   for (const nodeIdString of Object.keys(chainNodes)) {
     const contracts = req.body.chainNodes[nodeIdString];
     const nodeId = parseInt(nodeIdString, 10);
 
+    const [{ bp }] = await tokenBalanceCache.getBalanceProviders(nodeId);
     // Handle when only one value in array
     // no longer needed, always { address, tokenType }
     // if (typeof tokenAddresses === 'string') {
@@ -109,59 +110,36 @@ const bulkBalances = async (
     // Handle no token addresses for chain node
     // This is for Cosmos base
     if (!contracts || contracts.length === 0) {
-      let balanceTotal = 0;
-      let atLeastOneTokenAddress = false;
-      for (const userWalletAddress of profileWalletAddresses) {
-        try {
-          const balance = await tokenBalanceCache.getBalance(
-            nodeId,
-            userWalletAddress
-          );
-          balanceTotal += balance.toNumber();
-          atLeastOneTokenAddress = false;
-        } catch (e) {
-          console.log(
-            "Couldn't get balance for chainNodeId ",
-            nodeId,
-            ' with wallet ',
-            userWalletAddress
-          );
+      let balanceTotal = new BN(0);
+      try {
+        const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {});
+        for (const balance of Object.values(balanceResults.balances)) {
+          balanceTotal = balanceTotal.add(new BN(balance));
         }
-      }
-      if (atLeastOneTokenAddress) {
-        balances[nodeId] = balanceTotal;
+        balances[nodeId] = balanceTotal.toString();
+      } catch (e) {
+        log.info(`Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`);
       }
     } else {
       // this is for Ethereum / Solana Bases
-      const tokenBalances: { [contractAddress: string]: number } = {};
-      let atLeastOneTokenAddress = false;
+      const tokenBalances: { [contractAddress: string]: string } = {};
 
       // Build token balances for each address
       for (const contract of contracts) {
-        let balanceTotal = 0;
-        for (const userWalletAddress of profileWalletAddresses) {
-          try {
-            const balance = await tokenBalanceCache.getBalance(
-              nodeId,
-              userWalletAddress,
-              contract.address,
-              contract.tokenType,
-            );
-            balanceTotal += balance.toNumber();
-            atLeastOneTokenAddress = true;
-          } catch (e) {
-            console.log(
-              "Couldn't get balance for token address",
-              contract.address,
-              'on chainNodeId',
-              nodeId,
-              ' with wallet ',
-              userWalletAddress
-            );
+        let balanceTotal = new BN(0);
+        try {
+          const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {
+            contractType: contract.tokenType,
+            tokenAddress: contract.address,
+          });
+          for (const balance of Object.values(balanceResults.balances)) {
+            balanceTotal = balanceTotal.add(new BN(balance));
           }
-        }
-        if (atLeastOneTokenAddress) {
-          tokenBalances[contract.address] = balanceTotal;
+          tokenBalances[contract.address] = balanceTotal.toString();
+        } catch (e) {
+          log.info(
+            `Couldn't get token balances for chainNodeId ${nodeId} + contract ${contract.address}: ${e.message}`
+          );
         }
       }
 

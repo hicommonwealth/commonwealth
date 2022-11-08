@@ -10,6 +10,7 @@ import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/u
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -79,17 +80,16 @@ const editThread = async (
   const collaboration = await models.Collaboration.findOne({
     where: {
       thread_id,
-      address_id: { [Op.in]: userOwnedAddressIds }
-    }
-  });
-
-  const admin = await models.Role.findOne({
-    where: {
-      chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
-      permission: 'admin',
     },
   });
+
+  const admin = await findOneRole(
+    models,
+    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+    chain.id,
+    ['admin']
+  );
 
   // check if banned
   if (!admin) {
@@ -225,7 +225,7 @@ const editThread = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.Role],
+              include: [models.User, models.RoleAssignment],
             });
             return user;
           } catch (err) {
