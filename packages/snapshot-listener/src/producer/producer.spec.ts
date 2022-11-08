@@ -1,35 +1,70 @@
-import createMQProducer from './producer';
-import { rabbitMQ} from '../config';
-import { expect } from 'chai';
+import { assert } from 'chai';
+import { CWEvent } from 'chain-events/src';
+import { RabbitMqHandler } from '../../../server/eventHandlers/rabbitMQ';
+import { RascalPublications, RascalSubscriptions, getRabbitMQConfig } from "common-common/src/rabbitmq";
+import { RABBITMQ_URI } from "../../../server/config";
 
-describe('Producer ', () => {
-	const testQueue = 'test-queue';
+describe.skip('RabbitMQ producer integration tests', () => {
+  let controller
 
-	it('should return a function', () => {
-		const produceMessage = createMQProducer(rabbitMQ.url, testQueue);
-		expect(produceMessage).to.be.a('function');
-	});
+  beforeEach('Initialize RabbitMQ Controller', () => {
+    controller = new RabbitMqHandler(getRabbitMQConfig(RABBITMQ_URI), RascalPublications.SnapshotListener);
+  })
 
-	it('should throw an error if the message is not a string', () => {
-		const produceMessage = createMQProducer(rabbitMQ.url, testQueue);
-		// @ts-ignore
-		expect(() => produceMessage(123)).to.throw();
-	});
+  it('should initialize a RabbitMQ producer with the default config', async function () {
+    await controller.init();
+    assert.isNotNull(controller.broker);
+  });
 
-	it('should throw an error if the message is empty', () => {
-		const produceMessage = createMQProducer(rabbitMQ.url, testQueue);
-		expect(() => produceMessage('')).to.throw();
-	});
+  it('should publish a CWEvent to a queue', async function () {
+    await controller.init();
+    const sub = await controller.startSubscription(
+    async (event: CWEvent) => {
+      assert.equal(event.blockNumber, 10);
+      assert.deepEqual(event.data, {} as any);
+      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.network, 'substrate');
+      assert.equal(event.received, 123);
+    }, RascalSubscriptions.ChainEvents);
 
-	it('should throw an error if the message is undefined', () => {
-		const produceMessage = createMQProducer(rabbitMQ.url, testQueue);
-		//@ts-ignore
-		expect(() => produceMessage(undefined)).to.throw();
-	});
+    controller.handle({
+      blockNumber: 10,
+      data: {},
+      chain: 'polkadot',
+      network: 'substrate',
+      received: 123,
+    });
+  });
 
-	it('should throw an error if the message is null', () => {
-		const produceMessage = createMQProducer(rabbitMQ.url, testQueue);
-		//@ts-ignore
-		expect(() => produceMessage(null)).to.throw();
-	});
+  xit('should prevent excluded events from being published', async function () {
+    await controller.init();
+    const sub = await controller.startSubscription(
+      async (event: CWEvent) => {
+      assert.equal(event.blockNumber, 10);
+      assert.equal(event.data, {} as any);
+      assert.equal(event.chain, 'polkadot');
+      assert.equal(event.network, 'substrate');
+      assert.equal(event.received, 123);
+    }, RascalSubscriptions.ChainEvents);
+
+    controller.handle({
+      blockNumber: 10,
+      data: {
+        kind: 'dont-skip',
+      },
+      network: 'substrate',
+      chain: 'polkadot',
+      received: 123,
+    });
+
+    controller.handle({
+      blockNumber: 99,
+      data: {
+        kind: 'skip',
+      },
+      network: 'substrate',
+      chain: 'polkadot',
+      received: 77,
+    });
+  });
 });

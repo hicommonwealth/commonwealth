@@ -1,10 +1,9 @@
-import { CWEvent, IEventHandler } from 'chain-events/src';
 import Rascal from 'rascal';
+import { SnapshotEvent, EventHandler, ServerError } from '../types/';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { ServerError } from '../util/errors';
 import {RascalPublications} from "common-common/src/rabbitmq";
 
-export class RabbitMqHandler extends RabbitMQController implements IEventHandler {
+export class RabbitMqHandler extends RabbitMQController implements EventHandler {
 
   protected publication: RascalPublications
 
@@ -14,7 +13,7 @@ export class RabbitMqHandler extends RabbitMQController implements IEventHandler
     this.publication = publication;
   }
 
-  public async handle(event: CWEvent): Promise<any> {
+  public async handle(event: SnapshotEvent): Promise<any> {
     try {
       await this.publish(event, this.publication);
     } catch (err) {

@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import { rabbitMQ } from './config'
+import { SnapshotEvent } from './types';
 import createMQProducer from './producer/producer';
 import dotenv from "dotenv";
 dotenv.config();
@@ -11,12 +12,6 @@ app.use(express.json());
 
 const produceMessage = createMQProducer(rabbitMQ.url, "snapshot_event");
 
-export interface SnapshotEvent {
-  id: string;
-  event: string;
-  space: string;
-  expire: number;
-}
 
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
