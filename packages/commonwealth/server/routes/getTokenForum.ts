@@ -28,7 +28,7 @@ const getTokenForum = async (
     }
   });
   const node = await models.ChainNode.scope('withPrivateData').findOne({ where: { eth_chain_id: chain_id }});
-  let url = node.url;
+  let url = node?.url;
   if (!url) {
     url = req.query.url;
     if (!url) {
