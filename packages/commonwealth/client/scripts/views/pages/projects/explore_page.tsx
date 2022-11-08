@@ -2,18 +2,18 @@
 
 import m from 'mithril';
 import app from 'state';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ProjectCard from './project_card/index';
-import { PageLoading } from '../loading';
 
 export default class ExplorePage
   implements m.ClassComponent<{ currentBlockNum: number }>
 {
   view(vnode) {
     const { currentBlockNum } = vnode.attrs;
-
     if (!app.projects.initialized()) {
-      return <PageLoading />;
+      return <CWSpinner />;
     }
+
     const exploreProjects = app.projects.store
       .getAll()
       .filter((project) =>

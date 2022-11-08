@@ -23,7 +23,6 @@ const getProjects = async (
   req: TypedRequestQuery<GetProjectsReq>,
   res: TypedResponse<GetProjectsResp>
 ) => {
-  console.log(req.query);
   const { creator_address, chain_id, project_id } = req.query as GetProjectsReq;
   const params: WhereOptions<ProjectAttributes> = {};
   if (chain_id) {
@@ -59,7 +58,7 @@ const getProjects = async (
         ],
       },
     });
-    console.log(projects[0]);
+
     return success(
       res,
       projects.map((p) => p.toJSON())

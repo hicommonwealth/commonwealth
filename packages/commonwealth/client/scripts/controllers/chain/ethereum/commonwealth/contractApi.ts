@@ -63,6 +63,7 @@ export async function attachSigner<CT extends Contract>(
   if (!signer) {
     throw new Error('Could not get signer.');
   }
+  console.log({ factory, address });
   if (contract) {
     const ct = contract.connect(signer) as CT;
     await ct.deployed();

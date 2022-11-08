@@ -14,7 +14,6 @@ import {
 class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
-  public readonly address: string;
   public readonly tokenName: string;
   public readonly defaultSymbol: string;
   public name: string;
@@ -83,7 +82,6 @@ class ChainInfo {
     hideProjects,
     ChainNode,
     tokenName,
-    address,
     adminOnlyPolling,
   }) {
     this.id = id;
@@ -117,7 +115,6 @@ class ChainInfo {
     this.hideProjects = hideProjects;
     this.ChainNode = ChainNode;
     this.tokenName = tokenName;
-    this.address = address;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
   }
@@ -163,7 +160,11 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts ? Contracts[0]?.decimals : base === ChainBase.CosmosSDK ? 6 : 18;
+    const decimals = Contracts
+      ? Contracts[0]?.decimals
+      : base === ChainBase.CosmosSDK
+      ? 6
+      : 18;
     return new ChainInfo({
       id,
       network,

@@ -128,6 +128,7 @@ export default class CWCoverImageUploader
       console.log(vnode.attrs.defaultBackground);
       this.imageURL = vnode.attrs.defaultBackground;
       this.uploadStatus = 'success';
+      m.redraw();
     }
   }
 

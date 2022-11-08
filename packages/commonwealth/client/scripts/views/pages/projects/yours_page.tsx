@@ -2,12 +2,12 @@
 import 'pages/projects/index.scss';
 
 import m from 'mithril';
-import { Project } from 'models';
 import app from 'state';
-import { Spinner } from 'construct-ui';
+
+import { Project } from 'models';
 import ProjectCard from './project_card/index';
 import { ProjectCardSize } from './types';
-import { PageLoading } from '../loading';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export default class YoursPage
   implements m.ClassComponent<{ currentBlockNum: number }>
@@ -62,8 +62,9 @@ export default class YoursPage
       m.route.set(`/projects/explore`);
       return;
     }
+
     if (!app.projects.initialized()) {
-      return <PageLoading />;
+      return <CWSpinner />;
     }
 
     const userProjects = this.getActiveProjects(

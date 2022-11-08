@@ -52,6 +52,7 @@ export default class ProjectsController {
     chainId?: string;
   }) {
     const { projectId, chainId } = params;
+    console.log({ project_id: projectId, chain_id: chainId });
     const res = await $.get(`${this._app.serverUrl()}/getProjects`, {
       project_id: projectId,
       chain_id: chainId,
@@ -88,6 +89,7 @@ export default class ProjectsController {
       this._initializing = false;
       return;
     }
+    console.log(this._factoryInfo);
 
     // load all projects from server
     try {
@@ -151,16 +153,16 @@ export default class ProjectsController {
     } catch (err) {
       throw new Error(`Failed to pin IPFS blob: ${err.message}`);
     }
+    console.log(this._factoryInfo);
 
     // instantiate contract (TODO: additional validation, or do this earlier)
-    console.log(this._factoryInfo.node);
     const contract = await attachSigner(
       this._app.wallets,
       creator,
       null,
       this._factoryInfo.node,
-      ICuratedProjectFactory__factory.connect,
-      this._factoryInfo.address
+      ICuratedProjectFactory__factory.connect
+      // this._factoryInfo.address
     );
 
     const projectId = await contract.numProjects();
