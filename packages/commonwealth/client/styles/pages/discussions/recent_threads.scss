@@ -34,7 +34,10 @@ $size: 48px;
 }
 
 .RecentThreads {
+  display: flex;
+  flex-direction: column;
   padding: 0 24px;
+  width: 100%;
 
   .listing-scroll {
     align-items: center;

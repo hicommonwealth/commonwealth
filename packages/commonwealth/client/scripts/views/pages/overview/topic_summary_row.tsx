@@ -126,11 +126,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                   >
                     {thread.title}
                   </CWText>
-                  <CWText
-                    className="comment-preview-text"
-                    type="caption"
-                    noWrap
-                  >
+                  <CWText type="caption" noWrap>
                     {renderQuillTextBody(thread.body, {
                       hideFormatting: true,
                       collapse: true,

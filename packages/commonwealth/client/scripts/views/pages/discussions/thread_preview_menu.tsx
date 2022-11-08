@@ -196,7 +196,7 @@ export class ThreadPreviewMenu implements m.ClassComponent<{ thread: Thread }> {
                 ]
               : []),
           ]}
-          trigger={<CWIconButton iconName="chevronDown" iconSize="small" />}
+          trigger={<CWIconButton iconName="dotsVertical" iconSize="small" />}
         />
       </div>
     );

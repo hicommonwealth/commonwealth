@@ -2,24 +2,24 @@ import moment from 'moment';
 
 import { Thread } from 'models';
 
-export const getLastUpdated = (proposal) => {
-  const { lastCommentedOn } = proposal;
+export const getLastUpdated = (thread: Thread) => {
+  const { lastCommentedOn } = thread;
   const lastComment = lastCommentedOn ? Number(lastCommentedOn.utc()) : 0;
-  const createdAt = Number(proposal.createdAt.utc());
+  const createdAt = Number(thread.createdAt.utc());
   const lastUpdate = Math.max(createdAt, lastComment);
   return moment(lastUpdate);
 };
 
-export const isHot = (proposal) => {
+export const isHot = (thread: Thread) => {
   return (
-    moment.duration(moment().diff(getLastUpdated(proposal))).asSeconds() <
+    moment.duration(moment().diff(getLastUpdated(thread))).asSeconds() <
     24 * 60 * 60
   );
 };
 
-export const getLastUpdate = (proposal: Thread): number => {
-  const lastComment = proposal.lastCommentedOn?.unix() || 0;
-  const createdAt = proposal.createdAt?.unix() || 0;
+export const getLastUpdate = (thread: Thread): number => {
+  const lastComment = thread.lastCommentedOn?.unix() || 0;
+  const createdAt = thread.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
   return lastUpdate;
 };

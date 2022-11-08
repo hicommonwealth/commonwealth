@@ -1,4 +1,65 @@
 @import 'shared';
 
 .ThreadPreview {
+  cursor: pointer;
+  display: flex;
+  padding: 16px;
+  width: 100%;
+
+  &:hover {
+    background: $neutral-50;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    .user-and-date-row {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+
+      .User {
+        align-items: center;
+        display: flex;
+
+        .user-avatar {
+          position: unset;
+        }
+
+        .username {
+          @include caption;
+
+          font-weight: 500;
+        }
+      }
+
+      .last-updated-text.Text {
+        color: $neutral-500;
+      }
+    }
+
+    .row-bottom {
+      display: flex;
+      justify-content: space-between;
+
+      .comments-count {
+        align-items: center;
+        display: flex;
+        gap: 4px;
+
+        .Icon,
+        .Text {
+          color: $neutral-500;
+        }
+      }
+
+      .row-bottom-menu {
+        display: flex;
+        gap: 16px;
+      }
+    }
+  }
 }

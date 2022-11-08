@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
 import m from 'mithril';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { PageLoading } from './loading';
 
 class DiscussionsRedirect implements m.ClassComponent {
