@@ -102,16 +102,19 @@ export class RabbitMQController {
             ackOrNack();
           })
           .catch((e) => {
-            this.rollbar?.warn(`Failed to process message: ${JSON.stringify(content)}`, e)
+            const errorMsg = `Failed to process message: ${JSON.stringify(content)} with processor function ${messageProcessor.name} and context ${JSON.stringify(msgProcessorContext)}`
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {
               log.error(`Invalid Message Format Error`, e);
+              this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e)
+
               ackOrNack(e, {strategy: 'nack'});
             }
             else {
               // TODO: test republish strategy
               log.error(`Unknown Error`, e)
+              this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e)
               ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
             }
 
