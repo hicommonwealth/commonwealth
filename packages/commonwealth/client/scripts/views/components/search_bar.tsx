@@ -10,7 +10,6 @@ import {
   Input,
   List,
   ListItem,
-  Spinner,
   Button,
   Size,
   Tag,
@@ -26,6 +25,7 @@ import { SearchContentType } from 'types';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
 import { renderQuillTextBody } from './quill/helpers';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 const getMemberPreview = (
   addr,
@@ -602,7 +602,7 @@ export class SearchBar implements m.Component {
           ) : this.isTyping ? (
             <ListItem
               class="disabled upper-border"
-              label={<Spinner active={true} />}
+              label={<CWSpinner size="small" />}
             />
           ) : (
             <ListItem
@@ -613,7 +613,7 @@ export class SearchBar implements m.Component {
         ) : this.isTyping ? (
           <ListItem
             class="disabled upper-border"
-            label={<Spinner active={true} />}
+            label={<CWSpinner size="small" />}
           />
         ) : (
           results

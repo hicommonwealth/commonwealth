@@ -1,5 +1,4 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { RLPEncodedTransaction, TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import Account from './Account';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
@@ -9,13 +8,12 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabled: boolean;
   enabling: boolean;
   accounts: readonly AccountT[];
+  api: any;
   enable: () => Promise<void>;
   validateWithAccount: (
     account: Account,
     walletSignature: string
   ) => Promise<void>; // TODO add optional parameter: Function Callback
-  contractCall?: (tx: TransactionConfig) => Promise<string>;
-  sendTransaction?: (tx: TransactionConfig) => Promise<TransactionReceipt>;
   signWithAccount: (account: Account) => Promise<string>;
   chain: ChainBase;
   defaultNetwork: ChainNetwork;

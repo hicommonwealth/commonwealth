@@ -96,9 +96,10 @@ class GeneralContractPage
       try {
         // initialize daoFactory Controller
         const ethChain = app.chain.chain as EthereumChain;
+        const web3 = await ethChain._initApi(app.chain.meta.node);
 
         this.generalContractsController = new GeneralContractsController(
-          ethChain,
+          web3,
           contract
         );
 
