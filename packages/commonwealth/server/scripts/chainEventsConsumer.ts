@@ -10,7 +10,11 @@ import UserFlagsHandler from '../eventHandlers/userFlags';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import {ChainBase} from 'common-common/src/types';
 import {factory, formatFilename} from 'common-common/src/logging';
-import {getRabbitMQConfig, RabbitMQController, RascalSubscriptions} from 'common-common/src/rabbitmq';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalSubscriptions, RmqCWEvent,
+} from 'common-common/src/rabbitmq';
 import models from '../database';
 import {RABBITMQ_URI} from "../config";
 
@@ -76,6 +80,10 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
+    if (!RmqCWEvent.isValidMsgFormat(event)) {
+      throw RmqCWEvent.getInvalidFormatError(event);
+    }
+
     let prevResult = null;
     for (const handler of allChainEventHandlers) {
       try {

@@ -41,7 +41,7 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
 
   const queueOptions = {
     'x-dead-letter-exchange': RascalExchanges.DeadLetter,
-    'dead-letter-routing-key': RascalRoutingKeys.DeadLetter
+    'x-dead-letter-routing-key': RascalRoutingKeys.DeadLetter
   }
 
   const subscriptionConfig = {
@@ -89,17 +89,25 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
         'queues': {
           [RascalQueues.ChainEvents]: {
             ...queueConfig,
-            'options': queueOptions
+            'options': {
+              'arguments': {
+                ...queueOptions
+              }
+            }
           },
           [RascalQueues.SubstrateIdentityEvents]: {
             ...queueConfig,
-            'options': queueOptions
+            'options': {
+              'arguments': {
+                ...queueOptions
+              }
+            }
           },
           [RascalQueues.ChainEventNotifications]: {
             ...queueConfig,
             'options': {
-              ...queueOptions,
               "arguments": {
+                ...queueOptions,
                 "x-message-ttl": 600000
               }
             }

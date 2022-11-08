@@ -1,39 +1,30 @@
-import {CWEvent} from "chain-events/src";
-import {ChainEventNotification} from "commonwealth/shared/types";
-import moment from 'moment';
+export * from "./ChainEvents"
+export * from "./ChainEventNotification"
+import {RmqCWEvent} from "common-common/src/rabbitmq/types/ChainEvents";
+import {RmqCENotification} from "common-common/src/rabbitmq/types/ChainEventNotification";
 
+/**
+ * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
+ * will immediately dead-letter the message in question instead of using the requeue strategy.
+ */
 export class RmqMsgFormatError extends Error {
   constructor(msg: string) {
     super(msg);
   }
 }
 
+export interface RmqMsgNamespace<MsgType> {
+  getInvalidFormatError(...args): RmqMsgFormatError,
+  isValidMsgFormat(data: any): data is MsgType,
+}
+
+/**
+ * This type contains ALL the possible RabbitMQ message types. If you are publishing a message to any queue,
+ * anywhere, it MUST be one of these types
+ */
 export type TRmqMessages =
-  | CWEvent
-  | ChainEventNotification
-
-export function isRmqMsgCWEvent(data: any): data is CWEvent {
-  return (
-    typeof data.blockNumber === 'number'
-    && data.data
-    && data.network && typeof data.network === 'string'
-  );
-}
-
-export function isRmqMsgCENotification(data: any): data is ChainEventNotification {
-  return (
-    data.id && typeof data.id === 'string'
-    && data.notification_data && typeof data.notification_data === 'string'
-    && data.chain_event_id && typeof data.chain_event_id === 'string'
-    && data.category_id === 'chain-event'
-    && data.chain_id && typeof data.chain_id === 'string'
-    && moment.isMoment(data.updated_at)
-    && moment.isMoment(data.created_at)
-    && data.ChainEvent
-    && typeof data.ChainEvent.chain_event_type_id === 'string'
-    && typeof data.ChainEvent.block_number === 'string'
-  );
-}
+  | RmqCWEvent.RmqMsgType
+  | RmqCENotification.RmqMsgType
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',

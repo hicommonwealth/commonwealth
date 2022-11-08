@@ -12,7 +12,8 @@
   "keywords": [],
   "scripts": {
     "build-contracts": "cd src/eth && npx hardhat compile",
-    "check-types": "tsc --noEmit && tsc --project tsconfig.json --noEmit"
+    "check-types": "tsc --noEmit && tsc --project tsconfig.json --noEmit",
+    "publish-rmq-msg": "ts-node --project tsconfig.json src/rabbitmq/scripts/publishRmqMessage.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

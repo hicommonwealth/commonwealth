@@ -73,6 +73,13 @@ export const RABBITMQ_URI = (() => {
   } else return process.env.CLOUDAMQP_URL;
 })();
 
+export const RABBITMQ_API_URI = (() => {
+  if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT)
+    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`
+  else return 'http://guest:guest@localhost:15672/api'
+})();
+
+
 // if REDIS_URL exists use that (production or local redis instance) otherwise if
 // the Vultr server info is given then use that. Undefined otherwise.
 export const REDIS_URL = process.env.REDIS_URL

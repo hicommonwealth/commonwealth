@@ -96,18 +96,24 @@ export class RabbitMQController {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
-        // TODO: fix error handling - to test run the chain-events subscriber + consumer and then run the main service
-        //  consumer. To test an 'error' change isRmqMsgCreateCENotificationsCUD ChainEvent.id to be 'string' instead of 'number'
         messageProcessor.call({rmqController: this, ...msgProcessorContext}, content)
           .then(() => {
+            console.log("Message Acked")
             ackOrNack();
           })
           .catch((e) => {
             this.rollbar?.warn(`Failed to process message: ${JSON.stringify(content)}`, e)
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
-            if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
-            else ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+            if (e instanceof RmqMsgFormatError) {
+              log.error(`Invalid Message Format Error`, e);
+              ackOrNack(e, {strategy: 'nack'});
+            }
+            else {
+              // TODO: test republish strategy
+              log.error(`Unknown Error`, e)
+              ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+            }
 
           })
       });
