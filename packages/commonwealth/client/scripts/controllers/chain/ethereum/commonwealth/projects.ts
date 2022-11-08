@@ -160,7 +160,7 @@ export default class ProjectsController {
       null,
       this._factoryInfo.node,
       ICuratedProjectFactory__factory.connect,
-      '0x2E66ec77d995F83A97F904c92C980E22495d002c'
+      '0x9f20ed5f919dc1c1695042542c13adcfc100dcab'
     );
 
     const projectId = await contract.numProjects();
