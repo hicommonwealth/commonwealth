@@ -76,7 +76,7 @@ export class AddressInputTypeahead
             label={
               <div class="item-container">
                 {m(User, {
-                  user: new AddressInfo(null, item.address, item.chain, null),
+                  user: new AddressInfo(null, item.address, item.chain),
                   avatarOnly: true,
                   avatarSize: 18,
                 })}

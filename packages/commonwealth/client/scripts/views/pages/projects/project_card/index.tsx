@@ -9,7 +9,7 @@ import { Project } from 'models';
 import { ProjectStatus } from '../types';
 import CompletionBar from '../project_completion_bar';
 import { HeaderPanel } from './header_panel';
-import { InfoPanel } from './information_panel';
+import { InformationPanel } from './information_panel';
 
 interface ProjectCardAttrs {
   project: Project;
@@ -37,11 +37,7 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
           completionPercent={project.completionPercent}
           projectStatus={projectStatus}
         />
-        <InfoPanel
-          project={project}
-          avatarSize={16}
-          projectStatus={projectStatus}
-        />
+        <InformationPanel project={project} projectStatus={projectStatus} />
       </div>
     );
   }

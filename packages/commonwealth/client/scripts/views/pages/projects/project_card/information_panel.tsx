@@ -4,26 +4,27 @@ import m from 'mithril';
 import app from 'state';
 import _ from 'lodash';
 
-import { ChainInfo, Project } from 'models';
+import { AddressInfo, ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { AnonymousUser } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import { Tag } from 'construct-ui';
 import { ProjectStatus } from '../types';
 
-interface InfoPanelAttrs {
+interface InformationPanelAttrs {
   project: Project;
-  avatarSize: number;
   projectStatus: ProjectStatus;
 }
 
-export class InfoPanel implements m.ClassComponent<InfoPanelAttrs> {
-  view(vnode: m.Vnode<InfoPanelAttrs>) {
-    const { project, projectStatus, avatarSize } = vnode.attrs;
+export class InformationPanel
+  implements m.ClassComponent<InformationPanelAttrs>
+{
+  view(vnode: m.Vnode<InformationPanelAttrs>) {
+    const { project, projectStatus } = vnode.attrs;
     const projectChain: ChainInfo = app.config.chains.getById(project.chainId);
     return (
-      <div class="InfoPanel">
+      <div class="InformationPanel">
         <div class="funding-data">
           <Tag
             intent="none"
@@ -60,9 +61,12 @@ export class InfoPanel implements m.ClassComponent<InfoPanelAttrs> {
         </div>
         <div class="beneficiary-data">
           {/* // TODO: Make real user */}
-          {m(AnonymousUser, {
-            avatarSize,
-            distinguishingKey: '123',
+          {m(User, {
+            user: new AddressInfo(
+              project.creatorAddressId,
+              project.creatorAddressInfo.address,
+              project.creatorAddressInfo.chain.id
+            ),
           })}
           {project.chainId && (
             <Tag
