@@ -7,6 +7,7 @@ import 'pages/create_community.scss';
 
 import app from 'state';
 import {
+  BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
@@ -150,7 +151,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             try {
               const res = await app.contracts.add(
                 app.activeChainId(),
-                ChainBase.Ethereum,
+                BalanceType.Ethereum,
                 chain_node_id,
                 nodeUrl,
                 address,
@@ -168,7 +169,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || `Creating new contract with community ${app.activeChainId()} failed`
+                err.responseJSON?.error ||
+                  `Creating new contract with community ${app.activeChainId()} failed`
               );
             } finally {
               this.state.saving = false;
