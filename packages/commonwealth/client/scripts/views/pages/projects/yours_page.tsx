@@ -7,8 +7,9 @@ import app from 'state';
 import { Spinner } from 'construct-ui';
 import ProjectCard from './project_card/index';
 import { ProjectCardSize } from './types';
+import { PageLoading } from '../loading';
 
-export default class YourPage
+export default class YoursPage
   implements m.ClassComponent<{ currentBlockNum: number }>
 {
   // TODO v2: These counts will be used for pagination or scroll
@@ -62,11 +63,7 @@ export default class YourPage
       return;
     }
     if (!app.projects.initialized()) {
-      return (
-        <div class="YourPage">
-          <Spinner active={true} fill={true} size="xl" />
-        </div>
-      );
+      return <PageLoading />;
     }
 
     const userProjects = this.getActiveProjects(
@@ -75,10 +72,8 @@ export default class YourPage
       <ProjectCard project={project} size={ProjectCardSize.Large} />
     ));
 
-    // web3.eth.getBlock().then(());
-
     return (
-      <div class="YourPage">
+      <div class="YoursPage">
         <div class="projects-listing">{userProjects}</div>
       </div>
     );

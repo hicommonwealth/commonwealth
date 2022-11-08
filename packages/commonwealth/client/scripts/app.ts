@@ -670,9 +670,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               hideSidebar: true,
             }),
+            '/projects/yours': importRoute('views/pages/projects/index.tsx', {
+              scoped: true,
+              hideSidebar: true,
+            }),
             '/:scope/projects/explore': redirectRoute(
               () => `/projects/explore`
             ),
+            '/:scope/projects/yours': redirectRoute(() => `/projects/yours`),
             '/projects': redirectRoute(() => `/projects/explore`),
             '/:scope/projects': redirectRoute(() => `/projects/explore`),
 
@@ -925,6 +930,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               hideSidebar: true,
             }),
             '/:scope/projects/explore': importRoute(
+              'views/pages/projects/index.tsx',
+              {
+                scoped: true,
+                hideSidebar: true,
+              }
+            ),
+            '/projects/yours': importRoute('views/pages/projects/index.tsx', {
+              scoped: false,
+              hideSidebar: true,
+            }),
+            '/:scope/projects/yours': importRoute(
               'views/pages/projects/index.tsx',
               {
                 scoped: true,

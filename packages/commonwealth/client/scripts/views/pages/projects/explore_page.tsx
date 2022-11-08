@@ -2,20 +2,17 @@
 
 import m from 'mithril';
 import app from 'state';
-import { Spinner } from 'construct-ui';
 import ProjectCard from './project_card/index';
+import { PageLoading } from '../loading';
 
 export default class ExplorePage
   implements m.ClassComponent<{ currentBlockNum: number }>
 {
   view(vnode) {
     const { currentBlockNum } = vnode.attrs;
+
     if (!app.projects.initialized()) {
-      return (
-        <div class="ExplorePage">
-          <Spinner active={true} fill={true} size="xl" />
-        </div>
-      );
+      return <PageLoading />;
     }
     const exploreProjects = app.projects.store
       .getAll()

@@ -4,23 +4,18 @@ import 'pages/projects/index.scss';
 import m from 'mithril';
 import app from 'state';
 import Web3 from 'web3';
-import { TabItem, Tabs } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ChainNetwork } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
-import YourPage from './your_page';
+import YoursPage from './yours_page';
 import { getUserEthChains } from './helpers';
-
-enum ProjectListingSubpage {
-  Explore = 'explore',
-  Yours = 'yours',
-}
+import { PageLoading } from '../loading';
 
 export default class ProjectListing implements m.ClassComponent {
-  private subpage: ProjectListingSubpage;
   private web3Initialized: boolean;
   private web3: Web3;
   private currentBlockNum: number;
@@ -43,13 +38,16 @@ export default class ProjectListing implements m.ClassComponent {
     this.currentBlockNum = await this.web3.eth.getBlockNumber();
   }
 
-  view(vnode) {
-    const { subpage } = vnode.attrs;
-    if (!app) return;
+  view() {
+    if (!app) return <PageLoading />;
 
-    const onExplore = subpage !== ProjectListingSubpage.Yours;
-    if (!app.isLoggedIn() && !onExplore) {
+    const onExplorePage = m.route.get().includes('/explore');
+    const onYoursPage = m.route.get().includes('/yours');
+    const redirectToExplore =
+      (!onExplorePage && !onYoursPage) || (onYoursPage && !app.isLoggedIn);
+    if (redirectToExplore) {
       m.route.set('/projects/explore');
+      return;
     }
 
     if (!this.web3Initialized) {
@@ -76,47 +74,50 @@ export default class ProjectListing implements m.ClassComponent {
         <div class="ProjectListing">
           <div class="listing-header">
             <CWText type="h1">Crowdfunding</CWText>
-            <Tabs align="left" bordered={false} fluid={true}>
-              <TabItem
+            <CWTabBar align="left" bordered={false} fluid={true}>
+              <CWTab
                 label={[
                   <CWText type="h5" fontWeight="semibold">
                     Explore
                   </CWText>,
                 ]}
-                active={subpage === ProjectListingSubpage.Explore}
+                isSelected={onExplorePage}
                 onclick={() => {
-                  m.route.set(`/projects/${ProjectListingSubpage.Explore}`);
+                  m.route.set('/projects/explore');
                   m.redraw();
                 }}
               />
-              <TabItem
+              <CWTab
                 label={[
                   <CWText type="h5" fontWeight="semibold">
                     Your Projects
                   </CWText>,
                 ]}
-                active={subpage === ProjectListingSubpage.Yours}
+                disabled={!app.isLoggedIn()}
+                isSelected={onYoursPage}
                 onclick={() => {
-                  if (!app.user) {
+                  if (!app.isLoggedIn()) {
                     notifyInfo(
                       'Log in or create an account for user dashboard.'
                     );
+                    return;
                   }
-                  m.route.set(`/projects/${ProjectListingSubpage.Yours}`);
+                  m.route.set('/projects/yours');
                   m.redraw();
                 }}
               />
-            </Tabs>
+            </CWTabBar>
             <CWButton
+              disabled={!app.isLoggedIn()}
               label="Create Project"
               onclick={() => m.route.set(`/${defaultProjectChain}/new/project`)}
             />
           </div>
           <div class="listing-body">
-            {onExplore ? (
+            {onExplorePage ? (
               <ExplorePage currentBlockNum={this.currentBlockNum} />
             ) : (
-              <YourPage currentBlockNum={this.currentBlockNum} />
+              <YoursPage currentBlockNum={this.currentBlockNum} />
             )}
           </div>
         </div>
