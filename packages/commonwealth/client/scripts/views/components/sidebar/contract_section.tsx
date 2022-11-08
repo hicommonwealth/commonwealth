@@ -21,7 +21,7 @@ export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
     const showContractsOptions = app.chain?.base === ChainBase.Ethereum;
 
     this.contracts = app.contracts.getCommunityContracts();
-    if (this.contracts.length > 0) {
+    if (this.contracts) {
       this.loaded = true;
     } else {
       this.loaded = false;
