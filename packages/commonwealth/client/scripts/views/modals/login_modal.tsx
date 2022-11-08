@@ -239,9 +239,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const signature = await this.selectedWallet.signWithAccount(
-              account
-            );
+            const signature = await this.selectedWallet.signWithAccount(account);
             this.cashedWalletSignature = signature;
           } catch (e) {
             console.log(e);
@@ -290,11 +288,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const performLinkingCallback = async () => {
       try {
         const signature = await this.selectedLinkingWallet.signWithAccount(
-          this.secondaryLinkAccount
+          this.secondaryLinkAccount,
         );
         await this.selectedLinkingWallet.validateWithAccount(
           this.secondaryLinkAccount,
-          signature
+          signature,
         );
         await this.selectedWallet.validateWithAccount(
           this.primaryAccount,
