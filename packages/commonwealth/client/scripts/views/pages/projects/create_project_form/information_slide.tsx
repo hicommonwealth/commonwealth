@@ -4,6 +4,7 @@ import _ from 'lodash';
 import m from 'mithril';
 
 import { Account, ChainInfo } from 'models';
+import { setActiveAccount } from 'controllers/app/login';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
 import { CWDropdown } from '../../../components/component_kit/cw_dropdown';
 import { CWText } from '../../../components/component_kit/cw_text';
@@ -66,28 +67,7 @@ export class InformationSlide
               return { label: chain.name, disabled };
             }) as DefaultMenuItem[]
           }
-          customFilter={(item: DefaultMenuItem, query: string) => {
-            const matchingChains: string[] = allEthChains
-              .filter(
-                (c: ChainInfo) =>
-                  c.id.toLowerCase().includes(query.toLowerCase()) ||
-                  c.name.toLowerCase().includes(query.toLowerCase())
-              )
-              .map((c: ChainInfo) => c.name);
-            return matchingChains.includes(item.label);
-          }}
           defaultActiveIndex={defaultChainIdx}
-          inputValidationFn={(val: string) => {
-            const userChain = userEthChains.find(
-              (c: ChainInfo) => c.name.toLowerCase() === val.toLowerCase()
-            );
-            if (!userChain) {
-              return ['failure', 'User is not part of this community'];
-            } else {
-              m.route.set(`/${userChain.id}/new/project`);
-              return ['success', null];
-            }
-          }}
           label="Chain"
           onSelect={(label: string) => {
             const chain: ChainInfo = app.config.chains
@@ -97,8 +77,7 @@ export class InformationSlide
               m.route.set(`/${chain.id}/new/project`);
             }
           }}
-          searchable={true}
-          validateWhileTyping={false}
+          uniqueId="chain-selector"
         />
         <CWDropdown
           defaultMenuItems={
@@ -106,28 +85,15 @@ export class InformationSlide
               return { label: acc.address };
             }) as DefaultMenuItem[]
           }
-          customFilter={(item: DefaultMenuItem, query: string) => {
-            const matchingAccounts: string[] = chainAccounts
-              .filter(
-                (a: Account) =>
-                  a.address.includes(query) ||
-                  a.profile?.displayName.includes(query)
-              )
-              .map((a: Account) => a.address);
-            return matchingAccounts.includes(item.label);
-          }}
-          inputValidationFn={(val: string) =>
-            validateProjectForm('creator', val)
-          }
           label="Creator address"
           onSelect={(label: string) => {
             const selectedAccount = chainAccounts.find(
               (a) => a.address === label
             );
-            app.user.setActiveAccounts([selectedAccount]);
+            setActiveAccount(selectedAccount);
             vnode.attrs.form.creator === selectedAccount.address;
           }}
-          searchable={true}
+          uniqueId="creator-address-selector"
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project"

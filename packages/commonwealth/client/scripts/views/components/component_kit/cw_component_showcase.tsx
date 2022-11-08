@@ -396,8 +396,9 @@ export class ComponentShowcase implements m.ClassComponent {
             onSelect={(optionLabel: string) =>
               notifySuccess(`Selected option: ${optionLabel}`)
             }
+            uniqueId="component-kit"
           />
-          <CWDropdown
+          {/* <CWDropdown
             defaultMenuItems={[
               { label: 'Dropdown Option 1' },
               { label: 'Dropdown Option 2' },
@@ -415,7 +416,7 @@ export class ComponentShowcase implements m.ClassComponent {
               notifySuccess(`Selected option: ${optionLabel}`)
             }
             searchable={true}
-          />
+          /> */}
           <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {
               notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
