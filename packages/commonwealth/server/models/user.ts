@@ -20,7 +20,7 @@ export type UserAttributes = {
   lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
-  selected_chain_id?: number;
+  selected_chain_id?: number | null;
   created_at?: Date;
   updated_at?: Date;
 

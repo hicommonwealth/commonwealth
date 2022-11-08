@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
+import { WalletId } from 'common-common/src/types';
 import { ModelStatic, ModelInstance } from './types';
 import { ChainAttributes, ChainInstance } from './chain';
 import { UserAttributes, UserInstance } from './user';
@@ -7,10 +8,12 @@ import {
   OffchainProfileAttributes,
   OffchainProfileInstance,
 } from './offchain_profile';
-import { RoleAttributes, RoleInstance } from './role';
 import { ProfileInstance } from './profile';
 import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import { WalletId } from 'common-common/src/types';
+import {
+  RoleAssignmentAttributes,
+  RoleAssignmentInstance,
+} from './role_assignment';
 
 export type AddressAttributes = {
   address: string;
@@ -20,6 +23,7 @@ export type AddressAttributes = {
   verification_token_expires?: Date;
   verified?: Date;
   keytype?: string;
+  block_info?: string;
   name?: string;
   last_active?: Date;
   created_at?: Date;
@@ -34,7 +38,7 @@ export type AddressAttributes = {
   Chain?: ChainAttributes;
   User?: UserAttributes;
   OffchainProfile?: OffchainProfileAttributes;
-  Roles?: RoleAttributes[];
+  RoleAssignments?: RoleAssignmentAttributes[];
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -45,7 +49,7 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-  getRoles: Sequelize.HasManyGetAssociationsMixin<RoleInstance>;
+  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -87,6 +91,7 @@ export default (
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
       wallet_id: { type: dataTypes.STRING, allowNull: true },
+      block_info: { type: dataTypes.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -104,6 +109,7 @@ export default (
           exclude: [
             'verification_token',
             'verification_token_expires',
+            'block_info',
             'created_at',
             'updated_at',
           ],
@@ -130,8 +136,7 @@ export default (
     });
     models.Address.hasOne(models.OffchainProfile);
     models.Address.hasOne(models.SsoToken);
-    models.Address.hasMany(models.IpfsPins);
-    models.Address.hasMany(models.Role, { foreignKey: 'address_id' });
+    models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
     models.Address.belongsToMany(models.Thread, {
       through: models.Collaboration,
       as: 'collaboration',

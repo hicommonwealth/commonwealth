@@ -19,6 +19,7 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
+import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
@@ -75,6 +76,7 @@ export interface IApp {
   roles: RolesController;
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
+  sessions: SessionsController;
 
   // Web3
   wallets: WebWalletController;
@@ -164,6 +166,7 @@ const app: IApp = {
   roles,
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
+  sessions: new SessionsController(),
 
   toasts: getToastStore(),
   modals: getModalStore(),

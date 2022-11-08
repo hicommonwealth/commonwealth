@@ -1,6 +1,7 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import Account from './Account';
 import NodeInfo from './NodeInfo';
+import BlockInfo from './BlockInfo';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
@@ -9,13 +10,16 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabled: boolean;
   enabling: boolean;
   accounts: readonly AccountT[];
+
+  enable: () => Promise<void>;
+  reset?: () => Promise<void>;
+  getRecentBlock?: () => Promise<BlockInfo>;
+
   signWithAccount: (account: Account) => Promise<string>;
   validateWithAccount: (
     account: Account,
     walletSignature: string
   ) => Promise<void>;
-  enable: (node?: NodeInfo) => Promise<void>;
-  reset?: () => Promise<void>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;

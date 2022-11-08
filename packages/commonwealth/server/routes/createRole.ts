@@ -1,9 +1,10 @@
 import Sequelize from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { NotificationCategories } from 'common-common/src/types';
+import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
+import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -33,10 +34,7 @@ const createRole = async (
   });
   if (!validAddress) return next(new AppError(Errors.InvalidAddress));
 
-  const [ role ] = await models.Role.findOrCreate({ where: {
-    address_id: validAddress.id,
-    chain_id: chain.id,
-  }});
+  const role = await _createRole(models, validAddress.id, chain.id);
 
   const [ subscription ] = await models.Subscription.findOrCreate({
     where: {

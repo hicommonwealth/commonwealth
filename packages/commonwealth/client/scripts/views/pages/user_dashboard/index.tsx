@@ -3,7 +3,6 @@
 import m from 'mithril';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard/index.scss';
 
@@ -16,6 +15,7 @@ import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { UserDashboardRow } from './user_dashboard_row';
 import { fetchActivity, notificationsRemaining } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -186,7 +186,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                   }}
                 />
               </CWTabBar>
-              {loadingData && <Spinner active />}
+              {loadingData && <CWSpinner />}
             </div>
             {!loadingData && (
               <>
@@ -200,7 +200,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {notificationsRemaining(
                           fyNotifications.length,
                           this.fyCount
-                        ) && <Spinner active />}
+                        ) && <CWSpinner />}
                       </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
@@ -218,7 +218,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                       {notificationsRemaining(
                         globalNotifications.length,
                         this.globalCount
-                      ) && <Spinner active />}
+                      ) && <CWSpinner />}
                     </>
                   ) : (
                     <CWText>No Activity</CWText>
@@ -236,7 +236,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {notificationsRemaining(
                           chainEvents.length,
                           this.chainEventCount
-                        ) && <Spinner active />}
+                        ) && <CWSpinner />}
                       </>
                     ) : (
                       <CWText>
