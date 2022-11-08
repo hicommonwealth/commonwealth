@@ -14,9 +14,6 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
 
-  signWithAccount: (account: Account) => Promise<string>;
-  validateWithAccount: (account: Account, walletSignature: string) => Promise<void>;
-
   getChainId(): any;
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 

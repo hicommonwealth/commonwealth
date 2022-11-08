@@ -1479,10 +1479,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@canvas-js/interfaces@0.0.17-alpha2":
-  version "0.0.17-alpha2"
-  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.0.17-alpha2.tgz#6fbd0af2e6c82fa07c6296317fa154dce83b76d9"
-  integrity sha512-RIADp8JZkGUXsDiBPWYUt44BzLGIJyCsJ/DcFMvhJ9cCEvmNSdD466rX5GfIztYk7aSwDqpu8UabLaGLElwBaA==
+"@canvas-js/interfaces@0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.0.18.tgz#d6e0bd9931517f82e979f17beeaa8fb78cc639c9"
+  integrity sha512-k6+F7J/YuyOGYEjE9mIuTrAkVZ00PGhFsh01GA+xFC9P65/U1jwfc11CWueBRZIVV4QoqvPl20DonROppvU6cw==
   dependencies:
     "@ethersproject/abstract-signer" "^5.6.2"
     "@ethersproject/wallet" "^5.6.2"
