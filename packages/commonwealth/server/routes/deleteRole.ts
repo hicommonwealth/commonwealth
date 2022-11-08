@@ -1,8 +1,8 @@
 import Sequelize from 'sequelize';
-import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain, { ValidateChainParams } from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError } from '../util/errors';
+import { success, TypedRequestBody, TypedResponse } from '../types';
 import { findOneRole } from '../util/roles';
 
 export const Errors = {
@@ -12,16 +12,21 @@ export const Errors = {
   OtherAdminDNE: 'Must assign another admin',
 };
 
+type DeleteRoleReq = {
+  address_id: number,
+} & ValidateChainParams;
+
+type DeleteRoleResp = Record<string, never>;
+
 const deleteRole = async (
   models: DB,
-  req,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestBody<DeleteRoleReq>,
+  res: TypedResponse<DeleteRoleResp>
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
+  if (error) throw new AppError(error);
+  if (!req.user) throw new AppError(Errors.NotLoggedIn);
+  if (!req.body.address_id) throw new AppError(Errors.InvalidAddress);
 
   const validAddress = await models.Address.findOne({
     where: {
@@ -30,13 +35,13 @@ const deleteRole = async (
       verified: { [Sequelize.Op.ne]: null },
     },
   });
-  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
+  if (!validAddress) throw new AppError(Errors.InvalidAddress);
   const existingRole = await findOneRole(
     models,
     { where: { address_id: req.body.address_id } },
     chain.id
   );
-  if (!existingRole) return next(new AppError(Errors.RoleDNE));
+  if (!existingRole) throw new AppError(Errors.RoleDNE);
 
   if (existingRole.permission === 'admin') {
     const otherExistingAdmin = await findOneRole(
@@ -50,7 +55,7 @@ const deleteRole = async (
       chain.id,
       ['admin']
     );
-    if (!otherExistingAdmin) return next(new AppError(Errors.OtherAdminDNE));
+    if (!otherExistingAdmin) throw new AppError(Errors.OtherAdminDNE);
   }
 
   // Destroy all role assignments associated with the existing role and chain id and address provided
@@ -61,7 +66,7 @@ const deleteRole = async (
     }
   });
 
-  return res.json({ status: 'Success' });
+  return success(res, {});
 };
 
 export default deleteRole;
