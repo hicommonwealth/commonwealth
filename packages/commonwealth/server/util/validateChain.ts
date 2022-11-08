@@ -8,10 +8,15 @@ export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
 };
 
+export type ValidateChainParams = {
+  chain?: string;
+  chain_id?: string;
+};
+
 // sequelize 5.0 does not accept undefined key in where clause
 const validateChain = async (
   models: DB,
-  params: { chain?: string; chain_id?: string }
+  params: ValidateChainParams
 ): Promise<[ChainInstance, string]> => {
   const chain_id = params.chain || params.chain_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
