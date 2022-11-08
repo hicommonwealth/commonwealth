@@ -41,7 +41,7 @@ export class CWWalletOptionRow
         )}
         onclick={onclick}
       >
-        <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
+        <CWCustomIcon size={16} iconName={walletName} iconSize="large" />
         <CWText
           type="h5"
           fontWeight="semiBold"

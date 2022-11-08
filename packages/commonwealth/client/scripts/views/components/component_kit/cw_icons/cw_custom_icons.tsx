@@ -390,9 +390,10 @@ export const CWTerraStation2: m.Component<CustomIconAttrs> = {
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
-        height="32"
+        height="32" 
         fill="none"
-        viewBox="0 0 32 32"
+        transform="scale(0.5)"
+        viewBox="0 0 64 64"
         {...domAttrs}
       >
         <path fill="#FFF" d="M0 0h64v64H0z" opacity="0"/>
