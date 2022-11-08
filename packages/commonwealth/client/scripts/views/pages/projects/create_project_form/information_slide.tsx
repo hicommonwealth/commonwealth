@@ -143,6 +143,7 @@ export class InformationSlide
           value={vnode.attrs.form.shortDescription}
         />
         <CWCoverImageUploader
+          defaultBackground={vnode.attrs.form.coverImage}
           headerText="Cover Image"
           subheaderText="Use an image that helps people connect with your crowdfund right away"
           uploadCompleteCallback={(imageURL: string) => {

@@ -13,6 +13,7 @@ import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 
 type ICWCoverImageUploaderAttrs = {
+  defaultBackground?: string;
   headerText?: string;
   subheaderText?: string;
   uploadCompleteCallback: CallableFunction;
@@ -122,6 +123,12 @@ export default class CWCoverImageUploader
 
     pseudoInput.addEventListener('change', pseudoInputHandler);
     attachZone.addEventListener('click', clickHandler);
+
+    if (vnode.attrs.defaultBackground) {
+      console.log(vnode.attrs.defaultBackground);
+      this.imageURL = vnode.attrs.defaultBackground;
+      this.uploadStatus = 'success';
+    }
   }
 
   view(vnode: VnodeDOM<ICWCoverImageUploaderAttrs, this>) {
