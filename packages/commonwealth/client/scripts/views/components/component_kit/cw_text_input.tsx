@@ -40,7 +40,6 @@ export type TextInputAttrs = {
   placeholder?: string;
   required?: boolean;
   tabindex?: number;
-  validateWhileTyping?: boolean;
   value?: string;
 } & InputStyleAttrs;
 
@@ -116,8 +115,6 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       value,
     } = vnode.attrs;
 
-    const validateWhileTyping = vnode.attrs.validateWhileTyping ?? true;
-
     return (
       <div
         class={getClasses<{
@@ -161,9 +158,9 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             placeholder={placeholder}
             required={required}
             oninput={(e) => {
-              _.debounce(() => {
-                if (oninput) oninput(e);
-              }, 250)();
+              if (oninput) oninput(e);
+              // _.debounce(() => {
+              // }, 250)();
 
               const inputLength = e.target.value?.length;
               if (inputLength === 0) {
@@ -178,11 +175,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
                 const timeout = inputLength > 3 ? 250 : 1000;
                 this.inputTimeout = setTimeout(() => {
                   this.isTyping = false;
-                  if (
-                    inputValidationFn &&
-                    validateWhileTyping &&
-                    inputLength > 0
-                  ) {
+                  if (inputValidationFn && inputLength > 3) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
                     m.redraw();
