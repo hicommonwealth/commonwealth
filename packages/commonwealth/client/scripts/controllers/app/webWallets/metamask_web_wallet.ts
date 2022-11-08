@@ -21,6 +21,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public readonly label = 'Metamask';
   public readonly defaultNetwork = ChainNetwork.Ethereum;
   public readonly chain = ChainBase.Ethereum;
+  public readonly showMobile = true;
 
   public get available() {
     return !!window.ethereum;

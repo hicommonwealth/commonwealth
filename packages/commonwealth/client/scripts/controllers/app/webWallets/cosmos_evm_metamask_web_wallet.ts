@@ -31,6 +31,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Injective;
   public readonly specificChains = ['injective', 'evmos'];
+  public readonly showMobile = true;
 
   public get available() {
     return !!window.ethereum;

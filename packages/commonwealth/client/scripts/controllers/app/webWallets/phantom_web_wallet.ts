@@ -13,6 +13,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   public readonly label = 'Phantom';
   public readonly chain = ChainBase.Solana;
   public readonly defaultNetwork = ChainNetwork.Solana;
+  public readonly showMobile = true;
 
   public get available() {
     return window.solana && window.solana.isPhantom;

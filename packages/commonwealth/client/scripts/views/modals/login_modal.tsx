@@ -54,9 +54,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
+    this.showMobile = isWindowMediumSmallInclusive(window.innerWidth);
+    
     if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
-      this.wallets = app.wallets.availableWallets(chainbase);
+      this.wallets = app.wallets.availableWallets(chainbase, this.showMobile);
       this.sidebarType = 'communityWalletOptions';
       this.bodyType = 'walletList';
     } else {
@@ -77,7 +79,6 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.bodyType = 'walletList';
     }
 
-    this.showMobile = isWindowMediumSmallInclusive(window.innerWidth);
 
     // Override if initial data is provided (needed for redirecting wallets + CommonBot)
     if (vnode.attrs.initialBody) {

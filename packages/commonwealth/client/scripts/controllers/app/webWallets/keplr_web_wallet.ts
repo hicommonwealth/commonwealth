@@ -28,6 +28,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly showMobile = true;
 
   public get available() {
     return !!window.keplr;

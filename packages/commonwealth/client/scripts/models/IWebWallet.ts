@@ -5,6 +5,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
   label: string;
   available: boolean;
+  showMobile: boolean;
   enabled: boolean;
   enabling: boolean;
   accounts: readonly AccountT[];

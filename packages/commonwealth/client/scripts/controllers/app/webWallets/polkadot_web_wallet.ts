@@ -24,6 +24,7 @@ class PolkadotWebWalletController
   public readonly label = 'polkadot.js';
   public readonly defaultNetwork = ChainNetwork.Edgeware;
   public readonly chain = ChainBase.Substrate;
+  public readonly showMobile = true;
 
   public get available() {
     return isWeb3Injected;

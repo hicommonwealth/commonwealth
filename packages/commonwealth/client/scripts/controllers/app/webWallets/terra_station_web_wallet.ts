@@ -17,6 +17,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Terra;
   public readonly specificChains = ['terra'];
+  public readonly showMobile = false;
 
   public get available() {
     return this._extension.isAvailable;

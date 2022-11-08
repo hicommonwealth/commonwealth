@@ -19,6 +19,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Ethereum;
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Ethereum;
+  public readonly showMobile = true;
 
   public get provider() {
     return this._provider;

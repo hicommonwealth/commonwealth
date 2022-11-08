@@ -26,6 +26,7 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Terra;
   public readonly specificChains = ['terra'];
+  public readonly showMobile = true;
 
   public get enabled() {
     return this.available && this._enabled;
