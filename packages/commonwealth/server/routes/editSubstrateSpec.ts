@@ -5,12 +5,19 @@ import { ChainBase } from 'common-common/src/types';
 import { AppError, ServerError } from '../util/errors';
 
 import testSubstrateSpec from '../util/testSubstrateSpec';
+import { findAllRoles } from '../util/roles';
 
-const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const editSubstrateSpec = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!chain) return next(new AppError('Unknown chain.'));
-  if (chain.base !== ChainBase.Substrate) return next(new AppError('Chain must be substrate'));
+  if (chain.base !== ChainBase.Substrate)
+    return next(new AppError('Chain must be substrate'));
 
   const adminAddress = await models.Address.findOne({
     where: {
@@ -18,14 +25,14 @@ const editSubstrateSpec = async (models: DB, req: Request, res: Response, next: 
       user_id: req.user.id,
     },
   });
-  const requesterIsAdmin = await models.Role.findAll({
-    where: {
-      address_id: adminAddress.id,
-      chain_id: chain.id,
-      permission: ['admin'],
-    },
-  });
-  if (!requesterIsAdmin && !req.user.isAdmin) return next(new AppError('Must be admin to edit'));
+  const requesterIsAdmin = await findAllRoles(
+    models,
+    { where: { address_id: adminAddress.id } },
+    chain.id,
+    ['admin']
+  );
+  if (!requesterIsAdmin && !req.user.isAdmin)
+    return next(new AppError('Must be admin to edit'));
 
   const node = await chain.getChainNode();
   if (!node) return next(new AppError('no chain nodes found'));

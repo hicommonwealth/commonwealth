@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Switch, Input } from 'construct-ui';
 
 import 'components/token_decimal_input.scss';
 
 import { weiToTokens, tokensToWei } from 'helpers';
 import { CWText } from './component_kit/cw_text';
+import { CWTextInput } from './component_kit/cw_text_input';
+import { CWToggle } from './component_kit/cw_toggle';
 
 export class TokenDecimalInput
   implements
@@ -35,8 +36,7 @@ export class TokenDecimalInput
 
     return (
       <div class="TokenDecimalInput">
-        <Input
-          title=""
+        <CWTextInput
           value={this.displayValue}
           // type: 'number',
           oninput={(v) => {
@@ -68,9 +68,9 @@ export class TokenDecimalInput
         />
         {decimals > 0 && (
           <div class="token-settings">
-            <Switch
-              title=""
-              defaultValue={this.isInputInWei}
+            <CWToggle
+              value={this.isInputInWei}
+              checked={!this.isInputInWei}
               onchange={() => {
                 this.isInputInWei = !this.isInputInWei;
                 if (this.isInputInWei) {
@@ -84,7 +84,9 @@ export class TokenDecimalInput
                 }
               }}
             />
-            <CWText>{this.switchCaption}</CWText>
+            <CWText type="caption" className="toggle-caption-text">
+              {this.switchCaption}
+            </CWText>
           </div>
         )}
       </div>
