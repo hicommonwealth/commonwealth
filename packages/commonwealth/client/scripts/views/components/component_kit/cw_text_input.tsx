@@ -159,8 +159,6 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
             required={required}
             oninput={(e) => {
               if (oninput) oninput(e);
-              // _.debounce(() => {
-              // }, 250)();
 
               const inputLength = e.target.value?.length;
               if (inputLength === 0) {
