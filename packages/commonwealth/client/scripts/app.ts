@@ -907,6 +907,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/common/snapshot/:snapshotId': importRoute(
+              'views/pages/snapshot_proposals',
+              { scoped: true, deferChain: true }
+            ),
+            '/common/snapshot/:snapshotId/:identifier': importRoute(
+              'views/pages/view_snapshot_proposal',
+              { scoped: true, deferChain: true }
+            ),
             // Scoped routes
             //
 

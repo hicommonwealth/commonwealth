@@ -57,7 +57,7 @@ export class SnapshotVotesTable
         <div class="votes-container">
           <div class="column-header-row">
             <CWText type="h5" className="column-header-text">
-              User
+              {app.chain ? 'User' : 'Address'}
             </CWText>
             <CWText type="h5" className="column-header-text">
               Vote
@@ -68,16 +68,22 @@ export class SnapshotVotesTable
           </div>
           {displayedVoters.map((vote) => (
             <div class="vote-row">
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  vote.voter,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                popover: true,
-              })}
+              {app.chain ? (
+                m(User, {
+                  user: new AddressInfo(
+                    null,
+                    vote.voter,
+                    app.activeChainId(),
+                    null
+                  ),
+                  linkify: true,
+                  popover: true,
+                })
+              ) : (
+                <CWText className="column-text">
+                  {`${vote.voter.slice(0, 15)}...`}
+                </CWText>
+              )}
               <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>

@@ -121,32 +121,30 @@ class SnapshotProposalsPage
       <Sublayout
       // title="Proposals"
       >
-        {app.chain && (
-          <div class="SnapshotProposalsPage">
-            <SnapshotProposalStagesBar
-              selected={selectedFilter}
-              onChangeFilter={onChangeFilter}
-            />
-            <CardsCollection
-              content={
-                <>
-                  {proposals.length > 0 ? (
-                    proposals.map((proposal) => (
-                      <SnapshotProposalCard
-                        snapshotId={snapshotId}
-                        proposal={proposal}
-                      />
-                    ))
-                  ) : (
-                    <div class="no-proposals">
-                      No {this.selectedFilter.toLowerCase()} proposals found.
-                    </div>
-                  )}
-                </>
-              }
-            />
-          </div>
-        )}
+        <div class="SnapshotProposalsPage">
+          <SnapshotProposalStagesBar
+            selected={selectedFilter}
+            onChangeFilter={onChangeFilter}
+          />
+          <CardsCollection
+            content={
+              <>
+                {proposals.length > 0 ? (
+                  proposals.map((proposal) => (
+                    <SnapshotProposalCard
+                      snapshotId={snapshotId}
+                      proposal={proposal}
+                    />
+                  ))
+                ) : (
+                  <div class="no-proposals">
+                    No {this.selectedFilter.toLowerCase()} proposals found.
+                  </div>
+                )}
+              </>
+            }
+          />
+        </div>
       </Sublayout>
     );
   }

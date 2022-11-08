@@ -39,9 +39,13 @@ export class SnapshotProposalCard
         onclick={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-            window.scrollY;
-          navigateToSubpage(proposalLink);
+          if (app.chain) {
+            localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+              window.scrollY;
+            navigateToSubpage(proposalLink);
+          } else {
+            navigateToSubpage(`/common${proposalLink}`);
+          }
         }}
       >
         <div class="proposal-card-metadata">

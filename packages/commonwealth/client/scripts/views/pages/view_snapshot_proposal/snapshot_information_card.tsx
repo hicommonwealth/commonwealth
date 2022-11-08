@@ -80,17 +80,21 @@ export class SnapshotInformationCard
         <div class="info-rows-container">
           <SnapshotInfoRow
             label="Author"
-            value={m(User, {
-              user: new AddressInfo(
-                null,
-                proposal.author,
-                app.activeChainId(),
-                null
-              ),
-              hideAvatar: true,
-              linkify: true,
-              popover: true,
-            })}
+            value={
+              app.chain
+                ? m(User, {
+                    user: new AddressInfo(
+                      null,
+                      proposal.author,
+                      app.activeChainId(),
+                      null
+                    ),
+                    hideAvatar: true,
+                    linkify: true,
+                    popover: true,
+                  })
+                : proposal.author
+            }
           />
           <SnapshotInfoLinkRow
             label="IPFS"

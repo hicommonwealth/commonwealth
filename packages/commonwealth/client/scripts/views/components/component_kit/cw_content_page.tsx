@@ -99,14 +99,21 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
             {title}
           </CWText>
           <div class="header-info-row">
-            <CWText>
-              {m(User, {
-                user: new AddressInfo(null, author, app.activeChainId(), null),
-                showAddressWithDisplayName: true,
-                linkify: true,
-                popover: true,
-              })}
-            </CWText>
+            {app.chain && (
+              <CWText>
+                {m(User, {
+                  user: new AddressInfo(
+                    null,
+                    author,
+                    app.activeChainId(),
+                    null
+                  ),
+                  showAddressWithDisplayName: true,
+                  linkify: true,
+                  popover: true,
+                })}
+              </CWText>
+            )}
             <CWText type="caption" className="header-text">
               published on {moment(createdAt).format('l')}
             </CWText>
