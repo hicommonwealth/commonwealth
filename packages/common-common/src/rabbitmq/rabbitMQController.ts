@@ -106,18 +106,15 @@ export class RabbitMQController {
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {
-              log.error(`Invalid Message Format Error`, e);
+              log.error(`Invalid Message Format Error - ${errorMsg}`, e);
               this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e)
-
               ackOrNack(e, {strategy: 'nack'});
             }
             else {
-              // TODO: test republish strategy
-              log.error(`Unknown Error`, e)
+              log.error(`Unknown Error - ${errorMsg}`, e)
               this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e)
               ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
             }
-
           })
       });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -140,8 +137,6 @@ export class RabbitMQController {
 
   // TODO: add a class property that takes an object from publisherName => callback function
   //      if a message is successfully published to a particular queue then the callback is executed
-
-  // TODO: the publish ACK should be in a transaction with the publish itself
   public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError("RabbitMQController is not initialized!")

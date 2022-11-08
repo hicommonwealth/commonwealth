@@ -5,7 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 import {RascalExchanges, RascalRoutingKeys} from "common-common/src/rabbitmq";
 import {RABBITMQ_API_URI} from "commonwealth/server/config";
 
-async function publishRmqMessage() {
+async function publishRmqMessageScript() {
   const ceData: ITransfer = {
     kind: EventKind.Transfer,
     tokenAddress: uuidv4(),
@@ -31,4 +31,4 @@ async function publishRmqMessage() {
   console.log(publishJson)
 }
 
-publishRmqMessage();
+publishRmqMessageScript();

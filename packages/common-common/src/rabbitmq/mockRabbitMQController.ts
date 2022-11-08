@@ -1,7 +1,6 @@
 import {RabbitMQController, RabbitMQControllerError} from "./rabbitMQController";
 import * as Rascal from "rascal";
 import {RascalPublications, RascalSubscriptions, TRmqMessages} from "./types";
-import {Sequelize} from "sequelize";
 
 
 /**
@@ -36,10 +35,6 @@ export class MockRabbitMQController extends RabbitMQController {
     return;
   }
 
-  // TODO: add a class property that takes an object from publisherName => callback function
-  //      if a message is successfully published to a particular queue then the callback is executed
-
-  // TODO: the publish ACK should be in a transaction with the publish itself
   public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError("RabbitMQController is not initialized!")
