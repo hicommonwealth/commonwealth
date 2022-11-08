@@ -30,6 +30,7 @@
     "start-consumer": "ts-node --project server/tsconfig.json server/scripts/chainEventsConsumer.ts",
     "start-dbNode": "WORKER_NUMBER=0 NUM_WORKERS=1 ts-node --project server/tsconfig.json server/scripts/dbNode.ts",
     "start-prerender": "ts-node --project tsconfig.node.json server/scripts/runPrerenderService.ts",
+    "start-windows": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project server/tsconfig.json server.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts",
     "migrate-events": "ENTITY_MIGRATION=all ts-node --project tsconfig.node.json server/scripts/runMigrateChainEntities.ts",
     "migrate-event": "ts-node --project tsconfig.node.json server/scripts/runMigrateChainEntities.ts",
@@ -265,6 +266,7 @@
     "source-map-support": "^0.5.13",
     "stylelint": "^12.0.0",
     "sync-request": "^6.1.0",
+    "ts-node-dev": "^2.0.0",
     "webpack-dev-server": "^3.1.14"
   },
   "optionalDependencies": {
