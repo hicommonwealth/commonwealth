@@ -197,6 +197,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           [RascalSubscriptions.ChainEventNotifications]: {
             'queue': RascalQueues.ChainEventNotifications,
             ...subscriptionConfig
+          },
+          [RascalSubscriptions.SnapshotListener]: {
+            'queue': RascalQueues.SnapshotListener,
+            ...subscriptionConfig
           }
         }
       }

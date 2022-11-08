@@ -12,7 +12,6 @@ app.use(express.json());
 
 const produceMessage = createMQProducer(rabbitMQ.url, "snapshot_event");
 
-
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
 });

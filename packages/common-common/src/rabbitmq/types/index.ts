@@ -23,7 +23,7 @@ export interface RmqMsgNamespace<MsgType> {
  * This type contains ALL the possible RabbitMQ message types. If you are publishing a message to any queue,
  * anywhere, it MUST be one of these types
  */
-export type TRmqMessages =
+export type TRmqMessages = 
   | RmqCWEvent.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
@@ -38,7 +38,8 @@ export enum RascalPublications {
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
-  SubstrateIdentityEvents = 'SubstrateIdentityEventsSubscription'
+  SubstrateIdentityEvents = 'SubstrateIdentityEventsSubscription',
+  SnapshotListener = 'SnapshotListenerSubscription',
 }
 
 export enum RascalExchanges {
