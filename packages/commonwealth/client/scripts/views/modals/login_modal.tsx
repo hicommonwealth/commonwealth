@@ -23,6 +23,7 @@ import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -126,7 +127,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,
-      (w) => w instanceof WalletConnectWebWalletController && w.enabled
+      (w) => (w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController) && w.enabled
     );
 
     // Handles Magic Link Login
