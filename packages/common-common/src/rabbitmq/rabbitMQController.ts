@@ -117,12 +117,9 @@ export class RabbitMQController {
             }
           })
       });
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      subscription.on('error', (err, messageId, ackOrNack) => {
-        log.error(`Subscriber error: ${err} ${messageId}`);
-        ackOrNack(err, {strategy: 'nack'});
-        this.rollbar?.warn(`Publisher error: ${err} ${messageId}`);
+      subscription.on('error', (err) => {
+        log.error(`Subscriber error: ${err}`);
+        this.rollbar?.warn(`Subscriber error: ${err}`);
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
