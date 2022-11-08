@@ -12,7 +12,10 @@ class Account {
 
   // validation token sent by server
   private _validationToken?: string;
+<<<<<<< HEAD
   private _sessionPublicAddress: string;
+=======
+>>>>>>> master
   // block that the client is signing, in order to validate login to the server
   private _validationBlockInfo?: string;
 
@@ -31,7 +34,10 @@ class Account {
     addressId,
     walletId,
     validationToken,
+<<<<<<< HEAD
     sessionPublicAddress,
+=======
+>>>>>>> master
     validationBlockInfo,
     profile,
     ignoreProfile,
@@ -44,7 +50,10 @@ class Account {
     addressId?: number;
     walletId?: WalletId;
     validationToken?: string;
+<<<<<<< HEAD
     sessionPublicAddress?: string;
+=======
+>>>>>>> master
     validationBlockInfo?: string;
     profile?: Profile;
 
@@ -59,7 +68,10 @@ class Account {
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
+<<<<<<< HEAD
     this._sessionPublicAddress = sessionPublicAddress;
+=======
+>>>>>>> master
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
     if (profile) {
