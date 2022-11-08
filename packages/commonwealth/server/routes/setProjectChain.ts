@@ -1,5 +1,5 @@
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError } from '../util/errors';
 import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
@@ -9,7 +9,7 @@ export const Errors = {
   InvalidProjectId: 'Invalid project id',
 };
 
-type SetProjectChainReq = { chain_id: string, project_id: number };
+type SetProjectChainReq = { chain_id: string; project_id: number };
 type SetProjectChainResp = ProjectAttributes;
 
 const setProjectChain = async (
@@ -29,18 +29,18 @@ const setProjectChain = async (
     where: { id: project_id },
   });
   if (!project) {
-    throw new AppError(Errors.InvalidProjectId)
+    throw new AppError(Errors.InvalidProjectId);
   }
 
   const author = await models.Address.findOne({
     where: {
       address: project.creator,
       user_id: req.user.id,
-    }
+    },
   });
   // site admin can set chain always
   if (!author && !req.user.isAdmin) {
-    throw new AppError(Errors.OnlyAuthorCanSetChain)
+    throw new AppError(Errors.OnlyAuthorCanSetChain);
   }
   project.chain_id = chain_id;
   await project.save();

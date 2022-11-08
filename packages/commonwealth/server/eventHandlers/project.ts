@@ -6,7 +6,7 @@ import {
   CommonwealthTypes,
 } from 'chain-events/src';
 import { addPrefix, factory } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 
 export default class extends IEventHandler {
   public readonly name = 'Project';

@@ -2,7 +2,7 @@ import { WhereOptions } from 'sequelize/types';
 import Web3 from 'web3';
 
 import validateChain from '../util/validateChain';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
