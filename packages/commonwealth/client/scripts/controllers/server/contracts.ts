@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
-import { ChainBase, ContractType } from 'common-common/src/types';
+import { BalanceType, ContractType } from 'common-common/src/types';
 import { TypedResponse } from 'server/types';
 import { ContractAttributes } from 'server/models/contract';
 import { ContractAbiAttributes } from 'server/models/contract_abi';
@@ -96,7 +96,7 @@ class ContractsController {
 
   public async add(
     community: string,
-    chain_base: ChainBase,
+    balance_type: BalanceType,
     chain_node_id: number,
     node_url: string,
     address: string,
@@ -111,7 +111,7 @@ class ContractsController {
         `${app.serverUrl()}/createContract`,
         {
           community,
-          chain_base,
+          balance_type,
           chain_node_id,
           jwt: app.user.jwt,
           node_url,
@@ -125,14 +125,8 @@ class ContractsController {
       );
       const responseContract: ContractAttributes =
         response['result']['contract'];
-      const {
-        id,
-        type,
-        is_factory,
-        nickname,
-        createdAt,
-        updatedAt,
-      } = responseContract;
+      const { id, type, is_factory, nickname, createdAt, updatedAt } =
+        responseContract;
       const result = new Contract(
         id,
         address,
@@ -145,7 +139,7 @@ class ContractsController {
         symbol,
         abi,
         is_factory,
-        nickname,
+        nickname
       );
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
