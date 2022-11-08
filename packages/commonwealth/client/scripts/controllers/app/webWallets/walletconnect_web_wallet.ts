@@ -66,7 +66,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     );
     const msgParams = await constructTypedMessage(
       this.accounts[0],
-      this.node.ethChainId || 1,
+      app.chain?.meta.node.ethChainId || 1,
       sessionPublicAddress,
       validationBlockInfo
     );
