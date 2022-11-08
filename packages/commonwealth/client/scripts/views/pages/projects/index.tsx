@@ -83,7 +83,8 @@ export default class ProjectListing implements m.ClassComponent {
                 ]}
                 isSelected={onExplorePage}
                 onclick={() => {
-                  m.route.set('/projects/explore');
+                  if (onExplorePage) return;
+                  m.route.set(m.route.get().replace('yours', 'explore'));
                   m.redraw();
                 }}
               />
@@ -96,13 +97,14 @@ export default class ProjectListing implements m.ClassComponent {
                 disabled={!app.isLoggedIn()}
                 isSelected={onYoursPage}
                 onclick={() => {
+                  if (onYoursPage) return;
                   if (!app.isLoggedIn()) {
                     notifyInfo(
                       'Log in or create an account for user dashboard.'
                     );
                     return;
                   }
-                  m.route.set('/projects/yours');
+                  m.route.set(m.route.get().replace('explore', 'yours'));
                   m.redraw();
                 }}
               />
