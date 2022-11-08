@@ -40,7 +40,7 @@ import {
 import { Prefetch } from './types';
 import { TipDetail } from '../tip_detail';
 import { ProposalBody } from './proposal_body';
-import { ProposalSidebar } from './proposal_sidebar';
+import { ThreadSidebar } from '../view_thread/thread_sidebar';
 
 class ViewProposalPage
   implements
@@ -511,12 +511,12 @@ class ViewProposalPage
               />
             )}
             {hasSidebar && this.tabSelected === 'viewSidebar' && (
-              <ProposalSidebar
+              <ThreadSidebar
                 isAdmin={isAdmin}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={proposal}
+                thread={proposal}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />
@@ -541,12 +541,12 @@ class ViewProposalPage
               viewCount={viewCount}
             />
             {hasSidebar && (
-              <ProposalSidebar
+              <ThreadSidebar
                 isAdmin={isAdmin}
                 isAdminOrMod={isAdminOrMod}
                 isAuthor={isAuthor}
                 polls={this.polls}
-                proposal={proposal}
+                thread={proposal}
                 showLinkedSnapshotOptions={showLinkedSnapshotOptions}
                 showLinkedThreadOptions={showLinkedThreadOptions}
               />

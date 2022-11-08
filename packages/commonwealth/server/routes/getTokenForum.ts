@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { DB } from '../models';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { createDefaultCommunityRoles } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (
@@ -27,7 +28,7 @@ const getTokenForum = async (
     }
   });
   const node = await models.ChainNode.scope('withPrivateData').findOne({ where: { eth_chain_id: chain_id }});
-  let url = node.url;
+  let url = node?.url;
   if (!url) {
     url = req.query.url;
     if (!url) {
@@ -52,7 +53,7 @@ const getTokenForum = async (
       if (!node) {
         return res.json({ status: 'Failure', message: 'Cannot autocreate custom node' });
       }
-      const [chain] = await models.Chain.findOrCreate({
+      const [chain, success] = await models.Chain.findOrCreate({
         where: { id: token.id },
         defaults: {
           active: true,
@@ -65,6 +66,12 @@ const getTokenForum = async (
           has_chain_events_listener: false,
         },
       });
+
+      // Create default roles if chain created successfully
+      if (success) {
+        await createDefaultCommunityRoles(models, chain.id);
+      }
+
       // Create Contract + Association
       const [contract] = await models.Contract.findOrCreate({
         where: {

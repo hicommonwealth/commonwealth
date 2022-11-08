@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { Spinner } from 'construct-ui';
 import m from 'mithril';
 
 import 'pages/login/login_mobile.scss';
@@ -14,6 +13,7 @@ import {
   CWProfileRow,
   CWProfilesList,
 } from '../../components/component_kit/cw_profiles_list';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
@@ -156,7 +156,7 @@ export class LoginMobile implements m.ClassComponent<LoginAttrs> {
                   onenterkey={handleEmailLoginCallback}
                 />
               ) : (
-                <Spinner active={true} size="xl" position="inherit" />
+                <CWSpinner />
               )}
               <div class="buttons-row">
                 <CWButton

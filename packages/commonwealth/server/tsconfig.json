@@ -18,13 +18,10 @@
       "chain-events/*": ["../../packages/chain-events/*"]
     },
   },
-  "files": [
-    "scripts/chainEventsConsumer.ts",
-    "scripts/dbNode.ts",
-  ],
   "exclude": [
     "./node_modules",
     "node_modules",
+    "migrations",
     "build",
     "dist"
   ]

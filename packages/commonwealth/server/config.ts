@@ -73,6 +73,13 @@ export const RABBITMQ_URI = (() => {
   } else return process.env.CLOUDAMQP_URL;
 })();
 
+export const RABBITMQ_API_URI = (() => {
+  if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT)
+    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`
+  else return 'http://guest:guest@localhost:15672/api'
+})();
+
+
 // if REDIS_URL exists use that (production or local redis instance) otherwise if
 // the Vultr server info is given then use that. Undefined otherwise.
 export const REDIS_URL = process.env.REDIS_URL
@@ -91,7 +98,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ','
-) as ChainBase[]) || [ChainBase.Ethereum, ChainBase.Substrate];
+) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 

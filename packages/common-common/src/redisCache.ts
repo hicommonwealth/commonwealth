@@ -1,7 +1,7 @@
 import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
-import { factory, formatFilename } from 'common-common/src/logging';
-import { REDIS_URL, VULTR_IP } from '../config';
-import { RedisNamespaces } from '../../shared/types';
+import { factory, formatFilename } from './logging';
+import { REDIS_URL, VULTR_IP } from 'commonwealth/server/config';
+import { RedisNamespaces } from 'commonwealth/shared/types';
 import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
