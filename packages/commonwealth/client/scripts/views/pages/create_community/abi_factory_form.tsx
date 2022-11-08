@@ -156,11 +156,14 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       const contract = app.contracts.getByNickname(nickname);
 
       try {
-        // initialize daoFactory Controller
-        const ethChain = new EthereumChain(app);
+        // initialize daoFactory Controller with web3 object initialized with the selected chain's nodeUrl
+        const provider = new Web3.providers.WebsocketProvider(
+          this.state.form.nodeUrl
+        );
+        const _api = new Web3(provider);
 
         this.generalContractsController = new GeneralContractsController(
-          ethChain,
+          _api,
           contract
         );
         const metamaskWallet =
