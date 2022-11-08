@@ -11,7 +11,7 @@
     "migrate-db": "yarn --cwd packages/commonwealth migrate-db"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "repository": {
     "type": "git",
@@ -27,8 +27,8 @@
   "dependencies": {
     "@cosmjs/stargate": "^0.26.1",
     "@cosmjs/tendermint-rpc": "^0.26.1",
-    "@types/moment": "^2.13.0",
     "@solana/web3.js": "^1.30.2",
+    "@types/moment": "^2.13.0",
     "axios": "^0.21.2",
     "ethers": "5.4.3",
     "moment": "^2.23.0",
@@ -38,5 +38,6 @@
     "web3-utils": "1.5.2"
   },
   "devDependencies": {
+    "prettier": "2.7.1"
   }
 }

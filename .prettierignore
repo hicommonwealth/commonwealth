@@ -1,0 +1,15 @@
+*build
+*.github
+*.env
+*node_modules
+*.eslintrc.json
+*.mocharc.json
+*.nycrc
+*.stylelintrc
+*.md
+*coverage
+*.sol
+*.d.ts
+*contractTypes
+*factories
+*.nyc_output

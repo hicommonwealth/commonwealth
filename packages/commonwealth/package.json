@@ -52,7 +52,7 @@
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "repository": {
     "type": "git",
@@ -197,7 +197,6 @@
     "path-browserify": "^1.0.1",
     "prerender": "^5.6.0",
     "prerender-node": "^3.2.5",
-    "prettier": "2.4.1",
     "process": "^0.11.10",
     "quill": "^2.0.0-dev.4",
     "quill-image-drop-and-paste": "^1.0.4",
