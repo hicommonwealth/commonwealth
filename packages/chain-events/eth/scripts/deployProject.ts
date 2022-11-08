@@ -33,8 +33,6 @@ async function main() {
     'cwTokenImpSameDeal'
   );
 
-  console.log(projectFactory.address);
-
   const newProject = await projectFactory.createProject(
     'projectName',
     'ipfsHash',
@@ -45,8 +43,6 @@ async function main() {
     10000,
     170
   );
-
-  console.log({ newProject });
 }
 
 main()

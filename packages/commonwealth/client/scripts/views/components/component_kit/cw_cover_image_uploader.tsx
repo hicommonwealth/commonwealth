@@ -125,7 +125,6 @@ export default class CWCoverImageUploader
     attachZone.addEventListener('click', clickHandler);
 
     if (vnode.attrs.defaultBackground) {
-      console.log(vnode.attrs.defaultBackground);
       this.imageURL = vnode.attrs.defaultBackground;
       this.uploadStatus = 'success';
       m.redraw();
