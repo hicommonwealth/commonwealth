@@ -19,8 +19,8 @@ class ContractsController {
   public get initialized() {
     return this._initialized;
   }
-  public getByNickname(nickname: string) {
-    return this._store.getContractByNickname(nickname);
+  public getFactoryContractByNickname(nickname: string) {
+    return this._store.getFactoryContractByNickname(nickname);
   }
   public getByIdentifier(id) {
     return this._store.getById(id);
@@ -31,8 +31,8 @@ class ContractsController {
   public getByType(type: string) {
     return this._store.getContractByType(type);
   }
-  public getContractFactories() {
-    return this._store.getContractFactories();
+  public getFactoryContracts() {
+    return this._store.getFactoryContracts();
   }
   public getCommunityContracts() {
     return this._store.getCommunityContracts();
@@ -125,14 +125,8 @@ class ContractsController {
       );
       const responseContract: ContractAttributes =
         response['result']['contract'];
-      const {
-        id,
-        type,
-        is_factory,
-        nickname,
-        createdAt,
-        updatedAt,
-      } = responseContract;
+      const { id, type, is_factory, nickname, createdAt, updatedAt } =
+        responseContract;
       const result = new Contract(
         id,
         address,
@@ -145,7 +139,7 @@ class ContractsController {
         symbol,
         abi,
         is_factory,
-        nickname,
+        nickname
       );
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));

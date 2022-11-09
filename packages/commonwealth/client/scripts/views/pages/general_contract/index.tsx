@@ -35,6 +35,7 @@ import {
   EthFormFields,
 } from '../create_community/types';
 import { ethChainRows } from '../create_community/chain_input_rows';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 type CreateContractForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
@@ -209,9 +210,11 @@ class GeneralContractPage
                                 );
                                 this.state.loaded = true;
                               }}
-                              inputValidationFn={(val) =>
-                                validateAbiInput(val, input.type)
-                              }
+                              inputValidationFn={(
+                                val: string
+                              ): [ValidationStatus, string] => {
+                                return validateAbiInput(val, input.type);
+                              }}
                             />
                           </div>
                         </div>

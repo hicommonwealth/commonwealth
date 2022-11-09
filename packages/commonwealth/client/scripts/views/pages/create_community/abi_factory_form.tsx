@@ -7,11 +7,8 @@ import Web3 from 'web3';
 import 'pages/abi_factory_form.scss';
 
 import app from 'state';
-import { initAppState } from 'app';
 import {
-  ChainBase,
   ChainNetwork,
-  ChainType,
   factoryNicknameToCreateFunctionName,
   WalletId,
 } from 'common-common/src/types';
@@ -43,12 +40,15 @@ import {
   parseEventFromABI,
   parseFunctionFromABI,
 } from 'helpers/abi_utils';
-import EthereumChain from 'controllers/chain/ethereum/chain';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import { Spinner } from 'construct-ui';
+import {
+  handleMappingAbiInputs,
+  processAbiInputsToDataTypes,
+  validateAbiInput,
+} from 'helpers/abi_form_helpers';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -86,7 +86,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     loadingEthChains: true,
     functionNameToFunctionOutput: new Map<string, any[]>(),
     functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
-    daoFactoryType: 'partybidfactory',
+    daoFactoryType: 'curated-factory-goerli',
     form: {
       chainString: 'Ethereum Mainnet',
       ethChainId: 1,
@@ -127,33 +127,18 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       );
     };
 
-    const Bytes32 = ethers.utils.formatBytes32String;
-
     const disableField = !this.state.loaded;
 
     const createDao = async (nickname: string, fn: AbiItem) => {
       this.state.loading = true;
-      // handle array and int types
-      const processedArgs = fn.inputs.map((arg: AbiInput, index: number) => {
-        const type = arg.type;
-        if (type.substring(0, 4) === 'uint')
-          return BigNumber.from(
-            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
-          );
-        if (type.substring(0, 4) === 'byte')
-          return Bytes32(
-            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
-          );
-        if (type.slice(-2) === '[]')
-          return JSON.parse(
-            this.state.functionNameToFunctionInputArgs.get(fn.name).get(index)
-          );
-        return this.state.functionNameToFunctionInputArgs
-          .get(fn.name)
-          .get(index);
-      });
+      // handle processing the forms inputs into their proper data types
+      const processedArgs = processAbiInputsToDataTypes(
+        fn.name,
+        fn.inputs,
+        this.state.functionNameToFunctionInputArgs
+      );
 
-      const contract = app.contracts.getByNickname(nickname);
+      const contract = app.contracts.getFactoryContractByNickname(nickname);
 
       try {
         // initialize daoFactory Controller with web3 object initialized with the selected chain's nodeUrl
@@ -192,7 +177,8 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     };
 
     const loadFactoryContractAbi = (nickname: string) => {
-      const contract: Contract = app.contracts.getByNickname(nickname);
+      const contract: Contract =
+        app.contracts.getFactoryContractByNickname(nickname);
       const factoryFn = factoryNicknameToCreateFunctionName[nickname];
       if (!factoryFn) return null;
       const abiFunction = parseFunctionFromABI(contract.abi, factoryFn);
@@ -219,74 +205,18 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                       name="Contract Input Field"
                       placeholder="Insert Input Here"
                       oninput={(e) => {
-                        if (
-                          !this.state.functionNameToFunctionInputArgs.has(
-                            fn.name
-                          )
-                        ) {
-                          this.state.functionNameToFunctionInputArgs.set(
-                            fn.name,
-                            new Map<number, string>()
-                          );
-                          const inputArgMap =
-                            this.state.functionNameToFunctionInputArgs.get(
-                              fn.name
-                            );
-                          inputArgMap.set(inputIdx, e.target.value);
-                          this.state.functionNameToFunctionInputArgs.set(
-                            fn.name,
-                            inputArgMap
-                          );
-                        } else {
-                          const inputArgMap =
-                            this.state.functionNameToFunctionInputArgs.get(
-                              fn.name
-                            );
-                          inputArgMap.set(inputIdx, e.target.value);
-                          this.state.functionNameToFunctionInputArgs.set(
-                            fn.name,
-                            inputArgMap
-                          );
-                        }
+                        handleMappingAbiInputs(
+                          inputIdx,
+                          e.target.value,
+                          fn.name,
+                          this.state.functionNameToFunctionInputArgs
+                        );
                         this.state.loaded = true;
                       }}
                       inputValidationFn={(
                         val: string
                       ): [ValidationStatus, string] => {
-                        // TODO Array Validation will be complex. Check what cases we want to cover here
-                        if (input.type.slice(-2) === '[]') {
-                          if (val[0] !== '[' || val[val.length - 1] !== ']') {
-                            return ['failure', 'Input must be an array'];
-                          } else {
-                            return ['success', ''];
-                          }
-                        }
-                        if (input.type === 'bool') {
-                          if (val !== 'true' && val !== 'false') {
-                            return ['failure', 'Input must be a boolean'];
-                          }
-                        }
-                        if (input.type.substring(0, 4) === 'uint') {
-                          if (!Number.isNaN(Number(val))) {
-                            return ['success', ''];
-                          } else {
-                            return ['failure', 'Input must be a number'];
-                          }
-                        } else if (input.type === 'bool') {
-                          if (val === 'true' || val === 'false') {
-                            return ['success', ''];
-                          } else {
-                            return ['failure', 'Input must be a boolean'];
-                          }
-                        } else if (input.type === 'address') {
-                          if (val.length === 42) {
-                            return ['success', ''];
-                          } else {
-                            return ['failure', 'Input must be an address'];
-                          }
-                        } else {
-                          return ['success', ''];
-                        }
+                        return validateAbiInput(val, input.type);
                       }}
                     />
                   </div>
@@ -358,8 +288,8 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         />
         <SelectRow
           title="DAO Factory Type"
-          options={app.contracts.store
-            .getContractFactories()
+          options={app.contracts
+            .getFactoryContracts()
             .map((contract) => contract.nickname)}
           value={this.state.daoFactoryType}
           onchange={(value) => {
