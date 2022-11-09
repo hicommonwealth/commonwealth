@@ -1,7 +1,8 @@
 export * from "./ChainEvents"
 export * from "./ChainEventNotification"
-import {RmqCWEvent} from "common-common/src/rabbitmq/types/ChainEvents";
-import {RmqCENotification} from "common-common/src/rabbitmq/types/ChainEventNotification";
+import { RmqCWEvent } from "common-common/src/rabbitmq/types/ChainEvents";
+import { RmqSnapshotEvent } from "common-common/src/rabbitmq/types/SnapshotListener";
+import { RmqCENotification } from "common-common/src/rabbitmq/types/ChainEventNotification";
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -22,20 +23,23 @@ export interface RmqMsgNamespace<MsgType> {
  * This type contains ALL the possible RabbitMQ message types. If you are publishing a message to any queue,
  * anywhere, it MUST be one of these types
  */
-export type TRmqMessages =
+export type TRmqMessages = 
   | RmqCWEvent.RmqMsgType
+  | RmqSnapshotEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
-  SubstrateIdentityEvents = 'SubstrateIdentityEventsPublication'
+  SubstrateIdentityEvents = 'SubstrateIdentityEventsPublication',
+  SnapshotListener = 'SnapshotListenerPublication',
 }
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
-  SubstrateIdentityEvents = 'SubstrateIdentityEventsSubscription'
+  SubstrateIdentityEvents = 'SubstrateIdentityEventsSubscription',
+  SnapshotListener = 'SnapshotListenerSubscription',
 }
 
 export enum RascalExchanges {

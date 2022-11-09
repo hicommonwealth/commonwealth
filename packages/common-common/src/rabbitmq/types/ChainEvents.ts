@@ -1,5 +1,5 @@
-import {CWEvent} from "chain-events/src";
-import {RmqMsgFormatError, RmqMsgNamespace} from "common-common/src/rabbitmq";
+import { CWEvent } from "chain-events/src";
+import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
 
 /**
  * This class is merged with the namespace with the same name below so that within one object we have the invalid
@@ -14,7 +14,8 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
     return (
       typeof data.blockNumber === 'number'
       && data.data
-      && data.network && typeof data.network === 'string'
+      && data.network 
+      && typeof data.network === 'string'
     );
   }
 }
@@ -23,3 +24,5 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
 export namespace RmqCWEvent {
   export type RmqMsgType = CWEvent;
 }
+
+

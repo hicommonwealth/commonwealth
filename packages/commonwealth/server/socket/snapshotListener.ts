@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
 import {
-  ChainEventNotification,
+  SnapshotNotification,
   WebsocketEngineEvents,
   WebsocketMessageNames,
   WebsocketNamespaces,
@@ -10,11 +10,11 @@ import { authenticate } from './index';
 
 const log = factory.getLogger(addPrefix(__filename));
 
-export function createCeNamespace(io: Server) {
-  const CeNs = io.of(`/${WebsocketNamespaces.ChainEvents}`);
-  CeNs.use(authenticate);
+export function createSnapshotNamespace(io: Server) {
+  const snapshotEvents = io.of(`/${WebsocketNamespaces.SnapshotListener}`);
+  snapshotEvents.use(authenticate);
 
-  CeNs.on('connection', (socket) => {
+  snapshotEvents.on('connection', (socket) => {
     log.info(
       `socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
@@ -58,21 +58,21 @@ export function createCeNamespace(io: Server) {
     );
   });
 
-  io.of(`/${WebsocketNamespaces.ChainEvents}`).adapter.on(
+  io.of(`/${WebsocketNamespaces.SnapshotListener}`).adapter.on(
     WebsocketEngineEvents.CreateRoom,
     (room) => {
       log.info(`New room created: ${room}`);
     }
   );
 
-  io.of(`/${WebsocketNamespaces.ChainEvents}`).adapter.on(
+  io.of(`/${WebsocketNamespaces.SnapshotListener}`).adapter.on(
     WebsocketEngineEvents.DeleteRoom,
     (room) => {
       log.info(`Room: ${room}, was deleted`);
     }
   );
 
-  return CeNs;
+  return snapshotEvents;
 }
 
 /**
@@ -80,11 +80,11 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(
+export function publishToSnapshotRoom(
   this: Server,
-  notification: ChainEventNotification
+  notification: SnapshotNotification
 ) {
-  this.to(notification.ChainEvent.ChainEventType.id).emit(
+  this.to(notification.id).emit(
     WebsocketMessageNames.ChainEventNotification,
     notification
   );

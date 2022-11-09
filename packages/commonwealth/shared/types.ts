@@ -4,6 +4,7 @@ import moment from 'moment';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
+  SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
   ChatMessage = 'chat-message',
@@ -23,8 +24,20 @@ export type ChainEventNotification = {
   ChainEvent: ChainEventAttributes;
 };
 
+export type SnapshotNotification = {
+  id: string;
+  notification_data: '';
+  snapshot_event_id: string;
+  category_id: 'snapshot-listener';
+  chain_id: string;
+  updated_at: moment.Moment;
+  created_at: moment.Moment;
+  SnapshotEvent: any; 
+}
+
 export enum WebsocketNamespaces {
   ChainEvents = 'chain-events',
+  SnapshotListener = 'snapshot-listener',
   Chat = 'chat',
 }
 

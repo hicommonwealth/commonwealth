@@ -102,7 +102,11 @@ export class RabbitMQController {
             ackOrNack();
           })
           .catch((e) => {
-            const errorMsg = `Failed to process message: ${JSON.stringify(content)} with processor function ${messageProcessor.name} and context ${JSON.stringify(msgProcessorContext)}`
+            const errorMsg = `
+            Failed to process message: ${JSON.stringify(content)} 
+            with processor function ${messageProcessor.name} and context 
+            ${JSON.stringify(msgProcessorContext)}
+            `
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {

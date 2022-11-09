@@ -178,6 +178,11 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'exchange': RascalExchanges.Notifications,
             'routingKey': RascalRoutingKeys.ChainEventNotifications,
             ...publicationConfig
+          },
+          [RascalPublications.SnapshotListener]: {
+            'exchange': RascalExchanges.SnapshotListener,
+            'routingKey': RascalRoutingKeys.SnapshotListener,
+            ...publicationConfig
           }
         },
         'subscriptions': {
@@ -191,6 +196,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEventNotifications]: {
             'queue': RascalQueues.ChainEventNotifications,
+            ...subscriptionConfig
+          },
+          [RascalSubscriptions.SnapshotListener]: {
+            'queue': RascalQueues.SnapshotListener,
             ...subscriptionConfig
           }
         }
