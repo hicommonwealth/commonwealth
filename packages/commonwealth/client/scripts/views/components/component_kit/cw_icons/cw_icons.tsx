@@ -3,6 +3,7 @@
 /* eslint-disable max-len */
 
 import m from 'mithril';
+import { FC } from 'helpers/class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
@@ -56,38 +57,40 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //   },
 // };
 
-export const CWArrowLeft = (attrs: IconAttrs) => {
-  const {
-    className,
-    componentType,
-    disabled,
-    iconButtonTheme,
-    iconSize,
-    selected,
-    ...domAttrs
-  } = attrs;
+export class CWArrowLeft extends FC<IconAttrs> {
+  view(vnode) {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...domAttrs
+    } = vnode.attrs;
 
-  return (
-    <svg
-      class={getClasses<IconStyleAttrs>(
-        { className, disabled, iconButtonTheme, iconSize, selected },
-        componentType
-      )}
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      fill="none"
-      viewBox="0 0 32 32"
-      {...domAttrs}
-    >
-      <path
-        fill-rule="evenodd"
-        d="M2.244 15.582a.482.482 0 000 .836l13.038 7.517a.483.483 0 00.724-.418V17h13.5a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-13.5V8.483a.483.483 0 00-.724-.418L2.244 15.582z"
-        clip-rule="evenodd"
-      ></path>
-    </svg>
-  );
-};
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...domAttrs}
+      >
+        <path
+          fill-rule="evenodd"
+          d="M2.244 15.582a.482.482 0 000 .836l13.038 7.517a.483.483 0 00.724-.418V17h13.5a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-13.5V8.483a.483.483 0 00-.724-.418L2.244 15.582z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    );
+  }
+}
 
 // export const CWArrowLeft: m.Component<IconAttrs> = {
 //   view: (vnode: m.VnodeDOM<IconAttrs>) => {

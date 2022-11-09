@@ -24,15 +24,15 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
 
     const Icon = iconLookup['arrowLeft'];
 
-    return Icon({
-      className,
-      componentType,
-      disabled,
-      iconSize,
-      onclick,
-      selected,
-      ...domAttrs,
-    });
+    // return Icon({
+    //   className,
+    //   componentType,
+    //   disabled,
+    //   iconSize,
+    //   onclick,
+    //   selected,
+    //   ...domAttrs,
+    // });
 
     // return m(Icon, {
     //   className,
@@ -44,16 +44,16 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
     //   ...domAttrs,
     // });
 
-    // return (
-    //   <Icon
-    //     className={className}
-    //     componentType={componentType}
-    //     disabled={disabled}
-    //     iconSize={iconSize}
-    //     onclick={onclick}
-    //     selected={selected}
-    //     {...domAttrs}
-    //   />
-    // );
+    return (
+      <Icon
+        className={className}
+        componentType={componentType}
+        disabled={disabled}
+        iconSize={iconSize}
+        onclick={onclick}
+        selected={selected}
+        {...domAttrs}
+      />
+    );
   }
 }

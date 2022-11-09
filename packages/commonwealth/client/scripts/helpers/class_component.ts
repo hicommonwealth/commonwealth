@@ -29,3 +29,14 @@ export default abstract class ClassComponent<
   oninit?(v: m.Vnode<P>): void;
   abstract view(v: m.Vnode<P>): m.Children | null;
 }
+
+export abstract class FC<
+  P extends Record<string, unknown> = Record<string, unknown>
+> implements m.Component<P>
+{
+  /** Do not use, only used for JSX validation */
+  protected readonly __props: P;
+
+  // oninit?(v: m.Vnode<P>): void;
+  abstract view(v: m.Vnode<P>): m.Children | null;
+}
