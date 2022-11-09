@@ -7,9 +7,7 @@ import 'pages/create_community.scss';
 
 import app from 'state';
 import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
+  BalanceType,
   ContractType,
 } from 'common-common/src/types';
 import { isAddress } from 'web3-utils';
@@ -21,8 +19,6 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 
 import {
-  initChainForm,
-  defaultChainRows,
   ethChainRows,
 } from '../create_community/chain_input_rows';
 
@@ -150,7 +146,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             try {
               const res = await app.contracts.add(
                 app.activeChainId(),
-                ChainBase.Ethereum,
+                BalanceType.Ethereum,
                 chain_node_id,
                 nodeUrl,
                 address,
