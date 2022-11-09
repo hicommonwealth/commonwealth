@@ -1,7 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import { rabbitMQ } from './config'
 import { SnapshotEvent } from './types';
-import createMQProducer from './producer/producer';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,8 +7,6 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
-
-const produceMessage = createMQProducer(rabbitMQ.url, "snapshot_event");
 
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
@@ -23,14 +19,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
-    const success = produceMessage(JSON.stringify(event));
     
-    if (success) {
-      res.status(201).send("Snapshot event sent: " + JSON.stringify(event));
-    } else {
-      res.status(500).send("Error sending snapshot event");
-    }
-
   } catch (err) {
     console.log(err);
 
