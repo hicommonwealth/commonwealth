@@ -11,7 +11,8 @@
   },
   "keywords": [],
   "scripts": {
-    "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts"
+    "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {},
   "devDependencies": {
