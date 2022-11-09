@@ -1,5 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import { SnapshotEvent } from "./types";
+import { RabbitMqHandler } from "./rabbitMQ/eventHandler";
+import { RascalPublications } from "common-common/src/rabbitmq";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -18,6 +20,13 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     if (!event) {
       res.status(500).send("Error sending snapshot event");
     }
+    const rabbitMqHandler = new RabbitMqHandler(
+      JSON.parse(process.env.RABBITMQ_CONFIG),
+      RascalPublications.SnapshotListener
+    );
+
+    await rabbitMqHandler.handle(event);
+
   } catch (err) {
     console.log(err);
 
