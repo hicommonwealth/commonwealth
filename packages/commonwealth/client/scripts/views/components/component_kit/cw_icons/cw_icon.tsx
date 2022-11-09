@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import ClassComponent from 'helpers/class_component';
+import ClassComponent from 'client/scripts/component_wrappers';
 import 'components/component_kit/cw_icon.scss';
 
 import { iconLookup } from './cw_icon_lookup';
