@@ -36,6 +36,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api(): any {
+    return this._web3;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(message, this.accounts[0]);
     return signature;
@@ -70,7 +74,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async reset() {
     console.log('Attempting to reset WalletConnect');
-    const ks = await this._provider.wc.killSession();
+    if (!this._provider) {
+      return;
+    }
+    await this._provider.wc.killSession();
     this._provider.disconnect();
     this._enabled = false;
   }
@@ -78,7 +85,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
-    try {
+    // try {
       // Create WalletConnect Provider
       this._chainInfo =
         app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
@@ -89,7 +96,13 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         [chainId]:
           this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
       };
+
       this._provider = new WalletConnectProvider({ rpc, chainId });
+
+      // destroy pre-existing session if exists
+      if (this._provider.wc?.connected) {
+        await this._provider.wc.killSession();
+      }
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
@@ -102,10 +115,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
-    } catch (error) {
-      this._enabling = false;
-      throw new Error(`Failed to enable WalletConnect: ${error.message}`);
-    }
+    // } catch (error) {
+    //   this._enabling = false;
+    //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);
+    // }
   }
 
   public async initAccountsChanged() {

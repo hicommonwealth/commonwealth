@@ -30,6 +30,8 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  api: () => any
+
   public async signWithAccount(account: Account): Promise<string> {
     const encodedMessage = new TextEncoder().encode(account.validationToken);
     const { signature } = await window.solana.signMessage(

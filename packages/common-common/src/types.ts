@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+import * as _ from "lodash";
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
@@ -72,6 +74,7 @@ export enum WalletId {
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',
+  TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
@@ -131,4 +134,6 @@ export enum BalanceType {
   Ethereum = 'ethereum',
   Solana = 'solana',
   Cosmos = 'cosmos',
+  NEAR = 'near',
+  Substrate = 'substrate',
 }

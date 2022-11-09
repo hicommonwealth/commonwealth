@@ -8,14 +8,13 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabled: boolean;
   enabling: boolean;
   accounts: readonly AccountT[];
+  api: any;
   enable: () => Promise<void>;
-  signWithAccount: (account: Account) => Promise<string>;
   validateWithAccount: (
     account: Account,
     walletSignature: string
-  ) => Promise<void>;
-  reset?: () => Promise<void>;
-
+  ) => Promise<void>; // TODO add optional parameter: Function Callback
+  signWithAccount: (account: Account) => Promise<string>;
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
 

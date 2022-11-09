@@ -14,6 +14,10 @@ export type ContractAttributes = {
   token_name?: string;
   symbol?: string;
   type: string;
+  is_factory?: boolean;
+  nickname?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -45,6 +49,8 @@ export default (
       abi_id: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      is_factory: { type: dataTypes.BOOLEAN, allowNull: true },
+      nickname: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'Contracts',

@@ -3,7 +3,12 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
-import { provider } from 'web3-core';
+import {
+  provider,
+  RLPEncodedTransaction,
+  TransactionConfig,
+  TransactionReceipt,
+} from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
@@ -40,6 +45,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public get accounts() {
     return this._accounts || [];
+  }
+
+  public get api() {
+    return this._web3;
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -85,7 +94,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     try {
       // default to ETH
       const chainId = app.chain?.meta.node.ethChainId || 1;
-
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
@@ -123,7 +131,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           throw switchError;
         }
       }
-
       // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;

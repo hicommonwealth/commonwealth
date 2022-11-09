@@ -45,6 +45,7 @@ export const iconLookup = {
   heartFilled: Icons.CWHeartFilled,
   help: Icons.CWHelp,
   home: Icons.CWHome,
+  imageUpload: Icons.CWImageUpload,
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
   jar: Icons.CWJar,
@@ -87,9 +88,10 @@ export const customIconLookup = {
   phantom: CustomIcons.CWPhantom,
   polkadot: CustomIcons.CWPolkadot,
   ronin: CustomIcons.CWRonin,
-  terrastation: CustomIcons.CWTerraStation,
+  terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
+  'terra-walletconnect': CustomIcons.CWWalletConnect,
 };
 
 export type IconName = keyof typeof iconLookup;

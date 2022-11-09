@@ -3,7 +3,7 @@ import { bech32 } from 'bech32';
 declare let window: any;
 
 import Web3 from 'web3';
-import { provider } from 'web3-core';
+import { provider, RLPEncodedTransaction, TransactionConfig } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import app from 'state';
@@ -52,6 +52,10 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api(): any {
+    return this._web3;
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
       message,
@@ -59,6 +63,11 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       ''
     );
     return signature;
+  }
+
+  public async signTransaction(tx: TransactionConfig): Promise<RLPEncodedTransaction> {
+    const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
+    return rlpEncodedTx;
   }
 
   public async signWithAccount(account: Account): Promise<string> {

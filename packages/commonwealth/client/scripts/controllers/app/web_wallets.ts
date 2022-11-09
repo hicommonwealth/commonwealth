@@ -12,6 +12,7 @@ import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_walle
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
 import RoninWebWalletController from './webWallets/ronin_web_wallet';
+import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
@@ -43,7 +44,6 @@ export default class WebWalletController {
       console.error('account must be active to set wallet id');
       return;
     }
-
     // do nothing on failure
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
@@ -75,7 +75,6 @@ export default class WebWalletController {
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === account.address)) {
-        console.log(`Found wallet: ${wallet.name}`);
         await this._setWalletId(account, wallet.name);
         return wallet;
       }
@@ -96,6 +95,7 @@ export default class WebWalletController {
       new KeplrEthereumWalletController(),
       new PhantomWebWalletController(),
       new RoninWebWalletController(),
+      new TerraWalletConnectWebWalletController(),
     ];
   }
 }

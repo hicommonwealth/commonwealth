@@ -34,7 +34,6 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
-  AddContract = 'Add Contract'
 }
 
 const ADMIN_ONLY_TABS = [
