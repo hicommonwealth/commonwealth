@@ -22,9 +22,9 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
       ...domAttrs
     } = vnode.attrs;
 
-    const Icon = iconLookup[iconName];
+    const Icon = iconLookup['arrowLeft'];
 
-    return m(Icon, {
+    return Icon({
       className,
       componentType,
       disabled,
@@ -33,5 +33,27 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
       selected,
       ...domAttrs,
     });
+
+    // return m(Icon, {
+    //   className,
+    //   componentType,
+    //   disabled,
+    //   iconSize,
+    //   onclick,
+    //   selected,
+    //   ...domAttrs,
+    // });
+
+    // return (
+    //   <Icon
+    //     className={className}
+    //     componentType={componentType}
+    //     disabled={disabled}
+    //     iconSize={iconSize}
+    //     onclick={onclick}
+    //     selected={selected}
+    //     {...domAttrs}
+    //   />
+    // );
   }
 }
