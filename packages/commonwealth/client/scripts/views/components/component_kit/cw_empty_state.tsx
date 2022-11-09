@@ -1,14 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'globals';
+import ClassComponent from 'globals';
 
 import 'components/component_kit/cw_empty_state.scss';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
-import { ComponentType } from './types';
 
 type EmptyStateAttrs = {
   content: string | m.Vnode;
@@ -21,7 +20,7 @@ export class CWEmptyState extends ClassComponent<EmptyStateAttrs> {
     return (
       <div class="EmptyState">
         <div class="inner-content">
-          <CWIcon componentType={ComponentType.Icon} iconButtonTheme='black' iconName={iconName} iconSize="xl" />
+          <CWIcon iconButtonTheme="black" iconName={iconName} iconSize="xl" />
           {typeof content === 'string' ? <CWText>{content}</CWText> : content}
         </div>
       </div>

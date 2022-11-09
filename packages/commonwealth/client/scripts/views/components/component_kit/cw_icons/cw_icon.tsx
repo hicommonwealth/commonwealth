@@ -1,8 +1,8 @@
 /* @jsx m */
 
-import m from 'mithril';
+// import m from 'mithril';
+import ClassComponent from 'globals';
 
-import ClassComponent from 'client/scripts/component_wrappers';
 import 'components/component_kit/cw_icon.scss';
 
 import { iconLookup } from './cw_icon_lookup';
@@ -23,6 +23,7 @@ export class CWIcon extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
 
     const Icon = iconLookup[iconName];
+
     return (
       <Icon
         className={className}

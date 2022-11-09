@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-export abstract class ClassComponent<
+export default abstract class ClassComponent<
   P extends Record<string, unknown> = Record<string, unknown>
 > implements m.ClassComponent<P>
 {
