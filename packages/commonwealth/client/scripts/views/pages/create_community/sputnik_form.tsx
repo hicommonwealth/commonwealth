@@ -82,9 +82,15 @@ export class SputnikForm implements m.ClassComponent {
 
             const isMainnet = this.state.form.isMainnet;
 
+            // slice name if has sputnik-dao or sputnikv2 appened or keep name if otherwise
+            const daoName = name.includes('sputnik-dao')
+              ? name.slice(0, name.indexOf('sputnik-dao') - 1)
+              : name.includes('sputnikv2')
+              ? name.slice(0, name.indexOf('sputnikv2') - 1) : name;
+            
             const id = isMainnet
-              ? `${name}.sputnik-dao.near`
-              : `${name}.sputnikv2.testnet`;
+              ? `${daoName}.sputnik-dao.near`
+              : `${daoName}.sputnikv2.testnet`;
 
             const url = isMainnet
               ? 'https://rpc.mainnet.near.org'
@@ -98,7 +104,7 @@ export class SputnikForm implements m.ClassComponent {
               name: id,
               network: ChainNetwork.Sputnik,
               node_url: url,
-              symbol: isMainnet ? 'NEAR' : 'tNEAR',
+              default_symbol: isMainnet ? 'NEAR' : 'tNEAR',
               type: ChainType.DAO,
               ...this.state.form,
             };
