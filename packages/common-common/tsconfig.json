@@ -6,7 +6,7 @@
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "outDir": "../build",
-    "baseUrl": "..",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
@@ -16,16 +16,15 @@
       "common-common/*": ["../../packages/common-common/*"],
       "chain-events": ["../../packages/chain-events"],
       "chain-events/*": ["../../packages/chain-events/*"]
-    },
+    }
   },
-  "files": [
-    "scripts/chainEventsConsumer.ts",
-    "scripts/dbNode.ts",
+  "include": [
+    "src",
   ],
   "exclude": [
     "./node_modules",
     "node_modules",
     "build",
-    "dist"
+    "dist",
   ]
 }

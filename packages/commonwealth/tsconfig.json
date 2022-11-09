@@ -2,12 +2,16 @@
   "compilerOptions": {
     "jsx": "preserve",
     "allowJs": true,
-    "target": "es6",
+    "target": "esnext",
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "outDir": "./build",
     "baseUrl": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false,
     "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
@@ -16,18 +20,16 @@
       "token-balance-cache": ["../../packages/token-balance-cache"],
       "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
-    },
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": false
+    }
   },
   "include": [
     "./client",
     "./client/scripts",
     "./shared/adapters",
     "./test",
-    "./globals.d.ts"
+    "./globals.d.ts",
+    "server/*",
+    "server.ts"
   ],
   "exclude": ["./node_modules"]
 }
