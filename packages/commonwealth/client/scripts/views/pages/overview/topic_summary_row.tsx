@@ -97,6 +97,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                         user,
                         showAddressWithDisplayName: true,
                         avatarSize: 24,
+                        linkify: true,
                       })}
                       <CWText className="last-updated-text">•</CWText>
                       <CWText

@@ -25,7 +25,7 @@ export default class WebWalletController {
     const specificChain = app.chain?.meta?.id;
     if (app.chain?.meta?.id) {
       const specificWallets = this._wallets.filter((w) => !!w.specificChains?.includes(specificChain));
-      if (specificWallets.length > 0) return specificWallets;
+      if (specificWallets.length > 0) return specificWallets.filter((w) => w.available);
     }
 
     // handle general case of wallet by chain base
