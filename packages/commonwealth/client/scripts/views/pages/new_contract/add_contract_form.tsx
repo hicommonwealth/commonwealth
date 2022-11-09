@@ -164,7 +164,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || `Creating new contract with community ${app.activeChainId()} failed`
+                err.responseJSON?.error ||
+                  `Creating new contract with community ${app.activeChainId()} failed`
               );
             } finally {
               this.state.saving = false;
