@@ -15,9 +15,10 @@ export type IconStyleAttrs = {
 
 export type IconAttrs = IconStyleAttrs & {
   componentType?: ComponentType;
-  iconName: IconName;
   onclick?: () => void; // should be used by icon button, not by plain icons
 };
+
+export type IconComponentAttrs = IconAttrs & { iconName: IconName };
 
 export type CustomIconStyleAttrs = {
   iconSize?: IconSize;
