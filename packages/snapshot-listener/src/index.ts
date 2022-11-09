@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from "express";
-import { SnapshotEvent } from './types';
+import { SnapshotEvent } from "./types";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -18,8 +18,6 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     if (!event) {
       res.status(500).send("Error sending snapshot event");
     }
-
-    
   } catch (err) {
     console.log(err);
 
