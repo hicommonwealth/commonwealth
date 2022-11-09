@@ -5,6 +5,7 @@ import { RascalPublications,
   RascalSubscriptions, 
   getRabbitMQConfig 
 } from "common-common/src/rabbitmq";
+import { TRmqMessages } from "common-common/src/rabbitmq/types";
 import { RABBITMQ_URI } from '../config';
 
 describe.skip('RabbitMQ producer integration tests', () => {
@@ -25,7 +26,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
   it('should publish a SnapshotEvent to a queue', async function () {
     await controller.init();
     const sub = await controller.startSubscription(
-    async (event: SnapshotEvent) => {
+    async (event: TRmqMessages) => {
         assert.equal(event.id, 'proposal/0x42');
         assert.equal(event.space, 'test.eth')
         assert.equal(event.event, 'test/created');
