@@ -212,9 +212,11 @@ class GeneralContractPage
                                 );
                                 this.state.loaded = true;
                               }}
-                              inputValidationFn={(val) =>
-                                validateAbiInput(val, input.type)
-                              }
+                              inputValidationFn={(
+                                val: string
+                              ): [ValidationStatus, string] => {
+                                return validateAbiInput(val, input.type);
+                              }}
                             />
                           </div>
                         </div>

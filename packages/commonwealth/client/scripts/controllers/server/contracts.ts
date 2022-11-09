@@ -19,8 +19,8 @@ class ContractsController {
   public get initialized() {
     return this._initialized;
   }
-  public getByNickname(nickname: string) {
-    return this._store.getContractByNickname(nickname);
+  public getFactoryContractByNickname(nickname: string) {
+    return this._store.getFactoryContractByNickname(nickname);
   }
   public getByIdentifier(id) {
     return this._store.getById(id);
@@ -31,8 +31,8 @@ class ContractsController {
   public getByType(type: string) {
     return this._store.getContractByType(type);
   }
-  public getContractFactories() {
-    return this._store.getContractFactories();
+  public getFactoryContracts() {
+    return this._store.getFactoryContracts();
   }
   public getCommunityContracts() {
     return this._store.getCommunityContracts();
