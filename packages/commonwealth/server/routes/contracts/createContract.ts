@@ -15,6 +15,7 @@ export const Errors = {
   NoType: 'Must provide contract type',
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
+  NoCommunity: 'Must provide community',
   InvalidAddress: 'Address is invalid',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'Node url returned invalid response',
@@ -71,6 +72,9 @@ const createContract = async (
   if (!req.user.isAdmin) {
     return next(new Error(Errors.NotAdmin));
   }
+  if (!community) {
+    return next(new Error(Errors.NoCommunity));
+  }
   if (abi && abi.length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
@@ -98,7 +102,27 @@ const createContract = async (
   });
 
   if (oldContract && oldContract.address === address) {
-    return next(new Error(Errors.ContractAddressExists));
+    // contract already exists so attempt to add it to the community if it's not already there
+    const communityContract = await models.CommunityContract.findOne({
+      where: {
+        chain_id: community,
+        contract_id: oldContract.id,
+      },
+    });
+    if (!communityContract) {
+      await models.CommunityContract.create({
+        chain_id: community,
+        contract_id: oldContract.id,
+      });
+    } else {
+      return next(new Error(Errors.ContractAddressExists));
+    }
+    return res.json({
+      status: 'Success',
+      result: {
+        contract: oldContract.toJSON(),
+      },
+    });
   }
 
   try {
