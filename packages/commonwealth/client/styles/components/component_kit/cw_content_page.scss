@@ -6,6 +6,7 @@
     flex-direction: column;
     gap: 16px;
     max-width: 768px;
+    width: 100%;
 
     .header {
       display: flex;
@@ -13,7 +14,9 @@
       gap: 8px;
 
       .header-info-row {
+        align-items: center;
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
 
         .User {
@@ -42,7 +45,8 @@
 .ContentPage {
   display: flex;
   flex: 1;
-  padding: 24px;
+
+  @include contentPadding;
 
   .sidebar-view {
     display: flex;

@@ -2,26 +2,25 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/proposal_comments.scss';
+import 'components/comments/comments_tree.scss';
 
 import app from 'state';
-import { Thread, Comment, AnyProposal } from 'models';
+import { Thread, Comment as CommentType, AnyProposal } from 'models';
+import { Comment } from './comment';
+import { CWValidationText } from '../component_kit/cw_validation_text';
 import { CreateComment } from './create_comment';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { jumpHighlightComment } from './helpers';
-import { MAX_THREAD_LEVEL } from './constants';
-import { ProposalComment } from './proposal_comment';
 
-type ProposalCommentsAttrs = {
-  comments: Array<Comment<any>>;
+const MAX_THREAD_LEVEL = 2;
+
+type CommentsTreeAttrs = {
+  comments: Array<CommentType<any>>;
   proposal: Thread | AnyProposal;
-  setIsGloballyEditing: (status: boolean) => void;
+  setIsGloballyEditing?: (status: boolean) => void;
   updatedCommentsCallback: () => void;
 };
 
-export class ProposalComments
-  implements m.ClassComponent<ProposalCommentsAttrs>
-{
+export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
   private commentError: any;
   private dom;
   private highlightedComment: boolean;
@@ -101,13 +100,13 @@ export class ProposalComments
     };
 
     const recursivelyGatherComments = (
-      comments_: Comment<any>[],
-      parentComment: Comment<any>,
+      comments_: CommentType<any>[],
+      parentComment: CommentType<any>,
       threadLevel: number
     ) => {
       const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
 
-      return comments_.map((comment: Comment<any>) => {
+      return comments_.map((comment: CommentType<any>) => {
         const children = app.comments
           .getByProposal(proposal)
           .filter((c) => c.parentComment === comment.id);
@@ -115,7 +114,7 @@ export class ProposalComments
         if (isLivingCommentTree(comment, children)) {
           return (
             <>
-              <ProposalComment
+              <Comment
                 comment={comment}
                 handleIsReplying={handleIsReplying}
                 isLast={threadLevel === 2}

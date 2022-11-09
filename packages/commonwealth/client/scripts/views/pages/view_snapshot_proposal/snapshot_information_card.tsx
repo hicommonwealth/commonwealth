@@ -13,7 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCard } from '../../components/component_kit/cw_card';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
+import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 type SnapshotInfoRowAttrs = {
   label: string;
@@ -127,7 +127,7 @@ export class SnapshotInformationCard
               Linked Discussions
             </CWText>
             {threads.map((thread) => (
-              <ProposalHeaderSnapshotThreadLink thread={thread} />
+              <SnapshotThreadLink thread={thread} />
             ))}
           </div>
         )}
