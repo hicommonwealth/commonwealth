@@ -32,7 +32,7 @@ export type SnapshotNotification = {
   chain_id: string;
   updated_at: moment.Moment;
   created_at: moment.Moment;
-  SnapshotEvent: <any>; //This is here as models for SnaoshotEvent are not yet defined
+  SnapshotEvent: any; 
 }
 
 export enum WebsocketNamespaces {
