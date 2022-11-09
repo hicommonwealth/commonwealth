@@ -2,13 +2,14 @@
 
 import m from 'mithril';
 
+import ClassComponent from 'helpers/class_component';
 import 'components/component_kit/cw_icon.scss';
 
 import { iconLookup } from './cw_icon_lookup';
 import { IconAttrs } from './types';
 import { ComponentType } from '../types';
 
-export class CWIcon implements m.ClassComponent<IconAttrs> {
+export class CWIcon extends ClassComponent<IconAttrs> {
   view(vnode) {
     const {
       className,

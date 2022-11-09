@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'helpers/class_component';
 
 import 'components/component_kit/cw_empty_state.scss';
 
@@ -12,8 +13,7 @@ type EmptyStateAttrs = {
   content: string | m.Vnode;
   iconName?: IconName;
 };
-
-export class CWEmptyState implements m.ClassComponent<EmptyStateAttrs> {
+export class CWEmptyState extends ClassComponent<EmptyStateAttrs> {
   view(vnode) {
     const { content, iconName } = vnode.attrs;
     return (
