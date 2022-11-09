@@ -8,7 +8,7 @@ export type IconSize = 'small' | 'medium' | 'large' | 'xl' | 'xxl';
 export type IconStyleAttrs = {
   className?: string;
   disabled?: boolean;
-  iconButtonTheme: IconButtonTheme;
+  iconButtonTheme?: IconButtonTheme;
   iconSize?: IconSize;
   selected?: boolean;
 };

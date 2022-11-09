@@ -1,7 +1,7 @@
 /* @jsx m */
 
 // import m from 'mithril';
-import ClassComponent from 'globals';
+import ClassComponent from 'helpers/class_component';
 
 import 'components/component_kit/cw_icon.scss';
 
