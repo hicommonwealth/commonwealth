@@ -1,11 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs", 
-    "outDir": "./dist",
+    "allowJs": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./build",
+    "baseUrl": ".",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  }
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"]
+    }
+  },
+  "include": [
+    "src",
+  ],
+  "exclude": [
+    "./node_modules",
+    "node_modules",
+    "build",
+    "dist"
+  ]
 }
