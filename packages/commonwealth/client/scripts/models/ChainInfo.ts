@@ -3,7 +3,7 @@ import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import { RoleInfo, RolePermission } from 'models';
-import { ChainNetwork, ChainBase } from 'common-common/src/types';
+import { ChainNetwork, ChainBase, ContractsViewable } from 'common-common/src/types';
 import { ChainInstance } from 'server/models/chain';
 import NodeInfo from './NodeInfo';
 
@@ -34,6 +34,7 @@ class ChainInfo {
   public terms: string;
   public readonly blockExplorerIds: { [id: string]: string };
   public readonly collapsedOnHomepage: boolean;
+  public contractsViewable: ContractsViewable;
   public defaultOverview: boolean;
   public readonly chainObjectId: string;
   public adminsAndMods: RoleInfo[];
@@ -70,6 +71,7 @@ class ChainInfo {
     terms,
     blockExplorerIds,
     collapsedOnHomepage,
+    contractsViewable,
     defaultOverview,
     adminsAndMods,
     base,
@@ -103,6 +105,7 @@ class ChainInfo {
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
     this.collapsedOnHomepage = collapsedOnHomepage;
+    this.contractsViewable = contractsViewable;
     this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
@@ -137,6 +140,7 @@ class ChainInfo {
     block_explorer_ids,
     collapsed_on_homepage,
     default_summary_view,
+    contracts_viewable,
     adminsAndMods,
     base,
     ss58_prefix,
@@ -176,6 +180,7 @@ class ChainInfo {
       terms,
       blockExplorerIds: blockExplorerIdsParsed,
       collapsedOnHomepage: collapsed_on_homepage,
+      contractsViewable: contracts_viewable,
       defaultOverview: default_summary_view,
       adminsAndMods,
       base,
@@ -262,6 +267,7 @@ class ChainInfo {
     terms,
     snapshot,
     iconUrl,
+    contractsViewable,
     defaultOverview,
     chatEnabled,
   }) {
@@ -282,6 +288,7 @@ class ChainInfo {
       snapshot,
       terms,
       icon_url: iconUrl,
+      contracts_viewable: contractsViewable,
       default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
@@ -299,6 +306,7 @@ class ChainInfo {
     this.snapshot = updatedChain.snapshot;
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
+    this.contractsViewable = updatedChain.contracts_viewable;
     this.defaultOverview = updatedChain.default_summary_view;
     this.chatEnabled = updatedChain.chat_enabled;
   }

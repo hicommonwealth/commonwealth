@@ -40,9 +40,13 @@ export const setChainCategories = async (
             },
           ]);
         } else if (!create) {
-          app.config.chainCategories = app.config.chainCategories.filter(
-            (data) => data.id !== response.result.id
-          );
+          // TODO: this is a hack, we should be able to just remove the category from the list
+          if (response?.result) {
+            app.config.chainCategories = app.config.chainCategories.filter(
+              (c) => c.id !== response.result.id
+            );
+          }
+          // else we don't have a result, so we don't know what to remove
         }
         resolve();
         m.redraw();

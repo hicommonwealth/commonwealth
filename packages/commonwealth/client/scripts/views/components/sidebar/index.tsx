@@ -6,15 +6,16 @@ import 'components/sidebar/index.scss';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { ContractsViewable } from 'common-common/src/types';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
+import { ContractSection } from './contract_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CommunityHeader } from './community_header';
 import { getClasses } from '../component_kit/helpers';
-
 type SidebarAttrs = {
   isSidebarToggleable?: boolean;
   isSidebarToggled?: boolean;
@@ -23,7 +24,13 @@ type SidebarAttrs = {
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
   view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
     const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
-
+    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+    const contractsViewable = app.config.chains.getById(
+      app.activeChainId()
+    )?.contractsViewable;
+    const isContractsViewable =
+      (contractsViewable === ContractsViewable.AdminOnly && isAdmin) ||
+      contractsViewable === ContractsViewable.AllUsers;
     const hideChat = !app.chain?.meta?.chatEnabled;
 
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
@@ -45,6 +52,7 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
               <AdminSection />
               <DiscussionSection />
               <GovernanceSection />
+              {isContractsViewable && <ContractSection />}
               {app.socket && !hideChat && <ChatSection />}
               <ExternalLinksModule />
               <div class="buttons-container">

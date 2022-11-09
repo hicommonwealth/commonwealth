@@ -80,6 +80,7 @@ const updateChain = async (
     custom_domain,
     chat_enabled,
     default_summary_view,
+    contracts_viewable,
     terms,
   } = req.body;
 
@@ -144,6 +145,8 @@ const updateChain = async (
   // use the code they run to steal login tokens for arbitrary users.
   //
   // chain.custom_domain = custom_domain;
+
+  chain.contracts_viewable = contracts_viewable;
 
   await chain.save();
 

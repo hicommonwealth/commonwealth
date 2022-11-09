@@ -10,9 +10,10 @@ import {
   ChainBase,
   ChainCategoryType,
   ChainNetwork,
+  ContractsViewable,
 } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -51,6 +52,7 @@ export class ChainMetadataRows
   chatEnabled: boolean;
   customDomain: string;
   terms: string;
+  contractsViewable: ContractsViewable;
   defaultOverview: boolean;
   network: ChainNetwork;
   symbol: string;
@@ -79,6 +81,7 @@ export class ChainMetadataRows
     this.network = vnode.attrs.chain.network;
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
+    this.contractsViewable = vnode.attrs.chain.contractsViewable;
     this.defaultOverview = vnode.attrs.chain.defaultOverview;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
@@ -186,6 +189,17 @@ export class ChainMetadataRows
               : 'Discussion listing defaults to latest activity view'
           }
         />
+        <SelectRow
+          title="Contract Viewable Settings"
+          options={[
+            ContractsViewable.Off,
+            ContractsViewable.AdminOnly,
+            ContractsViewable.AllUsers,
+          ]}
+          value={this.contractsViewable}
+          onchange={(value) => {
+            this.contractsViewable = value;
+          }}/>
         <ToggleRow
           title="Chat Enabled"
           defaultValue={vnode.attrs.chain.chatEnabled}
@@ -309,6 +323,7 @@ export class ChainMetadataRows
               snapshot,
               terms,
               iconUrl,
+              contractsViewable,
               defaultOverview,
             } = this;
 
@@ -369,6 +384,7 @@ export class ChainMetadataRows
                 snapshot,
                 terms,
                 iconUrl,
+                contractsViewable,
                 defaultOverview,
                 chatEnabled,
               });
