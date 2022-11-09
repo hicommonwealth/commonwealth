@@ -35,7 +35,7 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
+import { getThreadSubScriptionMenuItem } from '../discussions/thread_preview_menu';
 import { CollapsibleBodyText } from '../../components/collapsible_body_text';
 import { CreateComment } from '../../components/comments/create_comment';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
