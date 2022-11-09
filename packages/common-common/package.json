@@ -11,7 +11,8 @@
   },
   "keywords": [],
   "scripts": {
-    "build-contracts": "cd src/eth && npx hardhat compile"
+    "build-contracts": "cd src/eth && npx hardhat compile",
+    "check-types": "tsc --noEmit && tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
