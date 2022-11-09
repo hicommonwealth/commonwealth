@@ -63,7 +63,6 @@ export default class GeneralContractsController {
     data: string,
     wallet: IWebWallet<any>
   ) {
-    // encoding + decoding require ABI + happen inside contracts controller
     try {
       const result = await this.contractCall(wallet.api, { to, data });
       return result;
@@ -217,7 +216,6 @@ export default class GeneralContractsController {
           );
         }
         await initAppState(false);
-        // TODO: notify about needing to run event migration
         m.route.set(`/${res.result.chain?.id}`);
       } catch (err) {
         throw new Error(err);
