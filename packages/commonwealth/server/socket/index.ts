@@ -1,20 +1,28 @@
 // Use https://admin.socket.io/#/ to monitor
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import {Server, Socket} from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
-import {ExtendedError} from 'socket.io/dist/namespace';
+import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
-import {createAdapter} from '@socket.io/redis-adapter';
-import {ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError} from "redis";
+import { createAdapter } from '@socket.io/redis-adapter';
+import {
+  ConnectionTimeoutError,
+  createClient,
+  ReconnectStrategyError,
+  SocketClosedUnexpectedlyError,
+} from 'redis';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalSubscriptions,
+} from 'common-common/src/rabbitmq';
 import Rollbar from 'rollbar';
-import {createCeNamespace, publishToCERoom} from './chainEventsNs';
-import {getRabbitMQConfig, RabbitMQController, RascalSubscriptions} from 'common-common/src/rabbitmq';
-import {JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP} from '../config';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {createChatNamespace} from './chatNs';
-import {DB} from '../models';
-import {RedisCache, redisRetryStrategy} from 'common-common/src/redisCache';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -133,14 +141,14 @@ export async function setupWebSocketServer(
     }
   });
   pubClient.on('ready', () => {
-    log.info("Redis pub-client ready");
-  })
+    log.info('Redis pub-client ready');
+  });
   pubClient.on('reconnecting', () => {
-    log.info("Redis pub-client reconnecting");
-  })
+    log.info('Redis pub-client reconnecting');
+  });
   pubClient.on('end', () => {
     log.info('Redis pub-client disconnected');
-  })
+  });
   subClient.on('error', (err) => {
     if (err instanceof ConnectionTimeoutError) {
       log.error(
@@ -164,28 +172,26 @@ export async function setupWebSocketServer(
     }
   });
   subClient.on('ready', () => {
-    log.info("Redis sub-client ready");
-  })
+    log.info('Redis sub-client ready');
+  });
   subClient.on('reconnecting', () => {
-    log.info("Redis sub-client reconnecting");
-  })
+    log.info('Redis sub-client reconnecting');
+  });
   subClient.on('end', () => {
     log.info('Redis sub-client disconnected');
-  })
+  });
 
   await Promise.all([pubClient.connect(), subClient.connect()]);
 
-  // provide the redis connection instances to the socket.io adapters
   await io.adapter(<any>createAdapter(pubClient, subClient));
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
+
   await redisCache.init();
   console.log('Redis Cache initialized!');
 
-  // create the chain-events namespace
-  const ceNamespace = createCeNamespace(io);
-  const chatNamespace = createChatNamespace(io, models, redisCache);
+  const chainEventsNameSpace = createCeNamespace(io);
 
   try {
     const rabbitController = new RabbitMQController(
@@ -194,7 +200,7 @@ export async function setupWebSocketServer(
 
     await rabbitController.init();
     await rabbitController.startSubscription(
-      publishToCERoom.bind(ceNamespace),
+      publishToCERoom.bind(chainEventsNameSpace),
       RascalSubscriptions.ChainEventNotifications
     );
   } catch (e) {
