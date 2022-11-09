@@ -44,7 +44,7 @@ export class SnapshotProposalCard
               window.scrollY;
             navigateToSubpage(proposalLink);
           } else {
-            navigateToSubpage(`/common${proposalLink}`);
+            navigateToSubpage(proposalLink);
           }
         }}
       >
