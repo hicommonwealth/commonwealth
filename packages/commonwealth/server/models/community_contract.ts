@@ -16,7 +16,6 @@ export type CommunityContractAttributes = {
 };
 
 export type CommunityContractInstance = ModelInstance<CommunityContractAttributes> & {
-  // add mixins as needed
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
   getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
 };

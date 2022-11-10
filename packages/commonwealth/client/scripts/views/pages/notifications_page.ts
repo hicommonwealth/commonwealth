@@ -80,7 +80,7 @@ function previousPage() {
   if (flag) m.redraw();
 }
 
-const NotificationsPage: m.Component<{}> = {
+const NotificationsPage: m.Component = {
   view: (vnode) => {
     if (!app.isLoggedIn())
       return m(PageError, {

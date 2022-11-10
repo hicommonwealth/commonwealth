@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
+import { ModelStatic } from './types';
 
 export type IdentityCacheAttributes = {
   chain: string;

@@ -15,9 +15,7 @@ export type SsoTokenAttributes = {
   Address: AddressAttributes;
 }
 
-export type SsoTokenInstance = ModelInstance<SsoTokenAttributes> & {
-
-}
+export type SsoTokenInstance = ModelInstance<SsoTokenAttributes>;
 
 export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
 

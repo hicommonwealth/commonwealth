@@ -8,9 +8,7 @@ export type ContractAbiAttributes = {
   abi: Record<string, unknown>;
 };
 
-export type ContractAbiInstance = ModelInstance<ContractAbiAttributes> & {
-    // add mixins as needed
-};
+export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
 

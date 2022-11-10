@@ -35,7 +35,7 @@ const COLLECTIVES: CWCollectiveStub[] = [
   },
 ];
 
-const CollectivesPage: m.Component<{}> = {
+const CollectivesPage: m.Component = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {

@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import { SocialAccountAttributes } from './social_account';
@@ -23,9 +23,7 @@ export type LoginTokenAttributes = {
 }
 
 
-export type LoginTokenInstance = ModelInstance<LoginTokenAttributes> & {
-  // no mixins used yet
-}
+export type LoginTokenInstance = ModelInstance<LoginTokenAttributes>;
 
 export type LoginTokenCreationAttributes = LoginTokenAttributes & {
   createForEmail?: (email: string, path?: string) => Promise<LoginTokenInstance>;

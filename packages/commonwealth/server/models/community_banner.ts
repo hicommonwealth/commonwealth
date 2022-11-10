@@ -10,8 +10,7 @@ export type CommunityBannerAttributes = {
   updated_at?: Date;
 }
 
-export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes> & {
-}
+export type CommunityBannerInstance = ModelInstance<CommunityBannerAttributes>;
 
 export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
 

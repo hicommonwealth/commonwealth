@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 
 import { UserAttributes, UserInstance } from './user';
 import { ModelStatic, ModelInstance } from './types';

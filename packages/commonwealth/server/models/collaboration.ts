@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ThreadInstance, ThreadAttributes } from './thread';
@@ -15,7 +15,6 @@ export type CollaborationAttributes = {
 }
 
 export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {
-  // no mixins used yet
   getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
   setAddress: Sequelize.BelongsToSetAssociationMixin<AddressInstance, AddressInstance['id']>;
   getThread: Sequelize.BelongsToGetAssociationMixin<ThreadInstance>;

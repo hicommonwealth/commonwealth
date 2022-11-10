@@ -11,8 +11,7 @@ export type ChatMessageAttributes = {
   updated_at?: Date;
 }
 
-export type ChatMessageInstance = ModelInstance<ChatMessageAttributes> & {
-}
+export type ChatMessageInstance = ModelInstance<ChatMessageAttributes>;
 
 export type ChatMessageModelStatic = ModelStatic<ChatMessageInstance>;
 

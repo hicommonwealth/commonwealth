@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
 import { ChainEventAttributes, ChainEventInstance } from './chain_event';

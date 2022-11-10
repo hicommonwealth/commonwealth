@@ -1,7 +1,8 @@
 import { ChainBase } from 'common-common/src/types';
+import * as dotenv from 'dotenv'
 
-/* eslint-disable indent,prefer-template,operator-linebreak */
-require('dotenv').config();
+
+dotenv.config();
 
 export const DEFAULT_PORT = '8080';
 

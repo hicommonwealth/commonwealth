@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { Permission } from './role';
 import {

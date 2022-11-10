@@ -7,8 +7,6 @@ import {
   CWEvent,
   SubstrateTypes,
 } from 'chain-events/src';
-import Sequelize from 'sequelize';
-const Op = Sequelize.Op;
 
 import { addPrefix, factory } from 'common-common/src/logging';
 

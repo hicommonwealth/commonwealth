@@ -44,7 +44,7 @@ const PROJECTS: CWProjectStub[] = [
   },
 ];
 
-const ProjectsPage: m.Component<{}> = {
+const ProjectsPage: m.Component = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {

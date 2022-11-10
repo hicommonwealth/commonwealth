@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { UserAttributes } from './user';
 import { ChainAttributes } from './chain';
@@ -16,9 +16,7 @@ export type StarredCommunityAttributes = {
   Chain?: ChainAttributes;
 }
 
-export type StarredCommunityInstance = ModelInstance<StarredCommunityAttributes> & {
-  // no mixins used
-}
+export type StarredCommunityInstance = ModelInstance<StarredCommunityAttributes>;
 
 export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
 

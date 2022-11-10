@@ -36,9 +36,7 @@ export type AddressAttributes = {
 	SsoToken?: SsoTokenAttributes;
 }
 
-// eslint-disable-next-line no-use-before-define
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-	// no mixins used yet
 	getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
 	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
 	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;

@@ -50,7 +50,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
-const ProposalsPage: m.Component<{}> = {
+const ProposalsPage: m.Component = {
   oncreate: () => {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');

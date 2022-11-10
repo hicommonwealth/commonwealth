@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 
 import { AddressAttributes } from './address';
@@ -25,9 +25,7 @@ export type CommentAttributes = {
   Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
 }
 
-export type CommentInstance = ModelInstance<CommentAttributes> & {
-  // no mixins used
-}
+export type CommentInstance = ModelInstance<CommentAttributes>;
 
 export type CommentModelStatic =  ModelStatic<CommentInstance>;
 

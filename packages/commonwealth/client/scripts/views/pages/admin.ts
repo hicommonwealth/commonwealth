@@ -119,7 +119,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
   },
 };
 
-const ChainStats: m.Component<{}> = {
+const ChainStats: m.Component = {
   view: () => {
     const header = (label) =>
       m('h4.header', { style: 'margin: 15px 0;' }, label);
@@ -366,7 +366,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
   },
 };
 
-const AdminPage: m.Component<{}> = {
+const AdminPage: m.Component = {
   oncreate: () => {},
   view: () => {
     if (!app.user.isSiteAdmin) {

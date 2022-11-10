@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { ThreadAttributes } from './thread';
 import { ChainEventAttributes } from './chain_event';

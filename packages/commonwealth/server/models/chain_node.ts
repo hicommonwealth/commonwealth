@@ -14,9 +14,7 @@ export type ChainNodeAttributes = {
   description?: string;
 }
 
-export type ChainNodeInstance = ModelInstance<ChainNodeAttributes> & {
-  // TODO: add mixins as needed
-}
+export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
 export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 

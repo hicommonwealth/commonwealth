@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "heroku-postbuild": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress && yarn build-scripts",
+    "heroku-postbuild": "yarn build-server && NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.prod.js --progress",
     "build": "webpack --config webpack/webpack.config.prod.js --progress",
     "build-scripts": "tsc --project tsconfig.scripts.json && tsc-alias --project tsconfig.scripts.json",
+    "build-server": "tsc --project tsconfig.server.json && tsc-alias --project tsconfig.server.json",
     "build:css": "NODE_ENV=production build client/styles/shared.scss",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit",
@@ -262,7 +263,6 @@
     "nyc": "^15.1.0",
     "process": "^0.11.10",
     "source-map-support": "^0.5.13",
-    "stylelint": "^12.0.0",
     "sync-request": "^6.1.0",
     "webpack-dev-server": "^3.1.14"
   },
