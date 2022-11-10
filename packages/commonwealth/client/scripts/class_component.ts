@@ -7,5 +7,5 @@ export default abstract class ClassComponent<
   /** Do not use, only used for JSX validation */
   protected readonly __props: A;
 
-  abstract view(v: m.Vnode<A, this>): m.Children | null;
+  abstract view(v: m.Vnode<A>): m.Children | null;
 }
