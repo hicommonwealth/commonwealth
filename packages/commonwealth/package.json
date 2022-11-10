@@ -30,7 +30,7 @@
     "start-consumer": "ts-node --project tsconfig.scripts.json server/scripts/chainEventsConsumer.ts",
     "start-dbNode": "WORKER_NUMBER=0 NUM_WORKERS=1 ts-node --project tsconfig.scripts.json server/scripts/dbNode.ts",
     "start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
-    "start-windows": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project server/tsconfig.json server.ts",
+    "start-windows": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
     "migrate-events": "ENTITY_MIGRATION=all ts-node --project tsconfig.json server/scripts/runMigrateChainEntities.ts",
     "migrate-event": "ts-node --project tsconfig.json server/scripts/runMigrateChainEntities.ts",
