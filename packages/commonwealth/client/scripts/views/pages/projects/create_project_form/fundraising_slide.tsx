@@ -4,6 +4,7 @@ import m from 'mithril';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTokenInput } from 'views/components/component_kit/cw_token_input';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { SelectList, Button, Icons } from 'construct-ui';
 import { validateProjectForm } from '../helpers';
 import {
@@ -26,49 +27,14 @@ export class FundraisingSlide
           Select what token type, your goal funding goal and period as well as
           what address the funds will be going.
         </CWText>
-        <SelectList
-          items={[
+        <CWDropdown
+          menuItems={[
             {
-              name: 'WETH',
-              address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+              label: 'WETH',
             },
-            // {
-            //   name: 'DAI',
-            //   address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-            // },
-            // {
-            //   name: 'USDC',
-            //   address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-            // },
-            // {
-            //   name: 'RAI',
-            //   address: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919',
-            // },
           ]}
-          itemRender={(token: TokenOption) => {
-            return (
-              <div value={token.address} style="cursor: pointer">
-                <CWText type="body1">{token.name}</CWText>
-              </div>
-            );
-          }}
-          filterable={false}
           label="Raise In"
-          name="Raise In"
-          onSelect={(token: TokenOption) => {
-            this.tokenName = token.name;
-            vnode.attrs.form.token = token.address;
-          }}
-          style="width: 441px;"
-          trigger={
-            <Button
-              align="left"
-              compact={true}
-              iconRight={Icons.CHEVRON_DOWN}
-              style="width: 100%;"
-              label={`Raise token: ${this.tokenName}`}
-            />
-          }
+          uniqueId="token-selector"
         />
         <CWTokenInput
           label="Goal"
@@ -83,35 +49,18 @@ export class FundraisingSlide
           tokenIconUrl={WethUrl}
           value={vnode.attrs.form.threshold}
         />
-        <SelectList
-          class="fundraise-length-list"
-          items={['1 week', '2 weeks', '3 weeks', '4 weeks']}
-          itemRender={(i: string) => {
-            return (
-              <div value={i} style="cursor: pointer">
-                <CWText type="body1">{i}</CWText>
-              </div>
-            );
-          }}
-          filterable={false}
+        <CWDropdown
+          menuItems={['1 week', '2 weeks', '3 weeks', '4 weeks'].map(
+            (length) => {
+              return { label: length };
+            }
+          )}
           label="Fundraising Period"
-          name="Fundraising Period"
           onSelect={(length: string) => {
             const lengthInSeconds = +length.split(' ')[0] * weekInSeconds;
             vnode.attrs.form.fundraiseLength = lengthInSeconds;
           }}
-          style="width: 441px;"
-          trigger={
-            <Button
-              align="left"
-              compact={true}
-              iconRight={Icons.CHEVRON_DOWN}
-              style="width: 100%;"
-              label={`Fundraise period: ${
-                vnode.attrs.form?.fundraiseLength / weekInSeconds
-              } week`}
-            />
-          }
+          uniqueId="length-selector"
         />
         <CWTextInput
           placeholder="Address"

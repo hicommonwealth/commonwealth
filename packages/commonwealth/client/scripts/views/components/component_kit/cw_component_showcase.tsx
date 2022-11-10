@@ -388,7 +388,7 @@ export class ComponentShowcase implements m.ClassComponent {
             placeholder="Type here"
           />
           <CWDropdown
-            defaultMenuItems={[
+            menuItems={[
               { label: 'Dropdown Option 1' },
               { label: 'Dropdown Option 2' },
               { label: 'Dropdown Option 3' },
@@ -399,7 +399,7 @@ export class ComponentShowcase implements m.ClassComponent {
             uniqueId="component-kit"
           />
           {/* <CWDropdown
-            defaultMenuItems={[
+            menuItems={[
               { label: 'Dropdown Option 1' },
               { label: 'Dropdown Option 2' },
               { label: 'Dropdown Option 3' },

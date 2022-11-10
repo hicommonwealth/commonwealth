@@ -61,7 +61,7 @@ export class InformationSlide
           required
         />
         <CWDropdown
-          defaultMenuItems={
+          menuItems={
             allEthChains.map((chain: ChainInfo) => {
               const disabled = !userEthChains.includes(chain);
               return { label: chain.name, disabled };
@@ -80,7 +80,7 @@ export class InformationSlide
           uniqueId="chain-selector"
         />
         <CWDropdown
-          defaultMenuItems={
+          menuItems={
             chainAccounts.map((acc: Account) => {
               return { label: acc.address };
             }) as DefaultMenuItem[]

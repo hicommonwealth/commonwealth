@@ -10,7 +10,7 @@ import { DefaultMenuItem } from './types';
 
 export type DropdownInputAttrs = {
   defaultActiveIndex?: number;
-  defaultMenuItems: DefaultMenuItem[];
+  menuItems: DefaultMenuItem[];
   label: string;
   placeholder?: string;
   onSelect?: (optionLabel: string, index?: number) => void;
@@ -36,16 +36,11 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
   }
 
   view(vnode: VnodeDOM<DropdownInputAttrs, this>) {
-    const {
-      defaultActiveIndex,
-      defaultMenuItems,
-      label,
-      onSelect,
-      placeholder,
-    } = vnode.attrs;
+    const { defaultActiveIndex, menuItems, label, onSelect, placeholder } =
+      vnode.attrs;
 
     if (!this.value) {
-      this.value = defaultMenuItems[defaultActiveIndex ?? 0].label;
+      this.value = menuItems[defaultActiveIndex ?? 0].label;
     }
     const { showDropdown, value } = this;
 
@@ -67,7 +62,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
         />
         {showDropdown && (
           <div class="dropdown-options-display">
-            {defaultMenuItems.map((item, idx) => {
+            {menuItems.map((item, idx) => {
               return (
                 <CWPopoverMenuItem
                   {...item}
