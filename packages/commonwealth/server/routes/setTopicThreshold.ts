@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import BN from 'bn.js';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
@@ -21,13 +22,13 @@ const setTopicThreshold = async (models, req, res: Response, next: NextFunction)
   });
   if (!topic) return next(new AppError(Errors.InvalidTopicId));
 
-  const token_threshold = parseInt(req.body.token_threshold, 10);
-  if (Number.isNaN(token_threshold) || token_threshold < 0) {
+  const isNumber = /^\d+$/.test(req.body.token_threshold);
+  if (!isNumber) {
     return next(new AppError(Errors.InvalidThreshold));
   }
 
   await models.Topic.update({
-    token_threshold
+    token_threshold: req.body.token_threshold
   },
   {
     where: {
