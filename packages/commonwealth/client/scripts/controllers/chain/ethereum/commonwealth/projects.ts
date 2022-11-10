@@ -158,7 +158,8 @@ export default class ProjectsController {
       null,
       this._factoryInfo.node,
       ICuratedProjectFactory__factory.connect,
-      '0x9f20ed5f919dc1c1695042542c13adcfc100dcab'
+      '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a'
+      // '0x9f20ed5f919dc1c1695042542c13adcfc100dcab'
     );
 
     const projectId = await contract.numProjects();
@@ -190,8 +191,8 @@ export default class ProjectsController {
     if (txReceipt.status !== 1) {
       throw new Error(`Failed to create project contract`);
     }
-    // TODO: disconnect provider?
 
+    // JAKE TODO: disconnect provider?
     // on success, hit server to update chain
     // TODO: should we check for failure vs success in result?
     if (chainId) {
