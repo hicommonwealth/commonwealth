@@ -16,7 +16,7 @@ export class CWParticipant {
   }
 
   public get addressInfo(): AddressInfo {
-    return null; // TODO: Lookup
+    return new AddressInfo(null, this.address, this.project.chainId);
   }
 
   constructor(

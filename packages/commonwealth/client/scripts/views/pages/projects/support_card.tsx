@@ -60,9 +60,9 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
         </div>
         <div class="card-body">
           <CWText type="caption">
-            {supportType === ProjectRole.Curator
-              ? 'Curate the project at the following amount'
-              : 'Back the project at the following amount'}
+            {supportType === ProjectRole.Backer
+              ? ''
+              : `Curator receives ${project.curatorFee / 100}% of funds`}
           </CWText>
           <CWTokenInput
             label={inputLabel}

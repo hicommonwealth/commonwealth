@@ -3,6 +3,7 @@
 .ViewProject {
   margin: 56px 0;
   max-width: 1000px;
+
   @include large {
     margin-left: 256px;
     margin-right: 256px;
@@ -24,16 +25,6 @@
     margin-right: 32px;
   }
 
-  .User {
-    display: flex;
-    align-items: center;
-
-    .username {
-      position: relative;
-      top: 1.5px;
-    }
-  }
-
   .project-metadata {
     display: flex;
     justify-content: space-between;
@@ -42,13 +33,13 @@
     .metadata-left {
       align-items: center;
       display: flex;
-      gap: 8px;
+      gap: 12px;
     }
 
     .metadata-right {
       display: flex;
       .cui-tag {
-        gap: 2px;
+        gap: 4px;
         .Icon,
         .Text {
           color: $neutral-500;
@@ -56,6 +47,7 @@
       }
     }
   }
+
   .project-overview-and-support {
     display: flex;
 
@@ -117,18 +109,6 @@
           }
         }
       }
-      .project-curator-data {
-        display: flex;
-        justify-content: left;
-        margin: 40px 0;
-
-        .User {
-          margin-right: 112px;
-        }
-        .caption {
-          color: $neutral-400;
-        }
-      }
     }
 
     .project-support-panel {
@@ -153,9 +133,6 @@
     }
   }
 
-  .Divider {
-    margin: 40px 0;
-  }
   .project-about {
     margin-top: 40px;
     .MarkdownFormattedText {
@@ -168,18 +145,23 @@
       }
     }
   }
-  .project-backers-wrap {
-    .CWTable {
+
+  .Table {
+    th:nth-child(even),
+    td:nth-child(even) {
+      display: flex;
+      justify-content: flex-end;
     }
   }
 
+  // Components
+
+  .Divider {
+    margin: 40px 0;
+  }
+
   .User {
-    .user-display-name {
-      position: relative;
-      top: 1px;
-    }
-    .user-avatar-only svg {
-      margin: 0;
-    }
+    display: flex;
+    align-items: center;
   }
 }
