@@ -27,7 +27,7 @@ export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
       : ProjectStatus.Active;
 
     const onclick = () => {
-      m.route.set(`project/${project.id}-${slugify(project.title)}`);
+      m.route.set(`/project/${project.id}-${slugify(project.title)}`);
     };
 
     return (

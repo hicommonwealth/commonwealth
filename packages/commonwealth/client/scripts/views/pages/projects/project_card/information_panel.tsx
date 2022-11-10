@@ -4,11 +4,11 @@ import m from 'mithril';
 import app from 'state';
 import _ from 'lodash';
 
-import { AddressInfo, ChainInfo, Project } from 'models';
+import { ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import User from 'views/components/widgets/user';
+import User, { AnonymousUser } from 'views/components/widgets/user';
 import { Tag } from 'construct-ui';
 import { ProjectStatus } from '../types';
 
@@ -20,9 +20,21 @@ interface InformationPanelAttrs {
 export class InformationPanel
   implements m.ClassComponent<InformationPanelAttrs>
 {
+  getProjectShortDescription(p: Project) {
+    if (p.shortDescription) return p.shortDescription;
+    else {
+      if (p.description.length > 244) {
+        return `${p.description.slice(0, 241)}...`;
+      } else {
+        return p.description;
+      }
+    }
+  }
+
   view(vnode: m.Vnode<InformationPanelAttrs>) {
     const { project, projectStatus } = vnode.attrs;
     const projectChain: ChainInfo = app.config.chains.getById(project.chainId);
+
     return (
       <div class="InformationPanel">
         <div class="funding-data">
@@ -54,29 +66,35 @@ export class InformationPanel
           </div>
         </div>
         <div class="description">
-          <CWText type="h5">{project.title}</CWText>
+          <CWText type="h5" fontStyle="semiBold">
+            {project.title}
+          </CWText>
           <CWText type="caption">
-            {project.shortDescription || project.description}
+            {this.getProjectShortDescription(project)}
           </CWText>
         </div>
         <div class="beneficiary-data">
-          {/* // TODO: Make real user */}
-          {m(User, {
-            user: new AddressInfo(
-              project.creatorAddressId,
-              project.creatorAddressInfo.address,
-              project.creatorAddressInfo.chain.id
-            ),
-          })}
-          {project.chainId && (
-            <Tag
-              label={
-                <CWText type="caption" fontWeight="medium">
-                  {projectChain.name}
-                </CWText>
-              }
-            />
-          )}
+          <div class="data-left">
+            {m(User, {
+              user: project.creatorAddressInfo,
+            })}
+          </div>
+          <div class="data-right">
+            {project.curatorFee > 0 && (
+              <CWText type="caption">
+                {project.curatorFee / 100}% Curator Fee
+              </CWText>
+            )}
+            {project.chainId && (
+              <Tag
+                label={
+                  <CWText type="caption" fontWeight="medium">
+                    {projectChain.name}
+                  </CWText>
+                }
+              />
+            )}
+          </div>
         </div>
       </div>
     );

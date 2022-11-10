@@ -514,7 +514,7 @@ export const AnonymousUser: m.Component<
   view: (vnode) => {
     const {
       avatarOnly,
-      avatarSize,
+      avatarSize = 16,
       hideAvatar,
       distinguishingKey,
       showAsDeleted,

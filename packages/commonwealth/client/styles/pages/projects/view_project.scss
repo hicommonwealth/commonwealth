@@ -31,22 +31,29 @@
     .username {
       position: relative;
       top: 1.5px;
-      margin-left: 5px;
     }
   }
 
   .project-metadata {
     display: flex;
     justify-content: space-between;
-    margin: 30px 0;
+    margin: 16px 0;
 
     .metadata-left {
-      display: flex;
       align-items: center;
+      display: flex;
+      gap: 8px;
     }
 
     .metadata-right {
       display: flex;
+      .cui-tag {
+        gap: 2px;
+        .Icon,
+        .Text {
+          color: $neutral-500;
+        }
+      }
     }
   }
   .project-overview-and-support {
@@ -60,6 +67,10 @@
       flex: 2;
       margin-right: 16px;
 
+      .ProjectCompletionBar {
+        height: 16px;
+      }
+
       .project-header-img {
         max-height: 512px;
         height: auto;
@@ -72,13 +83,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 20px;
 
         .left-panel {
           display: flex;
 
           .project-funds-raised,
           .project-funds-goal {
+            padding: 8px;
+            border-left: 2px solid $neutral-200;
             display: flex;
             flex-direction: column;
             margin-right: 48px;
@@ -145,7 +157,7 @@
     margin: 40px 0;
   }
   .project-about {
-    margin-top: 56px;
+    margin-top: 40px;
     .MarkdownFormattedText {
       p,
       a,
@@ -162,15 +174,10 @@
   }
 
   .User {
-    // TODO Graham 5-16-22: Our User components are jenky as hell and
-    // should be prioritized in ongoing component kit refactor
     .user-display-name {
       position: relative;
       top: 1px;
-      font-size: 12px;
     }
-    // TODO Graham 5-16-22: We should come up with global, dynamic,
-    // avatar-size-adapted adjustments for centering jdenticons
     .user-avatar-only svg {
       margin: 0;
     }

@@ -55,9 +55,9 @@ export default class SupportProjectModal
   }
 
   view(vnode) {
-    console.log(vnode.attrs);
     const { project, supportType } = vnode.attrs;
     const copyText = supportProjectModalCopy[supportType];
+
     return (
       <div class="SupportProjectModal">
         <div class={`sidebar ${supportType as string}`}>

@@ -14,6 +14,7 @@ export default class ProjectCompletionBar
 {
   view(vnode) {
     const { completionPercent, projectStatus } = vnode.attrs;
+
     return (
       <div class="ProjectCompletionBar">
         <div

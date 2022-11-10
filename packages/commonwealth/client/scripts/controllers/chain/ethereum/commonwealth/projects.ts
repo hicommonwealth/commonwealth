@@ -56,17 +56,15 @@ export default class ProjectsController {
       project_id: projectId,
       chain_id: chainId,
     });
-    console.log({ res });
+
     for (const project of res.result) {
       try {
         const pObj = Project.fromJSON(project);
-        console.log(pObj);
         if (!this._store.getById(pObj.id)) {
           this._store.add(pObj);
         } else {
           this._store.update(pObj);
         }
-        console.log(this._store);
       } catch (e) {
         console.error(
           `Could not load project: ${JSON.stringify(project)}: ${e.message}`
@@ -164,7 +162,6 @@ export default class ProjectsController {
     );
 
     const projectId = await contract.numProjects();
-    console.log({ projectId });
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
     console.log([

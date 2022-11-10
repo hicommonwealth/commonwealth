@@ -9,8 +9,7 @@ import { weiToTokens } from '../helpers';
 const projectDefaults = {
   title: 'Untitled Crowdfund',
   description: 'This project has not been provided with a description.',
-  shortDescription: 'This project has not been provided with a description.',
-  coverImage: '/static/img/crowdfund/default_cover_image',
+  coverImage: '/static/img/crowdfund_default.png',
 };
 
 class Project {
@@ -30,7 +29,7 @@ class Project {
     return new AddressInfo(
       this.creatorAddressId,
       this.creator,
-      this.chainId,
+      this.chainId || 'ethereum',
       null
     );
   }
@@ -181,9 +180,9 @@ class Project {
     public readonly token: string,
     public readonly title: string = projectDefaults.title,
     public readonly description: string = projectDefaults.description,
-    public readonly shortDescription: string = projectDefaults.shortDescription,
+    public readonly shortDescription: string,
     public readonly coverImage: string = projectDefaults.coverImage,
-    public readonly curatorFee: BN,
+    public readonly curatorFee: number,
     public readonly threshold: BN,
     public readonly deadline: number,
     public readonly createdAt: moment.Moment,
@@ -237,7 +236,7 @@ class Project {
       description || projectDefaults.description,
       short_description || projectDefaults.shortDescription,
       cover_image || projectDefaults.coverImage,
-      new BN(curator_fee), // TODO: This should perhaps be a % or decimal, not BN
+      curator_fee,
       new BN(threshold),
       deadline,
       moment(created_at),

@@ -83,9 +83,8 @@ export class CWTokenInput implements m.ClassComponent<TokenInputAttrs> {
       tokenId,
     } = vnode.attrs;
 
-    // TODO
-    const tokenIconUrl = vnode.attrs.tokenIconUrl; // || tokens.filter((t) => t.id === tokenId)
-    console.log(tokenIconUrl);
+    const tokenIconUrl = vnode.attrs.tokenIconUrl;
+
     return (
       <div
         class={getClasses<{
