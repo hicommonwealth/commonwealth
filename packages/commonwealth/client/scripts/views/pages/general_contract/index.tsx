@@ -29,7 +29,12 @@ import {
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import { ChainFormState } from '../create_community/types';
+import {
+  ChainFormState,
+  EthChainAttrs,
+  EthFormFields,
+} from '../create_community/types';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 type CreateContractForm = {
   functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
@@ -76,8 +81,18 @@ class GeneralContractPage
       }
     };
 
-    const callFunction = async (contractAddress: string, fn: AbiItem) => {
-      const contract = app.contracts.getByAddress(contractAddress);
+    const initContractController = async (contract: Contract) => {
+      // initialize daoFactory Controller
+      const ethChain = app.chain.chain as EthereumChain;
+      const web3 = await ethChain._initApi(app.chain.meta.node);
+
+      this.generalContractsController = new GeneralContractsController(
+        web3,
+        contract
+      );
+    };
+
+    const callFunction = async (fn: AbiItem) => {
       this.state.loading = true;
       let tx: string | TransactionReceipt;
 
@@ -89,22 +104,13 @@ class GeneralContractPage
       );
 
       try {
-        // initialize daoFactory Controller
-        const ethChain = app.chain.chain as EthereumChain;
-        const web3 = await ethChain._initApi(app.chain.meta.node);
-
-        this.generalContractsController = new GeneralContractsController(
-          web3,
-          contract
-        );
-
         const sender = app.user.activeAccount;
-        //   // get querying wallet
+
+        // get querying wallet
         const signingWallet = await app.wallets.locateWallet(
           sender,
           ChainBase.Ethereum
         );
-
         tx = await this.generalContractsController.callContractFunction(
           fn,
           processedArgs,
@@ -149,8 +155,8 @@ class GeneralContractPage
         this.state.loaded = true;
         this.state.status = 'success';
         this.state.message = 'Contract loaded';
+        fetchContractAbi(contract);
       }
-      fetchContractAbi(contract);
     }
 
     if (!app.contracts || !app.chain) {
@@ -162,6 +168,8 @@ class GeneralContractPage
         );
       }
     }
+    const contract = app.contracts.getByAddress(contractAddress);
+    initContractController(contract);
 
     return (
       <Sublayout>
@@ -244,7 +252,7 @@ class GeneralContractPage
                         notifySuccess('Submit Call button clicked!');
                         this.state.saving = true;
                         try {
-                          callFunction(contractAddress, fn);
+                          callFunction(fn);
                         } catch (err) {
                           notifyError(
                             err.responseJSON?.error ||
