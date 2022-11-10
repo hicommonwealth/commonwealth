@@ -66,6 +66,19 @@ export default class CreateProjectForm implements m.ClassComponent {
         }
       }
     }
+    console.log({
+      title: this.form.title,
+      description: this.form.description.textContentsAsString,
+      shortDescription: this.form.shortDescription,
+      coverImage: this.form.coverImage,
+      chainId: app.activeChainId(),
+      token: this.form.token,
+      creator: this.form.creator,
+      beneficiary: this.form.beneficiary,
+      threshold: this.form.threshold,
+      deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
+      curatorFee: Math.round(this.form.curatorFee * 100),
+    });
     const [txReceipt, newProjectId] = await app.projects.createProject({
       title: this.form.title,
       description: this.form.description.textContentsAsString,
@@ -76,7 +89,7 @@ export default class CreateProjectForm implements m.ClassComponent {
       creator: this.form.creator,
       beneficiary: this.form.beneficiary,
       threshold: this.form.threshold,
-      deadline: nowInSeconds + this.form.fundraiseLength,
+      deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
       curatorFee: Math.round(this.form.curatorFee * 100), // curator fee is between 0 & 10000
     });
     if (txReceipt.status !== 1) {
