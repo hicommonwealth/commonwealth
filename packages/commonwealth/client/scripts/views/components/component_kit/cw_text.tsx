@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text.scss';
 
@@ -37,10 +38,10 @@ type TextStyleAttrs = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
-  fontWeight: FontWeight;
+  fontWeight?: FontWeight;
   isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
-  type: FontType;
+  type?: FontType;
 };
 
 type TextAttrs = {
@@ -58,8 +59,8 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export class CWText implements m.ClassComponent<TextAttrs> {
-  view(vnode) {
+export class CWText extends ClassComponent<TextAttrs> {
+  view(vnode: m.Vnode<TextAttrs>) {
     const {
       className,
       disabled = false,
