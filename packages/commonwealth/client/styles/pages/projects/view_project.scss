@@ -27,13 +27,15 @@
 
   .project-metadata {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
-    margin: 16px 0;
+    margin: 8px 0;
 
     .metadata-left {
       align-items: center;
       display: flex;
       gap: 12px;
+      margin: 8px 0;
     }
 
     .metadata-right {
@@ -45,6 +47,7 @@
           color: $neutral-500;
         }
       }
+      margin: 8px 0;
     }
   }
 

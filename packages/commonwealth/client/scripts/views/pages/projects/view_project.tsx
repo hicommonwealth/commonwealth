@@ -74,7 +74,6 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
       <Sublayout
         title="Project"
         showNewProposalButton={false}
-        hideQuickSwitcher={true}
         hideSidebar={true}
       >
         <div class="ViewProject">
@@ -100,7 +99,9 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 }
               />
               <Tag
-                label={<CWText type="h5">{project.deadline} Blocks</CWText>}
+                label={
+                  <CWText type="h5">Ends at {project.deadline} Blocks</CWText>
+                }
               />
             </div>
           </div>

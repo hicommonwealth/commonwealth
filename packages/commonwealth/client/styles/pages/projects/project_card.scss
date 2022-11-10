@@ -7,16 +7,8 @@
   display: flex;
   filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.3));
   flex-direction: column;
-  width: 336px;
-
-  // TODO: REPLACE
-  .dummy-chain-wrap {
-    left: 8px;
-    position: relative;
-    .chain-icon {
-      border-radius: 100%;
-    }
-  }
+  min-width: 336px;
+  max-width: 336px;
 
   .HeaderPanel {
     background-color: $neutral-200;

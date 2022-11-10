@@ -16,7 +16,6 @@ import { SublayoutHeader } from './sublayout_header';
 // Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
   hideFooter?: boolean;
-  hideQuickSwitcher?: boolean;
   hideSearch?: boolean;
   hideSidebar?: boolean;
   onscroll: () => null; // lazy loading for page content
