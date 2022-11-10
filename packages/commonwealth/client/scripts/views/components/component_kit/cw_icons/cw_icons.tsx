@@ -1,9 +1,10 @@
 /* @jsx m */
 
+/* eslint-disable max-classes-per-file */
 /* eslint-disable max-len */
 
 import m from 'mithril';
-import { FC } from 'helpers/class_component';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
@@ -28,8 +29,8 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // If added properly, the icon should auto-display in the component kit.
 
 // ICON TEMPLATE
-// export const CWIconName: m.Component<IconAttrs> = {
-//   view: (vnode: m.VnodeDOM<IconAttrs>) => {
+// export class CWIconName extends ClassComponent<IconAttrs> {
+//   view(vnode: m.Vnode<IconAttrs>){
 // const {
 //   className,
 //   componentType,
@@ -54,11 +55,11 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //       {/* INSERT PATH HERE */}
 //       </svg>
 //     );
-//   },
-// };
+//   }
+// }
 
-export class CWArrowLeft extends FC<IconAttrs> {
-  view(vnode) {
+export class CWArrowLeft extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -68,7 +69,6 @@ export class CWArrowLeft extends FC<IconAttrs> {
       selected,
       ...domAttrs
     } = vnode.attrs;
-
     return (
       <svg
         class={getClasses<IconStyleAttrs>(
@@ -92,42 +92,8 @@ export class CWArrowLeft extends FC<IconAttrs> {
   }
 }
 
-// export const CWArrowLeft: m.Component<IconAttrs> = {
-//   view: (vnode: m.VnodeDOM<IconAttrs>) => {
-//     const {
-//       className,
-//       componentType,
-//       disabled,
-//       iconButtonTheme,
-//       iconSize,
-//       selected,
-//       ...domAttrs
-//     } = vnode.attrs;
-//     return (
-//       <svg
-//         class={getClasses<IconStyleAttrs>(
-//           { className, disabled, iconButtonTheme, iconSize, selected },
-//           componentType
-//         )}
-//         xmlns="http://www.w3.org/2000/svg"
-//         width="32"
-//         height="32"
-//         fill="none"
-//         viewBox="0 0 32 32"
-//         {...domAttrs}
-//       >
-//         <path
-//           fill-rule="evenodd"
-//           d="M2.244 15.582a.482.482 0 000 .836l13.038 7.517a.483.483 0 00.724-.418V17h13.5a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-13.5V8.483a.483.483 0 00-.724-.418L2.244 15.582z"
-//           clip-rule="evenodd"
-//         ></path>
-//       </svg>
-//     );
-//   },
-// };
-
-export const CWArrowRight: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWArrowRight extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -157,11 +123,11 @@ export const CWArrowRight: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWBacker: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWBacker extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -198,11 +164,11 @@ export const CWBacker: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWBadge: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWBadge extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -229,11 +195,11 @@ export const CWBadge: m.Component<IconAttrs> = {
         <path d="M17.083 4.583a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM17.083 28.417a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM27.183 22.458a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM6.882 22.458a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0zM6.882 10.64a1.083 1.083 0 11-2.167 0 1.083 1.083 0 012.167 0zM27.183 10.64a1.083 1.083 0 11-2.166 0 1.083 1.083 0 012.166 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWBell: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWBell extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -264,11 +230,11 @@ export const CWBell: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCautionCircle: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCautionCircle extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -300,11 +266,11 @@ export const CWCautionCircle: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCautionTriangle: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCautionTriangle extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -336,11 +302,11 @@ export const CWCautionTriangle: m.Component<IconAttrs> = {
         <path d="M14.67 11.585a.75.75 0 01.75-.75h.5a.75.75 0 01.75.75v8.503a.75.75 0 01-.75.75h-.5a.75.75 0 01-.75-.75v-8.503zM17.003 23.672a1.334 1.334 0 11-2.667 0 1.334 1.334 0 012.667 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCheck: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCheck extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -370,11 +336,11 @@ export const CWCheck: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWChevronDown: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWChevronDown extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -404,11 +370,11 @@ export const CWChevronDown: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWChevronLeft: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWChevronLeft extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -438,11 +404,11 @@ export const CWChevronLeft: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWChevronRight: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWChevronRight extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -472,11 +438,11 @@ export const CWChevronRight: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWChevronUp: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWChevronUp extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -506,11 +472,11 @@ export const CWChevronUp: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWClock: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWClock extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -540,11 +506,11 @@ export const CWClock: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWClose: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWClose extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -578,11 +544,11 @@ export const CWClose: m.Component<IconAttrs> = {
         </defs>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCloud: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCloud extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -616,11 +582,11 @@ export const CWCloud: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCollapse: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCollapse extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -650,11 +616,11 @@ export const CWCollapse: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCommonLogo: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCommonLogo extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -680,11 +646,11 @@ export const CWCommonLogo: m.Component<IconAttrs> = {
         <path d="M20.6647 6.81642C18.4119 6.81295 16.2273 7.59355 14.482 9.02568L20.2675 14.8461C20.4171 14.9957 20.5358 15.1736 20.6168 15.3695C20.6978 15.5654 20.7395 15.7754 20.7395 15.9876C20.7395 16.1998 20.6978 16.4098 20.6168 16.6057C20.5358 16.8016 20.4171 16.9795 20.2675 17.1291L14.3223 23.1058C16.0939 24.6149 18.3426 25.4398 20.6647 25.4322C25.958 25.4322 30.2539 21.2697 30.2539 16.1308C30.2539 10.9918 25.9493 6.81642 20.6647 6.81642Z" />
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCompass: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCompass extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -715,11 +681,11 @@ export const CWCompass: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCopy: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCopy extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -750,11 +716,11 @@ export const CWCopy: m.Component<IconAttrs> = {
         <path d="M26 6a.5.5 0 00-.5-.5h-11a.5.5 0 00-.5.5v3.5h-2V4a.5.5 0 01.5-.5h15a.5.5 0 01.5.5v19a.5.5 0 01-.5.5H19v-2h6.5a.5.5 0 00.5-.5V6z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCouncilProposal: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCouncilProposal extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -780,11 +746,11 @@ export const CWCouncilProposal: m.Component<IconAttrs> = {
         <path d="M14.586 8.914a2 2 0 012.828 0l6.364 6.364a2 2 0 010 2.829l-6.364 6.364a2 2 0 01-2.828 0l-6.364-6.364a2 2 0 010-2.829l6.364-6.364zM11 8.5a3 3 0 11-6 0 3 3 0 016 0zM27 8.5a3 3 0 11-6 0 3 3 0 016 0zM11 24.5a3 3 0 11-6 0 3 3 0 016 0zM27 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCow: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCow extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -814,11 +780,11 @@ export const CWCow: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWCurator: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWCurator extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -850,11 +816,11 @@ export const CWCurator: m.Component<IconAttrs> = {
         <path d="M10.428 23.347a2 2 0 013.404 0l2.25 3.648H8.178l2.248-3.648zM11.706 18.049a1.829 1.829 0 100-3.658 1.829 1.829 0 000 3.658z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWDemocraticProposal: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWDemocraticProposal extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -884,11 +850,11 @@ export const CWDemocraticProposal: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWDiscord: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWDiscord extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -914,11 +880,11 @@ export const CWDiscord: m.Component<IconAttrs> = {
         <path d="M26.182 8.864s-2.918-2.285-6.364-2.546l-.31.622c3.114.763 4.543 1.854 6.037 3.196C22.97 8.822 20.43 7.591 16 7.591c-4.43 0-6.97 1.23-9.545 2.545 1.494-1.342 3.194-2.555 6.037-3.196l-.31-.622c-3.615.34-6.364 2.546-6.364 2.546S2.56 13.589 2 22.864c3.284 3.788 8.273 3.818 8.273 3.818l1.043-1.39a12.748 12.748 0 01-5.498-3.701c2.06 1.559 5.17 3.182 10.182 3.182 5.011 0 8.121-1.623 10.182-3.182a12.74 12.74 0 01-5.498 3.701l1.043 1.39s4.99-.03 8.273-3.818c-.56-9.275-3.818-14-3.818-14zM11.864 20.318c-1.231 0-2.228-1.139-2.228-2.545 0-1.407.997-2.546 2.228-2.546 1.23 0 2.227 1.14 2.227 2.546s-.997 2.545-2.227 2.545zm8.272 0c-1.23 0-2.227-1.139-2.227-2.545 0-1.407.997-2.546 2.227-2.546 1.231 0 2.228 1.14 2.228 2.546s-.997 2.545-2.228 2.545z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWDots: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWDots extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -944,11 +910,11 @@ export const CWDots: m.Component<IconAttrs> = {
         <path d="M8.059 16a3 3 0 11-6 0 3 3 0 016 0zM18.858 16a3 3 0 11-6 0 3 3 0 016 0zM30.058 16c0 1.657-1.432 3-3.2 3-1.767 0-3.2-1.343-3.2-3s1.433-3 3.2-3c1.768 0 3.2 1.343 3.2 3z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWDotsVertical: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWDotsVertical extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -974,11 +940,11 @@ export const CWDotsVertical: m.Component<IconAttrs> = {
         <path d="M16 8.059a3 3 0 110-6 3 3 0 010 6zM16 18.858a3 3 0 110-6 3 3 0 010 6zM16 30.058c-1.657 0-3-1.432-3-3.2 0-1.767 1.343-3.2 3-3.2s3 1.433 3 3.2c0 1.768-1.343 3.2-3 3.2z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWDownvote: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWDownvote extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1004,11 +970,11 @@ export const CWDownvote: m.Component<IconAttrs> = {
         <path d="M16.73 27.828a.843.843 0 01-1.46 0L2.113 5.018a.845.845 0 01.731-1.268h26.31c.65 0 1.055.704.73 1.267l-13.154 22.81z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWElement: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWElement extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1038,11 +1004,11 @@ export const CWElement: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWExpand: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWExpand extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1072,11 +1038,11 @@ export const CWExpand: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWExploreCommunities: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWExploreCommunities extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1107,11 +1073,11 @@ export const CWExploreCommunities: m.Component<IconAttrs> = {
         <path d="M18.561 12.813a2.303 2.303 0 11-4.607 0 2.303 2.303 0 014.607 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWExternalLink: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWExternalLink extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1141,11 +1107,11 @@ export const CWExternalLink: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWFeedback: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWFeedback extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1175,11 +1141,11 @@ export const CWFeedback: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWFilter: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWFilter extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1209,11 +1175,11 @@ export const CWFilter: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWFlag: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWFlag extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1243,11 +1209,11 @@ export const CWFlag: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWFlame: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWFlame extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1273,11 +1239,11 @@ export const CWFlame: m.Component<IconAttrs> = {
         <path d="M19.909 30.332c-.215.043-.378-.314-.244-.487 1.575-2.034-.621-6.082-2.787-8.747a1.122 1.122 0 00-1.756 0c-2.166 2.665-4.362 6.713-2.787 8.747.134.173-.029.53-.244.487C-.757 27.749 7.91 11.445 15.085 2.93a1.189 1.189 0 011.83 0c7.176 8.515 15.842 24.82 2.994 27.402z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWGear: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWGear extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1357,11 +1323,11 @@ export const CWGear: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWGithub: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWGithub extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1391,11 +1357,11 @@ export const CWGithub: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHamburger: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHamburger extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1420,11 +1386,11 @@ export const CWHamburger: m.Component<IconAttrs> = {
         <path d="M2 20c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1zM30 13c0 .276-.348.5-.778.5H2.778c-.43 0-.778-.224-.778-.5v-1c0-.276.348-.5.778-.5h26.444c.43 0 .778.224.778.5v1z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHash: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHash extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1454,11 +1420,11 @@ export const CWHash: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHeartEmpty: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHeartEmpty extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1488,11 +1454,11 @@ export const CWHeartEmpty: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHeartFilled: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHeartFilled extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1522,11 +1488,11 @@ export const CWHeartFilled: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHelp: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHelp extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1556,11 +1522,11 @@ export const CWHelp: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWHome: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWHome extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1590,11 +1556,11 @@ export const CWHome: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWInfoEmpty: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWInfoEmpty extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1625,11 +1591,11 @@ export const CWInfoEmpty: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWImageUpload: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWImageUpload extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1655,11 +1621,11 @@ export const CWImageUpload: m.Component<IconAttrs> = {
         <path d="M25.3332 17.8488C24.9795 17.8488 24.6404 17.9893 24.3904 18.2393C24.1403 18.4894 23.9998 18.8285 23.9998 19.1822V19.6888L22.0265 17.7155C21.3297 17.0242 20.388 16.6363 19.4065 16.6363C18.425 16.6363 17.4833 17.0242 16.7865 17.7155L15.8532 18.6488L12.5465 15.3422C11.84 14.6696 10.9019 14.2945 9.9265 14.2945C8.95108 14.2945 8.01301 14.6696 7.3065 15.3422L5.33317 17.3155V9.84882C5.33317 9.4952 5.47365 9.15606 5.72369 8.90601C5.97374 8.65596 6.31288 8.51549 6.6665 8.51549H15.9998C16.3535 8.51549 16.6926 8.37501 16.9426 8.12496C17.1927 7.87491 17.3332 7.53578 17.3332 7.18215C17.3332 6.82853 17.1927 6.48939 16.9426 6.23934C16.6926 5.9893 16.3535 5.84882 15.9998 5.84882H6.6665C5.60564 5.84882 4.58822 6.27025 3.83808 7.02039C3.08793 7.77054 2.6665 8.78795 2.6665 9.84882V25.8488C2.6665 26.9097 3.08793 27.9271 3.83808 28.6772C4.58822 29.4274 5.60564 29.8488 6.6665 29.8488H22.6665C23.7274 29.8488 24.7448 29.4274 25.4949 28.6772C26.2451 27.9271 26.6665 26.9097 26.6665 25.8488V19.1822C26.6665 18.8285 26.526 18.4894 26.276 18.2393C26.0259 17.9893 25.6868 17.8488 25.3332 17.8488ZM6.6665 27.1822C6.31288 27.1822 5.97374 27.0417 5.72369 26.7916C5.47365 26.5416 5.33317 26.2024 5.33317 25.8488V21.0888L9.19984 17.2222C9.39572 17.0355 9.65592 16.9314 9.9265 16.9314C10.1971 16.9314 10.4573 17.0355 10.6532 17.2222L14.8798 21.4488L20.6132 27.1822H6.6665ZM23.9998 25.8488C23.9979 26.1041 23.9138 26.3519 23.7598 26.5555L17.7465 20.5155L18.6798 19.5822C18.7754 19.4846 18.8895 19.4071 19.0154 19.3542C19.1414 19.3013 19.2766 19.274 19.4132 19.274C19.5498 19.274 19.685 19.3013 19.8109 19.3542C19.9368 19.4071 20.0509 19.4846 20.1465 19.5822L23.9998 23.4622V25.8488ZM30.2798 6.23549L26.2798 2.23549C26.153 2.1141 26.0035 2.01895 25.8398 1.95549C25.5152 1.82213 25.1511 1.82213 24.8265 1.95549C24.6628 2.01895 24.5133 2.1141 24.3865 2.23549L20.3865 6.23549C20.1354 6.48656 19.9944 6.82708 19.9944 7.18215C19.9944 7.53722 20.1354 7.87775 20.3865 8.12882C20.6376 8.37989 20.9781 8.52094 21.3332 8.52094C21.6882 8.52094 22.0288 8.37989 22.2798 8.12882L23.9998 6.39549V13.8488C23.9998 14.2024 24.1403 14.5416 24.3904 14.7916C24.6404 15.0417 24.9795 15.1822 25.3332 15.1822C25.6868 15.1822 26.0259 15.0417 26.276 14.7916C26.526 14.5416 26.6665 14.2024 26.6665 13.8488V6.39549L28.3865 8.12882C28.5105 8.25379 28.6579 8.35298 28.8204 8.42067C28.9829 8.48837 29.1572 8.52322 29.3332 8.52322C29.5092 8.52322 29.6835 8.48837 29.8459 8.42067C30.0084 8.35298 30.1559 8.25379 30.2798 8.12882C30.4048 8.00487 30.504 7.8574 30.5717 7.69492C30.6394 7.53244 30.6742 7.35817 30.6742 7.18215C30.6742 7.00614 30.6394 6.83186 30.5717 6.66938C30.504 6.50691 30.4048 6.35944 30.2798 6.23549Z" />
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWInfoFilled: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWInfoFilled extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1689,11 +1655,11 @@ export const CWInfoFilled: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWJar: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWJar extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1724,11 +1690,11 @@ export const CWJar: m.Component<IconAttrs> = {
         <path d="M19 18.5a3 3 0 11-6 0 3 3 0 016 0zM15.026 24.5a3 3 0 11-6 0 3 3 0 016 0zM22.974 24.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWLink: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWLink extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1758,11 +1724,11 @@ export const CWLink: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWLock: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWLock extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1792,11 +1758,11 @@ export const CWLock: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWLogout: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWLogout extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1831,11 +1797,11 @@ export const CWLogout: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWMail: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWMail extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1865,11 +1831,11 @@ export const CWMail: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWMute: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWMute extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1900,11 +1866,11 @@ export const CWMute: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWPeople: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWPeople extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1935,11 +1901,11 @@ export const CWPeople: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWPerson: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWPerson extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -1969,11 +1935,11 @@ export const CWPerson: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWPin: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWPin extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2001,11 +1967,11 @@ export const CWPin: m.Component<IconAttrs> = {
         <path d="M10.556 2.5h10.888L23 19.5H9l1.556-17z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWPlus: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWPlus extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2032,11 +1998,11 @@ export const CWPlus: m.Component<IconAttrs> = {
         <path d="M16.5 2.5c.276 0 .5.348.5.778v26.444c0 .43-.224.778-.5.778h-1c-.276 0-.5-.348-.5-.778V3.278c0-.43.224-.778.5-.778h1z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWPlusCircle: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWPlusCircle extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2066,11 +2032,11 @@ export const CWPlusCircle: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWSearch: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWSearch extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2100,11 +2066,11 @@ export const CWSearch: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWSend: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWSend extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2134,11 +2100,11 @@ export const CWSend: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWShare: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWShare extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2168,11 +2134,11 @@ export const CWShare: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWShare2: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWShare2 extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2202,11 +2168,11 @@ export const CWShare2: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWSidebarCollapse: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWSidebarCollapse extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2236,11 +2202,11 @@ export const CWSidebarCollapse: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWSidebarExpand: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWSidebarExpand extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2270,11 +2236,11 @@ export const CWSidebarExpand: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWStar: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWStar extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2300,11 +2266,11 @@ export const CWStar: m.Component<IconAttrs> = {
         <path d="M13.065 1.469c.326-.861 1.544-.861 1.87 0l1.422 3.753a1 1 0 001.483.482l3.357-2.2c.77-.506 1.755.21 1.513 1.099l-1.056 3.872a1 1 0 00.917 1.262l4.01.192c.919.044 1.295 1.203.577 1.779l-3.13 2.512a1 1 0 000 1.56l3.13 2.512c.718.576.342 1.735-.578 1.779l-4.009.192a1 1 0 00-.917 1.262l1.056 3.873c.242.888-.743 1.604-1.513 1.099l-3.357-2.201a1 1 0 00-1.483.482l-1.422 3.753c-.326.861-1.544.861-1.87 0l-1.422-3.753a1 1 0 00-1.484-.482l-3.356 2.2c-.77.506-1.755-.21-1.513-1.098l1.056-3.873a1 1 0 00-.917-1.262l-4.01-.192C.5 20.027.125 18.868.843 18.292l3.13-2.512a1 1 0 000-1.56l-3.13-2.512C.124 11.132.5 9.973 1.42 9.929l4.009-.192a1 1 0 00.917-1.262L5.29 4.603c-.242-.889.743-1.605 1.513-1.1l3.356 2.201a1 1 0 001.484-.482l1.422-3.753z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWSun: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWSun extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2380,11 +2346,11 @@ export const CWSun: m.Component<IconAttrs> = {
         ></rect>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWTelegram: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWTelegram extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2414,11 +2380,11 @@ export const CWTelegram: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWTrash: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWTrash extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2449,11 +2415,11 @@ export const CWTrash: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWTreasuryProposal: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWTreasuryProposal extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2483,11 +2449,11 @@ export const CWTreasuryProposal: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWTwitter: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWTwitter extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2513,11 +2479,11 @@ export const CWTwitter: m.Component<IconAttrs> = {
         <path d="M28.553 8.978c.02.306.02.613.02.919 0 9.34-6.517 20.103-18.428 20.103-3.67 0-7.078-1.16-9.946-3.172.522.066 1.023.088 1.564.088 3.028 0 5.815-1.116 8.041-3.02-2.847-.065-5.233-2.1-6.056-4.9.401.067.803.11 1.224.11.581 0 1.163-.087 1.704-.24-2.968-.657-5.194-3.5-5.194-6.935v-.087a6.119 6.119 0 002.928.897c-1.744-1.27-2.887-3.435-2.887-5.885 0-1.312.32-2.515.882-3.565 3.188 4.287 7.98 7.087 13.355 7.393a8.668 8.668 0 01-.16-1.618C15.6 5.172 18.486 2 22.075 2c1.865 0 3.55.853 4.732 2.231a12.125 12.125 0 004.11-1.706c-.48 1.64-1.503 3.019-2.846 3.894 1.303-.153 2.566-.547 3.73-1.094a14.679 14.679 0 01-3.25 3.653z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWUpvote: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWUpvote extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2543,11 +2509,11 @@ export const CWUpvote: m.Component<IconAttrs> = {
         <path d="M15.27 4.172a.843.843 0 011.46 0l13.156 22.81a.845.845 0 01-.731 1.268H2.845a.845.845 0 01-.73-1.267l13.154-22.81z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWViews: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWViews extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2578,11 +2544,11 @@ export const CWViews: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWWallet: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWWallet extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2618,11 +2584,11 @@ export const CWWallet: m.Component<IconAttrs> = {
         <path d="M27.145 18.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWWebsite: m.Component<IconAttrs> = {
-  view: (vnode: m.VnodeDOM<IconAttrs>) => {
+export class CWWebsite extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
       componentType,
@@ -2652,11 +2618,11 @@ export const CWWebsite: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}
 
-export const CWWrite: m.Component<IconAttrs> = {
-  view: (vnode) => {
+export class CWWrite extends ClassComponent<IconAttrs> {
+  view(vnode) {
     const {
       className,
       componentType,
@@ -2686,5 +2652,5 @@ export const CWWrite: m.Component<IconAttrs> = {
         ></path>
       </svg>
     );
-  },
-};
+  }
+}

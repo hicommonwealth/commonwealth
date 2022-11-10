@@ -1,7 +1,7 @@
 /* @jsx m */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
-import ClassComponent from 'helpers/class_component';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -10,7 +10,7 @@ import { IconComponentAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWIcon extends ClassComponent<IconComponentAttrs> {
-  view(vnode: m.Vnode<IconComponentAttrs, this>) {
+  view(vnode: m.Vnode<IconComponentAttrs>) {
     const {
       className,
       componentType = ComponentType.Icon,
@@ -22,27 +22,7 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
       ...domAttrs
     } = vnode.attrs;
 
-    const Icon = iconLookup['arrowLeft'];
-
-    // return Icon({
-    //   className,
-    //   componentType,
-    //   disabled,
-    //   iconSize,
-    //   onclick,
-    //   selected,
-    //   ...domAttrs,
-    // });
-
-    // return m(Icon, {
-    //   className,
-    //   componentType,
-    //   disabled,
-    //   iconSize,
-    //   onclick,
-    //   selected,
-    //   ...domAttrs,
-    // });
+    const Icon = iconLookup[iconName];
 
     return (
       <Icon
