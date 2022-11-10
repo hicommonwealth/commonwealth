@@ -1,7 +1,7 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
 
-import { CuratedProjectFactory__factory } from '../types';
+import { CuratedProjectFactory__factory } from '../../src/contractTypes/factories/CuratedProjectFactory__factory';
 
 async function main() {
   // TODO: configure URL based on chain

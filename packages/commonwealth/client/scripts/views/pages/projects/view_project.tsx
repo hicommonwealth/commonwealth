@@ -3,12 +3,14 @@ import 'pages/projects/view_project.scss';
 
 import m from 'mithril';
 import app from 'state';
+import Web3 from 'web3';
+
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { AddressInfo, ChainInfo, Project } from 'models';
+import { ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import Sublayout from 'views/sublayout';
-import User, { AnonymousUser } from 'views/components/widgets/user';
+import User from 'views/components/widgets/user';
 import { PageNotFound } from 'views/pages/404';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { CWTable } from 'views/components/component_kit/cw_table';
@@ -17,8 +19,9 @@ import ProjectCompletionBar from './project_completion_bar';
 import SupportCard from './support_card';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CommunityLabel } from '../../components/community_label';
-import Web3 from 'web3';
 import { ChainNetwork } from '../../../../../../common-common/src/types';
+import { PageLoading } from '../loading';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -45,9 +48,9 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
   }
 
   view(vnode: m.Vnode<ProjectPageAttrs>) {
-    if (!app) return;
-
+    if (!app) return <PageLoading />;
     const { identifier } = vnode.attrs;
+
     if (typeof identifier !== 'string') {
       return m(PageNotFound, { title: 'Projects' });
     }
@@ -61,10 +64,8 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
 
     const threshold = +weiToTokens(project.threshold.toString(), 18);
     const fundingAmount = +weiToTokens(project.fundingAmount.toString(), 18);
-    const chain: ChainInfo = project.chainId
-      ? app.config.chains.getById(project.chainId)
-      : null;
-    console.log({ chain });
+    const chain: ChainInfo = app.config.chains.getById(project.chainId);
+
     return (
       <Sublayout
         title="Project"
@@ -76,14 +77,23 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
           <CWText type="h1">{project.title}</CWText>
           <div class="project-metadata">
             <div class="metadata-left">
-              {!!chain?.name && (
-                <CommunityLabel community={chain} size="large" />
-              )}
-              {/* {m(User, { avatarSize: 32, user: project.creatorAddressInfo })} */}
+              {!!chain && <CommunityLabel community={chain} size="large" />}
+              {m(User, { avatarSize: 32, user: project.creatorAddressInfo })}
             </div>
             <div class="metadata-right">
-              <Tag label={`${project.createdAt.format('MMMM D, YYYY')}`} />
-              <Tag label={`${project.deadline} Blocks`} />
+              <Tag
+                label={
+                  <>
+                    <CWIcon iconName="clock" />
+                    <CWText type="h5">
+                      {project.createdAt.format('MMMM D, YYYY')}
+                    </CWText>
+                  </>
+                }
+              />
+              <Tag
+                label={<CWText type="h5">{project.deadline} Blocks</CWText>}
+              />
             </div>
           </div>
 
@@ -112,11 +122,13 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 </div>
               </div>
               <div class="project-curator-data">
-                {/* TODO: Replace with actual user */}
-                {m(AnonymousUser, { avatarSize: 16, distinguishingKey: '2' })}
+                {project.curators.map((c) => {
+                  return m(User, {
+                    user: c.addressInfo,
+                  });
+                })}
                 <CWText type="caption">
-                  Curator receives {project.curatorFee.toNumber() / 100}% of
-                  funds.
+                  Curator receives {project.curatorFee / 100}% of funds.
                 </CWText>
               </div>
             </div>

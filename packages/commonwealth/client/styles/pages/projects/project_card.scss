@@ -93,14 +93,17 @@
 
   .InformationPanel {
     background-color: $white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
     padding: 8px 16px;
-    min-height: 208px;
-    max-height: 208px;
+    min-height: 212px;
+    max-height: 212px;
+    border-radius: 0px 0px 5px 5px;
     .funding-data {
       display: flex;
       justify-content: space-between;
       .cui-tag {
-        background: $neutral-50;
         border: none;
         border-radius: 5px;
         display: flex;
@@ -137,33 +140,47 @@
         white-space: break-spaces;
         overflow: hidden;
         &.caption {
-          height: 80px;
+          min-height: 80px;
         }
       }
     }
     .beneficiary-data {
+      align-items: flex-end;
       display: flex;
       justify-content: space-between;
-      margin: 8px 0;
-      .User {
+      .data-left {
         display: flex;
-        align-items: center;
-        .user-display-name {
-          margin-left: 4px;
-          color: $neutral-800;
-          font-size: 14px;
-        }
-        .user-avatar-only {
-          svg {
-            margin: 0 1px 1px 0 !important;
+        justify-content: left;
+        margin-bottom: 8px;
+        .User {
+          display: flex;
+          align-items: center;
+          .user-display-name {
+            color: $neutral-500;
+            font-size: 14px;
+            margin-left: 4px;
+          }
+          .user-avatar-only {
+            svg {
+              margin: 0 1px 1px 0 !important;
+            }
           }
         }
       }
-      .cui-tag {
-        background: $neutral-50;
-        border: none;
-        border-radius: 5px;
-        padding: 4px;
+      .data-right {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 8px;
+        .cui-tag {
+          background: $neutral-50;
+          border: none;
+          border-radius: 5px;
+          padding: 1px 2px 2px 2px;
+          margin-right: 0px;
+          max-width: min-content;
+        }
         .Text {
           color: $neutral-500;
         }

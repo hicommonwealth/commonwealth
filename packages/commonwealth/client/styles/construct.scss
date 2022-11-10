@@ -282,7 +282,7 @@ button,
     min-width: $icon-size;
   }
 
-  @include cui-tag-style($neutral-600, $primary-50, $primary-100);
+  @include cui-tag-style($neutral-500, $neutral-50, transparent);
 
   @each $size in $cui-sizes {
     &.cui-#{$size},
