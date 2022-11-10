@@ -3,10 +3,10 @@
 import m from 'mithril';
 import moment from 'moment';
 
-import 'pages/view_proposal/proposal_comment.scss';
+import 'components/comments/comment.scss';
 
 import app from 'state';
-import { Comment } from 'models';
+import { Account, Comment as CommentType } from 'models';
 import { ContentType } from 'types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ProposalCommentAuthor } from './proposal_components';
@@ -17,11 +17,58 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { EditComment } from './edit_comment';
 import { SharePopover } from '../../components/share_popover';
 import { CommentReactionButton } from '../../components/reaction_button/comment_reaction_button';
+import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../component_kit/cw_text';
+import { renderQuillTextBody } from '../quill/helpers';
+import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
+import { SharePopover } from '../share_popover';
+import User, { AnonymousUser } from '../widgets/user';
+import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 
-type ProposalCommentAttrs = {
-  comment: Comment<any>;
+class CommentAuthor
+  implements
+    m.Component<{
+      comment: CommentType<any>;
+    }>
+{
+  view(vnode) {
+    const { comment } = vnode.attrs;
+
+    // Check for accounts on forums that originally signed up on a different base chain,
+    // Render them as anonymous as the forum is unable to support them.
+    if (app.chain.meta.type === ChainType.Offchain) {
+      if (
+        comment.authorChain !== app.chain.id &&
+        comment.authorChain !== app.chain.base
+      ) {
+        return m(AnonymousUser, {
+          distinguishingKey: comment.author,
+        });
+      }
+    }
+
+    const author: Account = app.chain.accounts.get(comment.author);
+
+    return comment.deleted ? (
+      <span>[deleted]</span>
+    ) : (
+      m(User, {
+        avatarSize: 24,
+        user: author,
+        popover: true,
+        linkify: true,
+      })
+    );
+  }
+}
+
+type CommentAttrs = {
+  comment: CommentType<any>;
   handleIsReplying: (isReplying: boolean, id?: number) => void;
   isGloballyEditing: boolean;
   isLast: boolean;
@@ -31,7 +78,7 @@ type ProposalCommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
+export class Comment implements m.ClassComponent<CommentAttrs> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
@@ -71,7 +118,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
-      <div class={`ProposalComment comment-${comment.id}`}>
+      <div class={`Comment comment-${comment.id}`}>
         {threadLevel > 0 && (
           <div class="thread-connectors-container">
             {Array(threadLevel)
@@ -83,7 +130,7 @@ export class ProposalComment implements m.ClassComponent<ProposalCommentAttrs> {
         )}
         <div class="comment-body">
           <div class="comment-header">
-            <ProposalCommentAuthor item={comment} />
+            <CommentAuthor comment={comment} />
             {/* don't need this distinction yet since we aren't showing "edited at" */}
             {/* <CWText type="caption" className="published-text">
               published on
