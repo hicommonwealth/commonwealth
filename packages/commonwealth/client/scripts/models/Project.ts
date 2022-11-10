@@ -98,6 +98,13 @@ class Project {
 
   public get backers(): CWParticipant[] {
     const backerAmounts: { [address: string]: BN } = {};
+    return [
+      new CWParticipant(
+        this,
+        '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
+        new BN(5000000000000000)
+      ),
+    ];
 
     this.backEvents.forEach((event) => {
       const runningTotal = backerAmounts[event.sender] || new BN(0);
@@ -111,6 +118,13 @@ class Project {
 
   public get curators(): CWParticipant[] {
     const curatorAmounts: { [address: string]: BN } = {};
+    return [
+      new CWParticipant(
+        this,
+        '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
+        new BN(5000000000000000)
+      ),
+    ];
 
     this.curateEvents.forEach((event) => {
       const runningTotal = curatorAmounts[event.sender] || new BN(0);
@@ -234,9 +248,9 @@ class Project {
       token,
       title || projectDefaults.title,
       description || projectDefaults.description,
-      short_description || projectDefaults.shortDescription,
+      short_description,
       cover_image || projectDefaults.coverImage,
-      curator_fee,
+      +curator_fee,
       new BN(threshold),
       deadline,
       moment(created_at),

@@ -16,7 +16,14 @@ export class CWParticipant {
   }
 
   public get addressInfo(): AddressInfo {
-    return new AddressInfo(null, this.address, this.project.chainId);
+    console.log(
+      new AddressInfo(null, this.address, this.project.chainId || 'ethereum')
+    );
+    return new AddressInfo(
+      null,
+      this.address,
+      this.project.chainId || 'ethereum'
+    );
   }
 
   constructor(

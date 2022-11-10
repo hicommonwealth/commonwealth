@@ -52,16 +52,20 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
     const { identifier } = vnode.attrs;
 
     if (typeof identifier !== 'string') {
-      return m(PageNotFound, { title: 'Projects' });
+      return <PageNotFound title="Projects" />;
+    }
+
+    if (!app.projects.initialized) {
+      return <PageLoading />;
     }
 
     const projectId = identifier.split('-')[0];
     this.project = app.projects.store.getById(projectId);
     if (!this.project) {
-      return m(PageNotFound, { title: 'Projects' });
+      return <PageNotFound title="Projects" />;
     }
-    const { project } = this;
 
+    const { project } = this;
     const threshold = +weiToTokens(project.threshold.toString(), 18);
     const fundingAmount = +weiToTokens(project.fundingAmount.toString(), 18);
     const chain: ChainInfo = app.config.chains.getById(project.chainId);
@@ -78,7 +82,11 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
           <div class="project-metadata">
             <div class="metadata-left">
               {!!chain && <CommunityLabel community={chain} size="large" />}
-              {m(User, { avatarSize: 32, user: project.creatorAddressInfo })}
+              {m(User, {
+                avatarSize: 32,
+                linkify: true,
+                user: project.creatorAddressInfo,
+              })}
             </div>
             <div class="metadata-right">
               <Tag
@@ -145,7 +153,7 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 // TODO v2: Hook up timestamps, separate out participation events in individual rows
                 entries={project.backers.map((backer) => {
                   return [
-                    m(User, { user: backer.addressInfo }),
+                    m(User, { linkify: true, user: backer.addressInfo }),
                     m(
                       'span',
                       `${+weiToTokens(backer.amount.toString(), 18)} ETH`
@@ -168,7 +176,7 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 // TODO v2: Hook up timestamps, separate out participation events in individual rows
                 entries={project.curators.map((curator) => {
                   return [
-                    m(User, { user: curator.addressInfo }),
+                    m(User, { linkify: true, user: curator.addressInfo }),
                     m(
                       'span',
                       `${+weiToTokens(curator.amount.toString(), 18)} ETH`
