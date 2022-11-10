@@ -1,5 +1,4 @@
 import { Response, NextFunction } from 'express';
-import BN from 'bn.js';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
