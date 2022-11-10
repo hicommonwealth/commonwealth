@@ -127,9 +127,22 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       );
     };
 
+    const initContractController = async (contract: Contract) => {
+      // initialize daoFactory Controller with web3 object initialized with the selected chain's nodeUrl
+      const provider = new Web3.providers.WebsocketProvider(
+        this.state.form.nodeUrl
+      );
+      const _api = new Web3(provider);
+
+      this.generalContractsController = new GeneralContractsController(
+        _api,
+        contract
+      );
+    };
+
     const disableField = !this.state.loaded;
 
-    const createDao = async (nickname: string, fn: AbiItem) => {
+    const createDao = async (fn: AbiItem) => {
       this.state.loading = true;
       // handle processing the forms inputs into their proper data types
       const processedArgs = processAbiInputsToDataTypes(
@@ -137,20 +150,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
         fn.inputs,
         this.state.functionNameToFunctionInputArgs
       );
-
-      const contract = app.contracts.getFactoryContractByNickname(nickname);
-
       try {
-        // initialize daoFactory Controller with web3 object initialized with the selected chain's nodeUrl
-        const provider = new Web3.providers.WebsocketProvider(
-          this.state.form.nodeUrl
-        );
-        const _api = new Web3(provider);
-
-        this.generalContractsController = new GeneralContractsController(
-          _api,
-          contract
-        );
         const metamaskWallet =
           await app.wallets.getFirstAvailableMetamaskWallet();
 
@@ -256,7 +256,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                 notifySuccess('Create Dao button clicked!');
                 this.state.saving = true;
                 try {
-                  createDao(this.state.daoFactoryType, fn);
+                  createDao(fn);
                 } catch (err) {
                   notifyError(
                     err.responseJSON?.error ||
@@ -272,6 +272,11 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
     };
 
     if (this.state.loadingEthChains) queryEthChains();
+
+    const contract = app.contracts.getFactoryContractByNickname(
+      this.state.daoFactoryType
+    );
+    initContractController(contract);
 
     return (
       <div class="CreateCommunityForm">
