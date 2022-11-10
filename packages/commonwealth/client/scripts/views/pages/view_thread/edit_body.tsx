@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/edit_body.scss';
+import 'pages/view_thread/edit_body.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -11,9 +11,9 @@ import { Thread } from 'models';
 import { ContentType } from 'types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { clearEditingLocalStorage } from './helpers';
 import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { clearEditingLocalStorage } from '../../components/comments/helpers';
 
 type EditBodyAttrs = {
   thread: Thread;

@@ -11,6 +11,7 @@ import {
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
@@ -126,7 +127,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,
-      (w) => w instanceof WalletConnectWebWalletController && w.enabled
+      (w) => (w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController) && w.enabled
     );
 
     // Handles Magic Link Login
@@ -239,9 +240,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const signature = await this.selectedWallet.signWithAccount(
-              account
-            );
+            const signature = await this.selectedWallet.signWithAccount(account);
             this.cashedWalletSignature = signature;
           } catch (e) {
             console.log(e);
@@ -290,11 +289,11 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     const performLinkingCallback = async () => {
       try {
         const signature = await this.selectedLinkingWallet.signWithAccount(
-          this.secondaryLinkAccount
+          this.secondaryLinkAccount,
         );
         await this.selectedLinkingWallet.validateWithAccount(
           this.secondaryLinkAccount,
-          signature
+          signature,
         );
         await this.selectedWallet.validateWithAccount(
           this.primaryAccount,
