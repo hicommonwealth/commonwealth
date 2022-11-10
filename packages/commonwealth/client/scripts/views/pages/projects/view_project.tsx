@@ -7,7 +7,7 @@ import Web3 from 'web3';
 
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { AddressInfo, ChainInfo, Project } from 'models';
+import { ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';

@@ -50,7 +50,7 @@ export class InformationSlide
           image.
         </CWText>
         <CWTextInput
-          defaultValue={vnode.attrs.form.title}
+          value={vnode.attrs.form.title}
           inputValidationFn={(val: string) => validateProjectForm('title', val)}
           label="Name Your Crowdfund"
           oninput={(e) => {

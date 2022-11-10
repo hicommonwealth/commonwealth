@@ -151,7 +151,6 @@ export default class ProjectsController {
     }
 
     // instantiate contract (TODO: additional validation, or do this earlier)
-    console.log(this._factoryInfo.node);
     const contract = await attachSigner(
       this._app.wallets,
       creator,
@@ -172,7 +171,7 @@ export default class ProjectsController {
       beneficiary,
       token,
       threshold.toString(),
-      deadline,
+      deadline.toString(),
       curatorFee.toString(),
     ]);
 
@@ -183,7 +182,7 @@ export default class ProjectsController {
       beneficiary,
       token,
       threshold.toString(),
-      deadline,
+      deadline.toString(),
       curatorFee.toString(),
       { gasLimit: 2000000 }
     );
