@@ -7,7 +7,7 @@ import Web3 from 'web3';
 
 import { Tag } from 'construct-ui';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ChainInfo, Project } from 'models';
+import { AddressInfo, ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
@@ -110,26 +110,14 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                   <div class="project-funds-raised">
                     <CWText type="h5">Funds raised</CWText>
                     <CWText type="h1">{fundingAmount} ETH</CWText>
-                    {/* TODO: ETH shouldn't be hardcoded—we need a token address --> symbol converter */}
-                    {/* TODO, v2: We need oracles for USD conversion */}
+                    {/* TODO, v2: Swap hardcoded ETH for token; use oracles for USD conversion */}
                   </div>
                   <div class="project-funds-goal">
                     <CWText type="h5">Goal</CWText>
                     <CWText type="h1">{threshold} ETH</CWText>
-                    {/* TODO: ETH shouldn't be hardcoded—we need a token address --> symbol converter */}
-                    {/* TODO, v2: We need oracles for USD conversion */}
+                    {/* TODO, v2: Swap hardcoded ETH for token; use oracles for USD conversion */}
                   </div>
                 </div>
-              </div>
-              <div class="project-curator-data">
-                {project.curators.map((c) => {
-                  return m(User, {
-                    user: c.addressInfo,
-                  });
-                })}
-                <CWText type="caption">
-                  Curator receives {project.curatorFee / 100}% of funds.
-                </CWText>
               </div>
             </div>
             <div class="project-support-panel">
@@ -143,50 +131,53 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
 
           <div class="project-about">
             {m(MarkdownFormattedText, { doc: project.description })}
-            {(!!project.backers.length || !!project.curators.length) && (
-              <CWDivider />
-            )}
-            {!!project.backers.length && (
-              <div class="project-backers">
-                <CWText type="h1" textStyle="medium">
-                  Backers
-                </CWText>
-                <CWTable
-                  className="project-backer-table"
-                  tableName="Backers"
-                  headers={['Backer', 'Amount']}
-                  // TODO: CW user lookup
-                  entries={project.backers.map((backer) => {
-                    return [
-                      m('span', `${backer.address}`),
-                      // TODO: ETH shouldn't be hardcoded
-                      m('span', `${backer.amount} ETH`),
-                    ];
-                  })}
-                />
-              </div>
-            )}
-            {!!project.curators.length && (
-              <div class="project-curators">
-                <CWText type="h1" textStyle="medium">
-                  Curators
-                </CWText>
-                <CWTable
-                  className="project-curator-table"
-                  tableName="curators"
-                  headers={['curator', 'Amount']}
-                  // TODO: CW user lookup
-                  entries={project.curators.map((curator) => {
-                    return [
-                      m('span', `${curator.address}`),
-                      // TODO: ETH shouldn't be hardcoded
-                      m('span', `${curator.amount} ETH`),
-                    ];
-                  })}
-                />
-              </div>
-            )}
           </div>
+          {!!project.backers.length && (
+            <div class="project-backers">
+              <CWDivider />
+              <CWText type="h1" textStyle="medium">
+                {<CWIcon iconSize="xxl" iconName="backer" />} Backers
+              </CWText>
+              <CWTable
+                className="project-backer-table"
+                tableName="Backers"
+                headers={['Username', 'Amount']}
+                // TODO v2: Hook up timestamps, separate out participation events in individual rows
+                entries={project.backers.map((backer) => {
+                  return [
+                    m(User, { user: backer.addressInfo }),
+                    m(
+                      'span',
+                      `${+weiToTokens(backer.amount.toString(), 18)} ETH`
+                    ),
+                  ];
+                })}
+              />
+            </div>
+          )}
+          {!!project.curators.length && (
+            <div class="project-curators">
+              <CWDivider />
+              <CWText type="h1" textStyle="medium">
+                {<CWIcon iconSize="xxl" iconName="curator" />} Curators
+              </CWText>
+              <CWTable
+                className="project-curator-table"
+                tableName="curators"
+                headers={['Username', 'Amount']}
+                // TODO v2: Hook up timestamps, separate out participation events in individual rows
+                entries={project.curators.map((curator) => {
+                  return [
+                    m(User, { user: curator.addressInfo }),
+                    m(
+                      'span',
+                      `${+weiToTokens(curator.amount.toString(), 18)} ETH`
+                    ),
+                  ];
+                })}
+              />
+            </div>
+          )}
         </div>
       </Sublayout>
     );
