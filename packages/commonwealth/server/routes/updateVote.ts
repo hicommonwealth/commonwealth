@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { NextFunction } from 'express';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';

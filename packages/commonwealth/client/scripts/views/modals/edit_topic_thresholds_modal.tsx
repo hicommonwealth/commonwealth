@@ -1,16 +1,17 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
 import { Topic } from 'models';
-import { ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 class EditTopicThresholdsRow
   implements
@@ -31,11 +32,13 @@ class EditTopicThresholdsRow
       ? app.chain.meta.decimals
       : app.chain.network === ChainNetwork.ERC721
       ? 0
+      : app.chain.base === ChainBase.CosmosSDK
+      ? 6
       : 18;
 
     return (
       <div class="EditTopicThresholdsRow">
-        <div class="topic-name">{topic.name}</div>
+        <CWText>{topic.name}</CWText>
         <div class="input-and-button-row">
           <TokenDecimalInput
             decimals={decimals}
@@ -44,10 +47,8 @@ class EditTopicThresholdsRow
               this.newTokenThresholdInWei = newValue;
             }}
           />
-          <Button
+          <CWButton
             label="Update"
-            intent="primary"
-            rounded={true}
             disabled={!this.newTokenThresholdInWei}
             onclick={async (e) => {
               e.preventDefault();
@@ -111,21 +112,23 @@ export class EditTopicThresholdsModal
           <ModalExitButton />
         </div>
         <div class="compact-modal-body">
-          {topics.length > 0
-            ? topics
-                .sort((a, b) => {
-                  if (a.name < b.name) {
-                    return -1;
-                  }
-                  if (a.name > b.name) {
-                    return 1;
-                  }
-                  return 0;
-                })
-                .map((topic) => {
-                  return m(EditTopicThresholdsRow, { topic });
-                })
-            : 'There are no topics in this community yet'}
+          {topics.length > 0 ? (
+            topics
+              .sort((a, b) => {
+                if (a.name < b.name) {
+                  return -1;
+                }
+                if (a.name > b.name) {
+                  return 1;
+                }
+                return 0;
+              })
+              .map((topic) => {
+                return <EditTopicThresholdsRow topic={topic} />;
+              })
+          ) : (
+            <CWText>There are no topics in this community yet</CWText>
+          )}
         </div>
       </div>
     );

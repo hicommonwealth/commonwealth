@@ -72,6 +72,7 @@ export enum WalletId {
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',
+  TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
@@ -131,4 +132,6 @@ export enum BalanceType {
   Ethereum = 'ethereum',
   Solana = 'solana',
   Cosmos = 'cosmos',
+  NEAR = 'near',
+  Substrate = 'substrate',
 }

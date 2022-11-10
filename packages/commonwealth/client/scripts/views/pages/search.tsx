@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { ListItem, Select, Spinner } from 'construct-ui';
+import { ListItem, Select } from 'construct-ui';
 
 import 'pages/search.scss';
 
@@ -24,6 +24,7 @@ import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import ErrorPage from './error';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -340,7 +341,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         <div class="SearchPage">
           <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
-              <Spinner active fill size="xl" />
+              <CWSpinner size="xl" />
             ) : (
               <div class="search-results">
                 <CWTabBar>{tabs}</CWTabBar>

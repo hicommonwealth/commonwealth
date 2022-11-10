@@ -20,6 +20,7 @@ import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { RoleAttributes, RoleInstance } from '../models/role';
 
 import { AppError, ServerError } from '../util/errors';
+import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -270,8 +271,20 @@ const createChain = async (
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
-      // TODO: add other balance types if needed
-      balance_type: base === ChainBase.CosmosSDK ? BalanceType.Cosmos : undefined,
+      balance_type: base === ChainBase.CosmosSDK
+        ? BalanceType.Cosmos
+        : base === ChainBase.Substrate
+        ? BalanceType.Substrate
+        : base === ChainBase.Ethereum
+        ? BalanceType.Ethereum
+        // beyond here should never really happen, but just to make sure...
+        : base === ChainBase.NEAR
+        ? BalanceType.NEAR
+        : base === ChainBase.Solana
+        ? BalanceType.Solana
+        : undefined,
+      // use first chain name as node name
+      name: req.body.name,
     }
   });
 
@@ -296,6 +309,8 @@ const createChain = async (
     token_name,
     has_chain_events_listener: network === 'aave' || network === 'compound'
   });
+
+  await createDefaultCommunityRoles(models, chain.id)
 
   if (req.body.address) {
     const [contract] = await models.Contract.findOrCreate({
@@ -386,12 +401,7 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    role = await models.Role.create({
-      address_id: addressToBeAdmin.id,
-      chain_id: chain.id,
-      permission: 'admin',
-      is_user_default: true,
-    });
+    await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
 
     const [ subscription ] = await models.Subscription.findOrCreate({
       where: {

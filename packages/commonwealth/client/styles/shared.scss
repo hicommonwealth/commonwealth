@@ -65,6 +65,22 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   }
 }
 
+@mixin contentPadding {
+  padding: 56px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
+}
+
 @mixin header {
   font-family: $fonts;
   font-style: normal;

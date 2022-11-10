@@ -42,10 +42,12 @@ describe('AdminOnly rule tests', () => {
 
   it('should pass adminOnly rule on admin', async () => {
     // assign admin role to loggedInAddr
-    await models['Role'].create({
+    const communityRole = await models.CommunityRole.findOne({
+      where: { chain_id: chain, name: 'admin' },
+    });
+    await models['RoleAssignment'].create({
       address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'admin',
+      community_role_id: communityRole.id,
     });
     const rule = { AdminOnlyRule: [] as [] };
     const ruleType = new AdminOnlyRule();
@@ -55,10 +57,12 @@ describe('AdminOnly rule tests', () => {
 
   it('should fail adminOnly rule on member', async () => {
     // assign member role to loggedInAddr
-    await models['Role'].create({
+    const communityRole = await models.CommunityRole.findOne({
+      where: { chain_id: chain, name: 'member' },
+    });
+    await models['RoleAssignment'].create({
       address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+      community_role_id: communityRole.id,
     });
     const rule = { AdminOnlyRule: [] as [] };
     const ruleType = new AdminOnlyRule();

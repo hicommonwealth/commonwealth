@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -58,7 +58,7 @@ import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
-import getProfile from './routes/getProfile';
+import getProfileOld from './routes/getProfile';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -85,7 +85,7 @@ import deleteThread from './routes/deleteThread';
 import addEditors from './routes/addEditors';
 import deleteEditors from './routes/deleteEditors';
 import bulkThreads from './routes/bulkThreads';
-import getThreads from './routes/getThreads';
+import getThreadsOld from './routes/getThreads';
 import searchDiscussions from './routes/searchDiscussions';
 import searchComments from './routes/searchComments';
 import createDraft from './routes/drafts/createDraft';
@@ -150,6 +150,15 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
+
+import getThreads from './routes/threads/getThreads';
+import getComments from './routes/comments/getComments';
+import getReactions from './routes/reactions/getReactions';
+import getCommunities from './routes/communities/getCommunities';
+import getProfile from './routes/profiles/getProfile';
+import getProfiles from './routes/profiles/getProfiles';
+
+
 
 function setupRouter(
   app: Express,
@@ -336,11 +345,11 @@ function setupRouter(
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
   router.get('/activeThreads', activeThreads.bind(this, models));
-  router.get('/getThreads', getThreads.bind(this, models));
+  router.get('/getThreads', getThreadsOld.bind(this, models));
   router.get('/searchDiscussions', searchDiscussions.bind(this, models));
   router.get('/searchComments', searchComments.bind(this, models));
 
-  router.get('/profile', getProfile.bind(this, models));
+  router.get('/profile', getProfileOld.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -791,6 +800,15 @@ function setupRouter(
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
+
+  // new API
+  router.get('/threads', getThreads.bind(this, models));
+  router.get('/comments', getComments.bind(this, models));
+  router.get('/reactions', getReactions.bind(this, models));
+  router.get('/communities', getCommunities.bind(this, models));
+  router.get('/profile', getProfile.bind(this, models));
+  router.get('/profiles', getProfiles.bind(this, models));
+
 
   app.use('/api', router);
 }

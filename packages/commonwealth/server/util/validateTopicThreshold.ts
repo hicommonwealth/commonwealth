@@ -1,5 +1,6 @@
+import BN from 'bn.js';
 import { ChainNetwork } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -28,8 +29,16 @@ const validateTopicThreshold = async (
         },
       ]
     });
-    if (!topic?.chain?.ChainNode?.balance_type) {
-      // if we have no balance type for node, always approve
+    if (!topic?.chain?.ChainNode?.id) {
+      // if we have no node, always approve
+      return true;
+    }
+    let bp: string;
+    try {
+      const result = await tbc.getBalanceProviders(topic.chain.ChainNode.id);
+      bp = result[0].bp;
+    } catch (e) {
+      log.info(`No balance provider for chain node ${topic.chain.ChainNode.name}, skipping check.`);
       return true;
     }
 
@@ -39,19 +48,24 @@ const validateTopicThreshold = async (
     });
       // TODO: @JAKE in the future, we will have more than one contract,
       // need to handle this through the TBC Rule, passing in associated Contract.id
-    const threshold = topic.token_threshold;
-    if (threshold && threshold > 0) {
-      const tokenBalance = await tbc.getBalance(
+    const threshold = new BN(topic.token_threshold || '0');
+    if (!threshold.isZero()) {
+      const tokenBalances = await tbc.getBalancesForAddresses(
         topic.chain.chain_node_id,
-        userAddress,
-        communityContracts?.Contract?.address,
-        topic.chain.network === ChainNetwork.ERC20
+        [ userAddress ],
+        bp,
+        {
+          contractType: topic.chain.network === ChainNetwork.ERC20
           ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
-            ? 'erc721' : topic.chain.network === ChainNetwork.SPL
-              ? 'spl-token' : undefined,
+            ? 'erc721' : undefined,
+          tokenAddress: communityContracts?.Contract?.address,
+        }
       );
-      log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
-      return tokenBalance.gten(threshold);
+      if (tokenBalances.errors[userAddress] || !tokenBalances.balances[userAddress]) {
+        throw new Error(tokenBalances.errors[userAddress] || `No token balance queried for ${userAddress}`);
+      }
+      const tokenBalance = new BN(tokenBalances.balances[userAddress]);
+      return tokenBalance.gte(threshold);
     } else {
       return true;
     }

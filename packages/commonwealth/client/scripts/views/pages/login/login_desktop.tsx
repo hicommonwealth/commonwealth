@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
 
 import 'pages/login/login_desktop.scss';
 
@@ -20,6 +19,7 @@ import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import { LoginAttrs } from './types';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
   view(vnode) {
@@ -122,7 +122,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                   onenterkey={handleEmailLoginCallback}
                 />
               ) : (
-                <Spinner active={true} size="xl" position="inherit" />
+                <CWSpinner />
               )}
               <div class="buttons-row">
                 <CWButton
