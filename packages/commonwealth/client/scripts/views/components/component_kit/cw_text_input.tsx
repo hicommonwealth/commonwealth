@@ -28,6 +28,7 @@ export type TextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
+  defaultValue?: string;
   iconRight?: string;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
@@ -96,6 +97,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
       autofocus,
       containerClassName,
       darkMode,
+      defaultValue,
       displayOnly,
       disabled,
       iconRight,
@@ -200,6 +202,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               }
             }}
             value={value}
+            defaultValue={defaultValue}
           />
           {iconRightonclick && !!iconRight && !disabled ? (
             <div class="text-input-right-onclick-icon">

@@ -1,6 +1,6 @@
 @import 'shared';
 
-.ProposalComment {
+.Comment {
   display: flex;
 
   .thread-connectors-container {
@@ -13,7 +13,7 @@
       height: 100%;
       left: 36px;
       position: relative;
-      top: 8px;
+      top: 12px;
       width: 1px;
     }
   }
@@ -46,10 +46,16 @@
       display: flex;
       gap: 8px;
 
-      .username {
-        font-weight: 500;
+      .User {
+        align-items: center;
+        display: flex;
+        height: 24px;
 
-        @include caption;
+        .username {
+          font-weight: 500;
+
+          @include caption;
+        }
       }
 
       .published-text.Text {

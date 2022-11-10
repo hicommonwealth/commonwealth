@@ -3,7 +3,7 @@
 import m from 'mithril';
 import BN from 'bn.js';
 
-import 'pages/view_proposal/create_comment.scss';
+import 'components/comments/create_comment.scss';
 
 import app from 'state';
 import { Thread, AnyProposal } from 'models';
@@ -16,10 +16,10 @@ import User from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { jumpHighlightComment } from './helpers';
-import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
+import { CWValidationText } from '../component_kit/cw_validation_text';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
