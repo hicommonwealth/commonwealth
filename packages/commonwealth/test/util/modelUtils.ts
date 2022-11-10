@@ -38,12 +38,8 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
-<<<<<<< HEAD
-    const data = constructTypedMessage(chain_id, token);
-=======
     const sessionWallet = ethers.Wallet.createRandom()
     const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
->>>>>>> static-ui-generate-from-abi
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
