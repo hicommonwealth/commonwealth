@@ -17,6 +17,7 @@ module.exports = {
       );
 
       await queryInterface.addIndex('Chains', ['snapshot'], { transaction: t });
+      await queryInterface.addIndex('SnapshotProposals', { fields : ['id'] });
     });
   },
 
@@ -33,6 +34,7 @@ module.exports = {
       await queryInterface.removeIndex('Chains', ['snapshot'], {
         transaction: t,
       });
+      await queryInterface.addIndex('SnapshotProposals', { fields : ['id'] });
     });
   },
 };
