@@ -8,7 +8,10 @@
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "load-db": "yarn --cwd packages/commonwealth load-db",
-    "migrate-db": "yarn --cwd packages/commonwealth migrate-db"
+    "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
+    "lint": "./scripts/lint-new-work.sh",
+    "lint-all": "eslint ./packages/**",
+    "lint-branch": "./scripts/lint-branch.sh"
   },
   "engines": {
     "node": "16.x"
