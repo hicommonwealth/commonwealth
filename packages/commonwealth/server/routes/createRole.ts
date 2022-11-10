@@ -1,11 +1,4 @@
 import Sequelize from 'sequelize';
-<<<<<<< HEAD
-import { Response, NextFunction } from 'express';
-import { NotificationCategories } from 'common-common/src/types';
-import validateChain from '../util/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
-=======
 import { NotificationCategories } from 'common-common/src/types';
 import validateChain, { ValidateChainParams } from '../util/validateChain';
 import { DB } from '../models';
@@ -13,7 +6,6 @@ import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
 import { RoleAttributes } from '../models/role';
 import { SubscriptionAttributes } from '../models/subscription';
->>>>>>> static-ui-generate-from-abi
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
