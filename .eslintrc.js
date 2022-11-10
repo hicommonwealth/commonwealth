@@ -17,18 +17,18 @@ module.exports = {
   settings: {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"]
-    }
-  },
-  "import/resolver": {
-    node: {},
-    webpack: {
-      config: "webpack/webpack.common.js"
     },
-    typescript: {
-      project: [
-        "./packages/*/tsconfig.json"
-      ]
-    }
+    "import/resolver": {
+      node: {},
+      typescript: {
+        project: [
+          "./packages/*/tsconfig.json"
+        ]
+      }
+    },
   },
-  rules: {}
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+    "import/namespace": "off"
+  }
 }
