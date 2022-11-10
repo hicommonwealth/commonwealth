@@ -34,7 +34,7 @@ export default class CreateProjectForm implements m.ClassComponent {
     if (!this.form) {
       this.form = {
         title: null,
-        // WETH hard-coded as default raise token, but can be overwritten
+        // WETH hard-coded as default raise token until we diversify in future versions
         token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         creator: null,
         beneficiary: null,

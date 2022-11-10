@@ -5,14 +5,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTokenInput } from 'views/components/component_kit/cw_token_input';
 import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
-import { SelectList, Button, Icons } from 'construct-ui';
 import { validateProjectForm } from '../helpers';
-import {
-  ICreateProjectForm,
-  TokenOption,
-  WethUrl,
-  weekInSeconds,
-} from '../types';
+import { ICreateProjectForm, WethUrl, weekInSeconds } from '../types';
 
 export class FundraisingSlide
   implements m.ClassComponent<{ form: ICreateProjectForm }>
