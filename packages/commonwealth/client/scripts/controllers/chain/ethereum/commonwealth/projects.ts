@@ -35,10 +35,6 @@ export default class ProjectsController {
     return this._initializing;
   }
 
-  // TODO: Graham 22-10-26: Build a generic CommunityIdStore which extends IdStore
-  // and includes a _storeCommunityId substore. This would allow us to consolidate custom stores
-  // such as ActivityStore, TopicStore, and DraftStore, and to remove filtering logic on
-  // chain-scoped project listing pages.
   protected _store: IdStore<Project> = new IdStore();
   public get store() {
     return this._store;
@@ -99,27 +95,10 @@ export default class ProjectsController {
     this._initializing = false;
   }
 
-  // TODO: Should just be "create"
-  public async createProject(
+  public async create(
     projectData: IProjectCreationData
   ): Promise<[ContractReceipt, number]> {
     if (!this._initialized) throw new Error('Projects not yet initialized');
-
-    // TODO: validate arguments
-
-    // TODO: Create Project form should notify users that on-chain title will be truncated
-    // to 32 chars
-    // Form should represent token addresses as dropdown input (discrete options)
-    // if (!this.acceptedTokens.includes(projectData.token)) {
-    //   throw new Error('Invalid token');
-    // }
-    // if (projectData.deadline < moment.duration('24', 'hours')) {
-    //   throw new Error('Project duration must be minimum 24hrs');
-    // }
-    // if (projectData.threshold <= 0) {
-    //   throw new Error('Invalid threshold/goal');
-    // }
-    // const curatorFee = Math.min(projectData.curatorFee, 10000 - this.protocolFee);
 
     const ipfsContent = JSON.stringify(projectData);
     const {
@@ -134,23 +113,6 @@ export default class ProjectsController {
 
     const creator = this._app.user.activeAccount;
 
-    // upload ipfs content
-    // TODO: should we check for failure vs success in result?
-    let ipfsHash: string;
-    try {
-      // TODO: IPFS should include all user-submitted data incl cover image, description, etc
-      const response = await $.post(`${this._app.serverUrl()}/ipfsPin`, {
-        address: creator.address,
-        author_chain: chainId || creator.chain.id,
-        blob: ipfsContent,
-        jwt: this._app.user.jwt,
-      });
-      ipfsHash = response.result;
-    } catch (err) {
-      throw new Error(`Failed to pin IPFS blob: ${err.message}`);
-    }
-
-    // instantiate contract (TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
       creator,
@@ -160,6 +122,23 @@ export default class ProjectsController {
       '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a'
       // '0x9f20ed5f919dc1c1695042542c13adcfc100dcab'
     );
+
+    // upload ipfs content
+    let ipfsHash: string;
+    try {
+      const response = await $.post(`${this._app.serverUrl()}/ipfsPin`, {
+        address: creator.address,
+        author_chain: chainId || creator.chain.id,
+        blob: ipfsContent,
+        jwt: this._app.user.jwt,
+      });
+      if (response.status !== 'Success') {
+        throw new Error();
+      }
+      ipfsHash = response.result;
+    } catch (err) {
+      throw new Error(`Failed to pin IPFS blob: ${err.message}`);
+    }
 
     const projectId = await contract.numProjects();
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
@@ -193,14 +172,19 @@ export default class ProjectsController {
 
     // JAKE TODO: disconnect provider?
     // on success, hit server to update chain
-    // TODO: should we check for failure vs success in result?
     if (chainId) {
       try {
-        await $.get(`${this._app.serverUrl()}/setProjectChain`, {
-          chain_id: chainId,
-          project_id: projectId,
-          jwt: this._app.user.jwt,
-        });
+        const response = await $.get(
+          `${this._app.serverUrl()}/setProjectChain`,
+          {
+            chain_id: chainId,
+            project_id: projectId,
+            jwt: this._app.user.jwt,
+          }
+        );
+        if (response.status !== 'Success') {
+          throw new Error();
+        }
       } catch (err) {
         console.error(
           `Failed to set project ${projectId.toString()} chain to ${chainId}`
@@ -233,7 +217,7 @@ export default class ProjectsController {
     if (txReceipt.status !== 1) {
       throw new Error('Failed to back');
     }
-    // TODO: disconnect provider?
+    // JAKE TODO: disconnect provider?
 
     // refresh metadata
     await this._fetchProjectsFromServer({ projectId });
@@ -245,7 +229,7 @@ export default class ProjectsController {
     const curator = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
 
-    // make tx (TODO: additional validation, or do this earlier)
+    // make tx (JAKE TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
       curator,
@@ -260,7 +244,7 @@ export default class ProjectsController {
     if (txReceipt.status !== 1) {
       throw new Error('Failed to curate');
     }
-    // TODO: disconnect provider?
+    // JAKE TODO: disconnect provider?
 
     // refresh metadata
     await this._fetchProjectsFromServer({ projectId });
@@ -275,7 +259,7 @@ export default class ProjectsController {
       throw new Error('Must be beneficiary to withdraw');
     }
 
-    // make tx (TODO: additional validation, or do this earlier)
+    // make tx (JAKE TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
       beneficiary,
@@ -305,7 +289,7 @@ export default class ProjectsController {
       throw new Error('Must be backer to withdraw');
     }
 
-    // make tx (TODO: additional validation, or do this earlier)
+    // make tx (JAKE TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
       backer,
@@ -337,7 +321,7 @@ export default class ProjectsController {
       throw new Error('Must be backer to withdraw');
     }
 
-    // make tx (TODO: additional validation, or do this earlier)
+    // make tx (JAKE TODO: additional validation, or do this earlier)
     const contract = await attachSigner(
       this._app.wallets,
       curator,
@@ -352,7 +336,7 @@ export default class ProjectsController {
     if (txReceipt.status !== 1) {
       throw new Error('Failed to withdraw');
     }
-    // TODO: disconnect provider?
+    // JAKE TODO: disconnect provider?
 
     // refresh metadata
     await this._fetchProjectsFromServer({ projectId });

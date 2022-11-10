@@ -118,13 +118,6 @@ class Project {
 
   public get curators(): CWParticipant[] {
     const curatorAmounts: { [address: string]: BN } = {};
-    return [
-      new CWParticipant(
-        this,
-        '0xDaB156b7F2aFcBE63301eB2C81941703b808B28C',
-        new BN(5000000000000000)
-      ),
-    ];
 
     this.curateEvents.forEach((event) => {
       const runningTotal = curatorAmounts[event.sender] || new BN(0);

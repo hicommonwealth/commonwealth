@@ -9,6 +9,7 @@ import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ChainNetwork } from 'common-common/src/types';
+import { Project } from 'models';
 import Sublayout from 'views/sublayout';
 import ExplorePage from './explore_page';
 import YoursPage from './yours_page';
@@ -38,6 +39,25 @@ export default class ProjectListing implements m.ClassComponent {
     this.currentBlockNum = await this.web3.eth.getBlockNumber();
   }
 
+  getUserProjects(): Project[] {
+    const userProjects: Project[] = [];
+    app.user.addresses.forEach(({ address, chain }) => {
+      app.projects.store
+        .getAll()
+        .filter((project) =>
+          app.activeChainId() ? project.chainId === app.activeChainId() : true
+        )
+        .filter(
+          (project) =>
+            project.isAuthor(address, chain.id) ||
+            project.isBacker(address, chain.id) ||
+            project.isCurator(address, chain.id)
+        )
+        .forEach((project) => userProjects.push(project));
+    });
+    return userProjects;
+  }
+
   view() {
     if (!app) return <PageLoading />;
 
@@ -62,7 +82,7 @@ export default class ProjectListing implements m.ClassComponent {
       !userEthChains.length || userEthChains.find((c) => c.id === 'ethereum')
         ? 'ethereum'
         : userEthChains[0].id;
-
+    console.log(this.getUserProjects());
     return (
       <Sublayout
         title="Projects"
@@ -94,16 +114,12 @@ export default class ProjectListing implements m.ClassComponent {
                     Your Projects
                   </CWText>,
                 ]}
-                disabled={!app.isLoggedIn()}
+                disabled={
+                  !app.isLoggedIn() || this.getUserProjects().length === 0
+                }
                 isSelected={onYoursPage}
                 onclick={() => {
                   if (onYoursPage) return;
-                  if (!app.isLoggedIn()) {
-                    notifyInfo(
-                      'Log in or create an account for user dashboard.'
-                    );
-                    return;
-                  }
                   m.route.set(m.route.get().replace('explore', 'yours'));
                   m.redraw();
                 }}
@@ -119,7 +135,10 @@ export default class ProjectListing implements m.ClassComponent {
             {onExplorePage ? (
               <ExplorePage currentBlockNum={this.currentBlockNum} />
             ) : (
-              <YoursPage currentBlockNum={this.currentBlockNum} />
+              <YoursPage
+                currentBlockNum={this.currentBlockNum}
+                userProjects={this.getUserProjects()}
+              />
             )}
           </div>
         </div>

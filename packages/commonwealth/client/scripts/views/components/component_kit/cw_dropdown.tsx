@@ -48,7 +48,6 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
       this.value = defaultMenuItems[defaultActiveIndex ?? 0].label;
     }
     const { showDropdown, value } = this;
-    console.log({ defaultMenuItems });
 
     return (
       <div id={vnode.attrs.uniqueId} class="dropdown-wrapper">
@@ -61,7 +60,6 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
           }}
           onclick={() => {
             this.showDropdown = !showDropdown;
-            console.log('onclick', this.showDropdown);
           }}
           label={label}
           placeholder={placeholder}

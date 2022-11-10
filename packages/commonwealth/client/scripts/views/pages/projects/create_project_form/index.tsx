@@ -77,9 +77,9 @@ export default class CreateProjectForm implements m.ClassComponent {
       beneficiary: this.form.beneficiary,
       threshold: this.form.threshold,
       deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
-      curatorFee: Math.round(this.form.curatorFee * 100),
+      curatorFee: Math.round(this.form.curatorFee),
     });
-    const [txReceipt, newProjectId] = await app.projects.createProject({
+    const [txReceipt, newProjectId] = await app.projects.create({
       title: this.form.title,
       description: this.form.description.textContentsAsString,
       shortDescription: this.form.shortDescription,
@@ -90,7 +90,7 @@ export default class CreateProjectForm implements m.ClassComponent {
       beneficiary: this.form.beneficiary,
       threshold: this.form.threshold,
       deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
-      curatorFee: Math.round(this.form.curatorFee * 100), // curator fee is between 0 & 10000
+      curatorFee: Math.round(this.form.curatorFee),
     });
     if (txReceipt.status !== 1) {
       notifyError('Project creation failed');
