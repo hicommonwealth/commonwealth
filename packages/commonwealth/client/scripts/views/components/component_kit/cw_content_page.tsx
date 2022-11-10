@@ -5,15 +5,16 @@ import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
 
-import app from 'state';
-import { AddressInfo, Comment } from 'models';
+import { Comment } from 'models';
+import { pluralize } from 'helpers';
 import { ComponentType, MenuItem } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
-import User from '../widgets/user';
+import { CWIcon } from './cw_icons/cw_icon';
+import { SharePopover } from '../share_popover';
 
 type SidebarItem = {
   label: string;
@@ -28,19 +29,22 @@ type SidebarComponents = [
 ];
 
 type ContentPageAttrs = {
-  author: string;
-  body: m.Vnode;
-  createdAt: moment.Moment;
-  title: string;
+  createdAt: moment.Moment | number;
+  title: string | m.Vnode;
 
   // optional
+  author?: m.Vnode;
   actions?: Array<MenuItem>;
+  body?: m.Vnode;
   comments?: Array<Comment<any>>;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
+  headerComponents?: m.Vnode;
+  readOnly?: boolean;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
   subBody?: m.Vnode;
   subHeader?: m.Vnode;
+  viewCount?: number;
 };
 
 export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
@@ -62,7 +66,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
         ? 'tabsView'
         : 'sidebarView';
 
-    if (vnode.attrs.sidebarComponents.length > 0) {
+    if (vnode.attrs.sidebarComponents?.length > 0) {
       this.tabSelected = 0;
     }
 
@@ -85,37 +89,50 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
       comments,
       contentBodyLabel,
       createdAt,
+      headerComponents,
+      readOnly,
       showSidebar,
       sidebarComponents,
       subBody,
       subHeader,
       title,
+      viewCount,
     } = vnode.attrs;
 
     const mainBody = (
       <div class="main-body-container">
         <div class="header">
-          <CWText type="h3" fontWeight="semiBold">
-            {title}
-          </CWText>
+          {typeof title === 'string' ? (
+            <CWText type="h3" fontWeight="semiBold">
+              {title}
+            </CWText>
+          ) : (
+            title
+          )}
           <div class="header-info-row">
-            <CWText>
-              {m(User, {
-                user: new AddressInfo(null, author, app.activeChainId(), null),
-                showAddressWithDisplayName: true,
-                linkify: true,
-                popover: true,
-              })}
-            </CWText>
-            <CWText type="caption" className="header-text">
-              published on {moment(createdAt).format('l')}
-            </CWText>
+            {author}
+            {typeof createdAt === 'number' ||
+              (moment.isMoment(createdAt) && createdAt.isValid() && (
+                <CWText type="caption" className="header-text">
+                  published on {moment(createdAt).format('l')}
+                </CWText>
+              ))}
+            {!!viewCount && (
+              <CWText type="caption" className="header-text">
+                {pluralize(viewCount, 'view')}
+              </CWText>
+            )}
+            {headerComponents}
+            {readOnly && <CWIcon iconName="lock" iconSize="small" />}
             {actions && (
               <CWPopoverMenu
-                trigger={<CWIconButton iconName="dotsVertical" />}
+                trigger={
+                  <CWIconButton iconName="dotsVertical" iconSize="small" />
+                }
                 menuItems={actions}
               />
             )}
+            <SharePopover />
           </div>
         </div>
         {subHeader}
