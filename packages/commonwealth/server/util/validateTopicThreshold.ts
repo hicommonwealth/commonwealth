@@ -48,8 +48,8 @@ const validateTopicThreshold = async (
     });
       // TODO: @JAKE in the future, we will have more than one contract,
       // need to handle this through the TBC Rule, passing in associated Contract.id
-    const threshold = topic.token_threshold;
-    if (threshold && threshold > 0) {
+    const threshold = new BN(topic.token_threshold || '0');
+    if (!threshold.isZero()) {
       const tokenBalances = await tbc.getBalancesForAddresses(
         topic.chain.chain_node_id,
         [ userAddress ],
@@ -65,7 +65,7 @@ const validateTopicThreshold = async (
         throw new Error(tokenBalances.errors[userAddress] || `No token balance queried for ${userAddress}`);
       }
       const tokenBalance = new BN(tokenBalances.balances[userAddress]);
-      return tokenBalance.gten(threshold);
+      return tokenBalance.gte(threshold);
     } else {
       return true;
     }

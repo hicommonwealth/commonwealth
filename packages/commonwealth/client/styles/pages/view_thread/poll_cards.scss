@@ -1,0 +1,12 @@
+@import 'shared';
+
+.PollEditorCard.Card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 248px;
+
+  @include extraSmall {
+    width: 100%;
+  }
+}

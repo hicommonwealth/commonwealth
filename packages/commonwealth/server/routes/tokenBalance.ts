@@ -95,9 +95,8 @@ const tokenBalance = async (
         tokenAddress: contract?.address,
         contractType: chain.network === ChainNetwork.ERC20
           ? 'erc20' : chain.network === ChainNetwork.ERC721
-            ? 'erc721' : chain.network === ChainNetwork.SPL
-            ? 'spl-token' : undefined
-      }
+            ? 'erc721' : undefined,
+      },
     );
   } catch (err) {
     log.info(`Failed to query token balance: ${err.message}`);

@@ -2,16 +2,16 @@
 
 import m from 'mithril';
 
-import 'pages/view_proposal/edit_comment.scss';
+import 'components/comments/edit_comment.scss';
 
 import app from 'state';
 import { Comment } from 'models';
 import { ContentType } from 'types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
-import { QuillEditorComponent } from '../../components/quill/quill_editor_component';
-import { QuillEditor } from '../../components/quill/quill_editor';
+import { CWButton } from '../component_kit/cw_button';
+import { QuillEditor } from '../quill/quill_editor';
+import { QuillEditorComponent } from '../quill/quill_editor_component';
 
 type EditCommentAttrs = {
   comment: Comment<any>;
