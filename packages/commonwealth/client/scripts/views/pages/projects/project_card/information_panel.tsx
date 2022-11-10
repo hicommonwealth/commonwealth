@@ -81,9 +81,7 @@ export class InformationPanel
           </div>
           <div class="data-right">
             {project.curatorFee > 0 && (
-              <CWText type="caption">
-                {project.curatorFee / 100}% Curator Fee
-              </CWText>
+              <CWText type="caption">{project.curatorFee}% Curator Fee</CWText>
             )}
             {project.chainId && (
               <Tag
