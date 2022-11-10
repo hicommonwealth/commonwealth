@@ -17,7 +17,7 @@ export type TopicAttributes = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  token_threshold: number;
+  token_threshold: string;
   default_offchain_template?: string;
   rule_id?: number;
 
@@ -48,7 +48,7 @@ export default (
     created_at: { type: dataTypes.DATE, allowNull: false },
     updated_at: { type: dataTypes.DATE, allowNull: false },
     deleted_at: { type: dataTypes.DATE, allowNull: true },
-    token_threshold: { type: dataTypes.INTEGER, allowNull: true },
+    token_threshold: { type: dataTypes.STRING, allowNull: true },
     featured_in_sidebar: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
     featured_in_new_post: { type: dataTypes.BOOLEAN, allowNull: true, defaultValue: false },
     order: { type: dataTypes.INTEGER, allowNull: true },
