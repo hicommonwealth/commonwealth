@@ -11,7 +11,8 @@
     "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
     "lint": "./scripts/lint-new-work.sh",
     "lint-all": "eslint ./packages/**",
-    "lint-branch": "./scripts/lint-branch.sh"
+    "lint-branch": "./scripts/lint-branch.sh",
+    "stylelint": "stylelint packages/commonwealth/client/styles/*"
   },
   "engines": {
     "node": "16.x"
@@ -36,6 +37,9 @@
     "ethers": "5.4.3",
     "moment": "^2.23.0",
     "pg": "^8.7.1",
+    "stylelint": "^14.14.1",
+    "stylelint-config-prettier": "^9.0.4",
+    "stylelint-config-standard": "^29.0.0",
     "typescript": "^4.8.4",
     "web3": "1.5.2",
     "web3-utils": "1.5.2"
@@ -48,11 +52,6 @@
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-import": "^2.26.0",
-    "prettier": "2.7.1",
-    "stylelint": "^14.14.1",
-    "stylelint-config-prettier": "^9.0.4",
-    "stylelint-config-prettier-scss": "^0.0.1",
-    "stylelint-config-standard": "^29.0.0",
-    "stylelint-config-standard-scss": "^6.1.0"
+    "prettier": "2.7.1"
   }
 }
