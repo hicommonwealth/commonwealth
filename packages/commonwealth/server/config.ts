@@ -91,7 +91,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ','
-) as ChainBase[]) || [ChainBase.Ethereum, ChainBase.Substrate];
+) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 

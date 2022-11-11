@@ -2,10 +2,14 @@ import { assert } from 'chai';
 import {
   createDefaultCommunityRoles,
   createRole,
-} from 'commonwealth/server/util/roles';
-import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import models from 'commonwealth/server/database';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+} from '../../../server/util/roles';
+import * as modelUtils from '../../util/modelUtils';
+import models from '../../../server/database';
+import {
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+} from '../../../../common-common/src/types';
 
 describe('createRole tests', () => {
   let loggedInAddr: string;

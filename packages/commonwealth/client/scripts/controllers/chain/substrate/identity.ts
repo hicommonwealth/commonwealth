@@ -55,10 +55,8 @@ export function getIdentityQuality(judgements: string[]): IdentityQuality {
 }
 
 export default class SubstrateIdentity
-  extends Identity<SubstrateCoin>
+  extends Identity<SubstrateCoin, SubstrateAccount>
   implements ISerializable<ISubstrateIdentity> {
-  // override identity prop
-  public readonly account: SubstrateAccount;
 
   private _judgements: RegistrationJudgement[];
   private _info: IdentityInfo;
