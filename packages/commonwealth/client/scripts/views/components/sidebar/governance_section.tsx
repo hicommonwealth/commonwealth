@@ -50,7 +50,6 @@ export class GovernanceSection
         app.chain.network === ChainNetwork.Aave ||
         app.chain.network === ChainNetwork.Commonwealth ||
         app.chain.meta.snapshot?.length);
-    if (!hasProposals) return;
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
@@ -455,7 +454,7 @@ export class GovernanceSection
       displayData: null,
     };
 
-    const governanceGroupData: SectionGroupAttrs[] = [
+    let governanceGroupData: SectionGroupAttrs[] = [
       membersData,
       snapshotData,
       delegateData,
@@ -467,6 +466,8 @@ export class GovernanceSection
       councillorsData,
       validatorsData,
     ];
+
+    if (!hasProposals) governanceGroupData = [membersData];
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',
