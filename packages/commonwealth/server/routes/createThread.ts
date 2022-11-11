@@ -31,7 +31,6 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
