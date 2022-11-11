@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'pages/snapshot/index.scss';
 
 import app from 'state';
+import { AddressInfo } from 'models';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import {
@@ -25,6 +26,8 @@ import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
+import { CWText } from '../../components/component_kit/cw_text';
+import User from '../../components/widgets/user';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -124,8 +127,23 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
         <CWContentPage
           showSidebar
           title={this.proposal.title}
-          author={this.proposal.author}
+          author={
+            <CWText>
+              {m(User, {
+                user: new AddressInfo(
+                  null,
+                  this.proposal.author,
+                  app.activeChainId(),
+                  null
+                ),
+                showAddressWithDisplayName: true,
+                linkify: true,
+                popover: true,
+              })}
+            </CWText>
+          }
           createdAt={this.proposal.created}
+          contentBodyLabel="Snapshot"
           subHeader={
             this.proposal.state === 'active' ? (
               <ActiveProposalPill proposalEnd={this.proposal.end} />

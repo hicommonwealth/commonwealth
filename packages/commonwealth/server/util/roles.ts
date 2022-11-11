@@ -1,4 +1,4 @@
-import { Model, Transaction, Op, FindOptions } from 'sequelize';
+import { Transaction, Op, FindOptions } from 'sequelize';
 import {
   computePermissions,
   Action,
@@ -11,7 +11,7 @@ import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
-import { AddressInstance } from 'commonwealth/server/models/address';
+import { AddressInstance } from '../models/address';
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -306,7 +306,7 @@ export async function isAddressPermitted(
     throw new Error('Chain not found');
   }
 
-  // sort roles by roles with lowest roles first
+  // sort roles by roles with highest permissions first
   roles.sort((a) => {
     if (a.permission === 'member') return -1;
     if (a.permission === 'moderator') return 0;

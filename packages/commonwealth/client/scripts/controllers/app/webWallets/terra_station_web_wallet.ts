@@ -2,9 +2,13 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
-class TerraStationWebWalletController implements IWebWallet<string> {
+type TerraAddress = {
+  address: string
+}
+
+class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
-  private _accounts: string[] = [];
+  private _accounts: TerraAddress[] = [];
   private _enabling = false;
   private _extension = new Extension();
 
@@ -38,19 +42,20 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
-    try {
-      this._extension.once('onConnect', (accountAddr) => {
-        if (accountAddr && !this._accounts.includes(accountAddr)) {
-          this._accounts.push(accountAddr);
-        }
-        this._enabled = this._accounts.length !== 0;
-      });
+    // use a promise so that this function returns *after* the wallet has connected
+    const accountAddr = await new Promise<TerraAddress>((resolve) => {
+      this._extension.once('onConnect', resolve);
       this._extension.connect();
-      this._enabling = false;
-    } catch (error) {
+    }).catch((error) => {
       console.error(`Failed to enabled Terra Station ${error.message}`);
-      this._enabling = false;
+    });
+
+    if (accountAddr && !this._accounts.includes(accountAddr)) {
+      this._accounts.push(accountAddr);
     }
+
+    this._enabled = this._accounts.length !== 0;
+    this._enabling = false;
   }
 
   public async signWithAccount(account: Account): Promise<string> {
@@ -69,6 +74,7 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       }
     });
 
+    console.log(result);
     const signature = {
       signature: {
         pub_key: {

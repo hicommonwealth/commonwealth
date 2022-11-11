@@ -69,7 +69,7 @@ export class RolesController {
     return $.post('/api/createRole', {
       jwt: this.User.jwt,
       address_id: options.address.id,
-      ...options,
+      chain: options.chain || options.community || (options.address as AddressInfo).chain?.id,
     }).then((result) => {
       // handle state updates
       this.addRole(result.result.role);
@@ -85,7 +85,7 @@ export class RolesController {
     return $.post('/api/deleteRole', {
       jwt: this.User.jwt,
       address_id: options.address.id,
-      ...options,
+      chain: options.chain || options.community || options.address.chain?.id,
     }).then((result) => {
       if (result.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${result.status}`);
