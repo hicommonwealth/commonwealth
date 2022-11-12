@@ -21,6 +21,7 @@ import Rollbar from 'rollbar';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { createSnapshotNamespace } from './snapshotNamespace';
 import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
 
@@ -192,6 +193,7 @@ export async function setupWebSocketServer(
   console.log('Redis Cache initialized!');
 
   const chainEventsNameSpace = createCeNamespace(io);
+  const snapshotNamespace = createSnapshotNamespace(io);
 
   try {
     const rabbitController = new RabbitMQController(
@@ -202,6 +204,11 @@ export async function setupWebSocketServer(
     await rabbitController.startSubscription(
       publishToCERoom.bind(chainEventsNameSpace),
       RascalSubscriptions.ChainEventNotifications
+    );
+
+    await rabbitController.startSubscription(
+      publishToCERoom.bind(snapshotNamespace),
+      RascalSubscriptions.SnapshotListener
     );
   } catch (e) {
     log.error(
