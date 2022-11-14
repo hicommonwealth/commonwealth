@@ -138,22 +138,20 @@ export class ThreadSelector
                 }, 250);
               }}
             />
-            <QueryList
-              filterable={false}
-              checkmark
-              inputAttrs={{
+            {m(QueryList, {
+              filterable: false,
+              checkmark: true,
+              inputAttrs: {
                 placeholder: 'Search for thread to link...',
-              }}
-              emptyContent={getEmptyContentMessage()}
-              items={
+              },
+              emptyContent: getEmptyContentMessage(),
+              items:
                 this.showOnlyLinkedThreads && !queryLength
                   ? linkedThreads
-                  : searchResults
-              }
-              itemRender={(item: Thread, idx) =>
-                renderThreadPreview(this, item, idx)
-              }
-              onSelect={(thread: Thread) => {
+                  : searchResults,
+              itemRender: (item: Thread, idx) =>
+                renderThreadPreview(this, item, idx),
+              onSelect: (thread: Thread) => {
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
                 );
@@ -179,8 +177,8 @@ export class ThreadSelector
                       notifyError('Thread failed to link.');
                     });
                 }
-              }}
-            />
+              },
+            })}
           </>
         )}
       </div>
