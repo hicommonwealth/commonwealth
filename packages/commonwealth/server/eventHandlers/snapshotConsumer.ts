@@ -21,10 +21,13 @@ export default async function startSnapshotConsumer() {
 
     const snapshotNamespace = createSnapshotNamespace;
 
+    const subs = [];
+    subs.push(publishToSnapshotRoom.bind(snapshotNamespace));
+
     const consumer = new ServiceConsumer(
-      'SnapshotListenerQueue',
+      'SnapshotListenerExchange',
       rabbitMQController,
-      publishToSnapshotRoom.bind(snapshotNamespace)
+      subs
     );
 
     await consumer.init();

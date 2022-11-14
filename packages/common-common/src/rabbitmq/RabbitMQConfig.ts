@@ -80,10 +80,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             },
           },
           [RascalExchanges.SnapshotListener]:{
-            assert: true, 
-            type: 'fanout',
-            options: {
-              durable: true,
+            'assert': true, 
+            'type': 'fanout',
+            'options': {
+              'durable': true,
             },
           },
           [RascalExchanges.DeadLetter]: {
