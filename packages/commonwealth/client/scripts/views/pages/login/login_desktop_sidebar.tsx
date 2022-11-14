@@ -11,6 +11,7 @@ import { CWAccountCreationButton } from '../../components/component_kit/cw_accou
 import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
+import { ChainNetwork } from 'common-common/src/types';
 
 function generateText(wallets: Array<IWebWallet<any>>) {
   if (wallets.length === 0) {
@@ -26,10 +27,12 @@ function generateText(wallets: Array<IWebWallet<any>>) {
   }
   const wallet = wallets[0];
   const startsWithVowel = wallet.chain === 'ethereum';
+  const walletType =
+    wallet.defaultNetwork === ChainNetwork.Terra
+      ? `Terra Station`
+      : wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
 
-  return `This Community requires a${startsWithVowel ? 'n' : ''} ${
-    wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
-  } Wallet`;
+  return `This Community requires a${startsWithVowel ? 'n' : ''} ${walletType} Wallet`;
 }
 
 export class LoginDesktopSidebar

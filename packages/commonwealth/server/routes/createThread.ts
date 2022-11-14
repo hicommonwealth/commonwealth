@@ -8,6 +8,12 @@ import {
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import { Action } from 'common-common/src/permissions';
+import {
+  findAllRoles,
+  isAddressPermitted,
+  PermissionError,
+} from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -121,7 +127,7 @@ const dispatchHooks = async (
                 chain: mention[0] || null,
                 address: mention[1] || null,
               },
-              include: [models.User, models.Role],
+              include: [models.User, models.RoleAssignment],
             });
           } catch (err) {
             throw new ServerError(err);
@@ -214,6 +220,16 @@ const createThread = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
@@ -318,14 +334,12 @@ const createThread = async (
 
     if (chain && chain.type === ChainType.Token) {
       // skip check for admins
-      const isAdmin = await models.Role.findAll({
-        where: {
-          address_id: author.id,
-          chain_id: chain.id,
-          permission: ['admin'],
-        },
-        transaction,
-      });
+      const isAdmin = await findAllRoles(
+        models,
+        { where: { address_id: author.id } },
+        chain.id,
+        ['admin']
+      );
       if (!req.user.isAdmin && isAdmin.length === 0) {
         const canReact = await validateTopicThreshold(
           tokenBalanceCache,

@@ -1,8 +1,8 @@
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 
-import { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { DB } from '../models';
 import { JWT_SECRET } from '../config';
 import { useSocialAccountAuth } from './socialAccount';
 import { useMagicAuth } from './magic';
