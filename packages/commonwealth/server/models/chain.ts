@@ -46,6 +46,8 @@ export type ChainAttributes = {
   address?: string;
   token_name?: string;
   ce_verbose?: boolean;
+  default_allow_permissions: bigint;
+  default_deny_permissions: bigint;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -137,6 +139,16 @@ export default (
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
+      default_allow_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      default_deny_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       tableName: 'Chains',
