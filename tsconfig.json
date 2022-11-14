@@ -15,7 +15,10 @@
       "chain-events": ["./packages/chain-events"],
       "chain-events/*": ["./packages/chain-events/*"],
       "token-balance-cache": ["./packages/token-balance-cache"],
-      "token-balance-cache/*": ["./packages/token-balance-cache/*"],
+      "token-balance-cache/*": ["./packages/token-balance-cache/*"]
     }
   },
+  "include": [
+    ".eslintrc.js"
+  ]
 }

@@ -84,6 +84,8 @@ module.exports = {
                 "allowSingleExtends": true
             }
         ]
-    }
-
+    },
+    ignorePatterns: [
+        "server/scripts/setupPrerenderService.ts"
+    ]
 }
