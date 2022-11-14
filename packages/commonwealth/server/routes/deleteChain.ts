@@ -199,7 +199,6 @@ const deleteChain = async (
 
       await models.RoleAssignment.destroy({
         where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-        force: true,
         transaction: t,
       });
 
@@ -217,7 +216,6 @@ const deleteChain = async (
         where: {
           community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
         },
-        force: true,
         transaction: t,
       });
 
