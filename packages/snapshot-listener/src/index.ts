@@ -14,17 +14,14 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json());
 
+
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
 });
 
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
-    const rabbitController = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI)
-    );
-    await rabbitController.init();
-    const event: SnapshotEvent = req.body.event;
+        const event: SnapshotEvent = req.body.event;
     if (!event) {
       res.status(500).send("Error sending snapshot event");
     }
@@ -34,9 +31,13 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       RascalPublications.SnapshotListener
     );
 
+    await rabbitMqHandler.init()
+
     console.log(rabbitMqHandler);
 
     await rabbitMqHandler.handle(event);
+    //send the snapshot event data back as a 200 response
+    res.status(200).send(event);
   } catch (err) {
     console.log(err);
 
