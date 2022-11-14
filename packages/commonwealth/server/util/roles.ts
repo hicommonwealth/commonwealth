@@ -7,11 +7,13 @@ import {
   PermissionError,
   BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
+import { NextFunction, Request, Response } from 'express';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 import { AddressInstance } from '../models/address';
+import { AppError } from './errors';
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -383,5 +385,43 @@ export async function isAnyonePermitted(
   // check if action is permitted
   if (!isPermitted(permission, action)) {
     return PermissionError.NOT_PERMITTED;
+  }
+}
+
+export async function checkActiveAddressPermitted(
+  models: DB,
+  user_id: number,
+  chain_id: string,
+  action: Action,
+  next: NextFunction
+): Promise<void> {
+  // get active address
+  const activeAddressInstance = await getActiveAddress(
+    models,
+    user_id,
+    chain_id
+  );
+
+  if (activeAddressInstance) {
+    // check if the user has permission to view the channel
+    const permission_error = await isAddressPermitted(
+      models,
+      activeAddressInstance.id,
+      chain_id,
+      action
+    );
+
+    if (permission_error === PermissionError.NOT_PERMITTED) {
+      return next(new AppError(PermissionError.NOT_PERMITTED));
+    }
+  } else {
+    const permission_error = await isAnyonePermitted(
+      models,
+      chain_id,
+      action
+    );
+    if (permission_error === PermissionError.NOT_PERMITTED) {
+      return next(new AppError(PermissionError.NOT_PERMITTED));
+    }
   }
 }

@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Action, PermissionError } from 'common-common/src/permissions';
 import {
-  getActiveAddress,
-  isAddressPermitted,
+  checkActiveAddressPermitted,
   isAnyonePermitted,
 } from '../../util/roles';
 import { DB } from '../../models';
@@ -46,34 +45,14 @@ export default async (
       return next(new AppError(PermissionError.NOT_PERMITTED));
     }
   }
-  // get active address
-  const activeAddressInstance = await getActiveAddress(
+
+  await checkActiveAddressPermitted(
     models,
     req.user.id,
-    req.query.chain_id
+    req.query.chain_id,
+    Action.VIEW_CHAT_CHANNELS,
+    next
   );
-  if (activeAddressInstance) {
-    // check if the user has permission to view the channel
-    const permission_error = await isAddressPermitted(
-      models,
-      activeAddressInstance.id,
-      req.query.chain_id,
-      Action.VIEW_CHAT_CHANNELS
-    );
-
-    if (permission_error === PermissionError.NOT_PERMITTED) {
-      return next(new AppError(PermissionError.NOT_PERMITTED));
-    }
-  } else {
-    const permission_error = await isAnyonePermitted(
-      models,
-      req.query.chain_id,
-      Action.VIEW_CHAT_CHANNELS
-    );
-    if (permission_error === PermissionError.NOT_PERMITTED) {
-      return next(new AppError(PermissionError.NOT_PERMITTED));
-    }
-  }
 
   const channel = await models.ChatChannel.findOne({
     where: {
