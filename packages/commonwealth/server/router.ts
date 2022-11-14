@@ -791,6 +791,7 @@ function setupRouter(
 
   // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  router.get('snapshot', getSnapshotProposals.bind(this))
   router.get('/communityStats', communityStats.bind(this, models));
 
   // new API

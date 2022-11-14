@@ -6,28 +6,16 @@ import { SnapshotNotification } from '../../shared/types';
 import { createSnapshotNamespace } from '../socket/snapshotNamespace';
 import { RABBITMQ_URI } from '../config';
 
-function publishToSnapshotRoom(
-  this: Server,
-  notification: SnapshotNotification
-) {
-  this.to(notification.id).emit('snapshot', notification);
-}
-
 export default async function startSnapshotConsumer() {
   try {
     const rabbitMQController = new RabbitMQController(
       getRabbitMQConfig(RABBITMQ_URI)
     );
 
-    const snapshotNamespace = createSnapshotNamespace;
-
-    const subs = [];
-    subs.push(publishToSnapshotRoom.bind(snapshotNamespace));
-
     const consumer = new ServiceConsumer(
       'SnapshotListenerExchange',
       rabbitMQController,
-      subs
+      //RabbitMQSub
     );
 
     await consumer.init();
