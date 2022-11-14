@@ -789,6 +789,7 @@ function setupRouter(
   // TODO: Change to GET /entities
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
+  // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
 

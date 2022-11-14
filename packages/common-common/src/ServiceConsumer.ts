@@ -62,6 +62,7 @@ export class ServiceConsumer {
           sub.subscriptionName,
           sub.msgProcessorContext
         );
+        console.log('subscribed to', sub.subscriptionName);
       } catch (e) {
         this.log.error(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor.name}' ` +

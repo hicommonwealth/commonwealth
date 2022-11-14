@@ -29,7 +29,7 @@ import IdentityFetchCache, {
 } from './server/util/identityFetchCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
@@ -44,6 +44,7 @@ import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import StatsDController from './server/util/statsd';
+import startSnapshotConsumer from './server/eventHandlers/snapshotConsumer';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -57,8 +58,7 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE =
-    process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
@@ -158,7 +158,9 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV ? webpack(devWebpackConfig as any) : webpack(prodWebpackConfig as any);
+  const compiler = DEV
+    ? webpack(devWebpackConfig as any)
+    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
@@ -248,7 +250,6 @@ async function main() {
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-
     // add other middlewares
     app.use(logger('dev'));
     app.use(expressStatsdInit(StatsDController.get()));
@@ -292,7 +293,7 @@ async function main() {
     <any>identityFetchCache,
     tokenBalanceCache,
     ruleCache,
-    banCache,
+    banCache
   );
   setupCosmosProxy(app, models);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
@@ -315,6 +316,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
+  startSnapshotConsumer();
   setupServer(app, rollbar, models);
 }
 

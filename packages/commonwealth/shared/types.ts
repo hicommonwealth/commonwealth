@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import { ChainAttributes } from '../server/models/chain';
-import { ChainEventAttributes } from '../server/models/chain_event';
-=======
->>>>>>> master
 import moment from 'moment';
 import type { ChainAttributes } from '../server/models/chain';
 import type { ChainEventAttributes } from '../server/models/chain_event';

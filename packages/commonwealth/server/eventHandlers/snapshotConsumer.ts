@@ -1,11 +1,34 @@
+import { Server } from 'socket.io';
 import { ServiceConsumer } from 'common-common/src/serviceConsumer';
-import { RabbitMQController } from 'common-common/src/rabbitmqController';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
+import { SnapshotNotification } from '../../shared/types';
+import { createSnapshotNamespace } from '../socket/snapshotNamespace';
+import { RABBITMQ_URI } from '../config';
 
+function publishToSnapshotRoom(
+  this: Server,
+  notification: SnapshotNotification
+) {
+  this.to(notification.id).emit('snapshot', notification);
+}
 
-export default function StartSnapshotConsumer() {
+export default async function startSnapshotConsumer() {
+  try {
+    const rabbitMQController = new RabbitMQController(
+      getRabbitMQConfig(RABBITMQ_URI)
+    );
 
-  const rabbitMQController = new RabbitMQController();
+    const snapshotNamespace = createSnapshotNamespace;
 
-  const consumer = new ServiceConsumer('snapshot', rabbitMQController);
-  consumer.start();
+    const consumer = new ServiceConsumer(
+      'SnapshotListenerQueue',
+      rabbitMQController,
+      publishToSnapshotRoom.bind(snapshotNamespace)
+    );
+
+    await consumer.init();
+  } catch (err) {
+    console.log(err);
+  }
 }

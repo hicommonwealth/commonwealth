@@ -1,5 +1,4 @@
 // Use https://admin.socket.io/#/ to monitor
-
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
@@ -193,7 +192,6 @@ export async function setupWebSocketServer(
   console.log('Redis Cache initialized!');
 
   const chainEventsNameSpace = createCeNamespace(io);
-  const snapshotNamespace = createSnapshotNamespace(io);
 
   try {
     const rabbitController = new RabbitMQController(
@@ -204,11 +202,6 @@ export async function setupWebSocketServer(
     await rabbitController.startSubscription(
       publishToCERoom.bind(chainEventsNameSpace),
       RascalSubscriptions.ChainEventNotifications
-    );
-
-    await rabbitController.startSubscription(
-      publishToCERoom.bind(snapshotNamespace),
-      RascalSubscriptions.SnapshotListener
     );
   } catch (e) {
     log.error(
