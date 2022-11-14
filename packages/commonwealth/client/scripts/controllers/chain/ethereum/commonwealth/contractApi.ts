@@ -24,8 +24,6 @@ export async function attachSigner<CT extends Contract>(
   factory?: ContractFactoryT<CT>,
   address?: string
 ): Promise<CT> {
-  console.log({ factory, address });
-
   let signingWallet: IWebWallet<any>;
   if (sender) {
     signingWallet = await wallets.locateWallet(sender, ChainBase.Ethereum);

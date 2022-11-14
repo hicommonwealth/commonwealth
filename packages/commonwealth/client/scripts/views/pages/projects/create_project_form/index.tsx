@@ -9,7 +9,9 @@ import { ButtonGroup, Button } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
+import { tokensToWei, weiToTokens } from 'helpers';
 import { ChainBase } from 'common-common/src/types';
+import { CWButton } from 'views/components/component_kit/cw_button';
 import { validateProjectForm } from '../helpers';
 import {
   ICreateProjectForm,
@@ -88,7 +90,7 @@ export default class CreateProjectForm implements m.ClassComponent {
       token: this.form.token,
       creator: this.form.creator,
       beneficiary: this.form.beneficiary,
-      threshold: this.form.threshold,
+      threshold: weiToTokens(this.form.threshold.toString(), 18),
       deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
       curatorFee: Math.round(this.form.curatorFee),
     });
@@ -128,6 +130,40 @@ export default class CreateProjectForm implements m.ClassComponent {
         alwaysShowTitle={true}
       >
         <div class="CreateProjectForm">
+          <CWButton
+            disabled={!app.isLoggedIn()}
+            label="Create Project (Jake Test)"
+            onclick={async () => {
+              console.log('Creating a project with the following values:');
+              console.log({
+                title: 'Test title',
+                description: 'Long description',
+                shortDescription: 'Short description',
+                coverImage: 'https://www.mycoolimageurl.com',
+                chainId: 'dydx',
+                token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+                creator: app.user.activeAccounts[0].address,
+                beneficiary: app.user.activeAccounts[0].address,
+                threshold: tokensToWei('3', 18),
+                deadline: Math.round(nowInSeconds + weekInSeconds),
+                curatorFee: Math.round(30),
+              });
+              const [txReceipt, newProjectId] = await app.projects.create({
+                title: 'Test title',
+                description: 'Long description',
+                shortDescription: 'Short description',
+                coverImage: 'https://www.mycoolimageurl.com',
+                chainId: 'dydx',
+                token: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+                creator: app.user.activeAccounts[0].address,
+                beneficiary: app.user.activeAccounts[0].address,
+                threshold: tokensToWei('3', 18),
+                deadline: Math.round(nowInSeconds + weekInSeconds),
+                curatorFee: Math.round(30),
+              });
+              console.log({ txReceipt, newProjectId });
+            }}
+          />
           <div class="form-panel">
             <CWText type="h5" weight="medium">
               Project Creation

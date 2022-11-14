@@ -6,7 +6,6 @@ import app from 'state';
 import Web3 from 'web3';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-import { notifyInfo } from 'controllers/app/notifications';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { ChainNetwork } from 'common-common/src/types';
 import { Project } from 'models';

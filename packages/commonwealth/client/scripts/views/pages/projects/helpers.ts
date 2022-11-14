@@ -47,14 +47,15 @@ export const validateProjectForm = (
       }
       break;
     case 'fundraiseLength':
-      // TODO v2: Min/max fundraiseLength check to accompany more flex raise lengths
+      // TODO v2: Min/max fundraiseLength check to accompany more flex raise lengths.
+      // For now they are hardcoded at 1-4wks.
       if (Number.isNaN(+value)) {
         errorMessage = 'Invalid fundraise length. Must be between [X, Y]';
       }
       break;
     case 'threshold':
-      if (Number.isNaN(+value)) {
-        errorMessage = 'Invalid threshold amount. Must be between [X, Y]';
+      if (Number.isNaN(+value) || +value < 0) {
+        errorMessage = 'Invalid threshold amount. Must be a valid number';
       }
       break;
     case 'curatorFee':
