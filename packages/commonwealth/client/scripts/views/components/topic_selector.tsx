@@ -35,12 +35,10 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
       .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
-      return (
-        <ListItem
-          label={topic.name}
-          selected={(selectedTopic as Topic)?.name === topic.name}
-        />
-      );
+      return m(ListItem, {
+        label: topic.name,
+        selected: (selectedTopic as Topic)?.name === topic.name,
+      });
     };
 
     const itemPredicate = (query: string, item: Topic) => {
