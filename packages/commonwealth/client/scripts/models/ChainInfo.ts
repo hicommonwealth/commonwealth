@@ -195,7 +195,6 @@ class ChainInfo {
       substrateSpec: substrate_spec,
       hideProjects: hide_projects,
       tokenName: token_name,
-      address,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
     });
@@ -319,7 +318,7 @@ class ChainInfo {
   public getAvatar(size: number) {
     return this.iconUrl
       ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      : m(CWJdenticon, { address: undefined, size });
   }
 }
 
