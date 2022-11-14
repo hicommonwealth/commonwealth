@@ -449,55 +449,50 @@ export class CreateInviteModal
           <div class="community-and-address-row">
             <div class="community-select-container">
               <CWLabel label="Community" />
-              <SelectList
-                closeOnSelect
-                items={
-                  chainInfo
-                    ? [{ label: chainInfo.name, value: chainInfo.id }]
-                    : app.config.chains
-                        .getAll()
-                        .map((chain) => ({
-                          label: chain.name.toString(),
-                          value: chain.id.toString(),
-                        }))
-                        .sort((a: CommunityOption, b: CommunityOption) => {
-                          if (a.label > b.label) return 1;
-                          if (a.label < b.label) return -1;
-                          return 0;
-                        })
-                }
-                itemRender={(item: CommunityOption) => (
-                  <ListItem
-                    label={item.label}
-                    selected={
+              {m(SelectList, {
+                closeOnSelect: true,
+                items: chainInfo
+                  ? [{ label: chainInfo.name, value: chainInfo.id }]
+                  : app.config.chains
+                      .getAll()
+                      .map((chain) => ({
+                        label: chain.name.toString(),
+                        value: chain.id.toString(),
+                      }))
+                      .sort((a: CommunityOption, b: CommunityOption) => {
+                        if (a.label > b.label) return 1;
+                        if (a.label < b.label) return -1;
+                        return 0;
+                      }),
+                itemRender: (item: CommunityOption) =>
+                  m(ListItem, {
+                    label: item.label,
+                    selected:
                       this.invitedAddressChain &&
-                      this.invitedAddressChain === item.value
-                    }
-                  />
-                )}
-                itemPredicate={(query: string, item: CommunityOption) => {
-                  return item.label.toLowerCase().includes(query.toLowerCase());
-                }}
-                onSelect={(item: CommunityOption) => {
+                      this.invitedAddressChain === item.value,
+                  }),
+                itemPredicate: (query: string, item: CommunityOption) =>
+                  item.label.toLowerCase().includes(query.toLowerCase()),
+                onSelect: (item: CommunityOption) => {
                   this.invitedAddressChain = item.value;
-                }}
-                loading={false}
-                popoverAttrs={{
+                },
+                loading: false,
+                popoverAttrs: {
                   hasArrow: false,
-                }}
-                trigger={
+                },
+                trigger: (
                   <CWButton
                     iconName="chevronDown"
                     buttonType="lg-secondary-blue"
                     label={selectedChainId}
                   />
-                }
-                emptyContent="No communities found"
-                inputAttrs={{
+                ),
+                emptyContent: 'No communities found',
+                inputAttrs: {
                   placeholder: 'Search Community...',
-                }}
-                checkmark={false}
-              />
+                },
+                checkmark: false,
+              })}
             </div>
             <CWTextInput
               label="Address"

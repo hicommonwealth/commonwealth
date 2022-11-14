@@ -18,24 +18,22 @@ const renderThreadPreview = (state, thread: Thread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return (
-    <ListItem
-      label={
-        <div class="thread-preview-row">
-          <CWText fontWeight="medium" noWrap>
-            {thread.title}
-          </CWText>
-          <CWText type="caption">
-            {author.name
-              ? `${author.name} • ${formatAddressShort(thread.author)}`
-              : thread.author}
-          </CWText>
-        </div>
-      }
-      selected={selected}
-      key={idx}
-    />
-  );
+  return m(ListItem, {
+    label: (
+      <div class="thread-preview-row">
+        <CWText fontWeight="medium" noWrap>
+          {thread.title}
+        </CWText>
+        <CWText type="caption">
+          {author.name
+            ? `${author.name} • ${formatAddressShort(thread.author)}`
+            : thread.author}
+        </CWText>
+      </div>
+    ),
+    selected,
+    key: idx,
+  });
 };
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
