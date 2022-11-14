@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 // import { CommunityType } from 'client/scripts/views/pages/create_community';
 // import { ChainBase } from 'common-common/src/types';
 
+=======
+>>>>>>> master
 // Base Payload - Required for All Events
 export interface BaseMixpanelPayload {
   event: MixpanelEvents;
@@ -87,11 +90,14 @@ export const enum MixpanelCommunityCreationEvent {
   CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
 }
 
+<<<<<<< HEAD
 // export interface MixpanelCommunityCreationPayload extends BaseMixpanelPayload {
 //   chainBase: ChainBase;
 //   communityType: CommunityType;
 //   event: MixpanelCommunityCreationEvent;
 // }
+=======
+>>>>>>> master
 // END NEW COMMUNITY CREATION EVENT
 
 // CHAT EVENTS

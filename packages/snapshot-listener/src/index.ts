@@ -34,6 +34,8 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       RascalPublications.SnapshotListener
     );
 
+    console.log(rabbitMqHandler);
+
     await rabbitMqHandler.handle(event);
   } catch (err) {
     console.log(err);

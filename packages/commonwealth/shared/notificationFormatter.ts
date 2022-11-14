@@ -2,8 +2,6 @@ import { NotificationCategories } from 'common-common/src/types';
 import { IPostNotificationData } from './types';
 import { getProposalUrl, renderQuillDeltaToText, smartTrim, formatAddressShort } from './utils';
 
-import { SERVER_URL } from '../server/config';
-
 // forum notification format:
 // raymondz (mae7...) commented on 'Example Thread' in Edgeware
 

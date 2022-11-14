@@ -18,6 +18,10 @@
       "chain-events/*": ["../../packages/chain-events/*"]
       "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
     }
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "."
   },
   "include": [
     "src",
@@ -26,6 +30,6 @@
     "./node_modules",
     "node_modules",
     "build",
-    "dist"
+    "dist",
   ]
 }
