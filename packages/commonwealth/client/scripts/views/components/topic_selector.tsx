@@ -69,44 +69,41 @@ export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
         );
     };
 
-    return (
-      <SelectList
-        class="TopicSelector"
-        filterable={false}
-        checkmark={false}
-        closeOnSelect
-        emptyContent={
-          // This appears if no topics are available because all require token thresholds
-          <Callout
-            size="sm"
-            class="no-matching-topics"
-            icon={Icons.ALERT_TRIANGLE}
-            intent="negative"
-            content="Insufficient token balance."
-          />
-        }
-        itemPredicate={itemPredicate}
-        itemRender={itemRender}
-        items={sortTopics(topics)}
-        oncreate={oncreate}
-        onSelect={onSelect}
-        popoverAttrs={{
-          transitionDuration: 0,
-          hasArrow: false,
-        }}
-        trigger={
-          <CWButton
-            buttonType="lg-secondary-blue"
-            iconName="chevronDown"
-            label={
-              isNotUndefined(selectedTopic)
-                ? selectedTopic.name
-                : 'Select a topic'
-            }
-            tabindex={tabindex}
-          />
-        }
-      />
-    );
+    return m(SelectList, {
+      class: 'TopicSelector',
+      filterable: false,
+      checkmark: false,
+      closeOnSelect: true,
+      emptyContent:
+        // This appears if no topics are available because all require token thresholds
+        m(Callout, {
+          size: 'sm',
+          class: 'no-matching-topics',
+          icon: Icons.ALERT_TRIANGLE,
+          intent: 'negative',
+          content: 'Insufficient token balance.',
+        }),
+      itemPredicate,
+      itemRender,
+      items: sortTopics(topics),
+      oncreate,
+      onSelect,
+      popoverAttrs: {
+        transitionDuration: 0,
+        hasArrow: false,
+      },
+      trigger: (
+        <CWButton
+          buttonType="lg-secondary-blue"
+          iconName="chevronDown"
+          label={
+            isNotUndefined(selectedTopic)
+              ? selectedTopic.name
+              : 'Select a topic'
+          }
+          tabindex={tabindex}
+        />
+      ),
+    });
   }
 }
