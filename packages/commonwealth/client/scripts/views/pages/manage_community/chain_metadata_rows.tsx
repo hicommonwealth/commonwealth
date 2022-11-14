@@ -15,6 +15,12 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo } from 'models';
+import {
+  Action,
+  addPermission,
+  isPermitted,
+  removePermission,
+} from 'common-common/src/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -23,12 +29,6 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import {
-  Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from '../../../../../../common-common/src/permissions';
 
 type ChainMetadataRowsAttrs = {
   admins: any;

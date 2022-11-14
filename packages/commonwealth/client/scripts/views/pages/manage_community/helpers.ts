@@ -46,7 +46,7 @@ export const setChainCategories = async (
               (c) => c.id !== response.result.id
             );
           }
-          // else we don't have a result, so we don't know what to remove
+          // else we don't have a response.result, so we don't know what to remove
         }
         resolve();
         m.redraw();

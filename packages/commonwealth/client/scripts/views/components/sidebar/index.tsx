@@ -37,11 +37,11 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
     const hideChat =
       currentChainInfo &&
       activeAddressRoles &&
-      isActiveAddressPermitted(
+      !isActiveAddressPermitted(
         activeAddressRoles,
         currentChainInfo,
         Action.VIEW_CHAT_CHANNELS
-      ) === PermissionError.NOT_PERMITTED;
+      );
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
 
     return (

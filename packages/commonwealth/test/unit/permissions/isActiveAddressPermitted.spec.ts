@@ -63,8 +63,8 @@
 //       community_roles: [],
 //     });
 
-//     expect(
-//       isActiveAddressPermitted(roleObjects, chainInfo, Action.CREATE_THREAD)
-//     ).to.not.Throw;
+//     assert.deepEqual(
+//       isActiveAddressPermitted(roleObjects, chainInfo, Action.CREATE_THREAD), false
+//     );
 //   });
 // });

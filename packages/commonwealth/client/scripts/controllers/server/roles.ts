@@ -313,7 +313,7 @@ export function isActiveAddressPermitted(
   active_address_roles: RoleInfo[],
   chain_info: ChainInfo,
   action: Action
-): PermissionError | undefined {
+): boolean {
   const chainRoles = active_address_roles.filter(
     (r) => r.chain_id === chain_info.id
   );
@@ -348,8 +348,9 @@ export function isActiveAddressPermitted(
       permissionAssignments
     );
     if (!isPermitted(permission, action)) {
-      return PermissionError.NOT_PERMITTED;
+      return false;
     }
+    return true;
   }
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
@@ -361,7 +362,8 @@ export function isActiveAddressPermitted(
       },
     ]);
     if (!isPermitted(permission, action)) {
-      return PermissionError.NOT_PERMITTED;
+      return false;
     }
+    return true;
   }
 }
