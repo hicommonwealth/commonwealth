@@ -10,7 +10,7 @@ Then run
 ```
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
 ```
-This will install and run Docker, exposing it on your local port `15672`.
+This will install and run RabbitMQ in a docker container, exposing it on your local port `15672`.
 Running this command a second time will not install it, but just spin up the container. 
 
 To check its running you can go to `http://localhost:15672` in your browser. 
