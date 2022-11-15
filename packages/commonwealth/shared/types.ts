@@ -1,6 +1,6 @@
-import { ChainAttributes } from '../server/models/chain';
-import { ChainEventAttributes } from '../server/models/chain_event';
 import moment from 'moment';
+import type { ChainAttributes } from '../server/models/chain';
+import type { ChainEventAttributes } from '../server/models/chain_event';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
