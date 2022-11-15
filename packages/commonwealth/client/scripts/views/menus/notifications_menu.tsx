@@ -195,7 +195,7 @@ export class NotificationsMenu implements m.ClassComponent {
             },
           })}
           {m(Button, {
-            label = '>',
+            label: '>',
             onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
