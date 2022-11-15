@@ -136,9 +136,8 @@ const updateChain = async (
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
   // Set default allow/deny permissions
-  chain.default_allow_permissions = default_allow_permissions;
-  chain.default_deny_permissions = default_deny_permissions;
-
+  chain.default_allow_permissions = default_allow_permissions || BigInt(0);
+  chain.default_deny_permissions = default_deny_permissions || BigInt(0);
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
