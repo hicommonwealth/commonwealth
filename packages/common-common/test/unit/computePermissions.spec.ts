@@ -3,6 +3,8 @@ import {
   computePermissions,
   Permissions,
   Action,
+  addPermission,
+  isPermitted,
 } from 'common-common/src/permissions';
 
 describe('computePermissions() unit tests', () => {
@@ -55,5 +57,20 @@ describe('computePermissions() unit tests', () => {
     ]);
     // eslint-disable-next-line no-bitwise
     assert.deepEqual(permission, base_permission);
+  });
+
+  it('should correctly default to deny for computePermissions for a permission with the same allow and deny', () => {
+    // eslint-disable-next-line no-bitwise
+    overwrite_admin.deny = addPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_admin.deny = addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
+    // eslint-disable-next-line no-bitwise
+    overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
+
+    const permission = computePermissions(base_permission, [
+      chain_permission,
+      overwrite_admin,
+    ]);
+    // eslint-disable-next-line no-bitwise
+    assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
   });
 });
