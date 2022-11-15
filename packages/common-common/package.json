@@ -12,7 +12,8 @@
   "keywords": [],
   "scripts": {
     "build-contracts": "cd src/eth && npx hardhat compile",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json ./test/unit/**/*.spec.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
