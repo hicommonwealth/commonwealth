@@ -297,16 +297,23 @@ export const addressSwapper = (options: {
   }
 };
 
+type RoleObject = {
+  permission: Permission;
+  allow: Permissions;
+  deny: Permissions;
+};
+
 export function aggregatePermissions(
-  roles: { permission: Permission; allow: Permissions; deny: Permissions }[],
+  roles: RoleObject[],
   chain_permissions: { allow: Permissions; deny: Permissions }
 ) {
-  // sort roles by roles with highest permissions first
-  roles.sort((a) => {
-    if (a.permission === 'member') return -1;
-    if (a.permission === 'moderator') return 0;
-    else return 1;
-  });
+  // sort roles by roles with highest permissions last
+  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+
+  function compare(o1: RoleObject, o2: RoleObject) {
+    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  }
+  roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
     allow: Permissions;

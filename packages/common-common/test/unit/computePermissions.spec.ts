@@ -21,7 +21,6 @@ describe('computePermissions() unit tests', () => {
     chain_permission = { allow: base_permission, deny: base_permission };
   });
 
-
   it('should correctly computePermissions for allowing createThread action with two roles overwrites', () => {
     // eslint-disable-next-line no-bitwise
     overwrite_admin.allow = BigInt(1) << BigInt(Action.CREATE_THREAD);
@@ -76,5 +75,21 @@ describe('computePermissions() unit tests', () => {
     ]);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
+  });
+
+  it('should correctly default to allow for computePermissions for a permission with the same allow and deny and community permissions', () => {
+    // eslint-disable-next-line no-bitwise
+    overwrite_admin.deny = addPermission(BigInt(0), Action.CREATE_THREAD);
+    // eslint-disable-next-line no-bitwise
+    overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
+    chain_permission.deny = addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
+    const permission = computePermissions(base_permission, [
+      chain_permission,
+      overwrite_admin,
+    ]);
+    // eslint-disable-next-line no-bitwise
+    assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
+    // eslint-disable-next-line no-bitwise
+    assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
   });
 });
