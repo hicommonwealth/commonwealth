@@ -13,58 +13,69 @@ import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { CommunityHeader } from './community_header';
-import { getClasses } from '../component_kit/helpers';
+import { CreateContentSidebar } from '../../menus/create_content_menu';
+import { ExploreCommunitiesSidebar } from './explore_sidebar';
 
 type SidebarAttrs = {
-  isSidebarToggleable?: boolean;
-  isSidebarToggled?: boolean;
+  onMobile: boolean;
 };
+
+export type SidebarMenuName =
+  | 'default'
+  | 'create-content'
+  | 'explore-communities';
 
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
   view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
-    const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
+    const { onMobile } = vnode.attrs;
+    if (!app.sidebarMenu) app.sidebarMenu = 'default';
 
-    const hideChat = !app.chain?.meta?.chatEnabled;
-
-    const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
+    const showSidebar = app.sidebarToggled || !onMobile;
+    const showDefaultSidebar = showSidebar && app.sidebarMenu === 'default';
+    const showCommunityMenu = showDefaultSidebar && app.chain;
+    const showCommunityHeader =
+      showCommunityMenu && onMobile && app.sidebarToggled;
+    const showCreateSidebar =
+      showSidebar && app.sidebarMenu === 'create-content';
+    const showExploreSidebar =
+      showSidebar && app.sidebarMenu === 'explore-communities';
 
     return (
       <div class="Sidebar">
-        {app.chain && isSidebarToggleable && isSidebarToggled && (
-          <CommunityHeader meta={app.chain.meta} />
-        )}
-        <div class="quickswitcher-and-sidebar-inner">
-          {showQuickSwitcher && <SidebarQuickSwitcher />}
-          {app.chain && (
-            <div
-              class={getClasses<{
-                isSidebarToggleable: boolean;
-                isSidebarToggled: boolean;
-              }>({ isSidebarToggleable, isSidebarToggled }, 'sidebar-inner')}
-            >
-              <AdminSection />
-              <DiscussionSection />
-              <GovernanceSection />
-              {app.socket && !hideChat && <ChatSection />}
-              <ExternalLinksModule />
-              <div class="buttons-container">
-                {app.isLoggedIn() && app.chain && (
-                  <div class="subscription-button">
-                    <SubscriptionButton />
-                  </div>
+        {showCommunityHeader && <CommunityHeader meta={app.chain.meta} />}
+        {showDefaultSidebar && (
+          <div class="sidebar-default-menu">
+            <SidebarQuickSwitcher />
+            {showCommunityMenu && (
+              <div class="community-menu">
+                <AdminSection />
+                <DiscussionSection />
+                <GovernanceSection />
+                {app.socket && !!app.chain?.meta?.chatEnabled && (
+                  <ChatSection />
                 )}
-                {app.isCustomDomain() && (
-                  <div
-                    class="powered-by"
-                    onclick={() => {
-                      window.open('https://commonwealth.im/');
-                    }}
-                  />
-                )}
+                <ExternalLinksModule />
+                <div class="buttons-container">
+                  {app.isLoggedIn() && app.chain && (
+                    <div class="subscription-button">
+                      <SubscriptionButton />
+                    </div>
+                  )}
+                  {app.isCustomDomain() && (
+                    <div
+                      class="powered-by"
+                      onclick={() => {
+                        window.open('https://commonwealth.im/');
+                      }}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
+        {showCreateSidebar && <CreateContentSidebar />}
+        {showExploreSidebar && <ExploreCommunitiesSidebar />}
       </div>
     );
   }

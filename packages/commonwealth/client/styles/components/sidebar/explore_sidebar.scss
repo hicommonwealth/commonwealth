@@ -1,6 +1,6 @@
 @import 'shared';
 
-.CommunitySelectList {
+.ExploreCommunitiesSidebar {
   display: flex;
   flex-direction: column;
   transform: none !important; // override any scrolling effects
@@ -11,15 +11,15 @@
     width: 100%;
   }
 
+  .SidebarMenuItem.community {
+    padding: 0 16px;
+    display: flex;
+    width: 100%;
+  }
+
   span {
     font-size: 18px;
     font-weight: 500;
-  }
-
-  .cui-popover-content {
-    max-height: 100vh;
-    overflow-y: auto;
-    text-align: left;
   }
 
   .cui-menu {
@@ -45,11 +45,11 @@
 
   .cui-list-item {
     padding: 4px 8px;
-    margin: 0 8px;
     border-radius: 4px;
     height: 32px;
     border: none;
     user-select: none;
+    width: inherit;
 
     &.cui-selected {
       background: $purple-50;

@@ -21,7 +21,6 @@ type SublayoutAttrs = {
 };
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  private isSidebarToggled: boolean;
   private isWindowSmallInclusive: boolean;
 
   onResize() {
@@ -59,27 +58,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
-
-    const isSidebarToggleable = app.chain && this.isWindowSmallInclusive;
-    this.isSidebarToggled =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
-            isSidebarToggleable={isSidebarToggleable}
-            isSidebarToggled={this.isSidebarToggled}
-            toggleSidebar={() => {
-              this.isSidebarToggled = !this.isSidebarToggled;
-            }}
+            onMobile={this.isWindowSmallInclusive}
           />
           <div class="sidebar-and-body-container">
-            <Sidebar
-              isSidebarToggleable={isSidebarToggleable}
-              isSidebarToggled={this.isSidebarToggled}
-            />
+            <Sidebar onMobile={this.isWindowSmallInclusive} />
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

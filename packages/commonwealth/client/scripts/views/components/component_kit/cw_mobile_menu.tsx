@@ -23,10 +23,10 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
             { disabled, isSecondary },
             'MobileMenuItem'
           )}
-          onclick={() => {
+          onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick();
+            onclick(e);
           }}
         >
           <div class="mobile-menu-item-left">
@@ -36,16 +36,22 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
           {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
         </div>
       );
+    } else if (vnode.attrs.type === 'header') {
+      return (
+        <div class="MobileMenuItem">
+          <CWText type="caption">{vnode.attrs.label}</CWText>
+        </div>
+      );
     } else if (vnode.attrs.type === 'notification') {
       const { hasUnreads, iconLeft, iconRight, label, onclick } = vnode.attrs;
 
       return (
         <div
           class="MobileMenuItem"
-          onclick={() => {
+          onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick();
+            onclick(e);
           }}
         >
           <div class="mobile-menu-item-left">
@@ -73,6 +79,7 @@ type MobileMenuAttrs = {
 export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
   view(vnode: m.VnodeDOM<MobileMenuAttrs, this>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
+
     return (
       <div
         class={getClasses<{ className: string }>(
