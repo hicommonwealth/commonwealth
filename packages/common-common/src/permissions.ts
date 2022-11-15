@@ -1,5 +1,3 @@
-
-
 export enum Action {
   INVITE_MEMBERS = 0,
   BAN_MEMBERS = 1,
@@ -33,7 +31,7 @@ export function addPermission(
   permission: Permissions,
   actionNumber: number
 ): Permissions {
-  let result = BigInt(permission)
+  let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
   return result;
@@ -43,7 +41,7 @@ export function removePermission(
   permission: Permissions,
   actionNumber: number
 ): Permissions {
-  let result = BigInt(permission)
+  let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
   return result;
@@ -51,11 +49,12 @@ export function removePermission(
 
 export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.CREATE_THREAD) |
-  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS)
+  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
 
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-  const hasAction: boolean = (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
+  const hasAction: boolean =
+    (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }
 
@@ -64,25 +63,10 @@ export function computePermissions(
   assignments: Array<{ allow: Permissions; deny: Permissions }>
 ): Permissions {
   let permission: Permissions = base;
-  let allow: bigint = BigInt(0);
-  let deny: bigint = BigInt(0);
   for (const assignment of assignments) {
-    // if allow and deny have the same bit set, then set that bit to 0
-    // eslint-disable-next-line no-bitwise
-    if (assignment.allow === assignment.deny) {
-      continue;
-    }
-    if (assignment.allow > 0) {
-      const assignmentAllow: bigint = BigInt(assignment.allow);
-      allow |= assignmentAllow;
-    }
-    if (assignment.deny > 0) {
-      const assignmentDeny: bigint = BigInt(assignment.deny);
-      deny |= assignmentDeny;
-    }
+    permission &= ~BigInt(assignment.deny);
+    permission |= BigInt(assignment.allow);
   }
-  permission &= ~deny;
-  permission |= allow;
 
   return permission;
 }
