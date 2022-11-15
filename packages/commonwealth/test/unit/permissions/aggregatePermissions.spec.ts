@@ -1,6 +1,7 @@
 import { aggregatePermissions } from "shared/utils";
 import { assert } from 'chai';
 import { addPermission, Action, isPermitted } from "common-common/src/permissions";
+import { Permission } from "server/models/role";
 
 describe('aggregatePermissions() unit tests', () => {
   const base_permission = BigInt(0);
@@ -11,19 +12,20 @@ describe('aggregatePermissions() unit tests', () => {
 
   it('should correctly aggregate permissions for a community with member roles', () => {
     const allowCreateThread = addPermission(base_permission, Action.CREATE_THREAD);
+    const admin_name: Permission = 'admin';
+    const moderator_name: Permission = 'moderator';
     const roles = [
         {
             allow: allowCreateThread,
             deny: base_permission,
-            permission: 'admin'
+            permission: admin_name
         },
         {
             ...overwrite_moderator,
-            permission: 'moderator'
+            permission: moderator_name
         }]
 
     const permission = aggregatePermissions(roles, chain_permission);
-    console.log("bigint", permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
   });
