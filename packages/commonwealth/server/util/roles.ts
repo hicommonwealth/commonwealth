@@ -3,11 +3,11 @@ import {
   computePermissions,
   Action,
   isPermitted,
-  Permissions,
   PermissionError,
   BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
 import { NextFunction, Request, Response } from 'express';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
@@ -308,31 +308,23 @@ export async function isAddressPermitted(
     throw new Error('Chain not found');
   }
 
-  // sort roles by roles with highest permissions first
-  roles.sort((a) => {
-    if (a.permission === 'member') return -1;
-    if (a.permission === 'moderator') return 0;
-    else return 1;
-  });
+  if (roles.length > 0) {
+    const rolesWithPermission = roles.map((role) => {
+      return {
+        permission: role.permission,
+        allow: role.allow,
+        deny: role.deny,
+      };
+    });
+    const permission = aggregatePermissions(rolesWithPermission, {
+      allow: chain.default_allow_permissions,
+      deny: chain.default_deny_permissions,
+    });
 
-  const permissionsAllowDeny: Array<{ allow: Permissions; deny: Permissions }> =
-    roles;
-
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift({
-    allow: chain.default_allow_permissions,
-    deny: chain.default_deny_permissions,
-  });
-
-  // compute permissions
-  const permission: bigint = computePermissions(
-    BASE_PERMISSIONS,
-    permissionsAllowDeny
-  );
-
-  // check if action is permitted
-  if (!isPermitted(permission, action)) {
-    return PermissionError.NOT_PERMITTED;
+    // check if action is permitted
+    if (!isPermitted(permission, action)) {
+      return PermissionError.NOT_PERMITTED;
+    }
   }
 }
 
@@ -415,11 +407,7 @@ export async function checkActiveAddressPermitted(
       return next(new AppError(PermissionError.NOT_PERMITTED));
     }
   } else {
-    const permission_error = await isAnyonePermitted(
-      models,
-      chain_id,
-      action
-    );
+    const permission_error = await isAnyonePermitted(models, chain_id, action);
     if (permission_error === PermissionError.NOT_PERMITTED) {
       return next(new AppError(PermissionError.NOT_PERMITTED));
     }

@@ -16,6 +16,7 @@ import {
   PermissionError,
   Permissions,
 } from 'common-common/src/permissions';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -69,7 +70,10 @@ export class RolesController {
     return $.post('/api/createRole', {
       jwt: this.User.jwt,
       address_id: options.address.id,
-      chain: options.chain || options.community || (options.address as AddressInfo).chain?.id,
+      chain:
+        options.chain ||
+        options.community ||
+        (options.address as AddressInfo).chain?.id,
     }).then((result) => {
       // handle state updates
       this.addRole(result.result.role);
@@ -318,35 +322,27 @@ export function isActiveAddressPermitted(
     (r) => r.chain_id === chain_info.id
   );
 
+  // populate permission assignment array with role allow and deny permissions
+  const roles: Array<{
+    permission: RolePermission;
+    allow: Permissions;
+    deny: Permissions;
+  }> = chainRoles.map((r) => {
+    const communityRole = chain_info.communityRoles.find(
+      (cr) => cr.name === r.permission
+    );
+    return {
+      permission: r.permission,
+      allow: communityRole.allow,
+      deny: communityRole.deny,
+    };
+  });
+
   if (chainRoles.length > 0) {
-    // sort roles by roles with lowest roles first
-    chainRoles.sort((a) => {
-      if (a.permission === 'member') return -1;
-      if (a.permission === 'moderator') return 0;
-      else return 1;
-    });
-    // populate permission assignment array with role allow and deny permissions
-    const permissionAssignments: Array<{
-      allow: Permissions;
-      deny: Permissions;
-    }> = chainRoles.map((r) => {
-      const communityRole = chain_info.communityRoles.find(
-        (cr) => cr.name === r.permission
-      );
-      return {
-        allow: communityRole.allow,
-        deny: communityRole.deny,
-      };
-    });
-    // Add chain default permissions to beginning of permissions array
-    permissionAssignments.unshift({
+    const permission = aggregatePermissions(roles, {
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    const permission = computePermissions(
-      BASE_PERMISSIONS,
-      permissionAssignments
-    );
     if (!isPermitted(permission, action)) {
       return false;
     }
