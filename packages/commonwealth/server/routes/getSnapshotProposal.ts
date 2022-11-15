@@ -1,19 +1,19 @@
-import { Response, NextFunction, Request } from 'express';
+import { Response } from 'express';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
+import { AppError } from '../util/errors';
+import { success, TypedRequestQuery } from '../types';
+import fetchSnapshotProposl from '../util/fetchSnapshot'
 
 export const Errors = {
   NoId: 'No id was provided, cannot fetch snapshot proposal',
 };
 
 type GetSnapshotProposalReq = { id: string };
-type GetSnapshotProposalRes = { id: string; space: string; event: string; expire: string };
 
 const getSnapshotProposal = async (
   models: DB,
   req: TypedRequestQuery<GetSnapshotProposalReq>,
-  res: TypedResponse<GetSnapshotProposalRes>
+  res: Response,
 ) => {
   try {
     const { id } = req.query;
@@ -27,14 +27,9 @@ const getSnapshotProposal = async (
 
     if (!proposal) {
       console.log('no proposal found');
-      // fetch from snapshot API then update the db
+      const fetchedProposal = await fetchSnapshotProposl(id);
     }
-    return success(res, {
-      id,
-      space: 'test',
-      event: 'test',
-      expire: 'test'
-    });
+    return res.json({ status: 'success', result: id });
   } catch (err) {
     console.log(err);
   }
