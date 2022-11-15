@@ -98,7 +98,6 @@ class ChainInfo {
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
-    this.snapshot = snapshot;
     this.terms = terms;
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
@@ -156,7 +155,11 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts ? Contracts[0]?.decimals : base === ChainBase.CosmosSDK ? 6 : 18;
+    const decimals = Contracts
+      ? Contracts[0]?.decimals
+      : base === ChainBase.CosmosSDK
+      ? 6
+      : 18;
     return new ChainInfo({
       id,
       network,

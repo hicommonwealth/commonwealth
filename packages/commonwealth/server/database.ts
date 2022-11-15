@@ -21,6 +21,8 @@ import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
 import CommunityRoleFactory from './models/community_role';
+import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
+import SnapshotSpaceFactory from './models/snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
@@ -100,6 +102,7 @@ const models: Models = {
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
+  CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
@@ -125,6 +128,7 @@ const models: Models = {
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+  SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),

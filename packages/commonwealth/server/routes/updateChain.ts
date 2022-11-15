@@ -63,6 +63,15 @@ const updateChain = async (
     }
   }
 
+  const SnapshotSpace = await models.CommunitySnapshotSpaces.findAll({
+    where: { chain_id: chain.id },
+    include: {
+      model: models.SnapshotSpace,
+    },
+  });
+
+  console.log('SnapshotSpace', SnapshotSpace);
+
   const {
     active,
     icon_url,
