@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { DB } from '../models';
 import { AppError } from '../util/errors';
 import { success, TypedRequestQuery } from '../types';
-import fetchSnapshotProposl from '../util/fetchSnapshot'
+import processNewSnapshotProposal from '../util/fetchSnapshot'
 
 export const Errors = {
   NoId: 'No id was provided, cannot fetch snapshot proposal',
@@ -27,7 +27,7 @@ const getSnapshotProposal = async (
 
     if (!proposal) {
       console.log('no proposal found');
-      const fetchedProposal = await fetchSnapshotProposl(id);
+      const createdProposal = await processNewSnapshotProposal(id, models);
     }
     return res.json({ status: 'success', result: id });
   } catch (err) {

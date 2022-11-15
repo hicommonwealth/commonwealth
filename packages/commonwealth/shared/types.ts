@@ -27,9 +27,9 @@ export type ChainEventNotification = {
 export type SnapshotNotification = {
   id: string;
   space: string;
-  event: string;
+  event?: string;
   expire: string;
-}
+};
 
 export enum WebsocketNamespaces {
   ChainEvents = 'chain-events',
@@ -140,3 +140,32 @@ export type TokenResponse = {
 export enum RedisNamespaces {
   Chat_Socket = 'chat_socket',
 }
+
+export type SnapshotGraphQLResponse = {
+  data?: {
+    proposal: {
+      id: string;
+      title: string;
+      body: string;
+      choices: string[];
+      start: number;
+      end: number;
+      snapshot: number;
+      author: string;
+      created: number;
+      scores: number[];
+      scores_by_strategy: number[][];
+      scores_total: number;
+      scores_updated: number;
+      plugins: any;
+      network: string;
+      strategies: any;
+      space: {
+        id: string;
+        name: string;
+      };
+    };
+  };
+};
+
+
