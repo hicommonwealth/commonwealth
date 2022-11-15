@@ -6,6 +6,7 @@ import {
   RabbitMQController,
   getRabbitMQConfig,
 } from "common-common/src/rabbitmq";
+import { factory, formatFilename } from "common-common/src/logging";
 import { RABBITMQ_URI } from "./config";
 import dotenv from "dotenv";
 dotenv.config();
@@ -14,8 +15,7 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json());
 
-
-// create Controller outside of post request// 
+let controller: RabbitMQController;
 
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
@@ -28,12 +28,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
-    const controller = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI),
-    )
-
-    await controller.init()
-    await controller.publish(event, RascalPublications.SnapshotListener)
+    await controller.publish(event, RascalPublications.SnapshotListener);
     res.status(200).send({ message: "Snapshot event received", event });
   } catch (err) {
     console.log(err);
@@ -41,6 +36,16 @@ app.post("/snapshot", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
+app.listen(port, async () => {
+  const log = factory.getLogger(formatFilename(__filename));
+  log.info(`⚡️[server]: Server is running at https://localhost:${port}`);
+
+  try {
+    controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+    controller.init();
+    console.log(`Server listening on port ${port}`);
+  } catch (err) {
+    log.error(`Error starting server: ${err}`);
+  }
+  app.bind
 });

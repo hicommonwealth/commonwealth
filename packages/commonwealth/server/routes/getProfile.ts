@@ -4,7 +4,6 @@ import { CommentAttributes } from '../models/comment';
 import { ThreadAttributes } from '../models/thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
-const log = factory.getLogger(formatFilename(__filename));
 import { DB } from '../models';
 
 export const Errors = {
