@@ -52,6 +52,7 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
+import SnapshotProposalFactory from './models/snapshot_proposal';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -125,6 +126,7 @@ const models: Models = {
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+  SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),

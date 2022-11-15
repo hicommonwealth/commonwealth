@@ -156,6 +156,8 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
+import getSnapshotProposal from './routes/getSnapshotProposal';
+
 
 function setupRouter(
   app: Express,
@@ -791,7 +793,8 @@ function setupRouter(
 
   // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
-  router.get('snapshot', getSnapshotProposals.bind(this))
+  // snapshot-commonwealth
+  router.get('/snapshot', getSnapshotProposal.bind(this, models))
   router.get('/communityStats', communityStats.bind(this, models));
 
   // new API

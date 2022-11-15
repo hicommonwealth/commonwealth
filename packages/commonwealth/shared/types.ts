@@ -26,13 +26,9 @@ export type ChainEventNotification = {
 
 export type SnapshotNotification = {
   id: string;
-  notification_data: '';
-  snapshot_event_id: string;
-  category_id: 'snapshot-listener';
-  chain_id: string;
-  updated_at: moment.Moment;
-  created_at: moment.Moment;
-  SnapshotEvent: any; 
+  space: string;
+  event: string;
+  expire: string;
 }
 
 export enum WebsocketNamespaces {

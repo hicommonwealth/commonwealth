@@ -17,29 +17,21 @@ export type SnapshotProposalInstance = ModelInstance<
   >;
 };
 
-export type SnapshotProposalModel = ModelStatic<SnapshotProposalInstance>;
+export type SnapshotProposalModelStatic = ModelStatic<SnapshotProposalInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): SnapshotProposalModel => {
-  const Profile = <SnapshotProposalModel>sequelize.define(
-    'SnapshotProposalModel',
+): SnapshotProposalModelStatic => {
+  const SnapshotProposal = <SnapshotProposalModelStatic>sequelize.define(
+    'SnapshotProposal',
     {
-      id: { type: dataTypes.STRING, allowNull: false},
+      id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
       space: { type: dataTypes.STRING, allowNull: false},
       event: { type: dataTypes.STRING, allowNull: false},
       expire: { type: dataTypes.STRING, allowNull: false},
     }
   );
 
-  Profile.associate = (models) => {
-    models.Profile.belongsTo(models.User, {
-      foreignKey: 'user_id',
-      targetKey: 'id',
-    });
-    models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
-  };
-
-  return Profile;
+  return SnapshotProposal;
 };

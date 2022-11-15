@@ -316,7 +316,7 @@ async function main() {
       process.exit(exitCode);
     }
   }
-  startSnapshotConsumer();
+  startSnapshotConsumer(models);
   setupServer(app, rollbar, models);
 }
 

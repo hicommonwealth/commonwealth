@@ -33,6 +33,8 @@ export function success<T>(res: TypedResponse<T>, result: T) {
   });
 }
 
+
+
 // TODO: legacy overrides, convert all routes and remove
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

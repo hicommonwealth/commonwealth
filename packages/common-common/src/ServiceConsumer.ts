@@ -5,8 +5,9 @@ import { RabbitMQController, RascalSubscriptions } from "./rabbitmq";
 import Rollbar from "rollbar";
 import { Logger } from "typescript-logging";
 
+//any should be the Message type, not any
 export type RabbitMQSubscription = {
-  messageProcessor: (data: any) => Promise<any>;
+  messageProcessor: (...data: any[]) => Promise<any>;
   subscriptionName: RascalSubscriptions;
   msgProcessorContext?: { [key: string]: any };
 };
@@ -24,6 +25,7 @@ export class ServiceConsumer {
     _serviceName: string,
     _rabbitmqController: RabbitMQController,
     _subscriptions: RabbitMQSubscription[],
+    models?: DB,
     rollbar?: Rollbar
   ) {
     this.serviceName = _serviceName;

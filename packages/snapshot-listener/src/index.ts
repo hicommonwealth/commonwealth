@@ -14,6 +14,9 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json());
 
+
+// create Controller outside of post request// 
+
 app.get("/", (req: Request, res: Response) => {
   res.send("OK!");
 });
@@ -24,17 +27,16 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     if (!event) {
       res.status(500).send("Error sending snapshot event");
     }
-    const rabbitMqHandler = new RabbitMqHandler(
-      getRabbitMQConfig(RABBITMQ_URI),
-      RascalPublications.SnapshotListener
-    );
 
-    await rabbitMqHandler.init();
-    await rabbitMqHandler.handle(event);
+    const controller = new RabbitMQController(
+      getRabbitMQConfig(RABBITMQ_URI),
+    )
+
+    await controller.init()
+    await controller.publish(event, RascalPublications.SnapshotListener)
     res.status(200).send({ message: "Snapshot event received", event });
   } catch (err) {
     console.log(err);
-
     res.status(500).send("error: " + err);
   }
 });

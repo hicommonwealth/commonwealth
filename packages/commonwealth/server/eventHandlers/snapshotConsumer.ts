@@ -1,21 +1,55 @@
-import { Server } from 'socket.io';
-import { ServiceConsumer } from 'common-common/src/serviceConsumer';
+import {
+  ServiceConsumer,
+  RabbitMQSubscription,
+} from 'common-common/src/serviceConsumer';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
+import {
+  getRabbitMQConfig,
+  RascalSubscriptions,
+} from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { SnapshotNotification } from '../../shared/types';
-import { createSnapshotNamespace } from '../socket/snapshotNamespace';
+import  models from '../database';
 import { RABBITMQ_URI } from '../config';
 
-export default async function startSnapshotConsumer() {
+async function processSnapshotMessage(msg: SnapshotNotification) {
+const log = factory.getLogger(formatFilename(__filename));
   try {
-    const rabbitMQController = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI)
-    );
+    const proposal = await models.SnapshotProposal.findOne({
+      where: { id: msg.id },
+    });
+
+    if (!proposal) {
+      await models.SnapshotProposal.create({
+        id: msg.id,
+        space: msg.space,
+        event: msg.event,
+        expire: msg.expire
+      });
+      log.info(`Created new snapshot proposal: ${msg.id}`);
+    }
+
+  } catch (err) {
+    log.error(`Error processing snapshot message: ${err}`);
+  }
+}
+
+function createSnapshotSubscription(): RabbitMQSubscription {
+  return {
+    messageProcessor: processSnapshotMessage,
+    subscriptionName: RascalSubscriptions.SnapshotListener,
+  };
+}
+
+async function startSnapshotConsumer() {
+  try {
+    const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+    const subscriptions = [createSnapshotSubscription()];
 
     const consumer = new ServiceConsumer(
-      'SnapshotListenerExchange',
-      rabbitMQController,
-      //RabbitMQSub
+      RascalSubscriptions.SnapshotListener,
+      controller,
+      subscriptions
     );
 
     await consumer.init();
@@ -23,3 +57,5 @@ export default async function startSnapshotConsumer() {
     console.log(err);
   }
 }
+
+export default startSnapshotConsumer;

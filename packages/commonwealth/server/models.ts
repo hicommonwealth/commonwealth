@@ -98,6 +98,9 @@ import {
   WaitlistRegistrationModelStatic
 } from './models/waitlist_registration';
 import { WebhookModelStatic } from './models/webhook';
+import {
+  SnapshotProposalModelStatic
+} from './models/snapshot_proposal';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -142,6 +145,7 @@ export type Models = {
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
+  SnapshotProposal: SnapshotProposalModelStatic;
   Subscription: SubscriptionModelStatic;
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
