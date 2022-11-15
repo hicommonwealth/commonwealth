@@ -67,6 +67,8 @@ export function computePermissions(
   let allow: bigint = BigInt(0);
   let deny: bigint = BigInt(0);
   for (const assignment of assignments) {
+    // if allow and deny have the same bit set, then set that bit to 0
+    // eslint-disable-next-line no-bitwise
     if (assignment.allow === assignment.deny) {
       continue;
     }
