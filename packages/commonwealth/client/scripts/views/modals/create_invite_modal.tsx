@@ -102,32 +102,30 @@ const getMemberPreview = (
 
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
-  return (
-    <ListItem
-      tabIndex={tabIndex}
-      label={
-        <a class="search-results-item">
-          {m(UserBlock, {
-            user: profile,
-            searchTerm,
-            avatarSize: 24,
-            showAddressWithDisplayName: true,
-            showChainName,
-          })}
-        </a>
-      }
-      onclick={() => {
+  return m(ListItem, {
+    tabIndex,
+    label: (
+      <a class="search-results-item">
+        {m(UserBlock, {
+          user: profile,
+          searchTerm,
+          avatarSize: 24,
+          showAddressWithDisplayName: true,
+          showChainName,
+        })}
+      </a>
+    ),
+    onclick: () => {
+      enterAddressFn(addr.address);
+      closeResultsFn();
+    },
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
         enterAddressFn(addr.address);
         closeResultsFn();
-      }}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          enterAddressFn(addr.address);
-          closeResultsFn();
-        }
-      }}
-    />
-  );
+      }
+    },
+  });
 };
 
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
@@ -528,33 +526,31 @@ export class CreateInviteModal
               }}
             />
           </div>
-          {searchAddressTerm?.length > 3 && !this.hideResults && (
-            <List>
-              {!results || results?.length === 0 ? (
-                app.searchAddressCache[searchAddressTerm]?.loaded ? (
-                  <ListItem
-                    label={
-                      <div class="no-addresses">
-                        <CWText fontWeight="medium">{searchAddressTerm}</CWText>
-                        <CWText type="caption">No addresses found</CWText>
-                      </div>
-                    }
-                    onclick={() => {
-                      if (searchAddressTerm.length < 4) {
-                        notifyError('Query must be at least 4 characters');
-                      }
-                    }}
-                  />
-                ) : (
-                  <ListItem label={<CWSpinner size="small" />} />
-                )
-              ) : this.isTyping ? (
-                <ListItem label={<CWSpinner size="small" />} />
-              ) : (
-                results
-              )}
-            </List>
-          )}
+          {searchAddressTerm?.length > 3 &&
+            !this.hideResults &&
+            m(List, [
+              !results || results?.length === 0
+                ? app.searchAddressCache[searchAddressTerm]?.loaded
+                  ? m(ListItem, {
+                      label: (
+                        <div class="no-addresses">
+                          <CWText fontWeight="medium">
+                            {searchAddressTerm}
+                          </CWText>
+                          <CWText type="caption">No addresses found</CWText>
+                        </div>
+                      ),
+                      onclick: () => {
+                        if (searchAddressTerm.length < 4) {
+                          notifyError('Query must be at least 4 characters');
+                        }
+                      },
+                    })
+                  : m(ListItem, { label: <CWSpinner size="small" /> })
+                : this.isTyping
+                ? m(ListItem, { label: <CWSpinner size="small" /> })
+                : results,
+            ])}
           <InviteButton
             selection="address"
             disabled={!this.isAddressValid}
