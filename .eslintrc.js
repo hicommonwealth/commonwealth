@@ -30,6 +30,7 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-explicit-any": "off",
-    "import/namespace": "off"
+    "import/namespace": "off",
+    "import/default": "off"
   }
 }
