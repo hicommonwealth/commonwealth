@@ -25,7 +25,6 @@ export class ServiceConsumer {
     _serviceName: string,
     _rabbitmqController: RabbitMQController,
     _subscriptions: RabbitMQSubscription[],
-    models?: DB,
     rollbar?: Rollbar
   ) {
     this.serviceName = _serviceName;
