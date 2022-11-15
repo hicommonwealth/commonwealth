@@ -98,7 +98,6 @@ export class RabbitMQController {
       subscription.on('message', (message, content, ackOrNack) => {
         messageProcessor.call({rmqController: this, ...msgProcessorContext}, content)
           .then(() => {
-            console.log("Message Acked")
             ackOrNack();
           })
           .catch((e) => {
