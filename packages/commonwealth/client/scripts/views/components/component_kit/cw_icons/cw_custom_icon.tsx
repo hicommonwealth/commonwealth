@@ -9,7 +9,7 @@ import { CustomIconAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWCustomIcon implements m.ClassComponent<CustomIconAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CustomIconAttrs>) {
     const {
       componentType = ComponentType.CustomIcon,
       iconName,
