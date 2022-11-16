@@ -1,7 +1,10 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { AddressAttributes, AddressInstance } from './address';
-import { CommunityRoleAttributes, CommunityRoleInstance } from './community_role';
+import {
+  CommunityRoleAttributes,
+  CommunityRoleInstance,
+} from './community_role';
 import { ModelStatic, ModelInstance } from './types';
 
 export type RoleAssignmentAttributes = {
@@ -20,7 +23,7 @@ export type RoleAssignmentAttributes = {
 
 export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes> & {
   getCommunityRole: Sequelize.BelongsToGetAssociationMixin<CommunityRoleInstance>;
-  getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>
+  getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
 };
 
 export type RoleAssignmentModelStatic = ModelStatic<RoleAssignmentInstance>;
@@ -37,15 +40,16 @@ export default (
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
-      is_user_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      is_user_default: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      deletedAt: 'deleted_at',
-      paranoid: true,
       tableName: 'RoleAssignments',
       underscored: true,
       indexes: [{ fields: ['community_role_id'] }, { fields: ['address_id'] }],
