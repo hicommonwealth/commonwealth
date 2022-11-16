@@ -4,12 +4,12 @@ import BN from 'bn.js';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
+import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
+import { AbiItem } from 'web3-utils';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { DB } from '../../models';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { parseAbiItemsFromABI } from 'client/scripts/helpers/abi_utils';
-import { AbiItem } from 'web3-utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 
