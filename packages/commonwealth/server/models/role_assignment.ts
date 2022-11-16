@@ -40,7 +40,6 @@ export default (
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-      deleted_at: { type: dataTypes.DATE, allowNull: true },
       is_user_default: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
