@@ -1,10 +1,9 @@
 import * as Rascal from 'rascal';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessages} from "./types";
-import Rollbar from "rollbar";
+import { factory, formatFilename } from 'common-common/src/logging';
+import Rollbar from 'rollbar';
+import { RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessages } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
-
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
@@ -85,7 +84,7 @@ export class RabbitMQController {
     msgProcessorContext?: { [key: string]: any }
   ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
     }
 
     let subscription: Rascal.SubscriberSessionAsPromised;
@@ -135,7 +134,7 @@ export class RabbitMQController {
   //      if a message is successfully published to a particular queue then the callback is executed
   public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
     }
 
     if (!this.publishers.includes(publisherName))
