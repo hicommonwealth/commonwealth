@@ -18,24 +18,22 @@ const renderThreadPreview = (state, thread: Thread, idx: number) => {
   const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return (
-    <ListItem
-      label={
-        <div class="thread-preview-row">
-          <CWText fontWeight="medium" noWrap>
-            {thread.title}
-          </CWText>
-          <CWText type="caption">
-            {author.name
-              ? `${author.name} • ${formatAddressShort(thread.author)}`
-              : thread.author}
-          </CWText>
-        </div>
-      }
-      selected={selected}
-      key={idx}
-    />
-  );
+  return m(ListItem, {
+    label: (
+      <div class="thread-preview-row">
+        <CWText fontWeight="medium" noWrap>
+          {thread.title}
+        </CWText>
+        <CWText type="caption">
+          {author.name
+            ? `${author.name} • ${formatAddressShort(thread.author)}`
+            : thread.author}
+        </CWText>
+      </div>
+    ),
+    selected,
+    key: idx,
+  });
 };
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
@@ -140,22 +138,20 @@ export class ThreadSelector
                 }, 250);
               }}
             />
-            <QueryList
-              filterable={false}
-              checkmark
-              inputAttrs={{
+            {m(QueryList, {
+              filterable: false,
+              checkmark: true,
+              inputAttrs: {
                 placeholder: 'Search for thread to link...',
-              }}
-              emptyContent={getEmptyContentMessage()}
-              items={
+              },
+              emptyContent: getEmptyContentMessage(),
+              items:
                 this.showOnlyLinkedThreads && !queryLength
                   ? linkedThreads
-                  : searchResults
-              }
-              itemRender={(item: Thread, idx) =>
-                renderThreadPreview(this, item, idx)
-              }
-              onSelect={(thread: Thread) => {
+                  : searchResults,
+              itemRender: (item: Thread, idx) =>
+                renderThreadPreview(this, item, idx),
+              onSelect: (thread: Thread) => {
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
                 );
@@ -181,8 +177,8 @@ export class ThreadSelector
                       notifyError('Thread failed to link.');
                     });
                 }
-              }}
-            />
+              },
+            })}
           </>
         )}
       </div>

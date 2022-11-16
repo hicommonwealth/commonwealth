@@ -32,7 +32,8 @@ const getCreateContentMenuItems = (): MenuItem[] => {
 
   const showOnChainProposalItem =
     (app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain?.network !== ChainNetwork.Terra) ||
+      app.chain?.network !== ChainNetwork.Terra &&
+      app.chain?.network !== ChainNetwork.Kava) ||
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
