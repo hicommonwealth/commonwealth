@@ -37,25 +37,23 @@ class SnapshotProposalStagesBar
     return (
       <div class="DiscussionFilterBar">
         {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter) => (
-            <Button
-              rounded={true}
-              compact={true}
-              size="sm"
-              disabled={
+          (option: SnapshotProposalFilter) =>
+            m(Button, {
+              rounded: true,
+              compact: true,
+              size: 'sm',
+              disabled:
                 option === SnapshotProposalFilter.Core ||
-                option === SnapshotProposalFilter.Community
-              }
-              class={`discussions-stage ${
+                option === SnapshotProposalFilter.Community,
+              class: `discussions-stage ${
                 vnode.attrs.selected === option ? 'active' : ''
-              }`}
-              onclick={(e) => {
+              }`,
+              onclick: (e) => {
                 e.preventDefault();
                 vnode.attrs.onChangeFilter(option);
-              }}
-              label={option}
-            />
-          )
+              },
+              label: option,
+            })
         )}
       </div>
     );
