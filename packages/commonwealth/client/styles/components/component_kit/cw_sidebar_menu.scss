@@ -38,6 +38,10 @@
     background-color: inherit;
 
     .sidebar-menu-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: inherit;
       align-items: center;
       border-bottom: 1px solid $neutral-200;
       cursor: pointer;
