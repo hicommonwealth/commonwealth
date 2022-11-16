@@ -1,9 +1,11 @@
 import moment from 'moment';
 import type { ChainAttributes } from '../server/models/chain';
 import type { ChainEventAttributes } from '../server/models/chain_event';
+import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
+  SnapshotProposalNotification = 'snapshot-proposal-notification',
   SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
@@ -12,8 +14,15 @@ export enum WebsocketMessageNames {
   LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
+export type SnapshotProposalNotfication = {
+  id: string;
+  category_id: 'snapshot-proposal';
+  chain_id : string;
+  SnapshotProposal: SnapshotProposalAttributes;
+}
 
-export type ChainEventNotification = {
+
+export interface ChainEventNotification {
   id: string;
   notification_data: '';
   chain_event_id: string;
@@ -22,16 +31,21 @@ export type ChainEventNotification = {
   updated_at: moment.Moment;
   created_at: moment.Moment;
   ChainEvent: ChainEventAttributes;
-};
+}
 
-export type SnapshotNotification = {
+export interface SnapshotNotification {
   id: string;
   space: string;
   event?: string;
   expire: string;
-};
+}
+
+export interface INotification {
+  kind : ChainEventNotification |  SnapshotNotification;
+}
 
 export enum WebsocketNamespaces {
+  SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
   SnapshotListener = 'snapshot-listener',
   Chat = 'chat',

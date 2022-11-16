@@ -12,7 +12,11 @@ import {
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
+<<<<<<< Updated upstream
 import { RedisCache } from 'common-common/src/redisCache';
+=======
+import { RedisCache } from '../util/redisCache';
+>>>>>>> Stashed changes
 
 const log = factory.getLogger(addPrefix(__filename));
 

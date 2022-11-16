@@ -31,6 +31,7 @@ export type TRmqMessages =
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
+  SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
   SubstrateIdentityEvents = 'SubstrateIdentityEventsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
 }
@@ -38,6 +39,7 @@ export enum RascalPublications {
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
+  SnapshotProposalNotifications = 'SnapshotProposalNotificationsSubscription',
   SubstrateIdentityEvents = 'SubstrateIdentityEventsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
 }
@@ -52,6 +54,7 @@ export enum RascalExchanges {
 export enum RascalQueues {
   ChainEvents = 'ChainEventsQueue',
   ChainEventNotifications = 'ChainEventNotificationsQueue',
+  SnapshotProposalNotifications = 'SnapshotProposalNotificationsQueue',
   SnapshotListener = 'SnapshotListenerQueue',
   DeadLetter = 'DeadLetterQueue',
   SubstrateIdentityEvents = 'SubstrateIdentityEventsQueue'
@@ -60,6 +63,7 @@ export enum RascalQueues {
 export enum RascalBindings {
   ChainEvents = 'ChainEventsBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
+  SnapshotProposalNotifications = 'SnapshotProposalNotificationsBinding',
   SubstrateIdentityEvents = 'SubstrateIdentityEventsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding'
@@ -68,6 +72,7 @@ export enum RascalBindings {
 export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
   ChainEventNotifications = 'ChainEventNotifications',
+  SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SubstrateIdentityEvents = 'SubstrateIdentityEvents',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'deadLetter'

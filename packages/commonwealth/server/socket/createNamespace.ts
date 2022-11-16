@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
 import {
+  SnapshotProposalNotfication,
   ChainEventNotification,
   WebsocketEngineEvents,
   WebsocketMessageNames,
@@ -10,8 +11,8 @@ import { authenticate } from './index';
 
 const log = factory.getLogger(addPrefix(__filename));
 
-export function createCeNamespace(io: Server) {
-  const CeNs = io.of(`/${WebsocketNamespaces.ChainEvents}`);
+export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
+  const CeNs = io.of(`/${namespace}`);
   CeNs.use(authenticate);
 
   CeNs.on('connection', (socket) => {
@@ -31,41 +32,41 @@ export function createCeNamespace(io: Server) {
 
     socket.on(
       WebsocketMessageNames.NewSubscriptions,
-      (chainEventTypes: string[]) => {
-        if (chainEventTypes.length > 0) {
+      (eventTypes: string[]) => {
+        if (eventTypes.length > 0) {
           log.info(
             `socket_id = ${socket.id}, user_id = ${
               (<any>socket).user.id
-            } joining ${JSON.stringify(chainEventTypes)}`
+            } joining ${JSON.stringify(eventTypes)}`
           );
-          socket.join(chainEventTypes);
+          socket.join(eventTypes);
         }
       }
     );
 
     socket.on(
       WebsocketMessageNames.DeleteSubscriptions,
-      (chainEventTypes: string[]) => {
-        if (chainEventTypes.length > 0) {
+      (eventTypes: string[]) => {
+        if (eventTypes.length > 0) {
           log.info(
             `socket_id = ${socket.id}, user_id = ${
               (<any>socket).user.id
-            } leaving ${JSON.stringify(chainEventTypes)}`
+            } leaving ${JSON.stringify(eventTypes)}`
           );
-          for (const eventType of chainEventTypes) socket.leave(eventType);
+          for (const eventType of eventTypes) socket.leave(eventType);
         }
       }
     );
   });
 
-  io.of(`/${WebsocketNamespaces.ChainEvents}`).adapter.on(
+  io.of(`/${namespace}`).adapter.on(
     WebsocketEngineEvents.CreateRoom,
     (room) => {
       log.info(`New room created: ${room}`);
     }
   );
 
-  io.of(`/${WebsocketNamespaces.ChainEvents}`).adapter.on(
+  io.of(`/${namespace}`).adapter.on(
     WebsocketEngineEvents.DeleteRoom,
     (room) => {
       log.info(`Room: ${room}, was deleted`);
@@ -80,12 +81,22 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(
+export function publishToChainEventsRoom(
   this: Server,
   notification: ChainEventNotification
 ) {
   this.to(notification.ChainEvent.ChainEventType.id).emit(
     WebsocketMessageNames.ChainEventNotification,
+    notification
+  );
+}
+
+export function publishToSnapshotRoom(
+  this: Server,
+  notification: SnapshotProposalNotfication
+) {
+  this.to(notification.SnapshotProposal.id).emit(
+    WebsocketMessageNames.SnapshotProposalNotification,
     notification
   );
 }

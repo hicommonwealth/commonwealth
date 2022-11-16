@@ -11,6 +11,9 @@ import {
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
 } from 'redis';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+import { createChatNamespace } from './createChatNamespace';
 import {
   getRabbitMQConfig,
   RabbitMQController,
@@ -18,10 +21,13 @@ import {
 } from 'common-common/src/rabbitmq';
 import Rollbar from 'rollbar';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import { createSnapshotNamespace } from './snapshotNamespace';
-import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
+import { WebsocketNamespaces } from '../../shared/types';
+import {
+  createNamespace,
+  publishToChainEventsRoom,
+  publishToSnapshotRoom,
+} from './createNamespace';
+import { JWT_SECRET, REDIS_URL, VULTR_IP, RABBITMQ_URI } from '../config';
 import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -81,10 +87,6 @@ export async function setupWebSocketServer(
   });
 
   io.engine.on('connection_error', (err) => {
-    // log.error(err.req);      // the request object
-    // console.log(err.code);     // the error code, for example 1
-    // console.log(err.message);  // the error message, for example "Session ID unknown"
-    // console.log(err.context);  // some additional error context
     log.error('A WebSocket connection error has occurred', err);
   });
 
@@ -191,7 +193,16 @@ export async function setupWebSocketServer(
   await redisCache.init();
   console.log('Redis Cache initialized!');
 
-  const chainEventsNameSpace = createCeNamespace(io);
+  const chainEventsNamespace = createNamespace(
+    io,
+    WebsocketNamespaces.ChainEvents
+  );
+  const snapshotProposalNamespace = createNamespace(
+    io,
+    WebsocketNamespaces.SnapshotProposals
+  );
+
+  const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
     const rabbitController = new RabbitMQController(
@@ -200,9 +211,14 @@ export async function setupWebSocketServer(
 
     await rabbitController.init();
     await rabbitController.startSubscription(
-      publishToCERoom.bind(chainEventsNameSpace),
+      publishToChainEventsRoom.bind(chainEventsNamespace),
       RascalSubscriptions.ChainEventNotifications
     );
+
+    await rabbitController.startSubscription(
+      publishToSnapshotRoom.bind(snapshotProposalNamespace),
+      RascalSubscriptions.SnapshotProposalNotifications
+    )
   } catch (e) {
     log.error(
       `Failure connecting to ${process.env.NODE_ENV || 'local'}` +

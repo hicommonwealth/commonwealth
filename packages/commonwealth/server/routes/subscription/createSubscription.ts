@@ -83,6 +83,7 @@ export default async (
       }
       break;
     }
+
     case 'new-mention':
       return next(new AppError(Errors.NoMentions));
     case 'chain-event': {

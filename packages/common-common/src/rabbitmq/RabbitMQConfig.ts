@@ -119,6 +119,15 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
               }
             }
           },
+          [RascalQueues.SnapshotProposalNotifications]: {
+            ...queueConfig,
+            'options': {
+              "arguments": {
+                ...queueOptions,
+                "x-message-ttl": 600000
+              }
+            }
+          },
           [RascalQueues.SnapshotListener]: {
             ...queueConfig,
             'options': {
@@ -150,6 +159,12 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destinationType': 'queue',
             'bindingKey': RascalRoutingKeys.ChainEventNotifications
           },
+          [RascalBindings.SnapshotProposalNotifications]: {
+            'source': RascalExchanges.Notifications,
+            'destination': RascalQueues.SnapshotProposalNotifications,
+            'destinationType': 'queue',
+            'bindingKey': RascalRoutingKeys.SnapshotProposalNotifications
+          },
           [RascalBindings.SnapshotListener]: {
             'source': RascalExchanges.SnapshotListener,
             'destination': RascalQueues.SnapshotListener,
@@ -179,6 +194,11 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'routingKey': RascalRoutingKeys.ChainEventNotifications,
             ...publicationConfig
           },
+          [RascalPublications.SnapshotProposalNotifications]: {
+            'exchange': RascalExchanges.Notifications,
+            'routingKey': RascalRoutingKeys.SnapshotProposalNotifications,
+            ...publicationConfig
+          },
           [RascalPublications.SnapshotListener]: {
             'exchange': RascalExchanges.SnapshotListener,
             'routingKey': RascalRoutingKeys.SnapshotListener,
@@ -196,6 +216,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEventNotifications]: {
             'queue': RascalQueues.ChainEventNotifications,
+            ...subscriptionConfig
+          },
+          [RascalSubscriptions.SnapshotProposalNotifications]: {
+            'queue': RascalQueues.SnapshotProposalNotifications,
             ...subscriptionConfig
           },
           [RascalSubscriptions.SnapshotListener]: {
