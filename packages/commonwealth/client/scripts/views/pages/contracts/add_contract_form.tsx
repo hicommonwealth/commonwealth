@@ -12,7 +12,7 @@ import {
   ChainType,
   ContractType,
 } from 'common-common/src/types';
-import { isAddress } from 'web3-utils';
+import { AbiItem, isAddress } from 'web3-utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
@@ -37,7 +37,7 @@ import {
 
 type ContractFormFields = {
   chain_node_id: number;
-  abi: JSON;
+  abi: AbiItem[];
   contractType: ContractType;
   decimals: number;
   token_name: string;

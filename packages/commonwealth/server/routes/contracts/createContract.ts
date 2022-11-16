@@ -103,26 +103,30 @@ const createContract = async (
     return next(new Error('Node not found'));
   }
 
-  const contract_abi = await models.ContractAbi.create({
-    abi,
+  // transactionalize contract creation
+  await models.sequelize.transaction(async (t) => {
+    const contract_abi = await models.ContractAbi.create({
+      abi,
+    }, { transaction: t });
+
+    const [contract, result] = await models.Contract.findOrCreate({
+      where: {
+        address,
+        chain_node_id: node.id,
+        token_name,
+        abi_id: contract_abi.id,
+        symbol,
+        decimals,
+        type: contractType,
+      },
+      transaction: t
+    });
+
+    const nodeJSON = node.toJSON();
+    delete nodeJSON.private_url;
+
+    return success(res, { contract: contract.toJSON() });
   });
-
-  const [contract, result] = await models.Contract.findOrCreate({
-    where: {
-      address,
-      chain_node_id: node.id,
-      token_name,
-      abi_id: contract_abi.id,
-      symbol,
-      decimals,
-      type: contractType,
-    },
-  });
-
-  const nodeJSON = node.toJSON();
-  delete nodeJSON.private_url;
-
-  return success(res, { contract: contract.toJSON() });
 };
 
 export default createContract;
