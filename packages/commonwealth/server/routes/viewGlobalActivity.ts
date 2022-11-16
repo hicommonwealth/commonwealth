@@ -20,7 +20,7 @@ const viewGlobalActivity = async (
           FROM (SELECT (n.notification_data::jsonb->>'root_id') AS thread_id,
                   MAX(n.id) OVER (PARTITION BY (n.notification_data::jsonb->>'root_id')) AS mx_not_id
                 FROM "Notifications" n
-                WHERE n.category_id IN('new-thread-creation','new-comment-creation')
+                WHERE n.category_id IN('new-thread-creation','new-comment-creation', 'snapshot-proposal')
                 ORDER BY id DESC
                 FETCH FIRST 500 ROWS ONLY
                 ) nn

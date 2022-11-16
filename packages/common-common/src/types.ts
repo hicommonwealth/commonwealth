@@ -16,6 +16,7 @@ export const NotificationCategories = {
   EntityEvent: 'entity-event',
   NewChatMention: 'new-chat-mention',
   NewSnapshot: 'new-snapshot',
+  SnapshotProposal: 'snapshot-proposal',
 };
 
 export enum ProposalType {

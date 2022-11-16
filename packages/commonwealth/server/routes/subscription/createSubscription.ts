@@ -26,6 +26,7 @@ export default async (
     return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
+
   let obj;
   const parsed_object_id = req.body.object_id.split(/-|_/);
   const p_id = parsed_object_id[1];
@@ -41,6 +42,17 @@ export default async (
       });
       if (chain) {
         obj = { chain_id: p_entity };
+      }
+      break;
+    }
+    case 'snapshot-proposal': {
+      const proposal = await models.SnapshotProposal.findOne({
+        where: {
+          id: Number(p_id),
+        },
+      });
+      if (proposal) {
+        obj = { proposal_id: proposal.id };
       }
       break;
     }
