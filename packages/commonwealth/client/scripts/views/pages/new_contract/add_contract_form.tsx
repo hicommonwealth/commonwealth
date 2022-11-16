@@ -10,7 +10,7 @@ import {
   BalanceType,
   ContractType,
 } from 'common-common/src/types';
-import { isAddress } from 'web3-utils';
+import { AbiItem, isAddress } from 'web3-utils';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
@@ -31,7 +31,7 @@ import {
 
 type ContractFormFields = {
   chain_node_id: number;
-  abi: JSON;
+  abi: AbiItem[];
   contractType: ContractType;
   decimals: number;
   token_name: string;
@@ -87,12 +87,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         />
         <SelectRow
           title="Contract Type"
-          options={[
-            ContractType.ERC20,
-            ContractType.ERC721,
-            ContractType.AAVE,
-            ContractType.COMPOUND,
-          ]}
+          options={Object.values(ContractType)}
           value={this.state.form.contractType}
           onchange={(value) => {
             this.state.form.contractType = value;
