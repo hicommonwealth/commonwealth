@@ -71,40 +71,38 @@ export class UserDashboardRowBottom
               e.stopPropagation();
             }}
           >
-            <PopoverMenu
-              transitionDuration={0}
-              closeOnOutsideClick
-              closeOnContentClick
-              menuAttrs={{ size: 'default' }}
-              content={
-                <>
-                  <MenuItem
-                    iconLeft={Icons.COPY}
-                    label="Copy URL"
-                    onclick={async () => {
-                      await navigator.clipboard.writeText(path);
-                    }}
-                  />
-                  <MenuItem
-                    iconLeft={Icons.TWITTER}
-                    label="Share on Twitter"
-                    onclick={async () => {
-                      await window.open(
-                        `https://twitter.com/intent/tweet?text=${path}`,
-                        '_blank'
-                      );
-                    }}
-                  />
-                </>
-              }
-              trigger={
+            {m(PopoverMenu, {
+              transitionDuration: 0,
+              closeOnOutsideClick: true,
+              closeOnContentClick: true,
+              menuAttrs: { size: 'default' },
+              content: [
+                m(MenuItem, {
+                  iconLeft: Icons.COPY,
+                  label: 'Copy URL',
+                  onclick: async () => {
+                    await navigator.clipboard.writeText(path);
+                  },
+                }),
+                m(MenuItem, {
+                  iconLeft: Icons.TWITTER,
+                  label: 'Share on Twitter',
+                  onclick: async () => {
+                    await window.open(
+                      `https://twitter.com/intent/tweet?text=${path}`,
+                      '_blank'
+                    );
+                  },
+                }),
+              ],
+              trigger: (
                 <CWButton
                   label="Share"
                   iconName="share"
                   buttonType="secondary-blue"
                 />
-              }
-            />
+              ),
+            })}
           </div>
         </div>
         <div class="interaction-counts">
