@@ -14,7 +14,7 @@ export class CWCustomIcon implements m.ClassComponent<CustomIconAttrs> {
       componentType = ComponentType.CustomIcon,
       iconName,
       iconSize = 'medium',
-      ...domAttrs
+      ...otherAttrs
     } = vnode.attrs;
 
     const CustomIcon = customIconLookup[iconName];
@@ -23,7 +23,7 @@ export class CWCustomIcon implements m.ClassComponent<CustomIconAttrs> {
       <CustomIcon
         componentType={componentType}
         iconSize={iconSize}
-        {...domAttrs}
+        {...otherAttrs}
       />
     );
   }

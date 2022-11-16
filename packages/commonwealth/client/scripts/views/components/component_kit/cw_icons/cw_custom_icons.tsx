@@ -21,7 +21,7 @@ import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 
 export class CWCosmosEvmMetamask implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -30,7 +30,7 @@ export class CWCosmosEvmMetamask implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#000"
@@ -43,7 +43,7 @@ export class CWCosmosEvmMetamask implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWKeplr implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -52,7 +52,7 @@ export class CWKeplr implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#207afe"
@@ -74,7 +74,7 @@ export class CWKeplr implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWMagic implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -83,7 +83,7 @@ export class CWMagic implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#6452F6"
@@ -96,7 +96,7 @@ export class CWMagic implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWMetaMask implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -105,7 +105,7 @@ export class CWMetaMask implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#E2761B"
@@ -198,7 +198,7 @@ export class CWMetaMask implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWNearWallet implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -207,7 +207,7 @@ export class CWNearWallet implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#000"
@@ -281,7 +281,7 @@ export class CWPhantom implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWPolkadot implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -290,7 +290,7 @@ export class CWPolkadot implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#D32D79"
@@ -307,7 +307,7 @@ export class CWPolkadot implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWRonin implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -316,7 +316,7 @@ export class CWRonin implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#1374E9"
@@ -329,7 +329,7 @@ export class CWRonin implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWTerraStation implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -338,7 +338,7 @@ export class CWTerraStation implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#0E3CA5"
@@ -384,7 +384,7 @@ export class CWTerraStation implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWTerraStation2 implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -394,7 +394,7 @@ export class CWTerraStation2 implements m.ClassComponent<CustomIconAttrs> {
         fill="none"
         transform="scale(0.5)"
         viewBox="0 0 64 64"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path fill="#FFF" d="M0 0h64v64H0z" opacity="0" />
         <linearGradient
@@ -506,7 +506,7 @@ export class CWTerraStation2 implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWUnreads implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -515,7 +515,7 @@ export class CWUnreads implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#342E37"
@@ -531,7 +531,7 @@ export class CWUnreads implements m.ClassComponent<CustomIconAttrs> {
 
 export class CWWalletConnect implements m.ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
-    const { componentType, iconSize, ...domAttrs } = vnode.attrs;
+    const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
         class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
@@ -540,7 +540,7 @@ export class CWWalletConnect implements m.ClassComponent<CustomIconAttrs> {
         height="32"
         fill="none"
         viewBox="0 0 32 32"
-        {...domAttrs}
+        {...otherAttrs}
       >
         <path
           fill="#3B99FC"

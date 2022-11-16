@@ -18,7 +18,7 @@ export class CWIcon implements m.ClassComponent<IconComponentAttrs> {
       iconSize = 'medium',
       onclick,
       selected,
-      ...domAttrs
+      ...otherAttrs
     } = vnode.attrs;
 
     const Icon = iconLookup[iconName];
@@ -31,7 +31,7 @@ export class CWIcon implements m.ClassComponent<IconComponentAttrs> {
         iconSize={iconSize}
         onclick={onclick}
         selected={selected}
-        {...domAttrs}
+        {...otherAttrs}
       />
     );
   }
