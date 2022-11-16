@@ -17,10 +17,10 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `INSERT INTO CommunitySnapshotSpaces (chain_id, snapshot_space_id)
-      SELECT c.id, s.id 
-      FROM (SELECT DISTINCT id, UNNEST(snapshots) as snaps FROM "Chains") c
-       INNER JOIN "SnapshotSpaces" s
-      ON c.snaps = s.snapshot_space`,
+          SELECT c.id, s.id 
+          FROM (SELECT DISTINCT id, UNNEST(snapshots) as snaps FROM "Chains") c
+            INNER JOIN "SnapshotSpaces" s
+              ON c.snaps = s.snapshot_space;`,
         { transaction: t }
       );
 
@@ -31,11 +31,25 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    await queryInterface.sequelize.addcolumn(
+      'Chains', 
+      'snapshots', 
+      {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: true,
+      },
+      {transaction: t,}
+      );
+
+      await queryInterface.sequelize.query(
+        `UPDATE "Chains" 
+          SET snapshots = sn.snaps
+        FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
+              FROM CommunitySnapshotSpaces css
+              INNER JOIN SnapshotSpaces ss ON css.snapshot_space_id = ss.id
+              GROUP BY css.chain_id  ) sn
+        WHERE "Chains".id = sn.chain_id;`,
+        { transaction: t }
+      ); 
   },
 };
