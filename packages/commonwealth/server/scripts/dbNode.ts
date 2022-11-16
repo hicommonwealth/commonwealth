@@ -59,7 +59,6 @@ async function handleFatalError(
 
       if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
         listeners[chain].unsubscribe();
-        StatsDController.get().decrement('ce.listeners', { chain })
         delete listeners[chain];
 
         // TODO: email notification for this
@@ -329,18 +328,18 @@ async function mainProcess(
     if (!myChains.includes(chain) && !chain.startsWith(ChainNetwork.ERC20) && !chain.startsWith(ChainNetwork.ERC721)) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
-      StatsDController.get().decrement('ce.listeners', { chain })
       delete listeners[chain];
     }
   });
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
+    StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base });
+
     // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
     if (!listeners[chain.id] || !listeners[chain.id].subscribed) {
       log.info(`Starting listener for ${chain.id}...`);
-      StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network });
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
@@ -496,6 +495,10 @@ async function mainProcess(
   }
 
   log.info('Finished scheduled process.');
+
+  for (const c of Object.keys(listeners)) {
+    StatsDController.get().increment('ce.listeners-active', { chain: c });
+  }
   if (process.env.TESTING) {
     const listenerOptions = {};
     for (const chain of Object.keys(listeners)) {
