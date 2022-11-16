@@ -64,14 +64,15 @@ export async function initAppState(
           .map((node) => {
             return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
-        data.chains
-          .filter((chain) => chain.active)
+        data.chainsWithSnapshots
+          .filter((chain) => chain.chain.active)
           .map((chain) => {
-            delete chain.ChainNode;
+            delete chain.chain.ChainNode;
             return app.config.chains.add(
               ChainInfo.fromJSON({
                 ChainNode: app.config.nodes.getById(chain.chain_node_id),
-                ...chain,
+                snapshot: chain.snapshot,
+                ...chain.chain,
               })
             );
           });

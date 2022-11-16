@@ -50,6 +50,7 @@ export default (
       targetKey: 'id',
     });
     models.CommunitySnapshotSpaces.belongsTo(models.SnapshotSpace, {
+      as: 'snapshot_space',
       foreignKey: 'snapshot_space_id',
       targetKey: 'id',
     });

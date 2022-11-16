@@ -45,6 +45,30 @@ const status = async (
       models.ChainCategoryType.findAll(),
     ]);
 
+    const chainsWithSnapshots = await Promise.all(
+      chains.map(async (chain) => {
+        const snapshot_spaces = await models.CommunitySnapshotSpaces.findAll({
+          where: {
+            chain_id: chain.id,
+          },
+          include: {
+            model: models.SnapshotSpace,
+            as: 'snapshot_space',
+          },
+        });
+
+        const snapshot_space_names = snapshot_spaces.map((space) => {
+          return (space as any).snapshot_space?.snapshot_space;
+        });
+
+        return {
+          chain,
+          snapshot:
+            snapshot_space_names.length > 0 ? snapshot_space_names : null,
+        };
+      })
+    );
+
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
     );
@@ -69,7 +93,7 @@ const status = async (
         );
 
       return res.json({
-        chains,
+        chainsWithSnapshots,
         nodes,
         notificationCategories,
         chainCategories,
@@ -284,7 +308,7 @@ const status = async (
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
     return res.json({
-      chains,
+      chainsWithSnapshots,
       nodes,
       notificationCategories,
       chainCategories,
