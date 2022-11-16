@@ -4,7 +4,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type CommunitySnapshotSpacesAttributes = {
   id: number;
-  snapshot_space_id: string;
+  snapshot_space_id: number;
   chain_id: string;
   created_at?: Date;
   updated_at?: Date;

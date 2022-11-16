@@ -55,6 +55,7 @@ export class ChainMetadataRows
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
+  snapshotString: string;
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
@@ -79,6 +80,7 @@ export class ChainMetadataRows
     this.network = vnode.attrs.chain.network;
     this.symbol = vnode.attrs.chain.symbol;
     this.snapshot = vnode.attrs.chain.snapshot;
+    this.snapshotString = vnode.attrs.chain.snapshot;
     this.defaultOverview = vnode.attrs.chain.defaultOverview;
     this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
     this.categoryMap = buildCategoryMap();
@@ -218,7 +220,7 @@ export class ChainMetadataRows
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot}
+            value={this.snapshotString}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -232,6 +234,7 @@ export class ChainMetadataRows
                 })
                 .filter((val) => val.length > 4);
               this.snapshot = snapshots;
+              this.snapshotString = v;
             }}
           />
         )}

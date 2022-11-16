@@ -32,24 +32,24 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.addcolumn(
-      'Chains', 
-      'snapshot', 
+      'Chains',
+      'snapshot',
       {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
-      {transaction: t,}
-      );
+      { transaction: t }
+    );
 
-      await queryInterface.sequelize.query(
-        `UPDATE "Chains" 
+    await queryInterface.sequelize.query(
+      `UPDATE "Chains" 
           SET snapshot = sn.snaps
         FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
               FROM "CommunitySnapshotSpaces" css
               INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space_id = ss.id
               GROUP BY css.chain_id  ) sn
         WHERE "Chains".id = sn.chain_id;`,
-        { transaction: t }
-      ); 
+      { transaction: t }
+    );
   },
 };

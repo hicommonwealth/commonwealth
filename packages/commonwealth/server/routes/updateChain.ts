@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -34,7 +35,7 @@ type UpdateChainReq = ChainAttributes & {
   'snapshot[]'?: string[];
 };
 
-type UpdateChainResp = ChainAttributes;
+type UpdateChainResp = ChainAttributes & { snapshot: string[] };
 
 const updateChain = async (
   models: DB,
@@ -62,15 +63,6 @@ const updateChain = async (
       return next(new AppError(Errors.NotAdmin));
     }
   }
-
-  const SnapshotSpace = await models.CommunitySnapshotSpaces.findAll({
-    where: { chain_id: chain.id },
-    include: {
-      model: models.SnapshotSpace,
-    },
-  });
-
-  console.log('SnapshotSpace', SnapshotSpace);
 
   const {
     active,
@@ -127,6 +119,52 @@ const updateChain = async (
     return next(new AppError(Errors.InvalidTerms));
   }
 
+  const snapshotSpaces = await models.CommunitySnapshotSpaces.findAll({
+    where: { chain_id: chain.id },
+    include: {
+      model: models.SnapshotSpace,
+      as: 'snapshot_space',
+    },
+  });
+
+  // Check if any snapshot spaces are being removed
+  const removedSpaces = snapshotSpaces.filter((space) => {
+    return !snapshot.includes((space as any).snapshot_space.snapshot_space);
+  });
+  const existingSpaces = snapshotSpaces.filter((space) => {
+    return snapshot.includes((space as any).snapshot_space.snapshot_space);
+  });
+  const existingSpaceNames = existingSpaces.map((space) => {
+    return (space as any).snapshot_space.snapshot_space;
+  });
+
+  for (const spaceName of snapshot) {
+    // check if its in the mapping
+    if (existingSpaceNames.includes(spaceName)) {
+      continue;
+    } else {
+      const spaceModelInstance = await models.SnapshotSpace.findOrCreate({
+        where: { snapshot_space: spaceName },
+      });
+
+      // if it isnt, create it
+      await models.CommunitySnapshotSpaces.create({
+        snapshot_space_id: spaceModelInstance[0].id,
+        chain_id: chain.id,
+      });
+    }
+  }
+
+  // delete unwanted associations
+  for (const removedSpace of removedSpaces) {
+    await models.CommunitySnapshotSpaces.destroy({
+      where: {
+        snapshot_space_id: removedSpace.snapshot_space_id,
+        chain_id: chain.id,
+      },
+    });
+  }
+
   if (name) chain.name = name;
   if (description) chain.description = description;
   if (default_symbol) chain.default_symbol = default_symbol;
@@ -141,7 +179,6 @@ const updateChain = async (
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
-  if (snapshot) chain.snapshot = snapshot;
   if (chat_enabled) chain.chat_enabled = chat_enabled;
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
@@ -156,7 +193,9 @@ const updateChain = async (
 
   await chain.save();
 
-  return success(res, chain.toJSON());
+  console.log('snapshot', snapshot);
+
+  return success(res, { ...chain.toJSON(), snapshot });
 };
 
 export default updateChain;
