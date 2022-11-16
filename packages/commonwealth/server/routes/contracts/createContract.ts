@@ -8,6 +8,8 @@ import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { DB } from '../../models';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { parseAbiItemsFromABI } from 'client/scripts/helpers/abi_utils';
+import { AbiItem } from 'web3-utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -68,9 +70,17 @@ const createContract = async (
   if (!req.user.isAdmin) {
     return next(new Error(Errors.NotAdmin));
   }
+
   if (abi && (Object.keys(abi) as Array<string>).length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
+
+  try {
+    const abiItems: AbiItem[] = parseAbiItemsFromABI(abi);
+  } catch {
+    return next(new Error(Errors.InvalidABI));
+  }
+
 
   if (!contractType || !contractType.trim()) {
     return next(new Error(Errors.NoType));
@@ -121,9 +131,6 @@ const createContract = async (
       },
       transaction: t
     });
-
-    const nodeJSON = node.toJSON();
-    delete nodeJSON.private_url;
 
     return success(res, { contract: contract.toJSON() });
   });

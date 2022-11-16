@@ -20,8 +20,6 @@ import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-
 import {
   initChainForm,
   defaultChainRows,
@@ -92,12 +90,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
         />
         <SelectRow
           title="Contract Type"
-          options={[
-            ContractType.ERC20,
-            ContractType.ERC721,
-            ContractType.AAVE,
-            ContractType.COMPOUND,
-          ]}
+          options={Object.values(ContractType)}
           value={this.state.form.contractType}
           onchange={(value) => {
             this.state.form.contractType = value;
