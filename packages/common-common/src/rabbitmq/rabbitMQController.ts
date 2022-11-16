@@ -5,6 +5,10 @@ import { RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessage
 
 const log = factory.getLogger(formatFilename(__filename));
 
+/**
+ * All errors related to the RabbitMQController should be of this type. If a message processing funciton throws
+ * an error of this type it will follow a different recovery strategy than if a generic error is thrown.
+ */
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -19,6 +23,11 @@ class PublishError extends RabbitMQControllerError {
   }
 }
 
+/**
+ * This class encapsulates all interactions with a RabbitMQ instance. It allows publishing and subscribing to queues. To
+ * initialize the class you must have a Rascal configuration. Every publish and message processing should be done
+ * through this class as it implements error handling that is crucial to avoid data loss.
+ */
 export class RabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];

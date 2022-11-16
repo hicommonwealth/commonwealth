@@ -4,7 +4,6 @@ import { Op } from 'sequelize';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
-    RedisNamespaces,
     WebsocketEngineEvents,
     WebsocketMessageNames,
     WebsocketNamespaces,
@@ -13,6 +12,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { RedisCache } from 'common-common/src/redisCache';
+import { RedisNamespaces } from "common-common/src/types";
 
 
 const log = factory.getLogger(addPrefix(__filename));

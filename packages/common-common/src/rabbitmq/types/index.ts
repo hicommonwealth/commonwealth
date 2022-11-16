@@ -16,6 +16,7 @@ export class RmqMsgFormatError extends Error {
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,
   isValidMsgFormat(data: any): data is MsgType,
+  checkMsgFormat(data: any): void
 }
 
 /**

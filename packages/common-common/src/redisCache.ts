@@ -1,7 +1,6 @@
 import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
 import { factory, formatFilename } from './logging';
-import { REDIS_URL, VULTR_IP } from 'commonwealth/server/config';
-import { RedisNamespaces } from 'commonwealth/shared/types';
+import { RedisNamespaces } from './types';
 import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,22 +33,22 @@ export class RedisCache {
   /**
    * Initializes the Redis client. Must be run before any Redis command can be executed.
    */
-  public async init() {
-    if (!REDIS_URL) {
+  public async init(redis_url: string, vultr_ip?: string) {
+    if (!redis_url) {
       log.warn(
         'Redis Url is undefined. Some services (e.g. chat) may not be available.'
       );
       this.initialized = false;
       return;
     }
-    log.info(`Connecting to Redis at: ${REDIS_URL}`);
+    log.info(`Connecting to Redis at: ${redis_url}`);
 
-    const localRedis = REDIS_URL.includes('localhost') || REDIS_URL.includes('127.0.0.1');
-    const vultrRedis = REDIS_URL.includes(VULTR_IP);
+    const localRedis = redis_url.includes('localhost') || redis_url.includes('127.0.0.1');
+    const vultrRedis = redis_url.includes(vultr_ip);
 
     if (!this.client) {
       const redisOptions = {};
-      redisOptions['url'] = REDIS_URL;
+      redisOptions['url'] = redis_url;
 
       if (localRedis || vultrRedis) {
         redisOptions['socket'] = {
@@ -69,7 +68,7 @@ export class RedisCache {
     this.client.on('error', (err) => {
       if (err instanceof ConnectionTimeoutError) {
         log.error(
-          `RedisCache connection to ${REDIS_URL} timed out!`
+          `RedisCache connection to ${redis_url} timed out!`
         );
       } else if (err instanceof ReconnectStrategyError) {
         log.error(`RedisCache max connection retries exceeded!`);

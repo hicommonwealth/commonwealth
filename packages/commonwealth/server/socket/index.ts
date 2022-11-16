@@ -180,7 +180,7 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init();
+  await redisCache.init(REDIS_URL, VULTR_IP);
   console.log('Redis Cache initialized!');
 
   // create the chain-events namespace

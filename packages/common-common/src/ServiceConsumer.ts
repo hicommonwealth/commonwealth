@@ -10,6 +10,13 @@ export type RabbitMQSubscription = {
   msgProcessorContext?: { [key: string]: any };
 };
 
+/**
+ * This class is a general wrapper around RabbitMQ functionality. It initializes a RabbitMQ Controller and all the
+ * subscriptions that are passed. The subscriptions are held as state within the class, leaving room for future work
+ * to get insight into active subscriptions or for managing the currently active subscriptions. The class also
+ * initializes a logger instance with a prefix that helps identify exactly where the log came from in a multi-server
+ * architecture.
+ */
 export class ServiceConsumer {
   public readonly serviceName: string;
   public readonly serviceId: string;
