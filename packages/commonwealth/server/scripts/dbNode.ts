@@ -19,6 +19,7 @@ import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import StatsDController from '../util/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -410,15 +411,19 @@ async function mainProcess(
     }
 
     // add the logger if it is needed and isn't already added
-    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
-      listeners[chain.id].eventHandlers['logger'] = {
-        handler: generalLogger,
-      };
+    if (!listeners[chain.id].eventHandlers['logger']) {
+      if (chain.ce_verbose) {
+        listeners[chain.id].eventHandlers['logger'] = {
+          handler: generalLogger,
+        };
+      }
+      StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network })
     }
 
     // delete the logger if it is active but ce_verbose is false
     if (listeners[chain.id].eventHandlers['logger'] && !chain.ce_verbose)
       listeners[chain.id].eventHandlers['logger'] = null;
+      StatsDController.get().decrement('ce.listeners', { chain: chain.id, network: chain.network })
   }
 
   // loop through chains that have active listeners again this time dealing with identity
