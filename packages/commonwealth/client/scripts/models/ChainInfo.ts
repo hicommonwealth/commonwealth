@@ -288,7 +288,7 @@ class ChainInfo {
       default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInstance = r.result;
+    const updatedChain = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;

@@ -21,7 +21,13 @@ const updateThreadLinkedSnapshotProposal = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  if (!chain?.snapshot) {
+
+  const snapshotSpaces = await models.CommunitySnapshotSpaces.findAll({
+    where: {
+      chain_id: chain.id,
+    },
+  });
+  if (snapshotSpaces.length < 1) {
     return next(new AppError(Errors.MustBeSnapshotChain));
   }
   // ensure snapshot proposal is a bs58-encoded sha256 hash
