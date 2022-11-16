@@ -103,7 +103,7 @@ const createContract = async (
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
-  const node = await models.ChainNode.scope('withPrivateData').findOne({
+  const node = await models.ChainNode.findOne({
     where: {
       id: chain_node_id,
     },
