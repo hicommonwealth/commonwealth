@@ -124,6 +124,7 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
+  Kava = 'kava',
 }
 
 export enum BalanceType {
