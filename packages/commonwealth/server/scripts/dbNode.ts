@@ -59,6 +59,7 @@ async function handleFatalError(
 
       if (chain && chain.indexOf('erc20') === -1 && chainErrors[chain] >= 4) {
         listeners[chain].unsubscribe();
+        StatsDController.get().decrement('ce.listeners', { chain })
         delete listeners[chain];
 
         // TODO: email notification for this
@@ -328,6 +329,7 @@ async function mainProcess(
     if (!myChains.includes(chain) && !chain.startsWith(ChainNetwork.ERC20) && !chain.startsWith(ChainNetwork.ERC721)) {
       log.info(`[${chain}]: Deleting chain...`);
       if (listeners[chain]) listeners[chain].unsubscribe();
+      StatsDController.get().decrement('ce.listeners', { chain })
       delete listeners[chain];
     }
   });
@@ -338,6 +340,7 @@ async function mainProcess(
     // it will start a listener for the first successful chain node url in the db
     if (!listeners[chain.id] || !listeners[chain.id].subscribed) {
       log.info(`Starting listener for ${chain.id}...`);
+      StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network });
 
       // base is used to override built-in event chains in chain-events - only used for substrate chains in this case
       // NOTE: All erc20 tokens (type='token' base='ethereum') are removed at this point
@@ -411,19 +414,15 @@ async function mainProcess(
     }
 
     // add the logger if it is needed and isn't already added
-    if (!listeners[chain.id].eventHandlers['logger']) {
-      if (chain.ce_verbose) {
-        listeners[chain.id].eventHandlers['logger'] = {
-          handler: generalLogger,
-        };
-      }
-      StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network })
+    if (chain.ce_verbose && !listeners[chain.id].eventHandlers['logger']) {
+      listeners[chain.id].eventHandlers['logger'] = {
+        handler: generalLogger,
+      };
     }
 
     // delete the logger if it is active but ce_verbose is false
     if (listeners[chain.id].eventHandlers['logger'] && !chain.ce_verbose)
       listeners[chain.id].eventHandlers['logger'] = null;
-      StatsDController.get().decrement('ce.listeners', { chain: chain.id, network: chain.network })
   }
 
   // loop through chains that have active listeners again this time dealing with identity
