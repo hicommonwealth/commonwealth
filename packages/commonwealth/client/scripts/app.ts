@@ -9,7 +9,6 @@ import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 
 import './fragment-fix';
@@ -1110,9 +1109,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
-    // initialize construct-ui focus manager
-    FocusManager.showFocusOnlyOnTab();
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {

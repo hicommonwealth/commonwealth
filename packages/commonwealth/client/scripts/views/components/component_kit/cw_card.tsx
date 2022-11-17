@@ -24,7 +24,7 @@ type CardAttrs = {
 } & CardStyleAttrs;
 
 export class CWCard implements m.ClassComponent<CardAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CardAttrs>) {
     const {
       className,
       elevation,

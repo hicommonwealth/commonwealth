@@ -11,7 +11,7 @@ import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
 export class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
-  view(vnode: m.VnodeDOM<MenuItem, this>) {
+  view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'header') {
       return (
         <CWText className="menu-section-header-text" type="caption">
@@ -51,18 +51,13 @@ type PopoverMenuAttrs = {
 } & SharedPopoverAttrs;
 
 export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
-  view(vnode) {
-    const { className, menuItems, trigger } = vnode.attrs;
+  view(vnode: m.Vnode<PopoverMenuAttrs>) {
+    const { menuItems, trigger } = vnode.attrs;
 
     return (
       <CWPopover
         content={
-          <div
-            class={getClasses<{ className?: string }>(
-              { className },
-              ComponentType.PopoverMenu
-            )}
-          >
+          <div class={ComponentType.PopoverMenu}>
             {menuItems.map((item) => (
               <CWPopoverMenuItem type={item.type || 'default'} {...item} />
             ))}
