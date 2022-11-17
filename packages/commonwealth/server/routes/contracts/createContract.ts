@@ -40,7 +40,7 @@ export type CreateContractReq = ContractAttributes &
     community: string;
     node_url: string;
     address: string;
-    abi: Array<Record<string, unknown>>;
+    abi: string;
     contractType: ContractType;
   };
 
@@ -77,11 +77,21 @@ const createContract = async (
   if (abi && (Object.keys(abi) as Array<string>).length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
-
-  try {
-    const abiItems: AbiItem[] = parseAbiItemsFromABI(abi);
-  } catch {
-    return next(new Error(Errors.InvalidABI));
+  let abiAsRecord: Array<Record<string, unknown>>;
+  if (abi) {
+    try {
+      // Parse ABI to validate it as a properly formatted ABI
+      abiAsRecord = JSON.parse(abi);
+      if (!abiAsRecord) {
+        return next(new Error(Errors.InvalidABI));
+      }
+      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+      if (!abiItems) {
+        return next(new Error(Errors.InvalidABI));
+      }
+    } catch {
+      return next(new Error(Errors.InvalidABI));
+    }
   }
 
   if (!contractType || !contractType.trim()) {
@@ -123,7 +133,7 @@ const createContract = async (
     await models.sequelize.transaction(async (t) => {
       const contract_abi = await models.ContractAbi.create(
         {
-          abi,
+          abi: abiAsRecord,
         },
         { transaction: t }
       );
@@ -141,18 +151,32 @@ const createContract = async (
         transaction: t,
       });
 
+      await models.CommunityContract.create({
+        chain_id: community,
+        contract_id: contract.id,
+      }, { transaction: t });
+
       return success(res, { contract: contract.toJSON() });
     });
   } else {
-    [contract] = await models.Contract.findOrCreate({
-      where: {
-        address,
-        token_name,
-        symbol,
-        decimals,
-        type: contractType,
-        chain_node_id: node.id,
-      },
+    // transactionalize contract creation
+    await models.sequelize.transaction(async (t) => {
+      [contract] = await models.Contract.findOrCreate({
+        where: {
+          address,
+          token_name,
+          symbol,
+          decimals,
+          type: contractType,
+          chain_node_id: node.id,
+        },
+        transaction: t,
+      });
+      await models.CommunityContract.create({
+        chain_id: community,
+        contract_id: contract.id,
+      }, { transaction: t });
+      return success(res, { contract: contract.toJSON() });
     });
   }
 };
