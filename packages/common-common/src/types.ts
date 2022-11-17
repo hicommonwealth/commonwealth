@@ -136,3 +136,7 @@ export enum BalanceType {
   NEAR = 'near',
   Substrate = 'substrate',
 }
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
+}
