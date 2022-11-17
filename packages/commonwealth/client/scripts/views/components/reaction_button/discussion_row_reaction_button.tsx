@@ -29,7 +29,7 @@ export class DiscussionRowReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<DiscussionRowReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionRowReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};

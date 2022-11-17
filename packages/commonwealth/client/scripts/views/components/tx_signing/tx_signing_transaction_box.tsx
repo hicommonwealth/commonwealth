@@ -18,7 +18,7 @@ type TXSigningTransactionBoxAttrs = {
 export class TXSigningTransactionBox
   implements m.ClassComponent<TXSigningTransactionBoxAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<TXSigningTransactionBoxAttrs>) {
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 
     return (
