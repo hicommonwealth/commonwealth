@@ -12,7 +12,7 @@ type LabelAttrs = {
 };
 
 export class CWLabel implements m.ClassComponent<LabelAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<LabelAttrs>) {
     const { label } = vnode.attrs;
     return (
       <CWText type="caption" className={ComponentType.Label}>

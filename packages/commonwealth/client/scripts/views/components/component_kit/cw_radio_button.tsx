@@ -8,7 +8,7 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-export type RadioButton = { label?: string; value: string };
+export type RadioButton = { label?: string; value: string; disabled?: boolean };
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
@@ -22,7 +22,7 @@ type RadioButtonAttrs = {
   RadioButtonStyleAttrs;
 
 export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<RadioButtonAttrs>) {
     const {
       disabled = false,
       groupName,
