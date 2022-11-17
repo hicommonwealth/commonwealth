@@ -46,6 +46,7 @@ class ChainInfo {
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
+  public discord_config_id?: string;
 
   public get node() {
     return this.ChainNode;
@@ -82,6 +83,7 @@ class ChainInfo {
     ChainNode,
     tokenName,
     adminOnlyPolling,
+    discord_config_id,
   }) {
     this.id = id;
     this.network = network;
@@ -115,6 +117,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
+    this.discord_config_id = discord_config_id;
   }
 
   public static fromJSON({
@@ -148,6 +151,7 @@ class ChainInfo {
     Contracts,
     ChainNode,
     admin_only_polling,
+    discord_config_id,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -156,7 +160,11 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts ? Contracts[0]?.decimals : base === ChainBase.CosmosSDK ? 6 : 18;
+    const decimals = Contracts
+      ? Contracts[0]?.decimals
+      : base === ChainBase.CosmosSDK
+      ? 6
+      : 18;
     return new ChainInfo({
       id,
       network,
@@ -188,6 +196,7 @@ class ChainInfo {
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
+      discord_config_id,
     });
   }
 

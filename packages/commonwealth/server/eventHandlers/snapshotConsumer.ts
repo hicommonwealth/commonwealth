@@ -9,11 +9,11 @@ import {
 } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SnapshotNotification } from '../../shared/types';
-import  models from '../database';
+import models from '../database';
 import { RABBITMQ_URI } from '../config';
 
 async function processSnapshotMessage(msg: SnapshotNotification) {
-const log = factory.getLogger(formatFilename(__filename));
+  const log = factory.getLogger(formatFilename(__filename));
   try {
     const proposal = await models.SnapshotProposal.findOne({
       where: { id: msg.id },
@@ -24,11 +24,10 @@ const log = factory.getLogger(formatFilename(__filename));
         id: msg.id,
         space: msg.space,
         event: msg.event,
-        expire: msg.expire
+        expire: msg.expire,
       });
       log.info(`Created new snapshot proposal: ${msg.id}`);
     }
-
   } catch (err) {
     log.error(`Error processing snapshot message: ${err}`);
   }
