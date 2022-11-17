@@ -35,8 +35,8 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
     });
     const currentChainInfo = app.chain?.meta;
     const hideChat =
-      currentChainInfo &&
-      activeAddressRoles &&
+      !currentChainInfo ||
+      !activeAddressRoles ||
       !isActiveAddressPermitted(
         activeAddressRoles,
         currentChainInfo,
