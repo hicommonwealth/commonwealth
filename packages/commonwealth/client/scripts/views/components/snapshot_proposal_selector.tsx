@@ -47,46 +47,44 @@ export class SnapshotProposalSelector
     return (
       <div class="SnapshotProposalSelector">
         {this.snapshotProposalsLoaded ? (
-          <QueryList
-            checkmark={true}
-            items={this.allProposals.sort((a, b) => {
+          m(QueryList, {
+            checkmark: true,
+            items: this.allProposals.sort((a, b) => {
               return b.created - a.created;
-            })}
-            inputAttrs={{
+            }),
+            inputAttrs: {
               placeholder: 'Search for an existing snapshot proposal...',
-            }}
-            itemRender={(sn: SnapshotProposal) => {
+            },
+            itemRender: (sn: SnapshotProposal) => {
               const selected = sn.id === vnode.attrs.thread.snapshotProposal;
               // TODO: show additional info on the ListItem,
               // like any set proposal title, the creator, or other metadata
-              return (
-                <ListItem
-                  label={
-                    <div class="chain-entity">
-                      <div class="chain-entity-text" title={sn.title}>
-                        {sn.title}
-                      </div>
-                      <div class="chain-entity-subtext" title={sn.id}>
-                        Hash: ${sn.id}
-                      </div>
+              return m(ListItem, {
+                label: (
+                  <div class="chain-entity">
+                    <div class="chain-entity-text" title={sn.title}>
+                      {sn.title}
                     </div>
-                  }
-                  selected={selected}
-                  key={sn.id}
-                />
-              );
-            }}
-            itemPredicate={(query, sn: SnapshotProposal) => {
+                    <div class="chain-entity-subtext" title={sn.id}>
+                      Hash: ${sn.id}
+                    </div>
+                  </div>
+                ),
+                selected,
+                key: sn.id,
+              });
+            },
+            itemPredicate: (query, sn: SnapshotProposal) => {
               // TODO
               return sn.title
                 ?.toString()
                 .toLowerCase()
                 .includes(query.toLowerCase());
-            }}
-            onSelect={(sn: SnapshotProposal) => {
+            },
+            onSelect: (sn: SnapshotProposal) => {
               onSelect(sn);
-            }}
-          />
+            },
+          })
         ) : (
           <div class="loading-container">
             <div class="loading-text">
