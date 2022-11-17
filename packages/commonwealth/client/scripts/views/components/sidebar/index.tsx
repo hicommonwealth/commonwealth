@@ -4,9 +4,12 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
+import { Action } from 'common-common/src/permissions';
+
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import { ContractsViewable } from 'common-common/src/types';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ContractSection } from './contract_section';
@@ -31,8 +34,19 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
     const isContractsViewable =
       (contractsViewable === ContractsViewable.AdminOnly && isAdmin) ||
       contractsViewable === ContractsViewable.AllUsers;
-    const hideChat = !app.chain?.meta?.chatEnabled;
 
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+    const currentChainInfo = app.chain?.meta;
+    const hideChat =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_CHAT_CHANNELS
+      );
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
 
     return (

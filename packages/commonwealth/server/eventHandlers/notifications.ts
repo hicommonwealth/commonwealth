@@ -9,8 +9,9 @@ import {
 } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { ChainEventNotification } from '../../shared/types';
+import {RascalPublications} from "common-common/src/rabbitmq";
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -65,7 +66,7 @@ export default class extends IEventHandler {
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
 
       // publish notification to the appropriate RabbitMQ queue (sends to socket.io servers to send to clients)
-      await this._rabbitMqController.publish(formattedEvent, 'ChainEventsNotificationsPublication')
+      await this._rabbitMqController.publish(formattedEvent, RascalPublications.ChainEventNotifications)
 
       return dbEvent;
     } catch (e) {

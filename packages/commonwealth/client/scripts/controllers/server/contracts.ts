@@ -171,9 +171,7 @@ class ContractsController {
     } catch (err) {
       console.log('Failed to create and add contract', err);
       throw new Error(
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to create and add contract'
+        err
       );
     }
   }
