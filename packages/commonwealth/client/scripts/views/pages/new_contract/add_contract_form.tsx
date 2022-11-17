@@ -31,7 +31,7 @@ import {
 
 type ContractFormFields = {
   chain_node_id: number;
-  abi: AbiItem[];
+  abi: string;
   contractType: ContractType;
   decimals: number;
   token_name: string;
@@ -56,7 +56,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       // For Now we hard code the chain node id until we have a better way to distinguish between chains
       chain_node_id: 37,
       name: '',
-      abi: JSON.parse('[]'),
+      abi: '',
       contractType: ContractType.ERC20,
       nodeUrl: '',
       symbol: '',
@@ -159,7 +159,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               }
             } catch (err) {
               notifyError(
-                err.responseJSON?.error || `Creating new contract with community ${app.activeChainId()} failed`
+                err.responseJSON?.error ||
+                  `Creating new contract with community ${app.activeChainId()} failed`
               );
             } finally {
               this.state.saving = false;
