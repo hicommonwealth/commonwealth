@@ -52,11 +52,8 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
-<<<<<<< HEAD
 import SnapshotProposalFactory from './models/snapshot_proposal';
-=======
 import DiscordBotConfigFactory from './models/discord_bot_config';
->>>>>>> alex.discord-bot-improvements-pt1
 
 const log = factory.getLogger(formatFilename(__filename));
 
