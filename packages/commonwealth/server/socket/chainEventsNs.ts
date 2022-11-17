@@ -64,11 +64,11 @@ export function createCeNamespace(io: Server) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToCERoom(
-  this: Server,
+export async function publishToCERoom(
+  this: { server: Server },
   notification: ChainEventNotification
 ) {
-  this.to(notification.ChainEvent.ChainEventType.id).emit(
+  this.server.to(notification.ChainEvent.ChainEventType.id).emit(
     WebsocketMessageNames.ChainEventNotification,
     notification
   );

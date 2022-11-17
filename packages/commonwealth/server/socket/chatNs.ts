@@ -3,9 +3,9 @@ import moment from 'moment';
 import { Op } from 'sequelize';
 import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
-import { NotificationCategories } from 'common-common/src/types';
+import { RedisCache } from 'common-common/src/redisCache';
+import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
 import {
-    RedisNamespaces,
     WebsocketEngineEvents,
     WebsocketMessageNames,
     WebsocketNamespaces,
@@ -13,7 +13,6 @@ import {
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
-import { RedisCache } from '../util/redisCache';
 import { checkReadPermitted } from '../util/roles';
 
 
