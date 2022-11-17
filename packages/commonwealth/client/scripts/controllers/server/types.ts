@@ -1,3 +1,5 @@
+// Types for handling server API requests from the client side.
+
 import { Request, Response } from 'express';
 import { BalanceType, ContractType } from 'common-common/src/types';
 
