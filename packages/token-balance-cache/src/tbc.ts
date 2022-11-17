@@ -14,7 +14,7 @@ import {
   TokenBalanceResp,
 } from './types';
 import { default as BalanceProviders } from './providers';
-import { TbcStatsDSender } from 'common-common/src/tbcStatsDSender';
+import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));
 

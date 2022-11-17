@@ -3,6 +3,7 @@
 
 import { StatsD } from 'hot-shots';
 import { Request, Response, NextFunction } from 'express';
+import { ProjectTag } from 'common-common/src/statsd';
 
 export default function expressStatsdInit (client: StatsD) {
   return function expressStatsd (req: Request, res: Response, next: NextFunction) {
@@ -16,6 +17,7 @@ export default function expressStatsdInit (client: StatsD) {
         statusCode,
         method: req.method,
         path: req.path,
+        project: ProjectTag.Commonwealth,
       };
 
       // Response Time

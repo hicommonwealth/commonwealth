@@ -1,9 +1,9 @@
-import { StatsDController, StatsDTag } from 'common-common/src/statsd';
-import { BalanceProvider } from 'token-balance-cache/src';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
+import { BalanceProvider } from 'index';
 
 // Class with Helper functions to send statsD
 export class TbcStatsDSender {
-  private statsD = StatsDController.get(StatsDTag.TokenBalanceCache);
+  private statsD = StatsDController.get();
 
   // Log requests per provider + node + contract
   sendProviderInfo(bps: BalanceProvider[], nodeId?: number) {
@@ -11,7 +11,8 @@ export class TbcStatsDSender {
       const tags = {
         name: bp.name,
         nodeId: nodeId.toString(),
-        contract: bp.opts['contract']
+        contract: bp.opts['contract'],
+        project: ProjectTag.TokenBalanceCache,
       }
 
       this.statsD.increment(`tbc.provider_requests`, tags)
@@ -20,15 +21,20 @@ export class TbcStatsDSender {
 
   // Total cache size of 0 vs non-0 balance entries
   sendCacheSizeInfo({ zero, nonZero }) {
-    this.statsD.gauge('tbc.cache_size_zero', zero);
-    this.statsD.gauge('tbc.cache_size_nonzero', nonZero);
+    const tags = {
+      project: ProjectTag.TokenBalanceCache,
+    }
+
+    this.statsD.gauge('tbc.cache_size_zero', zero, tags);
+    this.statsD.gauge('tbc.cache_size_nonzero', nonZero, tags);
   }
 
   // Fetch timings per provider + node.
   sendFetchTiming(start: number, stop: number, name: string, nodeId: number) {
     const tags = {
       name: name,
-      node: nodeId.toString()
+      node: nodeId.toString(),
+      project: ProjectTag.TokenBalanceCache,
     }
 
     this.statsD.timing('tbc.fetch_timings', stop - start, tags);
@@ -38,7 +44,8 @@ export class TbcStatsDSender {
   sendJobItemRemoved(cacheKey: string) {
     const tags = {
       cacheKey: cacheKey,
-      date: Date.now().toString()
+      date: Date.now().toString(),
+      project: ProjectTag.TokenBalanceCache,
     }
 
     this.statsD.increment('tbc.node_removed', tags);
@@ -47,7 +54,8 @@ export class TbcStatsDSender {
   // Failure counts + reasons
   sendAndThrowError(error: Error) {
     const tags = {
-      reason: error.message
+      reason: error.message,
+      project: ProjectTag.TokenBalanceCache,
     }
 
     this.statsD.increment('tbc.error', tags);

@@ -3,7 +3,7 @@ import * as WebSocket from 'ws';
 import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController, StatsDTag } from 'common-common/src/statsd';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EventStorageHandler from '../eventHandlers/storage';
@@ -77,13 +77,14 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
-    StatsDController.get(StatsDTag.Commonwealth).increment(
+    StatsDController.get().increment(
       'ce.event',
       {
         chain: event.chain || '',
         network: event.network,
         blockNumber: `${event.blockNumber}`,
         kind: event.data.kind,
+        project: ProjectTag.Commonwealth,
       }
     );
     let prevResult = null;
