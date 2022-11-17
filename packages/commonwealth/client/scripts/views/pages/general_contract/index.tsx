@@ -90,11 +90,7 @@ class GeneralContractPage
 
       try {
         // initialize daoFactory Controller
-        const ethChain = app.chain.chain as EthereumChain;
-        const web3 = await ethChain._initApi(app.chain.meta.node);
-
         this.generalContractsController = new GeneralContractsController(
-          web3,
           contract
         );
 
@@ -111,6 +107,18 @@ class GeneralContractPage
           signingWallet
         );
         console.log('tx is ', tx);
+
+        const result = this.generalContractsController.decodeTransactionData(
+          fn,
+          tx,
+          signingWallet
+        );
+
+        this.state.functionNameToFunctionOutput.set(fn.name, result);
+        this.state.saving = false;
+        this.state.loaded = true;
+        this.state.loading = false;
+        m.redraw();
       } catch (err) {
         notifyError(
           err.responseJSON?.error || `Calling Function ${fn.name} failed`
@@ -119,19 +127,7 @@ class GeneralContractPage
         this.state.message = err.message;
         this.state.loading = false;
         m.redraw();
-        return;
       }
-
-      const result = this.generalContractsController.decodeTransactionData(
-        fn,
-        tx
-      );
-      this.state.functionNameToFunctionOutput.set(fn.name, result);
-
-      this.state.saving = false;
-      this.state.loaded = true;
-      this.state.loading = false;
-      m.redraw();
     };
 
     const loadContractAbi = () => {

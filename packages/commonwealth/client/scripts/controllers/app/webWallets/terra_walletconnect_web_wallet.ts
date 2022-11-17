@@ -39,8 +39,6 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
     return this._accounts || [];
   }
 
-  api: () => any
-
   public async signWithAccount(account: Account): Promise<string> {
     try {
       const result = await this._wallet.signBytes(Buffer.from(account.validationToken));
