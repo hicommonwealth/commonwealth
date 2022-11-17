@@ -16,7 +16,7 @@ module.exports = {
       );
 
       await queryInterface.sequelize.query(
-        `INSERT INTO "CommunitySnapshotSpaces" (chain_id, snapshot_space, created_at, updated_at)
+        `INSERT INTO "CommunitySnapshotSpaces" (chain_id, snapshot_space_id, created_at, updated_at)
           SELECT c.id, s.snapshot_space, NOW(), NOW()
           FROM (SELECT DISTINCT id, UNNEST(snapshot) as snaps FROM "Chains") c
             INNER JOIN "SnapshotSpaces" s
@@ -47,7 +47,7 @@ module.exports = {
             SET snapshot = sn.snaps
           FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
                 FROM "CommunitySnapshotSpaces" css
-                INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space = ss.id
+                INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space = ss.snapshot_space
                 GROUP BY css.chain_id  ) sn
           WHERE "Chains".id = sn.chain_id;`,
         { transaction: t }

@@ -147,7 +147,7 @@ const updateChain = async (
 
       // if it isnt, create it
       await models.CommunitySnapshotSpaces.create({
-        snapshot_space: spaceModelInstance[0].snapshot_space,
+        snapshot_space_id: spaceModelInstance[0].snapshot_space,
         chain_id: chain.id,
       });
     }
@@ -157,7 +157,7 @@ const updateChain = async (
   for (const removedSpace of removedSpaces) {
     await models.CommunitySnapshotSpaces.destroy({
       where: {
-        snapshot_space: removedSpace.snapshot_space,
+        snapshot_space_id: removedSpace.snapshot_space_id,
         chain_id: chain.id,
       },
     });

@@ -53,6 +53,7 @@ const status = async (
           },
           include: {
             model: models.SnapshotSpace,
+            as: 'snapshot_space',
           },
         });
 
@@ -67,6 +68,8 @@ const status = async (
         };
       })
     );
+
+    console.log('chains', chainsWithSnapshots);
 
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
