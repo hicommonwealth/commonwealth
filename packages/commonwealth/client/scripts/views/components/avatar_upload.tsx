@@ -29,7 +29,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.VnodeDOM<AvatarUploadAttrs>) {
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
@@ -96,7 +96,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<AvatarUploadAttrs>) {
     const { account, darkMode, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
