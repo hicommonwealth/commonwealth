@@ -15,24 +15,22 @@ export class ConvictionsChooser
   implements m.ClassComponent<{ callback: (number) => void }>
 {
   view(vnode) {
-    return (
-      <Select
-        class="ConvictionsChooser"
-        name="convictions"
-        oncreate={() => {
-          vnode.attrs.callback(convictions()[0].toString());
-        }}
-        defaultValue={convictions()[0].toString()}
-        options={convictions().map((c) => ({
-          value: c.toString(),
-          label: `${convictionToWeight(
-            c
-          )}x weight (locked for ${convictionToLocktime(c)}x enactment period)`,
-        }))}
-        onSelect={(option) => {
-          vnode.attrs.callback(parseInt((option as any).value, 10));
-        }}
-      />
-    );
+    return m(Select, {
+      class: 'ConvictionsChooser',
+      name: 'convictions',
+      oncreate: () => {
+        vnode.attrs.callback(convictions()[0].toString());
+      },
+      defaultValue: convictions()[0].toString(),
+      options: convictions().map((c) => ({
+        value: c.toString(),
+        label: `${convictionToWeight(
+          c
+        )}x weight (locked for ${convictionToLocktime(c)}x enactment period)`,
+      })),
+      onSelect: (option) => {
+        vnode.attrs.callback(parseInt((option as any).value, 10));
+      },
+    });
   }
 }

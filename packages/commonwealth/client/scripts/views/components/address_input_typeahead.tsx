@@ -65,69 +65,65 @@ export class AddressInputTypeahead
         });
     }
 
-    return (
-      <InputSelect
-        class="AddressInputTypeahead"
-        cacheItems
-        checkmark={false}
-        closeOnSelect
-        itemRender={(item: AddressInputTypeaheadItem) => (
-          <ListItem
-            label={
-              <div class="item-container">
-                {m(User, {
-                  user: new AddressInfo(null, item.address, item.chain, null),
-                  avatarOnly: true,
-                  avatarSize: 18,
-                })}
-                {item.name ? (
-                  <div class="item-and-address">
-                    <CWText noWrap type="caption" fontWeight="medium">
-                      {item.name}
-                    </CWText>
-                    <CWText noWrap type="caption" className="address-text">
-                      {item.address}
-                    </CWText>
-                  </div>
-                ) : (
+    return m(InputSelect, {
+      class: 'AddressInputTypeahead',
+      cacheItems: true,
+      checkmark: false,
+      closeOnSelect: true,
+      itemRender: (item: AddressInputTypeaheadItem) =>
+        m(ListItem, {
+          label: (
+            <div class="item-container">
+              {m(User, {
+                user: new AddressInfo(null, item.address, item.chain, null),
+                avatarOnly: true,
+                avatarSize: 18,
+              })}
+              {item.name ? (
+                <div class="item-and-address">
                   <CWText noWrap type="caption" fontWeight="medium">
+                    {item.name}
+                  </CWText>
+                  <CWText noWrap type="caption" className="address-text">
                     {item.address}
                   </CWText>
-                )}
-              </div>
-            }
-            selected={
-              this.selectedItem && this.selectedItem.address === item.address
-            }
-          />
-        )}
-        itemPredicate={(query: string, item: AddressInputTypeaheadItem) => {
-          return (
-            item.address.toLowerCase().includes(query.toLowerCase()) ||
-            item.name?.toLowerCase().includes(query.toLowerCase())
-          );
-        }}
-        onSelect={(item: AddressInputTypeaheadItem) => {
-          this.selectedItem = item;
-          if (oninput) oninput(item);
-          m.redraw();
-        }}
-        inputAttrs={{
-          fluid: options.fluid,
-          placeholder: options.placeholder,
-          autocomplete: 'xyz123',
-        }}
-        popoverAttrs={{
-          hasArrow: false,
-          class: 'AddressInputTypeaheadPopover',
-          portalAttrs: {
-            class: 'AddressInputTypeaheadPopoverPortal',
-          },
-        }}
-        value={this.selectedItem?.address}
-        items={this.typeaheadAddresses}
-        loading={this.loading}
-      />
-    );
+                </div>
+              ) : (
+                <CWText noWrap type="caption" fontWeight="medium">
+                  {item.address}
+                </CWText>
+              )}
+            </div>
+          ),
+          selected:
+            this.selectedItem && this.selectedItem.address === item.address,
+        }),
+      itemPredicate: (query: string, item: AddressInputTypeaheadItem) => {
+        return (
+          item.address.toLowerCase().includes(query.toLowerCase()) ||
+          item.name?.toLowerCase().includes(query.toLowerCase())
+        );
+      },
+      onSelect: (item: AddressInputTypeaheadItem) => {
+        this.selectedItem = item;
+        if (oninput) oninput(item);
+        m.redraw();
+      },
+      inputAttrs: {
+        fluid: options.fluid,
+        placeholder: options.placeholder,
+        autocomplete: 'xyz123',
+      },
+      popoverAttrs: {
+        hasArrow: false,
+        class: 'AddressInputTypeaheadPopover',
+        portalAttrs: {
+          class: 'AddressInputTypeaheadPopoverPortal',
+        },
+      },
+      value: this.selectedItem?.address,
+      items: this.typeaheadAddresses,
+      loading: this.loading,
+    });
   }
 }
