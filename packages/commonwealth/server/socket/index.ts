@@ -194,8 +194,9 @@ export async function setupWebSocketServer(
 
     await rabbitController.init();
     await rabbitController.startSubscription(
-      publishToCERoom.bind(ceNamespace),
-      RascalSubscriptions.ChainEventNotifications
+      publishToCERoom,
+      RascalSubscriptions.ChainEventNotifications,
+      {server: ceNamespace}
     );
   } catch (e) {
     log.error(
