@@ -7,14 +7,14 @@ import 'components/component_kit/cw_avatar.scss';
 
 import { ComponentType } from './types';
 
-type AvatarAttrs = {
+type BaseAvatarAttrs = {
   size: number;
 };
 
-export class CWAvatar
-  implements m.ClassComponent<AvatarAttrs & { avatarUrl: string }>
-{
-  view(vnode) {
+type AvatarAttrs = BaseAvatarAttrs & { avatarUrl: string };
+
+export class CWAvatar implements m.ClassComponent<AvatarAttrs> {
+  view(vnode: m.Vnode<AvatarAttrs>) {
     const { avatarUrl, size } = vnode.attrs;
 
     return (
@@ -26,10 +26,10 @@ export class CWAvatar
   }
 }
 
-export class CWJdenticon
-  implements m.ClassComponent<AvatarAttrs & { address?: string }>
-{
-  view(vnode) {
+type JdenticonAttrs = BaseAvatarAttrs & { address?: string };
+
+export class CWJdenticon implements m.ClassComponent<JdenticonAttrs> {
+  view(vnode: m.Vnode<JdenticonAttrs>) {
     const { address, size } = vnode.attrs;
     if (!address) return null;
 
