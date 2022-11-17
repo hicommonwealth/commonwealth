@@ -380,36 +380,36 @@ export async function isAnyonePermitted(
   }
 }
 
-export async function checkActiveAddressPermitted(
+export async function checkReadPermitted(
   models: DB,
-  user_id: number,
   chain_id: string,
   action: Action,
-  next: NextFunction
-): Promise<void> {
-  // get active address
-  const activeAddressInstance = await getActiveAddress(
-    models,
-    user_id,
-    chain_id
-  );
-
-  if (activeAddressInstance) {
-    // check if the user has permission to view the channel
-    const permission_error = await isAddressPermitted(
+  user_id?: number,
+) {
+  if (user_id) {
+    // get active address
+    const activeAddressInstance = await getActiveAddress(
       models,
-      activeAddressInstance.id,
-      chain_id,
-      action
+      user_id,
+      chain_id
     );
 
-    if (permission_error === PermissionError.NOT_PERMITTED) {
-      return next(new AppError(PermissionError.NOT_PERMITTED));
+    if (activeAddressInstance) {
+      // check if the user has permission to view the channel
+      const permission_error = await isAddressPermitted(
+        models,
+        activeAddressInstance.id,
+        chain_id,
+        action
+      );
+      if (permission_error) {
+        throw new AppError(permission_error);
+      }
+      return;
     }
-  } else {
-    const permission_error = await isAnyonePermitted(models, chain_id, action);
-    if (permission_error === PermissionError.NOT_PERMITTED) {
-      return next(new AppError(PermissionError.NOT_PERMITTED));
-    }
+  }
+  const permission_error = await isAnyonePermitted(models, chain_id, action);
+  if (permission_error) {
+    throw new AppError(permission_error);
   }
 }

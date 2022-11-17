@@ -1,61 +1,37 @@
-import { NextFunction, Request, Response } from 'express';
-import { Action, PermissionError } from 'common-common/src/permissions';
-import {
-  checkActiveAddressPermitted,
-  isAnyonePermitted,
-} from '../../util/roles';
+import { Action } from 'common-common/src/permissions';
 import { DB } from '../../models';
+import { ChatChannelAttributes } from '../../models/chat_channel';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
 import { AppError } from '../../util/errors';
+import {
+  checkReadPermitted
+} from '../../util/roles';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
-  NoValidAddress: 'No valid address',
   NoCommunityId: 'No community id given',
 };
 
-/**
- * Gets all relevant messages of a community. A user must be logged in, and they must have a valid address in the
- * community whose chat messages they are trying to view. Or the community must be public.
- * @param models
- * @param req
- * @param res
- * @param next
- */
+type GetChatMessagesReq = {
+  chain_id: string;
+}
+
+type GetChatMessagesResp = ChatChannelAttributes[];
+
 export default async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestQuery<GetChatMessagesReq>,
+  res: TypedResponse<GetChatMessagesResp>,
 ) => {
-  if (!req.user) {
-    const permission_error = await isAnyonePermitted(
-      models,
-      req.query.chain_id,
-      Action.VIEW_CHAT_CHANNELS
-    );
-    if (permission_error === PermissionError.NOT_PERMITTED) {
-      return next(new AppError(PermissionError.NOT_PERMITTED));
-    }
-  }
-
-  // check address
-  const addressAccount = await models.Address.findOne({
-    where: {
-      address: req.query.address,
-      user_id: req.user.id,
-    },
-  });
-  if (!addressAccount) {
-    return next(new AppError(Errors.NoValidAddress));
-  }
-
-  // check community id
   if (!req.query.chain_id) {
-    return next(new AppError(Errors.NoCommunityId));
+    throw new AppError(Errors.NoCommunityId);
   }
 
-  // checks if the user has permission to view the channel and throws error if not
-  await checkActiveAddressPermitted(models, req.user.id, req.query.chain_id, Action.VIEW_CHAT_CHANNELS, next);
+  await checkReadPermitted(
+    models,
+    req.query.chain_id,
+    Action.VIEW_CHAT_CHANNELS,
+    req.user?.id,
+  );
 
   // get all messages
   const messages = await models.ChatChannel.findAll({
@@ -68,5 +44,5 @@ export default async (
     },
   });
 
-  return res.json({ status: '200', result: JSON.stringify(messages) });
+  return success(res, messages.map((m) => m.toJSON()));
 };
