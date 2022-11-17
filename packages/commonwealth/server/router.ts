@@ -144,6 +144,7 @@ import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
 import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
+import fetchEtherscanContract from './routes/etherscanAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 import RuleCache from './util/rules/ruleCache';
@@ -158,8 +159,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-
-
 
 function setupRouter(
   app: Express,
@@ -239,6 +238,11 @@ function setupRouter(
     '/createContract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContract',
+    fetchEtherscanContract.bind(this, models)
   );
 
   router.post(
@@ -815,7 +819,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

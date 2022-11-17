@@ -14,11 +14,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
 import { TransactionReceipt } from 'web3-core';
-import {
-  parseAbiItemsFromABI,
-  parseFunctionsFromABI,
-  parseEventFromABI,
-} from 'helpers/abi_utils';
+import { parseFunctionsFromABI } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import {
   handleMappingAbiInputs,
@@ -55,6 +51,16 @@ class GeneralContractPage
   };
 
   view(vnode) {
+    const fetchContractAbi = async (contract: Contract) => {
+      if (contract.abi === undefined) {
+        // use the contract address to fetch the abi using controller
+        await app.contracts.checkFetchEtherscanForAbi(contract.address);
+        // TODO The UI Should In One Go show the abi form after successfully fetching the abi
+        // from etherscan, which it does not do rn
+        m.redraw();
+      }
+    };
+
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       const contract = app.contracts.getByAddress(contractAddress);
       this.state.loading = true;
@@ -125,6 +131,7 @@ class GeneralContractPage
         this.state.status = 'success';
         this.state.message = 'Contract loaded';
       }
+      fetchContractAbi(contract);
     }
 
     if (!app.contracts || !app.chain) {
