@@ -127,6 +127,10 @@ const createContract = async (
     },
   });
 
+  if (!node) {
+    return next(new Error(Errors.InvalidNodeUrl));
+  }
+
   let contract;
   if (abi != null) {
     // transactionalize contract creation
@@ -151,13 +155,15 @@ const createContract = async (
         transaction: t,
       });
 
-      await models.CommunityContract.create({
-        chain_id: community,
-        contract_id: contract.id,
-      }, { transaction: t });
-
-      return success(res, { contract: contract.toJSON() });
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
     });
+    return success(res, { contract: contract.toJSON() });
   } else {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
@@ -172,12 +178,15 @@ const createContract = async (
         },
         transaction: t,
       });
-      await models.CommunityContract.create({
-        chain_id: community,
-        contract_id: contract.id,
-      }, { transaction: t });
-      return success(res, { contract: contract.toJSON() });
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
     });
+    return success(res, { contract: contract.toJSON() });
   }
 };
 
