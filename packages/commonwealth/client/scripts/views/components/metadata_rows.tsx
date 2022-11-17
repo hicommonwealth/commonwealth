@@ -112,13 +112,13 @@ export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
     return (
       <div class="SelectRow">
         <CWLabel label={title} />
-        <Select
-          options={options}
-          onchange={(e) => {
+        {m(Select, {
+          options,
+          onchange: (e) => {
             onchange((e.currentTarget as HTMLInputElement).value);
-          }}
-          defaultValue={value}
-        />
+          },
+          defaultValue: value,
+        })}
       </div>
     );
   }
