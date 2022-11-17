@@ -140,16 +140,14 @@ const updateChain = async (
 
   for (const spaceName of snapshot) {
     // check if its in the mapping
-    if (existingSpaceNames.includes(spaceName)) {
-      continue;
-    } else {
+    if (!existingSpaceNames.includes(spaceName)) {
       const spaceModelInstance = await models.SnapshotSpace.findOrCreate({
         where: { snapshot_space: spaceName },
       });
 
       // if it isnt, create it
       await models.CommunitySnapshotSpaces.create({
-        snapshot_space_id: spaceModelInstance[0].id,
+        snapshot_space: spaceModelInstance[0].snapshot_space,
         chain_id: chain.id,
       });
     }
@@ -159,7 +157,7 @@ const updateChain = async (
   for (const removedSpace of removedSpaces) {
     await models.CommunitySnapshotSpaces.destroy({
       where: {
-        snapshot_space_id: removedSpace.snapshot_space_id,
+        snapshot_space: removedSpace.snapshot_space,
         chain_id: chain.id,
       },
     });
@@ -192,8 +190,6 @@ const updateChain = async (
   // chain.custom_domain = custom_domain;
 
   await chain.save();
-
-  console.log('snapshot', snapshot);
 
   return success(res, { ...chain.toJSON(), snapshot });
 };

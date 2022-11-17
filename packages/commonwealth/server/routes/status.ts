@@ -53,7 +53,6 @@ const status = async (
           },
           include: {
             model: models.SnapshotSpace,
-            as: 'snapshot_space',
           },
         });
 

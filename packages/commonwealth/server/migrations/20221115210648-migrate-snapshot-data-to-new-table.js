@@ -16,8 +16,8 @@ module.exports = {
       );
 
       await queryInterface.sequelize.query(
-        `INSERT INTO "CommunitySnapshotSpaces" (chain_id, snapshot_space_id, created_at, updated_at)
-          SELECT c.id, s.id, NOW(), NOW()
+        `INSERT INTO "CommunitySnapshotSpaces" (chain_id, snapshot_space, created_at, updated_at)
+          SELECT c.id, s.snapshot_space, NOW(), NOW()
           FROM (SELECT DISTINCT id, UNNEST(snapshot) as snaps FROM "Chains") c
             INNER JOIN "SnapshotSpaces" s
               ON c.snaps = s.snapshot_space;`,
@@ -31,25 +31,27 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.addcolumn(
-      'Chains',
-      'snapshot',
-      {
-        type: dataTypes.ARRAY(dataTypes.STRING),
-        allowNull: true,
-      },
-      { transaction: t }
-    );
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.addColumn(
+        'Chains',
+        'snapshot',
+        {
+          type: Sequelize.ARRAY(Sequelize.STRING),
+          allowNull: true,
+        },
+        { transaction: t }
+      );
 
-    await queryInterface.sequelize.query(
-      `UPDATE "Chains" 
-          SET snapshot = sn.snaps
-        FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
-              FROM "CommunitySnapshotSpaces" css
-              INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space_id = ss.id
-              GROUP BY css.chain_id  ) sn
-        WHERE "Chains".id = sn.chain_id;`,
-      { transaction: t }
-    );
+      await queryInterface.sequelize.query(
+        `UPDATE "Chains" 
+            SET snapshot = sn.snaps
+          FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
+                FROM "CommunitySnapshotSpaces" css
+                INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space = ss.id
+                GROUP BY css.chain_id  ) sn
+          WHERE "Chains".id = sn.chain_id;`,
+        { transaction: t }
+      );
+    });
   },
 };
