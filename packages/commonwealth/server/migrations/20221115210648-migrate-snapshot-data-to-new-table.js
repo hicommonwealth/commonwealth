@@ -47,7 +47,7 @@ module.exports = {
             SET snapshot = sn.snaps
           FROM (SELECT css.chain_id, array_agg(ss.snapshot_space) as snaps
                 FROM "CommunitySnapshotSpaces" css
-                INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space = ss.snapshot_space
+                INNER JOIN "SnapshotSpaces" ss ON css.snapshot_space_id = ss.snapshot_space
                 GROUP BY css.chain_id  ) sn
           WHERE "Chains".id = sn.chain_id;`,
         { transaction: t }
