@@ -1,44 +1,12 @@
+import fetch from 'node-fetch';
 import { DB } from '../models';
-
-function generateQuery(id: string): string {
-  const query = `
-    query {
-    proposal(id:${id}) {
-    id
-    title
-    body
-    choices
-    start
-    end
-    snapshot
-    state
-    author
-    created
-    scores
-    scores_by_strategy
-    scores_total
-    scores_updated
-    plugins
-    network
-    strategies {
-      name
-      network
-      params
-    }
-      space {
-        id
-        name
-      }
-      }
-    }`;
-  return query;
-}
 
 async function createSnapshotProposal(res: any, models: DB) {
   try {
     const createdProposal = models.SnapshotProposal.create({
       id: res.data.proposal.id,
       space: res.data.proposal.space.id,
+      event: 'fetched-from-snapshot',
       expire: res.data.proposal.end,
     });
 
@@ -48,9 +16,10 @@ async function createSnapshotProposal(res: any, models: DB) {
   }
 }
 
-export default async function processNewSnapshotProposal(id: string, models: DB) {
-  const query = generateQuery(id);
-
+export default async function fetchNewSnapshotProposal(
+  id: string,
+  models: DB
+) {
   try {
     const response = await fetch('https://hub.snapshot.org/graphql', {
       method: 'POST',
@@ -59,9 +28,20 @@ export default async function processNewSnapshotProposal(id: string, models: DB)
         Accept: 'application/json',
       },
       body: JSON.stringify({
-        query,
+        query: `
+         query($id: String!) {
+            proposal(id: $id) {
+            id
+            end
+            space {
+              id
+            }
+          }
+        }`,
+        variables: { id },
       }),
     });
+    console.log({ response });
     const json = await response.json();
     const proposal = await createSnapshotProposal(json, models);
 

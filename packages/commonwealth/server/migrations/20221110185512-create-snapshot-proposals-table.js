@@ -16,7 +16,7 @@ module.exports = {
         },
         event: {
           type: Sequelize.STRING,
-          allowNull: false,
+          allowNull: true,
         },
         expire: {
           type: Sequelize.STRING,

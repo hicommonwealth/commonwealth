@@ -28,7 +28,7 @@ export default (
     {
       id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
       space: { type: dataTypes.STRING, allowNull: false},
-      event: { type: dataTypes.STRING, allowNull: false},
+      event: { type: dataTypes.STRING, allowNull: true},
       expire: { type: dataTypes.STRING, allowNull: false},
     }
   );
