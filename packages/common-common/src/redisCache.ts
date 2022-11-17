@@ -50,14 +50,14 @@ export class RedisCache {
       const redisOptions = {};
       redisOptions['url'] = redis_url;
 
-      if (localRedis || vultrRedis) {
+      if (redis_url.includes('rediss')) {
         redisOptions['socket'] = {
+          tls: true,
+          rejectUnauthorized: false,
           reconnectStrategy: redisRetryStrategy
         };
       } else {
         redisOptions['socket'] = {
-          tls: true,
-          rejectUnauthorized: false,
           reconnectStrategy: redisRetryStrategy
         };
       }

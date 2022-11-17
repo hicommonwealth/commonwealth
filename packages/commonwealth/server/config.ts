@@ -80,13 +80,17 @@ export const RABBITMQ_API_URI = (() => {
 })();
 
 
-// if REDIS_URL exists use that (production or local redis instance) otherwise if
-// the Vultr server info is given then use that. Undefined otherwise.
-export const REDIS_URL = process.env.REDIS_URL
-  ? process.env.REDIS_URL
-  : process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT
-  ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
-  : undefined;
+// if a tls redis url is provided then that takes priority over everything else
+// then if a normal non-tls url is provided that is the second best option (local/staging)
+// finally, if no redis url is specified we use the Vultr redis instance (vultr)
+export const REDIS_URL = (() => {
+  if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
+  if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
+  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT) // vultr
+    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
+
+  return undefined;
+})();
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
