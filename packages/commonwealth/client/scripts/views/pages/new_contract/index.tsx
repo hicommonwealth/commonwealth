@@ -18,6 +18,7 @@ import { AddContractForm } from './add_contract_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import { Spinner } from 'construct-ui';
 
 class NewContractPage implements m.ClassComponent<any> {
   private state = {
@@ -70,7 +71,7 @@ class NewContractPage implements m.ClassComponent<any> {
       <Sublayout>
         <div class="NewContractPage">
           <CWText type="h4">Add New Contract</CWText>
-          {!this.state.loadingEthChains && getActiveForm()}
+          {!this.state.loadingEthChains ? getActiveForm() : <Spinner/>}
         </div>
       </Sublayout>
     );

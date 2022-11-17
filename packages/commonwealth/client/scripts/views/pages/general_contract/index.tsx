@@ -81,13 +81,6 @@ class GeneralContractPage
       this.state.loading = true;
       let tx: string | TransactionReceipt;
 
-      // handle processing the forms inputs into their proper data types
-      const processedArgs = processAbiInputsToDataTypes(
-        fn.name,
-        fn.inputs,
-        this.state.form.functionNameToFunctionInputArgs
-      );
-
       try {
         const sender = app.user.activeAccount;
         // get querying wallet
@@ -95,12 +88,19 @@ class GeneralContractPage
           sender,
           ChainBase.Ethereum
         );
+
         // initialize daoFactory Controller
         this.generalContractsController = new GeneralContractsController(
           signingWallet.api,
           contract
         );
 
+        // handle processing the forms inputs into their proper data types
+        const processedArgs = processAbiInputsToDataTypes(
+          fn.name,
+          fn.inputs,
+          this.state.form.functionNameToFunctionInputArgs
+        );
         tx = await this.generalContractsController.callContractFunction(
           fn,
           processedArgs,
