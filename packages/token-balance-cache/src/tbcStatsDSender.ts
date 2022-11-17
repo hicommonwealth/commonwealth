@@ -1,5 +1,5 @@
 import { StatsDController, ProjectTag } from 'common-common/src/statsd';
-import { BalanceProvider } from 'index';
+import { BalanceProvider } from './types';
 
 // Class with Helper functions to send statsD
 export class TbcStatsDSender {
