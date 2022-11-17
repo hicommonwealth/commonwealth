@@ -160,8 +160,6 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 
-
-
 function setupRouter(
   app: Express,
   models: DB,
@@ -240,6 +238,11 @@ function setupRouter(
     '/createContract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContract',
+    fetchEtherscanContract.bind(this, models)
   );
 
   router.post(
@@ -807,7 +810,6 @@ function setupRouter(
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
-  router.post('/etherscanAPI/fetchEtherscanContract', fetchEtherscanContract.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
 
   // new API
@@ -817,7 +819,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

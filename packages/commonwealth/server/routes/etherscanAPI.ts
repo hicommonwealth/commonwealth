@@ -5,6 +5,7 @@ import { networkIdToName } from 'common-common/src/types';
 import { AppError } from '../util/errors';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
+import { ETHERSCAN_JS_API_KEY } from '../config';
 
 const fetchEtherscanContract = async (
   models: DB,
@@ -34,9 +35,9 @@ const fetchEtherscanContract = async (
       const network = networkIdToName[chainNode.eth_chain_id];
 
       const fqdn =
-        network === 'mainnet' ? 'api' : `api-${network.toLowerCase()}`;
-      const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${process.env.ETHERSCAN_JS_API_KEY}`;
+        network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
 
+      const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`
       axiosRetry(axios, {
         retries: 3,
         shouldResetTimeout: true,
@@ -44,13 +45,11 @@ const fetchEtherscanContract = async (
       });
 
       try {
-        const response = await axios.post(url, {}, { timeout: 3000 });
+        const response = await axios.get(url, { timeout: 3000 });
         if (response.status === 200) {
           // check if etherscan abi is available by calling the fetchEtherscanContract api route
           const etherscanContract = response.data.result[0];
           if (etherscanContract && etherscanContract['ABI'] !== '') {
-            console.log('etherscanContract', etherscanContract);
-            console.log(etherscanContract['ABI']);
             const abiString = etherscanContract['ABI'];
 
             // create new ABI

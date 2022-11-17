@@ -131,6 +131,7 @@ class GeneralContractPage
         this.state.status = 'success';
         this.state.message = 'Contract loaded';
       }
+      fetchContractAbi(contract);
     }
 
     if (!app.contracts || !app.chain) {
