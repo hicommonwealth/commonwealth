@@ -8,6 +8,7 @@ import { DB } from 'server/models';
 import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -55,8 +56,13 @@ export const fetchEtherscanContract = async (
 ) => {
   const fqdn = network === 'mainnet' ? 'api' : `api-${network.toLowerCase()}`;
   const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${process.env.ETHERSCAN_JS_API_KEY}`;
+  axiosRetry(axios, {
+    retries: 3,
+    shouldResetTimeout: true,
+    retryCondition: (_error) => true, // retry no matter what
+  });
   axios
-    .post(url)
+    .post(url, {}, {timeout: 3000})
     .then((response) => {
       console.log(`statusCode: ${response.status}`);
       console.log(response.data);
@@ -187,9 +193,9 @@ const createContract = async (
   } else {
     // check if etherscan abi is available by calling the fetchEtherscanContract api route
 
-    const etherscanAbi = await fetchEtherscanContract("mainnet", address);
+    const etherscanAbi = await fetchEtherscanContract('mainnet', address);
 
-    console.log("etherscanAbi", etherscanAbi);
+    console.log('etherscanAbi', etherscanAbi);
 
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
