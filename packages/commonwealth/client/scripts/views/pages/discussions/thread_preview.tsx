@@ -74,10 +74,10 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
           <div class="row-subheader">
             {thread.readOnly && (
               <div class="discussion-locked">
-                <Tag
-                  size="xs"
-                  label={<CWIcon iconName="lock" iconSize="small" />}
-                />
+                {m(Tag, {
+                  size: 'xs',
+                  label: <CWIcon iconName="lock" iconSize="small" />,
+                })}
               </div>
             )}
             {thread.hasPoll && (
@@ -90,20 +90,18 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                 })
                 .map((ce) => {
                   if (!chainEntityTypeToProposalShortName(ce.type)) return;
-                  return (
-                    <Button
-                      label={[
-                        chainEntityTypeToProposalShortName(ce.type),
-                        Number.isNaN(parseInt(ce.typeId, 10))
-                          ? ''
-                          : ` #${ce.typeId}`,
-                      ]}
-                      intent="primary"
-                      class="proposal-button"
-                      size="xs"
-                      compact={true}
-                    />
-                  );
+                  return m(Button, {
+                    label: [
+                      chainEntityTypeToProposalShortName(ce.type),
+                      Number.isNaN(parseInt(ce.typeId, 10))
+                        ? ''
+                        : ` #${ce.typeId}`,
+                    ],
+                    intent: 'primary',
+                    class: 'proposal-button',
+                    size: 'xs',
+                    compact: true,
+                  });
                 })}
             {thread.snapshotProposal && (
               <Button

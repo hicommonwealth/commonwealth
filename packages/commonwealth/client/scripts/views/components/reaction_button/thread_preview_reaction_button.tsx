@@ -104,22 +104,20 @@ export class ThreadPreviewReactionButton
       </div>
     );
 
-    return likes > 0 ? (
-      <Popover
-        interactionType="hover"
-        content={
-          <div class="reaction-button-tooltip-contents">
-            {getDisplayedReactorsForPopup({
-              likes,
-              reactors: this.reactors,
-            })}
-          </div>
-        }
-        trigger={reactionButtonComponent}
-        hoverOpenDelay={100}
-      />
-    ) : (
-      reactionButtonComponent
-    );
+    return likes > 0
+      ? m(Popover, {
+          interactionType: 'hover',
+          content: (
+            <div class="reaction-button-tooltip-contents">
+              {getDisplayedReactorsForPopup({
+                likes,
+                reactors: this.reactors,
+              })}
+            </div>
+          ),
+          trigger: reactionButtonComponent,
+          hoverOpenDelay: 100,
+        })
+      : reactionButtonComponent;
   }
 }
