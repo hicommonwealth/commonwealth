@@ -17,21 +17,20 @@ const getSnapshotProposal = async (
 ) => {
   try {
     const { id } = req.query;
-    console.log({ id });
     if (!id) {
-      throw new AppError(Errors.NoId);
+      return res.status(400).json({ error: Errors.NoId });
     }
+
     const proposal = await models.SnapshotProposal.findOne({
       where: { id },
     });
 
-    console.log({ proposal });
 
     if (!proposal) {
-      console.log('no proposal found');
       const createdProposal = await fetchNewSnapshotProposal(id, models);
       return res.json({ status: 'Success', result: createdProposal.toJSON() });
     }
+
     return res.json({ status: 'success', result: id });
   } catch (err) {
     console.log(err);

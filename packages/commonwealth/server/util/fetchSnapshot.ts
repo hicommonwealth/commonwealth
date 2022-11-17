@@ -41,7 +41,7 @@ export default async function fetchNewSnapshotProposal(
         variables: { id },
       }),
     });
-    console.log({ response });
+
     const json = await response.json();
     const proposal = await createSnapshotProposal(json, models);
 
