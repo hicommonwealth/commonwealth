@@ -14,11 +14,7 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
 import { TransactionReceipt } from 'web3-core';
-import {
-  parseAbiItemsFromABI,
-  parseFunctionsFromABI,
-  parseEventFromABI,
-} from 'helpers/abi_utils';
+import { parseFunctionsFromABI } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
 import {
   handleMappingAbiInputs,
@@ -58,7 +54,7 @@ class GeneralContractPage
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
         // use the contract address to fetch the abi using controller
-        await app.contracts.checkEtherscanForAbi(contract.address);
+        await app.contracts.checkFetchEtherscanForAbi(contract.address);
         // TODO The UI Should In One Go show the abi form after successfully fetching the abi
         // from etherscan, which it does not do rn
         m.redraw();

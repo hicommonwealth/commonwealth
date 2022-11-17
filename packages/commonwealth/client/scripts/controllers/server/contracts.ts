@@ -68,7 +68,8 @@ class ContractsController {
       );
       console.log(response);
       const resultContract: ContractAttributes = response['result']['contract'];
-      const resultAbi: ContractAbiAttributes = response['result']['contractAbi'];
+      const resultAbi: ContractAbiAttributes =
+        response['result']['contractAbi'];
       this.update(resultAbi.abi, resultContract);
     } catch (err) {
       console.log('Failed to fetch abi from etherscan', err);
@@ -187,7 +188,12 @@ class ContractsController {
       try {
         let abiJson: Array<Record<string, unknown>>;
         if (contract.ContractAbi) {
-          abiJson = JSON.parse(contract.ContractAbi.abi);
+          // Necessary because the contract abi was stored as a string in some contracts
+          if (typeof contract.ContractAbi.abi === 'string') {
+            abiJson = JSON.parse(contract.ContractAbi.abi);
+          } else {
+            abiJson = contract.ContractAbi.abi;
+          }
         }
         this._store.add(
           Contract.fromJSON({
