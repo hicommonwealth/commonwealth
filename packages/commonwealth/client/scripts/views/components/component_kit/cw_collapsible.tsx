@@ -15,7 +15,7 @@ type CollapsibleAttrs = {
 export class CWCollapsible implements m.ClassComponent<CollapsibleAttrs> {
   private isExpanded: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CollapsibleAttrs>) {
     const { collapsibleContent, headerContent } = vnode.attrs;
 
     return (
