@@ -10,8 +10,13 @@ import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { CWTooltip } from './cw_tooltip';
 
-export class CWAddressTooltip implements m.ClassComponent<{ address: string }> {
-  view(vnode) {
+type AddressTooltipAttrs = {
+  address: string;
+  trigger: m.Vnode;
+};
+
+export class CWAddressTooltip implements m.ClassComponent<AddressTooltipAttrs> {
+  view(vnode: m.Vnode<AddressTooltipAttrs>) {
     const { address, trigger } = vnode.attrs;
 
     return (

@@ -26,7 +26,7 @@ type AvatarUsernameInputAttrs = {
 export class CWAvatarUsernameInput
   implements m.ClassComponent<AvatarUsernameInputAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<AvatarUsernameInputAttrs>) {
     const {
       account,
       address,

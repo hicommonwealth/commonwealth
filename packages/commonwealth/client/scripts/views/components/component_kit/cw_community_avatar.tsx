@@ -19,7 +19,7 @@ type CommunityAvatarAttrs = {
 export class CWCommunityAvatar
   implements m.ClassComponent<CommunityAvatarAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<CommunityAvatarAttrs>) {
     const { community, onclick, size = 'large' } = vnode.attrs;
 
     const sizeIsAboveLarge =
