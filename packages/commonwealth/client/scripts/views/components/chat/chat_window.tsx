@@ -93,7 +93,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
         currentChainInfo,
         Action.VIEW_CHAT_CHANNELS
       );
-    // TODO: if hideChat, get out of here
+    if (this.hideChat) return;
 
     this.shouldScroll = true;
     this.shouldScrollToHighlight = Boolean(m.route.param('message'));
@@ -123,7 +123,8 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
   }
 
   view(vnode) {
-    // TODO: if hideChat => don't show anything
+    if (this.hideChat) return;
+
     const { channel_id } = vnode.attrs;
     app.socket.chatNs.readMessages(channel_id);
     this.channel = app.socket.chatNs.channels[channel_id];
