@@ -100,7 +100,7 @@ class ContractsController {
     chain_node_id: number,
     node_url: string,
     address: string,
-    abi: JSON,
+    abi: string,
     contractType: ContractType,
     symbol: string,
     token_name: string,
