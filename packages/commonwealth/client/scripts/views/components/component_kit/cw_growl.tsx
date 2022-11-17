@@ -7,7 +7,6 @@ import 'components/component_kit/cw_growl.scss';
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { CWPortal } from './cw_portal';
 
 type GrowlPosition = 'bottom-left' | 'bottom-right';
 
@@ -19,7 +18,7 @@ type GrowlAttrs = {
 };
 
 export class CWGrowl implements m.ClassComponent<GrowlAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<GrowlAttrs>) {
     const { className, position, disabled } = vnode.attrs;
     return (
       !disabled && (

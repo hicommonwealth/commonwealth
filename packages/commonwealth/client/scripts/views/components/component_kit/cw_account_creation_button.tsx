@@ -17,7 +17,7 @@ type AccountCreationButtonAttrs = {
 export class CWAccountCreationButton
   implements m.ClassComponent<AccountCreationButtonAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<AccountCreationButtonAttrs>) {
     const { creationType = 'newAccount', onclick } = vnode.attrs;
 
     return (
