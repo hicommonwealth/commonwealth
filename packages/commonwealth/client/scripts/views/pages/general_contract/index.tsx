@@ -17,7 +17,6 @@ import { TransactionReceipt } from 'web3-core';
 import {
   parseAbiItemsFromABI,
   parseFunctionsFromABI,
-  getEtherscanABI,
   parseEventFromABI,
 } from 'helpers/abi_utils';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
@@ -55,27 +54,7 @@ class GeneralContractPage
     },
   };
 
-  loadAbiFromEtherscan = async (
-    contractAddress: string
-  ): Promise<Array<Record<string, unknown>>> => {
-    try {
-      return await getEtherscanABI('mainnet', contractAddress);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   view(vnode) {
-    const fetchContractAbi = async (contract: Contract) => {
-      if (contract.abi === undefined) {
-        const abiJson = await this.loadAbiFromEtherscan(contract.address);
-        await app.contracts.addContractAbi(contract, abiJson);
-        // TODO The UI Should In One Go show the abi form after successfully fetching the abi
-        // from etherscan, which it does not do rn
-        m.redraw();
-      }
-    };
-
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       const contract = app.contracts.getByAddress(contractAddress);
       this.state.loading = true;
@@ -146,7 +125,6 @@ class GeneralContractPage
         this.state.status = 'success';
         this.state.message = 'Contract loaded';
       }
-      fetchContractAbi(contract);
     }
 
     if (!app.contracts || !app.chain) {

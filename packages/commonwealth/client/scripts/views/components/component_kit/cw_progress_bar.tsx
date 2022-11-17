@@ -21,7 +21,7 @@ type ProgressBarAttrs = {
 };
 
 export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ProgressBarAttrs>) {
     const { label, progress, progressStatus, subtext, iconName } = vnode.attrs;
 
     return (

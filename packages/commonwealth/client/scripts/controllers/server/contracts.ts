@@ -4,11 +4,13 @@ import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
 import { BalanceType, ContractType } from 'common-common/src/types';
-import { TypedResponse } from 'server/types';
-import { ContractAttributes } from 'server/models/contract';
-import { ContractAbiAttributes } from 'server/models/contract_abi';
-import { CreateContractResp } from 'server/routes/contracts/createContract';
-import { CreateContractAbiResp } from 'server/routes/contractAbis/createContractAbi';
+import {
+  ContractAbiAttributes,
+  ContractAttributes,
+  CreateContractAbiResp,
+  CreateContractResp,
+  TypedResponse,
+} from './types';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();

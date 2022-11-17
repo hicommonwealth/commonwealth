@@ -19,7 +19,7 @@ export type ProfileRowAttrs = {
 } & ProfileRowStyleAttrs;
 
 export class CWProfileRow implements m.ClassComponent<ProfileRowAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ProfileRowAttrs>) {
     const { darkMode, isSelected, onclick, name } = vnode.attrs;
 
     return (
@@ -54,7 +54,7 @@ type ProfilesListAttrs = {
 };
 
 export class CWProfilesList implements m.ClassComponent<ProfilesListAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ProfilesListAttrs>) {
     const { darkMode, onclick, profiles } = vnode.attrs;
 
     return (

@@ -69,25 +69,3 @@ export function parseEventFromABI(abi: Array<Record<string, unknown>>, eventName
   }
   return eventItem;
 }
-
-function getSourceCodeEndpoint(network: chain, address: string): string {
-  // Ethers JS default API key
-  const apiKey = "8FG3JMZ9USS4NTA6YKEKHINU56SEPPVBJR";
-
-  const fqdn =
-    network === "mainnet" ? "api" : `api-${network.toLowerCase()}`;
-
-  return `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${apiKey}`;
-}
-
-export async function getEtherscanABI(network: chain, address: string): Promise<Array<Record<string,unknown>>> {
-  try {
-    console.log("fetching from etherscan...");
-    const resp = await fetch(getSourceCodeEndpoint(network, address));
-    const data = await resp.json();
-    const respResult = data.result[0];
-    return respResult.ABI;
-  } catch (e) {
-    console.log("error", e);
-  }
-}
