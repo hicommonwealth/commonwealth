@@ -37,10 +37,10 @@ type TextStyleAttrs = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;
-  fontWeight: FontWeight;
+  fontWeight?: FontWeight;
   isCentered?: boolean;
   noWrap?: boolean; // parent must be flex container and have definite width for this to work
-  type: FontType;
+  type?: FontType;
 };
 
 type TextAttrs = {
@@ -59,7 +59,7 @@ const getFontWeight = (type: FontType) => {
 };
 
 export class CWText implements m.ClassComponent<TextAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TextAttrs>) {
     const {
       className,
       disabled = false,
