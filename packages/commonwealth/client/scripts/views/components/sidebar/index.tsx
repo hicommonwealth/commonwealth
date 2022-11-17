@@ -4,14 +4,10 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
+import { Action } from 'common-common/src/permissions';
+
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
-import {
-  Action,
-  BASE_PERMISSIONS,
-  computePermissions,
-  PermissionError,
-} from 'common-common/src/permissions';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
