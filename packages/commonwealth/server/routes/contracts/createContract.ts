@@ -1,14 +1,10 @@
 import { NextFunction } from 'express';
 import Web3 from 'web3';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
 import { DB } from 'server/models';
 import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -50,30 +46,6 @@ export type CreateContractResp = {
   contract: ContractAttributes;
 };
 
-export const fetchEtherscanContract = async (
-  network: string,
-  address: string
-) => {
-  const fqdn = network === 'mainnet' ? 'api' : `api-${network.toLowerCase()}`;
-  const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${process.env.ETHERSCAN_JS_API_KEY}`;
-  axiosRetry(axios, {
-    retries: 3,
-    shouldResetTimeout: true,
-    retryCondition: (_error) => true, // retry no matter what
-  });
-  axios
-    .post(url, {}, { timeout: 3000 })
-    .then((response) => {
-      console.log(`statusCode: ${response.status}`);
-      console.log(response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      return null;
-    });
-};
-
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
@@ -100,11 +72,11 @@ const createContract = async (
     return next(new Error(Errors.NotAdmin));
   }
 
-  if (abi && (Object.keys(abi) as Array<string>).length === 0) {
+  if (abi !== '' && (Object.keys(abi) as Array<string>).length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
   let abiAsRecord: Array<Record<string, unknown>>;
-  if (abi) {
+  if (abi !== '') {
     try {
       // Parse ABI to validate it as a properly formatted ABI
       abiAsRecord = JSON.parse(abi);
@@ -158,7 +130,7 @@ const createContract = async (
   }
 
   let contract;
-  if (abi != null) {
+  if (abi !== '') {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
       const contract_abi = await models.ContractAbi.create(
@@ -191,12 +163,6 @@ const createContract = async (
     });
     return success(res, { contract: contract.toJSON() });
   } else {
-    // check if etherscan abi is available by calling the fetchEtherscanContract api route
-
-    const etherscanAbi = await fetchEtherscanContract('mainnet', address);
-
-    console.log('etherscanAbi', etherscanAbi);
-
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
       [contract] = await models.Contract.findOrCreate({

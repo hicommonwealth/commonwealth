@@ -1,5 +1,5 @@
 import $ from 'jquery';
-
+import { Response } from 'express';
 import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
@@ -57,6 +57,25 @@ class ContractsController {
     this.update(resultAbi.abi, resultContract);
     return response;
   }
+
+  public async checkFetchEtherscanForAbi(address: string) {
+    try {
+      const response: Response = await $.post(
+        `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
+        {
+          address,
+        }
+      );
+      console.log(response);
+      const resultContract: ContractAttributes = response['result']['contract'];
+      const resultAbi: ContractAbiAttributes = response['result']['contractAbi'];
+      this.update(resultAbi.abi, resultContract);
+    } catch (err) {
+      console.log('Failed to fetch abi from etherscan', err);
+      throw new Error(err);
+    }
+  }
+
   public async update(
     contractAbi: Array<Record<string, unknown>>,
     contractAttributes: ContractAttributes

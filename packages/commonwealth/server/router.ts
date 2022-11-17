@@ -144,6 +144,7 @@ import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
 import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
+import fetchEtherscanContract from './routes/etherscanAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
 import RuleCache from './util/rules/ruleCache';
@@ -806,6 +807,7 @@ function setupRouter(
   router.get('/bulkEntities', bulkEntities.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  router.post('/etherscanAPI/fetchEtherscanContract', fetchEtherscanContract.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
 
   // new API

@@ -55,6 +55,16 @@ class GeneralContractPage
   };
 
   view(vnode) {
+    const fetchContractAbi = async (contract: Contract) => {
+      if (contract.abi === undefined) {
+        // use the contract address to fetch the abi using controller
+        await app.contracts.checkEtherscanForAbi(contract.address);
+        // TODO The UI Should In One Go show the abi form after successfully fetching the abi
+        // from etherscan, which it does not do rn
+        m.redraw();
+      }
+    };
+
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       const contract = app.contracts.getByAddress(contractAddress);
       this.state.loading = true;
