@@ -153,3 +153,6 @@ export const networkIdToName = {
   5: Network.Goerli,
   42: Network.Kovan,
 };
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
+}
