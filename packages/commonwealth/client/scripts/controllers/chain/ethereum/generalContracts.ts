@@ -33,11 +33,11 @@ export default class GeneralContractsController {
   public web3Contract: Web3Contract;
   public isFactory: boolean;
 
-  constructor(contract: Contract) {
+  constructor(web3: Web3, contract: Contract) {
     this.isFactory = contract.isFactory;
     this.contract = contract;
     try {
-      this.web3Contract = new this.web3.eth.Contract(
+      this.web3Contract = new web3.eth.Contract(
         parseAbiItemsFromABI(this.contract.abi),
         this.contract.address
       );

@@ -89,16 +89,16 @@ class GeneralContractPage
       );
 
       try {
-        // initialize daoFactory Controller
-        this.generalContractsController = new GeneralContractsController(
-          contract
-        );
-
         const sender = app.user.activeAccount;
-        //   // get querying wallet
+        // get querying wallet
         const signingWallet = await app.wallets.locateWallet(
           sender,
           ChainBase.Ethereum
+        );
+        // initialize daoFactory Controller
+        this.generalContractsController = new GeneralContractsController(
+          signingWallet.api,
+          contract
         );
 
         tx = await this.generalContractsController.callContractFunction(
