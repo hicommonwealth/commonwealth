@@ -124,12 +124,11 @@ const createContract = async (
   const node = await models.ChainNode.findOne({
     where: {
       id: chain_node_id,
-      balance_type,
     },
   });
 
   if (!node) {
-    return next(new Error('Node not found'));
+    return next(new Error(Errors.InvalidNodeUrl));
   }
 
   let contract;
@@ -156,10 +155,13 @@ const createContract = async (
         transaction: t,
       });
 
-      await models.CommunityContract.create({
-        chain_id: community,
-        contract_id: contract.id,
-      }, { transaction: t });
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
     });
     return success(res, { contract: contract.toJSON() });
   } else {
@@ -176,12 +178,14 @@ const createContract = async (
         },
         transaction: t,
       });
-      await models.CommunityContract.create({
-        chain_id: community,
-        contract_id: contract.id,
-      }, { transaction: t });
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
     });
-
     return success(res, { contract: contract.toJSON() });
   }
 };
