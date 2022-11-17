@@ -157,9 +157,9 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
-                <Icon
-                  name={Icons.LINK}
-                  onclick={async () => {
+                {m(Icon, {
+                  name: Icons.LINK,
+                  onclick: async () => {
                     const route = app.socket.chatNs.getRouteToMessage(
                       grp.messages[0].chat_channel_id,
                       grp.messages[0].id,
@@ -176,8 +176,8 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
                         notifyError('Could not copy link to keyboard')
                       );
                     this.shouldScroll = false;
-                  }}
-                ></Icon>
+                  },
+                })}
               </div>
               <div class="clear" />
               {grp.messages.map((msg) => (

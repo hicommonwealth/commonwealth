@@ -81,16 +81,14 @@ export function useMagicAuth(models: DB) {
               wallet_id: WalletId.Magic,
             }, { transaction: t });
 
-          if (req.body.chain) {
-            await createRole(
-              models,
-              newAddress.id,
-              'ethereum',
-              'member',
-              false,
-              t
-            );
-          }
+          await createRole(
+            models,
+            newAddress.id,
+            chainId,
+            'member',
+            false,
+            t
+          );
 
           // Automatically create subscription to their own mentions
           await models.Subscription.create({

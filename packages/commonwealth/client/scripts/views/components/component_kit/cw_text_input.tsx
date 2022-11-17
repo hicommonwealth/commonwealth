@@ -14,10 +14,11 @@ import { CWIconButton } from './cw_icon_button';
 
 type TextInputSize = 'small' | 'large';
 
-export type TextInputAttrs = {
+export type BaseTextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
+  defaultValue?: string;
   value?: string;
   iconRight?: string;
   iconRightonclick?: () => void;
@@ -53,10 +54,13 @@ type MessageRowAttrs = {
   validationStatus?: ValidationStatus;
 };
 
+type TextInputAttrs = BaseTextInputAttrs &
+  InputStyleAttrs &
+  InputInternalStyleAttrs;
+
 export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
-  view(vnode) {
-    const { hasFeedback, label, statusMessage, validationStatus, displayOnly } =
-      vnode.attrs;
+  view(vnode: m.Vnode<MessageRowAttrs>) {
+    const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
     return (
       <div
@@ -88,12 +92,13 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: m.Vnode<TextInputAttrs>) {
     const {
       autocomplete = 'off',
       autofocus,
       containerClassName,
       darkMode,
+      defaultValue,
       value,
       disabled,
       iconRight,
@@ -195,6 +200,7 @@ export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
               }
             }}
             value={value}
+            defaultValue={defaultValue}
           />
           {iconRightonclick && !!iconRight && !disabled ? (
             <div class="text-input-right-onclick-icon">

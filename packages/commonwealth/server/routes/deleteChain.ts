@@ -76,162 +76,161 @@ const deleteChain = async (
     return next(new AppError(Errors.AdminPresent));
   }
 
-  await models.sequelize.transaction(async (t) => {
-    await models.ChainEntity.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
+  // eslint-disable-next-line no-new
+  new Promise(async (resolve, reject) => {
+    await models.sequelize.transaction(async (t) => {
+      await models.ChainEntity.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
 
-    await models.User.update(
-      {
-        selected_chain_id: null,
-      },
-      {
+      await models.User.update(
+        {
+          selected_chain_id: null,
+        },
+        {
+          where: {
+            selected_chain_id: chain.id,
+          },
+          transaction: t,
+        }
+      );
+
+      await models.Reaction.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
+
+      await models.Comment.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
+
+      await models.Topic.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
+
+      await models.Role.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
+
+      await models.InviteCode.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
+
+      await models.Subscription.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
+
+      await models.Webhook.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
+
+      const threads = await models.Thread.findAll({
+        where: { chain: chain.id },
+      });
+
+      await models.Collaboration.destroy({
+        where: { thread_id: { [Op.in]: threads.map((thread) => thread.id) } },
+        transaction: t,
+      });
+
+      await models.LinkedThread.destroy({
         where: {
-          selected_chain_id: chain.id,
+          linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
         },
         transaction: t,
-      }
-    );
+      });
 
-    await models.Reaction.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
+      await models.Vote.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    await models.Comment.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
+      await models.Poll.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    await models.Topic.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.Thread.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
 
-    await models.Role.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.StarredCommunity.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
 
-    await models.InviteCode.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      const addresses = await models.Address.findAll({
+        where: { chain: chain.id },
+      });
 
-    await models.Subscription.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.OffchainProfile.destroy({
+        where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
+        transaction: t,
+      });
 
-    await models.Webhook.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.ChainCategory.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    const threads = await models.Thread.findAll({
-      where: { chain: chain.id },
-    });
+      await models.CommunityBanner.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    await models.Collaboration.destroy({
-      where: { thread_id: { [Op.in]: threads.map((thread) => thread.id) } },
-      transaction: t,
-    });
+      await models.ChainEventType.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
 
-    await models.LinkedThread.destroy({
-      where: {
-        linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
-      },
-      transaction: t,
-    });
+      // notifications + notifications_read (cascade)
+      await models.Notification.destroy({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    await models.Vote.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.RoleAssignment.destroy({
+        where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
+        transaction: t,
+      });
 
-    await models.Poll.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
+      await models.Address.destroy({
+        where: { chain: chain.id },
+        transaction: t,
+      });
 
-    await models.Thread.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
+      const communityRoles = await models.CommunityRole.findAll({
+        where: { chain_id: chain.id },
+        transaction: t,
+      });
 
-    await models.StarredCommunity.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
+      await models.RoleAssignment.destroy({
+        where: {
+          community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
+        },
+        transaction: t,
+      });
 
-    const addresses = await models.Address.findAll({
-      where: { chain: chain.id },
-    });
+      await Promise.all(
+        communityRoles.map((r) => r.destroy({ transaction: t }))
+      );
 
-    await models.OffchainProfile.destroy({
-      where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-      transaction: t,
-    });
-
-    await models.ChainCategory.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
-
-    await models.CommunityBanner.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
-
-    await models.ChainEventType.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
-
-    // notifications + notifications_read (cascade)
-    await models.Notification.destroy({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
-
-    await models.RoleAssignment.destroy({
-      where: {
-        address_id: { [Op.in]: addresses.map((a) => a.id) },
-      },
-    });
-
-    await models.RoleAssignment.destroy({
-      where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
-      transaction: t,
-    });
-
-    await models.Address.destroy({
-      where: { chain: chain.id },
-      transaction: t,
-    });
-
-    const communityRoles = await models.CommunityRole.findAll({
-      where: { chain_id: chain.id },
-      transaction: t,
-    });
-
-    await models.RoleAssignment.destroy({
-      where: {
-        community_role_id: { [Op.in]: communityRoles.map((r) => r.id) },
-      },
-      transaction: t,
-    });
-
-    await Promise.all(communityRoles.map((r) => r.destroy({ transaction: t })));
-
-    await models.Chain.destroy({
-      where: { id: chain.id },
-      transaction: t,
+      await models.Chain.destroy({
+        where: { id: chain.id },
+        transaction: t,
+      });
     });
   });
 
-  return success(res, { result: 'Deleted Chain' });
+  return success(res, { result: 'success' });
 };
 
 export default deleteChain;
