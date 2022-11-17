@@ -101,8 +101,6 @@ class Account {
       throw new Error('signature required for validation');
     }
 
-    console.log('wtf', this.chain);
-
     const params = {
       address: this.address,
       chain: this.chain.id,
