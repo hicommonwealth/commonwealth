@@ -17,7 +17,7 @@ type BreadcrumbsAttrs = {
 };
 
 export class CWBreadcrumbs implements m.ClassComponent<BreadcrumbsAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<BreadcrumbsAttrs>) {
     const { breadcrumbs } = vnode.attrs;
 
     return (

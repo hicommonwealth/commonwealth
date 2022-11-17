@@ -16,7 +16,7 @@ type BannerAttrs = {
 };
 
 export class CWBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
@@ -34,7 +34,7 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
 }
 
 export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
