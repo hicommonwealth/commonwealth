@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
+import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
@@ -13,6 +14,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { RedisCache } from '../util/redisCache';
+import { checkReadPermitted } from '../util/roles';
 
 
 const log = factory.getLogger(addPrefix(__filename));
@@ -87,6 +89,20 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
               },
             },
           });
+
+          try {
+            if (channels?.length > 0) {
+              await checkReadPermitted(
+                models,
+                channels[0].chain_id,
+                Action.VIEW_CHAT_CHANNELS,
+                (<any>socket)?.user?.id
+              );
+            }
+          } catch (e) {
+            console.log('Not permitted to join chat channel');
+            return;
+          }
 
           for (let i = 1; i < channels.length; i++) {
             if (channels[i - 1].chain_id != channels[i].chain_id) {
