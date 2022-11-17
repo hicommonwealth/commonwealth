@@ -51,7 +51,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
   private viewType: 'sidebarView' | 'tabsView';
   private tabSelected: number;
 
-  onResize(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
+  onResize(vnode: m.Vnode<ContentPageAttrs>) {
     this.viewType =
       isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
         ? 'tabsView'
@@ -60,7 +60,7 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
     m.redraw();
   }
 
-  oninit(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
+  oninit(vnode: m.Vnode<ContentPageAttrs>) {
     this.viewType =
       isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
         ? 'tabsView'
@@ -75,13 +75,13 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
     });
   }
 
-  onremove(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
+  onremove(vnode: m.Vnode<ContentPageAttrs>) {
     window.removeEventListener('resize', () => {
       this.onResize(vnode);
     });
   }
 
-  view(vnode: m.VnodeDOM<ContentPageAttrs, this>) {
+  view(vnode: m.Vnode<ContentPageAttrs>) {
     const {
       actions,
       author,

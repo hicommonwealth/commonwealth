@@ -12,7 +12,7 @@ import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { ComponentType, MenuItem } from './types';
 
 class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
-  view(vnode: m.VnodeDOM<MenuItem, this>) {
+  view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
         vnode.attrs;
@@ -71,7 +71,7 @@ type MobileMenuAttrs = {
 };
 
 export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
-  view(vnode: m.VnodeDOM<MobileMenuAttrs, this>) {
+  view(vnode: m.Vnode<MobileMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
     return (
       <div
