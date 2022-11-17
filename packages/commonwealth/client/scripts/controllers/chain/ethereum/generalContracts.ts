@@ -28,7 +28,6 @@ type CreateFactoryEthDaoForm = ChainFormFields &
   EthDaoFormFields;
 
 export default class GeneralContractsController {
-  public web3: Web3;
   public contract: Contract;
   public web3Contract: Web3Contract;
   public isFactory: boolean;
