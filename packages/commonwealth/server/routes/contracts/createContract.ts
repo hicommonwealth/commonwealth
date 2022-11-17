@@ -62,7 +62,7 @@ export const fetchEtherscanContract = async (
     retryCondition: (_error) => true, // retry no matter what
   });
   axios
-    .post(url, {}, {timeout: 3000})
+    .post(url, {}, { timeout: 3000 })
     .then((response) => {
       console.log(`statusCode: ${response.status}`);
       console.log(response.data);
