@@ -207,7 +207,8 @@ export class ChatNamespace {
         try {
             const res = await $.get(`${app.serverUrl()}/getChatChannel`, {
                 jwt: app.user.jwt,
-                channel_id
+                channel_id,
+                chain_id: app.activeChainId()
             })
 
             if(res.status !== "200") {
