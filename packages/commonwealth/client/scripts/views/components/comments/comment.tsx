@@ -21,13 +21,12 @@ import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 
-class CommentAuthor
-  implements
-    m.Component<{
-      comment: CommentType<any>;
-    }>
-{
-  view(vnode) {
+type CommentAuthorAttrs = {
+  comment: CommentType<any>;
+};
+
+class CommentAuthor implements m.Component<CommentAuthorAttrs> {
+  view(vnode: m.Vnode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 
     // Check for accounts on forums that originally signed up on a different base chain,
@@ -74,7 +73,7 @@ export class Comment implements m.ClassComponent<CommentAttrs> {
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CommentAttrs>) {
     const {
       comment,
       handleIsReplying,

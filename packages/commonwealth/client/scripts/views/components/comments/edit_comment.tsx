@@ -25,7 +25,7 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditCommentAttrs>) {
     const {
       comment,
       savedEdits,
@@ -33,7 +33,9 @@ export class EditComment implements m.ClassComponent<EditCommentAttrs> {
       shouldRestoreEdits,
       updatedCommentsCallback,
     } = vnode.attrs;
+
     const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
+
     return (
       <div class="EditComment">
         <QuillEditorComponent

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import $ from 'jquery';
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -22,7 +22,7 @@ import { QuillEditor } from '../quill/quill_editor';
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
 
-const formatTimestampForChat = (timestamp) => {
+const formatTimestampForChat = (timestamp: moment.Moment) => {
   timestamp = moment(timestamp);
   if (timestamp.isBefore(moment().subtract(365, 'days')))
     return timestamp.format('MMM D YYYY');
@@ -76,9 +76,10 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     );
   };
 
-  oninit(vnode: VnodeDOM<ChatWindowAttrs, this>) {
+  oninit(vnode: m.VnodeDOM<ChatWindowAttrs, this>) {
     this.shouldScroll = true;
     this.shouldScrollToHighlight = Boolean(m.route.param('message'));
+
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
@@ -104,7 +105,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChatWindowAttrs>) {
     const { channel_id } = vnode.attrs;
     app.socket.chatNs.readMessages(channel_id);
     this.channel = app.socket.chatNs.channels[channel_id];
@@ -209,7 +210,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               // TODO Graham 7/20/22: I hate this usage of contentsDoc—can it be improved?
               contentsDoc=""
               oncreateBind={(state: QuillEditor) => {
-                vnode.state.quillEditorState = state;
+                this.quillEditorState = state;
               }}
               editorNamespace={`${document.location.pathname}-chatting`}
               onkeyboardSubmit={() => {
