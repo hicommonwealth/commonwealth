@@ -13,10 +13,10 @@ import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
 import { CWSpinner } from './component_kit/cw_spinner';
+import { CWIconButton } from './component_kit/cw_icon_button';
 
 const jumpHighlightNotification = (
   commentId,
@@ -368,12 +368,8 @@ const NotificationRow: m.Component<
             m('.comment-body-top.chain-event-notification-top', [
               `${label.heading} on ${chainName}`,
               !vnode.attrs.onListPage &&
-                m(CWIcon, {
+                m(CWIconButton, {
                   iconName: 'close',
-                  onmousedown: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();

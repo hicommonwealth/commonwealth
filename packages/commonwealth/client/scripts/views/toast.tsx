@@ -7,6 +7,6 @@ import app from 'state';
 
 export class AppToasts implements m.ClassComponent {
   view() {
-    return <Toaster toasts={app.toasts.getList()} />;
+    return m(Toaster, { toasts: app.toasts.getList() });
   }
 }

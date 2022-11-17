@@ -4,7 +4,11 @@ import app from 'state';
 import { Contract, NodeInfo, IWebWallet } from 'models';
 import { initAppState } from 'app';
 import { Contract as Web3Contract } from 'web3-eth-contract';
-import { RLPEncodedTransaction, TransactionConfig, TransactionReceipt } from 'web3-core/types';
+import {
+  RLPEncodedTransaction,
+  TransactionConfig,
+  TransactionReceipt,
+} from 'web3-core/types';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -31,10 +35,9 @@ export default class GeneralContractsController {
 
   constructor(web3: Web3, contract: Contract) {
     this.isFactory = contract.isFactory;
-    this.web3 = web3;
     this.contract = contract;
     try {
-      this.web3Contract = new this.web3.eth.Contract(
+      this.web3Contract = new web3.eth.Contract(
         parseAbiItemsFromABI(this.contract.abi),
         this.contract.address
       );
@@ -43,29 +46,19 @@ export default class GeneralContractsController {
     }
   }
 
-  private async contractCall(web3: Web3, tx: TransactionConfig): Promise<string> {
-    const txResult = await web3.givenProvider.request({
-      method: 'eth_call',
-      params: [tx, 'latest'],
-    });
-    return txResult;
-  }
-
-  private async sendTransaction(
-    web3: Web3,
-    tx: TransactionConfig
-  ): Promise<TransactionReceipt> {
-    return web3.eth.sendTransaction(tx);
-  }
-
   public async makeContractCall(
     to: string,
     data: string,
     wallet: IWebWallet<any>
   ) {
     try {
-      const result = await this.contractCall(wallet.api, { to, data });
-      return result;
+      const web3: Web3 = wallet.api;
+      const tx: TransactionConfig = { to, data };
+      const txResult = await web3.givenProvider.request({
+        method: 'eth_call',
+        params: [tx, 'latest'],
+      });
+      return txResult;
     } catch (error) {
       console.log(error);
     }
@@ -81,11 +74,13 @@ export default class GeneralContractsController {
   ): Promise<TransactionReceipt> {
     // Not using contractApi because it's ethers-dependent
     // Non hardhat, non ethers Web3 Lib solution for signing and submitting tx
-    return this.sendTransaction(wallet.api, {
+    const web3: Web3 = wallet.api;
+    const tx: TransactionConfig = {
       from: wallet.accounts[0],
       to,
       data,
-    });
+    };
+    return web3.eth.sendTransaction(tx);
   }
 
   public async callContractFunction(
@@ -122,7 +117,12 @@ export default class GeneralContractsController {
     }
   }
 
-  public decodeTransactionData(fn: AbiItem, tx: any): any[] {
+  public decodeTransactionData(
+    fn: AbiItem,
+    tx: any,
+    wallet: IWebWallet<any>
+  ): any[] {
+    const web3: Web3 = wallet.api;
     // simple return type
     let result;
     if (fn.outputs.length === 1) {
@@ -135,7 +135,7 @@ export default class GeneralContractsController {
           this.contract.abi,
           'ProjectCreated'
         );
-        const decodedLog = this.web3.eth.abi.decodeLog(
+        const decodedLog = web3.eth.abi.decodeLog(
           eventAbiItem.inputs,
           tx.logs[0].data,
           tx.logs[0].topics
@@ -143,15 +143,12 @@ export default class GeneralContractsController {
         console.log('decodedLog', decodedLog);
         decodedTx = decodedLog.projectAddress;
       } else {
-        decodedTx = this.web3.eth.abi.decodeParameter(
-          fn.outputs[0].type,
-          tx
-        );
+        decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
       }
       result = [];
       result.push(decodedTx);
     } else if (fn.outputs.length > 1) {
-      const decodedTxMap = this.web3.eth.abi.decodeParameters(
+      const decodedTxMap = web3.eth.abi.decodeParameters(
         fn.outputs.map((output) => output.type),
         tx
       );
@@ -167,6 +164,7 @@ export default class GeneralContractsController {
     wallet: IWebWallet<any>,
     daoForm: CreateFactoryEthDaoForm
   ) {
+    const web3: Web3 = wallet.api;
     const functionContract = this.web3Contract;
 
     const methodSignature = `${fn.name}(${fn.inputs
@@ -188,7 +186,7 @@ export default class GeneralContractsController {
         wallet
       );
       console.log('txReceipt', txReceipt);
-      const decodedLog = this.web3.eth.abi.decodeLog(
+      const decodedLog = web3.eth.abi.decodeLog(
         eventAbiItem.inputs,
         txReceipt.logs[0].data,
         txReceipt.logs[0].topics
