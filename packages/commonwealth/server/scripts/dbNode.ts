@@ -5,21 +5,21 @@ import _ from 'underscore';
 import format from 'pg-format';
 import {
   createListener,
-  SubstrateTypes,
-  SubstrateEvents,
-  IEventHandler,
   CWEvent,
+  IEventHandler,
   LoggingHandler,
+  SubstrateEvents,
+  SubstrateTypes,
   SupportedNetwork,
 } from 'chain-events/src';
 
 import { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController, StatsDTag } from 'common-common/src/statsd';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { DATABASE_URI } from '../config';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import StatsDController from '../util/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -334,7 +334,7 @@ async function mainProcess(
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
-    StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base });
+    StatsDController.get(StatsDTag.Commonwealth).increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base });
 
     // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
@@ -497,7 +497,7 @@ async function mainProcess(
   log.info('Finished scheduled process.');
 
   for (const c of Object.keys(listeners)) {
-    StatsDController.get().increment('ce.listeners-active', { chain: c });
+    StatsDController.get(StatsDTag.Commonwealth).increment('ce.listeners-active', { chain: c });
   }
   if (process.env.TESTING) {
     const listenerOptions = {};

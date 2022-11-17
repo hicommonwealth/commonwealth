@@ -1,8 +1,9 @@
-import { SubstrateTypes, CWEvent } from 'chain-events/src';
+import { CWEvent, SubstrateTypes } from 'chain-events/src';
 import * as WebSocket from 'ws';
 import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController, StatsDTag } from 'common-common/src/statsd';
 
 import EventNotificationHandler from '../eventHandlers/notifications';
 import EventStorageHandler from '../eventHandlers/storage';
@@ -13,7 +14,6 @@ import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
 import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
 import models from '../database';
-import StatsDController from '../util/statsd';
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -77,7 +77,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
-    StatsDController.get().increment(
+    StatsDController.get(StatsDTag.Commonwealth).increment(
       'ce.event',
       {
         chain: event.chain || '',
