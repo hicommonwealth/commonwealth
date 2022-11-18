@@ -1,20 +1,21 @@
 // Use https://admin.socket.io/#/ to monitor
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import {Server, Socket} from 'socket.io';
-import * as jwt from 'jsonwebtoken';
-import {ExtendedError} from 'socket.io/dist/namespace';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import * as http from 'http';
-import {createAdapter} from '@socket.io/redis-adapter';
-import {ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError} from "redis";
+import * as jwt from 'jsonwebtoken';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
 import Rollbar from 'rollbar';
-import {createCeNamespace, publishToCERoom} from './chainEventsNs';
-import {getRabbitMQConfig, RabbitMQController, RascalSubscriptions} from 'common-common/src/rabbitmq';
-import {JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP} from '../config';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {createChatNamespace} from './chatNs';
-import {DB} from '../models';
-import {RedisCache, redisRetryStrategy} from 'common-common/src/redisCache';
+import { Server, Socket } from 'socket.io';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
+import { DB } from '../models';
+import StatsDController from '../util/statsd';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { createChatNamespace } from './chatNs';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -58,12 +59,14 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
+    StatsDController.get().increment('cw.socket.connections');
     log.trace(
       `Socket connected: socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
       }`
     );
     socket.on('disconnect', () => {
+      StatsDController.get().decrement('cw.socket.connections');
       log.trace(
         `Socket disconnected: socket_id = ${socket.id}, user_id = ${
           (<any>socket).user.id
@@ -111,6 +114,7 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -142,6 +146,7 @@ export async function setupWebSocketServer(
     log.info('Redis pub-client disconnected');
   })
   subClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
