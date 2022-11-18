@@ -71,7 +71,8 @@ describe('findAllRoles and findOneRole tests', () => {
         icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
         active: false,
         type: ChainType.Token,
-        chat_enabled: false,
+        default_allow_permissions: BigInt(0),
+        default_deny_permissions: BigInt(2048),
       });
 
       newChain2 = await models.Chain.create({
@@ -84,7 +85,8 @@ describe('findAllRoles and findOneRole tests', () => {
         icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
         active: false,
         type: ChainType.Token,
-        chat_enabled: false,
+        default_allow_permissions: BigInt(0),
+        default_deny_permissions: BigInt(2048),
       });
 
       await createDefaultCommunityRoles(models, newChain.id);
