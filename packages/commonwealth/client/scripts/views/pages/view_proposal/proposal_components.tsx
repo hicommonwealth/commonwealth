@@ -22,8 +22,9 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { cancelProposal } from '../../components/proposals/helpers';
 
 type BaseCancelButtonAttrs = {
-  onModalClose?: () => void;
-  votingModalOpen?: boolean;
+  onModalClose: () => void;
+  toggleVotingModal: (newModalState: boolean) => void;
+  votingModalOpen: boolean;
 };
 
 type MolochCancelButtonAttrs = {
@@ -35,8 +36,13 @@ export class MolochCancelButton
   implements m.ClassComponent<MolochCancelButtonAttrs>
 {
   view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, molochMember, onModalClose } =
-      vnode.attrs;
+    const {
+      proposal,
+      votingModalOpen,
+      molochMember,
+      onModalClose,
+      toggleVotingModal,
+    } = vnode.attrs;
 
     return (
       <CWButton
@@ -46,7 +52,7 @@ export class MolochCancelButton
           votingModalOpen
         }
         onclick={(e) =>
-          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
       />
@@ -62,14 +68,15 @@ export class AaveCancelButton
   implements m.ClassComponent<AaveCancelButtonAttrs>
 {
   view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose } = vnode.attrs;
+    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
+      vnode.attrs;
 
     return (
       <CWButton
-        buttonType="secondary-red"
+        buttonType="primary-red"
         disabled={!proposal.isCancellable || votingModalOpen}
         onclick={(e) =>
-          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
       />
@@ -85,14 +92,15 @@ export class CompoundCancelButton
   implements m.ClassComponent<CompoundCancelButtonAttrs>
 {
   view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
-    const { proposal, votingModalOpen, onModalClose } = vnode.attrs;
+    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
+      vnode.attrs;
 
     return (
       <CWButton
         buttonType="primary-red"
         disabled={proposal.completed || votingModalOpen}
         onclick={(e) =>
-          cancelProposal(e, votingModalOpen, proposal, onModalClose)
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
       />
@@ -102,15 +110,20 @@ export class CompoundCancelButton
 
 type ProposalSubheaderAttrs = {
   proposal: AaveProposal | CompoundProposal | MolochProposal;
-  molochMember?: MolochMember;
+  molochMember: MolochMember;
 } & BaseCancelButtonAttrs;
 
 export class ProposalSubheader
   implements m.ClassComponent<ProposalSubheaderAttrs>
 {
   view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
-    const { onModalClose, proposal, molochMember, votingModalOpen } =
-      vnode.attrs;
+    const {
+      molochMember,
+      onModalClose,
+      proposal,
+      toggleVotingModal,
+      votingModalOpen,
+    } = vnode.attrs;
 
     return (
       <div class="ProposalSubheader">
@@ -148,9 +161,10 @@ export class ProposalSubheader
             />
             {proposal.isCancellable && (
               <AaveCancelButton
-                proposal={proposal}
-                votingModalOpen={votingModalOpen}
                 onModalClose={onModalClose}
+                proposal={proposal}
+                toggleVotingModal={toggleVotingModal}
+                votingModalOpen={votingModalOpen}
               />
             )}
           </div>
@@ -172,18 +186,19 @@ export class ProposalSubheader
               label={proposal.data.executed ? 'Executed' : 'Execute'}
             />
             <CompoundCancelButton
-              proposal={proposal}
-              votingModalOpen={votingModalOpen}
               onModalClose={onModalClose}
+              proposal={proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={votingModalOpen}
             />
           </div>
         )}
         {proposal instanceof MolochProposal && (
-          <CompoundCancelButton
-            proposal={proposal}
-            votingModalOpen={votingModalOpen}
-            onModalClose={onModalClose}
+          <MolochCancelButton
             molochMember={molochMember}
+            onModalClose={onModalClose}
+            proposal={proposal}
+            toggleVotingModal={toggleVotingModal}
           />
         )}
       </div>

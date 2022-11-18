@@ -62,21 +62,20 @@ class CannotVote implements m.ClassComponent<CannotVoteAttrs> {
   }
 }
 
-type VotingActionsAttrs = { proposal: AnyProposal };
+type VotingActionsAttrs = {
+  onModalClose: () => void;
+  proposal: AnyProposal;
+  toggleVotingModal: (newModalState: boolean) => void;
+  votingModalOpen: boolean;
+};
 
 export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
-  private votingModalOpen: boolean;
 
   view(vnode: m.Vnode<VotingActionsAttrs>) {
-    const { proposal } = vnode.attrs;
-    const { votingModalOpen } = this;
-
-    const onModalClose = () => {
-      this.votingModalOpen = false;
-      m.redraw();
-    };
+    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
+      vnode.attrs;
 
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;
@@ -113,7 +112,7 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
 
     const voteYes = async (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof SubstrateDemocracyProposal) {
         createTXModal(
@@ -124,12 +123,12 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
         );
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a conviction');
         }
 
         if (this.amount === 0) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a valid amount');
         }
 
@@ -187,28 +186,28 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError(
           'Unimplemented proposal type - use election voting modal'
         );
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteNo = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a conviction');
         }
 
         if (this.amount === 0) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a valid amount');
         }
 
@@ -254,14 +253,14 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const processProposal = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof MolochProposal) {
         proposal
@@ -275,14 +274,14 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
             notifyError(err.toString());
           });
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteAbstain = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -298,14 +297,14 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteVeto = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -313,14 +312,14 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteRemove = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof NearSputnikProposal) {
         proposal
@@ -336,7 +335,7 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
             notifyError(err.toString());
           });
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
