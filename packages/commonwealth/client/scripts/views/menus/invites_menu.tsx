@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { PopoverMenu, Button, Icons } from 'construct-ui';
+import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 
 import 'components/header/invites_menu.scss';
@@ -28,15 +28,6 @@ export const handleEmailInvites = (state) => {
   }
 };
 
-export const getInvitesMenuItems = () => {
-  return [
-    {
-      label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
-      onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-    },
-  ];
-};
-
 export class InvitesMenu implements m.ClassComponent {
   view() {
     return (
@@ -47,7 +38,10 @@ export class InvitesMenu implements m.ClassComponent {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={getInvitesMenuItems()}
+        menuItems={{
+          label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
+          onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+        }}
       />
     );
   }
@@ -55,39 +49,40 @@ export class InvitesMenu implements m.ClassComponent {
 
 export class InvitesMenuPopover implements m.ClassComponent {
   view() {
-    return (
-      <PopoverMenu
-        hasArrow={false}
-        transitionDuration={0}
-        hoverCloseDelay={0}
-        trigger={
-          <div class="invites-button-wrap">
-            <Button
-              iconLeft={Icons.MAIL}
-              intent="primary"
-              size="default"
-              compact
-            />
-            <div
-              class="invites-count-container"
-              style={
-                app.config.invites.length === 1
-                  ? 'padding: 2px 3px'
-                  : 'padding: 2px'
-              }
-            >
-              <div class="invites-count">{app.config.invites.length}</div>
-            </div>
+    return m(PopoverMenu, {
+      hasArrow: false,
+      transitionDuration: 0,
+      hoverCloseDelay: 0,
+      trigger: (
+        <div class="invites-button-wrap">
+          {m(Button, {
+            iconLeft: Icons.MAIL,
+            intent: 'primary',
+            size: 'default',
+            compact: true,
+          })}
+          <div
+            class="invites-count-container"
+            style={
+              app.config.invites.length === 1
+                ? 'padding: 2px 3px'
+                : 'padding: 2px'
+            }
+          >
+            <div class="invites-count">{app.config.invites.length}</div>
           </div>
-        }
-        position="bottom-end"
-        closeOnContentClick
-        closeOnOutsideClick
-        menuAttrs={{
-          align: 'left',
-        }}
-        content={getInvitesMenuItems()}
-      />
-    );
+        </div>
+      ),
+      position: 'bottom-end',
+      closeOnContentClick: true,
+      closeOnOutsideClick: true,
+      menuAttrs: {
+        align: 'left',
+      },
+      content: m(MenuItem, {
+        onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+        label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
+      }),
+    });
   }
 }

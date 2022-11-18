@@ -8,6 +8,7 @@ https://rawcdn.githack.com/rabbitmq/rabbitmq-server/v3.11.1/deps/rabbitmq_manage
  */
 
 /**
+ * FOR TESTING/SCRIPTING ONLY!
  * This function publishes a message containing the given data to the given exchange. In the event of a 400 Bad Request
  * error ensure ALL nested objects in the data object are stringified BEFORE calling this function.
  * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
@@ -40,6 +41,7 @@ export async function publishRmqMsg(
 }
 
 /**
+ * FOR TESTING/SCRIPTING ONLY!
  * This function fetches queue stats for the given queue.
  * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param queueName
@@ -50,6 +52,7 @@ export async function getQueueStats(rabbitMQUri: string, queueName: RascalQueues
 }
 
 /**
+ * FOR TESTING/SCRIPTING ONLY!
  * This functions retrieves a number of messages from the specified RabbitMQ queue
  * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param queueName The name of the queue to retrieve messages from

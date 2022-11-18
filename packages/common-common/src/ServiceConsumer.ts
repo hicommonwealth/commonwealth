@@ -1,17 +1,23 @@
 // @ts-ignore
 import crypto from "crypto";
 import { addPrefix, factory, formatFilename } from "./logging";
-import { RabbitMQController, RascalSubscriptions } from "./rabbitmq";
+import { RabbitMQController, RascalSubscriptions, TRmqMessages } from "./rabbitmq";
 import Rollbar from "rollbar";
 import { Logger } from "typescript-logging";
 
-//any should be the Message type, not any
 export type RabbitMQSubscription = {
-  messageProcessor: (...data: any[]) => Promise<any>;
+  messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;
   subscriptionName: RascalSubscriptions;
   msgProcessorContext?: { [key: string]: any };
 };
 
+/**
+ * This class is a general wrapper around RabbitMQ functionality. It initializes a RabbitMQ Controller and all the
+ * subscriptions that are passed. The subscriptions are held as state within the class, leaving room for future work
+ * to get insight into active subscriptions or for managing the currently active subscriptions. The class also
+ * initializes a logger instance with a prefix that helps identify exactly where the log came from in a multi-server
+ * architecture.
+ */
 export class ServiceConsumer {
   public readonly serviceName: string;
   public readonly serviceId: string;
@@ -81,7 +87,6 @@ export class ServiceConsumer {
         );
       }
     }
-
     this._initialized = true;
   }
 

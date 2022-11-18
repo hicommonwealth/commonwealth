@@ -13,11 +13,11 @@ export class BreadcrumbsTitleTag
     return (
       <>
         {title}
-        <Tag
-          size="xs"
-          label="Beta"
-          style="position: relative; top: -2px; margin-left: 6px"
-        />
+        {m(Tag, {
+          size: 'xs',
+          label: 'Beta',
+          style: 'position: relative; top: -2px; margin-left: 6px',
+        })}
       </>
     );
   }

@@ -126,6 +126,7 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
+  Kava = 'kava',
 }
 
 export enum BalanceType {
@@ -136,4 +137,8 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+}
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
 }

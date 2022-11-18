@@ -19,7 +19,7 @@ export type TagAttrs = {
 };
 
 export class CWTag implements m.ClassComponent<TagAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TagAttrs>) {
     const { iconName, label, status } = vnode.attrs;
 
     return (

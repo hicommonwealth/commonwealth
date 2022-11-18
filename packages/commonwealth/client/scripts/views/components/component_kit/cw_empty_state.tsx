@@ -14,8 +14,9 @@ type EmptyStateAttrs = {
 };
 
 export class CWEmptyState implements m.ClassComponent<EmptyStateAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<EmptyStateAttrs>) {
     const { content, iconName } = vnode.attrs;
+
     return (
       <div class="EmptyState">
         <div class="inner-content">

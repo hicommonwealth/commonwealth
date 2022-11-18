@@ -10,6 +10,10 @@ import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
+/**
+ * All errors related to the RabbitMQController should be of this type. If a message processing funciton throws
+ * an error of this type it will follow a different recovery strategy than if a generic error is thrown.
+ */
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
     super(msg);
@@ -24,6 +28,11 @@ class PublishError extends RabbitMQControllerError {
   }
 }
 
+/**
+ * This class encapsulates all interactions with a RabbitMQ instance. It allows publishing and subscribing to queues. To
+ * initialize the class you must have a Rascal configuration. Every publish and message processing should be done
+ * through this class as it implements error handling that is crucial to avoid data loss.
+ */
 export class RabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];
@@ -32,13 +41,9 @@ export class RabbitMQController {
   protected _initialized: boolean = false;
   protected rollbar: Rollbar;
 
-  constructor(
-    protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
-    rollbar?: Rollbar
-  ) {
+  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig, rollbar?: Rollbar) {
     // sets the first vhost config to _rawVhost
-    this._rawVhost =
-      _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
+    this._rawVhost = _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
 
     // array of subscribers
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -50,29 +55,31 @@ export class RabbitMQController {
   }
 
   public async init(): Promise<void> {
-    log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
+    log.info(
+      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`
+    );
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig)
     );
 
-    this.broker.on("error", (err, { vhost, connectionUrl }) => {
+    this.broker.on('error', (err, { vhost, connectionUrl }) => {
       log.error(
         `Broker error on vhost: ${vhost} using url: ${connectionUrl}`,
         err
       );
     });
-    this.broker.on("vhost_initialized", ({ vhost, connectionUrl }) => {
+    this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
       log.info(
         `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`
       );
     });
-    this.broker.on("blocked", (reason, { vhost, connectionUrl }) => {
+    this.broker.on('blocked', (reason, {vhost, connectionUrl}) => {
       log.warn(
         `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`
       );
     });
-    this.broker.on("unblocked", ({ vhost, connectionUrl }) => {
+    this.broker.on('unblocked', ({vhost, connectionUrl}) => {
       log.info(
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`
       );
@@ -106,6 +113,7 @@ export class RabbitMQController {
     try {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
+
       subscription.on("message", (message, content, ackOrNack) => {
         messageProcessor
           .call({ rmqController: this, ...msgProcessorContext }, content)
@@ -168,6 +176,7 @@ export class RabbitMQController {
     let publication;
     try {
       publication = await this.broker.publish(publisherName, data);
+
       publication.on("error", (err, messageId) => {
         log.error(`Publisher error ${messageId}`, err);
         this.rollbar?.warn(`Publisher error ${messageId}`, err);

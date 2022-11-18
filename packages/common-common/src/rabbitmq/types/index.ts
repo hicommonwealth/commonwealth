@@ -17,6 +17,7 @@ export class RmqMsgFormatError extends Error {
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,
   isValidMsgFormat(data: any): data is MsgType,
+  checkMsgFormat(data: any): void
 }
 
 /**
@@ -25,8 +26,8 @@ export interface RmqMsgNamespace<MsgType> {
  */
 export type TRmqMessages = 
   | RmqCWEvent.RmqMsgType
-  | RmqSnapshotEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
+  | RmqSnapshotEvent.RmqMsgType
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
@@ -73,8 +74,8 @@ export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
   ChainEventNotifications = 'ChainEventNotifications',
   SnapshotProposalNotifications = 'SnapshotProposalNotifications',
-  SubstrateIdentityEvents = 'SubstrateIdentityEvents',
   SnapshotListener = 'SnapshotListener',
-  DeadLetter = 'deadLetter'
+  SubstrateIdentityEvents = 'SubstrateIdentityEvents',
+  DeadLetter = 'DeadLetter',
 }
 
