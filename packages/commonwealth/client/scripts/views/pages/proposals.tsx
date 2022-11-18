@@ -50,6 +50,8 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
+
+
 const ProposalsPage: m.Component<{}> = {
   oncreate: () => {
     const returningFromThread =
@@ -65,6 +67,14 @@ const ProposalsPage: m.Component<{}> = {
         );
       }, 100);
     }
+  },
+
+  // eslint-disable-next-line no-restricted-globals
+  oninit() {
+    addEventListener('scroll', () => {
+      console.log('scrolling');
+      localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
+    });
   },
 
   view() {
