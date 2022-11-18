@@ -4,8 +4,14 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import {
+  BASE_PERMISSIONS,
+  computePermissions,
+  Permissions,
+} from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
+import { Permission } from 'server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -24,10 +30,7 @@ export const getNextPollEndingTime = (now) => {
   return t3;
 };
 
-export const getNextPollEndingTimeIsDangerouslyClose = (
-  now,
-  endingTime
-) => {
+export const getNextPollEndingTimeIsDangerouslyClose = (now, endingTime) => {
   now.utc().add(5, 'days');
   endingTime.utc();
 };
@@ -293,3 +296,37 @@ export const addressSwapper = (options: {
     return options.address;
   }
 };
+
+type RoleObject = {
+  permission: Permission;
+  allow: Permissions;
+  deny: Permissions;
+};
+
+export function aggregatePermissions(
+  roles: RoleObject[],
+  chain_permissions: { allow: Permissions; deny: Permissions }
+) {
+  // sort roles by roles with highest permissions last
+  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+
+  function compare(o1: RoleObject, o2: RoleObject) {
+    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  }
+  roles = roles.sort(compare);
+
+  const permissionsAllowDeny: Array<{
+    allow: Permissions;
+    deny: Permissions;
+  }> = roles;
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift(chain_permissions);
+
+  // compute permissions
+  const permission: bigint = computePermissions(
+    BASE_PERMISSIONS,
+    permissionsAllowDeny
+  );
+  return permission;
+}

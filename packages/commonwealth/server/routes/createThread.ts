@@ -8,11 +8,10 @@ import {
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
-import { Action } from 'common-common/src/permissions';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
-  PermissionError,
 } from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
