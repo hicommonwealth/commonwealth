@@ -21,7 +21,6 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
-  chat_enabled: boolean;
   id?: string;
   description?: string;
   discord?: string;
@@ -117,11 +116,6 @@ export default (
         defaultValue: true,
       },
       type: { type: dataTypes.STRING, allowNull: false },
-      chat_enabled: {
-        type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
