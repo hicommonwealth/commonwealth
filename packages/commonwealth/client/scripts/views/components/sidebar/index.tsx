@@ -4,8 +4,11 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
+import { Action } from 'common-common/src/permissions';
+
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
@@ -23,9 +26,18 @@ type SidebarAttrs = {
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
   view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
     const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
-
-    const hideChat = !app.chain?.meta?.chatEnabled;
-
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+    const currentChainInfo = app.chain?.meta;
+    const hideChat =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_CHAT_CHANNELS
+      );
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
 
     return (

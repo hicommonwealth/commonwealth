@@ -9,10 +9,22 @@ import { SnapshotSpaceAttributes } from 'server/models/snapshot_spaces';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainInfo } from 'client/scripts/models';
-import { ChainNodeAttributes } from 'server/models/chain_node';
-import { NotificationCategoryAttributes } from 'server/models/notification_category';
-import { ChainCategoryAttributes } from 'server/models/chain_category';
-import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import {
+  ChainNodeAttributes,
+  ChainNodeInstance,
+} from 'server/models/chain_node';
+import {
+  NotificationCategoryAttributes,
+  NotificationCategoryInstance,
+} from 'server/models/notification_category';
+import {
+  ChainCategoryAttributes,
+  ChainCategoryInstance,
+} from 'server/models/chain_category';
+import {
+  ChainCategoryTypeAttributes,
+  ChainCategoryTypeInstance,
+} from 'server/models/chain_category_type';
 import { InviteCodeAttributes } from 'server/models/invite_code';
 import { EmailNotificationInterval } from 'server/models/user';
 import { SocialAccountInstance } from 'server/models/social_account';
@@ -20,9 +32,8 @@ import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { StarredCommunityAttributes } from 'server/models/starred_community';
 import { DiscussionDraftAttributes } from 'server/models/discussion_draft';
-import { TypedResponse } from '../types';
+import { TypedResponse, success } from '../types';
 import { JWT_SECRET } from '../config';
-import '../types';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ServerError } from '../util/errors';
@@ -37,13 +48,13 @@ type ThreadCountQueryData = {
 
 type StatusResp = {
   chainsWithSnapshots: Array<{
-    chain: ChainInfo;
+    chain: ChainInstance;
     snapshot: string[];
   }>;
-  nodes: ChainNodeAttributes;
-  notificationCategories: NotificationCategoryAttributes;
-  chainCategories: ChainCategoryAttributes;
-  chainCategoryTypes: ChainCategoryTypeAttributes;
+  nodes: ChainNodeInstance[];
+  notificationCategories: NotificationCategoryInstance[];
+  chainCategories: ChainCategoryInstance[];
+  chainCategoryTypes: ChainCategoryTypeInstance[];
   recentThreads: ThreadCountQueryData[];
   roles: RoleInstanceWithPermission[];
   invites: InviteCodeAttributes[];
@@ -182,6 +193,7 @@ const status = async (
       where: { address_id: { [Op.in]: myAddressIds } },
       include: [models.Address],
     });
+
     const discussionDrafts = await models.DiscussionDraft.findAll({
       where: {
         address_id: { [Op.in]: myAddressIds },
@@ -356,7 +368,7 @@ const status = async (
      */
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-    return res.json({
+    return success(res, {
       chainsWithSnapshots,
       nodes,
       notificationCategories,
