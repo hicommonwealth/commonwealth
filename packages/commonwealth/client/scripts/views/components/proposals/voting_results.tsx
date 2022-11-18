@@ -22,10 +22,10 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 
-export class VotingResults
-  implements m.ClassComponent<{ proposal: AnyProposal }>
-{
-  view(vnode) {
+type VotingResultsAttrs = { proposal: AnyProposal };
+
+export class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
+  view(vnode: m.Vnode<VotingResultsAttrs>) {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
 

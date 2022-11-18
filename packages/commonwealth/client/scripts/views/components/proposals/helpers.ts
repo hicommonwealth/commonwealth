@@ -82,6 +82,7 @@ export const cancelProposal = (
   if (!onModalClose) {
     onModalClose = () => undefined;
   }
+
   if (proposal instanceof MolochProposal) {
     proposal
       .abortTx()

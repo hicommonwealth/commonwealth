@@ -42,19 +42,34 @@ import { NearAccount } from 'controllers/chain/near/account';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
-import { CannotVote, CancelButton } from './voting_actions_components';
 import { getCanVote, getVotingResults } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import {
+  CompoundCancelButton,
+  MolochCancelButton,
+} from '../../pages/view_proposal/proposal_components';
 
-export class VotingActions
-  implements m.ClassComponent<{ proposal: AnyProposal }>
-{
+type CannotVoteAttrs = { label: string };
+
+class CannotVote implements m.ClassComponent<CannotVoteAttrs> {
+  view(vnode: m.Vnode<CannotVoteAttrs>) {
+    return (
+      <div class="CannotVote">
+        <CWButton disabled label={vnode.attrs.label} />
+      </div>
+    );
+  }
+}
+
+type VotingActionsAttrs = { proposal: AnyProposal };
+
+export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
   private votingModalOpen: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<VotingActionsAttrs>) {
     const { proposal } = vnode.attrs;
     const { votingModalOpen } = this;
 
@@ -112,10 +127,12 @@ export class VotingActions
           this.votingModalOpen = false;
           return notifyError('Must select a conviction');
         }
+
         if (this.amount === 0) {
           this.votingModalOpen = false;
           return notifyError('Must select a valid amount');
         }
+
         createTXModal(
           proposal.submitVoteTx(
             new BinaryVote(
@@ -189,10 +206,12 @@ export class VotingActions
           this.votingModalOpen = false;
           return notifyError('Must select a conviction');
         }
+
         if (this.amount === 0) {
           this.votingModalOpen = false;
           return notifyError('Must select a valid amount');
         }
+
         createTXModal(
           proposal.submitVoteTx(
             new BinaryVote(
@@ -468,10 +487,10 @@ export class VotingActions
             {yesButton}
             {noButton}
             {processButton}
-            <CancelButton
+            <MolochCancelButton
+              molochMember={user}
               onModalClose={onModalClose}
               proposal={proposal}
-              user={user}
               votingModalOpen={votingModalOpen}
             />
           </div>
@@ -482,10 +501,9 @@ export class VotingActions
       votingActionObj = (
         <div class="button-row">
           {yesButton}
-          <CancelButton
+          <CompoundCancelButton
             onModalClose={onModalClose}
             proposal={proposal}
-            user={user}
             votingModalOpen={votingModalOpen}
           />
         </div>
@@ -496,10 +514,9 @@ export class VotingActions
           {yesButton}
           {noButton}
           {abstainButton}
-          <CancelButton
+          <CompoundCancelButton
             onModalClose={onModalClose}
             proposal={proposal}
-            user={user}
             votingModalOpen={votingModalOpen}
           />
         </div>

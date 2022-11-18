@@ -23,7 +23,7 @@ type VotingResultAttrs = {
 };
 
 export class VotingResult implements m.ClassComponent<VotingResultAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<VotingResultAttrs>) {
     const { getAbstainVotes, getNoVotes, getYesVotes, proposal } = vnode.attrs;
 
     return (
