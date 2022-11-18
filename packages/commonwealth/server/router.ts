@@ -171,13 +171,14 @@ function setupRouter(
   const router = express.Router();
 
   router.use((req, res, next) => {
-    StatsDController.get().increment(`cw.path.${req.path.slice(1)}.called`);
+    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
       StatsDController.get().histogram(
-        `cw.path.${req.path.slice(1)}.latency`,
-        latency
+        `cw.path.latency`,
+        latency,
+        { path: req.path.slice(1) }
       );
     });
     next();
