@@ -14,7 +14,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
@@ -59,13 +59,13 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
@@ -168,14 +168,14 @@ export class SidebarSectionGroup
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,
