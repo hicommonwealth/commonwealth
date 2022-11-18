@@ -8,20 +8,67 @@ import {
 import { SnapshotSpaceAttributes } from 'server/models/snapshot_spaces';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainInfo } from 'client/scripts/models';
+import { ChainNodeAttributes } from 'server/models/chain_node';
+import { NotificationCategoryAttributes } from 'server/models/notification_category';
+import { ChainCategoryAttributes } from 'server/models/chain_category';
+import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import { InviteCodeAttributes } from 'server/models/invite_code';
+import { EmailNotificationInterval } from 'server/models/user';
+import { SocialAccountInstance } from 'server/models/social_account';
+import { AddressInstance } from 'server/models/address';
+import { ChainInstance } from 'server/models/chain';
+import { StarredCommunityAttributes } from 'server/models/starred_community';
+import { DiscussionDraftAttributes } from 'server/models/discussion_draft';
+import { TypedResponse } from '../types';
 import { JWT_SECRET } from '../config';
 import '../types';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+type ThreadCountQueryData = {
+  concat: string;
+  count: number;
+};
+
+type StatusResp = {
+  chainsWithSnapshots: Array<{
+    chain: ChainInfo;
+    snapshot: string[];
+  }>;
+  nodes: ChainNodeAttributes;
+  notificationCategories: NotificationCategoryAttributes;
+  chainCategories: ChainCategoryAttributes;
+  chainCategoryTypes: ChainCategoryTypeAttributes;
+  recentThreads: ThreadCountQueryData[];
+  roles: RoleInstanceWithPermission[];
+  invites: InviteCodeAttributes[];
+  loggedIn: boolean;
+  user: {
+    email: string;
+    emailVerified: boolean;
+    emailInterval: EmailNotificationInterval;
+    jwt: string;
+    addresses: AddressInstance[];
+    socialAccounts: SocialAccountInstance[];
+    selectedChain: ChainInstance;
+    isAdmin: boolean;
+    disableRichText: boolean;
+    lastVisited: string;
+    starredCommunities: StarredCommunityAttributes[];
+    discussionDrafts: DiscussionDraftAttributes[];
+    unseenPosts: { [chain: string]: number };
+  };
+};
 
 const status = async (
   models: DB,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: TypedResponse<StatusResp>
 ) => {
   try {
     const [
@@ -79,10 +126,6 @@ const status = async (
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
     );
     const { user } = req;
-    type ThreadCountQueryData = {
-      concat: string;
-      count: number;
-    };
 
     if (!user) {
       const threadCountQueryData: ThreadCountQueryData[] =
