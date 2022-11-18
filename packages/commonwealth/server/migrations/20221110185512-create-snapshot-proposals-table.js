@@ -34,6 +34,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('SnapshotProposals');
+    return queryInterface.query('DROP TABLE "SnapshotProposals" IF EXISTS');
   },
 };
