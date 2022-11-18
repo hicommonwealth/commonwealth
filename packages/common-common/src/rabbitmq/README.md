@@ -1,18 +1,5 @@
-# ce-rabbitmq-plugin
-This package is a plugin that allows chain-events to be used with rabbitmq. This plugin relies heavily on Rascal, a 
-config drive wrapper for amqp.
-
-Two main objects are exposed:
-
-### Producer
-This is the generic object that instantiates a Rascal instance and can be used to publish messages to arbitrary RabbitMQ
-queues. The producer is the parent class of the RabbitMqHandler.
-
-### RabbitMqHandler
-This is a chain-events event handler (IEventHandler) used to publish events to rabbitmq.
-
-
-# Setting up RabbitMQ
+# Using RabbitMQ
+## Locally
 ### Installation
 - Follow instructions at https://www.rabbitmq.com/install-debian.html#apt to install Erlang and RabbitMQ make sure to install for the correct linux distribution!
 
@@ -40,3 +27,18 @@ The steps outlined below are the LAST resort in the event of catastrophic failur
 using the steps outlined in **Create an admin RabbitMQ User**.
    
 If the problem persists, then it may not originate from RabbitMQ but from Erlang or some other related service.
+
+## Remotely
+Refer to the [Commonwealth README](/packages/commonwealth/README.md)
+
+
+# Configuration Explained
+In order to configure our RabbitMQ instance we utilize the Rascal package. The following is a description of the Rascal
+configuration.
+
+All the major Rascal configuration component names are defined as enums [here](./types/index.ts).
+
+More Coming Soon...
+
+
+

@@ -1,8 +1,4 @@
 /* eslint-disable no-continue */
-import fetch from 'node-fetch';
-import { Pool } from 'pg';
-import _ from 'underscore';
-import format from 'pg-format';
 import {
   createListener,
   CWEvent,
@@ -10,16 +6,19 @@ import {
   LoggingHandler,
   SubstrateEvents,
   SubstrateTypes,
-  SupportedNetwork,
+  SupportedNetwork
 } from 'chain-events/src';
+import fetch from 'node-fetch';
+import { Pool } from 'pg';
+import format from 'pg-format';
+import _ from 'underscore';
 
-import { BrokerConfig } from 'rascal';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController, ProjectTag } from 'common-common/src/statsd';
+import { getRabbitMQConfig, RascalPublications } from "common-common/src/rabbitmq";
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { DATABASE_URI, RABBITMQ_URI } from '../config';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
-import { DATABASE_URI } from '../config';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -145,8 +144,8 @@ async function mainProcess(
       ON con.id = cc.contract_id
   WHERE c."has_chain_events_listener" = true
     AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
-      (c.base = 'substrate' AND c.type ='chain') OR
-      (c.base = 'cosmos' AND (c.type='token' OR c.type='chain')));
+         (c.base = 'substrate' AND c.type ='chain') OR
+         (c.base = 'cosmos' AND (c.type='token' OR c.type='chain')));
   `;
   const allChains = (await pool.query(query)).rows;
 
@@ -476,7 +475,7 @@ async function mainProcess(
 
     for (const event of identityEvents) {
       event.chain = chain.id; // augment event with chain
-      await producer.publish(event, 'SubstrateIdentityEventsPublication');
+      await producer.publish(event, RascalPublications.SubstrateIdentityEvents);
     }
 
     // clear the identity cache for this chain
@@ -607,7 +606,7 @@ async function initializer(): Promise<void> {
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(getRabbitMQConfig(RABBITMQ_URI), RascalPublications.ChainEvents);
   erc20Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   erc721Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   try {

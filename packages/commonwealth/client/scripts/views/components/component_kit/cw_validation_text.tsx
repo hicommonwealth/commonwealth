@@ -15,7 +15,7 @@ export type ValidationTextAttrs = {
 };
 
 export class CWValidationText implements m.ClassComponent<ValidationTextAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ValidationTextAttrs>) {
     const { message, status } = vnode.attrs;
     return (
       <CWText

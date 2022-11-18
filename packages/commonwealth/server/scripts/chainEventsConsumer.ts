@@ -1,19 +1,23 @@
 import { CWEvent, SubstrateTypes } from 'chain-events/src';
+import { SubscriberSessionAsPromised } from 'rascal';
 import * as WebSocket from 'ws';
-import { BrokerConfig, SubscriberSessionAsPromised } from 'rascal';
-import { ChainBase } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
-import EventNotificationHandler from '../eventHandlers/notifications';
-import EventStorageHandler from '../eventHandlers/storage';
+import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalSubscriptions, RmqCWEvent
+} from 'common-common/src/rabbitmq';
+import { ChainBase } from 'common-common/src/types';
+import { RABBITMQ_URI } from "../config";
+import models from '../database';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
 import IdentityHandler from '../eventHandlers/identity';
-import UserFlagsHandler from '../eventHandlers/userFlags';
+import EventNotificationHandler from '../eventHandlers/notifications';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import models from '../database';
+import EventStorageHandler from '../eventHandlers/storage';
+import UserFlagsHandler from '../eventHandlers/userFlags';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -23,7 +27,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   let consumer: RabbitMQController
   try {
-    consumer = new RabbitMQController(<BrokerConfig>RabbitMQConfig);
+    consumer = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
     await consumer.init();
   } catch (e) {
     log.error("Rascal consumer setup failed. Please check the Rascal configuration");
@@ -77,6 +81,10 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
 
   // feed the events into their respective handlers
   async function processClassicEvents(event: CWEvent): Promise<void> {
+    if (!RmqCWEvent.isValidMsgFormat(event)) {
+      throw RmqCWEvent.getInvalidFormatError(event);
+    }
+
     StatsDController.get().increment(
       'ce.event',
       {
@@ -136,7 +144,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
   try {
     eventsSubscriber = await consumer.startSubscription(
       processClassicEvents,
-      'ChainEventsHandlersSubscription'
+      RascalSubscriptions.ChainEvents
     );
   } catch (e) {
     log.info('Failure in ChainEventsHandlersSubscription');
@@ -146,7 +154,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
   try {
     identitySubscriber = await consumer.startSubscription(
       processIdentityEvents,
-      'SubstrateIdentityEventsSubscription'
+      RascalSubscriptions.SubstrateIdentityEvents
     );
   } catch (e) {
     log.info('Failure in SubstrateIdentityEventsSubscription');
