@@ -1,6 +1,11 @@
 import { QueryTypes, Op, Sequelize } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+import {
+  CommunitySnapshotSpacesAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from 'server/models/community_snapshot_spaces';
+import { SnapshotSpaceAttributes } from 'server/models/snapshot_spaces';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { JWT_SECRET } from '../config';
@@ -47,18 +52,19 @@ const status = async (
 
     const chainsWithSnapshots = await Promise.all(
       chains.map(async (chain) => {
-        const snapshot_spaces = await models.CommunitySnapshotSpaces.findAll({
-          where: {
-            chain_id: chain.id,
-          },
-          include: {
-            model: models.SnapshotSpace,
-            as: 'snapshot_space',
-          },
-        });
+        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+          await models.CommunitySnapshotSpaces.findAll({
+            where: {
+              chain_id: chain.id,
+            },
+            include: {
+              model: models.SnapshotSpace,
+              as: 'snapshot_space',
+            },
+          });
 
         const snapshot_space_names = snapshot_spaces.map((space) => {
-          return (space as any).snapshot_space?.snapshot_space;
+          return space.snapshot_space?.snapshot_space;
         });
 
         return {

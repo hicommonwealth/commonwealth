@@ -9,6 +9,7 @@ import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
 import { findOneRole } from '../util/roles';
+import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -119,23 +120,24 @@ const updateChain = async (
     return next(new AppError(Errors.InvalidTerms));
   }
 
-  const snapshotSpaces = await models.CommunitySnapshotSpaces.findAll({
-    where: { chain_id: chain.id },
-    include: {
-      model: models.SnapshotSpace,
-      as: 'snapshot_space',
-    },
-  });
+  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+    await models.CommunitySnapshotSpaces.findAll({
+      where: { chain_id: chain.id },
+      include: {
+        model: models.SnapshotSpace,
+        as: 'snapshot_space',
+      },
+    });
 
   // Check if any snapshot spaces are being removed
   const removedSpaces = snapshotSpaces.filter((space) => {
-    return !snapshot.includes((space as any).snapshot_space.snapshot_space);
+    return !snapshot.includes(space.snapshot_space.snapshot_space);
   });
   const existingSpaces = snapshotSpaces.filter((space) => {
-    return snapshot.includes((space as any).snapshot_space.snapshot_space);
+    return snapshot.includes(space.snapshot_space.snapshot_space);
   });
   const existingSpaceNames = existingSpaces.map((space) => {
-    return (space as any).snapshot_space.snapshot_space;
+    return space.snapshot_space.snapshot_space;
   });
 
   for (const spaceName of snapshot) {

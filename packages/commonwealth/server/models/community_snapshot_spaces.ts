@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
+import { SnapshotSpaceAttributes } from './snapshot_spaces';
 import { ModelStatic, ModelInstance } from './types';
 
 export type CommunitySnapshotSpacesAttributes = {
@@ -9,6 +10,11 @@ export type CommunitySnapshotSpacesAttributes = {
   created_at?: Date;
   updated_at?: Date;
 };
+
+export type CommunitySnapshotSpaceWithSpaceAttached =
+  CommunitySnapshotSpacesAttributes & {
+    snapshot_space?: SnapshotSpaceAttributes;
+  };
 
 export type CommunitySnapshotSpaceInstance =
   ModelInstance<CommunitySnapshotSpacesAttributes>;
