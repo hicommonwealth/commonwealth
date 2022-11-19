@@ -45,7 +45,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
   private _lastQueryTime: number = 0;
-  private statsDSender: TbcStatsDSender = new TbcStatsDSender();
+  public statsDSender: TbcStatsDSender = new TbcStatsDSender();
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
@@ -83,7 +83,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     // otherwise, return bps that support node's base
     // TODO: ensure all nodes have proper bases / balance types in db...
     const node = this._nodes[nodeId];
-    if (!node) this.statsDSender.sendAndThrowError(new Error('Could not find node'));
+    if (!node) throw new Error('Could not find node');
     const base = node.balance_type;
     const bps = Object.values(this._providers).filter(({ validBases }) => validBases.includes(base));
     return formatBps(bps);
@@ -97,11 +97,11 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   ): Promise<TokenBalanceResp> {
     const node = this._nodes[nodeId];
     if (!node) {
-      this.statsDSender.sendAndThrowError(new Error('unknown node id'));
+      throw new Error('unknown node id');
     }
     const [{ bp }] = await this.getBalanceProviders(nodeId);
     if (bp !== balanceProvider) {
-      this.statsDSender.sendAndThrowError(new Error('balance provider not valid for node'));
+      throw new Error('balance provider not valid for node');
     }
     const providerObj = this._providers[balanceProvider];
 

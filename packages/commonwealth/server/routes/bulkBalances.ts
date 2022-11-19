@@ -1,7 +1,7 @@
 import BN from 'bn.js';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { AddressInstance } from '../models/address';
 import { DB } from '../models';
 import { sequelize } from '../database';
@@ -119,6 +119,7 @@ const bulkBalances = async (
         balances[nodeId] = balanceTotal.toString();
       } catch (e) {
         log.info(`Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`);
+        tokenBalanceCache.statsDSender.sendError(e)
       }
     } else {
       // this is for Ethereum / Solana Bases

@@ -52,14 +52,12 @@ export class TbcStatsDSender {
   }
 
   // Failure counts + reasons
-  sendAndThrowError(error: Error) {
+  sendError(error: Error) {
     const tags = {
       reason: error.message,
       project: ProjectTag.TokenBalanceCache,
     }
 
     this.statsD.increment('tbc.error', tags);
-
-    throw error;
   }
 }

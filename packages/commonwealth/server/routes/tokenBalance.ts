@@ -6,7 +6,7 @@ import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
-import { BalanceType, ChainNetwork } from '../../../common-common/src/types';
+import { BalanceType, ChainNetwork } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -58,6 +58,7 @@ const tokenBalance = async (
     bp = providersResult[0].bp;
   } catch (e) {
     log.info(e.message);
+    tokenBalanceCache.statsDSender.sendError(e);
     throw new AppError(`No token balance provider found for ${chain.id}`);
   }
 

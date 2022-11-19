@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { ChainNetwork } from 'common-common/src/types';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -39,6 +39,7 @@ const validateTopicThreshold = async (
       bp = result[0].bp;
     } catch (e) {
       log.info(`No balance provider for chain node ${topic.chain.ChainNode.name}, skipping check.`);
+      tbc.statsDSender.sendError(e);
       return true;
     }
 
