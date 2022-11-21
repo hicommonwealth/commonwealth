@@ -9,16 +9,44 @@ import {
 } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SnapshotNotification } from '../../shared/types';
-import  models from '../database';
+import models from '../database';
 import { RABBITMQ_URI } from '../config';
 
 async function processSnapshotMessage(msg: SnapshotNotification) {
-const log = factory.getLogger(formatFilename(__filename));
+  const log = factory.getLogger(formatFilename(__filename));
   try {
     console.log('Processing snapshot message', msg);
+    const { space, id, title, body, choices, start, expire } = msg;
+
+    // Check if Space Exists, create it if not
+
+    // Check if proposal exists, create it if not
+
+    console.log('message id,', msg.event);
+    const eventType = msg.event;
+
     const proposal = await models.SnapshotProposal.findOne({
       where: { id: msg.id },
     });
+
+    if (eventType === 'proposal/created') {
+      if (!proposal) {
+        await models.SnapshotProposal.create({
+          id,
+          title,
+          body,
+          choices,
+          start,
+          event: eventType,
+          expire,
+          space,
+        });
+      }
+    } else {
+      if (!proposal) {
+        throw new Error('Proposal does not exist');
+      }
+    }
 
     if (!proposal) {
       await models.SnapshotProposal.create({
@@ -29,11 +57,10 @@ const log = factory.getLogger(formatFilename(__filename));
         space: msg.space,
         event: msg.event,
         start: msg.start,
-        expire: msg.expire
+        expire: msg.expire,
       });
       log.info(`Created new snapshot proposal: ${msg.id}`);
     }
-
   } catch (err) {
     log.error(`Error processing snapshot message: ${err}`);
   }

@@ -17,10 +17,9 @@ export enum WebsocketMessageNames {
 export type SnapshotProposalNotfication = {
   id: string;
   category_id: 'snapshot-proposal';
-  chain_id : string;
+  chain_id: string;
   SnapshotProposal: SnapshotProposalAttributes;
-}
-
+};
 
 export interface ChainEventNotification {
   id: string;
@@ -45,7 +44,7 @@ export interface SnapshotNotification {
 }
 
 export interface INotification {
-  kind : ChainEventNotification |  SnapshotNotification;
+  kind: ChainEventNotification | SnapshotNotification;
 }
 
 export enum WebsocketNamespaces {
