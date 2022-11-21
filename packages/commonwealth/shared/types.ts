@@ -35,8 +35,12 @@ export interface ChainEventNotification {
 
 export interface SnapshotNotification {
   id: string;
-  space: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
   event?: string;
+  start?: string;
   expire: string;
 }
 

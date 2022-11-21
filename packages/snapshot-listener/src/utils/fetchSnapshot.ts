@@ -1,9 +1,31 @@
 import fetch from 'node-fetch';
+import dotenv from "dotenv";
+dotenv.config();
 
 export default async function fetchNewSnapshotProposal(
   id: string,
 ) {
   try {
+    const environment = process.env.NODE_ENV || 'development';
+
+    if (environment === 'development') {
+      const dummyProposal = {
+        data: {
+          proposal: {
+            id: "proposal/0x123",
+            title: "Dummy Proposal",
+            body: "This is a dummy proposal",
+            choices: ["Yes", "No"],
+            space: "dummy-space",
+            start: "2021-01-01T00:00:00.000Z",
+            end: "2021-01-01T00:00:00.000Z",
+          }
+        }
+      }
+
+      return dummyProposal;
+    }
+    
     const response = await fetch('https://hub.snapshot.org/graphql', {
       method: 'POST',
       headers: {

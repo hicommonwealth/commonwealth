@@ -15,6 +15,7 @@ import { RABBITMQ_URI } from '../config';
 async function processSnapshotMessage(msg: SnapshotNotification) {
 const log = factory.getLogger(formatFilename(__filename));
   try {
+    console.log('Processing snapshot message', msg);
     const proposal = await models.SnapshotProposal.findOne({
       where: { id: msg.id },
     });
@@ -24,6 +25,7 @@ const log = factory.getLogger(formatFilename(__filename));
         id: msg.id,
         title: msg.title,
         body: msg.body,
+        choices: msg.choices,
         space: msg.space,
         event: msg.event,
         start: msg.start,
