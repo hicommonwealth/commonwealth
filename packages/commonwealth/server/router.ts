@@ -34,6 +34,8 @@ import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
+import setDiscordBotConfig from './routes/setDiscordBotConfig';
+import createDiscordBotConfig from './routes/createDiscordBotConfig';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -158,8 +160,6 @@ import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import getSnapshotProposal from './routes/getSnapshotProposal';
 import StatsDController from './util/statsd';
-
-
 
 function setupRouter(
   app: Express,
@@ -723,6 +723,14 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
+  // Discord Bot
+  router.post(
+    '/createDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
+    createDiscordBotConfig.bind(this, models)
+  );
+  router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
+
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
   router.post('/migrateEvent', migrateEvent.bind(this, models));
 
@@ -813,7 +821,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

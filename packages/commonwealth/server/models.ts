@@ -51,6 +51,7 @@ import { WebhookModelStatic } from './models/webhook';
 import { SnapshotProposalModelStatic } from './models/snapshot_proposal';
 import { SnapshotSpaceModelStatic } from './models/snapshot_spaces';
 import { CommunitySnapshotSpaceModelStatic } from './models/community_snapshot_spaces';
+import { DiscordBotConfigModelStatic } from './models/discord_bot_config';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -72,6 +73,7 @@ export type Models = {
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
+  DiscordBotConfig: DiscordBotConfigModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
   IpfsPins: IpfsPinsModelStatic;

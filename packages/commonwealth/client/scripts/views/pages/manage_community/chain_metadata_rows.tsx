@@ -6,6 +6,8 @@ import m from 'mithril';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
+import { uuidv4 } from 'lib/util';
+
 import {
   ChainBase,
   ChainCategoryType,
@@ -29,6 +31,9 @@ import {
   setChainCategories,
 } from './helpers';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -70,6 +75,8 @@ export class ChainMetadataRows
   communityBanner: string;
   quillBanner: any;
   bannerStateUpdated: boolean;
+  discord_bot_connected: boolean;
+  discord_bot_connecting: boolean;
 
   oninit(vnode) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -97,6 +104,8 @@ export class ChainMetadataRows
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
+    this.discord_bot_connected = chain.discord_config_id !== null;
+    this.discord_bot_connecting = this.discord_bot_connected;
     this.communityBanner = chain.communityBanner;
   }
 
@@ -291,6 +300,7 @@ export class ChainMetadataRows
             })}
           </div>
         </div>
+
         <ManageRoles
           label="Admins"
           roledata={vnode.attrs.admins}
@@ -410,6 +420,96 @@ export class ChainMetadataRows
             m.redraw();
           }}
         />
+        <div class="commonbot-section">
+          <CWText type="h3">Commonbot Settings</CWText>
+          {this.discord_bot_connected ? (
+            <>
+              <div class="connected-line">
+                <CWIcon iconName="check" />
+                <CWText>Connected</CWText>
+              </div>
+              <CWButton
+                label="reconnect"
+                buttonType="mini"
+                className="connect-button"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
+
+                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+                      chain_id: app.activeChainId(),
+                      verification_token,
+                      jwt: app.user.jwt,
+                    });
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
+                          verification_token,
+                        })
+                      )}`
+                    );
+                    this.discord_bot_connected = false;
+                    this.discord_bot_connecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </>
+          ) : this.discord_bot_connecting ? (
+            <>
+              <div class="settings-row">
+                <div class="spinner-group">
+                  <CWSpinner />
+                  <CWText>Connecting...</CWText>
+                </div>
+                <CWText>Refresh to check if connection succeeded</CWText>
+              </div>
+            </>
+          ) : (
+            <div class="settings-row">
+              <CWButton
+                label="Connect"
+                buttonType="primary-black"
+                onclick={async () => {
+                  try {
+                    const verification_token = uuidv4();
+
+                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
+                      chain_id: app.activeChainId(),
+                      verification_token,
+                      jwt: app.user.jwt,
+                    });
+
+                    window.open(
+                      `https://discord.com/oauth2/authorize?client_id=${
+                        process.env.DISCORD_CLIENT_ID
+                      }&redirect_uri=${encodeURI(
+                        process.env.DISCORD_UI_URL
+                      )}/callback&response_type=code&scope=bot&state=${encodeURI(
+                        JSON.stringify({
+                          cw_chain_id: app.activeChainId(),
+                          verification_token,
+                        })
+                      )}`
+                    );
+                    this.discord_bot_connecting = true;
+                    m.redraw();
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     );
   }

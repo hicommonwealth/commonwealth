@@ -48,6 +48,7 @@ class ChainInfo {
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
+  public discord_config_id?: string;
   public communityRoles: CommunityRole[];
 
   public get node() {
@@ -86,6 +87,7 @@ class ChainInfo {
     ChainNode,
     tokenName,
     adminOnlyPolling,
+    discord_config_id,
     communityRoles
   }) {
     this.id = id;
@@ -120,6 +122,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
+    this.discord_config_id = discord_config_id;
     this.communityRoles = communityRoles;
   }
 
@@ -155,6 +158,7 @@ class ChainInfo {
     Contracts,
     ChainNode,
     admin_only_polling,
+    discord_config_id,
     community_roles
   }) {
     let blockExplorerIdsParsed;
@@ -201,6 +205,7 @@ class ChainInfo {
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
+      discord_config_id,
       communityRoles: community_roles
     });
   }
