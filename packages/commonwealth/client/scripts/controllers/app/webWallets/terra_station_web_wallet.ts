@@ -34,8 +34,6 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     return this._accounts || [];
   }
 
-  api: () => any
-
   // public async signMessage(message: string): Promise<any> {
   //   return this._extension.sign({ msgs: [message]});
   // }
