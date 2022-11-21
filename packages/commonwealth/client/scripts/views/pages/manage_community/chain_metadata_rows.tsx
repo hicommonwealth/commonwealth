@@ -63,6 +63,7 @@ export class ChainMetadataRows
   network: ChainNetwork;
   symbol: string;
   snapshot: string[];
+  snapshotString: string;
   selectedTags: { [type in ChainCategoryType]?: boolean };
   categoryMap: { [type in ChainCategoryType]?: number };
   uploadInProgress: boolean;
@@ -81,7 +82,10 @@ export class ChainMetadataRows
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(chain.defaultDenyPermissions, Action.VIEW_CHAT_CHANNELS);
+    this.chatEnabled = !isPermitted(
+      chain.defaultDenyPermissions,
+      Action.VIEW_CHAT_CHANNELS
+    );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -89,6 +93,7 @@ export class ChainMetadataRows
     this.iconUrl = chain.iconUrl;
     this.network = chain.network;
     this.snapshot = chain.snapshot;
+    this.snapshotString = chain.snapshot.toString();
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
@@ -229,7 +234,7 @@ export class ChainMetadataRows
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot}
+            value={this.snapshotString}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -243,6 +248,7 @@ export class ChainMetadataRows
                 })
                 .filter((val) => val.length > 4);
               this.snapshot = snapshots;
+              this.snapshotString = v;
             }}
           />
         )}

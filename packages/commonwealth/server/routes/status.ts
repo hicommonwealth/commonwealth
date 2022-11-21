@@ -1,22 +1,85 @@
 import { QueryTypes, Op, Sequelize } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
+import {
+  CommunitySnapshotSpacesAttributes,
+  CommunitySnapshotSpaceWithSpaceAttached,
+} from 'server/models/community_snapshot_spaces';
+import { SnapshotSpaceAttributes } from 'server/models/snapshot_spaces';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainInfo } from 'client/scripts/models';
+import {
+  ChainNodeAttributes,
+  ChainNodeInstance,
+} from 'server/models/chain_node';
+import {
+  NotificationCategoryAttributes,
+  NotificationCategoryInstance,
+} from 'server/models/notification_category';
+import {
+  ChainCategoryAttributes,
+  ChainCategoryInstance,
+} from 'server/models/chain_category';
+import {
+  ChainCategoryTypeAttributes,
+  ChainCategoryTypeInstance,
+} from 'server/models/chain_category_type';
+import { InviteCodeAttributes } from 'server/models/invite_code';
+import { EmailNotificationInterval } from 'server/models/user';
+import { SocialAccountInstance } from 'server/models/social_account';
+import { AddressInstance } from 'server/models/address';
+import { ChainInstance } from 'server/models/chain';
+import { StarredCommunityAttributes } from 'server/models/starred_community';
+import { DiscussionDraftAttributes } from 'server/models/discussion_draft';
+import { TypedResponse, success } from '../types';
 import { JWT_SECRET } from '../config';
-import '../types';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+type ThreadCountQueryData = {
+  concat: string;
+  count: number;
+};
+
+type StatusResp = {
+  chainsWithSnapshots: {
+    chain: ChainInstance;
+    snapshot: string[] | null;
+  }[];
+  nodes: ChainNodeInstance[];
+  notificationCategories: NotificationCategoryInstance[];
+  chainCategories: ChainCategoryInstance[];
+  chainCategoryTypes: ChainCategoryTypeInstance[];
+  recentThreads: ThreadCountQueryData[];
+  roles: RoleInstanceWithPermission[];
+  invites: InviteCodeAttributes[];
+  loggedIn: boolean;
+  user: {
+    email: string;
+    emailVerified: boolean;
+    emailInterval: EmailNotificationInterval;
+    jwt: string;
+    addresses: AddressInstance[];
+    socialAccounts: SocialAccountInstance[];
+    selectedChain: ChainInstance;
+    isAdmin: boolean;
+    disableRichText: boolean;
+    lastVisited: string;
+    starredCommunities: StarredCommunityAttributes[];
+    discussionDrafts: DiscussionDraftAttributes[];
+    unseenPosts: { [chain: string]: number };
+  };
+};
 
 const status = async (
   models: DB,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: TypedResponse<StatusResp>
 ) => {
   try {
     const [
@@ -45,14 +108,35 @@ const status = async (
       models.ChainCategoryType.findAll(),
     ]);
 
+    const chainsWithSnapshots = await Promise.all(
+      chains.map(async (chain) => {
+        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+          await models.CommunitySnapshotSpaces.findAll({
+            where: {
+              chain_id: chain.id,
+            },
+            include: {
+              model: models.SnapshotSpace,
+              as: 'snapshot_space',
+            },
+          });
+
+        const snapshot_space_names = snapshot_spaces.map((space) => {
+          return space.snapshot_space?.snapshot_space;
+        });
+
+        return {
+          chain,
+          snapshot:
+            snapshot_space_names.length > 0 ? snapshot_space_names : null,
+        };
+      })
+    );
+
     const thirtyDaysAgo = new Date(
       (new Date() as any) - 1000 * 24 * 60 * 60 * 30
     );
     const { user } = req;
-    type ThreadCountQueryData = {
-      concat: string;
-      count: number;
-    };
 
     if (!user) {
       const threadCountQueryData: ThreadCountQueryData[] =
@@ -68,14 +152,17 @@ const status = async (
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
 
-      return res.json({
-        chains,
+      return success(res, {
+        chainsWithSnapshots,
         nodes,
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
+        roles: null,
+        invites: null,
         loggedIn: false,
+        user: null,
       });
     }
 
@@ -284,8 +371,8 @@ const status = async (
      */
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-    return res.json({
-      chains,
+    return success(res, {
+      chainsWithSnapshots,
       nodes,
       notificationCategories,
       chainCategories,

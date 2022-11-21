@@ -40,7 +40,6 @@ export type ChainAttributes = {
   default_summary_view?: boolean;
   terms?: string;
   admin_only_polling?: boolean;
-  snapshot?: string[];
   bech32_prefix?: string;
   token_name?: string;
   ce_verbose?: boolean;
@@ -124,10 +123,6 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
-      snapshot: {
-        type: dataTypes.ARRAY(dataTypes.STRING),
-        allowNull: true,
-      },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
