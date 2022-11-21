@@ -25,6 +25,7 @@ import {
 import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import fetch from "node-fetch";
+import StatsDController from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -91,6 +92,10 @@ async function mainProcess(
   const erc721Tokens = [];
   const chains = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
   for (const chain of allChainsAndTokens) {
+    StatsDController.get().increment(
+      'ce.listeners',
+      { chain: chain.id, network: chain.network, base: chain.base }
+    );
     if (
       chain.network === ChainNetwork.ERC20 &&
       chain.base === ChainBase.Ethereum
@@ -127,6 +132,10 @@ async function mainProcess(
   );
 
   await manageRegularListeners(chains, listenerInstances, producer, rollbar);
+
+  for (const c of Object.keys(listenerInstances)) {
+    StatsDController.get().increment('ce.listeners-active', { chain: c });
+  }
 
   log.info('Finished scheduled process.');
   if (process.env.TESTING) {

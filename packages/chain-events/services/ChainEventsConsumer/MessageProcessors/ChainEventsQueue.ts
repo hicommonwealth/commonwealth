@@ -1,5 +1,5 @@
 import { Logger } from 'typescript-logging';
-
+import StatsDController from "common-common/src/statsd";
 import { CWEvent, IEventHandler } from '../../../src';
 
 export type Ithis = {
@@ -18,6 +18,15 @@ export async function processChainEvents(
   event: CWEvent
 ): Promise<void> {
   let prevResult = null;
+  StatsDController.get().increment(
+    'ce.event',
+    {
+      chain: event.chain || '',
+      network: event.network,
+      blockNumber: `${event.blockNumber}`,
+      kind: event.data.kind
+    }
+  )
   for (const handler of this.allChainEventHandlers) {
     try {
       prevResult = await handler.handle(event, prevResult);

@@ -23,7 +23,7 @@ import {
 } from '../config';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../models';
-import StatsDController from "../util/statsd";
+import StatsDController from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 

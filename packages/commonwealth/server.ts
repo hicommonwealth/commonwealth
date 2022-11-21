@@ -39,7 +39,7 @@ import setupPassport from './server/passport';
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import StatsDController from './server/util/statsd';
+import StatsDController from 'common-common/src/statsd';
 import {BrokerConfig} from "rascal";
 
 const log = factory.getLogger(formatFilename(__filename));

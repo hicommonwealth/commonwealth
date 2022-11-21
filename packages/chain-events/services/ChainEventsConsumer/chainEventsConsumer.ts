@@ -19,7 +19,6 @@ import {
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
 import { SubstrateTypes } from '../../src';
-import { RepublishMessages } from './republishMessages';
 import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
