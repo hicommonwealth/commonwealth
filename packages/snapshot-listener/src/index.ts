@@ -31,7 +31,9 @@ app.post("/snapshot", async (req: Request, res: Response) => {
 
 
     const parsedId = event.id.replace(/.*\//, "");
+    console.log({ parsedId })
     const proposal = await fetchNewSnapshotProposal(parsedId);
+    proposal.id = parsedId;
 
 
     await controller.publish(proposal, RascalPublications.SnapshotListener);

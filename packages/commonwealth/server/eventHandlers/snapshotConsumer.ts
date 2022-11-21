@@ -22,8 +22,11 @@ const log = factory.getLogger(formatFilename(__filename));
     if (!proposal) {
       await models.SnapshotProposal.create({
         id: msg.id,
+        title: msg.title,
+        body: msg.body,
         space: msg.space,
         event: msg.event,
+        start: msg.start,
         expire: msg.expire
       });
       log.info(`Created new snapshot proposal: ${msg.id}`);

@@ -27,8 +27,11 @@ export default (
     'SnapshotProposal',
     {
       id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
+      title: { type: dataTypes.STRING, allowNull: true },
+      body: { type: dataTypes.STRING, allowNull: true },
       space: { type: dataTypes.STRING, allowNull: false},
       event: { type: dataTypes.STRING, allowNull: true},
+      start: { type: dataTypes.STRING, allowNull: true},
       expire: { type: dataTypes.STRING, allowNull: false},
     }
   );
