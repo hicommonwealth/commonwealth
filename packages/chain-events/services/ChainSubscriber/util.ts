@@ -23,7 +23,7 @@ export async function manageErcListeners(
   groupedTokens: { [url: string]: ChainAttributes[] },
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
-  rollbar: Rollbar
+  rollbar?: Rollbar
 ) {
   // delete any listeners that have no more tokens to listen to
   const currentChainUrls = Object.keys(groupedTokens);
@@ -94,7 +94,7 @@ export async function manageErcListeners(
           )} connecting to ${url}`,
           e
         );
-        rollbar.critical(
+        rollbar?.critical(
           `An error occurred while starting a listener for ${JSON.stringify(
             tokenNames
           )} connecting to ${url}`,
@@ -159,7 +159,7 @@ export async function manageRegularListeners(
   chains: ChainAttributes[],
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
-  rollbar: Rollbar
+  rollbar?: Rollbar
 ) {
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
   const regListenerInstances: IListenerInstances = {};
@@ -210,7 +210,7 @@ async function setupNewListeners(
   newChains: ChainAttributes[],
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
-  rollbar: Rollbar
+  rollbar?: Rollbar
 ) {
   for (const chain of newChains) {
     let network: SupportedNetwork;
@@ -238,7 +238,7 @@ async function setupNewListeners(
     } catch (error) {
       delete listenerInstances[chain.id];
       log.error(`Unable to create a listener instance for ${chain.id}`, error);
-      rollbar.critical(
+      rollbar?.critical(
         `Unable to create a listener instance for ${chain.id}`,
         error
       );
@@ -286,7 +286,7 @@ async function setupNewListeners(
 async function updateExistingListeners(
   allChains: ChainAttributes[],
   listenerInstances: IListenerInstances,
-  rollbar: Rollbar
+  rollbar?: Rollbar
 ) {
   for (const chain of allChains) {
     // skip a chain if the listener is inactive due to an error occurring for that specific listener i.e. connection error
@@ -307,7 +307,7 @@ async function updateExistingListeners(
         )).updateSpec(chain.substrate_spec);
       } catch (error) {
         log.error(`Unable to update substrate spec for ${chain.id}!`, error);
-        rollbar.critical(
+        rollbar?.critical(
           `Unable to update substrate spec for ${chain.id}!`,
           error
         );

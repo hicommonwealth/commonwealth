@@ -98,8 +98,10 @@ export async function setupChainEventConsumer() {
   );
   await serviceConsumer.init();
 
-  const republishMessages = new RepublishMessages(rmqController, models);
-  await republishMessages.run();
+  // TODO: turn this on if needed later - leaving off for now as it may not produce an optimal retrying strategy
+  //  and can dilute the retry message data/stats we get on datadog
+  // const republishMessages = new RepublishMessages(rmqController, models);
+  // await republishMessages.run();
 
   log.info('Consumer started');
 

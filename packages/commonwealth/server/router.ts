@@ -157,6 +157,7 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import StatsDController from './util/statsd';
+import {getChainEventServiceData} from "./routes/getChainEventServiceData";
 
 
 
@@ -800,6 +801,11 @@ function setupRouter(
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
+
+  router.get(
+    '/getChainEventServiceData',
+    getChainEventServiceData.bind(this, models)
+  );
 
   // new API
   router.get('/threads', getThreads.bind(this, models));

@@ -6,11 +6,11 @@ import {
   RascalPublications,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  CW_DATABASE_URI,
-  DATABASE_URI,
+  CHAIN_EVENT_SERVICE_SECRET,
+  CW_DATABASE_URI, CW_SERVER_URL,
   NUM_WORKERS,
   RABBITMQ_URI,
   REPEAT_TIME,
@@ -24,30 +24,25 @@ import {
 } from './util';
 import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
-import models from '../database/database';
-import { QueryTypes } from 'sequelize';
+import fetch from "node-fetch";
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const listenerInstances: IListenerInstances = {};
-let pool: Pool;
-let producer: RabbitMqHandler;
-let rollbar: Rollbar;
 
 /**
  * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
  * listen to and then creates, updates, or deletes the listeners.
  * @param producer {RabbitMqHandler} Used by the ChainEvents Listeners to push the messages to a queue
  * @param pool {Pool} Used by the function query the database
- * @param chain {String} An optional chain-id to start a listener for. Used for running a single listener quickly when
  * developing locally or when testing.
+ * @param rollbar
  */
 async function mainProcess(
   producer: RabbitMqHandler,
   pool: Pool,
-  chain?: string
+  rollbar?: Rollbar
 ) {
-  // TODO: post this data somewhere?
   log.info('Starting scheduled process...');
   const activeListeners = getListenerNames(listenerInstances);
   if (activeListeners.length > 0) {
@@ -56,13 +51,13 @@ async function mainProcess(
     log.info('No active listeners');
   }
 
-  let query: string;
-  if (process.env.CHAIN || chain) {
-    const selectedChain = process.env.CHAIN || chain;
+  let allChainsAndTokens;
+  if (process.env.CHAIN) {
+    const selectedChain = process.env.CHAIN;
     // gets the data needed to start a single listener for the chain specified by the CHAIN environment variable
     // this query will ignore all network types, token types, contract types, as well has_chain_events_listener
     // use this ONLY if you know what you are doing (must be a compatible chain)
-    query = `
+    const query = `
         SELECT C.id,
                C.substrate_spec,
                C2.address                                                              as contract_address,
@@ -76,42 +71,21 @@ async function mainProcess(
                  LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
         WHERE C.id = '${selectedChain}';
     `;
-  } else {
-    // selects the chain data needed to create the listeners for the current chainSubscriber
-    query = `
-      WITH allChains AS (SELECT "Chains".id,
-                                "Chains".substrate_spec,
-                                "Chains".network,
-                                "Chains".base,
-                                "Chains".ce_verbose,
-                                "ChainNodes".id                          as chain_node_id,
-                                "ChainNodes".private_url,
-                                "ChainNodes".url,
-                                "Contracts".address,
-                                ROW_NUMBER() OVER (ORDER BY "Chains".id) AS index
-                         FROM "Chains"
-                                  JOIN "ChainNodes" ON "Chains".chain_node_id = "ChainNodes".id
-                                  LEFT JOIN "CommunityContracts" cc
-                                            ON cc.chain_id = "Chains".id
-                                  LEFT JOIN "Contracts"
-                                            ON "Contracts".id = cc.contract_id
-                         WHERE "Chains"."has_chain_events_listener" = true
-                           AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
-                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
-      SELECT allChains.id,
-             allChains.substrate_spec,
-             allChains.address                                                 as contract_address,
-             allChains.network,
-             allChains.base,
-             allChains.ce_verbose                                              as verbose_logging,
-             JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
-                               COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
-      FROM allChains
-      WHERE MOD(allChains.index, ${NUM_WORKERS}) = ${WORKER_NUMBER};
-  `;
-  }
 
-  const allChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
+    allChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
+  } else {
+    try {
+      const result = await fetch(
+        `${CW_SERVER_URL}/api/getChainEventServiceData?secret=${CHAIN_EVENT_SERVICE_SECRET}`
+      );
+      const jsonRes = await result.json();
+      allChainsAndTokens = jsonRes.result;
+    } catch (e) {
+      log.error(`Could not fetch chain-event service date`, e);
+      rollbar?.critical(`Could not fetch chain-event service date`, e);
+      return;
+    }
+  }
 
   const erc20Tokens = [];
   const erc721Tokens = [];
@@ -164,38 +138,45 @@ async function mainProcess(
   }
 }
 
-export async function chainEventsSubscriberInitializer(): Promise<void> {
+export async function chainEventsSubscriberInitializer(): Promise<{ rollbar: any; pool: any; producer: RabbitMqHandler }> {
   // begin process
   log.info('Initializing ChainEventsSubscriber');
 
-  rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
+  let rollbar;
+  if (ROLLBAR_SERVER_TOKEN) {
+    rollbar = new Rollbar({
+      accessToken: ROLLBAR_SERVER_TOKEN,
+      environment: process.env.NODE_ENV,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
+  }
 
-  // setup sql client pool
-  pool = new Pool({
-    connectionString: CW_DATABASE_URI,
-    ssl:
-      process.env.NODE_ENV !== 'production'
-        ? false
-        : {
+  let pool;
+  // if CHAIN env var is set then we run the subscriber for only the specified chain
+  // and we query the commonwealth db directly i.e. bypass the need to have the Commonwealth server running
+  if (process.env.CHAIN) {
+    pool = new Pool({
+      connectionString: CW_DATABASE_URI,
+      ssl:
+        process.env.NODE_ENV !== 'production'
+          ? false
+          : {
             rejectUnauthorized: false,
           },
-    max: 3,
-  });
+      max: 3,
+    });
 
-  pool.on('error', (err, client) => {
-    log.error('Unexpected error on idle client', err);
-  });
+    pool.on('error', (err, client) => {
+      log.error('Unexpected error on idle client', err);
+    });
+  }
 
   log.info(
     `Worker Number: ${WORKER_NUMBER}, Number of Workers: ${NUM_WORKERS}`
   );
 
-  producer = new RabbitMqHandler(
+  const producer = new RabbitMqHandler(
     <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
     RascalPublications.ChainEvents
   );
@@ -203,24 +184,30 @@ export async function chainEventsSubscriberInitializer(): Promise<void> {
     await producer.init();
   } catch (e) {
     log.error('Fatal error occurred while starting the RabbitMQ producer', e);
-    rollbar.critical(
+    rollbar?.critical(
       'Fatal error occurred while starting the RabbitMQ producer',
       e
     );
   }
+
+  return {producer, pool, rollbar}
 }
 
 if (process.argv[2] === 'run-as-script') {
+  let producerInstance, poolInstance, rollbarInstance;
   chainEventsSubscriberInitializer()
-    .then(() => {
-      return mainProcess(producer, pool);
+    .then(({producer, pool, rollbar}) => {
+      producerInstance = producer;
+      poolInstance = pool;
+      rollbarInstance = rollbar;
+      return mainProcess(producer, pool, rollbar);
     })
     .then(() => {
       // re-run this function every [REPEAT_TIME] minutes
-      setInterval(mainProcess, REPEAT_TIME * 60000, producer, pool);
+      setInterval(mainProcess, REPEAT_TIME * 60000, producerInstance, poolInstance, rollbarInstance);
     })
     .catch((err) => {
       log.error('Fatal error occurred', err);
-      rollbar?.critical('Fatal error occurred', err);
+      rollbarInstance?.critical('Fatal error occurred', err);
     });
 }

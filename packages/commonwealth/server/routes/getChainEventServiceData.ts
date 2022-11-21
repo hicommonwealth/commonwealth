@@ -1,0 +1,59 @@
+import {DB} from '../models';
+import {AppError} from "common-common/src/errors";
+import { Response, NextFunction, Request } from 'express';
+import {CHAIN_EVENT_SERVICE_SECRET} from "../config";
+import {NUM_WORKERS, WORKER_NUMBER} from "chain-events/services/config";
+import {QueryTypes} from "sequelize";
+
+export const Errors = {
+  NeedSecret: 'Must provide the secret to use this route',
+  InvalidSecret: 'Must provide a valid secret to use this route'
+}
+
+export const getChainEventServiceData = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+  if (!req.query.secret) {
+    return next(new AppError(Errors.NeedSecret));
+  }
+
+  if (req.query.secret !== CHAIN_EVENT_SERVICE_SECRET) {
+    return next(new AppError(Errors.InvalidSecret));
+  }
+
+  const query = `
+      WITH allChains AS (SELECT "Chains".id,
+                                "Chains".substrate_spec,
+                                "Chains".network,
+                                "Chains".base,
+                                "Chains".ce_verbose,
+                                "ChainNodes".id                          as chain_node_id,
+                                "ChainNodes".private_url,
+                                "ChainNodes".url,
+                                "Contracts".address,
+                                ROW_NUMBER() OVER (ORDER BY "Chains".id) AS index
+                         FROM "Chains"
+                                  JOIN "ChainNodes" ON "Chains".chain_node_id = "ChainNodes".id
+                                  LEFT JOIN "CommunityContracts" cc
+                                            ON cc.chain_id = "Chains".id
+                                  LEFT JOIN "Contracts"
+                                            ON "Contracts".id = cc.contract_id
+                         WHERE "Chains"."has_chain_events_listener" = true
+                           AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
+                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')))
+      SELECT allChains.id,
+             allChains.substrate_spec,
+             allChains.address                                                 as contract_address,
+             allChains.network,
+             allChains.base,
+             allChains.ce_verbose                                              as verbose_logging,
+             JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
+                               COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
+      FROM allChains
+      WHERE MOD(allChains.index, ${NUM_WORKERS}) = ${WORKER_NUMBER};
+  `;
+
+  const result = await models.sequelize.query(
+    query, {type: QueryTypes.SELECT, raw: true}
+  );
+
+  return res.json({ status: 'Success', result });
+}

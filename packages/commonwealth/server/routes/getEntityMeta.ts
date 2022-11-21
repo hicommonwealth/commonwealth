@@ -1,5 +1,6 @@
 import { Response, NextFunction, Request } from 'express';
 import { DB } from '../models';
+import {AppError} from "common-common/src/errors";
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
@@ -8,7 +9,7 @@ export const Errors = {
 
 const getEntityMeta = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   if (!req.query.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
 
   const chain = await models.Chain.findOne({
@@ -16,7 +17,7 @@ const getEntityMeta = async (models: DB, req: Request, res: Response, next: Next
   });
 
   if (!chain) {
-    return next(new Error(Errors.InvalidChain));
+    return next(new AppError(Errors.InvalidChain));
   }
 
   const entityMetaFindOptions: any = {
