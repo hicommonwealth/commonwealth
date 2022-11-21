@@ -29,6 +29,7 @@ import reactionsCounts from './routes/reactionsCounts';
 import threadsUsersCountAndAvatars from './routes/threadsUsersCountAndAvatars';
 import starCommunity from './routes/starCommunity';
 import createChain from './routes/createChain';
+import createContract from './routes/contracts/createContract';
 import viewCount from './routes/viewCount';
 import updateEmail from './routes/updateEmail';
 import updateBanner from './routes/updateBanner';
@@ -140,7 +141,6 @@ import tokenBalance from './routes/tokenBalance';
 import bulkBalances from './routes/bulkBalances';
 import getSupportedEthChains from './routes/getSupportedEthChains';
 import editSubstrateSpec from './routes/editSubstrateSpec';
-import { getStatsDInstance } from './util/metrics';
 import updateAddress from './routes/updateAddress';
 import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
@@ -158,6 +158,7 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
+import StatsDController from './util/statsd';
 
 function setupRouter(
   app: Express,
@@ -171,13 +172,14 @@ function setupRouter(
   const router = express.Router();
 
   router.use((req, res, next) => {
-    getStatsDInstance().increment(`cw.path.${req.path.slice(1)}.called`);
+    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      getStatsDInstance().histogram(
-        `cw.path.${req.path.slice(1)}.latency`,
-        latency
+      StatsDController.get().histogram(
+        `cw.path.latency`,
+        latency,
+        { path: req.path.slice(1) }
       );
     });
     next();
@@ -231,6 +233,12 @@ function setupRouter(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
+  );
+
+  router.post(
+    '/createContract',
+    passport.authenticate('jwt', { session: false }),
+    createContract.bind(this, models)
   );
 
   router.post(

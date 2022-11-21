@@ -11,6 +11,7 @@ import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
+import CommunityRole from './CommunityRole';
 
 class ChainInfo {
   public readonly id: string;
@@ -39,7 +40,8 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
-  public chatEnabled: boolean;
+  public defaultAllowPermissions: bigint;
+  public defaultDenyPermissions: bigint;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -47,6 +49,7 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discord_config_id?: string;
+  public communityRoles: CommunityRole[];
 
   public get node() {
     return this.ChainNode;
@@ -77,13 +80,15 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    chatEnabled,
+    defaultAllowPermissions,
+    defaultDenyPermissions,
     decimals,
     substrateSpec,
     ChainNode,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
+    communityRoles
   }) {
     this.id = id;
     this.network = network;
@@ -108,7 +113,8 @@ class ChainInfo {
     this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
-    this.chatEnabled = chatEnabled;
+    this.defaultAllowPermissions = defaultAllowPermissions;
+    this.defaultDenyPermissions = defaultDenyPermissions;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
@@ -118,6 +124,7 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discord_config_id = discord_config_id;
+    this.communityRoles = communityRoles;
   }
 
   public static fromJSON({
@@ -145,13 +152,15 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    chat_enabled,
+    default_allow_permissions,
+    default_deny_permissions,
     substrate_spec,
     token_name,
     Contracts,
     ChainNode,
     admin_only_polling,
     discord_config_id,
+    community_roles
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -190,13 +199,15 @@ class ChainInfo {
       ss58_prefix,
       bech32_prefix,
       type,
-      chatEnabled: chat_enabled,
+      defaultAllowPermissions: default_allow_permissions,
+      defaultDenyPermissions: default_deny_permissions,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
+      communityRoles: community_roles
     });
   }
 
@@ -272,7 +283,8 @@ class ChainInfo {
     snapshot,
     iconUrl,
     defaultOverview,
-    chatEnabled,
+    default_allow_permissions,
+    default_deny_permissions,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -287,7 +299,8 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
-      chat_enabled: chatEnabled,
+      default_allow_permissions,
+      default_deny_permissions,
       snapshot,
       terms,
       icon_url: iconUrl,
@@ -309,7 +322,8 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultOverview = updatedChain.default_summary_view;
-    this.chatEnabled = updatedChain.chat_enabled;
+    this.defaultAllowPermissions = updatedChain.default_allow_permissions;
+    this.defaultDenyPermissions = updatedChain.default_deny_permissions;
   }
 
   public getAvatar(size: number) {
