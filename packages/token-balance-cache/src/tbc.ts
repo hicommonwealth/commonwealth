@@ -3,6 +3,7 @@ import { Client } from 'pg';
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNetwork } from 'common-common/src/types';
 
 import {
   BalanceProvider,
@@ -11,6 +12,7 @@ import {
   ICache,
   IChainNode,
   ITokenBalanceCache,
+  FetchTokenBalanceErrors,
   TokenBalanceResp,
 } from './types';
 import { default as BalanceProviders } from './providers';
@@ -139,6 +141,55 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       }
     }
     return results;
+  }
+
+  // Backwards compatibility function to fetch a single user's token balance
+  // in a context where a chain node only has a single balance provider.
+  public async fetchUserBalance(
+    network: ChainNetwork,
+    nodeId: number,
+    userAddress: string,
+    contractAddress?: string
+  ): Promise<string> {
+    let bp: string;
+    try {
+      const providersResult = await this.getBalanceProviders(nodeId);
+      bp = providersResult[0].bp;
+    } catch (e) {
+      throw new Error(FetchTokenBalanceErrors.NoBalanceProvider);
+    }
+
+    // grab contract if provided, otherwise query native token
+    let opts = {};
+    if (contractAddress) {
+      if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721) {
+        throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
+      }
+      opts = {
+        tokenAddress: contractAddress,
+        contractType: network,
+      };
+    }
+
+    let balancesResp: TokenBalanceResp;
+    try {
+      balancesResp = await this.getBalancesForAddresses(
+        nodeId,
+        [ userAddress ],
+        bp,
+        opts,
+      );
+    } catch (err) {
+      throw new Error('Query Failed');
+    }
+
+    if (balancesResp.balances[userAddress]) {
+      return balancesResp.balances[userAddress];
+    } else if (balancesResp.errors[userAddress]) {
+      throw new Error(`Error querying balance: ${balancesResp.errors[userAddress]}`);
+    } else {
+      throw new Error('Query failed');
+    }
   }
 
   private async _refreshNodes() {
