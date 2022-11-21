@@ -35,13 +35,14 @@ export type PollOptionAttrs = {
 };
 
 export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<PollOptionAttrs>) {
     const {
       multiSelect,
       voteInformation,
       selectedOptions,
       disableVoteOptions,
     } = vnode.attrs;
+
     return (
       <div class="PollOptions">
         {multiSelect
@@ -80,17 +81,22 @@ export type CastVoteAttrs = {
   disableVoteButton: boolean;
   timeRemaining: string;
   tooltipErrorMessage: string;
-  onVoteCast: () => any;
+  onVoteCast: (
+    selectedOption: string,
+    handleVoteCast: () => void,
+    isSelected?: boolean
+  ) => any;
 };
 
 export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CastVoteAttrs>) {
     const {
       disableVoteButton,
       timeRemaining,
       onVoteCast,
       tooltipErrorMessage,
     } = vnode.attrs;
+
     return (
       <div class="CastVoteSection">
         {disableVoteButton ? (
@@ -132,7 +138,7 @@ export type VoteDisplayAttrs = {
 };
 
 export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<VoteDisplayAttrs>) {
     const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
       vnode.attrs;
 
@@ -178,7 +184,7 @@ export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
 
 export type ResultsSectionAttrs = {
   resultString: string;
-  onResultsClick: () => any;
+  onResultsClick: (e: Event) => any;
   tokenSymbol: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
@@ -188,7 +194,7 @@ export type ResultsSectionAttrs = {
 };
 
 export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ResultsSectionAttrs>) {
     const {
       resultString,
       onResultsClick,
@@ -295,7 +301,11 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
 
 export type PollCardAttrs = PollOptionAttrs &
   CastVoteAttrs &
-  ResultsSectionAttrs;
+  ResultsSectionAttrs & {
+    hasVoted?: boolean;
+    incrementalVoteCast?: number;
+    proposalTitle?: string;
+  };
 
 export class PollCard implements m.ClassComponent<PollCardAttrs> {
   private hasVoted: boolean;
@@ -303,7 +313,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
   private totalVoteCount: number;
   private voteDirectionString: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<PollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -313,7 +323,7 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
     this.selectedOptions = [];
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<PollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,
@@ -344,7 +354,6 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
 
       await onVoteCast(
         this.selectedOptions[0],
-        this.selectedOptions.length === 0,
         () => {
           if (!votedFor) {
             this.totalVoteCount += incrementalVoteCast;
@@ -353,7 +362,8 @@ export class PollCard implements m.ClassComponent<PollCardAttrs> {
             this.selectedOptions[0]
           );
           this.hasVoted = true;
-        }
+        },
+        this.selectedOptions.length === 0
       );
       m.redraw();
     };

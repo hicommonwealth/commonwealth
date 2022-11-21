@@ -14,8 +14,12 @@ import { CWTextInput } from './component_kit/cw_text_input';
 import { CWText } from './component_kit/cw_text';
 import { CWSpinner } from './component_kit/cw_spinner';
 
-const renderThreadPreview = (state, thread: Thread, idx: number) => {
-  const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
+const renderThreadPreview = (
+  linkedThreads: Array<Thread>,
+  thread: Thread,
+  idx: number
+) => {
+  const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
   return m(ListItem, {
@@ -39,13 +43,12 @@ const renderThreadPreview = (state, thread: Thread, idx: number) => {
 // The thread-to-thread relationship is comprised of linked and linking threads,
 // i.e. child and parent nodes.
 
-export class ThreadSelector
-  implements
-    m.ClassComponent<{
-      linkedThreads: Thread[];
-      linkingThread: Thread;
-    }>
-{
+type ThreadSelectorAttrs = {
+  linkedThreads: Array<Thread>;
+  linkingThread: Thread;
+};
+
+export class ThreadSelector implements m.ClassComponent<ThreadSelectorAttrs> {
   private inputTimeout;
   private linkedThreads: Thread[];
   private loading: boolean;
@@ -53,14 +56,14 @@ export class ThreadSelector
   private searchTerm: string;
   private showOnlyLinkedThreads: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ThreadSelectorAttrs>) {
     this.showOnlyLinkedThreads = true;
     this.searchResults = [];
     this.linkedThreads = vnode.attrs.linkedThreads;
     this.searchTerm = '';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ThreadSelectorAttrs>) {
     const { linkingThread } = vnode.attrs;
     const { searchResults } = this;
 
@@ -150,7 +153,7 @@ export class ThreadSelector
                   ? linkedThreads
                   : searchResults,
               itemRender: (item: Thread, idx) =>
-                renderThreadPreview(this, item, idx),
+                renderThreadPreview(this.linkedThreads, item, idx),
               onSelect: (thread: Thread) => {
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
