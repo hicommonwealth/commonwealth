@@ -47,10 +47,10 @@ type ThreadCountQueryData = {
 };
 
 type StatusResp = {
-  chainsWithSnapshots: Array<{
+  chainsWithSnapshots: {
     chain: ChainInstance;
-    snapshot: string[];
-  }>;
+    snapshot: string[] | null;
+  }[];
   nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
   chainCategories: ChainCategoryInstance[];
@@ -152,14 +152,17 @@ const status = async (
           { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
         );
 
-      return res.json({
+      return success(res, {
         chainsWithSnapshots,
         nodes,
         notificationCategories,
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
+        roles: null,
+        invites: null,
         loggedIn: false,
+        user: null,
       });
     }
 
