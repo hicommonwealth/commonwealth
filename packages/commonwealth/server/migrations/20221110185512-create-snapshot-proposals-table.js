@@ -18,6 +18,10 @@ module.exports = {
           type: Sequelize.TEXT,
           allowNull: true,
         },
+        choices: {
+          type: Sequelize.ARRAY(Sequelize.STRING),
+          allowNull: true,
+        },
         space: {
           type: Sequelize.STRING,
           allowNull: false,

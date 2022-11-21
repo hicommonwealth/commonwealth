@@ -27,7 +27,11 @@ export class AppError extends Error {
 
 export interface SnapshotEvent {
   id: string;
-  event: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
   space: string;
-  expire: number;
+  event: string;
+  start?: string;
+  expire: string;
 }

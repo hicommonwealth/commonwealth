@@ -4,8 +4,12 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type SnapshotProposalAttributes = {
   id: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
   space: string;
   event: string;
+  start?: string;
   expire: string;
 };
 
@@ -29,6 +33,7 @@ export default (
       id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
       title: { type: dataTypes.STRING, allowNull: true },
       body: { type: dataTypes.STRING, allowNull: true },
+      choices: { type: dataTypes.ARRAY(Sequelize.STRING), allowNull: true },
       space: { type: dataTypes.STRING, allowNull: false},
       event: { type: dataTypes.STRING, allowNull: true},
       start: { type: dataTypes.STRING, allowNull: true},
