@@ -1,13 +1,12 @@
-import { DB } from '../../models';
 import { Logger } from 'typescript-logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
-  isRmqMsgCreateCENotificationsCUD,
-  RascalPublications, RmqMsgFormatError, TRmqMsgCENotificationsCUD
+  RascalPublications, RmqCENotificationCUD
 } from 'common-common/src/rabbitmq/types';
 import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQController";
+import {ChainEventNotification} from "types";
+import { DB } from '../../models';
 import {NotificationInstance} from "../../models/notification";
-import {ChainEventNotification} from "../../../shared/types";
 
 export type Ithis = {
   models: DB;
@@ -17,13 +16,9 @@ export type Ithis = {
 
 export async function processChainEventNotificationsCUD(
   this: Ithis,
-  data: TRmqMsgCENotificationsCUD
+  data: RmqCENotificationCUD.RmqMsgType
 ) {
-  if (!isRmqMsgCreateCENotificationsCUD(data)) {
-    // TODO: rollbar/datadog reporting
-    this.log.error(`Incorrect CENotificationsCUD message format: ${JSON.stringify(data)}`);
-    throw new RmqMsgFormatError(`Incorrect message format: ${data}`);
-  }
+  RmqCENotificationCUD.checkMsgFormat(data);
 
   const chainEvent = data.ChainEvent;
   let dbNotification: NotificationInstance;
@@ -63,8 +58,7 @@ export async function processChainEventNotificationsCUD(
 
     // send to socket.io for WebSocket notifications
     await this.rmqController.publish(
-      // TODO: better type here
-      <ChainEventNotification><unknown>formattedEvent,
+      <ChainEventNotification>formattedEvent,
       RascalPublications.ChainEventNotifications
     );
     this.log.info('Notification pushed to socket queue');

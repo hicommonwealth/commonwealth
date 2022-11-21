@@ -1,6 +1,5 @@
 import {RmqMsgFormatError, RmqMsgNamespace} from "common-common/src/rabbitmq";
 import {ChainEventNotification} from "commonwealth/shared/types";
-import moment from "moment/moment";
 
 /**
  * This object is merged with the namespace with the same name below so that within one object we have the invalid
@@ -49,7 +48,10 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
    */
   checkMsgFormat(data: any): void {
     const valid = this.isValidMsgFormat(data);
-    if (!valid) throw this.getInvalidFormatError(data);
+    if (!valid) {
+      console.log(`The following notification is improperly formatted: ${JSON.stringify(data)}`);
+      throw this.getInvalidFormatError(data);
+    }
   }
 }
 

@@ -1,18 +1,18 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import {app} from "../../../services/app/Server";
-import {Errors as EntityErrors} from "../../../services/app/routes/entities";
-import {Errors as EventErrors} from "../../../services/app/routes/eventActivity";
+import { app } from '../../../services/app/Server';
+import { Errors as EntityErrors } from '../../../services/app/routes/entities';
+import { Errors as EventErrors } from '../../../services/app/routes/eventActivity';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe("Tests for the App service", () => {
-  describe("Tests for /entities", () => {
-    it("Should return entities for a specific chain", async () => {
+describe('Tests for the App service', () => {
+  describe('Tests for /entities', () => {
+    it('Should return entities for a specific chain', async () => {
       const result = await chai
         .request(app)
-        .get("/api/entities?chain=dydx")
+        .get('/api/entities?chain=dydx')
         .set('Accept', 'application/json');
 
       expect(result.status).to.be.equal(200);
@@ -20,19 +20,19 @@ describe("Tests for the App service", () => {
       expect(result.body.result).to.not.be.null;
     });
 
-    it("Should fail if a chain is not provided", async () => {
+    it('Should fail if a chain is not provided', async () => {
       const result = await chai
         .request(app)
-        .get("/api/entities")
+        .get('/api/entities')
         .set('Accept', 'application/json');
 
       expect(result.status).to.be.equal(400);
       expect(result.text.includes(EntityErrors.NeedChain)).to.be.true;
-    })
+    });
   });
 
-  describe("Tests for /events", async () => {
-    it("Should return a limited number of events from any chain", async () => {
+  describe('Tests for /events', async () => {
+    it('Should return a limited number of events from any chain', async () => {
       const limit = 13;
       const result = await chai
         .request(app)
@@ -42,11 +42,11 @@ describe("Tests for the App service", () => {
       expect(result.status).to.be.equal(200);
       expect(result.body).to.not.be.null;
       expect(result.body.result).to.not.be.null;
-      expect(result.body.result).to.have.property("length");
+      expect(result.body.result).to.have.property('length');
       expect(result.body.result.length).to.be.equal(limit);
     });
 
-    it("Should fail if a limit number is not provided", async () => {
+    it('Should fail if a limit number is not provided', async () => {
       const limit = 13;
       const result = await chai
         .request(app)
@@ -64,6 +64,6 @@ describe("Tests for the App service", () => {
    * post listener info to the ChainEventsApp but that would serve little purpose as the
    * data would be minimal/inconsequential due to the way the ChainSubscriber is set up
    */
-  xit("Should support posting ChainSubscriber status data");
-  xit("Should be able to fetch ChainSubscriber status data");
+  xit('Should support posting ChainSubscriber status data');
+  xit('Should be able to fetch ChainSubscriber status data');
 });

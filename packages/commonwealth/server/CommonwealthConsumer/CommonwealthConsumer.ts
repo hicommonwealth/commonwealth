@@ -4,14 +4,14 @@ import {
   ServiceConsumer,
 } from 'common-common/src/ServiceConsumer';
 import { BrokerConfig } from 'rascal';
-import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
+import Rollbar from "rollbar";
+import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
-import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -60,7 +60,7 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     msgProcessorContext: context,
   };
 
-  let subscriptions: RabbitMQSubscription[] = [
+  const subscriptions: RabbitMQSubscription[] = [
     chainEntityCUDProcessorRmqSub,
     ceNotifsCUDProcessorRmqSub,
     ceTypeCUDProcessorRmqSub,

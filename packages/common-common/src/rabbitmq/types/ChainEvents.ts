@@ -14,7 +14,9 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
    * @param event The raw message from RabbitMQ
    */
   getInvalidFormatError(event: any): RmqMsgFormatError {
-    return new RmqMsgFormatError(`The following CW event is improperly formatted: ${JSON.stringify(event)}`);
+    return new RmqMsgFormatError(
+      `The following CW event is improperly formatted: ${JSON.stringify(event)}`
+    );
   },
 
   /**
@@ -40,7 +42,10 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
    */
   checkMsgFormat(data: any): void {
     const valid = this.isValidMsgFormat(data);
-    if (!valid) throw this.getInvalidFormatError(data);
+    if (!valid) {
+      console.log(`The following CW event is improperly formatted: ${JSON.stringify(data)}`);
+      throw this.getInvalidFormatError(data);
+    }
   }
 }
 

@@ -1,11 +1,12 @@
-import {DB} from "../database/database";
 import {
-  IRmqMsgCreateCETypeCUD,
   RabbitMQController,
   RascalPublications,
-  RepublishFailedMessages
-} from "common-common/src/rabbitmq";
-import Sequelize from "sequelize";
+  RepublishFailedMessages,
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
+import * as Sequelize from 'sequelize';
+
+import { DB } from '../database/database';
 
 /**
  * A worker that periodically republishes data from the database if it's queued value is between -1 and 5. A queued
@@ -13,10 +14,7 @@ import Sequelize from "sequelize";
  *
  */
 export class RepublishMessages extends RepublishFailedMessages<DB> {
-  constructor(
-    _rmqController: RabbitMQController,
-    _models: DB
-  ) {
+  constructor(_rmqController: RabbitMQController, _models: DB) {
     super(_rmqController, _models, 180000);
   }
 
@@ -24,19 +22,19 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     const result = await this._models.ChainEventType.findAll({
       where: {
         queued: {
-          [Sequelize.Op.between]: [-1, 5]
-        }
-      }
+          [Sequelize.Op.between]: [-1, 5],
+        },
+      },
     });
 
     // TODO
     if (result.length > 100) {}
 
     for (const eventType of result) {
-      const publishData: IRmqMsgCreateCETypeCUD = {
+      const publishData: RmqCETypeCUD.RmqMsgType = {
         chainEventTypeId: eventType.id,
-        cud: 'create'
-      }
+        cud: 'create',
+      };
 
       await this._rmqController.safePublish(
         publishData,
@@ -44,10 +42,9 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
         RascalPublications.ChainEventTypeCUDMain,
         {
           sequelize: this._models.sequelize,
-          model: this._models.ChainEventType
+          model: this._models.ChainEventType,
         }
-      )
+      );
     }
   }
 }
-

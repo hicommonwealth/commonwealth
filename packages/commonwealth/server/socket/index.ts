@@ -2,7 +2,6 @@
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
-import { BrokerConfig } from 'rascal';
 import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
@@ -13,17 +12,18 @@ import {
   ReconnectStrategyError, SocketClosedUnexpectedlyError
 } from "redis";
 import Rollbar from 'rollbar';
-import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import {
   JWT_SECRET,
   REDIS_URL,
   VULTR_IP
 } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { createChatNamespace } from './chatNs';
 import { DB } from '../models';
-import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import StatsDController from "../util/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 

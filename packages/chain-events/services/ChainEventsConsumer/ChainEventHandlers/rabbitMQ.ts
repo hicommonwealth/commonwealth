@@ -1,14 +1,21 @@
 import { CWEvent, IEventHandler } from 'chain-events/src';
 import Rascal from 'rascal';
-import {RascalPublications, RabbitMQController} from 'common-common/src/rabbitmq'
+import {
+  RascalPublications,
+  RabbitMQController,
+} from 'common-common/src/rabbitmq';
 
-export class RabbitMqHandler extends RabbitMQController implements IEventHandler {
+export class RabbitMqHandler extends RabbitMQController
+  implements IEventHandler {
+  protected publication: RascalPublications;
 
-  protected publication: RascalPublications
-
-  constructor(_rabbitMQConfig: Rascal.BrokerConfig, publication: RascalPublications) {
+  constructor(
+    _rabbitMQConfig: Rascal.BrokerConfig,
+    publication: RascalPublications
+  ) {
     super(_rabbitMQConfig);
-    if (!this.publishers.includes(publication)) throw new Error('Given publication does not exist!');
+    if (!this.publishers.includes(publication))
+      throw new Error('Given publication does not exist!');
     this.publication = publication;
   }
 

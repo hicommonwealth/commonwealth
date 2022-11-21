@@ -2,19 +2,18 @@ import chai from 'chai';
 import {ServiceConsumer} from "common-common/src/ServiceConsumer";
 import {getQueueStats, publishRmqMsg} from "common-common/src/rabbitmq/util";
 import {
-  IRmqMsgCreateCENotificationsCUD, IRmqMsgCreateEntityCUD,
   RascalExchanges,
   RascalQueues,
-  RascalRoutingKeys
+  RascalRoutingKeys, RmqCENotificationCUD, RmqEntityCUD
 } from "common-common/src/rabbitmq";
-import {setupCommonwealthConsumer} from "../../server/CommonwealthConsumer/CommonwealthConsumer";
-import {RABBITMQ_API_URI} from "../../server/config";
-import models from "../../server/database";
 import {v4 as uuidv4} from 'uuid';
 import * as AaveTypes from "chain-events/src/chains/aave/types";
 import {EventKind, ITransfer} from "chain-events/src/chains/aave/types";
 import {CWEvent, SupportedNetwork} from "chain-events/src";
 import {ChainEventAttributes} from "chain-events/services/database/models/chain_event";
+import {setupCommonwealthConsumer} from "../../server/CommonwealthConsumer/CommonwealthConsumer";
+import {RABBITMQ_API_URI} from "../../server/config";
+import models from "../../server/database";
 
 
 const {expect} = chai;
@@ -107,7 +106,7 @@ describe("Tests for the commonwealth-app consumer", () => {
       ChainEventType: cet
     }
 
-    const ceNotifCUD: IRmqMsgCreateCENotificationsCUD = {
+    const ceNotifCUD: RmqCENotificationCUD.RmqMsgType = {
       ChainEvent: chainEvent,
       event: cwEvent,
       cud: 'create'
@@ -142,7 +141,7 @@ describe("Tests for the commonwealth-app consumer", () => {
     const maxEntityId: number = await models.ChainEntityMeta.max('ce_id');
     if (!maxEntityId) throw new Error("Failed to get max entity id");
 
-    const entity: IRmqMsgCreateEntityCUD = {
+    const entity: RmqEntityCUD.RmqMsgType = {
       ce_id: maxEntityId + 1,
       chain_id: 'aave',
       cud: 'create'

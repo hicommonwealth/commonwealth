@@ -5,15 +5,15 @@ import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
 import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
-import { Sequelize, DataTypes } from "sequelize";
-import { DATABASE_URI } from "../config";
+import { Sequelize, DataTypes } from 'sequelize';
+import { DATABASE_URI } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 export type Models = {
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
-}
+};
 
 export interface DB extends Models {
   sequelize: Sequelize;
@@ -29,17 +29,17 @@ export const sequelize = new Sequelize(DATABASE_URI, {
     process.env.NODE_ENV === 'test'
       ? false
       : (msg) => {
-        log.trace(msg);
-      },
+          log.trace(msg);
+        },
   dialectOptions:
     process.env.NODE_ENV !== 'production'
       ? {
-        requestTimeout: 40000,
-      }
+          requestTimeout: 40000,
+        }
       : {
-        requestTimeout: 40000,
-        ssl: { rejectUnauthorized: false },
-      },
+          requestTimeout: 40000,
+          ssl: { rejectUnauthorized: false },
+        },
   pool: {
     max: 10,
     min: 0,
@@ -52,7 +52,7 @@ const models: Models = {
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
   ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
-}
+};
 
 const db: DB = {
   sequelize,

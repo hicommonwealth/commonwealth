@@ -1,10 +1,13 @@
-import {Pool} from 'pg';
+import { Pool } from 'pg';
 import _ from 'underscore';
-import {BrokerConfig} from 'rascal';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {RascalPublications, getRabbitMQConfig} from 'common-common/src/rabbitmq';
-import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
-import {factory, formatFilename} from 'common-common/src/logging';
+import { BrokerConfig } from 'rascal';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import {
+  RascalPublications,
+  getRabbitMQConfig,
+} from 'common-common/src/rabbitmq';
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   CW_DATABASE_URI,
   DATABASE_URI,
@@ -19,10 +22,10 @@ import {
   manageErcListeners,
   manageRegularListeners,
 } from './util';
-import {ChainAttributes, IListenerInstances} from './types';
+import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import models from '../database/database';
-import {QueryTypes} from 'sequelize';
+import { QueryTypes } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -30,7 +33,6 @@ const listenerInstances: IListenerInstances = {};
 let pool: Pool;
 let producer: RabbitMqHandler;
 let rollbar: Rollbar;
-
 
 /**
  * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
@@ -46,12 +48,12 @@ async function mainProcess(
   chain?: string
 ) {
   // TODO: post this data somewhere?
-  log.info("Starting scheduled process...")
+  log.info('Starting scheduled process...');
   const activeListeners = getListenerNames(listenerInstances);
   if (activeListeners.length > 0) {
     log.info(`Active listeners: ${JSON.stringify(activeListeners)}`);
   } else {
-    log.info("No active listeners");
+    log.info('No active listeners');
   }
 
   let query: string;
@@ -73,7 +75,7 @@ async function mainProcess(
                  LEFT JOIN "CommunityContracts" CC on C.id = CC.chain_id
                  LEFT JOIN "Contracts" C2 on CC.contract_id = C2.id
         WHERE C.id = '${selectedChain}';
-    `
+    `;
   } else {
     // selects the chain data needed to create the listeners for the current chainSubscriber
     query = `
@@ -115,9 +117,15 @@ async function mainProcess(
   const erc721Tokens = [];
   const chains = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
   for (const chain of allChainsAndTokens) {
-    if (chain.network === ChainNetwork.ERC20 && chain.base === ChainBase.Ethereum) {
+    if (
+      chain.network === ChainNetwork.ERC20 &&
+      chain.base === ChainBase.Ethereum
+    ) {
       erc20Tokens.push(chain);
-    } else if (chain.network === ChainNetwork.ERC721 && chain.base === ChainBase.Ethereum) {
+    } else if (
+      chain.network === ChainNetwork.ERC721 &&
+      chain.base === ChainBase.Ethereum
+    ) {
       erc721Tokens.push(chain);
     } else {
       chains.push(chain);
@@ -129,8 +137,20 @@ async function mainProcess(
   const erc721ByUrl = _.groupBy(erc721Tokens, (token) => token.ChainNode.url);
 
   // this creates/updates/deletes a single listener in listenerInstances called 'erc20' or 'erc721' respectively
-  await manageErcListeners(ChainNetwork.ERC20, erc20ByUrl, listenerInstances, producer, rollbar);
-  await manageErcListeners(ChainNetwork.ERC721, erc721ByUrl, listenerInstances, producer, rollbar);
+  await manageErcListeners(
+    ChainNetwork.ERC20,
+    erc20ByUrl,
+    listenerInstances,
+    producer,
+    rollbar
+  );
+  await manageErcListeners(
+    ChainNetwork.ERC721,
+    erc721ByUrl,
+    listenerInstances,
+    producer,
+    rollbar
+  );
 
   await manageRegularListeners(chains, listenerInstances, producer, rollbar);
 
@@ -158,9 +178,12 @@ export async function chainEventsSubscriberInitializer(): Promise<void> {
   // setup sql client pool
   pool = new Pool({
     connectionString: CW_DATABASE_URI,
-    ssl: process.env.NODE_ENV !== 'production' ? false : {
-      rejectUnauthorized: false,
-    },
+    ssl:
+      process.env.NODE_ENV !== 'production'
+        ? false
+        : {
+            rejectUnauthorized: false,
+          },
     max: 3,
   });
 
@@ -168,14 +191,22 @@ export async function chainEventsSubscriberInitializer(): Promise<void> {
     log.error('Unexpected error on idle client', err);
   });
 
-  log.info(`Worker Number: ${WORKER_NUMBER}, Number of Workers: ${NUM_WORKERS}`);
+  log.info(
+    `Worker Number: ${WORKER_NUMBER}, Number of Workers: ${NUM_WORKERS}`
+  );
 
-  producer = new RabbitMqHandler(<BrokerConfig>getRabbitMQConfig(RABBITMQ_URI), RascalPublications.ChainEvents);
+  producer = new RabbitMqHandler(
+    <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+    RascalPublications.ChainEvents
+  );
   try {
     await producer.init();
   } catch (e) {
-    log.error("Fatal error occurred while starting the RabbitMQ producer", e);
-    rollbar.critical("Fatal error occurred while starting the RabbitMQ producer", e);
+    log.error('Fatal error occurred while starting the RabbitMQ producer', e);
+    rollbar.critical(
+      'Fatal error occurred while starting the RabbitMQ producer',
+      e
+    );
   }
 }
 
@@ -186,17 +217,10 @@ if (process.argv[2] === 'run-as-script') {
     })
     .then(() => {
       // re-run this function every [REPEAT_TIME] minutes
-      setInterval(
-        mainProcess,
-        REPEAT_TIME * 60000,
-        producer,
-        pool,
-      );
+      setInterval(mainProcess, REPEAT_TIME * 60000, producer, pool);
     })
     .catch((err) => {
-      log.error("Fatal error occurred", err);
-      rollbar?.critical("Fatal error occurred", err);
+      log.error('Fatal error occurred', err);
+      rollbar?.critical('Fatal error occurred', err);
     });
 }
-
-

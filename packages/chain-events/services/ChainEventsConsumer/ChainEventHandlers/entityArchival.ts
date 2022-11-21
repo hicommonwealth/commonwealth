@@ -12,10 +12,12 @@ import {
   SubstrateTypes,
 } from 'chain-events/src';
 
-import {addPrefix, factory} from 'common-common/src/logging';
-import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
-import {IRmqMsgCreateEntityCUD, RascalPublications} from 'common-common/src/rabbitmq/types';
-import {DB} from "../../database/database";
+import { addPrefix, factory } from 'common-common/src/logging';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import {
+  RascalPublications, RmqEntityCUD,
+} from 'common-common/src/rabbitmq/types';
+import { DB } from '../../database/database';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -23,7 +25,7 @@ export default class extends IEventHandler {
   constructor(
     private readonly _models: DB,
     private readonly _rmqController: RabbitMQController,
-    private readonly _chain?: string,
+    private readonly _chain?: string
   ) {
     super();
   }
@@ -36,7 +38,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
 
     // if chain is stored in the event then that will override the class property
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
@@ -72,14 +76,14 @@ export default class extends IEventHandler {
         type_id,
         chain,
         author,
-        completed
+        completed,
       });
 
-      const publishData: IRmqMsgCreateEntityCUD = {
+      const publishData: RmqEntityCUD.RmqMsgType = {
         ce_id: dbEntity.id,
         chain_id: dbEntity.chain,
-        cud: 'create'
-      }
+        cud: 'create',
+      };
 
       await this._rmqController.safePublish(
         publishData,
@@ -87,7 +91,7 @@ export default class extends IEventHandler {
         RascalPublications.ChainEntityCUDMain,
         {
           sequelize: this._models.sequelize,
-          model: this._models.ChainEntity
+          model: this._models.ChainEntity,
         }
       );
 
@@ -95,9 +99,7 @@ export default class extends IEventHandler {
         dbEvent.entity_id = dbEntity.id;
         await dbEvent.save();
       } else {
-        log.info(
-          `Db Event is already linked to entity! Doing nothing.`
-        );
+        log.info(`Db Event is already linked to entity! Doing nothing.`);
       }
 
       return dbEvent;
@@ -116,9 +118,7 @@ export default class extends IEventHandler {
         },
       });
       if (!dbEntity) {
-        log.error(
-          `no relevant db entity found for ${type}: ${type_id}`
-        );
+        log.error(`no relevant db entity found for ${type}: ${type_id}`);
         return;
       }
       log.info(`Updated db entity, ${type}: ${type_id}.`);

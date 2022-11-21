@@ -1,14 +1,13 @@
-import express, { Request, Response } from "express";
-import { factory, formatFilename } from 'common-common/src/logging'
-import bodyParser from 'body-parser'
-import passport from "passport";
-import setupPassport from "./passport";
-import setupRouter from "./router";
-import models from "../database/database";
-import {DEFAULT_PORT} from "../config";
+import express, { Request, Response } from 'express';
+import { factory, formatFilename } from 'common-common/src/logging';
+import bodyParser from 'body-parser';
+import passport from 'passport';
+import setupPassport from './passport';
+import setupRouter from './router';
+import models from '../database/database';
+import { DEFAULT_PORT } from '../config';
 import logger from 'morgan';
-import cors from 'cors'
-
+import cors from 'cors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

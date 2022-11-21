@@ -1,10 +1,10 @@
-import {Request, Response, NextFunction} from 'express';
-import {Op,QueryTypes} from 'sequelize';
+import {NextFunction} from 'express';
+import {Op} from 'sequelize';
 import {factory, formatFilename} from 'common-common/src/logging';
+import {AppError} from 'common-common/src/errors';
 import {TypedRequestBody, TypedResponse, success} from '../types';
 import {DB} from '../models';
-import {AppError, ServerError} from 'common-common/src/errors';
-import { findAllRoles, findOneRole } from '../util/roles';
+import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -79,7 +79,8 @@ const deleteChain = async (
   // eslint-disable-next-line no-new
   new Promise(async (resolve, reject) => {
     await models.sequelize.transaction(async (t) => {
-      await models.ChainEntity.destroy({
+      // TODO: need a parallel API call to chain-events to destroy chain-entities there too
+      await models.ChainEntityMeta.destroy({
         where: { chain : chain.id },
         transaction: t,
       });
@@ -186,8 +187,9 @@ const deleteChain = async (
         transaction: t,
       });
 
+      // TODO: delete chain-event-types in chain-events
       await models.ChainEventType.destroy({
-        where: { chain : chain.id },
+        where: { id : {[Op.like]: `%${chain.id}%`} },
         transaction: t,
       });
 

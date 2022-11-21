@@ -20,11 +20,13 @@ export type ChainEventAttributes = {
 
   ChainEventType?: ChainEventTypeAttributes;
   ChainEntity?: ChainEntityAttributes;
-}
+};
 
 export type ChainEventInstance = ModelInstance<ChainEventAttributes> & {
-  getChainEventType: Sequelize.HasOneGetAssociationMixin<ChainEventTypeInstance>;
-}
+  getChainEventType: Sequelize.HasOneGetAssociationMixin<
+    ChainEventTypeInstance
+  >;
+};
 
 export type ChainEventModelStatic = ModelStatic<ChainEventInstance>;
 
@@ -42,7 +44,7 @@ export default (
       event_data: { type: dataTypes.JSONB, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
-      queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 }
+      queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
     },
     {
       tableName: 'ChainEvents',

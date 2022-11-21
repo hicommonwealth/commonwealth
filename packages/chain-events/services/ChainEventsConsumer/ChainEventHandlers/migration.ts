@@ -12,14 +12,15 @@ import {
 import { WhereOptions } from 'sequelize';
 
 import {
-  IRmqMsgCreateCENotificationsCUD,
-  IRmqMsgCreateCETypeCUD,
   RabbitMQController,
-  RascalPublications
-} from 'common-common/src/rabbitmq'
+  RascalPublications, RmqCENotificationCUD, RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {DB} from "../../database/database";
-import {ChainEventAttributes, ChainEventInstance} from "../../database/models/chain_event";
+import { DB } from '../../database/database';
+import {
+  ChainEventAttributes,
+  ChainEventInstance,
+} from '../../database/models/chain_event';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {
@@ -44,24 +45,26 @@ export default class extends IEventHandler<ChainEventInstance> {
       fieldValue: string,
       eventType: EntityEventKind
     ) => {
-      const [dbEventType, created] =
-        await this._models.ChainEventType.findOrCreate({
-          where: {
-            id: `${chain}-${event.data.kind.toString()}`,
-            chain,
-            event_network: event.network,
-            event_name: event.data.kind.toString(),
-          },
-        });
+      const [
+        dbEventType,
+        created,
+      ] = await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain,
+          event_network: event.network,
+          event_name: event.data.kind.toString(),
+        },
+      });
       log.trace(
         `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
       );
 
       if (created) {
-        const publishData: IRmqMsgCreateCETypeCUD = {
+        const publishData: RmqCETypeCUD.RmqMsgType = {
           chainEventTypeId: dbEventType.id,
-          cud: 'create'
-        }
+          cud: 'create',
+        };
 
         await this._rmqController.safePublish(
           publishData,
@@ -69,7 +72,7 @@ export default class extends IEventHandler<ChainEventInstance> {
           RascalPublications.ChainEventTypeCUDMain,
           {
             sequelize: this._models.sequelize,
-            model: this._models.ChainEventType
+            model: this._models.ChainEventType,
           }
         );
       }
@@ -101,9 +104,11 @@ export default class extends IEventHandler<ChainEventInstance> {
         const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
         formattedEvent.ChainEventType = dbEventType.toJSON();
 
-        const publishData: IRmqMsgCreateCENotificationsCUD = {
-          ChainEvent: formattedEvent, event, cud: 'create'
-        }
+        const publishData: RmqCENotificationCUD.RmqMsgType = {
+          ChainEvent: formattedEvent,
+          event,
+          cud: 'create',
+        };
 
         await this._rmqController.safePublish(
           publishData,
@@ -111,7 +116,7 @@ export default class extends IEventHandler<ChainEventInstance> {
           RascalPublications.ChainEventNotificationsCUDMain,
           {
             sequelize: this._models.sequelize,
-            model: this._models.ChainEvent
+            model: this._models.ChainEvent,
           }
         );
       } else {

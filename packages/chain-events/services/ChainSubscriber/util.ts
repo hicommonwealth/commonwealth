@@ -8,11 +8,11 @@ import {
   SupportedNetwork,
 } from '../../src';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import {ChainAttributes, IListenerInstances} from './types';
+import { ChainAttributes, IListenerInstances } from './types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
 import Rollbar from 'rollbar';
-import models, {DB} from "../database/database";
+import models, { DB } from '../database/database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -188,12 +188,7 @@ export async function manageRegularListeners(
   });
 
   // create listeners for all the new chains -- this does not update any existing chains!
-  await setupNewListeners(
-    newChains,
-    listenerInstances,
-    producer,
-    rollbar
-  );
+  await setupNewListeners(newChains, listenerInstances, producer, rollbar);
 
   // update existing listeners whose verbose_logging or substrate_spec has changed
   await updateExistingListeners(chains, listenerInstances, rollbar);
@@ -359,9 +354,11 @@ export function getListenerNames(
 async function discoverReconnectRange(this: DB, chain: string) {
   let latestBlock;
   try {
-    const eventTypes = (await this.ChainEventType.findAll({
-      where: { chain }
-    })).map(x => x.id);
+    const eventTypes = (
+      await this.ChainEventType.findAll({
+        where: { chain },
+      })
+    ).map((x) => x.id);
     if (eventTypes.length === 0) {
       log.info(
         `[${chain}]: No events in database to get last block number from`
@@ -370,8 +367,8 @@ async function discoverReconnectRange(this: DB, chain: string) {
     }
     latestBlock = await this.ChainEvent.max('block_number', {
       where: {
-        chain_event_type_id: eventTypes
-      }
+        chain_event_type_id: eventTypes,
+      },
     });
   } catch (error) {
     log.warn(

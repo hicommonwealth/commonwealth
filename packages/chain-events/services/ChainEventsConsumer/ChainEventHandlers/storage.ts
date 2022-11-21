@@ -1,19 +1,24 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {CWEvent, IChainEventKind, IEventHandler, SubstrateTypes,} from 'chain-events/src';
-import Sequelize from 'sequelize';
-import {addPrefix, factory, formatFilename} from 'common-common/src/logging';
 import {
-  IRmqMsgCreateCETypeCUD,
+  CWEvent,
+  IChainEventKind,
+  IEventHandler,
+  SubstrateTypes,
+} from 'chain-events/src';
+import * as Sequelize from 'sequelize';
+import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import {
   RabbitMQController,
-  RabbitMQControllerError,
-  RascalPublications
+  RascalPublications,
+  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
-import hash from 'object-hash'
-import {DB} from "../../database/database";
-import {ChainEventInstance} from "../../database/models/chain_event";
+import hash from 'object-hash';
+
+import { DB } from '../../database/database';
+import { ChainEventInstance } from '../../database/models/chain_event';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -24,22 +29,23 @@ export interface StorageFilterConfig {
 }
 
 export default class extends IEventHandler {
-  public readonly name = 'Storage'
-  public readonly eventCache: NodeCache
+  public readonly name = 'Storage';
+
+  public readonly eventCache: NodeCache;
+
   public readonly ttl = 20;
 
   constructor(
     private readonly _models: DB,
     private readonly _rmqController: RabbitMQController,
     private readonly _chain?: string,
-    private readonly _filterConfig: StorageFilterConfig = {},
-
+    private readonly _filterConfig: StorageFilterConfig = {}
   ) {
     super();
     this.eventCache = new NodeCache({
       stdTTL: this.ttl,
       deleteOnExpire: true,
-      useClones: false
+      useClones: false,
     });
   }
 
@@ -49,10 +55,13 @@ export default class extends IEventHandler {
    */
   private truncateEvent(event: CWEvent, maxLength = 64): CWEvent {
     // only truncate preimages, for now
-    if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted && event.data.preimage) {
-      event.data.preimage.args = event.data.preimage.args.map((m) => m.length > maxLength
-        ? `${m.slice(0, maxLength - 1)}…`
-        : m);
+    if (
+      event.data.kind === SubstrateTypes.EventKind.PreimageNoted &&
+      event.data.preimage
+    ) {
+      event.data.preimage.args = event.data.preimage.args.map((m) =>
+        m.length > maxLength ? `${m.slice(0, maxLength - 1)}…` : m
+      );
     }
     return event;
   }
@@ -67,7 +76,9 @@ export default class extends IEventHandler {
    */
   public async handle(event: CWEvent): Promise<ChainEventInstance> {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const log = factory.getLogger(addPrefix(__filename, [event.network, event.chain]));
+    const log = factory.getLogger(
+      addPrefix(__filename, [event.network, event.chain])
+    );
     const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
@@ -78,20 +89,23 @@ export default class extends IEventHandler {
     }
 
     // locate event type and add event (and event type if needed) to database
-    const [ dbEventType, created ] = await this._models.ChainEventType.findOrCreate({
+    const [
+      dbEventType,
+      created,
+    ] = await this._models.ChainEventType.findOrCreate({
       where: {
         id: `${chain}-${event.data.kind.toString()}`,
         chain,
         event_network: event.network,
         event_name: event.data.kind.toString(),
-      }
+      },
     });
 
     if (created) {
-      const publishData: IRmqMsgCreateCETypeCUD = {
+      const publishData: RmqCETypeCUD.RmqMsgType = {
         chainEventTypeId: dbEventType.id,
-        cud: 'create'
-      }
+        cud: 'create',
+      };
 
       await this._rmqController.safePublish(
         publishData,
@@ -99,7 +113,7 @@ export default class extends IEventHandler {
         RascalPublications.ChainEventTypeCUDMain,
         {
           sequelize: this._models.sequelize,
-          model: this._models.ChainEventType
+          model: this._models.ChainEventType,
         }
       );
     }
@@ -118,11 +132,11 @@ export default class extends IEventHandler {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,
-    }
+    };
 
     // duplicate event check
     const eventKey = hash(eventData, {
-      respectType: false
+      respectType: false,
     });
     const cachedEvent = this.eventCache.get(eventKey);
 
@@ -136,7 +150,7 @@ export default class extends IEventHandler {
       return dbEvent;
     } else {
       // refresh ttl for the duplicated event
-      this.eventCache.ttl(eventKey, this.ttl)
+      this.eventCache.ttl(eventKey, this.ttl);
       // return nothing so following handlers ignore this event
     }
   }

@@ -1,8 +1,8 @@
-import {CWEvent} from "chain-events/src";
-import {isTRmqMsgEntityCUD, TRmqMsgEntityCUD} from './chainEntityCUD'
-import {isTRmqMsgCENotificationsCUD, TRmqMsgCENotificationsCUD} from "./chainEventNotificationsCUD";
-import {ChainEventNotification} from "commonwealth/shared/types";
-import {isRmqMsgCETypeCUD, TRmqMsgCETypeCUD} from "./chainEventTypeCUD";
+import {RmqEntityCUD} from './chainEntityCUD'
+import {
+  RmqCENotificationCUD
+} from "./chainEventNotificationsCUD";
+import {RmqCETypeCUD} from "./chainEventTypeCUD";
 
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
@@ -23,10 +23,16 @@ export class RmqMsgFormatError extends Error {
   }
 }
 
+/**
+ * This function determines a message's data type and returns the database model it is related to.
+ * This function is used by the `safePublish` function of the RabbitMQController to update the `queued`
+ * column of the table relevant to the message.
+ * @param data
+ */
 export function rmqMsgToName(data: TRmqMessages) {
-  if (isTRmqMsgEntityCUD(data)) return 'ChainEntity'
-  else if (isTRmqMsgCENotificationsCUD(data)) return 'ChainEvent'
-  else if (isRmqMsgCETypeCUD(data)) return 'ChainEventType'
+  if (RmqEntityCUD.isValidMsgFormat(data)) return 'ChainEntity'
+  else if (RmqCENotificationCUD.isValidMsgFormat(data)) return 'ChainEvent'
+  else if (RmqCETypeCUD.isValidMsgFormat(data)) return 'ChainEventType'
 }
 
 /**
@@ -34,18 +40,11 @@ export function rmqMsgToName(data: TRmqMessages) {
  * anywhere, it MUST be one of these types
  */
 export type TRmqMessages =
-  TRmqMsgEntityCUD
-  | TRmqMsgCENotificationsCUD
-  | CWEvent
-  | ChainEventNotification
-  | TRmqMsgCETypeCUD;
-
-export enum RascalPublications {
-  ChainEvents = 'ChainEventsPublication',
-  ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
-  ChainEventNotifications = 'ChainEventNotificationsPublication',
-  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication'
+  RmqEntityCUD.RmqMsgType
+  | RmqCENotificationCUD.RmqMsgType
+  | RmqCETypeCUD.RmqMsgType
+  | RmqCWEvent.RmqMsgType
+  | RmqCENotification.RmqMsgType
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,

@@ -1,6 +1,6 @@
-import { DB } from '../../models';
 import { Logger } from 'typescript-logging';
-import {IRmqMsgCreateCETypeCUD, TRmqMsgCETypeCUD} from "common-common/src/rabbitmq/types/chainEventTypeCUD";
+import {RmqCETypeCUD} from "common-common/src/rabbitmq/types/chainEventTypeCUD";
+import { DB } from '../../models';
 
 export type Ithis = {
   models: DB;
@@ -8,23 +8,20 @@ export type Ithis = {
 };
 
 export async function processChainEventTypeCUD(
-  this,
-  data: TRmqMsgCETypeCUD
+  this: Ithis,
+  data: RmqCETypeCUD.RmqMsgType
 ) {
-  if (IRmqMsgCreateCETypeCUD(data)) {
-    try {
-      await this.models.ChainEventType.create({
-        id: data.chainEventTypeId,
-      });
-    } catch (e) {
-      this.log.error(
-        `An error occurred while saving the ${data.chainEventTypeId} chain-event-type`,
-        e
-      );
-      throw e;
-    }
-  } else {
-    console.log("The received message type is not supported!", data);
-    throw new Error(`The received message type is not supported! ${JSON.stringify(data)}`)
+  RmqCETypeCUD.checkMsgFormat(data);
+
+  try {
+    await this.models.ChainEventType.create({
+      id: data.chainEventTypeId,
+    });
+  } catch (e) {
+    this.log.error(
+      `An error occurred while saving the ${data.chainEventTypeId} chain-event-type`,
+      e
+    );
+    throw e;
   }
 }

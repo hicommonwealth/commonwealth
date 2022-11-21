@@ -1,9 +1,15 @@
-import {CWEvent, IChainEventData, IChainEventKind, IEventHandler,} from 'chain-events/src';
-import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
-import {addPrefix, factory} from '../../../src/logging';
-import {ChainEventAttributes} from '../../database/models/chain_event';
-import {IRmqMsgCreateCENotificationsCUD, RascalPublications} from 'common-common/src/rabbitmq/types';
-import {DB} from "../../database/database";
+import {
+  CWEvent,
+  IChainEventData,
+  IChainEventKind,
+  IEventHandler,
+} from 'chain-events/src';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import {RascalPublications, RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
+
+import { addPrefix, factory } from '../../../src/logging';
+import { ChainEventAttributes } from '../../database/models/chain_event';
+import { DB } from '../../database/database';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';
@@ -48,9 +54,11 @@ export default class extends IEventHandler {
     const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
     formattedEvent.ChainEventType = dbEventType.toJSON();
 
-    const publishData: IRmqMsgCreateCENotificationsCUD = {
-      ChainEvent: formattedEvent, event, cud: 'create'
-    }
+    const publishData: RmqCENotificationCUD.RmqMsgType = {
+      ChainEvent: formattedEvent,
+      event,
+      cud: 'create',
+    };
 
     await this._rmqController.safePublish(
       publishData,
@@ -58,11 +66,11 @@ export default class extends IEventHandler {
       RascalPublications.ChainEventNotificationsCUDMain,
       {
         sequelize: this._models.sequelize,
-        model: this._models.ChainEvent
+        model: this._models.ChainEvent,
       }
     );
 
-    log.info("Chain-event Notification sent to CUD queue.");
+    log.info('Chain-event Notification sent to CUD queue.');
     return dbEvent;
   }
 }
