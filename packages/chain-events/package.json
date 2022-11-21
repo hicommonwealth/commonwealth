@@ -11,6 +11,7 @@
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "compile-contracts": "cd eth && npx hardhat compile",
+    "check-types": "tsc --noEmit",
     "unit-test": "ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/*.test.ts --timeout 20000",

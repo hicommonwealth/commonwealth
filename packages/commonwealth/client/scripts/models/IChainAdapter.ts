@@ -84,6 +84,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       rules, // TODO: store in rules controller
       communityBanner,
       contracts,
+      communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
@@ -91,6 +92,9 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contracts, true);
+
+    // add community roles to the chain's roles
+    this.meta.communityRoles = communityRoles;
 
     await this.app.recentActivity.getRecentTopicActivity(this.id);
 

@@ -50,8 +50,9 @@ const createTopic = async (
     return next(new AppError(Errors.MustBeAdmin));
   }
 
-  const token_threshold_test = parseInt(req.body.token_threshold, 10);
-  if (Number.isNaN(token_threshold_test)) {
+
+  const isNumber = /^\d+$/.test(req.body.token_threshold);
+  if (!isNumber) {
     return next(new AppError(Errors.InvalidTokenThreshold));
   }
 

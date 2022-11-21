@@ -11,7 +11,10 @@
   },
   "keywords": [],
   "scripts": {
-    "build-contracts": "cd src/eth && npx hardhat compile"
+    "build-contracts": "cd src/eth && npx hardhat compile",
+    "check-types": "tsc --noEmit",
+    "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json ./test/unit/**/*.spec.ts",
+    "publish-rmq-msg": "ts-node --project tsconfig.json src/rabbitmq/scripts/publishRmqMessageScript.ts"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -22,7 +25,13 @@
     "pg": "^8.8.0",
     "rascal": "^14.4.5",
     "ts-generator": "^0.1.1",
+    "ts-mocha": "^10.0.0",
     "typechain": "^4.0.1",
     "typescript-logging": "^0.6.4"
+  },
+  "devDependencies": {
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^10.0.0",
+    "mocha": "^6.2.2"
   }
 }

@@ -51,3 +51,13 @@ export const getPollTimestamp = (poll: Poll, pollingEnded: boolean) => {
     ? `Ended ${poll.endsAt?.format('lll')}`
     : `${moment().from(poll.endsAt).replace(' ago', '')} left`;
 };
+
+export const activeQuillEditorHasText = () => {
+  // TODO: Better lookup than document.getElementsByClassName[0]
+  // TODO: This should also check whether the Quill editor has changed, rather than whether it has text
+  // However, threading is overdue for a refactor anyway, so we'll handle this then
+  return (
+    (document.getElementsByClassName('ql-editor')[0] as HTMLTextAreaElement)
+      ?.innerText.length > 1
+  );
+};

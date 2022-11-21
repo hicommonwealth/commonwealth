@@ -1,7 +1,6 @@
-import {RabbitMQController, RabbitMQControllerError, SafeRmqPublishSupported} from "./rabbitMQController";
+import {RabbitMQController, RabbitMQControllerError} from "./rabbitMQController";
 import * as Rascal from "rascal";
 import {RascalPublications, RascalSubscriptions, TRmqMessages} from "./types";
-import {Sequelize} from "sequelize";
 
 
 /**
@@ -36,42 +35,11 @@ export class MockRabbitMQController extends RabbitMQController {
     return;
   }
 
-  // TODO: add a class property that takes an object from publisherName => callback function
-  //      if a message is successfully published to a particular queue then the callback is executed
-
-  // TODO: the publish ACK should be in a transaction with the publish itself
   public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError("RabbitMQController is not initialized!")
     }
     console.log("Message published")
-  }
-
-  /**
-   * This function implements a method of publishing that guarantees eventual consistency. The function assumes that a
-   * data record has already been entered in the source database, and now we need to publish a part of this data
-   * record to a queue. Eventual consistency is achieved specifically by the 'queued' column of the data records. That
-   * is, if the message is successfully published to the required queue, the 'queued' column is updated to reflect this.
-   * If the update to the queue column fails then the message is not published and is left to be re-published by the
-   * background job RepublishMessage.
-   * @param publishData The content of the message to send
-   * @param objectId The id of the data record in the source database
-   * @param publication {RascalPublications} The Rascal publication (aka queue) to send the message to
-   * @param DB {sequelize: Sequelize, model: SafeRmqPublishSupported} An object containing a sequelize connection/object
-   *  and the sequelize model static which contains the objectId.
-   */
-  public async safePublish(
-    publishData: TRmqMessages,
-    objectId: number | string,
-    publication: RascalPublications,
-    DB: { sequelize: Sequelize, model: SafeRmqPublishSupported }
-  ) {
-    if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
-    }
-
-    console.log("Message publish confirmed");
-    return;
   }
 
   public get initialized(): boolean {

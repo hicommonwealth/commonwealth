@@ -31,6 +31,11 @@ class PublishError extends RabbitMQControllerError {
   }
 }
 
+/**
+ * This class encapsulates all interactions with a RabbitMQ instance. It allows publishing and subscribing to queues. To
+ * initialize the class you must have a Rascal configuration. Every publish and message processing should be done
+ * through this class as it implements error handling that is crucial to avoid data loss.
+ */
 export class RabbitMQController {
   public broker: Rascal.BrokerAsPromised;
   public readonly subscribers: string[];
@@ -96,7 +101,7 @@ export class RabbitMQController {
     msgProcessorContext?: { [key: string]: any }
   ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
     }
 
     let subscription: Rascal.SubscriberSessionAsPromised;
@@ -107,27 +112,29 @@ export class RabbitMQController {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
       subscription.on('message', (message, content, ackOrNack) => {
-        // TODO: fix error handling - to test run the chain-events subscriber + consumer and then run the main service
-        //  consumer. To test an 'error' change isRmqMsgCreateCENotificationsCUD ChainEvent.id to be 'string' instead of 'number'
         messageProcessor.call({rmqController: this, ...msgProcessorContext}, content)
           .then(() => {
             ackOrNack();
           })
           .catch((e) => {
-            this.rollbar?.warn(`Failed to process message: ${JSON.stringify(content)}`, e)
+            const errorMsg = `Failed to process message: ${JSON.stringify(content)} with processor function ${messageProcessor.name} and context ${JSON.stringify(msgProcessorContext)}`
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
-            if (e instanceof RmqMsgFormatError) ackOrNack(e, {strategy: 'nack'});
-            else ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
-
+            if (e instanceof RmqMsgFormatError) {
+              log.error(`Invalid Message Format Error - ${errorMsg}`, e);
+              this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e)
+              ackOrNack(e, {strategy: 'nack'});
+            }
+            else {
+              log.error(`Unknown Error - ${errorMsg}`, e)
+              this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e)
+              ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
+            }
           })
       });
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      subscription.on('error', (err, messageId, ackOrNack) => {
-        log.error(`Subscriber error: ${err} ${messageId}`);
-        ackOrNack(err, {strategy: 'nack'});
-        this.rollbar?.warn(`Publisher error: ${err} ${messageId}`);
+      subscription.on('error', (err) => {
+        log.error(`Subscriber error: ${err}`);
+        this.rollbar?.warn(`Subscriber error: ${err}`);
       });
       subscription.on('invalid_content', (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
@@ -142,11 +149,9 @@ export class RabbitMQController {
 
   // TODO: add a class property that takes an object from publisherName => callback function
   //      if a message is successfully published to a particular queue then the callback is executed
-
-  // TODO: the publish ACK should be in a transaction with the publish itself
   public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
     }
 
     if (!this.publishers.includes(publisherName))

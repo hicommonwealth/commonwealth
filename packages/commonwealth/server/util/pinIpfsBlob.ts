@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import axios from 'axios';
-const FormData = require('form-data');
+import FormData from 'form-data';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 import models from '../database';
 import { ServerError } from 'common-common/src/errors';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 require('dotenv').config();
 
@@ -24,7 +26,7 @@ const pinIpfsBlob = async (
   if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
     const headers = {
       pinata_api_key: process.env.PINATA_API_KEY,
-      'Content-Type': `multipart/form-data; boundary= ${data._boundary}`,
+      'Content-Type': `multipart/form-data; boundary= ${data.getBoundary()}`,
       pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
     };
     try {

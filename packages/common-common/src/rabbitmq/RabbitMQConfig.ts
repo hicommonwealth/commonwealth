@@ -34,6 +34,32 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
     }
   }
 
+  const queueConfig = {
+    'assert': true,
+    'purge': purge,
+  }
+
+  const queueOptions = {
+    'x-dead-letter-exchange': RascalExchanges.DeadLetter,
+    'x-dead-letter-routing-key': RascalRoutingKeys.DeadLetter
+  }
+
+  const subscriptionConfig = {
+    'contentType': 'application/json',
+    'retry': {
+      'delay': 1000
+    },
+    'prefetch': 10,
+  }
+
+  const publicationConfig = {
+    'confirm': true,
+    'timeout': 10000,
+    'options': {
+      'persistent': true
+    }
+  }
+
   const config = {
     'vhosts': {
       [vhost]: {

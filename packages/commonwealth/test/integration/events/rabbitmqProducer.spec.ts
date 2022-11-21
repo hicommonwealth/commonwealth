@@ -26,7 +26,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       assert.equal(event.chain, 'polkadot');
       assert.equal(event.network, 'substrate');
       assert.equal(event.received, 123);
-    }, 'ChainEventsHandlersSubscription');
+    }, RascalSubscriptions.ChainEvents);
 
     controller.handle({
       blockNumber: 10,
@@ -46,7 +46,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       assert.equal(event.chain, 'polkadot');
       assert.equal(event.network, 'substrate');
       assert.equal(event.received, 123);
-    }, 'ChainEventsHandlersSubscription');
+    }, RascalSubscriptions.ChainEvents);
 
     controller.handle({
       blockNumber: 10,

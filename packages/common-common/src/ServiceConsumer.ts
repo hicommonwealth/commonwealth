@@ -1,80 +1,100 @@
-// @ts-ignore
-import crypto from "crypto";
-import { addPrefix, factory, formatFilename } from "./logging";
-import { RabbitMQController, RascalSubscriptions } from "./rabbitmq";
-
-let log;
+import crypto from 'crypto';
+import Rollbar from 'rollbar';
+import { Logger } from 'typescript-logging';
+import { addPrefix, factory, formatFilename } from './logging';
+import { RabbitMQController, RascalSubscriptions, TRmqMessages } from './rabbitmq';
 
 export type RabbitMQSubscription = {
-  messageProcessor: (data: any) => Promise<any>;
+  messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;
   subscriptionName: RascalSubscriptions;
   msgProcessorContext?: { [key: string]: any };
 };
 
+/**
+ * This class is a general wrapper around RabbitMQ functionality. It initializes a RabbitMQ Controller and all the
+ * subscriptions that are passed. The subscriptions are held as state within the class, leaving room for future work
+ * to get insight into active subscriptions or for managing the currently active subscriptions. The class also
+ * initializes a logger instance with a prefix that helps identify exactly where the log came from in a multi-server
+ * architecture.
+ */
 export class ServiceConsumer {
   public readonly serviceName: string;
   public readonly serviceId: string;
   public readonly rabbitMQController: RabbitMQController;
   public readonly subscriptions: RabbitMQSubscription[];
   private _initialized = false;
+  protected rollbar: Rollbar;
+  private log: Logger
 
   constructor(
     _serviceName: string,
     _rabbitmqController: RabbitMQController,
-    _subscriptions: RabbitMQSubscription[]
+    _subscriptions: RabbitMQSubscription[],
+    rollbar?: Rollbar
   ) {
     this.serviceName = _serviceName;
     // TODO: make this deterministic somehow
-    this.serviceId = crypto.randomBytes(10).toString("hex");
+    this.serviceId = crypto.randomBytes(10).toString('hex');
     this.subscriptions = _subscriptions;
 
     // setup logger
-    log = factory.getLogger(
+    this.log = factory.getLogger(
       addPrefix(formatFilename(__filename), [this.serviceName, this.serviceId])
     );
 
     this.rabbitMQController = _rabbitmqController;
+    this.rollbar = rollbar;
   }
 
   public async init(): Promise<void> {
-    log.info(`Initializing service-consumer: ${this.serviceName}-${this.serviceId}`);
+    this.log.info(`Initializing service-consumer: ${this.serviceName}-${this.serviceId}`);
 
     if (!this.rabbitMQController.initialized) {
       try {
         await this.rabbitMQController.init();
       } catch (e) {
-        log.error("Failed to initialize the RabbitMQ Controller", e);
+        this.log.error('Failed to initialize the RabbitMQ Controller', e);
+        this.rollbar?.error('Failed to initialize the RabbitMQ Controller', e)
       }
     }
 
-    try {
       // start all the subscriptions for this consumer
       for (const sub of this.subscriptions) {
-        await this.rabbitMQController.startSubscription(
-          sub.messageProcessor,
-          sub.subscriptionName,
-          sub.msgProcessorContext
-        );
+        try {
+          await this.rabbitMQController.startSubscription(
+            sub.messageProcessor,
+            sub.subscriptionName,
+            sub.msgProcessorContext
+          );
+        } catch (e) {
+          this.log.error(
+            `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor.name}' `
+              + `processor function using context: ${JSON.stringify(sub.msgProcessorContext)}`,
+            e
+          );
+          this.rollbar?.critical(
+            `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor.name}' `
+            + `processor function using context: ${JSON.stringify(sub.msgProcessorContext)}`,
+            e
+          )
+        }
       }
-    } catch (e) {
-      log.error("A critical error occurred.", e);
-      // TODO: rollbar error reporting
-    }
+
 
     this._initialized = true;
   }
 
   public async shutdown(): Promise<void> {
-    log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`);
+    this.log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`);
     if (this.rabbitMQController.initialized) {
-      log.info("Attempting to shutdown RabbitMQ Broker...")
+      this.log.info('Attempting to shutdown RabbitMQ Broker...')
       await this.rabbitMQController.shutdown();
     }
 
     // any other future clean-up + logging
 
     this._initialized = false;
-    log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shut down successful`);
+    this.log.info(`Service Consumer ${this.serviceName}:${this.serviceId} shut down successful`);
   }
 
   public get initialized(): boolean {

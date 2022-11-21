@@ -4,7 +4,6 @@
  * from the chain, writing the results back into the database.
  */
 
-import _ from 'underscore';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {

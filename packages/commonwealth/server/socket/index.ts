@@ -68,12 +68,14 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
+    StatsDController.get().increment('cw.socket.connections');
     log.trace(
       `Socket connected: socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
       }`
     );
     socket.on('disconnect', () => {
+      StatsDController.get().decrement('cw.socket.connections');
       log.trace(
         `Socket disconnected: socket_id = ${socket.id}, user_id = ${
           (<any>socket).user.id
@@ -121,6 +123,7 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -152,6 +155,7 @@ export async function setupWebSocketServer(
     log.info('Redis pub-client disconnected');
   })
   subClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
@@ -190,7 +194,7 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init();
+  await redisCache.init(REDIS_URL, VULTR_IP);
   console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
@@ -199,8 +203,9 @@ export async function setupWebSocketServer(
 
   try {
     await rabbitMQController.startSubscription(
-      publishToCERoom.bind(ceNamespace),
-      RascalSubscriptions.ChainEventNotifications
+      publishToCERoom,
+      RascalSubscriptions.ChainEventNotifications,
+      {server: ceNamespace}
     );
   } catch (e) {
     log.error(

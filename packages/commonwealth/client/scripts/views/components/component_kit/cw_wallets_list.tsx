@@ -195,7 +195,8 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock();
+        const validationBlockInfo =
+          wallet.getRecentBlock && (await wallet.getRecentBlock());
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
@@ -211,7 +212,9 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
 
     const resetWalletConnectOnclick = async (webWallets) => {
       const wallet = webWallets.find(
-        (w) => w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController
+        (w) =>
+          w instanceof WalletConnectWebWalletController ||
+          w instanceof TerraWalletConnectWebWalletController
       );
       await wallet.reset();
       if (isWindowMediumSmallInclusive(window.innerWidth)) {

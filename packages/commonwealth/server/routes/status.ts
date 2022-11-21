@@ -109,6 +109,7 @@ const status = async (
       where: { address_id: { [Op.in]: myAddressIds } },
       include: [models.Address],
     });
+
     const discussionDrafts = await models.DiscussionDraft.findAll({
       where: {
         address_id: { [Op.in]: myAddressIds },
