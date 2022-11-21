@@ -8,6 +8,7 @@ import {
 } from "common-common/src/rabbitmq";
 import { factory, formatFilename } from "common-common/src/logging";
 import { RABBITMQ_URI } from "./config";
+import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -28,7 +29,12 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
-    await controller.publish(event, RascalPublications.SnapshotListener);
+
+    const parsedId = event.id.replace(/.*\//, "");
+    const proposal = await fetchNewSnapshotProposal(parsedId);
+
+
+    await controller.publish(proposal, RascalPublications.SnapshotListener);
     res.status(200).send({ message: "Snapshot event received", event });
   } catch (err) {
     console.log(err);

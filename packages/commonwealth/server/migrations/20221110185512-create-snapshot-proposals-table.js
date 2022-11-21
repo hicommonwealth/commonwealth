@@ -10,11 +10,23 @@ module.exports = {
           allowNull: false,
           primaryKey: true,
         },
+        title: {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        body: {
+          type: Sequelize.TEXT,
+          allowNull: true,
+        },
         space: {
           type: Sequelize.STRING,
           allowNull: false,
         },
         event: {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        start: {
           type: Sequelize.STRING,
           allowNull: true,
         },
