@@ -28,7 +28,7 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
    * @param data The raw message from RabbitMQ
    */
   isValidMsgFormat(data: any): data is CWEvent {
-    return (
+    return !!(
       typeof data.blockNumber === 'number'
       && data.data
       && data.network && typeof data.network === 'string'

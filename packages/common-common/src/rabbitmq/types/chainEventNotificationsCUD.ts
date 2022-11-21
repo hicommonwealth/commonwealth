@@ -17,7 +17,7 @@ export const RmqCENotificationCUD: RmqMsgNamespace<IRmqMsgCreateCENotificationsC
   },
 
   isValidMsgFormat(data: any): data is IRmqMsgCreateCENotificationsCUD {
-    return (
+    return !!(
       typeof data.ChainEvent?.id === 'number'
       && data.ChainEvent.chain_event_type_id && typeof data.ChainEvent.chain_event_type_id === 'string'
       && typeof data.ChainEvent.block_number === 'number'

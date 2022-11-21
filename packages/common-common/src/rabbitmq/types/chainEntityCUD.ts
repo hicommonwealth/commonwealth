@@ -15,7 +15,7 @@ export const RmqEntityCUD: RmqMsgNamespace<IRmqMsgCreateEntityCUD> = {
   },
 
   isValidMsgFormat(data: any): data is IRmqMsgCreateEntityCUD {
-    return (
+    return !!(
       typeof data.ce_id === 'number'
       && data.chain_id && typeof data.chain_id === 'string'
       && data.cud === 'create'

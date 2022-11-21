@@ -263,8 +263,8 @@ describe('Tests for the ChainEventsConsumer service', () => {
     );
     expect(message).to.have.property('length');
     expect(message.length).to.equal(1);
-    expect(RmqCENotificationCUD.isValidMsgFormat(JSON.parse(message[0].payload))).to
-      .be.true;
+    expect(RmqCENotificationCUD.isValidMsgFormat(JSON.parse(message[0].payload)),
+      "NotificationCUD has an invalid format").to.be.true;
 
     await models.ChainEvent.destroy({
       where: {

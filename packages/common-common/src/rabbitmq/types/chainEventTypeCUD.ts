@@ -14,7 +14,7 @@ export const RmqCETypeCUD: RmqMsgNamespace<IRmqMsgCreateCETypeCUD> = {
   },
 
   isValidMsgFormat(data: any): data is IRmqMsgCreateCETypeCUD {
-    return (
+    return !!(
       data.chainEventTypeId && typeof data.chainEventTypeId === 'string'
       && data.cud === 'create'
     );
