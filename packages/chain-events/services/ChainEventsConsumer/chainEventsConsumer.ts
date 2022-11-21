@@ -31,12 +31,15 @@ const log = factory.getLogger(formatFilename(__filename));
  * that was previously unsuccessfully published.
  */
 export async function setupChainEventConsumer() {
-  const rollbar = new Rollbar({
-    accessToken: ROLLBAR_SERVER_TOKEN,
-    environment: process.env.NODE_ENV,
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-  });
+  let rollbar;
+  if (ROLLBAR_SERVER_TOKEN) {
+    rollbar = new Rollbar({
+      accessToken: ROLLBAR_SERVER_TOKEN,
+      environment: process.env.NODE_ENV,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
+  }
 
   let rmqController: RabbitMQController;
   try {
