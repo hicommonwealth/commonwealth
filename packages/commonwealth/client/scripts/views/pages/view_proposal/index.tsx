@@ -50,7 +50,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private proposal: AnyProposal;
   private tipAmount: number;
 
-  view(vnode: m.VnodeDOM<ViewProposalPageAttrs, this>) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {

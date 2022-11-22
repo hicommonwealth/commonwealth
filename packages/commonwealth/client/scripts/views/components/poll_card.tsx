@@ -295,7 +295,11 @@ export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
 
 export type PollCardAttrs = PollOptionAttrs &
   CastVoteAttrs &
-  ResultsSectionAttrs;
+  ResultsSectionAttrs & {
+    hasVoted?: boolean;
+    incrementalVoteCast?: number;
+    proposalTitle?: string;
+  };
 
 export class PollCard implements m.ClassComponent<PollCardAttrs> {
   private hasVoted: boolean;

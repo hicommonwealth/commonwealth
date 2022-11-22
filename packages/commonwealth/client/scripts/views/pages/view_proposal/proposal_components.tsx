@@ -21,10 +21,14 @@ import {
   VotingInterfaceLink,
 } from './proposal_header_links';
 
+type ProposalSubheaderAttrs = {
+  proposal: AnyProposal;
+};
+
 export class ProposalSubheader
-  implements m.ClassComponent<{ proposal: AnyProposal }>
+  implements m.ClassComponent<ProposalSubheaderAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
