@@ -35,12 +35,14 @@ class ContractsController {
 
   public async addContractAbi(
     contract: Contract,
-    abi: Array<Record<string, unknown>>
+    abi: string,
+    nickname: string
   ) {
     const response = await $.post(`${app.serverUrl()}/createContractAbi`, {
       jwt: app.user.jwt,
       contractId: contract.id,
       abi,
+      nickname
     });
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
@@ -112,10 +114,12 @@ class ContractsController {
     node_url,
     address,
     abi,
+    abiNickname,
     contractType,
     symbol,
     token_name,
     decimals,
+    nickname,
   }: {
     community: string;
     balance_type: BalanceType;
@@ -123,10 +127,12 @@ class ContractsController {
     node_url: string;
     address: string;
     abi: string;
+    abiNickname: string;
     contractType: ContractType;
     symbol: string;
     token_name: string;
     decimals: number;
+    nickname: string;
   }) {
     try {
       const response = await $.post(`${app.serverUrl()}/createContract`, {
@@ -141,9 +147,11 @@ class ContractsController {
         symbol,
         token_name,
         decimals,
+        nickname,
+        abiNickname,
       });
       const responseContract = response['result']['contract'];
-      const { id, type, is_factory, nickname } = responseContract;
+      const { id, type, is_factory } = responseContract;
       const result = new Contract({
         id,
         address,

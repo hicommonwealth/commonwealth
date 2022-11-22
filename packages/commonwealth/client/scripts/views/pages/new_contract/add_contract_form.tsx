@@ -153,6 +153,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
               symbol,
               token_name,
               decimals,
+              contractNickname,
+              abiNickname,
             } = this.state.form;
             this.state.saving = true;
             try {
@@ -167,6 +169,8 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 symbol,
                 token_name,
                 decimals,
+                nickname: contractNickname,
+                abiNickname,
               });
               if (res) {
                 this.state.status = 'success';

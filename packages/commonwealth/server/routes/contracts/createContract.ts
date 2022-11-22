@@ -19,6 +19,7 @@ export const Errors = {
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'Node url returned invalid response',
   InvalidABI: 'Invalid ABI',
+  NoAbiNickname: 'Must provide ABI nickname',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBalanceType: 'Must provide balance type',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -39,6 +40,7 @@ export type CreateContractReq = ContractAttributes &
     node_url: string;
     address: string;
     abi: string;
+    abiNickname: string;
     contractType: ContractType;
   };
 
@@ -57,6 +59,7 @@ const createContract = async (
     address,
     contractType,
     abi,
+    abiNickname,
     symbol,
     token_name,
     decimals,
@@ -70,6 +73,10 @@ const createContract = async (
   // require Admin privilege for creating Contract
   if (!req.user.isAdmin) {
     return next(new Error(Errors.NotAdmin));
+  }
+
+  if (!abiNickname) {
+    return next(new Error(Errors.NoAbiNickname));
   }
 
   if (abi !== '' && (Object.keys(abi) as Array<string>).length === 0) {
@@ -152,6 +159,7 @@ const createContract = async (
       const contract_abi = await models.ContractAbi.create(
         {
           abi: abiAsRecord,
+          nickname: abiNickname,
         },
         { transaction: t }
       );
