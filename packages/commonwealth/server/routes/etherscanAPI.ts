@@ -73,7 +73,7 @@ const fetchEtherscanContract = async (
             const nickname = etherscanContract['ContractName'];
             // create new ABI
             const [contract_abi] = await models.ContractAbi.findOrCreate({
-              where: { nickname },
+              where: { nickname, abi: abiString },
             });
             // update contract with new ABI
             contract.abi_id = contract_abi.id;
