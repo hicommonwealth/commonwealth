@@ -5,6 +5,8 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from 'server/models';
 import { ContractAbiAttributes } from 'server/models/contract_abi';
+import { AbiItem } from 'web3-utils';
+import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -19,11 +21,12 @@ export const Errors = {
   ChainNameExists:
     'The name for this chain already exists, please choose another name',
   NotAdmin: 'Must be admin',
+  InvalidABI: 'Invalid ABI',
 };
 
 export type CreateContractAbiReq = {
   contractId: number;
-  abi: Array<Record<string, unknown>>;
+  abi: string;
 };
 
 export type CreateContractAbiResp = {
@@ -51,14 +54,38 @@ const createContractAbi = async (
     return next(new Error(Errors.NoAbi));
   }
 
+  let abiAsRecord: Array<Record<string, unknown>>;
+  if (abi !== '') {
+    try {
+      // Parse ABI to validate it as a properly formatted ABI
+      abiAsRecord = JSON.parse(abi);
+      if (!abiAsRecord) {
+        return next(new Error(Errors.InvalidABI));
+      }
+      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+      if (!abiItems) {
+        return next(new Error(Errors.InvalidABI));
+      }
+    } catch {
+      return next(new Error(Errors.InvalidABI));
+    }
+  }
+
   try {
     const contract_abi = await models.ContractAbi.create({
-      abi,
+      abi: abiAsRecord,
     });
 
     const contract = await models.Contract.findOne({
       where: { id: contractId },
     });
+
+    if (!contract) {
+      return success(res, {
+        contractAbi: contract_abi.toJSON(),
+        contract: null,
+      });
+    }
 
     if (contract && contract_abi) {
       contract.abi_id = contract_abi.id;

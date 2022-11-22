@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
@@ -143,22 +142,6 @@ export enum BalanceType {
   NEAR = 'near',
   Substrate = 'substrate',
 }
-
-export enum Network {
-  Mainnet = "Mainnet",
-  Rinkeby = "Rinkeby",
-  Ropsten = "Ropsten",
-  Kovan = "Kovan",
-  Goerli = "Goerli",
-}
-
-export const networkIdToName = {
-  1: Network.Mainnet,
-  3: Network.Ropsten,
-  4: Network.Rinkeby,
-  5: Network.Goerli,
-  42: Network.Kovan,
-};
 
 export enum RedisNamespaces {
   Chat_Socket = 'chat_socket',

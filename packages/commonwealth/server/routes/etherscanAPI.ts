@@ -1,11 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { networkIdToName } from 'common-common/src/types';
 import { AppError } from '../util/errors';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
+
+export enum Network {
+  Mainnet = "Mainnet",
+  Rinkeby = "Rinkeby",
+  Ropsten = "Ropsten",
+  Kovan = "Kovan",
+  Goerli = "Goerli",
+}
+
+export const networkIdToName = {
+  1: Network.Mainnet,
+  3: Network.Ropsten,
+  4: Network.Rinkeby,
+  5: Network.Goerli,
+  42: Network.Kovan,
+};
 
 const fetchEtherscanContract = async (
   models: DB,
@@ -37,6 +52,10 @@ const fetchEtherscanContract = async (
       const fqdn =
         network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
 
+      if (!ETHERSCAN_JS_API_KEY) {
+        throw new AppError('Etherscan API key not found');
+      }
+
       const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`
       axiosRetry(axios, {
         retries: 3,
@@ -51,10 +70,10 @@ const fetchEtherscanContract = async (
           const etherscanContract = response.data.result[0];
           if (etherscanContract && etherscanContract['ABI'] !== '') {
             const abiString = etherscanContract['ABI'];
-
+            const nickname = etherscanContract['ContractName'];
             // create new ABI
             const [contract_abi] = await models.ContractAbi.findOrCreate({
-              where: { abi: abiString },
+              where: { nickname },
             });
             // update contract with new ABI
             contract.abi_id = contract_abi.id;

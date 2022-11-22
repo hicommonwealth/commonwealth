@@ -41,8 +41,6 @@ class PolkadotWebWalletController
     return this._accounts || [];
   }
 
-  api: () => any
-
   public async getSigner(who: string): Promise<Signer> {
     // finds an injector for an address
     // web wallet stores addresses in testnet format for now, so we have to re-encode
