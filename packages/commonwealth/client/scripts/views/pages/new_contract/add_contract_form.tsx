@@ -6,10 +6,7 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
-import {
-  BalanceType,
-  ContractType,
-} from 'common-common/src/types';
+import { BalanceType, ContractType } from 'common-common/src/types';
 import { AbiItem, isAddress } from 'web3-utils';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -18,9 +15,7 @@ import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 
-import {
-  ethChainRows,
-} from '../create_community/chain_input_rows';
+import { ethChainRows } from '../create_community/chain_input_rows';
 
 import {
   ChainFormIdFields,
@@ -139,18 +134,18 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             } = this.state.form;
             this.state.saving = true;
             try {
-              const res = await app.contracts.add(
-                app.activeChainId(),
-                BalanceType.Ethereum,
+              const res = await app.contracts.add({
+                community: app.activeChainId(),
+                balance_type: BalanceType.Ethereum,
                 chain_node_id,
-                nodeUrl,
+                node_url: nodeUrl,
                 address,
                 abi,
                 contractType,
                 symbol,
                 token_name,
-                decimals
-              );
+                decimals,
+              });
               if (res) {
                 this.state.status = 'success';
                 this.state.message = `Contract with Address ${res.address} saved successfully`;
