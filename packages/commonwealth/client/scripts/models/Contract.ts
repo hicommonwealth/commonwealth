@@ -5,8 +5,8 @@ class Contract {
   public readonly address: string;
   public readonly chainNodeId: number;
   public readonly type: string;
-  public readonly createdAt: moment.Moment;
-  public readonly updatedAt: moment.Moment;
+  public readonly createdAt?: moment.Moment;
+  public readonly updatedAt?: moment.Moment;
 
   public readonly decimals?: number;
   public readonly tokenName?: string;
@@ -15,20 +15,33 @@ class Contract {
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
 
-  constructor(
+  constructor({
     id,
     address,
     chainNodeId,
     type,
     createdAt,
     updatedAt,
-    decimals?,
-    tokenName?,
-    symbol?,
-    contractAbi?,
-    isFactory?,
-    nickname?,
-  ) {
+    decimals,
+    tokenName,
+    symbol,
+    abi,
+    isFactory,
+    nickname,
+  }: {
+    id: number;
+    address: string;
+    chainNodeId: number;
+    type: string;
+    createdAt?: moment.Moment;
+    updatedAt?: moment.Moment;
+    decimals?: number;
+    tokenName?: string;
+    symbol?: string;
+    abi?: Array<Record<string, unknown>>;
+    isFactory?: boolean;
+    nickname?: string;
+  }) {
     this.id = id;
     this.address = address;
     this.chainNodeId = chainNodeId;
@@ -38,7 +51,7 @@ class Contract {
     this.decimals = decimals;
     this.tokenName = tokenName;
     this.symbol = symbol;
-    this.abi = contractAbi;
+    this.abi = abi;
     this.isFactory = isFactory;
     this.nickname = nickname;
   }
@@ -48,29 +61,29 @@ class Contract {
     address,
     chain_node_id,
     type,
-    created_at,
-    updated_at,
+    createdAt,
+    updatedAt,
     decimals,
-    token_name,
+    tokenName,
     symbol,
     abi,
-    is_factory,
+    isFactory,
     nickname,
   }) {
-    return new Contract(
+    return new Contract({
       id,
       address,
-      chain_node_id,
+      chainNodeId: chain_node_id,
       type,
-      created_at,
-      updated_at,
+      createdAt,
+      updatedAt,
       decimals,
-      token_name,
+      tokenName,
       symbol,
       abi,
-      is_factory,
+      isFactory,
       nickname,
-    );
+    });
   }
 }
 

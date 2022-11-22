@@ -4,13 +4,6 @@ import { ContractsStore } from 'stores';
 import { Contract } from 'models';
 import app from 'state';
 import { BalanceType, ContractType } from 'common-common/src/types';
-import {
-  ContractAbiAttributes,
-  ContractAttributes,
-  CreateContractAbiResp,
-  CreateContractResp,
-  TypedResponse,
-} from './types';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
@@ -44,16 +37,13 @@ class ContractsController {
     contract: Contract,
     abi: Array<Record<string, unknown>>
   ) {
-    const response: TypedResponse<CreateContractAbiResp> = await $.post(
-      `${app.serverUrl()}/createContractAbi`,
-      {
-        jwt: app.user.jwt,
-        contractId: contract.id,
-        abi,
-      }
-    );
-    const resultContract: ContractAttributes = response['result']['contract'];
-    const resultAbi: ContractAbiAttributes = response['result']['contractAbi'];
+    const response = await $.post(`${app.serverUrl()}/createContractAbi`, {
+      jwt: app.user.jwt,
+      contractId: contract.id,
+      abi,
+    });
+    const resultContract = response['result']['contract'];
+    const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
     return response;
   }
@@ -67,9 +57,8 @@ class ContractsController {
         }
       );
       console.log(response);
-      const resultContract: ContractAttributes = response['result']['contract'];
-      const resultAbi: ContractAbiAttributes =
-        response['result']['contractAbi'];
+      const resultContract = response['result']['contract'];
+      const resultAbi = response['result']['contractAbi'];
       this.update(resultAbi.abi, resultContract);
     } catch (err) {
       console.log('Failed to fetch abi from etherscan', err);
@@ -78,8 +67,8 @@ class ContractsController {
   }
 
   public async update(
-    contractAbi: Array<Record<string, unknown>>,
-    contractAttributes: ContractAttributes
+    abi: Array<Record<string, unknown>>,
+    contractAttributes: any
   ) {
     // Update contract in store
     if (this._store.getById(contractAttributes.id)) {
@@ -99,70 +88,74 @@ class ContractsController {
       nickname,
     } = contractAttributes;
     this._store.add(
-      new Contract(
+      new Contract({
         id,
         address,
-        chain_node_id,
+        chainNodeId: chain_node_id,
         type,
         createdAt,
         updatedAt,
         decimals,
-        token_name,
+        tokenName: token_name,
         symbol,
-        contractAbi,
-        is_factory,
-        nickname
-      )
+        abi,
+        isFactory: is_factory,
+        nickname,
+      })
     );
   }
 
-  public async add(
-    community: string,
-    balance_type: BalanceType,
-    chain_node_id: number,
-    node_url: string,
-    address: string,
-    abi: string,
-    contractType: ContractType,
-    symbol: string,
-    token_name: string,
-    decimals: number
-  ) {
+  public async add({
+    community,
+    balance_type,
+    chain_node_id,
+    node_url,
+    address,
+    abi,
+    contractType,
+    symbol,
+    token_name,
+    decimals,
+  }: {
+    community: string;
+    balance_type: BalanceType;
+    chain_node_id: number;
+    node_url: string;
+    address: string;
+    abi: string;
+    contractType: ContractType;
+    symbol: string;
+    token_name: string;
+    decimals: number;
+  }) {
     try {
-      const response: TypedResponse<CreateContractResp> = await $.post(
-        `${app.serverUrl()}/createContract`,
-        {
-          community,
-          balance_type,
-          chain_node_id,
-          jwt: app.user.jwt,
-          node_url,
-          address,
-          abi,
-          contractType,
-          symbol,
-          token_name,
-          decimals,
-        }
-      );
-      const responseContract: ContractAttributes =
-        response['result']['contract'];
-      const { id, type, is_factory, nickname, createdAt, updatedAt } =
-        responseContract;
-      const result = new Contract(
+      const response = await $.post(`${app.serverUrl()}/createContract`, {
+        community,
+        balance_type,
+        chain_node_id,
+        jwt: app.user.jwt,
+        node_url,
+        address,
+        abi,
+        contractType,
+        symbol,
+        token_name,
+        decimals,
+      });
+      const responseContract = response['result']['contract'];
+      const { id, type, is_factory, nickname } = responseContract;
+      const result = new Contract({
         id,
         address,
-        chain_node_id,
+        chainNodeId: chain_node_id,
         type,
-        createdAt,
-        updatedAt,
         decimals,
-        token_name,
+        tokenName: token_name,
         symbol,
-        abi,
-        is_factory,
-        nickname
-      );
+        abi: JSON.parse(abi),
+        isFactory: is_factory,
+        nickname,
+      });
       if (this._store.getById(result.id)) {
         this._store.remove(this._store.getById(result.id));
       }
@@ -170,9 +163,7 @@ class ContractsController {
       return result;
     } catch (err) {
       console.log('Failed to create and add contract', err);
-      throw new Error(
-        err
-      );
+      throw new Error(err);
     }
   }
   public addToStore(contract: Contract) {
