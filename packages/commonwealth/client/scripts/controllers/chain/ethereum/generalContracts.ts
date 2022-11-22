@@ -117,6 +117,25 @@ export default class GeneralContractsController {
     }
   }
 
+  public decodeCuratedFactoryTx(web3: Web3, fn: AbiItem, tx: any): any {
+    if (
+      this.contract.nickname === 'curated-factory-goerli' &&
+      fn.name === 'createProject'
+    ) {
+      const eventAbiItem = parseEventFromABI(
+        this.contract.abi,
+        'ProjectCreated'
+      );
+      const decodedLog = web3.eth.abi.decodeLog(
+        eventAbiItem.inputs,
+        tx.logs[0].data,
+        tx.logs[0].topics
+      );
+      return decodedLog.projectAddress;
+    }
+    return null;
+  }
+
   public decodeTransactionData(
     fn: AbiItem,
     tx: any,
@@ -127,22 +146,8 @@ export default class GeneralContractsController {
     let result;
     if (fn.outputs.length === 1) {
       let decodedTx;
-      if (
-        this.contract.nickname === 'curated-factory-goerli' &&
-        fn.name === 'createProject'
-      ) {
-        const eventAbiItem = parseEventFromABI(
-          this.contract.abi,
-          'ProjectCreated'
-        );
-        const decodedLog = web3.eth.abi.decodeLog(
-          eventAbiItem.inputs,
-          tx.logs[0].data,
-          tx.logs[0].topics
-        );
-        console.log('decodedLog', decodedLog);
-        decodedTx = decodedLog.projectAddress;
-      } else {
+      decodedTx = this.decodeCuratedFactoryTx(web3, fn, tx);
+      if (decodedTx == null) {
         decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
       }
       result = [];
@@ -158,25 +163,13 @@ export default class GeneralContractsController {
     return result;
   }
 
-  public async createFactoryDao(
-    fn: AbiItem,
-    processedArgs: any[],
+  public async createCuratedFactory(
+    contract: Contract,
+    web3: Web3,
+    functionTx: any,
     wallet: IWebWallet<any>,
     daoForm: CreateFactoryEthDaoForm
   ) {
-    const web3: Web3 = wallet.api;
-    const functionContract = this.web3Contract;
-
-    const methodSignature = `${fn.name}(${fn.inputs
-      .map((input) => input.type)
-      .join(',')})`;
-
-    const functionTx = functionContract.methods[methodSignature](
-      ...processedArgs
-    );
-
-    const contract = this.contract;
-
     if (contract.nickname === 'curated-factory-goerli') {
       const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
       // Sign Tx with PK if not view function
@@ -185,14 +178,11 @@ export default class GeneralContractsController {
         functionTx.encodeABI(),
         wallet
       );
-      console.log('txReceipt', txReceipt);
       const decodedLog = web3.eth.abi.decodeLog(
         eventAbiItem.inputs,
         txReceipt.logs[0].data,
         txReceipt.logs[0].topics
       );
-      console.log('decodedLog', decodedLog);
-      console.log('state.form.address', decodedLog.projectAddress);
       try {
         const res = await $.post(`${app.serverUrl()}/createChain`, {
           base: ChainBase.Ethereum,
@@ -220,5 +210,33 @@ export default class GeneralContractsController {
         throw new Error(err);
       }
     }
+  }
+
+  public async createFactoryDao(
+    fn: AbiItem,
+    processedArgs: any[],
+    wallet: IWebWallet<any>,
+    daoForm: CreateFactoryEthDaoForm
+  ) {
+    const web3: Web3 = wallet.api;
+    const functionContract = this.web3Contract;
+
+    const methodSignature = `${fn.name}(${fn.inputs
+      .map((input) => input.type)
+      .join(',')})`;
+
+    const functionTx = functionContract.methods[methodSignature](
+      ...processedArgs
+    );
+
+    const contract = this.contract;
+
+    await this.createCuratedFactory(
+      contract,
+      web3,
+      functionTx,
+      wallet,
+      daoForm
+    );
   }
 }
