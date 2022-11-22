@@ -70,7 +70,12 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
 
   view(vnode) {
     const validAddress = isAddress(this.state.form.address);
-    const validAbiNickname = this.state.form.abiNickname.length > 0;
+    let validAbiNickname;
+    if (this.state.form.abi.length > 0) {
+      validAbiNickname = this.state.form.abiNickname.length > 0;
+    } else {
+      validAbiNickname = true;
+    }
 
     return (
       <div class="CreateCommunityForm">

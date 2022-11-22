@@ -75,15 +75,15 @@ const createContract = async (
     return next(new Error(Errors.NotAdmin));
   }
 
-  if (!abiNickname) {
-    return next(new Error(Errors.NoAbiNickname));
-  }
-
   if (abi !== '' && (Object.keys(abi) as Array<string>).length === 0) {
     return next(new Error(Errors.InvalidABI));
   }
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi !== '') {
+    if (!abiNickname) {
+      return next(new Error(Errors.NoAbiNickname));
+    }
+
     try {
       // Parse ABI to validate it as a properly formatted ABI
       abiAsRecord = JSON.parse(abi);
@@ -138,7 +138,6 @@ const createContract = async (
       return next(new Error(Errors.ContractAddressExists));
     }
     return success(res, { contract: oldContract.toJSON() });
-
   }
 
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
