@@ -29,20 +29,11 @@ type CreateFactoryEthDaoForm = ChainFormFields &
 
 export default class GeneralContractsController {
   public contract: Contract;
-  public web3Contract: Web3Contract;
   public isFactory: boolean;
 
-  constructor(web3: Web3, contract: Contract) {
+  constructor(contract: Contract) {
     this.isFactory = contract.isFactory;
     this.contract = contract;
-    try {
-      this.web3Contract = new web3.eth.Contract(
-        parseAbiItemsFromABI(this.contract.abi),
-        this.contract.address
-      );
-    } catch (error) {
-      console.error('Failed to create DaoFactory controller', error);
-    }
   }
 
   public async makeContractCall(
@@ -85,14 +76,30 @@ export default class GeneralContractsController {
 
   public async callContractFunction(
     fn: AbiItem,
-    processedArgs: any[],
-    wallet: IWebWallet<any>
+    processedArgs: any[]
   ): Promise<TransactionReceipt | string> {
+    const sender = app.user.activeAccount;
+    // get querying wallet
+    const signingWallet = await app.wallets.locateWallet(
+      sender,
+      ChainBase.Ethereum
+    );
+    const web3: Web3 = signingWallet.api;
+
     const methodSignature = `${fn.name}(${fn.inputs
       .map((input) => input.type)
       .join(',')})`;
 
-    const functionContract = this.web3Contract;
+    let functionContract;
+    try {
+      functionContract = new web3.eth.Contract(
+        parseAbiItemsFromABI(this.contract.abi),
+        this.contract.address
+      );
+    } catch (error) {
+      console.error('Failed to create DaoFactory controller', error);
+    }
+
     const contract = this.contract;
 
     const functionTx = functionContract.methods[methodSignature](
@@ -103,7 +110,7 @@ export default class GeneralContractsController {
       const txReceipt: TransactionReceipt = await this.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
-        wallet
+        signingWallet
       );
       return txReceipt;
     } else {
@@ -111,7 +118,7 @@ export default class GeneralContractsController {
       const tx: string = await this.makeContractCall(
         contract.address,
         functionTx.encodeABI(),
-        wallet
+        signingWallet
       );
       return tx;
     }
@@ -136,12 +143,14 @@ export default class GeneralContractsController {
     return null;
   }
 
-  public decodeTransactionData(
-    fn: AbiItem,
-    tx: any,
-    wallet: IWebWallet<any>
-  ): any[] {
-    const web3: Web3 = wallet.api;
+  public async decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
+    const sender = app.user.activeAccount;
+    // get querying wallet
+    const signingWallet = await app.wallets.locateWallet(
+      sender,
+      ChainBase.Ethereum
+    );
+    const web3: Web3 = signingWallet.api;
     // simple return type
     let result;
     if (fn.outputs.length === 1) {
@@ -219,7 +228,15 @@ export default class GeneralContractsController {
     daoForm: CreateFactoryEthDaoForm
   ) {
     const web3: Web3 = wallet.api;
-    const functionContract = this.web3Contract;
+    let functionContract;
+    try {
+      functionContract = new web3.eth.Contract(
+        parseAbiItemsFromABI(this.contract.abi),
+        this.contract.address
+      );
+    } catch (error) {
+      console.error('Failed to create DaoFactory controller', error);
+    }
 
     const methodSignature = `${fn.name}(${fn.inputs
       .map((input) => input.type)
