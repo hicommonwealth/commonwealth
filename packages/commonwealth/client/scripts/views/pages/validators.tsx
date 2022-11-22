@@ -20,7 +20,7 @@ import { GovExplainer } from '../components/gov_explainer';
 import { CWText } from '../components/component_kit/cw_text';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
-type ValidatorAttrs = {
+type ValidatorType = {
   chain: string;
   commission: any;
   controller: string;
@@ -31,30 +31,34 @@ type ValidatorAttrs = {
   total: SubstrateCoin;
 };
 
+type ValidatorAttrs = {
+  info: ValidatorType;
+};
+
 class Validator implements m.ClassComponent<ValidatorAttrs> {
   view(vnode: m.Vnode<ValidatorAttrs>) {
-    const { stash, chain, total, nominators, commission } = vnode.attrs;
+    const { info } = vnode.attrs;
 
     return (
       <CWCard className="ValidatorCard">
         <div class="user-and-nominator">
           {m(User, {
-            user: new AddressInfo(null, stash, chain, null),
+            user: new AddressInfo(null, info.stash, info.chain, null),
             popover: true,
             hideIdentityIcon: true,
           })}
           <CWText type="caption" fontWeight="medium">
-            {`${total?.format(true)} from ${pluralize(
-              nominators,
+            {`${info.total?.format(true)} from ${pluralize(
+              info.nominators,
               'nominator'
             )}`}
           </CWText>
         </div>
-        {commission && (
+        {info.commission && (
           <CWText
             type="caption"
             className="commission-text"
-          >{`${commission} commission`}</CWText>
+          >{`${info.commission} commission`}</CWText>
         )}
       </CWCard>
     );
