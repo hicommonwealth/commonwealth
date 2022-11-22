@@ -18,6 +18,7 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 import Web3 from 'web3';
+import { processAbiInputsToDataTypes } from 'client/scripts/helpers/abi_form_helpers';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -76,8 +77,15 @@ export default class GeneralContractsController {
 
   public async callContractFunction(
     fn: AbiItem,
-    processedArgs: any[]
+    formInputMap: Map<string, Map<number, string>>,
   ): Promise<TransactionReceipt | string> {
+    // handle processing the forms inputs into their proper data types
+    const processedArgs = processAbiInputsToDataTypes(
+      fn.name,
+      fn.inputs,
+      formInputMap
+    );
+
     const sender = app.user.activeAccount;
     // get querying wallet
     const signingWallet = await app.wallets.locateWallet(

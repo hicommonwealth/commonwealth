@@ -72,14 +72,9 @@ class GeneralContractPage
         );
 
         // handle processing the forms inputs into their proper data types
-        const processedArgs = processAbiInputsToDataTypes(
-          fn.name,
-          fn.inputs,
-          this.state.form.functionNameToFunctionInputArgs
-        );
         tx = await this.generalContractsController.callContractFunction(
           fn,
-          processedArgs
+          this.state.form.functionNameToFunctionInputArgs
         );
         console.log('tx is ', tx);
 
