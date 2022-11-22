@@ -20,7 +20,7 @@ type ManageRoleRowAttrs = {
 };
 
 export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta;

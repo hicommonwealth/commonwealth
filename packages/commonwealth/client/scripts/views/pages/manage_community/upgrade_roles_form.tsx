@@ -23,7 +23,7 @@ export class UpgradeRolesForm
   private role: string;
   private user: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
     const nonAdmins: RoleInfo[] = roleData.filter((role) => {
