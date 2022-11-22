@@ -25,7 +25,9 @@ import {
 } from '../create_community/types';
 
 type ContractFormFields = {
+  contractNickname: string;
   chain_node_id: number;
+  abiNickname: string;
   abi: string;
   contractType: ContractType;
   decimals: number;
@@ -51,7 +53,9 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
       // For Now we hard code the chain node id until we have a better way to distinguish between chains
       chain_node_id: 37,
       name: '',
+      abiNickname: '',
       abi: '',
+      contractNickname: '',
       contractType: ContractType.ERC20,
       nodeUrl: '',
       symbol: '',
@@ -66,19 +70,18 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
 
   view(vnode) {
     const validAddress = isAddress(this.state.form.address);
+    const validAbiNickname = this.state.form.abiNickname.length > 0;
 
     return (
       <div class="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
         <InputRow
-          title="Abi"
-          value={this.state.form.abi}
-          placeholder="Optional: Paste ABI here"
-          onChangeHandler={(value) => {
-            this.state.form.abi = value;
-            this.state.loaded = false;
+          title="Contract Nickname"
+          value={this.state.form.contractNickname}
+          placeholder="Optional: Enter a nickname for this contract"
+          onChangeHandler={(v) => {
+            this.state.form.contractNickname = v;
           }}
-          textarea
         />
         <SelectRow
           title="Contract Type"
@@ -88,6 +91,24 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.form.contractType = value;
             this.state.loaded = false;
           }}
+        />
+        <InputRow
+          title="Abi Nickname"
+          value={this.state.form.abiNickname}
+          placeholder="Required: Enter a nickname for this abi"
+          onChangeHandler={(v) => {
+            this.state.form.abiNickname = v;
+          }}
+        />
+        <InputRow
+          title="Abi"
+          value={this.state.form.abi}
+          placeholder="Optional: Paste ABI here"
+          onChangeHandler={(value) => {
+            this.state.form.abi = value;
+            this.state.loaded = false;
+          }}
+          textarea
         />
         <InputRow
           title="Token Name"
@@ -118,6 +139,7 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
           disabled={
             this.state.saving ||
             !validAddress ||
+            !validAbiNickname ||
             !this.state.form.chain_node_id ||
             this.state.loading
           }
