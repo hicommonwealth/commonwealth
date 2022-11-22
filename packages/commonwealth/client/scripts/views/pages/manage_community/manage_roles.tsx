@@ -7,7 +7,7 @@ import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { AddressInfo } from 'models';
+import { AddressInfo, RoleInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -15,8 +15,8 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate?: () => void;
-  roledata?: any;
+  onRoleUpdate?: (role: RoleInfo, newRole: RoleInfo) => void;
+  roledata?: Array<RoleInfo>;
 };
 
 export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
@@ -34,7 +34,7 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
 
             const isSelf =
               role.Address.address === app.user.activeAccount?.address &&
-              role.Address.chain === app.user.activeAccount?.chain.id;
+              role.Address.chain.id === app.user.activeAccount?.chain.id;
 
             const roleBelongsToUser = !!app.user.addresses.filter(
               (addr_) => addr_.id === (role.address_id || role.Address.id)
@@ -46,9 +46,9 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                   user: new AddressInfo(
                     addr.id,
                     addr.address,
-                    addr.chain,
+                    addr.chain.id,
                     null,
-                    addr.wallet_id
+                    addr.walletId
                   ), // role.Address, // make AddressInfo?
                   popover: true,
                   linkify: false,

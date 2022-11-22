@@ -13,7 +13,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 type UpgradeRolesFormAttrs = {
-  onRoleUpgrade: (oldRole: string, newRole: string) => void;
+  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
 };
 
