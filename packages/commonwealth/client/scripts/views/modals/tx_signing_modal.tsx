@@ -28,7 +28,7 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
     this.stageName = 'intro';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ITXModalData>) {
     const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);
