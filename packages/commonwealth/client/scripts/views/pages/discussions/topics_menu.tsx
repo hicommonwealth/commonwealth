@@ -29,14 +29,14 @@ type Topic = {
 
 type TopicsMenuAttrs = {
   disabled: boolean;
-  featuredTopics: string[];
+  featuredTopics: Topic[];
   otherTopics: Topic[];
   selectedTopic: Topic;
   topic: string;
 };
 
 export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TopicsMenuAttrs>) {
     const { disabled, featuredTopics, otherTopics, selectedTopic, topic } =
       vnode.attrs;
 

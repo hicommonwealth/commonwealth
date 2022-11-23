@@ -7,7 +7,7 @@ export class CWPortal implements m.ClassComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private content: any;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode) {
     const rootElement = document.createElement('div');
     const container = document.body;
     container.appendChild(rootElement);

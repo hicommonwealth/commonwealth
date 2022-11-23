@@ -22,7 +22,7 @@ type SublayoutBannersAttrs = {
 export class SublayoutBanners
   implements m.ClassComponent<SublayoutBannersAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SublayoutBannersAttrs>) {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (
