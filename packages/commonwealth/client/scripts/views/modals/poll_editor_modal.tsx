@@ -48,7 +48,7 @@ export class PollEditorModal implements m.ClassComponent<PollEditorAttrs> {
   private options: Array<string>;
   private prompt: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<PollEditorAttrs>) {
     const { thread } = vnode.attrs;
     const { customDurationEnabled, customDuration } = this;
 

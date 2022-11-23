@@ -24,7 +24,7 @@ type StagesMenuAttrs = {
 };
 
 export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<StagesMenuAttrs>) {
     const { disabled, selectedStage, stage, stages } = vnode.attrs;
 
     return m(PopoverMenu, {

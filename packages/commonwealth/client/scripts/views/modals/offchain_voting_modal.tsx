@@ -8,10 +8,14 @@ import { Vote, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
+type OffchainVotingModalAttrs = {
+  votes: Array<Vote>;
+};
+
 export class OffchainVotingModal
-  implements m.ClassComponent<{ votes: Vote[] }>
+  implements m.ClassComponent<OffchainVotingModalAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;
 
     if (!votes || votes.length === 0) return;
