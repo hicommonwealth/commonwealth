@@ -9,10 +9,12 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import { GovExplainer } from '../gov_explainer';
 import { CWButton } from '../component_kit/cw_button';
 
+type SubstrateProposalStatsAttrs = { nextLaunchBlock: number };
+
 export class SubstrateProposalStats
-  implements m.ClassComponent<{ nextLaunchBlock: number }>
+  implements m.ClassComponent<SubstrateProposalStatsAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SubstrateProposalStatsAttrs>) {
     const { nextLaunchBlock } = vnode.attrs;
 
     return (

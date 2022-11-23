@@ -13,9 +13,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 
-import {
-  MixpanelCommunityCreationEvent,
-} from 'analytics/types';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { initChainForm, defaultChainRows } from './chain_input_rows';
@@ -39,7 +37,7 @@ export class SputnikForm implements m.ClassComponent {
     },
   };
 
-  view(vnode) {
+  view() {
     return (
       <div class="CreateCommunityForm">
         <InputRow
@@ -54,7 +52,7 @@ export class SputnikForm implements m.ClassComponent {
           title="Network"
           defaultValue={this.state.form.isMainnet}
           onToggle={(checked) => {
-            vnode.state.isMainnet = checked;
+            this.state.form.isMainnet = checked;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: ChainBase.CosmosSDK,
@@ -85,8 +83,9 @@ export class SputnikForm implements m.ClassComponent {
             const daoName = name.includes('sputnik-dao')
               ? name.slice(0, name.indexOf('sputnik-dao') - 1)
               : name.includes('sputnikv2')
-              ? name.slice(0, name.indexOf('sputnikv2') - 1) : name;
-            
+              ? name.slice(0, name.indexOf('sputnikv2') - 1)
+              : name;
+
             const id = isMainnet
               ? `${daoName}.sputnik-dao.near`
               : `${daoName}.sputnikv2.testnet`;
