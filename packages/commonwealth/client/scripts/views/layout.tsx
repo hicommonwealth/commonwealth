@@ -46,7 +46,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  view(vnode) {
+  view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;

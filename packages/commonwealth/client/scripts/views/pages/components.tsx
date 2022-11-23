@@ -4,8 +4,8 @@ import m from 'mithril';
 import Sublayout from 'views/sublayout';
 import { ComponentShowcase } from '../components/component_kit/cw_component_showcase';
 
-const ComponentsPage: m.Component = {
-  view: () => {
+class ComponentsPage implements m.ClassComponent {
+  view() {
     return (
       <Sublayout
       // title="Commonwealth UI Component Kit"
@@ -13,7 +13,7 @@ const ComponentsPage: m.Component = {
         <ComponentShowcase />
       </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default ComponentsPage;
