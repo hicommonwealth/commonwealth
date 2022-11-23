@@ -16,28 +16,33 @@
     gap: 8px;
     width: 100%;
 
-    .user-and-date-row {
-      align-items: center;
+    .top-row {
       display: flex;
-      gap: 8px;
+      justify-content: space-between;
 
-      .User {
+      .user-and-date {
         align-items: center;
         display: flex;
+        gap: 8px;
 
-        .user-avatar {
-          position: unset;
+        .User {
+          align-items: center;
+          display: flex;
+
+          .user-avatar {
+            position: unset;
+          }
+
+          .username {
+            @include caption;
+
+            font-weight: 500;
+          }
         }
 
-        .username {
-          @include caption;
-
-          font-weight: 500;
+        .last-updated-text.Text {
+          color: $neutral-500;
         }
-      }
-
-      .last-updated-text.Text {
-        color: $neutral-500;
       }
     }
 

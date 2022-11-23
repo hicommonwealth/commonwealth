@@ -1,6 +1,10 @@
+import m from 'mithril';
 import moment from 'moment';
 
-import { Thread } from 'models';
+import app from 'state';
+import { NotificationSubscription, Thread } from 'models';
+import { notifySuccess } from 'controllers/app/notifications';
+import { NotificationCategories } from '../../../../../../common-common/src/types';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -31,4 +35,78 @@ export const orderDiscussionsbyLastComment = (a, b) => {
   const tsB = Math.max(+b.createdAt, +(b.lastCommentedOn || 0));
   const tsA = Math.max(+a.createdAt, +(a.lastCommentedOn || 0));
   return tsB - tsA;
+};
+
+const handleToggleSubscription = async (
+  thread: Thread,
+  commentSubscription: NotificationSubscription,
+  reactionSubscription: NotificationSubscription,
+  bothActive: boolean
+) => {
+  if (!commentSubscription || !reactionSubscription) {
+    await Promise.all([
+      app.user.notifications.subscribe(
+        NotificationCategories.NewReaction,
+        thread.uniqueIdentifier
+      ),
+      app.user.notifications.subscribe(
+        NotificationCategories.NewComment,
+        thread.uniqueIdentifier
+      ),
+    ]);
+    notifySuccess('Subscribed!');
+  } else if (bothActive) {
+    await app.user.notifications.disableSubscriptions([
+      commentSubscription,
+      reactionSubscription,
+    ]);
+    notifySuccess('Unsubscribed!');
+  } else {
+    await app.user.notifications.enableSubscriptions([
+      commentSubscription,
+      reactionSubscription,
+    ]);
+    notifySuccess('Subscribed!');
+  }
+
+  m.redraw();
+};
+
+export const getCommentSubscription = (thread: Thread) => {
+  return app.user.notifications.subscriptions.find(
+    (v) =>
+      v.objectId === thread.uniqueIdentifier &&
+      v.category === NotificationCategories.NewComment
+  );
+};
+
+export const getReactionSubscription = (thread: Thread) => {
+  return app.user.notifications.subscriptions.find(
+    (v) =>
+      v.objectId === thread.uniqueIdentifier &&
+      v.category === NotificationCategories.NewReaction
+  );
+};
+
+export const getThreadSubScriptionMenuItem = (thread: Thread) => {
+  const commentSubscription = getCommentSubscription(thread);
+  const reactionSubscription = getReactionSubscription(thread);
+
+  const bothActive =
+    commentSubscription?.isActive && reactionSubscription?.isActive;
+
+  return {
+    onclick: (e) => {
+      e.preventDefault();
+      handleToggleSubscription(
+        thread,
+        getCommentSubscription(thread),
+        getReactionSubscription(thread),
+        bothActive
+      );
+      m.redraw();
+    },
+    label: bothActive ? 'Unsubscribe' : 'Subscribe',
+    iconLeft: 'bell',
+  };
 };

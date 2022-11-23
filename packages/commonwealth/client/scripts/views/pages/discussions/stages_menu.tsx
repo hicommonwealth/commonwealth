@@ -17,15 +17,14 @@ import { ThreadStage } from 'models';
 import { threadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
-  disabled: boolean;
   selectedStage: ThreadStage;
   stage: string;
-  stages: ThreadStage[];
+  stages: Array<ThreadStage>;
 };
 
 export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
-  view(vnode) {
-    const { disabled, selectedStage, stage, stages } = vnode.attrs;
+  view(vnode: m.Vnode<StagesMenuAttrs>) {
+    const { selectedStage, stage, stages } = vnode.attrs;
 
     return m(PopoverMenu, {
       trigger: m(Button, {
@@ -36,7 +35,6 @@ export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
           : 'All Stages',
         iconRight: Icons.CHEVRON_DOWN,
         size: 'sm',
-        disabled,
       }),
       hasArrow: false,
       transitionDuration: 0,

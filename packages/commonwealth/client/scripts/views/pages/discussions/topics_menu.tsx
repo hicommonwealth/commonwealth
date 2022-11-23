@@ -28,17 +28,15 @@ type Topic = {
 };
 
 type TopicsMenuAttrs = {
-  disabled: boolean;
-  featuredTopics: string[];
-  otherTopics: Topic[];
+  featuredTopics: Array<Topic>;
+  otherTopics: Array<Topic>;
   selectedTopic: Topic;
   topic: string;
 };
 
 export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
-  view(vnode) {
-    const { disabled, featuredTopics, otherTopics, selectedTopic, topic } =
-      vnode.attrs;
+  view(vnode: m.Vnode<TopicsMenuAttrs>) {
+    const { featuredTopics, otherTopics, selectedTopic, topic } = vnode.attrs;
 
     return m(PopoverMenu, {
       trigger: m(Button, {
@@ -47,7 +45,6 @@ export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
         label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
         iconRight: Icons.CHEVRON_DOWN,
         size: 'sm',
-        disabled,
       }),
       hasArrow: false,
       transitionDuration: 0,

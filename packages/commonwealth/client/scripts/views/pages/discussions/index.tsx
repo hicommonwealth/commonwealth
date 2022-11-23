@@ -6,15 +6,20 @@ import { debounce } from 'lodash';
 import 'pages/discussions/index.scss';
 
 import app from 'state';
+import { pluralize } from 'helpers';
+import { isNotUndefined } from 'helpers/typeGuards';
 import { PageLoading } from '../loading';
-import { RecentThreads } from './recent_threads';
 import Sublayout from '../../sublayout';
-import { DiscussionFilterBar } from './discussion_filter_bar';
+import { RecentThreadsHeader } from './recent_threads_header';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CreateContentPopover } from '../../menus/create_content_menu';
+import { _ThreadPreview } from './_thread_preview';
 
 type DiscussionPageAttrs = { topic?: string };
 
-// Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
 class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
+  private initializing: boolean;
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
@@ -29,30 +34,20 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
 
     const { fetchingThreads, topicName, stageName } = this;
 
-    if (fetchingThreads) return;
-
-    const params = { topicName, stageName };
-
-    const noThreadsRemaining = app.threads.listingStore.isDepleted(params);
-
-    if (noThreadsRemaining) return;
-
-    const { scrollHeight, scrollTop } = this.scrollEle;
-
-    const fetchpointNotReached = scrollHeight - 1000 >= scrollTop;
-
-    if (fetchpointNotReached) return;
-
-    this.fetchingThreads = true;
-
-    await app.threads.loadNextPage({ topicName, stageName });
-
-    this.fetchingThreads = false;
-
-    m.redraw();
+    if (
+      !fetchingThreads &&
+      !app.threads.listingStore.isDepleted({
+        topicName,
+        stageName,
+      }) &&
+      !(this.scrollEle.scrollHeight - 1000 >= this.scrollEle.scrollTop)
+    ) {
+      this.fetchingThreads = true;
+      await app.threads.loadNextPage({ topicName, stageName });
+      this.fetchingThreads = false;
+      m.redraw();
+    }
   }
-
-  // Lifecycle methods
 
   oncreate() {
     const storedScrollYPos =
@@ -65,15 +60,46 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     }
   }
 
-  view(vnode: m.VnodeDOM<DiscussionPageAttrs, this>) {
-    if (!app.chain || !app.chain.serverLoaded) {
-      return <PageLoading />;
-    }
-
+  view(vnode: m.Vnode<DiscussionPageAttrs>) {
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
 
-    return (
+    const { listingStore } = app.threads;
+    const { topicName, stageName } = this;
+
+    // Fetch first 20 unpinned threads
+    if (
+      !listingStore.isInitialized({
+        topicName,
+        stageName,
+      })
+    ) {
+      this.initializing = true;
+      app.threads.loadNextPage({ topicName, stageName }).then(() => {
+        this.initializing = false;
+        m.redraw();
+      });
+    }
+
+    const pinnedThreads = listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: true,
+    });
+
+    const unpinnedThreads = listingStore.getThreads({
+      topicName,
+      stageName,
+      pinned: false,
+    });
+
+    const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
+
+    const subpage = topicName || stageName;
+
+    return !app.chain || !app.chain.serverLoaded || this.initializing ? (
+      <PageLoading />
+    ) : (
       <Sublayout
         title="Discussions"
         description={
@@ -82,17 +108,52 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
         onscroll={debounce(this.onscroll.bind(this), 400)}
       >
         <div class="DiscussionsPage">
-          {app.chain?.meta && (
-            <DiscussionFilterBar
-              topic={this.topicName}
-              stage={this.stageName}
-              parentState={this}
-            />
-          )}
-          <RecentThreads
-            topicName={this.topicName}
-            stageName={this.stageName}
+          <RecentThreadsHeader
+            topic={this.topicName}
+            stage={this.stageName}
+            totalThreadCount={totalThreadCount}
           />
+          {totalThreadCount > 0 ? (
+            <div class="RecentThreads">
+              {pinnedThreads.map((t) => (
+                <_ThreadPreview thread={t} />
+              ))}
+              {unpinnedThreads.map((t) => (
+                <_ThreadPreview thread={t} />
+              ))}
+              {listingStore.isDepleted({ topicName, stageName }) && (
+                <div class="listing-scroll">
+                  <CWText className="thread-count-text">
+                    {`Showing ${totalThreadCount} of ${pluralize(
+                      totalThreadCount,
+                      'thread'
+                    )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
+                  </CWText>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div class="NoThreadsPlaceholder">
+              {isNotUndefined(topicName) ? (
+                <CWText className="no-threads-text">
+                  There are no threads matching your filter.
+                </CWText>
+              ) : (
+                <>
+                  <div class="icon-circle">
+                    <CWIcon iconName="hash" iconSize="large" />
+                  </div>
+                  <div class="welcome-text-container">
+                    <CWText type="h3">Welcome to the community!</CWText>
+                    <CWText className="no-threads-text">
+                      There are no threads here yet.
+                    </CWText>
+                  </div>
+                  <CreateContentPopover />
+                </>
+              )}
+            </div>
+          )}
         </div>
       </Sublayout>
     );

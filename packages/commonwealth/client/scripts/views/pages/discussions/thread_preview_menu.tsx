@@ -4,68 +4,21 @@ import m from 'mithril';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { NotificationCategories } from 'common-common/src/types';
 import { Thread, ThreadStage, Topic } from 'models';
-import { notifySuccess } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
-export const getThreadSubScriptionMenuItem = (thread: Thread) => {
-  const commentSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewComment
-  );
-
-  const reactionSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewReaction
-  );
-
-  const bothActive =
-    commentSubscription?.isActive && reactionSubscription?.isActive;
-
-  return {
-    onclick: async (e) => {
-      e.preventDefault();
-      if (!commentSubscription || !reactionSubscription) {
-        await Promise.all([
-          app.user.notifications.subscribe(
-            NotificationCategories.NewReaction,
-            thread.uniqueIdentifier
-          ),
-          app.user.notifications.subscribe(
-            NotificationCategories.NewComment,
-            thread.uniqueIdentifier
-          ),
-        ]);
-        notifySuccess('Subscribed!');
-      } else if (bothActive) {
-        await app.user.notifications.disableSubscriptions([
-          commentSubscription,
-          reactionSubscription,
-        ]);
-        notifySuccess('Unsubscribed!');
-      } else {
-        await app.user.notifications.enableSubscriptions([
-          commentSubscription,
-          reactionSubscription,
-        ]);
-        notifySuccess('Subscribed!');
-      }
-      m.redraw();
-    },
-    label: bothActive ? 'Unsubscribe' : 'Subscribe',
-    iconLeft: 'bell',
-  };
+type ThreadPreviewMenuAttrs = {
+  thread: Thread;
 };
 
-export class ThreadPreviewMenu implements m.ClassComponent<{ thread: Thread }> {
-  view(vnode) {
+export class ThreadPreviewMenu
+  implements m.ClassComponent<ThreadPreviewMenuAttrs>
+{
+  view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
     const { thread } = vnode.attrs;
@@ -96,8 +49,6 @@ export class ThreadPreviewMenu implements m.ClassComponent<{ thread: Thread }> {
       >
         <CWPopoverMenu
           menuItems={[
-            getThreadSubScriptionMenuItem(thread),
-            ...(hasAdminPermissions ? [{ type: 'divider' }] : []),
             ...(hasAdminPermissions
               ? [
                   {
