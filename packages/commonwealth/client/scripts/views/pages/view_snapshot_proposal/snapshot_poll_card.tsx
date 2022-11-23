@@ -30,7 +30,7 @@ export class SnapshotPollCard
   private voteDirectionString: string;
   private localVoteInformation: Array<VoteInformation>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SnapshotPollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
