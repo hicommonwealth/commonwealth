@@ -69,7 +69,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
   chain: string;
   activeChannel: number;
 
-  async oninit(vnode) {
+  async oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     this.loaded = false;
     this.chain = app.activeChainId();
     this.activeChannel = null;
@@ -137,9 +137,12 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
     };
   }
 
-  onbeforeupdate(vnode, old) {
+  onbeforeupdate(
+    vnode: m.Vnode<SidebarSectionAttrs>,
+    old: m.VnodeDOM<SidebarSectionAttrs, this>
+  ) {
     if (
-      !_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)
+      !_.isEqual(Object.values(app.socket.chatNs.channels), old.state.channels)
     ) {
       Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
@@ -147,6 +150,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
           ? this.channels[metadata.category].push(metadata)
           : (this.channels[metadata.category] = [metadata]);
       });
+
       this.menuToggleTree = {
         toggledState: false,
         children: this.categoryToToggleTree(Object.keys(this.channels), false),
@@ -163,7 +167,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
     }
   }
 
-  view(vnode) {
+  view() {
     if (!app.socket) return;
     if (!this.loaded) return <CWSpinner />;
     this.activeChannel = m.route.param()['channel'];
@@ -193,9 +197,9 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
         chatDefaultToggleTree
       );
     }
-    const toggleTreeState = vnode.attrs.mobile
-      ? chatDefaultToggleTree
-      : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
+    const toggleTreeState = JSON.parse(
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`]
+    );
 
     // ---------- Build Section Props ---------- //
 
