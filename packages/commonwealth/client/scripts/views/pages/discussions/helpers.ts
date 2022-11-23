@@ -41,7 +41,7 @@ const handleToggleSubscription = async (
   thread: Thread,
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
-  bothActive: boolean
+  isSubscribed: boolean
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -55,7 +55,7 @@ const handleToggleSubscription = async (
       ),
     ]);
     notifySuccess('Subscribed!');
-  } else if (bothActive) {
+  } else if (isSubscribed) {
     await app.user.notifications.disableSubscriptions([
       commentSubscription,
       reactionSubscription,
@@ -92,7 +92,7 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
 
-  const bothActive =
+  const isSubscribed =
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   return {
@@ -102,11 +102,11 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
         thread,
         getCommentSubscription(thread),
         getReactionSubscription(thread),
-        bothActive
+        isSubscribed
       );
       m.redraw();
     },
-    label: bothActive ? 'Unsubscribe' : 'Subscribe',
-    iconLeft: 'bell',
+    label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
+    iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
   };
 };

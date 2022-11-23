@@ -12,7 +12,6 @@ import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
-import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -126,12 +125,6 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                     }}
                   >
                     {thread.title}
-                  </CWText>
-                  <CWText type="caption" noWrap>
-                    {renderQuillTextBody(thread.body, {
-                      hideFormatting: true,
-                      collapse: true,
-                    })}
                   </CWText>
                   <div class="row-bottom">
                     <div class="comments-and-users">

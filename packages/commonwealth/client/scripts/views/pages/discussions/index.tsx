@@ -14,15 +14,15 @@ import { RecentThreadsHeader } from './recent_threads_header';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CreateContentPopover } from '../../menus/create_content_menu';
-import { _ThreadPreview } from './_thread_preview';
+import { ThreadPreview } from './thread_preview';
 
 type DiscussionPageAttrs = { topic?: string };
 
 class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
-  private initializing: boolean;
-  private topicName: string;
-  private stageName: string;
   private fetchingThreads: boolean;
+  private initializing: boolean;
+  private stageName: string;
+  private topicName: string;
 
   get scrollEle() {
     return document.getElementsByClassName('Body')[0];
@@ -116,10 +116,10 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
           {totalThreadCount > 0 ? (
             <div class="RecentThreads">
               {pinnedThreads.map((t) => (
-                <_ThreadPreview thread={t} />
+                <ThreadPreview thread={t} />
               ))}
               {unpinnedThreads.map((t) => (
-                <_ThreadPreview thread={t} />
+                <ThreadPreview thread={t} />
               ))}
               {listingStore.isDepleted({ topicName, stageName }) && (
                 <div class="listing-scroll">

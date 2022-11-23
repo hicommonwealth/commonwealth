@@ -48,14 +48,6 @@
     flex-direction: column;
     width: 100%;
 
-    @include large {
-      max-width: 720px;
-    }
-
-    @include mediumInclusive {
-      max-width: 520px;
-    }
-
     .recent-thread-row {
       display: flex;
       flex-direction: column;
