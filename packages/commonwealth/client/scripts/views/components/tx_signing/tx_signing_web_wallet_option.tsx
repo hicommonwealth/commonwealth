@@ -21,14 +21,14 @@ type TXSigningWebWalletOptionAttrs = {
 export class TXSigningWebWalletOption
   implements m.ClassComponent<TXSigningWebWalletOptionAttrs>
 {
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {
       vnode.attrs.wallet.enable().then(() => m.redraw());
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     const { author, wallet } = vnode.attrs;
 
     const webWallet = wallet as PolkadotWebWalletController;

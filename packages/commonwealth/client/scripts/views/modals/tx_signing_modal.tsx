@@ -28,7 +28,7 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
     this.stageName = 'intro';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ITXModalData>) {
     const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);
@@ -59,7 +59,9 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
               txType={txType}
             />
           )}
-          {this.stageName === 'waiting' && <TxSigningModalWaitingStage />}
+          {this.stageName === 'waiting' && (
+            <TxSigningModalWaitingStage next={next} />
+          )}
           {this.stageName === 'success' && (
             <TxSigningModalSuccessStage
               blocknum={this.data.blocknum}
