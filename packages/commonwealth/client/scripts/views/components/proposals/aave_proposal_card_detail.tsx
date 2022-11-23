@@ -13,15 +13,10 @@ export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);
 };
 
-type AaveProposalCardDetailAttrs = {
-  proposal: AaveProposal;
-  statusText: any;
-};
+type AaveInfoRowAttrs = { aaveNum: number; aaveText: string };
 
-export class AaveInfoRow
-  implements m.ClassComponent<{ aaveNum: number; aaveText: string }>
-{
-  view(vnode) {
+export class AaveInfoRow implements m.ClassComponent<AaveInfoRowAttrs> {
+  view(vnode: m.Vnode<AaveInfoRowAttrs>) {
     const { aaveNum, aaveText } = vnode.attrs;
 
     return (
@@ -35,10 +30,15 @@ export class AaveInfoRow
   }
 }
 
+type AaveProposalCardDetailAttrs = {
+  proposal: AaveProposal;
+  statusText: any;
+};
+
 export class AaveProposalCardDetail
   implements m.ClassComponent<AaveProposalCardDetailAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<AaveProposalCardDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     const statusText = Array.isArray(vnode.attrs.statusText)
