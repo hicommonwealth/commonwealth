@@ -4,6 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';

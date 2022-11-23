@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_toggle.scss';
 
@@ -15,7 +16,7 @@ type ToggleAttrs = {
   onchange: (e?: any) => void;
 } & ToggleStyleAttrs;
 
-export class CWToggle implements m.ClassComponent<ToggleAttrs> {
+export class CWToggle extends ClassComponent<ToggleAttrs> {
   view(vnode: m.Vnode<ToggleAttrs>) {
     const { className, disabled = false, onchange, checked } = vnode.attrs;
 

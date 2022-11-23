@@ -1,6 +1,7 @@
 import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
@@ -18,7 +19,7 @@ type UpgradeRolesFormAttrs = {
 };
 
 export class UpgradeRolesForm
-  implements m.ClassComponent<UpgradeRolesFormAttrs>
+  extends ClassComponent<UpgradeRolesFormAttrs>
 {
   private role: string;
   private user: string;

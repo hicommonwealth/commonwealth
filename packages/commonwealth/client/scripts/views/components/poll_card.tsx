@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/poll_card.scss';
 
@@ -34,7 +35,7 @@ export type PollOptionAttrs = {
   disableVoteOptions: boolean;
 };
 
-export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
+export class PollOptions extends ClassComponent<PollOptionAttrs> {
   view(vnode: m.Vnode<PollOptionAttrs>) {
     const {
       multiSelect,
@@ -88,7 +89,7 @@ export type CastVoteAttrs = {
   ) => void;
 };
 
-export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
+export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
   view(vnode: m.Vnode<CastVoteAttrs>) {
     const {
       disableVoteButton,
@@ -137,7 +138,7 @@ export type VoteDisplayAttrs = {
   voteInformation: Array<VoteInformation>;
 };
 
-export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
+export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
   view(vnode: m.Vnode<VoteDisplayAttrs>) {
     const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
       vnode.attrs;
@@ -193,7 +194,7 @@ export type ResultsSectionAttrs = {
   isPreview: boolean;
 };
 
-export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
+export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
   view(vnode: m.Vnode<ResultsSectionAttrs>) {
     const {
       resultString,
@@ -307,7 +308,7 @@ export type PollCardAttrs = PollOptionAttrs &
     proposalTitle?: string;
   };
 
-export class PollCard implements m.ClassComponent<PollCardAttrs> {
+export class PollCard extends ClassComponent<PollCardAttrs> {
   private hasVoted: boolean;
   private selectedOptions: Array<string>;
   private totalVoteCount: number;

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';

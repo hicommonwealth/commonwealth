@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -68,7 +69,7 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class Comment implements m.ClassComponent<CommentAttrs> {
+export class Comment extends ClassComponent<CommentAttrs> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;

@@ -4,6 +4,7 @@ import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import {io, Socket} from 'socket.io-client';
 import _ from 'lodash';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'

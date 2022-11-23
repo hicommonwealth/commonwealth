@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';

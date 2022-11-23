@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { WalletAccount, WalletConnection } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';

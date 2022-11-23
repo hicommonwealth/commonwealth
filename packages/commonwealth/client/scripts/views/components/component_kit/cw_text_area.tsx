@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -14,7 +15,7 @@ type TextAreaStyleAttrs = {
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextArea implements m.ClassComponent<BaseTextInputAttrs> {
+export class CWTextArea extends ClassComponent<BaseTextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';

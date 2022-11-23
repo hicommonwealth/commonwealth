@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -20,7 +21,7 @@ type LinkedThreadsCardAttrs = {
 };
 
 export class LinkedThreadsCard
-  implements m.ClassComponent<LinkedThreadsCardAttrs>
+  extends ClassComponent<LinkedThreadsCardAttrs>
 {
   private fetchLinkedThreads: boolean;
   private linkedThreads: Thread[];

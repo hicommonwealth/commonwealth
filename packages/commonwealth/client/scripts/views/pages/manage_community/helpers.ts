@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 
 import { RolePermission } from 'models';

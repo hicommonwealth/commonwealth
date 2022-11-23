@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
@@ -16,7 +17,7 @@ type AdminPanelTabsAttrs = {
   webhooks: Webhook[];
 };
 
-export class AdminPanelTabs implements m.ClassComponent<AdminPanelTabsAttrs> {
+export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {
   private index: number;
 
   oninit(vnode: m.Vnode<AdminPanelTabsAttrs>) {

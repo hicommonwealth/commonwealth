@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -35,7 +36,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 }
 
 export class GovernanceSection
-  implements m.ClassComponent<SidebarSectionAttrs>
+  extends ClassComponent<SidebarSectionAttrs>
 {
   view(vnode) {
     // Conditional Render Details

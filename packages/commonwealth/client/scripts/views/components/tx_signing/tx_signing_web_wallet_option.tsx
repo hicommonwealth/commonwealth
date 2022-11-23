@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -19,7 +20,7 @@ type TXSigningWebWalletOptionAttrs = {
 } & ITXModalData;
 
 export class TXSigningWebWalletOption
-  implements m.ClassComponent<TXSigningWebWalletOptionAttrs>
+  extends ClassComponent<TXSigningWebWalletOptionAttrs>
 {
   oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet

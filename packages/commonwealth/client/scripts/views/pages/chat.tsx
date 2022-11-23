@@ -2,6 +2,7 @@
 
 import { navigateToSubpage } from 'app';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/chat.scss';
 
@@ -12,7 +13,7 @@ import Sublayout from 'views/sublayout';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 
-class ChatPage implements m.ClassComponent {
+class ChatPage extends ClassComponent {
   oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.CHAT_PAGE_VISIT,

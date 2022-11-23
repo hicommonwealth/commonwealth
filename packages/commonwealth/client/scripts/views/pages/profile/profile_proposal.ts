@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import lity from 'lity';
 import { slugify } from 'utils';
 

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 const JoinCommonWealthSection: m.Component<{}, {}> = {
   view: (vnode) => {

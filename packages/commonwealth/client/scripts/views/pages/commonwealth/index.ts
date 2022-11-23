@@ -1,5 +1,6 @@
 import './commonwealth.scss';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -49,7 +50,7 @@ type CreateCommunityState = {
   loadingEthChains: boolean;
 } & EthChainAttrs;
 
-class CreateCommunity implements m.ClassComponent {
+class CreateCommunity extends ClassComponent {
   private state: CreateCommunityState = {
     activeForm: CommunityType.StarterCommunity,
     ethChainNames: {},

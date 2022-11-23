@@ -1,6 +1,7 @@
 import 'pages/commonwealth/collectives.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Card, Button, Input } from 'construct-ui';
 
 import app from 'state';

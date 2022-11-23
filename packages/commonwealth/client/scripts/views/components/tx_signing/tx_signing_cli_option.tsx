@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -17,7 +18,7 @@ import { CWTextArea } from '../component_kit/cw_text_area';
 type TXSigningCLIOptionAttrs = ITXModalData & { next: NextFn };
 
 export class TXSigningCLIOption
-  implements m.ClassComponent<TXSigningCLIOptionAttrs>
+  extends ClassComponent<TXSigningCLIOptionAttrs>
 {
   private calldata?: ISubstrateTXData;
   private signedTx: string;

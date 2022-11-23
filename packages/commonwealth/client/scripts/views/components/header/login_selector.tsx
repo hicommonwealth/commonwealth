@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import {
   MenuItem,
   MenuDivider,
@@ -58,7 +59,7 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export class LoginSelectorMenuLeft
-  implements m.ClassComponent<LoginSelectorMenuLeftAttrs>
+  extends ClassComponent<LoginSelectorMenuLeftAttrs>
 {
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
     const { activeAddressesWithRole, nAccountsWithoutRole, mobile } =
@@ -248,7 +249,7 @@ type TOSModalAttrs = {
 };
 
 // TODO: Replace this with a proper TOS Compoment when we have one
-class TOSModal implements m.ClassComponent<TOSModalAttrs> {
+class TOSModal extends ClassComponent<TOSModalAttrs> {
   view(vnode: m.Vnode<TOSModalAttrs>) {
     return (
       <div class="TOSModal">
@@ -274,7 +275,7 @@ class TOSModal implements m.ClassComponent<TOSModalAttrs> {
 
 type LoginSelectorAttrs = { small?: boolean };
 
-export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
+export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
   private profileLoadComplete: boolean;
 
   view(vnode: m.Vnode<LoginSelectorAttrs>) {

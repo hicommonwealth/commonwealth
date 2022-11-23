@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import 'pages/landing/find_your_community_section.scss';
 
 interface IState {

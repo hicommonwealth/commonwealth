@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -25,7 +26,7 @@ type EditCollaboratorsModalAttrs = {
 };
 
 export class EditCollaboratorsModal
-  implements m.ClassComponent<EditCollaboratorsModalAttrs>
+  extends ClassComponent<EditCollaboratorsModalAttrs>
 {
   private addedEditors: any;
   private items: any[];

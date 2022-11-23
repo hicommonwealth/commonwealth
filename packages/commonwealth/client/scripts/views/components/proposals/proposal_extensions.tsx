@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/proposal_extensions.scss';
 
@@ -27,7 +28,7 @@ type ProposalExtensionsAttrs = {
 };
 
 export class ProposalExtensions
-  implements m.ClassComponent<ProposalExtensionsAttrs>
+  extends ClassComponent<ProposalExtensionsAttrs>
 {
   view(vnode: m.Vnode<ProposalExtensionsAttrs>) {
     const {

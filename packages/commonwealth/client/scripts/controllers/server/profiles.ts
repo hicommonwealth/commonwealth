@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
 import { addressSwapper } from 'commonwealth/shared/utils';

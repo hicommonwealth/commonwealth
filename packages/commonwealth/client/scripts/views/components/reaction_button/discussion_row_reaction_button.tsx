@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/discussion_row_reaction_button.scss';
@@ -20,7 +21,7 @@ type DiscussionRowReactionButtonAttrs = {
 };
 
 export class DiscussionRowReactionButton
-  implements m.ClassComponent<DiscussionRowReactionButtonAttrs>
+  extends ClassComponent<DiscussionRowReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;

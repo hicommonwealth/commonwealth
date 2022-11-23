@@ -3,6 +3,7 @@
 import 'pages/landing/privacyAndTerms.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';
 

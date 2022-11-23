@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -22,7 +23,7 @@ type CommentReactionButtonAttrs = {
 };
 
 export class CommentReactionButton
-  implements m.ClassComponent<CommentReactionButtonAttrs>
+  extends ClassComponent<CommentReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;

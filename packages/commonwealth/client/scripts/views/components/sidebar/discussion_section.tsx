@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -29,7 +30,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
 }
 
 export class DiscussionSection
-  implements m.ClassComponent<SidebarSectionAttrs>
+  extends ClassComponent<SidebarSectionAttrs>
 {
   view() {
     // Conditional Render Details +

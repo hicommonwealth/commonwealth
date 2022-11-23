@@ -3,6 +3,7 @@
 import 'pages/new_proposal_page.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import Sublayout from 'views/sublayout';
 import NewProposalForm from './new_proposal_form';
@@ -10,7 +11,7 @@ import NewProposalForm from './new_proposal_form';
 type NewProposalSnapshotPageAttrs = { snapshotId: string };
 
 class NewSnapshotProposalPage
-  implements m.ClassComponent<NewProposalSnapshotPageAttrs>
+  extends ClassComponent<NewProposalSnapshotPageAttrs>
 {
   view(vnode) {
     return (

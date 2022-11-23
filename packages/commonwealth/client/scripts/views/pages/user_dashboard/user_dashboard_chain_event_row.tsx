@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 
@@ -17,7 +18,7 @@ type UserDashboardChainEventRowAttrs = {
 };
 
 export class UserDashboardChainEventRow
-  implements m.ClassComponent<UserDashboardChainEventRowAttrs>
+  extends ClassComponent<UserDashboardChainEventRowAttrs>
 {
   view(vnode: m.Vnode<UserDashboardChainEventRowAttrs>) {
     const { blockNumber, chain, label } = vnode.attrs;

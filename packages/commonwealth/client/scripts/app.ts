@@ -8,6 +8,7 @@ import 'lity/dist/lity.min.css';
 import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import moment from 'moment';
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -71,7 +72,7 @@ export class ThreadAuthor implements m.Component<ThreadComponentAttrs> {
   }
 }
 
-export class ThreadStage implements m.ClassComponent<ThreadComponentAttrs> {
+export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
@@ -104,7 +105,7 @@ export class ThreadStage implements m.ClassComponent<ThreadComponentAttrs> {
   }
 }
 
-export class ExternalLink implements m.ClassComponent<ThreadComponentAttrs> {
+export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';

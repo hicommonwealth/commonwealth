@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -39,7 +40,7 @@ type ChainMetadataRowsAttrs = {
 };
 
 export class ChainMetadataRows
-  implements m.ClassComponent<ChainMetadataRowsAttrs>
+  extends ClassComponent<ChainMetadataRowsAttrs>
 {
   name: string;
   description: string;

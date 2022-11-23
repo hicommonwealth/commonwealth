@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/token_decimal_input.scss';
 
@@ -16,7 +17,7 @@ type TokenDecimalInputAttrs = {
 };
 
 export class TokenDecimalInput
-  implements m.ClassComponent<TokenDecimalInputAttrs>
+  extends ClassComponent<TokenDecimalInputAttrs>
 {
   private displayValue: string;
   private isInputInWei: boolean;

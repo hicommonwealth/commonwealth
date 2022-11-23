@@ -4,6 +4,7 @@ import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController, {

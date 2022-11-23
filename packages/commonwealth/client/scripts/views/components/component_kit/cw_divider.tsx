@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_divider.scss';
 
@@ -11,7 +12,7 @@ type DividerAttrs = {
   isVertical?: boolean;
 };
 
-export class CWDivider implements m.ClassComponent<DividerAttrs> {
+export class CWDivider extends ClassComponent<DividerAttrs> {
   view(vnode: m.Vnode<DividerAttrs>) {
     const { isVertical } = vnode.attrs;
 

@@ -1,6 +1,7 @@
 import 'modals/version_history_modal.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import Quill from 'quill';
 import { Thread, Comment } from 'models';

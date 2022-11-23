@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -31,7 +32,7 @@ type CreateSubstrateForm = ChainFormFields & SubstrateFormFields;
 
 type CreateSubstrateState = ChainFormState & { form: CreateSubstrateForm };
 
-export class SubstrateForm implements m.ClassComponent {
+export class SubstrateForm extends ClassComponent {
   private state: CreateSubstrateState = {
     saving: false,
     form: {

@@ -2,6 +2,7 @@
 import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 

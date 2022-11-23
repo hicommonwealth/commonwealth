@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
@@ -19,7 +20,7 @@ type SnapshotProposalSelectorAttrs = {
 };
 
 export class SnapshotProposalSelector
-  implements m.ClassComponent<SnapshotProposalSelectorAttrs>
+  extends ClassComponent<SnapshotProposalSelectorAttrs>
 {
   private allProposals: SnapshotProposal[];
   private initialized: boolean;

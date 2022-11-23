@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/change_topic_modal.scss';
@@ -17,7 +18,7 @@ type ChangeTopicModalAttrs = {
 };
 
 export class ChangeTopicModal
-  implements m.ClassComponent<ChangeTopicModalAttrs>
+  extends ClassComponent<ChangeTopicModalAttrs>
 {
   private activeTopic: Topic;
 

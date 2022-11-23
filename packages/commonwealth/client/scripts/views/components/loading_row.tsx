@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/loading_row.scss';
 

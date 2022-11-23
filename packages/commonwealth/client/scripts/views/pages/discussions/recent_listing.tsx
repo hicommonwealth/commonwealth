@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/recent_listing.scss';
 
@@ -16,7 +17,7 @@ interface RecentListingAttrs {
   stageName: string;
   topicName: string;
 }
-export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
+export class RecentListing extends ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
 
   view(vnode: m.Vnode<RecentListingAttrs>) {

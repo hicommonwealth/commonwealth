@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_button.scss';
 
@@ -49,7 +50,7 @@ const getTextType = (buttonType: ButtonType) => {
   }
 };
 
-export class CWButton implements m.ClassComponent<ButtonAttrs> {
+export class CWButton extends ClassComponent<ButtonAttrs> {
   view(vnode: m.Vnode<ButtonAttrs>) {
     const {
       buttonType = 'primary-blue',

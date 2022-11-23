@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -25,7 +26,7 @@ type CouncilVotingModalAttrs = {
 };
 
 export class CouncilVotingModal
-  implements m.ClassComponent<CouncilVotingModalAttrs>
+  extends ClassComponent<CouncilVotingModalAttrs>
 {
   private currentApprovals: Array<string>;
   private currentStake: number;

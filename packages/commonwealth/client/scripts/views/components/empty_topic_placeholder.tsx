@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/empty_topic_placeholder.scss';
 
@@ -16,7 +17,7 @@ type EmptyListingPlaceholderAttrs = {
 };
 
 export class EmptyListingPlaceholder
-  implements m.ClassComponent<EmptyListingPlaceholderAttrs>
+  extends ClassComponent<EmptyListingPlaceholderAttrs>
 {
   view(vnode: m.Vnode<EmptyListingPlaceholderAttrs>) {
     const { stageName, topicName, communityName } = vnode.attrs;

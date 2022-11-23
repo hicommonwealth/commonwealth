@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -18,7 +19,7 @@ type EditTopicThresholdsRowAttrs = {
 };
 
 class EditTopicThresholdsRow
-  implements m.ClassComponent<EditTopicThresholdsRowAttrs>
+  extends ClassComponent<EditTopicThresholdsRowAttrs>
 {
   private newTokenThresholdInWei: string;
 
@@ -89,7 +90,7 @@ type EditTopicThresholdsModalAttrs = {
 };
 
 export class EditTopicThresholdsModal
-  implements m.ClassComponent<EditTopicThresholdsModalAttrs>
+  extends ClassComponent<EditTopicThresholdsModalAttrs>
 {
   private form: NewTopicModalForm;
 

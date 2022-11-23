@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_account_creation_button.scss';
 
@@ -15,7 +16,7 @@ type AccountCreationButtonAttrs = {
 };
 
 export class CWAccountCreationButton
-  implements m.ClassComponent<AccountCreationButtonAttrs>
+  extends ClassComponent<AccountCreationButtonAttrs>
 {
   view(vnode: m.Vnode<AccountCreationButtonAttrs>) {
     const { creationType = 'newAccount', onclick } = vnode.attrs;

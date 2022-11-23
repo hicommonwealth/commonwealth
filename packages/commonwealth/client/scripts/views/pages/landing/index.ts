@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 // Logged Out Homepage View
 import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';

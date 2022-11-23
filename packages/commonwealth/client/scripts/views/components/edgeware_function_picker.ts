@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 

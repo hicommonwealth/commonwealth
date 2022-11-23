@@ -2,6 +2,7 @@
 /* @jsx m */
 
 // import m from 'mithril';
+import ClassComponent from 'class_component';
 // import $ from 'jquery';
 // import _ from 'lodash';
 // import moment from 'moment';
@@ -608,7 +609,7 @@ export const getNotificationTypeText = (category: string) => {
 //   }
 // }
 
-// export class EdgewareChainEventNotifications implements m.ClassComponent {
+// export class EdgewareChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -638,7 +639,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class KusamaChainEventNotifications implements m.ClassComponent {
+//   export class KusamaChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -668,7 +669,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class PolkadotChainEventNotifications implements m.ClassComponent {
+//   export class PolkadotChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -698,7 +699,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class KulupuChainEventNotifications implements m.ClassComponent {
+//   export class KulupuChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -728,7 +729,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class DydxChainEventNotifications implements m.ClassComponent {
+//   export class DydxChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -745,7 +746,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-// export class EmailIntervalConfiguration implements m.ClassComponent {
+// export class EmailIntervalConfiguration extends ClassComponent {
 //     private interval: string;
 //     private saving: boolean;
 

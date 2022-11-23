@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -139,7 +140,7 @@ type SubscriptionRowAttrs = {
 };
 
 export class SubscriptionRowTextContainer
-  implements m.ClassComponent<SubscriptionRowAttrs>
+  extends ClassComponent<SubscriptionRowAttrs>
 {
   view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
@@ -161,7 +162,7 @@ export class SubscriptionRowTextContainer
 }
 
 export class SubscriptionRowMenu
-  implements m.ClassComponent<SubscriptionRowAttrs>
+  extends ClassComponent<SubscriptionRowAttrs>
 {
   view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;

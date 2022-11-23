@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { StarredCommunity } from 'models';
 
 class CommunitiesController {

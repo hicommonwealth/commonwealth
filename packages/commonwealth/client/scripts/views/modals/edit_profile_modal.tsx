@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -19,7 +20,7 @@ type EditProfileModalAttrs = {
 };
 
 export class EditProfileModal
-  implements m.ClassComponent<EditProfileModalAttrs>
+  extends ClassComponent<EditProfileModalAttrs>
 {
   private avatarUrl: string;
   private bio: string;

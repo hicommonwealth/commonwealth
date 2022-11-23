@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/tx_signing_modal.scss';
 
@@ -20,7 +21,7 @@ import {
   TxSigningModalWaitingStage,
 } from '../components/tx_signing/tx_signing_modal_stages';
 
-class TXSigningModal implements m.ClassComponent<ITXModalData> {
+class TXSigningModal extends ClassComponent<ITXModalData> {
   private data: TxDataState;
   private stageName: StageName;
 

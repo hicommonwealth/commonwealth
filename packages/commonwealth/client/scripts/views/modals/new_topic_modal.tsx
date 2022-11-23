@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 
@@ -28,7 +29,7 @@ type NewTopicModalForm = {
   tokenThreshold: string;
 };
 
-export class NewTopicModal implements m.ClassComponent {
+export class NewTopicModal extends ClassComponent {
   private error: string;
   private form: NewTopicModalForm = {
     description: '',

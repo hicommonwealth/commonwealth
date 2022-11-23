@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_progress_bar.scss';
 
@@ -20,7 +21,7 @@ type ProgressBarAttrs = {
   iconName?: IconName;
 };
 
-export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
+export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
   view(vnode: m.Vnode<ProgressBarAttrs>) {
     const { label, progress, progressStatus, subtext, iconName } = vnode.attrs;
 

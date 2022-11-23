@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -42,7 +43,7 @@ type QuillEditorComponentAttrs = {
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
 export class QuillEditorComponent
-  implements m.ClassComponent<QuillEditorComponentAttrs>
+  extends ClassComponent<QuillEditorComponentAttrs>
 {
   unsavedChanges;
   $editor: JQuery<HTMLElement>;

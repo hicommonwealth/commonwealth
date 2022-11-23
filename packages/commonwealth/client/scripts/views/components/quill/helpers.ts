@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';

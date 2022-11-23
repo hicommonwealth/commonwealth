@@ -3,6 +3,7 @@
 import 'components/reaction_button/comment_reaction_button.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { Thread, ChainInfo } from 'models';
@@ -21,7 +22,7 @@ type ThreadReactionButtonAttrs = {
 };
 
 export class ThreadReactionButton
-  implements m.ClassComponent<ThreadReactionButtonAttrs>
+  extends ClassComponent<ThreadReactionButtonAttrs>
 {
   private loading: boolean;
   private reactors: any;

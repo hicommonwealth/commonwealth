@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_checkbox.scss';
 
@@ -21,7 +22,7 @@ type CheckboxAttrs = {
 } & Checkbox &
   CheckboxStyleAttrs;
 
-export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
+export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
   view(vnode) {
     const {
       className,

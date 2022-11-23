@@ -1,6 +1,7 @@
 import 'components/forms.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { CustomSelect } from 'construct-ui';
 

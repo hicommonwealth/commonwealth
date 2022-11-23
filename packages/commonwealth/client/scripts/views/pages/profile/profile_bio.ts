@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

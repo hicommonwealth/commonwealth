@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
@@ -19,7 +20,7 @@ type ManageRoleRowAttrs = {
   roledata?: any;
 };
 
-export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
+export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
   view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = { chain: app.activeChainId() };

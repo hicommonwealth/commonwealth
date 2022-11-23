@@ -2,6 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import { link } from 'helpers';
 

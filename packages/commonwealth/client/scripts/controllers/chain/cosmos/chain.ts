@@ -1,6 +1,7 @@
 import { ITXModalData, NodeInfo, IChainModule, ITXData, ChainInfo } from 'models';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';

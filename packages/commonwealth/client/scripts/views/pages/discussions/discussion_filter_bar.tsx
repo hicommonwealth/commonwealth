@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/discussion_filter_bar.scss';
 
@@ -18,7 +19,7 @@ type DiscussionFilterBarAttrs = {
 };
 
 export class DiscussionFilterBar
-  implements m.ClassComponent<DiscussionFilterBarAttrs>
+  extends ClassComponent<DiscussionFilterBarAttrs>
 {
   view(vnode: m.Vnode<DiscussionFilterBarAttrs>) {
     const { topic, stage, disabled, parentState } = vnode.attrs;

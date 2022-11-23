@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -20,7 +21,7 @@ type TxSigningModalIntroStageAttrs = ITXModalData & {
 };
 
 export class TxSigningModalIntroStage
-  implements m.ClassComponent<TxSigningModalIntroStageAttrs>
+  extends ClassComponent<TxSigningModalIntroStageAttrs>
 {
   private introTab: 'webWallet' | 'commandLine';
 
@@ -74,7 +75,7 @@ export class TxSigningModalIntroStage
 type TxSigningModalWaitingStageAttrs = { next: NextFn };
 
 export class TxSigningModalWaitingStage
-  implements m.ClassComponent<TxSigningModalWaitingStageAttrs>
+  extends ClassComponent<TxSigningModalWaitingStageAttrs>
 {
   private timeoutHandle?: NodeJS.Timeout;
   private timer?: number;
@@ -126,7 +127,7 @@ export class TxSigningModalWaitingStage
 }
 
 export class TxSigningModalSuccessStage
-  implements m.ClassComponent<TxDataState>
+  extends ClassComponent<TxDataState>
 {
   view(vnode: m.VnodeDOM<TxDataState, this>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
@@ -153,7 +154,7 @@ export class TxSigningModalSuccessStage
 }
 
 export class TxSigningModalRejectedStage
-  implements m.ClassComponent<TxDataState & NextFn>
+  extends ClassComponent<TxDataState & NextFn>
 {
   view(vnode) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;

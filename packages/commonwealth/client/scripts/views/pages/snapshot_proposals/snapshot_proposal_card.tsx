@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/proposal_card/index.scss';
@@ -19,7 +20,7 @@ type SnapshotProposalCardAttrs = {
 };
 
 export class SnapshotProposalCard
-  implements m.ClassComponent<SnapshotProposalCardAttrs>
+  extends ClassComponent<SnapshotProposalCardAttrs>
 {
   view(vnode: m.Vnode<SnapshotProposalCardAttrs>) {
     const { proposal } = vnode.attrs;

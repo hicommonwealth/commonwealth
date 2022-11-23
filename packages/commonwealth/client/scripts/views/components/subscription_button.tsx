@@ -2,12 +2,13 @@
 
 import { isNotUndefined } from 'helpers/typeGuards';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { NotificationCategories } from 'common-common/src/types';
 import { CWButton } from './component_kit/cw_button';
 
-export class SubscriptionButton implements m.ClassComponent {
+export class SubscriptionButton extends ClassComponent {
   view() {
     const subscriptions = app.user.notifications;
     const communitySubscription = subscriptions.subscriptions.find(

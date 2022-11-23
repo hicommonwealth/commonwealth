@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Icon, Icons, ListItem, PopoverMenu } from 'construct-ui';
 
 import 'components/sidebar/community_selector.scss';
@@ -74,7 +75,7 @@ const renderCommunity = (item) => {
 //   </a>
 // );
 
-export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
+export class CommunitySelector extends ClassComponent<{ isMobile: true }> {
   view(vnode) {
     const { isMobile } = vnode.attrs;
     const allCommunities = app.config.chains

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -67,7 +68,7 @@ type SnapshotProposalsPageAttrs = {
 };
 
 class SnapshotProposalsPage
-  implements m.ClassComponent<SnapshotProposalsPageAttrs>
+  extends ClassComponent<SnapshotProposalsPageAttrs>
 {
   private selectedFilter: SnapshotProposalFilter;
 

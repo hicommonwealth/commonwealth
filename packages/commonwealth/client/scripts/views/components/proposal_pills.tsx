@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/proposal_pills.scss';
@@ -11,7 +12,7 @@ import { CWText } from './component_kit/cw_text';
 type ActiveProposalPillAttrs = { proposalEnd: number };
 
 export class ActiveProposalPill
-  implements m.ClassComponent<ActiveProposalPillAttrs>
+  extends ClassComponent<ActiveProposalPillAttrs>
 {
   view(vnode: m.Vnode<ActiveProposalPillAttrs>) {
     const { proposalEnd } = vnode.attrs;
@@ -32,7 +33,7 @@ export class ActiveProposalPill
 type ClosedProposalPillAttrs = { proposalState: string };
 
 export class ClosedProposalPill
-  implements m.ClassComponent<ClosedProposalPillAttrs>
+  extends ClassComponent<ClosedProposalPillAttrs>
 {
   view(vnode: m.Vnode<ClosedProposalPillAttrs>) {
     const { proposalState } = vnode.attrs;

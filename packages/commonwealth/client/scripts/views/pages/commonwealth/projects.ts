@@ -1,6 +1,7 @@
 import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { Card, Button } from 'construct-ui';
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
@@ -28,7 +29,7 @@ type ModalAttrs = {
   breakpointFn?: (width: number) => boolean;
 };
 
-export class CWModal implements m.ClassComponent<ModalAttrs> {
+export class CWModal extends ClassComponent<ModalAttrs> {
   private modalTypeState: string;
 
   oncreate(vnode: m.Vnode<ModalAttrs>) {
@@ -108,7 +109,7 @@ type ModalExitButtonAttrs = {
   iconButtonTheme: IconButtonTheme;
 };
 
-export class ModalExitButton implements m.ClassComponent<ModalExitButtonAttrs> {
+export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
   view(vnode: m.Vnode<ModalExitButtonAttrs>) {
     const { disabled, iconButtonTheme } = vnode.attrs;
 

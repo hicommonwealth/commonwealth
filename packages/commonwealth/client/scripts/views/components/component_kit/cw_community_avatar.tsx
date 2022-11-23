@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_community_avatar.scss';
 
@@ -17,7 +18,7 @@ type CommunityAvatarAttrs = {
 };
 
 export class CWCommunityAvatar
-  implements m.ClassComponent<CommunityAvatarAttrs>
+  extends ClassComponent<CommunityAvatarAttrs>
 {
   view(vnode: m.Vnode<CommunityAvatarAttrs>) {
     const { community, onclick, size = 'large' } = vnode.attrs;

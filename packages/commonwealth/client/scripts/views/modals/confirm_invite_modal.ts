@@ -1,6 +1,7 @@
 import 'modals/confirm_invite_modal.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import app from 'state';
 import { Button } from 'construct-ui';

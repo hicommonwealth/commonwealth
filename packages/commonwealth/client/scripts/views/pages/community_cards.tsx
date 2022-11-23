@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import numeral from 'numeral';
 
 import 'pages/landing/community_cards.scss';
@@ -45,7 +46,7 @@ export const buildChainToCategoriesMap = (
   return chainToCategoriesMap;
 };
 
-class HomepageCommunityCards implements m.ClassComponent {
+class HomepageCommunityCards extends ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;

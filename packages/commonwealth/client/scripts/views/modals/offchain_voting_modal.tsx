@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -13,7 +14,7 @@ type OffchainVotingModalAttrs = {
 };
 
 export class OffchainVotingModal
-  implements m.ClassComponent<OffchainVotingModalAttrs>
+  extends ClassComponent<OffchainVotingModalAttrs>
 {
   view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;

@@ -1,5 +1,6 @@
 /* @jsx m */
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -50,7 +51,7 @@ const radioGroupOptions = [
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
-export class ComponentShowcase implements m.ClassComponent {
+export class ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';
@@ -24,7 +25,7 @@ type UpdateProposalStatusModalAttrs = {
 };
 
 export class UpdateProposalStatusModal
-  implements m.ClassComponent<UpdateProposalStatusModalAttrs>
+  extends ClassComponent<UpdateProposalStatusModalAttrs>
 {
   private chainEntitiesToSet: ChainEntity[];
   private snapshotProposalsToSet: SnapshotProposal[];

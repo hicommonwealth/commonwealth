@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -20,7 +21,7 @@ type SnapshotInfoRowAttrs = {
   value: string;
 };
 
-class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
+class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
   view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
@@ -38,7 +39,7 @@ class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
 type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
 
 class SnapshotInfoLinkRow
-  implements m.ClassComponent<SnapshotInfoLinkRowAttrs>
+  extends ClassComponent<SnapshotInfoLinkRowAttrs>
 {
   view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
@@ -65,7 +66,7 @@ type SnapshotInformationCardAttrs = {
 };
 
 export class SnapshotInformationCard
-  implements m.ClassComponent<SnapshotInformationCardAttrs>
+  extends ClassComponent<SnapshotInformationCardAttrs>
 {
   view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;

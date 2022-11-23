@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_boilerplate.scss';
 
@@ -13,7 +14,7 @@ type LoginBoilerplateAttrs = {
 };
 
 export class LoginBoilerplate
-  implements m.ClassComponent<LoginBoilerplateAttrs>
+  extends ClassComponent<LoginBoilerplateAttrs>
 {
   view(vnode: m.Vnode<LoginBoilerplateAttrs>) {
     const { darkMode } = vnode.attrs;

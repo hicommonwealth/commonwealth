@@ -3,6 +3,7 @@
 import 'components/sidebar/sidebar_section.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
@@ -13,7 +14,7 @@ import {
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
-class SubSection implements m.ClassComponent<SubSectionAttrs> {
+class SubSection extends ClassComponent<SubSectionAttrs> {
   view(vnode: m.Vnode<SubSectionAttrs>) {
     const {
       isActive,
@@ -55,7 +56,7 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
     );
   }
 }
-class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
+class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
@@ -163,7 +164,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
 }
 
 export class SidebarSectionGroup
-  implements m.ClassComponent<SidebarSectionAttrs>
+  extends ClassComponent<SidebarSectionAttrs>
 {
   private toggled: boolean;
   private hoverColor: string;

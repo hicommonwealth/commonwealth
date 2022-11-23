@@ -1,6 +1,7 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import {

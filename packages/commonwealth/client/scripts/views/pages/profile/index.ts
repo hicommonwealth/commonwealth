@@ -1,6 +1,7 @@
 import 'pages/profile.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';

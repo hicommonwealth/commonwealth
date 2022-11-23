@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 
@@ -28,7 +29,7 @@ export const handleEmailInvites = (state) => {
   }
 };
 
-export class InvitesMenu implements m.ClassComponent {
+export class InvitesMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
@@ -47,7 +48,7 @@ export class InvitesMenu implements m.ClassComponent {
   }
 }
 
-export class InvitesMenuPopover implements m.ClassComponent {
+export class InvitesMenuPopover extends ClassComponent {
   view() {
     return m(PopoverMenu, {
       hasArrow: false,

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_growl.scss';
 
@@ -17,7 +18,7 @@ type GrowlAttrs = {
   position: GrowlPosition;
 };
 
-export class CWGrowl implements m.ClassComponent<GrowlAttrs> {
+export class CWGrowl extends ClassComponent<GrowlAttrs> {
   view(vnode: m.Vnode<GrowlAttrs>) {
     const { className, position, disabled } = vnode.attrs;
     return (

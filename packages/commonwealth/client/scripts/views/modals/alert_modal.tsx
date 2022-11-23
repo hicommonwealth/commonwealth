@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 

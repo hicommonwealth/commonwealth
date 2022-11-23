@@ -1,6 +1,7 @@
 import 'modals/edit_identity_modal.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import {
   Button,

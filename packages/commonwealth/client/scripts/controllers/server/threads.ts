@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import app from 'state';

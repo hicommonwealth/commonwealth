@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/discussion_row_menu.scss';
 
@@ -71,7 +72,7 @@ type DiscussionRowMenuAttrs = {
 };
 
 export class DiscussionRowMenu
-  implements m.ClassComponent<DiscussionRowMenuAttrs>
+  extends ClassComponent<DiscussionRowMenuAttrs>
 {
   view(vnode: m.Vnode<DiscussionRowMenuAttrs>) {
     if (!app.isLoggedIn()) return;

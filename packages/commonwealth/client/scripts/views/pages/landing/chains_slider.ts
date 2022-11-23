@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 

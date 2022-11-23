@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/edit_topic_modal.scss';
@@ -37,7 +38,7 @@ type EditTopicModalForm = {
   name: string;
 };
 
-export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
+export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
   private error: string;
   private form: EditTopicModalForm;
   private quillEditorState: QuillEditor;

@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

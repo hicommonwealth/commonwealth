@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';

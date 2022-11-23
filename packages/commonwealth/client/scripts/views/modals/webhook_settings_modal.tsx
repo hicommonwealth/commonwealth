@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -27,7 +28,7 @@ type WebhookSettingsModalAttrs = {
 };
 
 export class WebhookSettingsModal
-  implements m.ClassComponent<WebhookSettingsModalAttrs>
+  extends ClassComponent<WebhookSettingsModalAttrs>
 {
   private selectedCategories: string[];
 

@@ -2,6 +2,7 @@ import 'pages/new_proposal_page.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { utils } from 'ethers';
 import {
   Input,

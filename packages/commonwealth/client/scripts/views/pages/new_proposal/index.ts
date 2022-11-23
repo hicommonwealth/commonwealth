@@ -1,6 +1,7 @@
 import 'pages/new_proposal_page.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 

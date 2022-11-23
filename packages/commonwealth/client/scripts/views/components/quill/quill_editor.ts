@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import QuillEditorInternal from './quill_editor_internal';
 import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
